@@ -1,0 +1,147 @@
+version: "{build}-{branch}"
+
+# effectively prevent this from running
+branches:
+  only:
+    - 666
+
+build_script:
+  - export VCPKG_OVERLAY_TRIPLETS=cmake/vcpkg-triplets
+  - cmake -B build -DCMAKE_BUILD_TYPE=Release
+    -DCMAKE_TOOLCHAIN_FILE=~/vcpkg/scripts/buildsystems/vcpkg.cmake
+    -DVCPKG_TARGET_TRIPLET=arch-env -DVCPKG_CHAINLOAD_TOOLCHAIN_FILE=$TOOLCHAIN
+    -DCMAKE_OSX_ARCHITECTURES=$ARCH -DCMAKE_OSX_DEPLOYMENT_TARGET=$DEPLOY_TARGET
+  - cmake --build build
+  - cd build 
+  - if [ "$ARCH" == "arm64;x86_64" ]; then sudo cpack && rm *.dylib; fi
+
+for:
+  - matrix: { only: [ appveyor_build_worker_image: &linux Ubuntu1804 ] }
+    cache:
+      - build/vcpkg_installed -> vcpkg.json, cmake/vcpkg-triplets/arch-env.cmake
+    install: |-
+      # set -e
+
+      sudo sed -i '/arch=/! s/^deb/deb [arch=amd64,i386]/' /etc/apt/sources.list
+
+      install-deps() {
+        # sudo add-apt-repository --remove "deb http://apt.postgresql.org/pub/repos/apt/ bionic-pgdg main"
+        local arch="$1"; shift
+        local native=("$@" php-cli qemu-user-binfmt )
+        local target=()
+
+        sudo dpkg --add-architecture $arch
+        sudo apt-get update -qq
+        sudo apt-get install -qq aptitude > /dev/null
+        sudo aptitude install -yR ${native[@]} ${target[@]/%/:$arch} > /dev/null
+      }
+      
+      sudo update-alternatives --set gcc /usr/bin/gcc-7
+
+      case $ARCH in
+      x86_64)
+        install-deps amd64
+        ;;
+      i686)
+        install-deps i386 g++-multilib
+        export TOOLCHAIN=$(pwd)/cmake/linux-cross.cmake \
+               TOOLCHAIN_PREFIX=i386-linux-gnu
+        ;;
+      armv7l)
+        install-deps armhf g++-arm-linux-gnueabihf
+        export TOOLCHAIN=$(pwd)/cmake/linux-cross.cmake \
+               TOOLCHAIN_PREFIX=arm-linux-gnueabihf
+        ;;
+      aarch64)
+        install-deps arm64 g++-aarch64-linux-gnu
+        export TOOLCHAIN=$(pwd)/cmake/linux-cross.cmake \
+               TOOLCHAIN_PREFIX=aarch64-linux-gnu
+        ;;
+      esac
+    artifacts:
+      - path: build/reaper_*.so
+
+  - matrix: { only: [ appveyor_build_worker_image: macos-catalina,
+                      appveyor_build_worker_image: macos-monterey,
+                      appveyor_build_worker_image: macos-mojave ] }
+    cache:
+      # - build/vcpkg_installed -> vcpkg.json, cmake/vcpkg-triplets/arch-env.cmake
+    install:
+      - |-
+        case $ARCH in
+        *arm64*)
+          DEPLOY_TARGET=11.0
+          ;;
+        *)
+          DEPLOY_TARGET=10.9
+          ;;
+        esac
+
+    artifacts:
+      - path: build/reaper_*.dylib
+      - path: build/*.pkg
+
+  - matrix: { only: [ appveyor_build_worker_image: &windows Visual Studio 2022 ] }
+
+    cache:
+      - build\vcpkg_installed -> vcpkg.json
+    install:
+      - if "%ARCH%" == "x64" call "%ProgramFiles%\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"
+      - if "%ARCH%" == "x86" call "%ProgramFiles%\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars32.bat"
+    build_script:
+      - cmake -B build -G "Ninja" -DCMAKE_BUILD_TYPE=RelWithDebInfo
+        -DVCPKG_TARGET_TRIPLET=%ARCH%-windows-static
+        -DCMAKE_TOOLCHAIN_FILE=C:\Tools\vcpkg\scripts\buildsystems\vcpkg.cmake
+      - cmake --build build
+      - cd build
+      - if "%ARCH%" == "x64" cpack
+    artifacts:
+      - path: build\reaper_*.dll
+      - path: build\*.exe
+      - path: build\reaper_*64.pdb
+      - path: scripts\ReaBlink_Monitor.lua
+
+environment:
+  BUILD_NUMBER: $(APPVEYOR_BUILD_NUMBER)
+  REPO_COMMIT: $(APPVEYOR_REPO_COMMIT)
+  REPO_TAG: $(APPVEYOR_REPO_TAG_NAME)
+
+  matrix:
+    - job_name: macOS universal 64-bit
+      appveyor_build_worker_image: macos-monterey
+      ARCH: arm64;x86_64
+    - job_name: Linux ARM 32-bit
+      appveyor_build_worker_image: *linux
+      ARCH: armv7l
+    - job_name: Windows 64-bit
+      appveyor_build_worker_image: *windows
+      ARCH: x64
+    - job_name: macOS ARM 64-bit
+      appveyor_build_worker_image: macos-monterey
+      ARCH: arm64
+    - job_name: macOS x86 64-bit
+      appveyor_build_worker_image: macos-monterey
+      ARCH: x86_64
+    - job_name: Windows 32-bit
+      appveyor_build_worker_image: *windows
+      ARCH: x86
+    - job_name: Linux x86 32-bit
+      appveyor_build_worker_image: *linux
+      ARCH: i686
+    - job_name: Linux x86 64-bit
+      appveyor_build_worker_image: *linux
+      ARCH: x86_64
+    - job_name: Linux ARM 64-bit
+      appveyor_build_worker_image: *linux
+      ARCH: aarch64
+
+deploy:
+  provider: GitHub
+  draft: true
+  description: ''
+  force_update: true
+  auth_token:
+    secure: Rk8do2Q/etdabjwIABBRdTJu1a4wYVu9Ltz8HJuC0wc3rz+hHUMGa3N7vTlsrd7z
+  artifact: /.*\.(dll|dylib|so|lua|exe|pkg|pdb)/
+  on:
+    APPVEYOR_REPO_TAG: true

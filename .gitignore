@@ -1,0 +1,8 @@
+.vscode/*
+!.vscode/launch.json
+**/.DS_Store
+/*build*
+/lib
+/WDL
+/.idea
+/.vs
