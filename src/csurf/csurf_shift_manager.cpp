@@ -25,11 +25,11 @@ protected:
     bool armInvert = false;
     int armStart = 0;
 
-    void SetButtonValue(midi_Output *m_midiout)
+    void SetButtonValue()
     {
-        shiftLeftButton->SetValue(context->GetSfiftLeft() ? BTN_VALUE_ON : BTN_VALUE_OFF, m_midiout);
-        shiftRightButton->SetValue(context->GetSfiftRight() ? BTN_VALUE_ON : BTN_VALUE_OFF, m_midiout);
-        armButton->SetValue(context->GetArm() ? BTN_VALUE_ON : BTN_VALUE_OFF, m_midiout);
+        shiftLeftButton->SetValue(context->GetShiftLeft() ? BTN_VALUE_ON : BTN_VALUE_OFF);
+        shiftRightButton->SetValue(context->GetShiftRight() ? BTN_VALUE_ON : BTN_VALUE_OFF);
+        armButton->SetValue(context->GetArm() ? BTN_VALUE_ON : BTN_VALUE_OFF);
     }
 
 public:
@@ -42,7 +42,7 @@ public:
     }
     ~CSurf_ShiftManager();
 
-    void HandleShiftLeftButton(int val, midi_Output *m_midiout)
+    void HandleShiftLeftButton(int val)
     {
         int time = timeGetTime();
         shiftLeft = val > 0;
@@ -61,10 +61,10 @@ public:
         }
         context->SetShiftLeft(shiftLeftInvert ? !shiftLeft : shiftLeft);
 
-        SetButtonValue(m_midiout);
+        SetButtonValue();
     }
 
-    void HandleShiftRightButton(int val, midi_Output *m_midiout)
+    void HandleShiftRightButton(int val)
     {
         int time = timeGetTime();
         shiftRight = val > 0;
@@ -83,10 +83,10 @@ public:
         }
         context->SetShiftRight(shiftRightInvert ? !shiftRight : shiftRight);
 
-        SetButtonValue(m_midiout);
+        SetButtonValue();
     }
 
-    void HandleArmButton(int val, midi_Output *m_midiout)
+    void HandleArmButton(int val)
     {
         int time = timeGetTime();
         arm = val > 0;
@@ -105,7 +105,7 @@ public:
         }
         context->SetArm(armInvert ? !arm : arm);
 
-        SetButtonValue(m_midiout);
+        SetButtonValue();
     }
 };
 

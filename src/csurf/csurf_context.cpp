@@ -12,10 +12,10 @@ public:
     ~CSurf_Context() {}
 
     void SetShiftLeft(bool val) { shift_left = val; }
-    bool GetSfiftLeft() { return shift_left; }
+    bool GetShiftLeft() { return shift_left; }
 
     void SetShiftRight(bool val) { shift_right = val; }
-    bool GetSfiftRight() { return shift_right; }
+    bool GetShiftRight() { return shift_right; }
 
     void SetArm(bool val) { arm = val; }
     bool GetArm() { return arm; }

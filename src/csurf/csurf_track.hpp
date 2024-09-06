@@ -1,11 +1,10 @@
 #ifndef CSURF_TRACK_H_
 #define CSURF_TRACK_H_
 
-class CSurf_Button;
-class CSurf_ColorButton;
-
 #include "csurf_button.hpp"
+#include "csurf_color_button.hpp"
 #include "csurf_context.cpp"
+#include "csurf_fader.hpp"
 
 inline Btn_Types SelectButtons[8] = {
     BTN_SELECT_1,
@@ -48,26 +47,24 @@ protected:
     CSurf_ColorButton *selectButton;
     CSurf_Button *soloButton;
     CSurf_Button *muteButton;
+    CSurf_Fader *fader;
     ButtonColor color;
 
     // Slider
 
 public:
     CSurf_Track(ButtonColor colorActive, ButtonColor colorDim, int index, CSurf_Context *_context, midi_Output *m_midiout);
-    ~CSurf_Track();
+    ~CSurf_Track() {};
 
-    // void SetFaderValue(Btn_Value value, midi_Output *m_midiout)
-    // {
-    //     selectButton->SetValue(value, m_midiout);
-    // }
+    void SetTrackColor(ButtonColor colorActive, ButtonColor colorDim);
 
-    void SetTrackColor(ButtonColor colorActive, ButtonColor colorDim, midi_Output *m_midiout);
+    void SetSelectButtonValue(Btn_Value value);
 
-    void SetSelectButtonValue(Btn_Value value, midi_Output *m_midiout);
+    void SetSoloButtonValue(Btn_Value value);
 
-    void SetSoloButtonValue(Btn_Value value, midi_Output *m_midiout);
+    void SetMuteButtonValue(Btn_Value value);
 
-    void SetMuteButtonValue(Btn_Value value, midi_Output *m_midiout);
+    void SetFaderValue(double value);
 };
 
 #endif

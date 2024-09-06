@@ -15,6 +15,7 @@
 #include "csurf_shift_manager.cpp"
 #include "csurf_track_manager.cpp"
 #include "csurf_navigator.cpp"
+#include "csurf_fader_resources.hpp"
 #include "csurf_button.hpp"
 #include <WDL/ptrlist.h>
 #include <vector>
@@ -25,13 +26,6 @@
 
 // static bool g_csurf_mcpmode = false; // we may wish to allow an action to set this
 
-// static double int14ToVol(unsigned char msb, unsigned char lsb)
-// {
-//   int val = lsb | (msb << 7);
-//   double pos = ((double)val * 1000.0) / 16383.0;
-//   pos = SLIDER2DB(pos);
-//   return DB2VAL(pos);
-// }
 // static double int14ToPan(unsigned char msb, unsigned char lsb)
 // {
 //   int val = lsb | (msb << 7);
@@ -69,7 +63,7 @@ class CSurf_FaderPort : public IReaperControlSurface
 
   CSurf_SessionManager *sessionManager;
   CSurf_ShiftManager *shiftManager;
-  CSurf_TrackManager *trackManager;
+  CSurf_ChannelManager *trackManager = NULL;
   CSurf_Navigator *trackNavigator;
 
   CSurf_Button *playButton;
@@ -99,9 +93,17 @@ class CSurf_FaderPort : public IReaperControlSurface
   {
 
     /**
+     * Fader values
+     */
+    if (evt->midi_message[0] >= FADER_1 && evt->midi_message[0] <= FADER_8)
+    {
+      trackManager->HandleFaderMove(evt->midi_message[0] - FADER_1, evt->midi_message[2], evt->midi_message[1]);
+    }
+
+    /**
      * ENCODERS & VALUEBAR
      */
-    if (evt->midi_message[0] == MIDI_MESSAGE_ENDCODER)
+    else if (evt->midi_message[0] == MIDI_MESSAGE_ENDCODER)
     {
       //       if (evt->midi_message[1] == 0)
       //         m_faderport_lasthw = evt->midi_message[2];
@@ -348,16 +350,16 @@ class CSurf_FaderPort : public IReaperControlSurface
        */
       else if (evt->midi_message[1] == BTN_ARM) // loop
       {
-        shiftManager->HandleArmButton(evt->midi_message[2], m_midiout);
-        sessionManager->Refresh(m_midiout);
+        shiftManager->HandleArmButton(evt->midi_message[2]);
+        sessionManager->Refresh();
       }
       /**
        * Shift Manager Buttons
        */
       else if (evt->midi_message[1] == BTN_SHIFT_LEFT) // loop
       {
-        shiftManager->HandleShiftLeftButton(evt->midi_message[2], m_midiout);
-        sessionManager->Refresh(m_midiout);
+        shiftManager->HandleShiftLeftButton(evt->midi_message[2]);
+        sessionManager->Refresh();
       }
       else if (evt->midi_message[1] == BTN_SHIFT_RIGHT) // loop
       {
@@ -622,10 +624,10 @@ public:
     shiftManager = new CSurf_ShiftManager(context, m_midiout);
     trackManager = new CSurf_TrackManager(tracks, trackNavigator, context, m_midiout);
 
-    playButton = new CSurf_Button(BTN_PLAY, BTN_VALUE_OFF);
-    stopButton = new CSurf_Button(BTN_STOP, BTN_VALUE_OFF);
-    recordButton = new CSurf_Button(BTN_RECORD, BTN_VALUE_OFF);
-    loopButton = new CSurf_Button(BTN_RECORD, BTN_VALUE_OFF);
+    playButton = new CSurf_Button(BTN_PLAY, BTN_VALUE_OFF, m_midiout);
+    stopButton = new CSurf_Button(BTN_STOP, BTN_VALUE_OFF, m_midiout);
+    recordButton = new CSurf_Button(BTN_RECORD, BTN_VALUE_OFF, m_midiout);
+    loopButton = new CSurf_Button(BTN_RECORD, BTN_VALUE_OFF, m_midiout);
 
     // int colorActive[3] = {0x7f, 0x7f, 0x00};
     // int colorDim[3] = {0x00, 0x7f, 0x00};
@@ -724,9 +726,9 @@ public:
     if (m_midiout)
     {
       DWORD now = timeGetTime();
-      if ((now - m_buttonstate_lastrun) >= 1000)
+      if ((now - m_buttonstate_lastrun) >= 10)
       {
-        trackManager->UpdateTracks(m_midiout);
+        trackManager->UpdateTracks();
         m_buttonstate_lastrun = now;
       }
 
@@ -839,7 +841,7 @@ public:
   {
     if (m_midiout)
     {
-      loopButton->SetValue(rep ? BTN_VALUE_ON : BTN_VALUE_OFF, m_midiout);
+      loopButton->SetValue(rep ? BTN_VALUE_ON : BTN_VALUE_OFF);
     }
   }
 

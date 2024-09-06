@@ -48,10 +48,6 @@ public:
     void AdjustBankOffset(int offset)
     {
         track_offset += offset;
-
-        // char buffer[250];
-        // snprintf(buffer, sizeof(buffer), "Track Offset -- %d\n", track_offset);
-        // ShowConsoleMsg(buffer);
     }
 };
 
