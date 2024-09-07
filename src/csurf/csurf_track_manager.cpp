@@ -5,6 +5,7 @@
 #include <WDL/ptrlist.h>
 #include "csurf_track.hpp"
 #include "csurf_channel_manager.hpp"
+#include "csurf_channel_manager_resources.hpp"
 #include "csurf_navigator.cpp"
 #include <vector>
 
@@ -26,6 +27,35 @@ protected:
         colorDim.SetColor(red / 4, green / 4, blue / 4);
     }
 
+    int GetPanMode(MediaTrack *media_track)
+    {
+        int panMode = 0;
+        double pan1, pan2 = 0.0;
+
+        GetTrackUIPan(media_track, &pan1, &pan2, &panMode);
+
+        return panMode;
+    }
+
+    int GetFaderValue(MediaTrack *media_track)
+    {
+        int panMode = 0;
+        double volume, pan1, pan2 = 0.0;
+
+        GetTrackUIVolPan(media_track, &volume, &pan1);
+        GetTrackUIPan(media_track, &pan1, &pan2, &panMode);
+
+        if (context->GetShiftLeft())
+        {
+            return panToNormalized(pan1) * 16383.0;
+        }
+        if (context->GetShiftRight() && panMode > 4)
+        {
+            return panToNormalized(pan2) * 16383.0;
+        }
+        return int(volToNormalized(volume) * 16383.0);
+    }
+
 public:
     CSurf_TrackManager(std::vector<CSurf_Track *> tracks, CSurf_Navigator *navigator, CSurf_Context *context, midi_Output *m_midiout) : CSurf_ChannelManager(tracks, navigator, context, m_midiout)
     {
@@ -40,24 +70,22 @@ public:
 
         for (int i = 0; i < nb_tracks; i++)
         {
+            int flagsOut;
+            int selectFlag = context->GetArm() ? 6 : 1;
+
             CSurf_Track *track = tracks.at(i);
             MediaTrack *media_track = media_tracks.Get(i);
-            int flagsOut = 0;
-            int selectFlag = 1;
-            double vol, pan = 0.0;
-            GetTrackState(media_track, &flagsOut);
             SetTrackColors(media_track);
-            if (context->GetArm())
-            {
-                selectFlag = 6;
-            }
-            GetTrackUIVolPan(media_track, &vol, &pan);
+            GetTrackState(media_track, &flagsOut);
 
             track->SetTrackColor(colorActive, colorDim);
-            track->SetSelectButtonValue(hasBit(flagsOut, selectFlag) ? BTN_VALUE_ON : BTN_VALUE_OFF);
+            // If the track is armed always blink as an indication it is armed
+            track->SetSelectButtonValue(selectFlag != 6 && hasBit(flagsOut, 6) ? BTN_VALUE_BLINK : hasBit(flagsOut, selectFlag) ? BTN_VALUE_ON
+                                                                                                                                : BTN_VALUE_OFF);
             track->SetMuteButtonValue(hasBit(flagsOut, 3) ? BTN_VALUE_ON : BTN_VALUE_OFF);
             track->SetSoloButtonValue(hasBit(flagsOut, 4) ? BTN_VALUE_ON : BTN_VALUE_OFF);
-            track->SetFaderValue(vol);
+
+            track->SetFaderValue(GetFaderValue(media_track));
         }
     }
 
@@ -73,7 +101,7 @@ public:
             return;
         }
 
-        if (!context->GetShiftLeft())
+        if (context->GetShiftLeft())
         {
             SetTrackSelected(media_track, !(hasBit(flagsOut, 1) == 1));
             return;
@@ -109,7 +137,18 @@ public:
     {
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
 
-        CSurf_SetSurfaceVolume(media_track, CSurf_OnVolumeChange(media_track, int14ToVol(msb, lsb), false), NULL);
+        if (context->GetShiftLeft())
+        {
+            CSurf_SetSurfacePan(media_track, CSurf_OnPanChange(media_track, normalizedToPan(int14ToNormalized(msb, lsb)), false), NULL);
+        }
+        else if (context->GetShiftRight())
+        {
+            SetMediaTrackInfo_Value(media_track, "D_WIDTH", CSurf_OnWidthChange(media_track, normalizedToPan(int14ToNormalized(msb, lsb)), false));
+        }
+        else
+        {
+            CSurf_SetSurfaceVolume(media_track, CSurf_OnVolumeChange(media_track, int14ToVol(msb, lsb), false), NULL);
+        }
     }
 };
 

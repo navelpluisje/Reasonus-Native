@@ -40,7 +40,7 @@ public:
         shiftRightButton = new CSurf_Button(BTN_SHIFT_RIGHT, BTN_VALUE_OFF, m_midiout);
         armButton = new CSurf_Button(BTN_ARM, BTN_VALUE_OFF, m_midiout);
     }
-    ~CSurf_ShiftManager();
+    ~CSurf_ShiftManager() {};
 
     void HandleShiftLeftButton(int val)
     {

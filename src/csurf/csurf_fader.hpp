@@ -10,15 +10,13 @@ using namespace std;
 class CSurf_Fader
 {
 protected:
-    double value;
+    int value;
     int channel;
     midi_Output *m_midiout;
 
     void SendValue()
     {
-        int volint = int(volToNormalized(value) * 16383.0);
-
-        m_midiout->Send(0xe0 + channel, volint & 0x7f, (volint >> 7) & 0x7f, -1);
+        m_midiout->Send(0xe0 + channel, value & 0x7f, (value >> 7) & 0x7f, -1);
     };
 
 public:
@@ -26,7 +24,7 @@ public:
 
     ~CSurf_Fader() {};
 
-    void SetValue(double _value)
+    void SetValue(int _value)
     {
         if (value == _value)
         {

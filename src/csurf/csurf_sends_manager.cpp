@@ -8,7 +8,7 @@
 #include "csurf_navigator.cpp"
 #include <vector>
 
-class CSurf_TrackManager : public CSurf_ChannelManager
+class CSurf_PanManager : public CSurf_ChannelManager
 {
 protected:
     void SetTrackColors(MediaTrack *media_track) override
@@ -27,11 +27,11 @@ protected:
     }
 
 public:
-    CSurf_TrackManager(std::vector<CSurf_Track *> tracks, CSurf_Navigator *navigator, CSurf_Context *context, midi_Output *m_midiout) : CSurf_ChannelManager(tracks, navigator, context, m_midiout)
+    CSurf_PanManager(std::vector<CSurf_Track *> tracks, CSurf_Navigator *navigator, CSurf_Context *context, midi_Output *m_midiout) : CSurf_ChannelManager(tracks, navigator, context, m_midiout)
     {
         UpdateTracks();
     }
-    ~CSurf_TrackManager() {};
+    ~CSurf_PanManager() {};
 
     void UpdateTracks() override
     {
@@ -42,22 +42,20 @@ public:
         {
             CSurf_Track *track = tracks.at(i);
             MediaTrack *media_track = media_tracks.Get(i);
-            int flagsOut = 0;
-            int selectFlag = 1;
-            double vol, pan = 0.0;
-            GetTrackState(media_track, &flagsOut);
             SetTrackColors(media_track);
-            if (context->GetArm())
-            {
-                selectFlag = 6;
-            }
-            GetTrackUIVolPan(media_track, &vol, &pan);
+
+            int flagsOut, panMode = 0;
+            double pan1, pan2 = 0.0;
+            int selectFlag = context->GetArm() ? 6 : 1;
+
+            GetTrackState(media_track, &flagsOut);
+            GetTrackUIPan(media_track, &pan1, &pan2, &panMode);
 
             track->SetTrackColor(colorActive, colorDim);
             track->SetSelectButtonValue(hasBit(flagsOut, selectFlag) ? BTN_VALUE_ON : BTN_VALUE_OFF);
             track->SetMuteButtonValue(hasBit(flagsOut, 3) ? BTN_VALUE_ON : BTN_VALUE_OFF);
             track->SetSoloButtonValue(hasBit(flagsOut, 4) ? BTN_VALUE_ON : BTN_VALUE_OFF);
-            track->SetFaderValue(vol);
+            track->SetFaderValue(context->GetShiftLeft() && panMode > 4 ? pan2 : pan1);
         }
     }
 

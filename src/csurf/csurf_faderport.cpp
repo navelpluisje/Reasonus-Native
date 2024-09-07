@@ -363,7 +363,7 @@ class CSurf_FaderPort : public IReaperControlSurface
       }
       else if (evt->midi_message[1] == BTN_SHIFT_RIGHT) // loop
       {
-        // shiftManager->HandleShiftLeftButton(evt->midi_message[2], m_midiout);
+        shiftManager->HandleShiftRightButton(evt->midi_message[2]);
       }
 
       /**

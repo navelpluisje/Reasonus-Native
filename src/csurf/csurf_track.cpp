@@ -32,7 +32,7 @@ void CSurf_Track::SetMuteButtonValue(Btn_Value value)
     muteButton->SetValue(value);
 }
 
-void CSurf_Track::SetFaderValue(double value)
+void CSurf_Track::SetFaderValue(int value)
 {
     fader->SetValue(value);
 }

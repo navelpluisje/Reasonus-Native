@@ -64,7 +64,7 @@ public:
 
     void SetMuteButtonValue(Btn_Value value);
 
-    void SetFaderValue(double value);
+    void SetFaderValue(int value);
 };
 
 #endif

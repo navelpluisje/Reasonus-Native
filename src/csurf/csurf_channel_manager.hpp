@@ -8,35 +8,6 @@
 #include <vector>
 #include <db2val.h>
 
-/**
- * @brief Check if the bit with index key is set in val
- *
- * @param val The value to check
- * @param key The key to search for
- * @return true
- * @return false
- */
-static bool hasBit(int val, int key)
-{
-    return val & (1 << key);
-};
-
-/**
- * @brief get the midi messages of the fader and translate it to volume
- *
- * @param msb Midi message 2
- * @param lsb Midi message 1
- * @return double
- */
-static double int14ToVol(unsigned char msb, unsigned char lsb)
-{
-    int val = lsb | (msb << 7);
-    double pos = ((double)val * 1000.0) / 16383.0;
-    pos = SLIDER2DB(pos);
-
-    return DB2VAL(pos);
-}
-
 class CSurf_ChannelManager
 {
 protected:
