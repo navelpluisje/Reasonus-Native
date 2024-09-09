@@ -5,6 +5,8 @@
 #include "csurf_color_button.hpp"
 #include "csurf_context.cpp"
 #include "csurf_fader.hpp"
+#include "csurf_valuebar.hpp"
+#include "csurf_display.hpp"
 
 inline Btn_Types SelectButtons[8] = {
     BTN_SELECT_1,
@@ -48,6 +50,8 @@ protected:
     CSurf_Button *soloButton;
     CSurf_Button *muteButton;
     CSurf_Fader *fader;
+    CSurf_Valuebar *valueBar;
+    CSurf_Display *display;
     ButtonColor color;
 
     // Slider
@@ -65,6 +69,12 @@ public:
     void SetMuteButtonValue(Btn_Value value);
 
     void SetFaderValue(int value);
+
+    void SetValueBarMode(ValuebarMode mode);
+    void SetValueBarValue(int value);
+
+    void SetDisplayMode(DisplayMode mode);
+    void SetDisplayLine(int line, Alignment alignment, const char *value);
 };
 
 #endif

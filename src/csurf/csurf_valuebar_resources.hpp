@@ -1,0 +1,37 @@
+#ifndef CSURF_VALUEBAR_RESOURCES_H_
+#define CSURF_VALUEBAR_RESOURCES_H_
+
+enum ChannelValueBar
+{
+    VALUEBAR_1 = 0x30,
+    VALUEBAR_2 = 0x31,
+    VALUEBAR_3 = 0x32,
+    VALUEBAR_4 = 0x33,
+    VALUEBAR_5 = 0x34,
+    VALUEBAR_6 = 0x35,
+    VALUEBAR_7 = 0x36,
+    VALUEBAR_8 = 0x37,
+};
+
+enum ChannelValueBarMode
+{
+    VALUEBAR_MODE_1 = 0x38,
+    VALUEBAR_MODE_2 = 0x39,
+    VALUEBAR_MODE_3 = 0x3a,
+    VALUEBAR_MODE_4 = 0x3b,
+    VALUEBAR_MODE_5 = 0x3c,
+    VALUEBAR_MODE_6 = 0x3d,
+    VALUEBAR_MODE_7 = 0x3e,
+    VALUEBAR_MODE_8 = 0x3f,
+};
+
+enum ValuebarMode
+{
+    VALUEBAR_MODE_NORMAL = 0,
+    VALUEBAR_MODE_BIPOLAR = 1,
+    VALUEBAR_MODE_FILL = 2,
+    VALUEBAR_MODE_SPREAD = 3,
+    VALUEBAR_MODE_OFF = 4,
+};
+
+#endif

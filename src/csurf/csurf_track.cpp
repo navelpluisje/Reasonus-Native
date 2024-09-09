@@ -9,6 +9,8 @@ CSurf_Track::CSurf_Track(ButtonColor colorActive, ButtonColor colorDim, int inde
     soloButton = new CSurf_Button(SoloButtons[index], BTN_VALUE_OFF, m_midiout);
     muteButton = new CSurf_Button(MuteButtons[index], BTN_VALUE_OFF, m_midiout);
     fader = new CSurf_Fader(index, 0, m_midiout);
+    valueBar = new CSurf_Valuebar(index, 0, m_midiout);
+    display = new CSurf_Display(index, m_midiout);
 }
 
 void CSurf_Track::SetTrackColor(ButtonColor colorActive, ButtonColor colorDim)
@@ -36,5 +38,25 @@ void CSurf_Track::SetFaderValue(int value)
 {
     fader->SetValue(value);
 }
+
+void CSurf_Track::SetValueBarMode(ValuebarMode mode)
+{
+    valueBar->SetMode(mode);
+}
+
+void CSurf_Track::SetValueBarValue(int value)
+{
+    valueBar->SetValue(value);
+}
+
+void CSurf_Track::SetDisplayMode(DisplayMode mode)
+{
+    display->SetMode(mode);
+};
+
+void CSurf_Track::SetDisplayLine(int line, Alignment alignment, const char *value)
+{
+    display->SetValue(line, alignment, value);
+};
 
 #endif

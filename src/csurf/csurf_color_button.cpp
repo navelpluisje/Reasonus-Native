@@ -24,7 +24,10 @@ void CSurf_ColorButton::SendColor()
 
 void CSurf_ColorButton::SetColor(ButtonColor colorActive, ButtonColor colorDim)
 {
-    this->colorActive = colorActive;
-    this->colorDim = colorDim;
-    SendColor();
+    if (!this->colorActive.IsColor(colorActive) || !this->colorDim.IsColor(colorDim))
+    {
+        this->colorActive = colorActive;
+        this->colorDim = colorDim;
+        SendColor();
+    }
 };

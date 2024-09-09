@@ -17,6 +17,11 @@ struct ButtonColor
         green = _green;
         blue = _blue;
     }
+
+    bool IsColor(ButtonColor color)
+    {
+        return color.blue == blue && color.red == red && color.green == green;
+    }
 };
 
 class CSurf_ColorButton : public CSurf_Button

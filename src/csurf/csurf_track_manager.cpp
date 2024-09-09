@@ -9,6 +9,46 @@
 #include "csurf_navigator.cpp"
 #include <vector>
 
+string GetPanString(double pan, int panMode)
+{
+    int panInt = (int)(pan * 100.0);
+    string strVal = to_string(abs(panInt));
+    if (panMode == 5)
+    {
+        panInt = (panInt + 100) / 2;
+        return to_string(panInt) + "L";
+    }
+    if (pan < 0)
+    {
+        return "L" + strVal;
+    }
+    if (pan > 0)
+    {
+        return "R" + strVal;
+    }
+    return "<C>";
+}
+
+string GetWidthString(double pan, int panMode)
+{
+    int panInt = ((int)(pan * 100.0) + 100) / 2;
+    string strVal = to_string(abs(panInt));
+    if (panMode == 5)
+    {
+        panInt = (panInt + 100) / 2;
+        return to_string(panInt) + "R";
+    }
+    if (pan < 0)
+    {
+        return "L" + strVal;
+    }
+    if (pan > 0)
+    {
+        return "R" + strVal;
+    }
+    return "<C>";
+}
+
 class CSurf_TrackManager : public CSurf_ChannelManager
 {
 protected:
@@ -20,6 +60,7 @@ protected:
 
         if (!context->GetArm())
         {
+
             int trackColor = GetTrackColor(media_track);
             ColorFromNative(trackColor, &red, &green, &blue);
         }
@@ -37,23 +78,31 @@ protected:
         return panMode;
     }
 
-    int GetFaderValue(MediaTrack *media_track)
+    void GetFaderValue(MediaTrack *media_track, int *faderValue, int *valueBarValue, string *_pan1, string *_pan2)
     {
         int panMode = 0;
         double volume, pan1, pan2 = 0.0;
 
         GetTrackUIVolPan(media_track, &volume, &pan1);
         GetTrackUIPan(media_track, &pan1, &pan2, &panMode);
+        *_pan1 = GetPanString(pan1, panMode);
+        *_pan2 = GetWidthString(pan2, panMode);
 
         if (context->GetShiftLeft())
         {
-            return panToNormalized(pan1) * 16383.0;
+            *faderValue = int(panToNormalized(pan1) * 16383.0);
+            *valueBarValue = int(volToNormalized(volume) * 127);
         }
-        if (context->GetShiftRight() && panMode > 4)
+        else if (context->GetShiftRight() && panMode > 4)
         {
-            return panToNormalized(pan2) * 16383.0;
+            *faderValue = int(panToNormalized(pan2) * 16383.0);
+            *valueBarValue = int(volToNormalized(volume) * 127);
         }
-        return int(volToNormalized(volume) * 16383.0);
+        else
+        {
+            *faderValue = int(volToNormalized(volume) * 16383.0);
+            *valueBarValue = int(panToNormalized(pan1) * 127);
+        }
     }
 
 public:
@@ -67,25 +116,46 @@ public:
     {
         WDL_PtrList<MediaTrack> media_tracks = navigator->GetBankTracks();
         int nb_tracks = tracks.size();
+        // Set the display type
 
         for (int i = 0; i < nb_tracks; i++)
         {
-            int flagsOut;
+            int flagsOut, faderValue = 0, valueBarValue = 0;
             int selectFlag = context->GetArm() ? 6 : 1;
+            string strPan1, strPan2;
 
             CSurf_Track *track = tracks.at(i);
             MediaTrack *media_track = media_tracks.Get(i);
+            string trackIndex = to_string((int)GetMediaTrackInfo_Value(media_track, "IP_TRACKNUMBER"));
             SetTrackColors(media_track);
-            GetTrackState(media_track, &flagsOut);
+            const char *trackName = GetTrackState(media_track, &flagsOut);
+            GetFaderValue(media_track, &faderValue, &valueBarValue, &strPan1, &strPan2);
+            Btn_Value selectValue = hasBit(flagsOut, selectFlag) ? BTN_VALUE_ON : BTN_VALUE_OFF;
 
             track->SetTrackColor(colorActive, colorDim);
             // If the track is armed always blink as an indication it is armed
-            track->SetSelectButtonValue(selectFlag != 6 && hasBit(flagsOut, 6) ? BTN_VALUE_BLINK : hasBit(flagsOut, selectFlag) ? BTN_VALUE_ON
-                                                                                                                                : BTN_VALUE_OFF);
+            track->SetSelectButtonValue((selectFlag != 6 && hasBit(flagsOut, 6)) ? BTN_VALUE_BLINK : selectValue);
             track->SetMuteButtonValue(hasBit(flagsOut, 3) ? BTN_VALUE_ON : BTN_VALUE_OFF);
             track->SetSoloButtonValue(hasBit(flagsOut, 4) ? BTN_VALUE_ON : BTN_VALUE_OFF);
+            track->SetFaderValue(faderValue);
+            track->SetValueBarMode(context->GetShiftLeft() ? VALUEBAR_MODE_FILL : VALUEBAR_MODE_BIPOLAR);
+            track->SetValueBarValue(valueBarValue);
 
-            track->SetFaderValue(GetFaderValue(media_track));
+            if (!context->GetShiftLeft())
+            {
+                track->SetDisplayMode(DISPLAY_MODE_8);
+                track->SetDisplayLine(0, ALIGN_LEFT, trackName);
+                track->SetDisplayLine(1, ALIGN_CENTER, trackIndex.c_str());
+                track->SetDisplayLine(2, ALIGN_CENTER, strPan1.c_str());
+            }
+            else
+            {
+                track->SetDisplayMode(DISPLAY_MODE_2);
+                track->SetDisplayLine(0, ALIGN_CENTER, trackName);
+                track->SetDisplayLine(1, ALIGN_CENTER, trackIndex.c_str());
+                track->SetDisplayLine(2, ALIGN_CENTER, strPan1.c_str());
+                track->SetDisplayLine(3, ALIGN_CENTER, strPan2.c_str());
+            }
         }
     }
 
