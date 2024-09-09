@@ -9,46 +9,6 @@
 #include "csurf_navigator.cpp"
 #include <vector>
 
-string GetPanString(double pan, int panMode)
-{
-    int panInt = (int)(pan * 100.0);
-    string strVal = to_string(abs(panInt));
-    if (panMode == 5)
-    {
-        panInt = (panInt + 100) / 2;
-        return to_string(panInt) + "L";
-    }
-    if (pan < 0)
-    {
-        return "L" + strVal;
-    }
-    if (pan > 0)
-    {
-        return "R" + strVal;
-    }
-    return "<C>";
-}
-
-string GetWidthString(double pan, int panMode)
-{
-    int panInt = ((int)(pan * 100.0) + 100) / 2;
-    string strVal = to_string(abs(panInt));
-    if (panMode == 5)
-    {
-        panInt = (panInt + 100) / 2;
-        return to_string(panInt) + "R";
-    }
-    if (pan < 0)
-    {
-        return "L" + strVal;
-    }
-    if (pan > 0)
-    {
-        return "R" + strVal;
-    }
-    return "<C>";
-}
-
 class CSurf_TrackManager : public CSurf_ChannelManager
 {
 protected:

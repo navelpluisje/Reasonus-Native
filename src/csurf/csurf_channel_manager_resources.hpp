@@ -99,4 +99,50 @@ static double int14ToVol(unsigned char msb, unsigned char lsb)
     return DB2VAL(pos);
 }
 
+/**
+ * @brief Get a string representation of the pan value and the panMode. If panMode is 5, it will return the left pan representation
+ *
+ * @param pan The pan value
+ * @param panMode The pan mode
+ * @return string
+ */
+static string GetPanString(double pan, int panMode)
+{
+    int panInt = (int)(pan * 100.0);
+    string strVal = to_string(abs(panInt));
+    if (panMode == 5)
+    {
+        panInt = (panInt + 100) / 2;
+        return to_string(panInt) + "L";
+    }
+    if (pan < 0)
+    {
+        return "L" + strVal;
+    }
+    if (pan > 0)
+    {
+        return "R" + strVal;
+    }
+    return "<C>";
+}
+
+/**
+ * @brief Get a string representation of the width value and the panMode. If panMode is 5, it will return the right pan representation
+ *
+ * @param width The pan value
+ * @param panMode The pan mode
+ * @return string
+ */
+static string GetWidthString(double width, int panMode)
+{
+    int panInt = ((int)(width * 100.0) + 100) / 2;
+    panInt = (panInt + 100) / 2;
+    string strVal = to_string(abs(panInt));
+    if (panMode == 5)
+    {
+        return to_string(panInt) + "R";
+    }
+    return "W" + strVal;
+}
+
 #endif
