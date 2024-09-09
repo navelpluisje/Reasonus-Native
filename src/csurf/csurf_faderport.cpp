@@ -4,7 +4,6 @@
 ** Copyright (C) 2007-2008 Cockos Incorporated
 ** License: LGPL.
 */
-
 #define LOCALIZE_IMPORT_PREFIX "csurf_"
 #include <reaper_plugin.h>
 #include <localize-import.h>
@@ -1035,8 +1034,3 @@ reaper_csurf_reg_t csurf_faderport_reg =
         createFunc,
         configFunc,
 };
-
-#ifndef _WIN32 // import the resources. Note: if you do not have these files, run "php WDL/swell/mac_resgen.php res.rc" from this directory
-#include <WDL/swell/swell-dlggen.h>
-// #include "res.rc_mac_dlg"
-#endif
