@@ -49,7 +49,7 @@ extern "C"
 
 #ifndef _WIN32 // import the resources. Note: if you do not have these files, run "php WDL/swell/mac_resgen.php res.rc" from this directory
 #include "WDL/swell/swell-dlggen.h"
-#include "res.rc_mac_dlg"
+// #include "res.rc_mac_dlg"
 #include "WDL/swell/swell-menugen.h"
 #include "res.rc_mac_menu"
 
