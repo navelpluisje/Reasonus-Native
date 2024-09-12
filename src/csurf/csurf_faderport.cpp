@@ -13,10 +13,12 @@
 #include "csurf_session_manager.cpp"
 #include "csurf_shift_manager.cpp"
 #include "csurf_track_manager.cpp"
+#include "csurf_sends_manager.cpp"
 #include "csurf_navigator.cpp"
 #include "csurf_fader_resources.hpp"
 #include "csurf_button.hpp"
 #include <WDL/ptrlist.h>
+#include "../src/resource.h"
 #include <vector>
 
 /*
@@ -621,7 +623,8 @@ public:
     sessionManager = new CSurf_SessionManager(context, m_midiout);
     trackNavigator = new CSurf_Navigator();
     shiftManager = new CSurf_ShiftManager(context, m_midiout);
-    trackManager = new CSurf_TrackManager(tracks, trackNavigator, context, m_midiout);
+    trackManager = new CSurf_SendsManager(tracks, trackNavigator, context, m_midiout);
+    // trackManager = new CSurf_TrackManager(tracks, trackNavigator, context, m_midiout);
 
     playButton = new CSurf_Button(BTN_PLAY, BTN_VALUE_OFF, m_midiout);
     stopButton = new CSurf_Button(BTN_STOP, BTN_VALUE_OFF, m_midiout);
@@ -952,8 +955,16 @@ static IReaperControlSurface *createFunc(const char *type_string, const char *co
   return new CSurf_FaderPort(parms[2], parms[3], errStats);
 }
 
+static void AddComboEntry(HWND hwndDlg, int x, char *buf, int comboId)
+{
+  int a = (int)SendDlgItemMessage(hwndDlg, comboId, CB_ADDSTRING, 0, (LPARAM)buf);
+  SendDlgItemMessage(hwndDlg, comboId, CB_SETITEMDATA, a, x);
+}
+
 static WDL_DLGRET dlgProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+  (void)wParam;
+  (void)lParam;
   switch (uMsg)
   {
   case WM_INITDIALOG:
@@ -966,57 +977,48 @@ static WDL_DLGRET dlgProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
     // ShowWindow(GetDlgItem(hwndDlg, IDC_EDIT2), SW_HIDE);
     // ShowWindow(GetDlgItem(hwndDlg, IDC_EDIT2_LBL), SW_HIDE);
     // ShowWindow(GetDlgItem(hwndDlg, IDC_EDIT2_LBL2), SW_HIDE);
+    char buf[520];
+    int currentIndex = 0;
 
-    WDL_UTF8_HookComboBox(GetDlgItem(hwndDlg, IDC_COMBO1));
-    WDL_UTF8_HookComboBox(GetDlgItem(hwndDlg, IDC_COMBO2));
+    WDL_UTF8_HookComboBox(GetDlgItem(hwndDlg, IDC_COMBO_MidiIn));
+    WDL_UTF8_HookComboBox(GetDlgItem(hwndDlg, IDC_COMBO_MidiOut));
 
-    int n = GetNumMIDIInputs();
-    int x = SendDlgItemMessage(hwndDlg, IDC_COMBO1, CB_ADDSTRING, 0, (LPARAM)__LOCALIZE("None", "csurf"));
-    SendDlgItemMessage(hwndDlg, IDC_COMBO1, CB_SETITEMDATA, x, -1);
-    x = SendDlgItemMessage(hwndDlg, IDC_COMBO2, CB_ADDSTRING, 0, (LPARAM)__LOCALIZE("None", "csurf"));
-    SendDlgItemMessage(hwndDlg, IDC_COMBO2, CB_SETITEMDATA, x, -1);
-    for (x = 0; x < n; x++)
-    {
-      char buf[512];
-      if (GetMIDIInputName(x, buf, sizeof(buf)))
+    for (int i = 0; i < GetNumMIDIInputs(); ++i)
+      if (GetMIDIInputName(i, buf, sizeof(buf)))
       {
-        int a = SendDlgItemMessage(hwndDlg, IDC_COMBO1, CB_ADDSTRING, 0, (LPARAM)buf);
-        SendDlgItemMessage(hwndDlg, IDC_COMBO1, CB_SETITEMDATA, a, x);
-        if (x == parms[2])
-          SendDlgItemMessage(hwndDlg, IDC_COMBO1, CB_SETCURSEL, a, 0);
+        AddComboEntry(hwndDlg, i, buf, IDC_COMBO_MidiIn);
+        SendMessage(GetDlgItem(hwndDlg, IDC_COMBO_MidiIn), CB_SETCURSEL, currentIndex, 0);
+        currentIndex++;
       }
-    }
-    n = GetNumMIDIOutputs();
-    for (x = 0; x < n; x++)
-    {
-      char buf[512];
-      if (GetMIDIOutputName(x, buf, sizeof(buf)))
+
+    currentIndex = 0;
+
+    for (int i = 0; i < GetNumMIDIOutputs(); ++i)
+      if (GetMIDIOutputName(i, buf, sizeof(buf)))
       {
-        int a = SendDlgItemMessage(hwndDlg, IDC_COMBO2, CB_ADDSTRING, 0, (LPARAM)buf);
-        SendDlgItemMessage(hwndDlg, IDC_COMBO2, CB_SETITEMDATA, a, x);
-        if (x == parms[3])
-          SendDlgItemMessage(hwndDlg, IDC_COMBO2, CB_SETCURSEL, a, 0);
+        AddComboEntry(hwndDlg, i, buf, IDC_COMBO_MidiOut);
+        SendMessage(GetDlgItem(hwndDlg, IDC_COMBO_MidiOut), CB_SETCURSEL, currentIndex, 0);
+        currentIndex++;
       }
-    }
   }
   break;
-  case WM_USER + 1024:
-    if (wParam > 1 && lParam)
-    {
-      char tmp[512];
+    // case WM_USER + 1024:
+    //   if (wParam > 1 && lParam)
+    //   {
+    //     char tmp[512];
 
-      int indev = -1, outdev = -1;
-      int r = SendDlgItemMessage(hwndDlg, IDC_COMBO1, CB_GETCURSEL, 0, 0);
-      if (r != CB_ERR)
-        indev = SendDlgItemMessage(hwndDlg, IDC_COMBO1, CB_GETITEMDATA, r, 0);
-      r = SendDlgItemMessage(hwndDlg, IDC_COMBO2, CB_GETCURSEL, 0, 0);
-      if (r != CB_ERR)
-        outdev = SendDlgItemMessage(hwndDlg, IDC_COMBO2, CB_GETITEMDATA, r, 0);
+    //     int indev = -1, outdev = -1;
+    //     int r = SendDlgItemMessage(hwndDlg, IDC_COMBO1, CB_GETCURSEL, 0, 0);
+    //     if (r != CB_ERR)
+    //       indev = SendDlgItemMessage(hwndDlg, IDC_COMBO1, CB_GETITEMDATA, r, 0);
+    //     r = SendDlgItemMessage(hwndDlg, IDC_COMBO2, CB_GETCURSEL, 0, 0);
+    //     if (r != CB_ERR)
+    //       outdev = SendDlgItemMessage(hwndDlg, IDC_COMBO2, CB_GETITEMDATA, r, 0);
 
-      snprintf(tmp, 100, "0 0 %d %d", indev, outdev);
-      lstrcpyn((char *)lParam, tmp, wParam);
-    }
-    break;
+    //     snprintf(tmp, 100, "0 0 %d %d", indev, outdev);
+    //     lstrcpyn((char *)lParam, tmp, wParam);
+    //   }
+    //   break;
   }
   return 0;
 }
@@ -1024,7 +1026,7 @@ static WDL_DLGRET dlgProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 static HWND configFunc(const char *type_string, HWND parent, const char *initConfigString)
 {
   (void)type_string;
-  return CreateDialogParam(g_hInst, MAKEINTRESOURCE(IDD_SURFACEEDIT_MCU), parent, dlgProc, (LPARAM)initConfigString);
+  return CreateDialogParam(g_hInst, MAKEINTRESOURCE(IDD_DIALOG_REASONUS_NATIVE), parent, dlgProc, (LPARAM)initConfigString);
 }
 
 reaper_csurf_reg_t csurf_faderport_reg =

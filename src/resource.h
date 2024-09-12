@@ -8,6 +8,9 @@
 #define IDC_BUTTON1 1001
 #define IDC_LASTMSG 1002
 #define IDC_CHECK1 1003
+#define IDC_COMBO_MidiIn 1004
+#define IDC_COMBO_MidiOut 1005
+#define IDC_STATIC 1005
 #define ID_QUIT 40000
 
 // Next default values for new objects

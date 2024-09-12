@@ -87,7 +87,7 @@ public:
 
     ~CSurf_Display() {};
 
-    void SetValue(int line, Alignment _alignment, const char *_value)
+    void SetValue(int line, Alignment _alignment, const char *_value, Inverted invert = NON_INVERT)
     {
         // We have to convert the char array to a string. Somehow the simple conversion makes it crash
         char buffer[250];
@@ -101,6 +101,7 @@ public:
         }
         values[line] = strVal;
         alignment[line] = _alignment;
+        inverted[line] = invert;
         this->SendValue(line);
     };
 

@@ -6,7 +6,6 @@
 
 #include <WDL/wdlstring.h>
 #include <WDL/win32_utf8.h>
-#include "resource.h"
 
 enum
 {

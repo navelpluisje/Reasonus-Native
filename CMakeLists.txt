@@ -84,6 +84,13 @@ find_package(WDL REQUIRED)
 
 if(NOT WIN32)
   find_package(SWELL REQUIRED)
+  
+  add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/src/res.rc_mac_dlg
+    COMMAND ${SWELL_RESGEN} ${CMAKE_CURRENT_SOURCE_DIR}/src/res.rc)
+
+  add_custom_target( generate
+    ALL ${SWELL_RESGEN} ${CMAKE_CURRENT_SOURCE_DIR}/src/res.rc
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/res.rc)
 endif()
 
 target_link_libraries(reaper-sdk INTERFACE WDL::WDL)
