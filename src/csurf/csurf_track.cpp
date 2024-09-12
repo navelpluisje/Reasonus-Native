@@ -54,9 +54,9 @@ void CSurf_Track::SetDisplayMode(DisplayMode mode)
     display->SetMode(mode);
 };
 
-void CSurf_Track::SetDisplayLine(int line, Alignment alignment, const char *value)
+void CSurf_Track::SetDisplayLine(int line, Alignment alignment, const char *value, Inverted invert)
 {
-    display->SetValue(line, alignment, value);
+    display->SetValue(line, alignment, value, invert);
 };
 
 #endif

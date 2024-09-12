@@ -28,12 +28,12 @@ extern "C"
       g_hwnd = reaper_plugin_info->hwnd_main;
       g_reaper_plugin_info = reaper_plugin_info;
 
-      // // load Reaper API functions
-      // // check that our plugin hasn't been already loaded
-      // if (REAPERAPI_LoadAPI(reaper_plugin_info->GetFunc) > 0 || reaper_plugin_info->GetFunc("ReaScriptAPIFunctionExample"))
-      // {
-      //   return 0;
-      // }
+      // load Reaper API functions
+      // check that our plugin hasn't been already loaded
+      if (REAPERAPI_LoadAPI(reaper_plugin_info->GetFunc) > 0 || reaper_plugin_info->GetFunc("ReaScriptAPIFunctionExample"))
+      {
+        return 0;
+      }
 
       TOGGLE_PLAY_CURSOR::Register();
       SHOW_REAPER_RESOURCE_PATH::Register();

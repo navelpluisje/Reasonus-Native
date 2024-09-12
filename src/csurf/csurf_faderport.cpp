@@ -623,8 +623,8 @@ public:
     sessionManager = new CSurf_SessionManager(context, m_midiout);
     trackNavigator = new CSurf_Navigator();
     shiftManager = new CSurf_ShiftManager(context, m_midiout);
-    // trackManager = new CSurf_SendsManager(tracks, trackNavigator, context, m_midiout);
-    trackManager = new CSurf_TrackManager(tracks, trackNavigator, context, m_midiout);
+    trackManager = new CSurf_SendsManager(tracks, trackNavigator, context, m_midiout);
+    // trackManager = new CSurf_TrackManager(tracks, trackNavigator, context, m_midiout);
 
     playButton = new CSurf_Button(BTN_PLAY, BTN_VALUE_OFF, m_midiout);
     stopButton = new CSurf_Button(BTN_STOP, BTN_VALUE_OFF, m_midiout);

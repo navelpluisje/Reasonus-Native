@@ -74,7 +74,7 @@ public:
     void SetValueBarValue(int value);
 
     void SetDisplayMode(DisplayMode mode);
-    void SetDisplayLine(int line, Alignment alignment, const char *value);
+    void SetDisplayLine(int line, Alignment alignment, const char *value, Inverted invert = NON_INVERT);
 };
 
 #endif

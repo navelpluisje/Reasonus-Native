@@ -15,6 +15,7 @@ protected:
     int nbSends = 0;
     int nbTrackSends[8] = {0, 0, 0, 0, 0, 0, 0, 0};
     int currentSend = 0;
+    int sendModes[3] = {0, 1, 3};
 
     void SetTrackColors(MediaTrack *media_track) override
     {
@@ -66,82 +67,135 @@ public:
 
         for (int i = 0; i < nb_tracks; i++)
         {
-            // MediaTrack *media_track = media_tracks.Get(i);
-            // int _nbTrackSends = GetTrackNumSends(media_track, 0);
-            // nbTrackSends[i] = _nbTrackSends;
+            MediaTrack *media_track = media_tracks.Get(i);
+            int _nbTrackSends = GetTrackNumSends(media_track, 0);
+            nbTrackSends[i] = _nbTrackSends;
 
-            // if (_nbTrackSends > nbSends)
-            // {
-            //     nbSends = _nbTrackSends;
-            // }
+            if (_nbTrackSends > nbSends)
+            {
+                nbSends = _nbTrackSends;
+            }
         }
 
-        // if (nbSends < currentSend)
-        // {
-        //     currentSend = nbSends;
-        // }
+        if (nbSends < currentSend)
+        {
+            currentSend = nbSends;
+        }
 
         for (int i = 0; i < nb_tracks; i++)
         {
-            // int sendIndex = nbTrackSends[i] < currentSend ? nbTrackSends[i] : currentSend;
+            int sendIndex = nbTrackSends[i] < currentSend ? nbTrackSends[i] : currentSend;
 
-            // CSurf_Track *track = tracks.at(i);
-            // MediaTrack *media_track = media_tracks.Get(i);
-            // SetTrackColors(media_track);
+            CSurf_Track *track = tracks.at(i);
+            MediaTrack *media_track = media_tracks.Get(i);
+            SetTrackColors(media_track);
 
-            // int pan, volume, valueBarValue = 0;
-            // string panStr;
-            // GetFaderValue(media_track, sendIndex, &volume, &valueBarValue, &pan, &panStr);
+            int pan, faderValue, valueBarValue = 0;
+            string panStr;
+            GetFaderValue(media_track, sendIndex, &faderValue, &valueBarValue, &pan, &panStr);
 
-            // const char *sendName;
-            // MediaTrack *destTrack = (MediaTrack *)GetSetTrackSendInfo(media_track, 0, sendIndex, "P_DESTTRACK", 0);
-            // if (destTrack)
-            // {
-            //     sendName = (const char *)GetSetMediaTrackInfo(destTrack, "P_NAME", NULL);
-            // }
+            int flagsOut;
+            const char *trackName = GetTrackState(media_track, &flagsOut);
 
-            // track->SetTrackColor(colorActive, colorDim);
-            // track->SetSelectButtonValue(BTN_VALUE_OFF);
-            // track->SetMuteButtonValue(BTN_VALUE_OFF);
-            // track->SetSoloButtonValue(BTN_VALUE_OFF);
-            // track->SetFaderValue(context->GetShiftLeft() ? pan : volume);
-            // track->SetValueBarMode(context->GetShiftLeft() ? VALUEBAR_MODE_FILL : VALUEBAR_MODE_BIPOLAR);
-            // track->SetValueBarValue(valueBarValue);
+            bool sendMute = false;
+            GetTrackSendUIMute(media_track, sendIndex, &sendMute);
 
-            // track->SetDisplayMode(DISPLAY_MODE_2);
-            // ShowConsoleMsg(sendName);
-            // track->SetDisplayLine(0, ALIGN_LEFT, sendName);
+            int autoMode = (int)GetTrackSendInfo_Value(media_track, 0, sendIndex, "I_AUTOMODE");
+            int sendMode = (int)GetTrackSendInfo_Value(media_track, 0, sendIndex, "I_SENDMODE");
+            bool sendPhase = (bool)GetTrackSendInfo_Value(media_track, 0, sendIndex, "B_PHASE");
+            bool sendMono = (bool)GetTrackSendInfo_Value(media_track, 0, sendIndex, "B_MONO");
+
+            const char *sendName = "";
+            MediaTrack *destTrack = (MediaTrack *)GetSetTrackSendInfo(media_track, 0, sendIndex, "P_DESTTRACK", 0);
+            if (destTrack)
+            {
+                sendName = (const char *)GetSetMediaTrackInfo(destTrack, "P_NAME", NULL);
+                // Because of the const an being a pointer we need to do this here
+                track->SetDisplayLine(1, ALIGN_LEFT, sendName, INVERT);
+            }
+
+            track->SetTrackColor(colorActive, colorDim);
+            track->SetSelectButtonValue(hasBit(flagsOut, 1) ? BTN_VALUE_ON : BTN_VALUE_OFF);
+            track->SetMuteButtonValue((context->GetShiftLeft() && sendMute) ? BTN_VALUE_BLINK : sendMute ? BTN_VALUE_ON
+                                                                                                         : BTN_VALUE_OFF);
+            track->SetSoloButtonValue(((context->GetShiftLeft() && sendMono) || (!context->GetShiftLeft() && sendPhase)) ? BTN_VALUE_ON : BTN_VALUE_OFF);
+            track->SetFaderValue(faderValue);
+            track->SetValueBarMode(context->GetShiftLeft() ? VALUEBAR_MODE_FILL : VALUEBAR_MODE_BIPOLAR);
+            track->SetValueBarValue(valueBarValue);
+
+            track->SetDisplayMode(DISPLAY_MODE_2);
+            track->SetDisplayLine(0, ALIGN_CENTER, trackName);
+            track->SetDisplayLine(2, ALIGN_CENTER, GetSendModeString(sendMode).c_str());
+            track->SetDisplayLine(3, ALIGN_CENTER, GetAutomationString(autoMode).c_str());
         }
     }
 
     void HandleSelectClick(int index) override
     {
-        (void)index;
+        int flagsOut = 0;
+        MediaTrack *media_track = navigator->GetTrackByIndex(index);
+        GetTrackState(media_track, &flagsOut);
+
+        if (context->GetShiftLeft())
+        {
+            SetTrackSelected(media_track, !(hasBit(flagsOut, 1) == 1));
+            return;
+        }
+
+        for (int i = 0; i < 8; i++)
+        {
+            MediaTrack *media_track = navigator->GetTrackByIndex(i);
+            SetTrackSelected(media_track, false);
+        }
+        SetTrackSelected(media_track, true);
     }
 
     void HandleMuteClick(int index) override
     {
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
-        int flagsOut = 0;
-        GetTrackState(media_track, &flagsOut);
-        CSurf_SetSurfaceMute(media_track, CSurf_OnMuteChange(media_track, !hasBit(flagsOut, 3)), NULL);
+        if (context->GetShiftLeft())
+        {
+            int sendMode = GetTrackSendInfo_Value(media_track, 0, currentSend, "I_SENDMODE");
+            SetTrackSendInfo_Value(media_track, 0, currentSend, "I_SENDMODE", sendModes[(sendMode + 1) % 4]);
+        }
+        else
+        {
+            bool sendMute = GetTrackSendInfo_Value(media_track, 0, currentSend, "B_MUTE");
+            SetTrackSendInfo_Value(media_track, 0, currentSend, "B_MUTE", !sendMute);
+        }
     }
 
     void HandleSoloClick(int index) override
     {
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
-        int flagsOut = 0;
-        GetTrackState(media_track, &flagsOut);
-        CSurf_SetSurfaceSolo(media_track, CSurf_OnSoloChange(media_track, !hasBit(flagsOut, 4)), NULL);
+        if (context->GetShiftLeft())
+        {
+            bool sendMono = GetTrackSendInfo_Value(media_track, 0, currentSend, "B_MONO");
+            SetTrackSendInfo_Value(media_track, 0, currentSend, "B_MONO", !sendMono);
+        }
+        else
+        {
+            bool sendMute = GetTrackSendInfo_Value(media_track, 0, currentSend, "B_PHASE");
+            SetTrackSendInfo_Value(media_track, 0, currentSend, "B_PHASE", !sendMute);
+        }
     }
 
-    void HandleFaderTouch() override {}
+    void
+    HandleFaderTouch() override
+    {
+    }
 
     void HandleFaderMove(int index, int msb, int lsb) override
     {
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
-
-        CSurf_SetSurfaceVolume(media_track, CSurf_OnVolumeChange(media_track, int14ToVol(msb, lsb), false), NULL);
+        if (context->GetShiftLeft())
+        {
+            SetTrackSendInfo_Value(media_track, 0, currentSend, "D_PAN", CSurf_OnSendPanChange(media_track, currentSend, normalizedToPan(int14ToNormalized(msb, lsb)), false));
+        }
+        else
+        {
+            SetTrackSendInfo_Value(media_track, 0, currentSend, "D_VOL", CSurf_OnSendVolumeChange(media_track, currentSend, int14ToVol(msb, lsb), false));
+        }
     }
 };
 
