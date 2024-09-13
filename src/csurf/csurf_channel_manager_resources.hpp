@@ -196,4 +196,12 @@ static string GetSendModeString(int sendMode)
     };
 }
 
+enum ChannelMode
+{
+    TrackMode,
+    PluginMode,
+    SendMode,
+    PanMode,
+};
+
 #endif

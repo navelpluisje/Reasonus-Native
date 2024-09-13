@@ -12,8 +12,7 @@
 #include "csurf.h"
 #include "csurf_session_manager.cpp"
 #include "csurf_shift_manager.cpp"
-#include "csurf_track_manager.cpp"
-#include "csurf_sends_manager.cpp"
+#include "csurf_channel_context.cpp"
 #include "csurf_navigator.cpp"
 #include "csurf_fader_resources.hpp"
 #include "csurf_button.hpp"
@@ -64,7 +63,7 @@ class CSurf_FaderPort : public IReaperControlSurface
 
   CSurf_SessionManager *sessionManager;
   CSurf_ShiftManager *shiftManager;
-  CSurf_ChannelManager *trackManager = NULL;
+  CSurf_ChannelContext *channelContext;
   CSurf_Navigator *trackNavigator;
 
   CSurf_Button *playButton;
@@ -98,7 +97,7 @@ class CSurf_FaderPort : public IReaperControlSurface
      */
     if (evt->midi_message[0] >= FADER_1 && evt->midi_message[0] <= FADER_8)
     {
-      trackManager->HandleFaderMove(evt->midi_message[0] - FADER_1, evt->midi_message[2], evt->midi_message[1]);
+      channelContext->HandleFaderMove(evt->midi_message[0] - FADER_1, evt->midi_message[2], evt->midi_message[1]);
     }
 
     /**
@@ -293,21 +292,41 @@ class CSurf_FaderPort : public IReaperControlSurface
        */
       else if (evt->midi_message[1] >= BTN_SELECT_1 && evt->midi_message[1] <= BTN_SELECT_8)
       {
-        trackManager->HandleSelectClick(evt->midi_message[1] - BTN_SELECT_1);
+        channelContext->HandleSelectClick(evt->midi_message[1] - BTN_SELECT_1);
       }
       /**
        * Track Mute Buttons
        */
       else if (evt->midi_message[1] >= BTN_MUTE_1 && evt->midi_message[1] <= BTN_MUTE_8)
       {
-        trackManager->HandleMuteClick(evt->midi_message[1] - BTN_MUTE_1);
+        channelContext->HandleMuteClick(evt->midi_message[1] - BTN_MUTE_1);
       }
       /**
        * Track Solo Buttons
        */
       else if (evt->midi_message[1] >= BTN_SOLO_1 && evt->midi_message[1] <= BTN_SOLO_8)
       {
-        trackManager->HandleSoloClick(evt->midi_message[1] - BTN_SOLO_1);
+        channelContext->HandleSoloClick(evt->midi_message[1] - BTN_SOLO_1);
+      }
+
+      /**
+       * Fader Buttons
+       */
+      else if (evt->midi_message[1] == BTN_TRACK)
+      {
+        channelContext->handleTrackButtonClick();
+      }
+      else if (evt->midi_message[1] == BTN_EDIT_PLUGINS)
+      {
+        channelContext->handlePluginsButtonClick();
+      }
+      else if (evt->midi_message[1] == BTN_SEND)
+      {
+        channelContext->handleSendButtonClick();
+      }
+      else if (evt->midi_message[1] == BTN_PAN)
+      {
+        channelContext->handlePanButtonClick();
       }
 
       /**
@@ -623,8 +642,7 @@ public:
     sessionManager = new CSurf_SessionManager(context, m_midiout);
     trackNavigator = new CSurf_Navigator();
     shiftManager = new CSurf_ShiftManager(context, m_midiout);
-    trackManager = new CSurf_SendsManager(tracks, trackNavigator, context, m_midiout);
-    // trackManager = new CSurf_TrackManager(tracks, trackNavigator, context, m_midiout);
+    channelContext = new CSurf_ChannelContext(context, trackNavigator, m_midiout);
 
     playButton = new CSurf_Button(BTN_PLAY, BTN_VALUE_OFF, m_midiout);
     stopButton = new CSurf_Button(BTN_STOP, BTN_VALUE_OFF, m_midiout);
@@ -730,7 +748,7 @@ public:
       DWORD now = timeGetTime();
       if ((now - m_buttonstate_lastrun) >= 10)
       {
-        trackManager->UpdateTracks();
+        channelContext->UpdateTracks();
         m_buttonstate_lastrun = now;
       }
 
