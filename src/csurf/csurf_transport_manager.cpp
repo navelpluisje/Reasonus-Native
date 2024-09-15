@@ -68,6 +68,38 @@ class CSurf_TransportManager
         }
     }
 
+    void SetPause()
+    {
+        if (isPlaying)
+        {
+            CSurf_OnPlay();
+        }
+    }
+
+    void SetRewindingState()
+    {
+        if (isRewinding)
+        {
+            isFastFwdRwd = !isFastFwdRwd;
+            return;
+        }
+        isFastFwdRwd = false;
+        isForwarding = false;
+        isRewinding = true;
+    };
+
+    void SetForwardingState()
+    {
+        if (isForwarding)
+        {
+            isFastFwdRwd = !isFastFwdRwd;
+            return;
+        }
+        isFastFwdRwd = false;
+        isRewinding = false;
+        isForwarding = true;
+    };
+
 public:
     CSurf_TransportManager(CSurf_Context *context, midi_Output *m_midiout) : context(context)
     {
@@ -140,20 +172,8 @@ public:
             CSurf_GoStart();
             return;
         }
-        if (isRewinding)
-        {
-            isFastFwdRwd = !isFastFwdRwd;
-        }
-        else
-        {
-            isFastFwdRwd = false;
-            isForwarding = false;
-            if (isPlaying)
-            {
-                CSurf_OnPlay();
-            }
-            isRewinding = true;
-        }
+        SetPause();
+        SetRewindingState();
     };
 
     void HandleForwardButton()
@@ -163,20 +183,9 @@ public:
             CSurf_GoEnd();
             return;
         }
-        if (isForwarding)
-        {
-            isFastFwdRwd = !isFastFwdRwd;
-        }
-        else
-        {
-            isFastFwdRwd = false;
-            isRewinding = false;
-            if (isPlaying)
-            {
-                CSurf_OnPlay();
-            }
-            isForwarding = true;
-        }
+
+        SetPause();
+        SetForwardingState();
     };
 };
 
