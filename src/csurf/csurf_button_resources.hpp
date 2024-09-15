@@ -109,4 +109,10 @@ enum Btn_Value
 #define MIDI_MESSAGE_COLOR_BLUE 0x93
 #define MIDI_MESSAGE_ENDCODER 0xb0
 
+enum Encoders
+{
+    ENCODER_PAN = 0x10,
+    ENCODER_NAV = 0x3c,
+};
+
 #endif

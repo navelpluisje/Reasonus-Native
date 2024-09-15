@@ -22,9 +22,6 @@ class CSurf_ChannelContext
     CSurf_Button *sendButton;
     CSurf_Button *panButton;
 
-    ButtonColor colorActive{0x7f, 0x7f, 0x7f};
-    ButtonColor Colordim{0x7f, 0x00, 0x7f};
-
     void SetButtonValues(ChannelMode mode)
     {
         channelMode = mode;
@@ -44,7 +41,7 @@ public:
 
         for (int i = 0; i < 8; i++)
         {
-            CSurf_Track *track = new CSurf_Track(colorActive, Colordim, i, context, m_midiout);
+            CSurf_Track *track = new CSurf_Track(i, context, m_midiout);
             tracks.push_back(track);
         }
 
@@ -58,6 +55,7 @@ public:
         {
             SetButtonValues(TrackMode);
             channelManager = new CSurf_TrackManager(tracks, navigator, context, m_midiout);
+            context->SetPanEncoderMode(PanEncoderPanMode);
         }
     };
     void handlePluginsButtonClick() {};
@@ -67,6 +65,7 @@ public:
         {
             SetButtonValues(SendMode);
             channelManager = new CSurf_SendsManager(tracks, navigator, context, m_midiout);
+            context->SetPanEncoderMode(PanEncoderNavigateMode);
         }
     };
     void handlePanButtonClick()
@@ -75,6 +74,7 @@ public:
         {
             SetButtonValues(PanMode);
             channelManager = new CSurf_ReceivesManager(tracks, navigator, context, m_midiout);
+            context->SetPanEncoderMode(PanEncoderNavigateMode);
         }
     };
 

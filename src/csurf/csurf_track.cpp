@@ -3,9 +3,9 @@
 
 #include "csurf_track.hpp"
 
-CSurf_Track::CSurf_Track(ButtonColor colorActive, ButtonColor colorDim, int index, CSurf_Context *context, midi_Output *m_midiout) : context(context)
+CSurf_Track::CSurf_Track(int index, CSurf_Context *context, midi_Output *m_midiout) : context(context)
 {
-    selectButton = new CSurf_ColorButton(colorActive, colorDim, SelectButtons[index], BTN_VALUE_OFF, m_midiout);
+    selectButton = new CSurf_ColorButton(ButtonColorWhite, ButtonColorWhiteDim, SelectButtons[index], BTN_VALUE_OFF, m_midiout);
     soloButton = new CSurf_Button(SoloButtons[index], BTN_VALUE_OFF, m_midiout);
     muteButton = new CSurf_Button(MuteButtons[index], BTN_VALUE_OFF, m_midiout);
     fader = new CSurf_Fader(index, 0, m_midiout);

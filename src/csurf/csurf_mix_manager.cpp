@@ -1,0 +1,97 @@
+#ifndef CSURF_MIX_MANAGER_C_
+#define CSURF_MIX_MANAGER_C_
+
+#include "csurf_color_button.hpp"
+#include "csurf_navigator.cpp"
+#include "csurf_context.cpp"
+
+class CSurf_MixManager
+{
+protected:
+    CSurf_Context *context;
+    CSurf_Navigator *trackNavigator;
+    midi_Output *m_midiout;
+
+    NavigatorFilter trackFilter = TrackAllFilter;
+
+    CSurf_ColorButton *mixAudioButton;
+    CSurf_ColorButton *mixViButton;
+    CSurf_ColorButton *mixBusButton;
+    CSurf_ColorButton *mixVcaButton;
+    CSurf_ColorButton *mixAllButton;
+
+    void SetButtonValue()
+    {
+        mixAudioButton->SetValue(BTN_VALUE_OFF);
+        mixViButton->SetValue(trackFilter == TrackInstrumentsFilter ? BTN_VALUE_ON : BTN_VALUE_OFF);
+        mixBusButton->SetValue((trackFilter == TrackAllFoldersFilter || trackFilter == TrackTopFoldersFilter) ? BTN_VALUE_ON : BTN_VALUE_OFF);
+        mixVcaButton->SetValue((trackFilter == TrackSendsFilter || trackFilter == TrackReceivesFilter) ? BTN_VALUE_ON : BTN_VALUE_OFF);
+        mixAllButton->SetValue(trackFilter == TrackAllFilter ? BTN_VALUE_ON : BTN_VALUE_OFF);
+    }
+
+public:
+    CSurf_MixManager(CSurf_Context *context, CSurf_Navigator *trackNavigator, midi_Output *m_midiout) : context(context), trackNavigator(trackNavigator), m_midiout(m_midiout)
+    {
+        mixAudioButton = new CSurf_ColorButton(ButtonColorWhite, ButtonColorWhiteDim, BTN_AUDIO, BTN_VALUE_OFF, m_midiout);
+        mixViButton = new CSurf_ColorButton(ButtonColorWhite, ButtonColorWhiteDim, BTN_VI, BTN_VALUE_OFF, m_midiout);
+        mixBusButton = new CSurf_ColorButton(ButtonColorWhite, ButtonColorWhiteDim, BTN_BUS, BTN_VALUE_ON, m_midiout);
+        mixVcaButton = new CSurf_ColorButton(ButtonColorWhite, ButtonColorWhiteDim, BTN_VCA, BTN_VALUE_OFF, m_midiout);
+        mixAllButton = new CSurf_ColorButton(ButtonColorWhite, ButtonColorWhiteDim, BTN_ALL, BTN_VALUE_ON, m_midiout);
+    }
+    ~CSurf_MixManager() {};
+
+    void HandleMixAudioButton()
+    {
+        SetButtonValue();
+    }
+
+    void HandleMixViButton()
+    {
+        trackFilter = TrackInstrumentsFilter;
+        trackNavigator->handleFilter(TrackInstrumentsFilter);
+        SetButtonValue();
+    }
+
+    void HandleMixBusButton()
+    {
+        if (context->GetShiftLeft())
+        {
+            mixBusButton->SetColor(ButtonColorYellow, ButtonColorRed);
+            trackFilter = TrackAllFoldersFilter;
+            trackNavigator->handleFilter(TrackAllFoldersFilter);
+        }
+        else
+        {
+            mixBusButton->SetColor(ButtonColorWhite, ButtonColorWhiteDim);
+            trackFilter = TrackTopFoldersFilter;
+            trackNavigator->handleFilter(TrackTopFoldersFilter);
+        }
+        SetButtonValue();
+    }
+
+    void HandleMixVcaButton()
+    {
+        if (context->GetShiftLeft())
+        {
+            mixVcaButton->SetColor(ButtonColorYellow, ButtonColorRed);
+            trackFilter = TrackReceivesFilter;
+            trackNavigator->handleFilter(TrackReceivesFilter);
+        }
+        else
+        {
+            mixVcaButton->SetColor(ButtonColorWhite, ButtonColorWhiteDim);
+            trackFilter = TrackSendsFilter;
+            trackNavigator->handleFilter(TrackSendsFilter);
+        }
+        SetButtonValue();
+    }
+
+    void HandleMixAllButton()
+    {
+        trackFilter = TrackAllFilter;
+        trackNavigator->handleFilter(TrackAllFilter);
+        SetButtonValue();
+    }
+};
+
+#endif

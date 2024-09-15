@@ -3,6 +3,7 @@
 
 #include "csurf_button.hpp"
 #include "csurf_context.cpp"
+#include "csurf_navigator.cpp"
 
 enum SessionTypes
 {
@@ -18,81 +19,12 @@ enum SessionTypes
 
 const int TO_FUNCTION = 8;
 
-void AdjustBankOffset(int amount, bool dosel)
-{
-    (void)dosel;
-    if (!amount)
-    {
-        return;
-    }
-
-    // if (amount < 0)
-    // {
-    //     if (m_bank_offset > 0)
-    //     {
-    //         m_bank_offset += amount;
-    //         if (m_bank_offset < 0)
-    //         {
-    //             m_bank_offset = 0;
-    //         }
-
-    //         if (dosel)
-    //         {
-    //             int x;
-    //             MediaTrack *t = CSurf_TrackFromID(m_bank_offset, g_csurf_mcpmode);
-    //             for (x = 0;; x++)
-    //             {
-    //                 int f = 0;
-    //                 if (!GetTrackInfo(x - 1, &f))
-    //                     break;
-
-    //                 MediaTrack *tt = CSurf_TrackFromID(x, false);
-    //                 bool sel = tt == t;
-    //                 if (tt && !(f & 2) == sel)
-    //                 {
-    //                     SetTrackSelected(tt, sel);
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }
-    // else
-    // {
-    //     int msize = CSurf_NumTracks(g_csurf_mcpmode);
-
-    //     if (m_bank_offset < msize)
-    //     {
-    //         m_bank_offset += amount;
-    //         if (m_bank_offset > msize)
-    //             m_bank_offset = msize;
-
-    //         if (dosel)
-    //         {
-    //             int x;
-    //             MediaTrack *t = CSurf_TrackFromID(m_bank_offset, g_csurf_mcpmode);
-    //             for (x = 0;; x++)
-    //             {
-    //                 int f = 0;
-    //                 if (!GetTrackInfo(x - 1, &f))
-    //                     break;
-
-    //                 MediaTrack *tt = CSurf_TrackFromID(x, false);
-    //                 bool sel = tt == t;
-    //                 if (tt && !(f & 2) == sel)
-    //                 {
-    //                     SetTrackSelected(tt, sel);
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }
-}
-
 class CSurf_SessionManager
 {
 protected:
     CSurf_Context *context;
     midi_Output *m_midiout;
+    CSurf_Navigator *trackNavigator;
     SessionTypes session_type = Channel;
     bool handleFunctionKeys = false;
 
@@ -133,9 +65,8 @@ protected:
     void handleFunction8() {}
 
 public:
-    CSurf_SessionManager(CSurf_Context *_context, midi_Output *m_midiout)
+    CSurf_SessionManager(CSurf_Context *context, CSurf_Navigator *trackNavigator, midi_Output *m_midiout) : context(context), m_midiout(m_midiout), trackNavigator(trackNavigator)
     {
-        context = _context;
         channelButton = new CSurf_Button(BTN_CHANNEL, BTN_VALUE_ON, m_midiout);
         zoomButton = new CSurf_Button(BTN_ZOOM, BTN_VALUE_OFF, m_midiout);
         scrollButton = new CSurf_Button(BTN_SCROLL, BTN_VALUE_OFF, m_midiout);
@@ -277,7 +208,7 @@ public:
         switch (session_type)
         {
         case Channel:
-            AdjustBankOffset(context->GetShiftLeft() ? -8 : -1, true);
+            trackNavigator->DecrementOffset(context->GetShiftLeft() ? 8 : 1);
             TrackList_UpdateAllExternalSurfaces();
             break;
         case Zoom:
@@ -310,7 +241,7 @@ public:
         switch (session_type)
         {
         case Channel:
-            AdjustBankOffset(context->GetShiftLeft() ? -8 : -1, true);
+            trackNavigator->IncrementOffset(context->GetShiftLeft() ? 8 : 1);
             TrackList_UpdateAllExternalSurfaces();
             break;
         case Zoom:

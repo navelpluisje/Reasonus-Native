@@ -4,27 +4,27 @@
 #include <WDL/ptrlist.h>
 #include <reaper_plugin.h>
 #include <reaper_plugin_functions.h>
+#include "csurf_channel_manager_resources.hpp"
+#include "csurf_navigator_filters.hpp"
 
 class CSurf_Navigator
 {
     int nb_channels = 8;
     int track_offset = 0;
+    NavigatorFilter trackFilter = TrackAllFilter;
 
     WDL_PtrList<MediaTrack> tracks;
 
-    void GetAllTracks()
+    void UpdateMixerPosition()
     {
-        tracks.Empty();
-
-        for (int i = 0; i < CountTracks(0); i++)
-        {
-            tracks.Add(GetTrack(0, i));
-        }
+        MediaTrack *media_track = GetTrack(0, track_offset);
+        SetMixerScroll(media_track);
     }
 
 public:
-    CSurf_Navigator() {
-
+    CSurf_Navigator()
+    {
+        HandleAllTracksFilter();
     };
 
     MediaTrack *GetTrackByIndex(int index)
@@ -36,18 +36,95 @@ public:
     WDL_PtrList<MediaTrack> GetBankTracks()
     {
         WDL_PtrList<MediaTrack> bank;
-
-        GetAllTracks();
+        GetAllVisibleTracks(tracks);
         for (int i = track_offset; i < track_offset + nb_channels; i++)
         {
-            bank.Add(GetTrack(0, i));
+            bank.Add(tracks.Get(i));
         }
         return bank;
     }
 
-    void AdjustBankOffset(int offset)
+    void SetOffset(int offset)
     {
-        track_offset += offset;
+        if (offset > (tracks.GetSize() - nb_channels))
+        {
+            track_offset = tracks.GetSize() - nb_channels;
+        }
+        else
+        {
+            track_offset = offset;
+        }
+    }
+
+    void IncrementOffset(int count)
+    {
+        if ((track_offset + count) <= (tracks.GetSize() - nb_channels))
+        {
+            track_offset += count;
+        }
+        else if (tracks.GetSize() < nb_channels)
+        {
+            track_offset = 0;
+        }
+        else
+        {
+            track_offset = tracks.GetSize() - nb_channels;
+        }
+        UpdateMixerPosition();
+    }
+
+    void DecrementOffset(int count)
+    {
+        if ((track_offset - count) >= 0)
+        {
+            track_offset -= count;
+        }
+        else
+        {
+            track_offset = 0;
+        }
+        UpdateMixerPosition();
+    }
+
+    void
+    HandlePanEncoderChange(int value)
+    {
+        if (hasBit(value, 6))
+        {
+            DecrementOffset(1);
+        }
+        if (!hasBit(value, 6) && track_offset < (tracks.GetSize() - nb_channels))
+        {
+            track_offset += 1;
+        }
+    }
+
+    void handleFilter(NavigatorFilter filter)
+    {
+        trackFilter = filter;
+        switch (filter)
+        {
+        case TrackSendsFilter:
+            HandleTracksWithSendsFilter();
+            break;
+        case TrackReceivesFilter:
+            HandleTracksWithReceivesFilter();
+            break;
+        case TrackHarwareOutputFilter:
+            HandleTracksWithHardwareOutputsFilter();
+            break;
+        case TrackInstrumentsFilter:
+            HandleTracksWithinstrumentsFilter();
+            break;
+        case TrackTopFoldersFilter:
+            HandleTracksTopFoldersFilter();
+            break;
+        case TrackAllFoldersFilter:
+            HandleTracksAllFoldersFilter();
+            break;
+        default:
+            HandleAllTracksFilter();
+        }
     }
 };
 

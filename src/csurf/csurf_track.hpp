@@ -52,12 +52,11 @@ protected:
     CSurf_Fader *fader;
     CSurf_Valuebar *valueBar;
     CSurf_Display *display;
-    ButtonColor color;
 
     // Slider
 
 public:
-    CSurf_Track(ButtonColor colorActive, ButtonColor colorDim, int index, CSurf_Context *_context, midi_Output *m_midiout);
+    CSurf_Track(int index, CSurf_Context *_context, midi_Output *m_midiout);
     ~CSurf_Track() {};
 
     void SetTrackColor(ButtonColor colorActive, ButtonColor colorDim);

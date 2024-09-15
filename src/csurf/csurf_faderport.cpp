@@ -12,6 +12,7 @@
 #include "csurf.h"
 #include "csurf_session_manager.cpp"
 #include "csurf_shift_manager.cpp"
+#include "csurf_mix_manager.cpp"
 #include "csurf_channel_context.cpp"
 #include "csurf_navigator.cpp"
 #include "csurf_fader_resources.hpp"
@@ -19,39 +20,6 @@
 #include <WDL/ptrlist.h>
 #include "../src/resource.h"
 #include <vector>
-
-/*
- * Todo: automation status, automation mode setting using "auto" button, more
- */
-
-// static bool g_csurf_mcpmode = false; // we may wish to allow an action to set this
-
-// static double int14ToPan(unsigned char msb, unsigned char lsb)
-// {
-//   int val = lsb | (msb << 7);
-//   return 1.0 - (val / (16383.0 * 0.5));
-// }
-
-// static int volToInt14(double vol)
-// {
-//   double d = (DB2SLIDER(VAL2DB(vol)) * 16383.0 / 1000.0);
-//   if (d < 0.0)
-//     d = 0.0;
-//   else if (d > 16383.0)
-//     d = 16383.0;
-
-//   return (int)(d + 0.5);
-// }
-// static int panToInt14(double pan)
-// {
-//   double d = ((1.0 - pan) * 16383.0 * 0.5);
-//   if (d < 0.0)
-//     d = 0.0;
-//   else if (d > 16383.0)
-//     d = 16383.0;
-
-//   return (int)(d + 0.5);
-// }
 
 class CSurf_FaderPort : public IReaperControlSurface
 {
@@ -65,6 +33,7 @@ class CSurf_FaderPort : public IReaperControlSurface
   CSurf_ShiftManager *shiftManager;
   CSurf_ChannelContext *channelContext;
   CSurf_Navigator *trackNavigator;
+  CSurf_MixManager *mixManager;
 
   CSurf_Button *playButton;
   CSurf_Button *stopButton;
@@ -105,22 +74,17 @@ class CSurf_FaderPort : public IReaperControlSurface
      */
     else if (evt->midi_message[0] == MIDI_MESSAGE_ENDCODER)
     {
-      //       if (evt->midi_message[1] == 0)
-      //         m_faderport_lasthw = evt->midi_message[2];
-      //       else if (evt->midi_message[1] == 0x20)
-      //       {
-      //         MediaTrack *tr = CSurf_TrackFromID(m_bank_offset, g_csurf_mcpmode);
-
-      //         if (tr)
-      //         {
-      //           if (m_flipmode)
-      //           {
-      //             CSurf_SetSurfacePan(tr, CSurf_OnPanChange(tr, int14ToPan(m_faderport_lasthw, evt->midi_message[2]), false), NULL);
-      //           }
-      //           else
-      //             CSurf_SetSurfaceVolume(tr, CSurf_OnVolumeChange(tr, int14ToVol(m_faderport_lasthw, evt->midi_message[2]), false), NULL);
-      //         }
-      //       }
+      if (evt->midi_message[1] == ENCODER_PAN)
+      {
+        if (context->GetPanEncoderMode() == PanEncoderPanMode)
+        {
+          // Handle the pan pan mode
+        }
+        if (context->GetPanEncoderMode() == PanEncoderNavigateMode)
+        {
+          trackNavigator->HandlePanEncoderChange(evt->midi_message[2]);
+        }
+      }
     }
 
     /**
@@ -136,156 +100,6 @@ class CSurf_FaderPort : public IReaperControlSurface
       {
         return;
       }
-      if (evt->midi_message[1] == 0x7f)
-      {
-        //         m_fader_touchstate = !!evt->midi_message[2];
-      }
-      //       else if (evt->midi_message[1] == 0x2) // shift
-      //       {
-      //         if (evt->midi_message[2])
-      //           m_faderport_buttonstates |= 2;
-      //         else
-      //           m_faderport_buttonstates &= ~2;
-
-      //         if (m_midiout)
-      //           m_midiout->Send(0xa0, 5, evt->midi_message[2], -1);
-      //       }
-      //       else if (evt->midi_message[1] == 0x10) // rec arm key push
-      //       {
-      //         if (evt->midi_message[2])
-      //         {
-      //           if (m_faderport_buttonstates & 2)
-      //             ClearAllRecArmed();
-      //           else
-      //           {
-      //             MediaTrack *tr = CSurf_TrackFromID(m_bank_offset, g_csurf_mcpmode);
-      //             if (tr)
-      //               SetSurfaceRecArm(tr, CSurf_OnRecArmChange(tr, -1));
-      //           }
-      //         }
-      //       }
-      //       else if (evt->midi_message[1] == 0x17) // automation off
-      //       {
-      //         if (evt->midi_message[2])
-      //         {
-      //           MediaTrack *tr = CSurf_TrackFromID(m_bank_offset, g_csurf_mcpmode);
-
-      //           if (tr)
-      //           {
-      //             SetTrackAutomationMode(tr, 0);
-      //             CSurf_SetAutoMode(-1, NULL);
-      //           }
-      //         }
-      //       }
-      //       else if (evt->midi_message[1] == 0x8) // automation  touch
-      //       {
-      //         if (evt->midi_message[2])
-      //         {
-      //           MediaTrack *tr = CSurf_TrackFromID(m_bank_offset, g_csurf_mcpmode);
-
-      //           if (tr)
-      //           {
-      //             SetTrackAutomationMode(tr, 2);
-      //             CSurf_SetAutoMode(-1, NULL);
-      //           }
-      //         }
-      //       }
-      //       else if (evt->midi_message[1] == 0x9) // automation write
-      //       {
-      //         if (evt->midi_message[2])
-      //         {
-      //           MediaTrack *tr = CSurf_TrackFromID(m_bank_offset, g_csurf_mcpmode);
-
-      //           if (tr)
-      //           {
-      //             SetTrackAutomationMode(tr, 3);
-      //             CSurf_SetAutoMode(-1, NULL);
-      //           }
-      //         }
-      //       }
-      //       else if (evt->midi_message[1] == 0xa) // automation read
-      //       {
-      //         if (evt->midi_message[2])
-      //         {
-      //           MediaTrack *tr = CSurf_TrackFromID(m_bank_offset, g_csurf_mcpmode);
-
-      //           if (tr)
-      //           {
-      //             SetTrackAutomationMode(tr, 1);
-      //             CSurf_SetAutoMode(-1, NULL);
-      //           }
-      //         }
-      //       }
-      //       else if (evt->midi_message[1] == 0xb || evt->midi_message[1] == 0xc || evt->midi_message[1] == 0xd) // automation read
-      //       {
-      //         if (evt->midi_message[2])
-      //         {
-      //           int a = (evt->midi_message[1] - 0xb) + 8;
-      //           if (m_faderport_buttonstates & 2)
-      //             a += 3;
-      //           MIDI_event_t evt = {0, 3, {0xbf, a, 0}};
-      //           kbd_OnMidiEvent(&evt, -1);
-      //         }
-      //       }
-      //       else if (evt->midi_message[1] == 0x3) // rew
-      //       {
-      //         m_button_states &= ~1;
-      //         if (evt->midi_message[2])
-      //         {
-      //           if ((m_faderport_buttonstates & 2))
-      //             CSurf_GoStart();
-      //           else
-      //             m_button_states |= 1;
-      //         }
-      //         if (m_midiout)
-      //           m_midiout->Send(0xa0, 4, evt->midi_message[2], -1);
-      //       }
-      //       else if (evt->midi_message[1] == 0x4) // fwd
-      //       {
-      //         m_button_states &= ~2;
-      //         if (evt->midi_message[2])
-      //         {
-      //           if ((m_faderport_buttonstates & 2))
-      //           {
-      //             CSurf_GoEnd();
-      //           }
-      //           else
-      //             m_button_states |= 2;
-      //         }
-      //         if (m_midiout)
-      //           m_midiout->Send(0xa0, 3, evt->midi_message[2], -1);
-      //       }
-      //       else if (evt->midi_message[1] == 0x5) // stop
-      //       {
-      //         if (evt->midi_message[2])
-      //         {
-      //           CSurf_OnStop();
-      //         }
-      //       }
-      //       else if (evt->midi_message[1] == 0x1) // punch
-      //       {
-      //         if (evt->midi_message[2])
-      //         {
-      //           if ((m_faderport_buttonstates & 2))
-      //           {
-      //             SendMessage(g_hwnd, WM_COMMAND, ID_MARKER_PREV, 0);
-      //           }
-      //           else
-      //             SendMessage(g_hwnd, WM_COMMAND, ID_LOOP_SETSTART, 0);
-      //         }
-      //       }
-      //       else if (evt->midi_message[1] == 0x0) // user
-      //       {
-      //         if (evt->midi_message[2])
-      //         {
-      //           if ((m_faderport_buttonstates & 2))
-      //           {
-      //             SendMessage(g_hwnd, WM_COMMAND, ID_MARKER_NEXT, 0);
-      //           }
-      //           else
-      //             SendMessage(g_hwnd, WM_COMMAND, ID_LOOP_SETEND, 0);
-      //         }
-      //       }
 
       /**
        * Track Select Buttons
@@ -368,240 +182,94 @@ class CSurf_FaderPort : public IReaperControlSurface
       /**
        * Arm Button
        */
-      else if (evt->midi_message[1] == BTN_ARM) // loop
+      else if (evt->midi_message[1] == BTN_ARM)
       {
         shiftManager->HandleArmButton(evt->midi_message[2]);
         sessionManager->Refresh();
       }
+
       /**
        * Shift Manager Buttons
        */
-      else if (evt->midi_message[1] == BTN_SHIFT_LEFT) // loop
+      else if (evt->midi_message[1] == BTN_SHIFT_LEFT)
       {
         shiftManager->HandleShiftLeftButton(evt->midi_message[2]);
         sessionManager->Refresh();
       }
-      else if (evt->midi_message[1] == BTN_SHIFT_RIGHT) // loop
+      else if (evt->midi_message[1] == BTN_SHIFT_RIGHT)
       {
         shiftManager->HandleShiftRightButton(evt->midi_message[2]);
       }
 
       /**
+       * Mix Management
+       */
+      else if (evt->midi_message[1] == BTN_AUDIO)
+      {
+        mixManager->HandleMixAudioButton();
+      }
+      else if (evt->midi_message[1] == BTN_VI)
+      {
+        mixManager->HandleMixViButton();
+      }
+      else if (evt->midi_message[1] == BTN_BUS)
+      {
+        mixManager->HandleMixBusButton();
+      }
+      else if (evt->midi_message[1] == BTN_VCA)
+      {
+        mixManager->HandleMixVcaButton();
+      }
+      else if (evt->midi_message[1] == BTN_ALL)
+      {
+        mixManager->HandleMixAllButton();
+      }
+
+      /**
        * Session Manager Buttons
        */
-      else if (evt->midi_message[1] == BTN_CHANNEL) // loop
+      else if (evt->midi_message[1] == BTN_CHANNEL)
       {
-        // sessionManager->HandleChannelButton(m_midiout);
+        sessionManager->HandleChannelButton();
       }
-      else if (evt->midi_message[1] == BTN_ZOOM) // loop
+      else if (evt->midi_message[1] == BTN_ZOOM)
       {
-        // sessionManager->HandleZoomButton(m_midiout);
+        sessionManager->HandleZoomButton();
       }
-      else if (evt->midi_message[1] == BTN_SCROLL) // loop
+      else if (evt->midi_message[1] == BTN_SCROLL)
       {
-        // sessionManager->HandleScrollButton(m_midiout);
+        sessionManager->HandleScrollButton();
       }
-      else if (evt->midi_message[1] == BTN_BANK) // loop
+      else if (evt->midi_message[1] == BTN_BANK)
       {
-        // sessionManager->HandleBankButton(m_midiout);
+        sessionManager->HandleBankButton();
       }
-      else if (evt->midi_message[1] == BTN_MASTER) // loop
+      else if (evt->midi_message[1] == BTN_MASTER)
       {
-        // sessionManager->HandleMasterButton(m_midiout);
+        sessionManager->HandleMasterButton();
       }
-      else if (evt->midi_message[1] == BTN_CLICK) // loop
+      else if (evt->midi_message[1] == BTN_CLICK)
       {
-        // sessionManager->HandleClickButton(m_midiout);
+        sessionManager->HandleClickButton();
       }
-      else if (evt->midi_message[1] == BTN_SECTION) // loop
+      else if (evt->midi_message[1] == BTN_SECTION)
       {
-        // sessionManager->HandleSectionButton(m_midiout);
+        sessionManager->HandleSectionButton();
       }
-      else if (evt->midi_message[1] == BTN_MARKER) // loop
+      else if (evt->midi_message[1] == BTN_MARKER)
       {
-        // sessionManager->HandleMarkerButton(m_midiout);
+        sessionManager->HandleMarkerButton();
       }
-      else if (evt->midi_message[1] == BTN_NEXT) // loop
+      else if (evt->midi_message[1] == BTN_NEXT)
       {
-        // sessionManager->HandleNextButton(evt->midi_message[2], m_midiout);
+        sessionManager->HandleNextButton(evt->midi_message[2]);
       }
-      else if (evt->midi_message[1] == BTN_PREV) // loop
+      else if (evt->midi_message[1] == BTN_PREV)
       {
-        // sessionManager->HandlePrevButton(evt->midi_message[2], m_midiout);
+        sessionManager->HandlePrevButton(evt->midi_message[2]);
       }
-
-      //       else if (evt->midi_message[1] == 0x0e) // undo/redo
-      //       {
-      //         if (evt->midi_message[2])
-      //         {
-
-      //           SendMessage(g_hwnd, WM_COMMAND, (m_faderport_buttonstates & 2) ? IDC_EDIT_REDO : IDC_EDIT_UNDO, 0);
-      //         }
-      //       }
-      //       else if (evt->midi_message[1] == 0x16) // output (flip)
-      //       {
-      //         if (evt->midi_message[2])
-      //         {
-      //           m_flipmode = !m_flipmode;
-      //           if (m_midiout)
-      //             m_midiout->Send(0xa0, 0x11, m_flipmode ? 1 : 0, -1);
-      //           CSurf_ResetAllCachedVolPanStates();
-      //           TrackList_UpdateAllExternalSurfaces();
-      //         }
-      //       }
-      //       else if (evt->midi_message[1] == 0x11) // solo key push
-      //       {
-      //         if (evt->midi_message[2])
-      //         {
-      //           if (m_faderport_buttonstates & 2)
-      //             SoloAllTracks(0);
-      //           else
-      //           {
-      //             MediaTrack *tr = CSurf_TrackFromID(m_bank_offset, g_csurf_mcpmode);
-      //             if (tr)
-      //               SetSurfaceSolo(tr, CSurf_OnSoloChange(tr, -1));
-      //           }
-      //         }
-      //       }
-      //       else if (evt->midi_message[1] == 0x12) // mute key push
-      //       {
-      //         if (evt->midi_message[2])
-      //         {
-      //           if (m_faderport_buttonstates & 2)
-      //             MuteAllTracks(false);
-      //           else
-      //           {
-      //             MediaTrack *tr = CSurf_TrackFromID(m_bank_offset, g_csurf_mcpmode);
-      //             if (tr)
-      //               SetSurfaceMute(tr, CSurf_OnMuteChange(tr, -1));
-      //           }
-      //         }
-      //       }
-      //       else if (evt->midi_message[1] == 0x13) // prevchan
-      //       {
-      //         if (evt->midi_message[2])
-      //         {
-      //           AdjustBankOffset((m_faderport_buttonstates & 1) ? -8 : -1, true);
-      //           TrackList_UpdateAllExternalSurfaces();
-      //         }
-      //         if (m_midiout)
-      //           m_midiout->Send(0xa0, 0x14, evt->midi_message[2], -1);
-      //       }
-      //       else if (evt->midi_message[1] == 0x14) // bank
-      //       {
-      //         if (evt->midi_message[2])
-      //           m_faderport_buttonstates |= 1;
-      //         else
-      //           m_faderport_buttonstates &= ~1;
-
-      //         if (m_midiout)
-      //           m_midiout->Send(0xa0, 0x13, evt->midi_message[2], -1);
-      //       }
-      //       else if (evt->midi_message[1] == 0x15) // nextchan
-      //       {
-      //         if (evt->midi_message[2])
-      //         {
-      //           AdjustBankOffset((m_faderport_buttonstates & 1) ? 8 : 1, true);
-      //           TrackList_UpdateAllExternalSurfaces();
-      //         }
-      //         if (m_midiout)
-      //           m_midiout->Send(0xa0, 0x12, evt->midi_message[2], -1);
-      //       }
-      //       else if (evt->midi_message[1] == 0x7e)
-      //       {
-      //         // passthrough footswitch
-      //         MIDI_event_t e = {0, 3, {0x97, evt->midi_message[1], evt->midi_message[2]}};
-      //         kbd_OnMidiEvent(&e, -1);
-      //       }
-      //     }
-      //     else if (evt->midi_message[0] == 0xe0)
-      //     {
-      //       if (!evt->midi_message[1])
-      //       {
-      //         m_pan_lasttouch = timeGetTime();
-
-      //         double adj = 0.02;
-      //         if (evt->midi_message[2] > 0x3f)
-      //           adj = -adj;
-      //         MediaTrack *tr = CSurf_TrackFromID(m_bank_offset, g_csurf_mcpmode);
-
-      //         if (tr)
-      //         {
-      //           if (m_flipmode)
-      //           {
-      //             CSurf_SetSurfaceVolume(tr, CSurf_OnVolumeChange(tr, adj * 11.0, true), NULL);
-      //           }
-      //           else
-      //             CSurf_SetSurfacePan(tr, CSurf_OnPanChange(tr, adj, true), NULL);
-      //         }
-      //       }
     }
   }
-
-  //   void AdjustBankOffset(int amt, bool dosel)
-  //   {
-  //     if (!amt)
-  //       return;
-
-  //     if (amt < 0)
-  //     {
-  //       if (m_bank_offset > 0)
-  //       {
-  //         m_bank_offset += amt;
-  //         if (m_bank_offset < 0)
-  //           m_bank_offset = 0;
-
-  //         if (dosel)
-  //         {
-  //           int x;
-  //           MediaTrack *t = CSurf_TrackFromID(m_bank_offset, g_csurf_mcpmode);
-  //           for (x = 0;; x++)
-  //           {
-  //             int f = 0;
-  //             if (!GetTrackInfo(x - 1, &f))
-  //               break;
-
-  //             MediaTrack *tt = CSurf_TrackFromID(x, false);
-  //             bool sel = tt == t;
-  //             if (tt && !(f & 2) == sel)
-  //             {
-  //               SetTrackSelected(tt, sel);
-  //             }
-  //           }
-  //         }
-  //       }
-  //     }
-  //     else
-  //     {
-  //       int msize = CSurf_NumTracks(g_csurf_mcpmode);
-
-  //       if (m_bank_offset < msize)
-  //       {
-  //         m_bank_offset += amt;
-  //         if (m_bank_offset > msize)
-  //           m_bank_offset = msize;
-
-  //         if (dosel)
-  //         {
-  //           int x;
-  //           MediaTrack *t = CSurf_TrackFromID(m_bank_offset, g_csurf_mcpmode);
-  //           for (x = 0;; x++)
-  //           {
-  //             int f = 0;
-  //             if (!GetTrackInfo(x - 1, &f))
-  //               break;
-
-  //             MediaTrack *tt = CSurf_TrackFromID(x, false);
-  //             bool sel = tt == t;
-  //             if (tt && !(f & 2) == sel)
-  //             {
-  //               SetTrackSelected(tt, sel);
-  //             }
-  //           }
-  //         }
-  //       }
-  //     }
-  //   }
 
 public:
   CSurf_FaderPort(int indev, int outdev, int *errStats)
@@ -631,27 +299,22 @@ public:
 
     context = new CSurf_Context();
 
-    ButtonColor active{0x7f, 0x7f, 0x7f};
-    ButtonColor dim{0x7f, 0x00, 0x7f};
     for (int i = 0; i < 8; i++)
     {
-      CSurf_Track *track = new CSurf_Track(active, dim, i, context, m_midiout);
+      CSurf_Track *track = new CSurf_Track(i, context, m_midiout);
       tracks.push_back(track);
     }
 
-    sessionManager = new CSurf_SessionManager(context, m_midiout);
     trackNavigator = new CSurf_Navigator();
+    sessionManager = new CSurf_SessionManager(context, trackNavigator, m_midiout);
     shiftManager = new CSurf_ShiftManager(context, m_midiout);
     channelContext = new CSurf_ChannelContext(context, trackNavigator, m_midiout);
+    mixManager = new CSurf_MixManager(context, trackNavigator, m_midiout);
 
     playButton = new CSurf_Button(BTN_PLAY, BTN_VALUE_OFF, m_midiout);
     stopButton = new CSurf_Button(BTN_STOP, BTN_VALUE_OFF, m_midiout);
     recordButton = new CSurf_Button(BTN_RECORD, BTN_VALUE_OFF, m_midiout);
     loopButton = new CSurf_Button(BTN_RECORD, BTN_VALUE_OFF, m_midiout);
-
-    // int colorActive[3] = {0x7f, 0x7f, 0x00};
-    // int colorDim[3] = {0x00, 0x7f, 0x00};
-    // linkButton = new CSurf_ColorButton(colorActive, colorDim, BTN_LINK, BTN_VALUE_OFF);
 
     if (errStats)
     {
@@ -721,13 +384,13 @@ public:
     return configtmp;
   }
 
-  //   void CloseNoReset()
-  //   {
-  //     DELETE_ASYNC(m_midiout);
-  //     DELETE_ASYNC(m_midiin);
-  //     m_midiout = 0;
-  //     m_midiin = 0;
-  //   }
+  // void CloseNoReset()
+  // {
+  //   DELETE_ASYNC(m_midiout);
+  //   DELETE_ASYNC(m_midiin);
+  //   m_midiout = 0;
+  //   m_midiin = 0;
+  // }
 
   void Run()
   {
@@ -751,94 +414,19 @@ public:
         channelContext->UpdateTracks();
         m_buttonstate_lastrun = now;
       }
-
-      if (m_button_states)
-      {
-        DWORD now = timeGetTime();
-        if ((now - m_buttonstate_lastrun) >= 100)
-        {
-          m_buttonstate_lastrun = now;
-
-          if ((m_button_states & 3) != 3)
-          {
-            if (m_button_states & 1)
-            {
-              CSurf_OnRewFwd(1, -1);
-            }
-            else if (m_button_states & 2)
-            {
-              CSurf_OnRewFwd(1, 1);
-            }
-          }
-        }
-      }
     }
   }
 
-  void SetTrackListChange()
+  // void SetTrackListChange()
+  // {
+  //   ShowConsoleMsg("SetTrackListChange");
+  // }
+
+  void OnTrackSelection(MediaTrack *media_track)
   {
-    SetAutoMode(0);
+    int trackId = GetMediaTrackInfo_Value(media_track, "IP_TRACKNUMBER");
+    trackNavigator->SetOffset(trackId - 1);
   }
-
-  // #define FIXID(id)                                            \
-//   const int oid = CSurf_TrackToID(trackid, g_csurf_mcpmode); \
-//   const int id = oid - m_bank_offset;
-
-  //   void SetSurfaceVolume(MediaTrack *trackid, double volume)
-  //   {
-  //     FIXID(id)
-  //     if (m_midiout && !id && !m_flipmode)
-  //     {
-  //       int volint = volToInt14(volume);
-  //       volint /= 16;
-
-  //       if (m_vol_lastpos != volint)
-  //       {
-  //         m_vol_lastpos = volint;
-  //         m_midiout->Send(0xb0, 0x00, volint >> 7, -1);
-  //         m_midiout->Send(0xb0, 0x20, volint & 127, -1);
-  //       }
-  //     }
-  //   }
-  //   void SetSurfacePan(MediaTrack *trackid, double pan)
-  //   {
-  //     FIXID(id)
-  //     if (m_midiout && !id && m_flipmode)
-  //     {
-  //       int volint = panToInt14(pan);
-  //       volint /= 16;
-
-  //       if (m_vol_lastpos != volint)
-  //       {
-  //         m_vol_lastpos = volint;
-  //         m_midiout->Send(0xb0, 0x00, volint >> 7, -1);
-  //         m_midiout->Send(0xb0, 0x20, volint & 127, -1);
-  //       }
-  //     }
-  //   }
-  //   void SetSurfaceMute(MediaTrack *trackid, bool mute)
-  //   {
-  //     FIXID(id)
-  //     if (!id && m_midiout)
-  //       m_midiout->Send(0xa0, 0x15, mute ? 1 : 0, -1);
-  //   }
-  //   void SetSurfaceSelected(MediaTrack *trackid, bool selected)
-  //   {
-  //     (void)trackid;
-  //     (void)selected;
-  //   }
-  //   void SetSurfaceSolo(MediaTrack *trackid, bool solo)
-  //   {
-  //     FIXID(id)
-  //     if (!id && m_midiout)
-  //       m_midiout->Send(0xa0, 0x16, solo ? 1 : 0, -1);
-  //   }
-  //   void SetSurfaceRecArm(MediaTrack *trackid, bool recarm)
-  //   {
-  //     FIXID(id)
-  //     if (!id && m_midiout)
-  //       m_midiout->Send(0xa0, 0x17, recarm ? 1 : 0, -1);
-  //   }
 
   void SetPlayState(bool play, bool pause, bool rec)
   {
@@ -864,78 +452,6 @@ public:
       loopButton->SetValue(rep ? BTN_VALUE_ON : BTN_VALUE_OFF);
     }
   }
-
-  //   void SetTrackTitle(MediaTrack *trackid, const char *title)
-  //   {
-  //     (void)trackid;
-  //     (void)title;
-  //   }
-
-  //   bool GetTouchState(MediaTrack *trackid, int isPan)
-  //   {
-  //     if (isPan != 0 && isPan != 1)
-  //       return false;
-
-  //     FIXID(id)
-  //     if (!id)
-  //     {
-  //       if (!m_flipmode != !isPan)
-  //       {
-  //         if (m_pan_lasttouch == 1 || (timeGetTime() - m_pan_lasttouch) < 3000) // fake touch, go for 3s after last movement
-  //         {
-  //           return true;
-  //         }
-  //         return false;
-  //       }
-  //       return !!m_fader_touchstate;
-  //     }
-  //     return false;
-  //   }
-
-  //   void SetAutoMode(int mode)
-  //   {
-  //     if (m_midiout)
-  //     {
-  //       MediaTrack *tr = CSurf_TrackFromID(m_bank_offset, g_csurf_mcpmode);
-  //       if (tr)
-  //         mode = GetTrackAutomationMode(tr);
-
-  //       if (mode < 0)
-  //         return;
-
-  //       m_midiout->Send(0xa0, 0x10, 0, -1); // mode==0); // dont set off light, it disables the fader?!
-  //       m_midiout->Send(0xa0, 0xf, mode == 2 || mode == 4, -1);
-  //       m_midiout->Send(0xa0, 0xe, mode == 3, -1);
-  //       m_midiout->Send(0xa0, 0xd, mode == 1, -1);
-  //     }
-  //   }
-
-  //   void ResetCachedVolPanStates()
-  //   {
-  //     m_vol_lastpos = -1000;
-  //   }
-
-  //   void OnTrackSelection(MediaTrack *trackid)
-  //   {
-  //     int newpos = CSurf_TrackToID(trackid, g_csurf_mcpmode);
-  //     if (newpos >= 0 && newpos != m_bank_offset)
-  //     {
-  //       AdjustBankOffset(newpos - m_bank_offset, false);
-  //       TrackList_UpdateAllExternalSurfaces();
-  //     }
-  //   }
-
-  //   bool IsKeyDown(int key)
-  //   {
-  //     (void)key;
-  //     return false;
-  //   }
-
-  //   virtual int Extended(int call, void *parm1, void *parm2, void *parm3)
-  //   {
-  //     DEFAULT_DEVICE_REMAP()
-  //     return 0;
-  //   }
 };
 
 static void parseParms(const char *str, int parms[4])

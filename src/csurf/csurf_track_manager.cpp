@@ -22,7 +22,16 @@ protected:
         {
 
             int trackColor = GetTrackColor(media_track);
-            ColorFromNative(trackColor, &red, &green, &blue);
+            if (trackColor == 0)
+            {
+                red = 0x7f;
+                green = 0x7f;
+                blue = 0x7f;
+            }
+            else
+            {
+                ColorFromNative(trackColor, &red, &green, &blue);
+            }
         }
         colorActive.SetColor(red / 2, green / 2, blue / 2);
         colorDim.SetColor(red / 4, green / 4, blue / 4);
