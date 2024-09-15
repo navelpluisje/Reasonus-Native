@@ -86,8 +86,7 @@ public:
         UpdateMixerPosition();
     }
 
-    void
-    HandlePanEncoderChange(int value)
+    void HandlePanEncoderChange(int value)
     {
         if (hasBit(value, 6))
         {

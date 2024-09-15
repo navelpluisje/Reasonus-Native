@@ -4,6 +4,7 @@
 #include "csurf_button.hpp"
 #include "csurf_context.cpp"
 #include "csurf_navigator.cpp"
+#include "csurf_session_manager_actions.hpp"
 
 enum SessionTypes
 {
@@ -43,7 +44,6 @@ protected:
     {
         // With shift engaged, blink the selected button
         Btn_Value valueOn = context->GetShiftLeft() ? BTN_VALUE_BLINK : BTN_VALUE_ON;
-        // ShowConsoleMsg("SetButtonValues\n");
 
         channelButton->SetValue(session_type == Channel ? valueOn : BTN_VALUE_OFF);
         zoomButton->SetValue(session_type == Zoom ? valueOn : BTN_VALUE_OFF);
@@ -90,18 +90,13 @@ public:
 
     void HandleChannelButton()
     {
-        // ShowConsoleMsg("Channel");
         if (context->GetShiftLeft())
         {
-            // ShowConsoleMsg("ChannelShift");
             handleFunction1();
+            return;
         }
-        else
-        {
-            // ShowConsoleMsg("Channel No Shift");
-            session_type = Channel;
-            SetButtonValues();
-        }
+        session_type = Channel;
+        SetButtonValues();
     }
 
     void HandleZoomButton()
@@ -109,12 +104,10 @@ public:
         if (context->GetShiftLeft())
         {
             handleFunction2();
+            return;
         }
-        else
-        {
-            session_type = Zoom;
-            SetButtonValues();
-        }
+        session_type = Zoom;
+        SetButtonValues();
     }
 
     void HandleScrollButton()
@@ -122,12 +115,10 @@ public:
         if (context->GetShiftLeft())
         {
             handleFunction3();
+            return;
         }
-        else
-        {
-            session_type = Scroll;
-            SetButtonValues();
-        }
+        session_type = Scroll;
+        SetButtonValues();
     }
 
     void HandleBankButton()
@@ -135,12 +126,10 @@ public:
         if (context->GetShiftLeft())
         {
             handleFunction4();
+            return;
         }
-        else
-        {
-            session_type = Bank;
-            SetButtonValues();
-        }
+        session_type = Bank;
+        SetButtonValues();
     }
 
     void HandleMasterButton()
@@ -148,12 +137,10 @@ public:
         if (context->GetShiftLeft())
         {
             handleFunction5();
+            return;
         }
-        else
-        {
-            session_type = Master;
-            SetButtonValues();
-        }
+        session_type = Master;
+        SetButtonValues();
     }
 
     void HandleClickButton()
@@ -161,12 +148,10 @@ public:
         if (context->GetShiftLeft())
         {
             handleFunction6();
+            return;
         }
-        else
-        {
-            session_type = Click;
-            SetButtonValues();
-        }
+        session_type = Click;
+        SetButtonValues();
     }
 
     void HandleSectionButton()
@@ -174,12 +159,15 @@ public:
         if (context->GetShiftLeft())
         {
             handleFunction7();
+            return;
         }
-        else
+        // Once selected and repressing it again, it will create a region from the time selection
+        if (session_type == Section)
         {
-            session_type = Section;
-            SetButtonValues();
+            Main_OnCommandEx(40306, 0, 0); // Markers: Insert region from time selection and edit...
         }
+        session_type = Section;
+        SetButtonValues();
     }
 
     void HandleMarkerButton()
@@ -187,12 +175,10 @@ public:
         if (context->GetShiftLeft())
         {
             handleFunction8();
+            return;
         }
-        else
-        {
-            session_type = Marker;
-            SetButtonValues();
-        }
+        session_type = Marker;
+        SetButtonValues();
     }
 
     void HandlePrevButton(int val)
@@ -212,18 +198,29 @@ public:
             TrackList_UpdateAllExternalSurfaces();
             break;
         case Zoom:
+            context->GetShiftLeft() ? Main_OnCommandEx(40112, 0, 0) // View: Zoom out vertical
+                                    : Main_OnCommandEx(1011, 0, 0); // View: Zoom out horizontal
             break;
         case Scroll:
+            Main_OnCommandEx(40286, 0, 0); // Track: Go to previous track
             break;
         case Bank:
+            trackNavigator->DecrementOffset(context->GetShiftLeft() ? 1 : 8);
+            TrackList_UpdateAllExternalSurfaces();
             break;
         case Master:
+            trackNavigator->DecrementOffset(context->GetShiftLeft() ? 8 : 1);
+            TrackList_UpdateAllExternalSurfaces();
             break;
         case Click:
+            Main_OnCommandEx(42456, 0, 0); // Options: Set metronome speed to 1x
             break;
         case Section:
+            context->GetShiftLeft() ? Main_OnCommandEx(40625, 0, 0)               // Time selection: Set start point
+                                    : Main_OnCommandStringEx("_SWS_SELPREVMORR"); // SWS: Goto/select previous marker/region
             break;
         case Marker:
+            Main_OnCommandStringEx("_SWS_SELPREVMORR"); // SWS: Goto/select previous marker/region
             break;
         }
     }
@@ -245,18 +242,30 @@ public:
             TrackList_UpdateAllExternalSurfaces();
             break;
         case Zoom:
+            context->GetShiftLeft() ? Main_OnCommandEx(40111, 0, 0) // View: Zoom in vertical
+                                    : Main_OnCommandEx(1012, 0, 0); // View: Zoom in horizontal
             break;
         case Scroll:
+            Main_OnCommandEx(40285, 0, 0); // Track: Go to next track
             break;
         case Bank:
+            trackNavigator->IncrementOffset(context->GetShiftLeft() ? 1 : 8);
+            TrackList_UpdateAllExternalSurfaces();
             break;
         case Master:
+            trackNavigator->IncrementOffset(context->GetShiftLeft() ? 8 : 1);
+            TrackList_UpdateAllExternalSurfaces();
             break;
         case Click:
+            Main_OnCommandEx(42457, 0, 0); // Options: Set metronome speed to 2x
             break;
         case Section:
+            context->GetShiftLeft() ? Main_OnCommandEx(40626, 0, 0)               // Time selection: Set end point
+                                    : Main_OnCommandStringEx("_SWS_SELNEXTMORR"); // SWS: Goto/select next marker/region
+
             break;
         case Marker:
+            Main_OnCommandStringEx("_SWS_SELNEXTMORR"); // SWS: Goto/select next marker/region
             break;
         }
     }
@@ -268,18 +277,30 @@ public:
         case Channel:
             break;
         case Zoom:
+            context->GetShiftLeft() ? Main_OnCommandEx(40111, 0, 0) // View: Zoom in vertical
+                                    : Main_OnCommandEx(1012, 0, 0); // View: Zoom in horizontal
             break;
         case Scroll:
+            context->GetShiftLeft() ? Main_OnCommandEx(40141, 0, 0)  // View: Scroll view left
+                                    : Main_OnCommandEx(40139, 0, 0); // View: Scroll view up
             break;
         case Bank:
+            trackNavigator->IncrementOffset(context->GetShiftLeft() ? 1 : 8);
             break;
         case Master:
+            Main_OnCommandStringEx("_XENAKIOS_NUDMASVOL1DBU"); // Xenakios/SWS: Nudge master volume 1 dB up
             break;
         case Click:
+            IncrementMetronomeVolume();
             break;
         case Section:
+            context->GetShiftLeft()    ? Main_OnCommandEx(40105, 0, 0)  // View: Move cursor left one pixel, View: Move cursor right one pixel
+            : context->GetShiftRight() ? Main_OnCommandEx(40103, 0, 0)  // Time selection: Move cursor left, creating time selection, Time selection: Move cursor left, creating time selection
+                                       : Main_OnCommandEx(41044, 0, 0); // View: Move cursor left one pixel, View: Move cursor right one pixel
             break;
         case Marker:
+            context->GetShiftLeft() ? Main_OnCommandEx(40105, 0, 0)  // View: Move cursor left one pixel, View: Move cursor right one pixel
+                                    : Main_OnCommandEx(41044, 0, 0); // Move edit cursor back one beat, Move edit cursor forward one beat
             break;
         }
     }
@@ -291,18 +312,30 @@ public:
         case Channel:
             break;
         case Zoom:
+            context->GetShiftLeft() ? Main_OnCommandEx(40112, 0, 0) // View: Zoom out vertical
+                                    : Main_OnCommandEx(1011, 0, 0); // View: Zoom out horizontal
             break;
         case Scroll:
+            context->GetShiftLeft() ? Main_OnCommandEx(40140, 0, 0)  // View: Scroll view right
+                                    : Main_OnCommandEx(40138, 0, 0); // View: Scroll view down
             break;
         case Bank:
+            trackNavigator->DecrementOffset(context->GetShiftLeft() ? 1 : 8);
             break;
         case Master:
+            Main_OnCommandStringEx("_XENAKIOS_NUDMASVOL1DBD"); // Xenakios/SWS: Nudge master volume 1 dB down
             break;
         case Click:
+            DecrementMetronomeVolume();
             break;
         case Section:
+            context->GetShiftLeft()    ? Main_OnCommandEx(40104, 0, 0)  // View: Move cursor left one pixel, View: Move cursor right one pixel
+            : context->GetShiftRight() ? Main_OnCommandEx(40102, 0, 0)  // Time selection: Move cursor left, creating time selection, Time selection: Move cursor left, creating time selection
+                                       : Main_OnCommandEx(41045, 0, 0); // Move edit cursor back one beat, Move edit cursor forward one beat
             break;
         case Marker:
+            context->GetShiftLeft() ? Main_OnCommandEx(40104, 0, 0)  // View: Move cursor left one pixel, View: Move cursor right one pixel
+                                    : Main_OnCommandEx(41045, 0, 0); // Move edit cursor back one beat, Move edit cursor forward one beat
             break;
         }
     }
@@ -314,19 +347,45 @@ public:
         case Channel:
             break;
         case Zoom:
+            context->GetShiftLeft() ? Main_OnCommandEx(40113, 0, 0)  // View: Toggle track zoom to maximum height
+                                    : Main_OnCommandEx(40110, 0, 0); // View: Toggle track zoom to minimum height
             break;
         case Scroll:
+            context->GetShiftLeft() ? Main_OnCommandStringEx("_SWS_HSCROLLPLAY50") // SWS: Horizontal scroll to put play cursor at 50%
+                                    : Main_OnCommandEx(40913, 0, 0);               // Track: Vertical scroll selected tracks into view
             break;
         case Bank:
             break;
         case Master:
+            context->GetShiftLeft() ? SetMasterPanToCenter()
+                                    : Main_OnCommandStringEx("_XENAKIOS_SETMASTVOLTO0"); // Xenakios/SWS: Set master volume to 0 dB
             break;
         case Click:
+            context->GetShiftLeft() ? Main_OnCommandEx(40363, 0, 0)  // Options: Show metronome/pre-roll settings
+                                    : Main_OnCommandEx(40364, 0, 0); // Options: Toggle metronome
             break;
         case Section:
+            context->GetShiftLeft()    ? Main_OnCommandEx(41041, 0, 0)  // Move edit cursor to start of current measure
+            : context->GetShiftRight() ? Main_OnCommandEx(40615, 0, 0)  // Markers: Delete region near cursor
+                                       : Main_OnCommandEx(40616, 0, 0); // Markers: Edit region near cursor
             break;
         case Marker:
+            context->GetShiftLeft()    ? Main_OnCommandEx(40171, 0, 0)  // Markers: Insert and/or edit marker at current position
+            : context->GetShiftRight() ? Main_OnCommandEx(40613, 0, 0)  // Markers: Delete marker near cursor
+                                       : Main_OnCommandEx(40157, 0, 0); // Markers: Insert marker at current position
             break;
+        }
+    }
+
+    void HandleSessionNavEncoderChange(int value)
+    {
+        if (hasBit(value, 6))
+        {
+            HandleEncoderDecrement();
+        }
+        else
+        {
+            HandleEncoderIncrement();
         }
     }
 };

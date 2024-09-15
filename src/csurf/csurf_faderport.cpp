@@ -70,6 +70,10 @@ class CSurf_FaderPort : public IReaperControlSurface
           trackNavigator->HandlePanEncoderChange(evt->midi_message[2]);
         }
       }
+      if (evt->midi_message[1] == ENCODER_NAV)
+      {
+        sessionManager->HandleSessionNavEncoderChange(evt->midi_message[2]);
+      }
     }
 
     /**
@@ -244,6 +248,10 @@ class CSurf_FaderPort : public IReaperControlSurface
       else if (evt->midi_message[1] == BTN_PREV)
       {
         sessionManager->HandlePrevButton(evt->midi_message[2]);
+      }
+      else if (evt->midi_message[1] == BTN_SESSION_ENC_PUSH)
+      {
+        sessionManager->HandleEncoderClick();
       }
     }
   }
