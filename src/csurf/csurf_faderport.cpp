@@ -38,9 +38,7 @@ class CSurf_FaderPort : public IReaperControlSurface
 
   std::vector<CSurf_Track *> tracks;
 
-  DWORD m_frameupd_lastrun;
-  DWORD m_buttonstate_lastrun;
-  DWORD m_pan_lasttouch;
+  DWORD surface_update_lastrun;
 
   WDL_String descspace;
   char configtmp[1024];
@@ -259,9 +257,7 @@ public:
     m_midi_in_dev = 6;   // indev;
     m_midi_out_dev = 11; // outdev;
 
-    m_frameupd_lastrun = 0;
-    m_buttonstate_lastrun = 0;
-    m_pan_lasttouch = 0;
+    surface_update_lastrun = 0;
 
     // create midi hardware access
     m_midiin = m_midi_in_dev >= 0 ? CreateMIDIInput(m_midi_in_dev) : NULL;
@@ -373,11 +369,11 @@ public:
     if (m_midiout)
     {
       DWORD now = timeGetTime();
-      if ((now - m_buttonstate_lastrun) >= 10)
+      if ((now - surface_update_lastrun) >= 10)
       {
         channelContext->UpdateTracks();
         transportManager->Update();
-        m_buttonstate_lastrun = now;
+        surface_update_lastrun = now;
       }
     }
   }

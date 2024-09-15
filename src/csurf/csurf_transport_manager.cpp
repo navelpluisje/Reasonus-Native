@@ -135,6 +135,11 @@ public:
 
     void HandleRewindButton()
     {
+        if (context->GetShiftLeft())
+        {
+            CSurf_GoStart();
+            return;
+        }
         if (isRewinding)
         {
             isFastFwdRwd = !isFastFwdRwd;
@@ -153,6 +158,11 @@ public:
 
     void HandleForwardButton()
     {
+        if (context->GetShiftLeft())
+        {
+            CSurf_GoEnd();
+            return;
+        }
         if (isForwarding)
         {
             isFastFwdRwd = !isFastFwdRwd;
