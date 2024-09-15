@@ -12,6 +12,7 @@
 #include "csurf.h"
 #include "csurf_session_manager.cpp"
 #include "csurf_shift_manager.cpp"
+#include "csurf_transport_manager.cpp"
 #include "csurf_mix_manager.cpp"
 #include "csurf_channel_context.cpp"
 #include "csurf_navigator.cpp"
@@ -28,30 +29,16 @@ class CSurf_FaderPort : public IReaperControlSurface
   midi_Input *m_midiin;
 
   CSurf_Context *context;
-
   CSurf_SessionManager *sessionManager;
   CSurf_ShiftManager *shiftManager;
   CSurf_ChannelContext *channelContext;
   CSurf_Navigator *trackNavigator;
   CSurf_MixManager *mixManager;
-
-  CSurf_Button *playButton;
-  CSurf_Button *stopButton;
-  CSurf_Button *recordButton;
-  CSurf_Button *loopButton;
-  // CSurf_ColorButton *linkButton;
+  CSurf_TransportManager *transportManager;
 
   std::vector<CSurf_Track *> tracks;
 
-  int m_vol_lastpos;
-  int m_flipmode;
-  int m_faderport_lasthw, m_faderport_buttonstates;
-
-  char m_fader_touchstate;
-  int m_bank_offset;
-
   DWORD m_frameupd_lastrun;
-  int m_button_states;
   DWORD m_buttonstate_lastrun;
   DWORD m_pan_lasttouch;
 
@@ -148,35 +135,27 @@ class CSurf_FaderPort : public IReaperControlSurface
        */
       else if (evt->midi_message[1] == BTN_PLAY)
       {
-        CSurf_OnPlay();
+        transportManager->HandlePlayButton();
       }
       else if (evt->midi_message[1] == BTN_STOP)
       {
-        CSurf_OnStop();
+        transportManager->HandleStopButton();
       }
       else if (evt->midi_message[1] == BTN_RECORD)
       {
-        CSurf_OnRecord();
+        transportManager->HandleRecordButton();
       }
       else if (evt->midi_message[1] == BTN_REWIND)
       {
-        CSurf_OnRewFwd(1, -1);
+        transportManager->HandleRewindButton();
       }
       else if (evt->midi_message[1] == BTN_FORWARD)
       {
-        CSurf_OnRewFwd(1, 1);
+        transportManager->HandleForwardButton();
       }
       else if (evt->midi_message[1] == BTN_LOOP)
       {
-        SendMessage(g_hwnd, WM_COMMAND, IDC_REPEAT, 0);
-      }
-      else if (evt->midi_message[1] == BTN_FORWARD)
-      {
-        // Implement Fast Forward
-      }
-      else if (evt->midi_message[1] == BTN_REWIND)
-      {
-        // Implement Fast Rewind
+        transportManager->HandleRepeatButton();
       }
 
       /**
@@ -280,16 +259,7 @@ public:
     m_midi_in_dev = 6;   // indev;
     m_midi_out_dev = 11; // outdev;
 
-    m_faderport_lasthw = 0;
-    m_faderport_buttonstates = 0;
-    m_flipmode = 0;
-    m_vol_lastpos = -1000;
-
-    m_fader_touchstate = 0;
-
-    m_bank_offset = 0;
     m_frameupd_lastrun = 0;
-    m_button_states = 0;
     m_buttonstate_lastrun = 0;
     m_pan_lasttouch = 0;
 
@@ -310,11 +280,7 @@ public:
     shiftManager = new CSurf_ShiftManager(context, m_midiout);
     channelContext = new CSurf_ChannelContext(context, trackNavigator, m_midiout);
     mixManager = new CSurf_MixManager(context, trackNavigator, m_midiout);
-
-    playButton = new CSurf_Button(BTN_PLAY, BTN_VALUE_OFF, m_midiout);
-    stopButton = new CSurf_Button(BTN_STOP, BTN_VALUE_OFF, m_midiout);
-    recordButton = new CSurf_Button(BTN_RECORD, BTN_VALUE_OFF, m_midiout);
-    loopButton = new CSurf_Button(BTN_RECORD, BTN_VALUE_OFF, m_midiout);
+    transportManager = new CSurf_TransportManager(context, m_midiout);
 
     if (errStats)
     {
@@ -339,8 +305,6 @@ public:
       int x;
       for (x = 0; x < 0x30; x++) // lights out
         m_midiout->Send(0xa0, x, 0x00, -1);
-
-      // m_midiout->Send(0xa0,0xf,m_flipmode?1:0);// fucko
 
       m_midiout->Send(0x91, 0x00, 0x64, -1); // send these every so often?
     }
@@ -412,6 +376,7 @@ public:
       if ((now - m_buttonstate_lastrun) >= 10)
       {
         channelContext->UpdateTracks();
+        transportManager->Update();
         m_buttonstate_lastrun = now;
       }
     }
@@ -426,31 +391,6 @@ public:
   {
     int trackId = GetMediaTrackInfo_Value(media_track, "IP_TRACKNUMBER");
     trackNavigator->SetOffset(trackId - 1);
-  }
-
-  void SetPlayState(bool play, bool pause, bool rec)
-  {
-    (void)play;
-    (void)pause;
-    (void)rec;
-
-    if (m_midiout)
-    {
-      // Btn_Value play_value = play ? BTN_VALUE_ON : pause ? BTN_VALUE_BLINK
-      //                                                    : BTN_VALUE_OFF;
-      // playButton->SetValue(play_value, m_midiout);
-      // linkButton->SetValue(play_value, m_midiout);
-      // recordButton->SetValue(rec ? BTN_VALUE_ON : BTN_VALUE_OFF, m_midiout);
-      // stopButton->SetValue((!play && !pause) ? BTN_VALUE_ON : BTN_VALUE_OFF, m_midiout);
-    }
-  }
-
-  void SetRepeatState(bool rep)
-  {
-    if (m_midiout)
-    {
-      loopButton->SetValue(rep ? BTN_VALUE_ON : BTN_VALUE_OFF);
-    }
   }
 };
 

@@ -34,9 +34,11 @@ public:
     {
         mixAudioButton = new CSurf_ColorButton(ButtonColorWhite, ButtonColorWhiteDim, BTN_AUDIO, BTN_VALUE_OFF, m_midiout);
         mixViButton = new CSurf_ColorButton(ButtonColorWhite, ButtonColorWhiteDim, BTN_VI, BTN_VALUE_OFF, m_midiout);
-        mixBusButton = new CSurf_ColorButton(ButtonColorWhite, ButtonColorWhiteDim, BTN_BUS, BTN_VALUE_ON, m_midiout);
+        mixBusButton = new CSurf_ColorButton(ButtonColorWhite, ButtonColorWhiteDim, BTN_BUS, BTN_VALUE_OFF, m_midiout);
         mixVcaButton = new CSurf_ColorButton(ButtonColorWhite, ButtonColorWhiteDim, BTN_VCA, BTN_VALUE_OFF, m_midiout);
         mixAllButton = new CSurf_ColorButton(ButtonColorWhite, ButtonColorWhiteDim, BTN_ALL, BTN_VALUE_ON, m_midiout);
+
+        HandleMixAllButton();
     }
     ~CSurf_MixManager() {};
 
