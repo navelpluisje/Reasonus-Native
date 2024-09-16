@@ -14,10 +14,12 @@
 #include "csurf_shift_manager.cpp"
 #include "csurf_transport_manager.cpp"
 #include "csurf_mix_manager.cpp"
+#include "csurf_automation_manager.cpp"
 #include "csurf_channel_context.cpp"
 #include "csurf_navigator.cpp"
 #include "csurf_fader_resources.hpp"
 #include "csurf_button.hpp"
+#include "csurf_utils.hpp"
 #include <WDL/ptrlist.h>
 #include "../src/resource.h"
 #include <vector>
@@ -35,8 +37,10 @@ class CSurf_FaderPort : public IReaperControlSurface
   CSurf_Navigator *trackNavigator;
   CSurf_MixManager *mixManager;
   CSurf_TransportManager *transportManager;
+  CSurf_AutomationManager *automationManager;
 
-  std::vector<CSurf_Track *> tracks;
+  std::vector<CSurf_Track *>
+      tracks;
 
   DWORD surface_update_lastrun;
 
@@ -207,6 +211,38 @@ class CSurf_FaderPort : public IReaperControlSurface
       }
 
       /**
+       * Automation Management
+       */
+      else if (evt->midi_message[1] == BTN_LATCH)
+      {
+        automationManager->HandleLatchButton();
+      }
+      else if (evt->midi_message[1] == BTN_TRIM)
+      {
+        automationManager->HandleTrimButton();
+      }
+      else if (evt->midi_message[1] == BTN_OFF)
+      {
+        automationManager->HandleOffButton();
+      }
+      else if (evt->midi_message[1] == BTN_TOUCH)
+      {
+        automationManager->HandleTouchButton();
+      }
+      else if (evt->midi_message[1] == BTN_WRITE)
+      {
+        automationManager->HandleWriteButton();
+      }
+      else if (evt->midi_message[1] == BTN_WRITE)
+      {
+        automationManager->HandleWriteButton();
+      }
+      else if (evt->midi_message[1] == BTN_READ)
+      {
+        automationManager->HandleReadButton();
+      }
+
+      /**
        * Session Manager Buttons
        */
       else if (evt->midi_message[1] == BTN_CHANNEL)
@@ -285,6 +321,7 @@ public:
     channelContext = new CSurf_ChannelContext(context, trackNavigator, m_midiout);
     mixManager = new CSurf_MixManager(context, trackNavigator, m_midiout);
     transportManager = new CSurf_TransportManager(context, m_midiout);
+    automationManager = new CSurf_AutomationManager(context, m_midiout);
 
     if (errStats)
     {
@@ -381,6 +418,7 @@ public:
       {
         channelContext->UpdateTracks();
         transportManager->Update();
+        automationManager->Update();
         surface_update_lastrun = now;
       }
     }

@@ -6,6 +6,7 @@
 #include <reaper_plugin_functions.h>
 #include "csurf_channel_manager_resources.hpp"
 #include "csurf_navigator_filters.hpp"
+#include "csurf_utils.hpp"
 
 class CSurf_Navigator
 {

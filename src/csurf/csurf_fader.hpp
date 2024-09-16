@@ -3,7 +3,6 @@
 
 #include <reaper_plugin.h>
 #include "csurf_fader_resources.hpp"
-#include "csurf_utils.h"
 
 using namespace std;
 

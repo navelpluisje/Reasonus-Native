@@ -4,6 +4,7 @@
 #include "csurf_context.cpp"
 #include <WDL/ptrlist.h>
 #include "csurf_track.hpp"
+#include "csurf_utils.hpp"
 #include "csurf_channel_manager.hpp"
 #include "csurf_navigator.cpp"
 #include <vector>
@@ -53,7 +54,11 @@ protected:
     }
 
 public:
-    CSurf_ReceivesManager(std::vector<CSurf_Track *> tracks, CSurf_Navigator *navigator, CSurf_Context *context, midi_Output *m_midiout) : CSurf_ChannelManager(tracks, navigator, context, m_midiout)
+    CSurf_ReceivesManager(
+        std::vector<CSurf_Track *> tracks,
+        CSurf_Navigator *navigator,
+        CSurf_Context *context,
+        midi_Output *m_midiout) : CSurf_ChannelManager(tracks, navigator, context, m_midiout)
     {
         UpdateTracks();
     }

@@ -71,19 +71,6 @@ static double panToNormalized(double val)
 }
 
 /**
- * @brief Check if the bit with index key is set in val
- *
- * @param val The value to check
- * @param key The key to search for
- * @return true
- * @return false
- */
-static bool hasBit(int val, int key)
-{
-    return val & (1 << key);
-};
-
-/**
  * @brief get the midi messages of the fader and translate it to volume
  *
  * @param msb Midi message 2

@@ -2,6 +2,7 @@
 #define CSURF_SESSION_MANAGER_C_
 
 #include "csurf_button.hpp"
+#include "csurf_utils.hpp"
 #include "csurf_context.cpp"
 #include "csurf_navigator.cpp"
 #include "csurf_session_manager_actions.hpp"
@@ -65,7 +66,10 @@ protected:
     void handleFunction8() {}
 
 public:
-    CSurf_SessionManager(CSurf_Context *context, CSurf_Navigator *trackNavigator, midi_Output *m_midiout) : context(context), m_midiout(m_midiout), trackNavigator(trackNavigator)
+    CSurf_SessionManager(
+        CSurf_Context *context,
+        CSurf_Navigator *trackNavigator,
+        midi_Output *m_midiout) : context(context), m_midiout(m_midiout), trackNavigator(trackNavigator)
     {
         channelButton = new CSurf_Button(BTN_CHANNEL, BTN_VALUE_ON, m_midiout);
         zoomButton = new CSurf_Button(BTN_ZOOM, BTN_VALUE_OFF, m_midiout);

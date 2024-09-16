@@ -75,7 +75,11 @@ protected:
     }
 
 public:
-    CSurf_TrackManager(std::vector<CSurf_Track *> tracks, CSurf_Navigator *navigator, CSurf_Context *context, midi_Output *m_midiout) : CSurf_ChannelManager(tracks, navigator, context, m_midiout)
+    CSurf_TrackManager(
+        std::vector<CSurf_Track *> tracks,
+        CSurf_Navigator *navigator,
+        CSurf_Context *context,
+        midi_Output *m_midiout) : CSurf_ChannelManager(tracks, navigator, context, m_midiout)
     {
         UpdateTracks();
     }

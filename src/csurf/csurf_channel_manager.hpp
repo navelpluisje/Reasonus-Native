@@ -11,14 +11,13 @@
 class CSurf_ChannelManager
 {
 protected:
-    CSurf_Context *context;
+    std::vector<CSurf_Track *> tracks;
     CSurf_Navigator *navigator;
+    CSurf_Context *context;
     midi_Output *m_midiout;
 
     ButtonColor colorActive;
     ButtonColor colorDim;
-
-    std::vector<CSurf_Track *> tracks;
 
     virtual void SetTrackColors(MediaTrack *media_track)
     {
@@ -26,13 +25,11 @@ protected:
     };
 
 public:
-    CSurf_ChannelManager(std::vector<CSurf_Track *> tracks, CSurf_Navigator *navigator, CSurf_Context *context, midi_Output *m_midiout)
-    {
-        this->context = context;
-        this->navigator = navigator;
-        this->tracks = tracks;
-        this->m_midiout = m_midiout;
-    };
+    CSurf_ChannelManager(
+        std::vector<CSurf_Track *> tracks,
+        CSurf_Navigator *navigator,
+        CSurf_Context *context,
+        midi_Output *m_midiout) : tracks(tracks), navigator(navigator), context(context), m_midiout(m_midiout) {};
     virtual ~CSurf_ChannelManager() {};
 
     virtual void UpdateTracks() {};

@@ -38,4 +38,6 @@ static ButtonColor ButtonColorPurpleDim = {0x03, 0x00, 0x0a};
 static ButtonColor ButtonColorBlue = {0x00, 0x1b, 0x7f};
 static ButtonColor ButtonColorBlueDim = {0x00, 0x03, 0x0a};
 
+static ButtonColor ButtonColorBlack = {0x00, 0x00, 0x00};
+
 #endif // CSURF_COLOR_BUTTON_H_
