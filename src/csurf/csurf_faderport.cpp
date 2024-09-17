@@ -15,6 +15,7 @@
 #include "csurf_transport_manager.cpp"
 #include "csurf_mix_manager.cpp"
 #include "csurf_automation_manager.cpp"
+#include "csurf_general_control_manager.cpp"
 #include "csurf_channel_context.cpp"
 #include "csurf_navigator.cpp"
 #include "csurf_fader_resources.hpp"
@@ -38,6 +39,7 @@ class CSurf_FaderPort : public IReaperControlSurface
   CSurf_MixManager *mixManager;
   CSurf_TransportManager *transportManager;
   CSurf_AutomationManager *automationManager;
+  CSurf_GeneralControlManager *generalControlManager;
 
   std::vector<CSurf_Track *>
       tracks;
@@ -211,6 +213,30 @@ class CSurf_FaderPort : public IReaperControlSurface
       }
 
       /**
+       * General Control Management
+       */
+      else if (evt->midi_message[1] == BTN_SOLO_CLEAR)
+      {
+        generalControlManager->handleSoloClearButton();
+      }
+      else if (evt->midi_message[1] == BTN_MUTE_CLEAR)
+      {
+        generalControlManager->handleMuteClearButton();
+      }
+      else if (evt->midi_message[1] == BTN_BYPASS)
+      {
+        generalControlManager->handleBypassButton();
+      }
+      else if (evt->midi_message[1] == BTN_MACRO)
+      {
+        generalControlManager->handleMacroButton();
+      }
+      else if (evt->midi_message[1] == BTN_LINK)
+      {
+        generalControlManager->handleLinkButton();
+      }
+
+      /**
        * Automation Management
        */
       else if (evt->midi_message[1] == BTN_LATCH)
@@ -322,6 +348,7 @@ public:
     mixManager = new CSurf_MixManager(context, trackNavigator, m_midiout);
     transportManager = new CSurf_TransportManager(context, m_midiout);
     automationManager = new CSurf_AutomationManager(context, m_midiout);
+    generalControlManager = new CSurf_GeneralControlManager(context, trackNavigator, m_midiout);
 
     if (errStats)
     {
@@ -419,6 +446,7 @@ public:
         channelContext->UpdateTracks();
         transportManager->Update();
         automationManager->Update();
+        generalControlManager->Update();
         surface_update_lastrun = now;
       }
     }

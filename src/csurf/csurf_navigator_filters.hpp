@@ -14,19 +14,36 @@ enum NavigatorFilter
     TrackAllFoldersFilter,
 };
 
-static void GetAllVisibleTracks(WDL_PtrList<MediaTrack> &tracks)
+static void GetAllVisibleTracks(WDL_PtrList<MediaTrack> &tracks, bool &hasSolo, bool &hasMute)
 {
     tracks.Empty();
+    bool _solo = false;
+    bool _mute = false;
 
     for (int i = 0; i < CountTracks(0); i++)
     {
         MediaTrack *media_track = GetTrack(0, i);
         bool visible = (bool)GetMediaTrackInfo_Value(media_track, "B_SHOWINMIXER");
+        int solo = GetMediaTrackInfo_Value(media_track, "I_SOLO");
+        bool mute = (bool)GetMediaTrackInfo_Value(media_track, "B_MUTE");
+
+        if (solo > 0 && !_solo)
+        {
+            _solo = true;
+        }
+
+        if (mute && !_mute)
+        {
+            _mute = true;
+        }
+
         if (visible)
         {
             tracks.Add(media_track);
         }
     }
+    hasSolo = _solo;
+    hasMute = _mute;
 }
 
 static void SetTrackUIVisibility(map<int, bool> tracks)

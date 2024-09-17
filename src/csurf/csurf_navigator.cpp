@@ -15,6 +15,8 @@ class CSurf_Navigator
     NavigatorFilter trackFilter = TrackAllFilter;
 
     WDL_PtrList<MediaTrack> tracks;
+    bool hasSolo;
+    bool hasMute;
 
     void UpdateMixerPosition()
     {
@@ -37,7 +39,7 @@ public:
     WDL_PtrList<MediaTrack> GetBankTracks()
     {
         WDL_PtrList<MediaTrack> bank;
-        GetAllVisibleTracks(tracks);
+        GetAllVisibleTracks(tracks, hasSolo, hasMute);
         for (int i = track_offset; i < track_offset + nb_channels; i++)
         {
             bank.Add(tracks.Get(i));
@@ -98,6 +100,16 @@ public:
             track_offset += 1;
         }
     }
+
+    bool HasTracksWithSolo()
+    {
+        return hasSolo;
+    };
+
+    bool HasTracksWithMute()
+    {
+        return hasMute;
+    };
 
     void handleFilter(NavigatorFilter filter)
     {

@@ -1,12 +1,6 @@
 #ifndef CSURF_SESSION_MANAGER_ACTIONS_H_
 #define CSURF_SESSION_MANAGER_ACTIONS_H_
 
-void Main_OnCommandStringEx(string action_name, int flag = 0, ReaProject *proj = 0)
-{
-    int actionId = NamedCommandLookup(action_name.c_str());
-    Main_OnCommandEx(actionId, flag, proj);
-}
-
 void SetMasterPanToCenter() // Xenakios/SWS: Set master volume to 0 dB
 {
     MediaTrack *masterTrack = GetMasterTrack(0);

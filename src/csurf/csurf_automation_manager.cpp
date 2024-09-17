@@ -3,7 +3,7 @@
 
 #include "csurf_color_button.hpp"
 #include "csurf_context.cpp"
-#include "csurf_automation_manager_resources.hpp"
+#include "csurf_utils.hpp"
 
 class CSurf_AutomationManager
 {
