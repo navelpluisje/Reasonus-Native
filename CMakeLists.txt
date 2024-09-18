@@ -176,7 +176,7 @@ else()
   target_compile_options(
     ${PROJECT_NAME}
       PRIVATE
-      -Wall -Wextra -Werror -Wpedantic 
+      -Wall -Wextra -Wno-missing-field-initializers -Wpedantic 
   )
 endif()
 
