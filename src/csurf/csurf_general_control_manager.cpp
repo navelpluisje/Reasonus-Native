@@ -2,10 +2,10 @@
 #define CSURF_GENERAL_CONTROL_MANAGER_C_
 
 #include "csurf_context.cpp"
-#include "csurf_button.hpp"
+#include "controls/csurf_button.hpp"
 #include "csurf_utils.hpp"
 #include "csurf_navigator.cpp"
-#include "csurf_color_button.hpp"
+#include "controls/csurf_color_button.hpp"
 
 class CSurf_GeneralControlManager
 {

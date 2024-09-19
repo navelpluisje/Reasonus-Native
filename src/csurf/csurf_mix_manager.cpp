@@ -1,7 +1,7 @@
 #ifndef CSURF_MIX_MANAGER_C_
 #define CSURF_MIX_MANAGER_C_
 
-#include "csurf_color_button.hpp"
+#include "controls/csurf_color_button.hpp"
 #include "csurf_navigator.cpp"
 #include "csurf_context.cpp"
 

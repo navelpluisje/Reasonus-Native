@@ -1,7 +1,7 @@
 #ifndef CSURF_AUTOMATION_MANAGER_C_
 #define CSURF_AUTOMATION_MANAGER_C_
 
-#include "csurf_color_button.hpp"
+#include "controls/csurf_color_button.hpp"
 #include "csurf_context.cpp"
 #include "csurf_utils.hpp"
 

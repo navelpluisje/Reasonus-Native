@@ -18,8 +18,7 @@
 #include "csurf_general_control_manager.cpp"
 #include "csurf_channel_context.cpp"
 #include "csurf_navigator.cpp"
-#include "csurf_fader_resources.hpp"
-#include "csurf_button.hpp"
+#include "controls/csurf_button.hpp"
 #include "csurf_utils.hpp"
 #include "csurf_faderport_ui.cpp"
 #include <WDL/ptrlist.h>

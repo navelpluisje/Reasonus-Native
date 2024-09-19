@@ -1,7 +1,7 @@
 #ifndef CSURF_SHIFT_MANAGER_C_
 #define CSURF_SHIFT_MANAGER_C_
 
-#include "csurf_button.hpp"
+#include "controls/csurf_button.hpp"
 #include "csurf_context.cpp"
 
 const int TOGGLE_SPEED = 150;

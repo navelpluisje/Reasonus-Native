@@ -3,7 +3,7 @@
 
 #include "csurf_context.cpp"
 #include "csurf_navigator.cpp"
-#include "csurf_button.hpp"
+#include "controls/csurf_button.hpp"
 #include "csurf_track.hpp"
 #include <vector>
 #include <db2val.h>

@@ -4,7 +4,7 @@
 #include "csurf_track_manager.cpp"
 #include "csurf_sends_manager.cpp"
 #include "csurf_receives_manager.cpp"
-#include "csurf_button.hpp"
+#include "controls/csurf_button.hpp"
 #include "csurf_track.hpp"
 
 class CSurf_ChannelContext

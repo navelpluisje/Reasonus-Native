@@ -1,12 +1,12 @@
 #ifndef CSURF_TRACK_H_
 #define CSURF_TRACK_H_
 
-#include "csurf_button.hpp"
-#include "csurf_color_button.hpp"
+#include "controls/csurf_button.hpp"
+#include "controls/csurf_color_button.hpp"
+#include "controls/csurf_display.hpp"
+#include "controls/csurf_fader.hpp"
+#include "controls/csurf_valuebar.hpp"
 #include "csurf_context.cpp"
-#include "csurf_fader.hpp"
-#include "csurf_valuebar.hpp"
-#include "csurf_display.hpp"
 
 inline Btn_Types SelectButtons[8] = {
     BTN_SELECT_1,

@@ -1,7 +1,7 @@
 #ifndef CSURF_SESSION_MANAGER_C_
 #define CSURF_SESSION_MANAGER_C_
 
-#include "csurf_button.hpp"
+#include "controls/csurf_button.hpp"
 #include "csurf_utils.hpp"
 #include "csurf_context.cpp"
 #include "csurf_navigator.cpp"
