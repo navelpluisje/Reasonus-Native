@@ -16,6 +16,7 @@
 #include "csurf_mix_manager.cpp"
 #include "csurf_automation_manager.cpp"
 #include "csurf_general_control_manager.cpp"
+// #include "csurf_last_touched_fx_manager.hpp"
 #include "csurf_channel_context.cpp"
 #include "csurf_navigator.hpp"
 #include "controls/csurf_button.hpp"
@@ -42,6 +43,7 @@ class CSurf_FaderPort : public IReaperControlSurface
   CSurf_TransportManager *transportManager;
   CSurf_AutomationManager *automationManager;
   CSurf_GeneralControlManager *generalControlManager;
+  // CSurf_LastTouchedFXManager *lastTouchedFxManager;
 
   std::vector<CSurf_Track *>
       tracks;
@@ -351,6 +353,7 @@ public:
     transportManager = new CSurf_TransportManager(context, m_midiout);
     automationManager = new CSurf_AutomationManager(context, m_midiout);
     generalControlManager = new CSurf_GeneralControlManager(context, trackNavigator, m_midiout);
+    // lastTouchedFxManager = new CSurf_LastTouchedFXManager(tracks.at(7), context, m_midiout);
 
     if (errStats)
     {
@@ -449,6 +452,7 @@ public:
       if ((now - surface_update_lastrun) >= 10)
       {
         channelContext->UpdateTracks();
+        // lastTouchedFxManager->UpdateTrack();
         transportManager->Update();
         automationManager->Update();
         generalControlManager->Update();
