@@ -5,8 +5,7 @@
 #include <WDL/ptrlist.h>
 #include "csurf_track.hpp"
 #include "csurf_channel_manager.hpp"
-#include "csurf_channel_manager_resources.hpp"
-#include "csurf_navigator.cpp"
+#include "csurf_navigator.hpp"
 #include <vector>
 
 class CSurf_TrackManager : public CSurf_ChannelManager

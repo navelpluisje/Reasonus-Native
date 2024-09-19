@@ -2,11 +2,11 @@
 #define CSURF_CHANNEL_MANAGER_H_
 
 #include "csurf_context.cpp"
-#include "csurf_navigator.cpp"
+#include "csurf_navigator.hpp"
+#include "csurf_channel_manager_resources.hpp"
 #include "controls/csurf_button.hpp"
 #include "csurf_track.hpp"
 #include <vector>
-#include <db2val.h>
 
 class CSurf_ChannelManager
 {

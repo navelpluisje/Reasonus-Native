@@ -7,6 +7,7 @@ class CSurf_Context
     bool shift_left;
     bool shift_right;
     bool arm;
+    bool lastTouchedFxMode;
     PanEncoderMode panEncoderMode = PanEncoderPanMode;
 
 public:
@@ -26,6 +27,9 @@ public:
 
     void SetPanEncoderMode(PanEncoderMode val) { panEncoderMode = val; }
     PanEncoderMode GetPanEncoderMode() { return panEncoderMode; }
+
+    void ToggleLastTouchedFxMode() { lastTouchedFxMode = !lastTouchedFxMode; }
+    bool GetLastTouchedFxMode() { return lastTouchedFxMode; }
 };
 
 #endif

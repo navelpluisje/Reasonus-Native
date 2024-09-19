@@ -4,7 +4,7 @@
 #include "controls/csurf_button.hpp"
 #include "csurf_utils.hpp"
 #include "csurf_context.cpp"
-#include "csurf_navigator.cpp"
+#include "csurf_navigator.hpp"
 #include "csurf_session_manager_actions.hpp"
 
 enum SessionTypes

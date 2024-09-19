@@ -4,7 +4,7 @@
 #include "csurf_context.cpp"
 #include "controls/csurf_button.hpp"
 #include "csurf_utils.hpp"
-#include "csurf_navigator.cpp"
+#include "csurf_navigator.hpp"
 #include "controls/csurf_color_button.hpp"
 
 class CSurf_GeneralControlManager
@@ -25,6 +25,7 @@ protected:
     bool hasSelectedBypass;
     bool hasGlobalBypass;
     bool followCursor;
+    bool lastTouchedFxMode;
 
     void SetButtonValue()
     {
@@ -67,6 +68,7 @@ public:
         hasSelectedBypass = (bool)GetToggleCommandState(8);
         hasGlobalBypass = (bool)GetToggleCommandState(40344);
         followCursor = GetToggleCommandStringState("_REASONUS_TOGGLE_PLAY_CURSOR_COMMAND");
+        lastTouchedFxMode = context->GetLastTouchedFxMode();
 
         SetButtonValue();
     };
@@ -91,7 +93,15 @@ public:
 
     void handleLinkButton()
     {
-        Main_OnCommandStringEx("_REASONUS_TOGGLE_PLAY_CURSOR_COMMAND");
+        if (context->GetShiftLeft())
+        {
+            Main_OnCommandStringEx("_REASONUS_TOGGLE_PLAY_CURSOR_COMMAND");
+        }
+        else
+        {
+            context->ToggleLastTouchedFxMode();
+            trackNavigator->UpdateTrackCount();
+        }
     };
 };
 

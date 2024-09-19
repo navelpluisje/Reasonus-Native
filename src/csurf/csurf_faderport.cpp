@@ -17,7 +17,7 @@
 #include "csurf_automation_manager.cpp"
 #include "csurf_general_control_manager.cpp"
 #include "csurf_channel_context.cpp"
-#include "csurf_navigator.cpp"
+#include "csurf_navigator.hpp"
 #include "controls/csurf_button.hpp"
 #include "csurf_utils.hpp"
 #include "csurf_faderport_ui.cpp"
@@ -343,7 +343,7 @@ public:
       tracks.push_back(track);
     }
 
-    trackNavigator = new CSurf_Navigator();
+    trackNavigator = new CSurf_Navigator(context);
     sessionManager = new CSurf_SessionManager(context, trackNavigator, m_midiout);
     shiftManager = new CSurf_ShiftManager(context, m_midiout);
     channelContext = new CSurf_ChannelContext(context, trackNavigator, m_midiout);

@@ -6,9 +6,8 @@
 #include "csurf_track.hpp"
 #include "csurf_utils.hpp"
 #include "csurf_channel_manager.hpp"
-#include "csurf_navigator.cpp"
+#include "csurf_navigator.hpp"
 #include <vector>
-#include "csurf_channel_manager_resources.hpp"
 
 class CSurf_ReceivesManager : public CSurf_ChannelManager
 {
