@@ -18,7 +18,7 @@ static string GetPanString(double pan, int panMode)
 {
     int panInt = (int)(pan * 100.0);
     string strVal = to_string(abs(panInt));
-    if (panMode == 5)
+    if (panMode == 6)
     {
         panInt = (panInt + 100) / 2;
         return to_string(panInt) + "L";
@@ -46,7 +46,7 @@ static string GetWidthString(double width, int panMode)
     int panInt = ((int)(width * 100.0) + 100) / 2;
     panInt = (panInt + 100) / 2;
     string strVal = to_string(abs(panInt));
-    if (panMode == 5)
+    if (panMode == 6)
     {
         return to_string(panInt) + "R";
     }

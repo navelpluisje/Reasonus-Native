@@ -116,10 +116,14 @@ public:
                 receiveName = (const char *)GetSetMediaTrackInfo(destTrack, "P_NAME", NULL);
                 // Because of the const an being a pointer we need to do this here
                 track->SetDisplayLine(1, ALIGN_LEFT, receiveName, INVERT);
+                track->SetDisplayLine(2, ALIGN_CENTER, GetSendModeString(sendMode).c_str());
+                track->SetDisplayLine(3, ALIGN_CENTER, GetAutomationString(autoMode).c_str());
             }
             else
             {
                 track->SetDisplayLine(1, ALIGN_LEFT, "No Rcvs", INVERT);
+                track->SetDisplayLine(2, ALIGN_CENTER, "");
+                track->SetDisplayLine(3, ALIGN_CENTER, "");
             }
 
             track->SetTrackColor(colorActive, colorDim);
@@ -133,8 +137,6 @@ public:
 
             track->SetDisplayMode(DISPLAY_MODE_2);
             track->SetDisplayLine(0, ALIGN_CENTER, trackName);
-            track->SetDisplayLine(2, ALIGN_CENTER, GetSendModeString(sendMode).c_str());
-            track->SetDisplayLine(3, ALIGN_CENTER, GetAutomationString(autoMode).c_str());
         }
     }
 

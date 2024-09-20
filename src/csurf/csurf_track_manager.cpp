@@ -119,6 +119,7 @@ public:
                 track->SetDisplayLine(0, ALIGN_LEFT, trackName);
                 track->SetDisplayLine(1, ALIGN_CENTER, trackIndex.c_str());
                 track->SetDisplayLine(2, ALIGN_CENTER, strPan1.c_str());
+                track->SetDisplayLine(3, ALIGN_CENTER, string("").c_str());
             }
             else
             {
