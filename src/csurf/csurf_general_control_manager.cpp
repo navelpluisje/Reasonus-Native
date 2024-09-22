@@ -42,7 +42,7 @@ protected:
 
         soloClearButton->SetValue(hasSolo ? BTN_VALUE_ON : BTN_VALUE_OFF);
         muteClearButton->SetValue(hasMute ? BTN_VALUE_ON : BTN_VALUE_OFF);
-        linkButton->SetValue(followCursor ? BTN_VALUE_ON : BTN_VALUE_OFF);
+        linkButton->SetValue(context->GetLastTouchedFxMode() ? BTN_VALUE_ON : BTN_VALUE_OFF);
     };
 
     void SetButtonColors() {};

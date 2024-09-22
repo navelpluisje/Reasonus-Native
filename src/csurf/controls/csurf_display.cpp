@@ -1,4 +1,7 @@
 #include "csurf_display.hpp"
+#include <reaper_plugin.h>
+#include <reaper_plugin_functions.h>
+#include "../csurf_utils.hpp"
 
 void CSurf_Display::SendValue(int line)
 {
@@ -64,7 +67,7 @@ void CSurf_Display::SendMode()
     m_midiout->SendMsg(&midiSysExData.evt, 0);
 };
 
-void CSurf_Display::SetValue(int line, Alignment _alignment, const char *_value, Inverted invert)
+void CSurf_Display::SetValue(int line, Alignment _alignment, const char *_value, Inverted invert, bool force)
 {
     // We have to convert the char array to a string. Somehow the simple conversion makes it crash
     char buffer[250];
@@ -72,7 +75,7 @@ void CSurf_Display::SetValue(int line, Alignment _alignment, const char *_value,
     string strVal = buffer;
 
     // If values have not changed, we do nothing
-    if (strVal == values[line] && alignment[line] == _alignment)
+    if (strVal == values[line] && alignment[line] == _alignment && !force)
     {
         return;
     }
@@ -82,9 +85,9 @@ void CSurf_Display::SetValue(int line, Alignment _alignment, const char *_value,
     this->SendValue(line);
 };
 
-void CSurf_Display::SetMode(DisplayMode _displayMode)
+void CSurf_Display::SetMode(DisplayMode _displayMode, bool force)
 {
-    if (displayMode == _displayMode)
+    if (displayMode == _displayMode && !force)
     {
         return;
     }

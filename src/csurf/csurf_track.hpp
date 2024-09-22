@@ -53,27 +53,25 @@ protected:
     CSurf_Valuebar *valueBar;
     CSurf_Display *display;
 
-    // Slider
-
 public:
     CSurf_Track(int index, CSurf_Context *_context, midi_Output *m_midiout);
     ~CSurf_Track() {};
 
     void SetTrackColor(ButtonColor colorActive, ButtonColor colorDim);
 
-    void SetSelectButtonValue(Btn_Value value);
+    void SetSelectButtonValue(Btn_Value value, bool force = false);
 
-    void SetSoloButtonValue(Btn_Value value);
+    void SetSoloButtonValue(Btn_Value value, bool force = false);
 
-    void SetMuteButtonValue(Btn_Value value);
+    void SetMuteButtonValue(Btn_Value value, bool force = false);
 
-    void SetFaderValue(int value);
+    void SetFaderValue(int value, bool force = false);
 
     void SetValueBarMode(ValuebarMode mode);
     void SetValueBarValue(int value);
 
-    void SetDisplayMode(DisplayMode mode);
-    void SetDisplayLine(int line, Alignment alignment, const char *value, Inverted invert = NON_INVERT);
+    void SetDisplayMode(DisplayMode mode, bool force = false);
+    void SetDisplayLine(int line, Alignment alignment, const char *value, Inverted invert = NON_INVERT, bool force = false);
 };
 
 #endif

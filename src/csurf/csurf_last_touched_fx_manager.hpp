@@ -14,6 +14,9 @@ protected:
     CSurf_Context *context;
     midi_Output *m_midiout;
 
+    bool forceUpdate = false;
+    bool hasLastTouchedFxEnabled = false;
+
     ButtonColor colorActive;
     ButtonColor colorDim;
 
@@ -31,7 +34,12 @@ public:
 
     void HandleFaderTouch();
 
-    void HandleFaderMove(int index, int msb, int lsb);
+    void HandleFaderMove(int msb, int lsb);
+
+    void resetLastTouchedFxEnabled()
+    {
+        hasLastTouchedFxEnabled = false;
+    };
 };
 
 #endif

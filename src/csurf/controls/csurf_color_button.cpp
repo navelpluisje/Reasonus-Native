@@ -23,9 +23,9 @@ void CSurf_ColorButton::SendColor()
     m_midiout->Send(MIDI_MESSAGE_COLOR_BLUE, type, color.blue, -1);
 };
 
-void CSurf_ColorButton::SetValue(Btn_Value _value)
+void CSurf_ColorButton::SetValue(Btn_Value _value, bool force)
 {
-    if (value == _value)
+    if (value == _value && !force)
     {
         return;
     }
@@ -33,9 +33,9 @@ void CSurf_ColorButton::SetValue(Btn_Value _value)
     this->SendValue();
 };
 
-void CSurf_ColorButton::SetColor(ButtonColor _colorActive, ButtonColor _colorDim)
+void CSurf_ColorButton::SetColor(ButtonColor _colorActive, ButtonColor _colorDim, bool force)
 {
-    if (!colorActive.IsColor(_colorActive) || !colorDim.IsColor(_colorDim))
+    if (!colorActive.IsColor(_colorActive) || !colorDim.IsColor(_colorDim) || force)
     {
         colorActive = _colorActive;
         colorDim = _colorDim;

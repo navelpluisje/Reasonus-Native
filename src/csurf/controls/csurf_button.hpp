@@ -21,7 +21,7 @@ public:
 
     ~CSurf_Button() {};
 
-    virtual void SetValue(Btn_Value value);
+    virtual void SetValue(Btn_Value value, bool force = false);
 };
 
 #endif // CSURF_BUTTON_H_

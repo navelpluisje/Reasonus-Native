@@ -20,7 +20,7 @@ public:
 
     ~CSurf_Fader() {};
 
-    void SetValue(int _value);
+    void SetValue(int _value, bool force = false);
 };
 
 #endif // CSURF_FADER_H_

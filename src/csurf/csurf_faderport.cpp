@@ -16,7 +16,7 @@
 #include "csurf_mix_manager.cpp"
 #include "csurf_automation_manager.cpp"
 #include "csurf_general_control_manager.cpp"
-// #include "csurf_last_touched_fx_manager.hpp"
+#include "csurf_last_touched_fx_manager.hpp"
 #include "csurf_channel_context.cpp"
 #include "csurf_navigator.hpp"
 #include "controls/csurf_button.hpp"
@@ -43,10 +43,10 @@ class CSurf_FaderPort : public IReaperControlSurface
   CSurf_TransportManager *transportManager;
   CSurf_AutomationManager *automationManager;
   CSurf_GeneralControlManager *generalControlManager;
-  // CSurf_LastTouchedFXManager *lastTouchedFxManager;
+  CSurf_LastTouchedFXManager *lastTouchedFxManager;
 
-  std::vector<CSurf_Track *>
-      tracks;
+  std::vector<CSurf_Track *> tracks;
+  CSurf_Track *lastTouchedFxTrack;
 
   DWORD surface_update_lastrun;
 
@@ -62,6 +62,10 @@ class CSurf_FaderPort : public IReaperControlSurface
     if (evt->midi_message[0] >= FADER_1 && evt->midi_message[0] <= FADER_8)
     {
       channelContext->HandleFaderMove(evt->midi_message[0] - FADER_1, evt->midi_message[2], evt->midi_message[1]);
+      if (context->GetLastTouchedFxMode() && evt->midi_message[0] == FADER_8)
+      {
+        lastTouchedFxManager->HandleFaderMove(evt->midi_message[2], evt->midi_message[1]);
+      }
     }
 
     /**
@@ -344,6 +348,7 @@ public:
       CSurf_Track *track = new CSurf_Track(i, context, m_midiout);
       tracks.push_back(track);
     }
+    lastTouchedFxTrack = new CSurf_Track(7, context, m_midiout);
 
     trackNavigator = new CSurf_Navigator(context);
     sessionManager = new CSurf_SessionManager(context, trackNavigator, m_midiout);
@@ -353,7 +358,7 @@ public:
     transportManager = new CSurf_TransportManager(context, m_midiout);
     automationManager = new CSurf_AutomationManager(context, m_midiout);
     generalControlManager = new CSurf_GeneralControlManager(context, trackNavigator, m_midiout);
-    // lastTouchedFxManager = new CSurf_LastTouchedFXManager(tracks.at(7), context, m_midiout);
+    lastTouchedFxManager = new CSurf_LastTouchedFXManager(lastTouchedFxTrack, context, m_midiout);
 
     if (errStats)
     {
@@ -452,10 +457,18 @@ public:
       if ((now - surface_update_lastrun) >= 10)
       {
         channelContext->UpdateTracks();
-        // lastTouchedFxManager->UpdateTrack();
+        if (context->GetLastTouchedFxMode())
+        {
+          lastTouchedFxManager->UpdateTrack();
+        }
+        else
+        {
+          lastTouchedFxManager->resetLastTouchedFxEnabled();
+        }
         transportManager->Update();
         automationManager->Update();
         generalControlManager->Update();
+
         surface_update_lastrun = now;
       }
     }

@@ -21,7 +21,6 @@ enum NavigatorFilter
 
 class CSurf_Navigator
 {
-    int nb_channels = 8;
     int track_offset = 0;
     CSurf_Context *context;
 
@@ -71,6 +70,8 @@ public:
     void handleFilter(NavigatorFilter filter);
 
     void UpdateTrackCount();
+
+    int GetTrackCount();
 };
 
 #endif

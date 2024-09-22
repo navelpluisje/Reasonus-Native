@@ -198,7 +198,7 @@ public:
         switch (session_type)
         {
         case Channel:
-            trackNavigator->DecrementOffset(context->GetShiftLeft() ? 8 : 1);
+            trackNavigator->DecrementOffset(context->GetShiftLeft() ? trackNavigator->GetTrackCount() : 1);
             TrackList_UpdateAllExternalSurfaces();
             break;
         case Zoom:
@@ -209,11 +209,11 @@ public:
             Main_OnCommandEx(40286, 0, 0); // Track: Go to previous track
             break;
         case Bank:
-            trackNavigator->DecrementOffset(context->GetShiftLeft() ? 1 : 8);
+            trackNavigator->DecrementOffset(context->GetShiftLeft() ? 1 : trackNavigator->GetTrackCount());
             TrackList_UpdateAllExternalSurfaces();
             break;
         case Master:
-            trackNavigator->DecrementOffset(context->GetShiftLeft() ? 8 : 1);
+            trackNavigator->DecrementOffset(context->GetShiftLeft() ? trackNavigator->GetTrackCount() : 1);
             TrackList_UpdateAllExternalSurfaces();
             break;
         case Click:
@@ -242,7 +242,7 @@ public:
         switch (session_type)
         {
         case Channel:
-            trackNavigator->IncrementOffset(context->GetShiftLeft() ? 8 : 1);
+            trackNavigator->IncrementOffset(context->GetShiftLeft() ? trackNavigator->GetTrackCount() : 1);
             TrackList_UpdateAllExternalSurfaces();
             break;
         case Zoom:
@@ -253,11 +253,11 @@ public:
             Main_OnCommandEx(40285, 0, 0); // Track: Go to next track
             break;
         case Bank:
-            trackNavigator->IncrementOffset(context->GetShiftLeft() ? 1 : 8);
+            trackNavigator->IncrementOffset(context->GetShiftLeft() ? 1 : trackNavigator->GetTrackCount());
             TrackList_UpdateAllExternalSurfaces();
             break;
         case Master:
-            trackNavigator->IncrementOffset(context->GetShiftLeft() ? 8 : 1);
+            trackNavigator->IncrementOffset(context->GetShiftLeft() ? trackNavigator->GetTrackCount() : 1);
             TrackList_UpdateAllExternalSurfaces();
             break;
         case Click:
@@ -289,7 +289,7 @@ public:
                                     : Main_OnCommandEx(40139, 0, 0); // View: Scroll view up
             break;
         case Bank:
-            trackNavigator->IncrementOffset(context->GetShiftLeft() ? 1 : 8);
+            trackNavigator->IncrementOffset(context->GetShiftLeft() ? 1 : trackNavigator->GetTrackCount());
             break;
         case Master:
             Main_OnCommandStringEx("_XENAKIOS_NUDMASVOL1DBU"); // Xenakios/SWS: Nudge master volume 1 dB up
@@ -324,7 +324,7 @@ public:
                                     : Main_OnCommandEx(40138, 0, 0); // View: Scroll view down
             break;
         case Bank:
-            trackNavigator->DecrementOffset(context->GetShiftLeft() ? 1 : 8);
+            trackNavigator->DecrementOffset(context->GetShiftLeft() ? 1 : trackNavigator->GetTrackCount());
             break;
         case Master:
             Main_OnCommandStringEx("_XENAKIOS_NUDMASVOL1DBD"); // Xenakios/SWS: Nudge master volume 1 dB down

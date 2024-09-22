@@ -175,7 +175,7 @@ WDL_PtrList<MediaTrack> CSurf_Navigator::GetBankTracks()
 {
     WDL_PtrList<MediaTrack> bank;
     GetAllVisibleTracks(tracks, hasSolo, hasMute);
-    for (int i = track_offset; i < track_offset + nb_channels; i++)
+    for (int i = track_offset; i < track_offset + context->GetNbTracks(); i++)
     {
         bank.Add(tracks.Get(i));
     }
@@ -184,9 +184,9 @@ WDL_PtrList<MediaTrack> CSurf_Navigator::GetBankTracks()
 
 void CSurf_Navigator::SetOffset(int offset)
 {
-    if (offset > (tracks.GetSize() - nb_channels))
+    if (offset > (tracks.GetSize() - context->GetNbTracks()))
     {
-        track_offset = tracks.GetSize() - nb_channels;
+        track_offset = tracks.GetSize() - context->GetNbTracks();
     }
     else
     {
@@ -196,17 +196,17 @@ void CSurf_Navigator::SetOffset(int offset)
 
 void CSurf_Navigator::IncrementOffset(int count)
 {
-    if ((track_offset + count) <= (tracks.GetSize() - nb_channels))
+    if ((track_offset + count) <= (tracks.GetSize() - context->GetNbTracks()))
     {
         track_offset += count;
     }
-    else if (tracks.GetSize() < nb_channels)
+    else if (tracks.GetSize() < context->GetNbTracks())
     {
         track_offset = 0;
     }
     else
     {
-        track_offset = tracks.GetSize() - nb_channels;
+        track_offset = tracks.GetSize() - context->GetNbTracks();
     }
     UpdateMixerPosition();
 }
@@ -230,7 +230,7 @@ void CSurf_Navigator::HandlePanEncoderChange(int value)
     {
         DecrementOffset(1);
     }
-    if (!hasBit(value, 6) && track_offset < (tracks.GetSize() - nb_channels))
+    if (!hasBit(value, 6) && track_offset < (tracks.GetSize() - context->GetNbTracks()))
     {
         track_offset += 1;
     }
@@ -276,7 +276,12 @@ void CSurf_Navigator::handleFilter(NavigatorFilter filter)
 void CSurf_Navigator::UpdateTrackCount()
 {
     bool hasLastTouchedFx = context->GetLastTouchedFxMode();
-    nb_channels = hasLastTouchedFx ? 7 : 8;
+    context->SetNbTracks(hasLastTouchedFx ? 7 : 8);
+}
+
+int CSurf_Navigator::GetTrackCount()
+{
+    return context->GetNbTracks();
 }
 
 // char buffer[250];

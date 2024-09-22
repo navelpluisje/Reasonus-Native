@@ -8,6 +8,7 @@ class CSurf_Context
     bool shift_right;
     bool arm;
     bool lastTouchedFxMode;
+    int nbTracks = 8;
     PanEncoderMode panEncoderMode = PanEncoderPanMode;
 
 public:
@@ -30,6 +31,9 @@ public:
 
     void ToggleLastTouchedFxMode() { lastTouchedFxMode = !lastTouchedFxMode; }
     bool GetLastTouchedFxMode() { return lastTouchedFxMode; }
+
+    void SetNbTracks(int count) { nbTracks = count; }
+    int GetNbTracks() { return nbTracks; }
 };
 
 #endif

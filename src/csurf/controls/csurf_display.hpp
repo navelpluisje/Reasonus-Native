@@ -27,9 +27,9 @@ public:
 
     ~CSurf_Display() {};
 
-    void SetValue(int line, Alignment _alignment, const char *_value, Inverted invert = NON_INVERT);
+    void SetValue(int line, Alignment _alignment, const char *_value, Inverted invert = NON_INVERT, bool force = false);
 
-    void SetMode(DisplayMode _displayMode);
+    void SetMode(DisplayMode _displayMode, bool force = false);
 };
 
 #endif // CSURF_DISPLAY_H_

@@ -12,9 +12,9 @@ CSurf_Button::CSurf_Button(Btn_Types type, Btn_Value value, midi_Output *m_midio
     this->SendValue();
 };
 
-void CSurf_Button::SetValue(Btn_Value _value)
+void CSurf_Button::SetValue(Btn_Value _value, bool force)
 {
-    if (value == _value)
+    if (value == _value && !force)
     {
         return;
     }

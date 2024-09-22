@@ -7,6 +7,7 @@
 #include "csurf_channel_manager.hpp"
 #include "csurf_navigator.hpp"
 #include <vector>
+#include "csurf_utils.hpp"
 
 class CSurf_SendsManager : public CSurf_ChannelManager
 {
@@ -66,9 +67,8 @@ public:
     {
         nbSends = 0;
         WDL_PtrList<MediaTrack> media_tracks = navigator->GetBankTracks();
-        int nb_tracks = tracks.size();
 
-        for (int i = 0; i < nb_tracks; i++)
+        for (int i = 0; i < navigator->GetTrackCount(); i++)
         {
             MediaTrack *media_track = media_tracks.Get(i);
             int _nbTrackSends = GetTrackNumSends(media_track, 0);
@@ -85,7 +85,7 @@ public:
             currentSend = nbSends;
         }
 
-        for (int i = 0; i < nb_tracks; i++)
+        for (int i = 0; i < navigator->GetTrackCount(); i++)
         {
             int sendIndex = nbTrackSends[i] < currentSend ? nbTrackSends[i] : currentSend;
 
@@ -151,7 +151,7 @@ public:
             return;
         }
 
-        for (int i = 0; i < 8; i++)
+        for (int i = 0; i < navigator->GetTrackCount(); i++)
         {
             MediaTrack *media_track = navigator->GetTrackByIndex(i);
             SetTrackSelected(media_track, false);

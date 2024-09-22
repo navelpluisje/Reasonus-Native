@@ -67,9 +67,8 @@ public:
     {
         nbReceives = 0;
         WDL_PtrList<MediaTrack> media_tracks = navigator->GetBankTracks();
-        int nb_tracks = tracks.size();
 
-        for (int i = 0; i < nb_tracks; i++)
+        for (int i = 0; i < navigator->GetTrackCount(); i++)
         {
             MediaTrack *media_track = media_tracks.Get(i);
             int _nbTrackReceives = GetTrackNumSends(media_track, -1);
@@ -86,7 +85,7 @@ public:
             currentReceive = nbReceives;
         }
 
-        for (int i = 0; i < nb_tracks; i++)
+        for (int i = 0; i < navigator->GetTrackCount(); i++)
         {
             int receiveIndex = nbTrackReceives[i] < currentReceive ? nbTrackReceives[i] : currentReceive;
 
@@ -152,7 +151,7 @@ public:
             return;
         }
 
-        for (int i = 0; i < 8; i++)
+        for (int i = 0; i < navigator->GetTrackCount(); i++)
         {
             MediaTrack *media_track = navigator->GetTrackByIndex(i);
             SetTrackSelected(media_track, false);

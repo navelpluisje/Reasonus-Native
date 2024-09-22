@@ -2,6 +2,7 @@
 #define CSURF_SHIFT_MANAGER_C_
 
 #include "csurf_track.hpp"
+#include "csurf_utils.hpp"
 
 CSurf_Track::CSurf_Track(int index, CSurf_Context *context, midi_Output *m_midiout) : context(context)
 {
@@ -19,24 +20,24 @@ void CSurf_Track::SetTrackColor(ButtonColor colorActive, ButtonColor colorDim)
     selectButton->SetColor(colorActive, colorDim);
 }
 
-void CSurf_Track::SetSelectButtonValue(Btn_Value value)
+void CSurf_Track::SetSelectButtonValue(Btn_Value value, bool force)
 {
-    selectButton->SetValue(value);
+    selectButton->SetValue(value, force);
 }
 
-void CSurf_Track::SetSoloButtonValue(Btn_Value value)
+void CSurf_Track::SetSoloButtonValue(Btn_Value value, bool force)
 {
-    soloButton->SetValue(value);
+    soloButton->SetValue(value, force);
 }
 
-void CSurf_Track::SetMuteButtonValue(Btn_Value value)
+void CSurf_Track::SetMuteButtonValue(Btn_Value value, bool force)
 {
-    muteButton->SetValue(value);
+    muteButton->SetValue(value, force);
 }
 
-void CSurf_Track::SetFaderValue(int value)
+void CSurf_Track::SetFaderValue(int value, bool force)
 {
-    fader->SetValue(value);
+    fader->SetValue(value, force);
 }
 
 void CSurf_Track::SetValueBarMode(ValuebarMode mode)
@@ -49,14 +50,14 @@ void CSurf_Track::SetValueBarValue(int value)
     valueBar->SetValue(value);
 }
 
-void CSurf_Track::SetDisplayMode(DisplayMode mode)
+void CSurf_Track::SetDisplayMode(DisplayMode mode, bool force)
 {
-    display->SetMode(mode);
+    display->SetMode(mode, force);
 };
 
-void CSurf_Track::SetDisplayLine(int line, Alignment alignment, const char *value, Inverted invert)
+void CSurf_Track::SetDisplayLine(int line, Alignment alignment, const char *value, Inverted invert, bool force)
 {
-    display->SetValue(line, alignment, value, invert);
+    display->SetValue(line, alignment, value, invert, force);
 };
 
 #endif

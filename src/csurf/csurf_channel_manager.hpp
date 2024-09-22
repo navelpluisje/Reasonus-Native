@@ -19,6 +19,8 @@ protected:
     ButtonColor colorActive;
     ButtonColor colorDim;
 
+    bool forceUpdate = false;
+
     virtual void SetTrackColors(MediaTrack *media_track)
     {
         (void)media_track;

@@ -7,10 +7,13 @@
 #include "csurf_channel_manager.hpp"
 #include "csurf_navigator.hpp"
 #include <vector>
+#include "csurf_utils.hpp"
 
 class CSurf_TrackManager : public CSurf_ChannelManager
 {
 protected:
+    bool hasLastTouchedFxEnabled = false;
+
     void SetTrackColors(MediaTrack *media_track) override
     {
         int red = 0xff;
@@ -87,10 +90,13 @@ public:
     void UpdateTracks() override
     {
         WDL_PtrList<MediaTrack> media_tracks = navigator->GetBankTracks();
-        int nb_tracks = tracks.size();
-        // Set the display type
 
-        for (int i = 0; i < nb_tracks; i++)
+        if (hasLastTouchedFxEnabled != context->GetLastTouchedFxMode() && !context->GetLastTouchedFxMode())
+        {
+            forceUpdate = true;
+        }
+
+        for (int i = 0; i < navigator->GetTrackCount(); i++)
         {
             int flagsOut, faderValue = 0, valueBarValue = 0;
             int selectFlag = context->GetArm() ? 6 : 1;
@@ -106,30 +112,33 @@ public:
 
             track->SetTrackColor(colorActive, colorDim);
             // If the track is armed always blink as an indication it is armed
-            track->SetSelectButtonValue((selectFlag != 6 && hasBit(flagsOut, 6)) ? BTN_VALUE_BLINK : selectValue);
-            track->SetMuteButtonValue(hasBit(flagsOut, 3) ? BTN_VALUE_ON : BTN_VALUE_OFF);
-            track->SetSoloButtonValue(hasBit(flagsOut, 4) ? BTN_VALUE_ON : BTN_VALUE_OFF);
-            track->SetFaderValue(faderValue);
+            track->SetSelectButtonValue((selectFlag != 6 && hasBit(flagsOut, 6)) ? BTN_VALUE_BLINK : selectValue, forceUpdate);
+            track->SetMuteButtonValue(hasBit(flagsOut, 3) ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
+            track->SetSoloButtonValue(hasBit(flagsOut, 4) ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
+            track->SetFaderValue(faderValue, forceUpdate);
             track->SetValueBarMode(context->GetShiftLeft() ? VALUEBAR_MODE_FILL : VALUEBAR_MODE_BIPOLAR);
             track->SetValueBarValue(valueBarValue);
 
             if (!context->GetShiftLeft())
             {
-                track->SetDisplayMode(DISPLAY_MODE_8);
-                track->SetDisplayLine(0, ALIGN_LEFT, trackName);
-                track->SetDisplayLine(1, ALIGN_CENTER, trackIndex.c_str());
-                track->SetDisplayLine(2, ALIGN_CENTER, strPan1.c_str());
-                track->SetDisplayLine(3, ALIGN_CENTER, string("").c_str());
+                track->SetDisplayMode(DISPLAY_MODE_8, forceUpdate);
+                track->SetDisplayLine(0, ALIGN_LEFT, trackName, NON_INVERT, forceUpdate);
+                track->SetDisplayLine(1, ALIGN_CENTER, trackIndex.c_str(), NON_INVERT, forceUpdate);
+                track->SetDisplayLine(2, ALIGN_CENTER, strPan1.c_str(), NON_INVERT, forceUpdate);
+                track->SetDisplayLine(3, ALIGN_CENTER, string("").c_str(), NON_INVERT, forceUpdate);
             }
             else
             {
-                track->SetDisplayMode(DISPLAY_MODE_2);
-                track->SetDisplayLine(0, ALIGN_CENTER, trackName);
-                track->SetDisplayLine(1, ALIGN_CENTER, trackIndex.c_str());
-                track->SetDisplayLine(2, ALIGN_CENTER, strPan1.c_str());
-                track->SetDisplayLine(3, ALIGN_CENTER, strPan2.c_str());
+                track->SetDisplayMode(DISPLAY_MODE_2, forceUpdate);
+                track->SetDisplayLine(0, ALIGN_CENTER, trackName, NON_INVERT, forceUpdate);
+                track->SetDisplayLine(1, ALIGN_CENTER, trackIndex.c_str(), NON_INVERT, forceUpdate);
+                track->SetDisplayLine(2, ALIGN_CENTER, strPan1.c_str(), NON_INVERT, forceUpdate);
+                track->SetDisplayLine(3, ALIGN_CENTER, strPan2.c_str(), NON_INVERT, forceUpdate);
             }
         }
+
+        hasLastTouchedFxEnabled = context->GetLastTouchedFxMode();
+        forceUpdate = false;
     }
 
     void HandleSelectClick(int index) override
