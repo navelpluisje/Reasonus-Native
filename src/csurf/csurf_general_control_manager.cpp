@@ -124,8 +124,6 @@ public:
         switch (context->GetPanEncoderMode())
         {
         case PanEncoderPanMode:
-            // Get the selected track
-            // Set pan width, depending on the mode
             hasBit(val, 6) ? DecrementPan(1) : IncrementPan(1);
             break;
 
