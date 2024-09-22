@@ -11,7 +11,6 @@
 #include <string>
 #include "csurf.h"
 #include "csurf_session_manager.cpp"
-#include "csurf_shift_manager.cpp"
 #include "csurf_transport_manager.cpp"
 #include "csurf_mix_manager.cpp"
 #include "csurf_automation_manager.cpp"
@@ -36,7 +35,6 @@ class CSurf_FaderPort : public IReaperControlSurface
 
   CSurf_Context *context;
   CSurf_SessionManager *sessionManager;
-  CSurf_ShiftManager *shiftManager;
   CSurf_ChannelContext *channelContext;
   CSurf_Navigator *trackNavigator;
   CSurf_MixManager *mixManager;
@@ -175,28 +173,6 @@ class CSurf_FaderPort : public IReaperControlSurface
       }
 
       /**
-       * Arm Button
-       */
-      else if (evt->midi_message[1] == BTN_ARM)
-      {
-        shiftManager->HandleArmButton(evt->midi_message[2]);
-        sessionManager->Refresh();
-      }
-
-      /**
-       * Shift Manager Buttons
-       */
-      else if (evt->midi_message[1] == BTN_SHIFT_LEFT)
-      {
-        shiftManager->HandleShiftLeftButton(evt->midi_message[2]);
-        sessionManager->Refresh();
-      }
-      else if (evt->midi_message[1] == BTN_SHIFT_RIGHT)
-      {
-        shiftManager->HandleShiftRightButton(evt->midi_message[2]);
-      }
-
-      /**
        * Mix Management
        */
       else if (evt->midi_message[1] == BTN_AUDIO)
@@ -219,10 +195,19 @@ class CSurf_FaderPort : public IReaperControlSurface
       {
         mixManager->HandleMixAllButton();
       }
+      else if (evt->midi_message[1] == BTN_SHIFT_RIGHT)
+      {
+        mixManager->HandleShiftButton(evt->midi_message[2]);
+      }
 
       /**
        * General Control Management
        */
+      else if (evt->midi_message[1] == BTN_ARM)
+      {
+        generalControlManager->HandleArmButton(evt->midi_message[2]);
+        sessionManager->Refresh();
+      }
       else if (evt->midi_message[1] == BTN_SOLO_CLEAR)
       {
         generalControlManager->handleSoloClearButton();
@@ -242,6 +227,11 @@ class CSurf_FaderPort : public IReaperControlSurface
       else if (evt->midi_message[1] == BTN_LINK)
       {
         generalControlManager->handleLinkButton();
+      }
+      else if (evt->midi_message[1] == BTN_SHIFT_LEFT)
+      {
+        generalControlManager->HandleShiftButton(evt->midi_message[2]);
+        sessionManager->Refresh();
       }
 
       /**
@@ -352,7 +342,6 @@ public:
 
     trackNavigator = new CSurf_Navigator(context);
     sessionManager = new CSurf_SessionManager(context, trackNavigator, m_midiout);
-    shiftManager = new CSurf_ShiftManager(context, m_midiout);
     channelContext = new CSurf_ChannelContext(context, trackNavigator, m_midiout);
     mixManager = new CSurf_MixManager(context, trackNavigator, m_midiout);
     transportManager = new CSurf_TransportManager(context, m_midiout);

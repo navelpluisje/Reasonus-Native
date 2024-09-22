@@ -6,6 +6,8 @@
 
 using namespace std;
 
+const int TOGGLE_SPEED = 150;
+
 const int AUTOMATION_OFF = -1;
 const int AUTOMATION_TRIM = 0;
 const int AUTOMATION_READ = 1;
@@ -13,6 +15,18 @@ const int AUTOMATION_TOUCH = 2;
 const int AUTOMATION_LATCH = 4;
 const int AUTOMATION_PREVIEW = 5;
 const int AUTOMATION_WRITE = 3;
+
+struct ShiftState
+{
+    bool active = false;
+    int start = false;
+    bool invert = false;
+
+    void ToggleInvert()
+    {
+        invert = !invert;
+    }
+};
 
 void Main_OnCommandStringEx(string action_name, int flag = 0, ReaProject *proj = 0);
 

@@ -19,6 +19,9 @@ protected:
     CSurf_ColorButton *mixBusButton;
     CSurf_ColorButton *mixVcaButton;
     CSurf_ColorButton *mixAllButton;
+    CSurf_Button *shiftRightButton;
+
+    ShiftState shiftState;
 
     void SetButtonValue()
     {
@@ -27,6 +30,7 @@ protected:
         mixBusButton->SetValue((trackFilter == TrackAllFoldersFilter || trackFilter == TrackTopFoldersFilter) ? BTN_VALUE_ON : BTN_VALUE_OFF);
         mixVcaButton->SetValue((trackFilter == TrackSendsFilter || trackFilter == TrackReceivesFilter) ? BTN_VALUE_ON : BTN_VALUE_OFF);
         mixAllButton->SetValue(trackFilter == TrackAllFilter ? BTN_VALUE_ON : BTN_VALUE_OFF);
+        shiftRightButton->SetValue(context->GetShiftRight() ? BTN_VALUE_ON : BTN_VALUE_OFF);
     }
 
 public:
@@ -40,6 +44,7 @@ public:
         mixBusButton = new CSurf_ColorButton(ButtonColorWhite, ButtonColorWhiteDim, BTN_BUS, BTN_VALUE_OFF, m_midiout);
         mixVcaButton = new CSurf_ColorButton(ButtonColorWhite, ButtonColorWhiteDim, BTN_VCA, BTN_VALUE_OFF, m_midiout);
         mixAllButton = new CSurf_ColorButton(ButtonColorWhite, ButtonColorWhiteDim, BTN_ALL, BTN_VALUE_ON, m_midiout);
+        shiftRightButton = new CSurf_Button(BTN_SHIFT_RIGHT, BTN_VALUE_OFF, m_midiout);
 
         HandleMixAllButton();
     }
@@ -95,6 +100,28 @@ public:
     {
         trackFilter = TrackAllFilter;
         trackNavigator->handleFilter(TrackAllFilter);
+        SetButtonValue();
+    }
+
+    void HandleShiftButton(int val)
+    {
+        int time = timeGetTime();
+        shiftState.active = val > 0;
+
+        if (shiftState.start == 0)
+        {
+            shiftState.start = time;
+        }
+        else
+        {
+            if (time - shiftState.start < TOGGLE_SPEED)
+            {
+                shiftState.ToggleInvert();
+            }
+            shiftState.start = 0;
+        }
+        context->SetShiftRight(shiftState.invert ? !shiftState.active : shiftState.active);
+
         SetButtonValue();
     }
 };
