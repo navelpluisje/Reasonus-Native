@@ -4,7 +4,8 @@
 enum PanEncoderMode
 {
     PanEncoderPanMode,
-    PanEncoderNavigateMode,
+    PanEncoderSendMode,
+    PanEncoderReceiveMode,
 };
 
 #endif // CSURF_CONTEXT_RESOURCES_H_

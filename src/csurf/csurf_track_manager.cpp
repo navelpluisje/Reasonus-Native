@@ -104,8 +104,9 @@ public:
 
             CSurf_Track *track = tracks.at(i);
             MediaTrack *media_track = media_tracks.Get(i);
-            string trackIndex = to_string((int)GetMediaTrackInfo_Value(media_track, "IP_TRACKNUMBER"));
             SetTrackColors(media_track);
+
+            string trackIndex = to_string((int)GetMediaTrackInfo_Value(media_track, "IP_TRACKNUMBER"));
             const char *trackName = GetTrackState(media_track, &flagsOut);
             GetFaderValue(media_track, &faderValue, &valueBarValue, &strPan1, &strPan2);
             Btn_Value selectValue = hasBit(flagsOut, selectFlag) ? BTN_VALUE_ON : BTN_VALUE_OFF;
@@ -124,7 +125,7 @@ public:
                 track->SetDisplayMode(DISPLAY_MODE_8, forceUpdate);
                 track->SetDisplayLine(0, ALIGN_LEFT, trackName, NON_INVERT, forceUpdate);
                 track->SetDisplayLine(1, ALIGN_CENTER, trackIndex.c_str(), NON_INVERT, forceUpdate);
-                track->SetDisplayLine(2, ALIGN_CENTER, strPan1.c_str(), NON_INVERT, forceUpdate);
+                track->SetDisplayLine(2, ALIGN_CENTER, context->GetPanPushMode() ? strPan1.c_str() : strPan2.c_str(), NON_INVERT, forceUpdate);
                 track->SetDisplayLine(3, ALIGN_CENTER, string("").c_str(), NON_INVERT, forceUpdate);
             }
             else

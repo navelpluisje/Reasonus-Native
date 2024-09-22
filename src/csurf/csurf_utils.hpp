@@ -22,6 +22,25 @@ struct ShiftState
     int start = false;
     bool invert = false;
 
+    void SetValue(bool value)
+    {
+        int time = timeGetTime();
+        active = value;
+
+        if (start == 0)
+        {
+            start = time;
+        }
+        else
+        {
+            if (time - start < TOGGLE_SPEED)
+            {
+                ToggleInvert();
+            }
+            start = 0;
+        }
+    }
+
     void ToggleInvert()
     {
         invert = !invert;

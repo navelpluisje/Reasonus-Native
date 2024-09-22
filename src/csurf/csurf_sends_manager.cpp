@@ -59,6 +59,7 @@ public:
         CSurf_Context *context,
         midi_Output *m_midiout) : CSurf_ChannelManager(tracks, navigator, context, m_midiout)
     {
+        context->ResetTrackSendIndex();
         UpdateTracks();
     }
     ~CSurf_SendsManager() {};
@@ -66,6 +67,8 @@ public:
     void UpdateTracks() override
     {
         nbSends = 0;
+        currentSend = context->GetSendIndex();
+
         WDL_PtrList<MediaTrack> media_tracks = navigator->GetBankTracks();
 
         for (int i = 0; i < navigator->GetTrackCount(); i++)
@@ -80,7 +83,7 @@ public:
             }
         }
 
-        if (nbSends < currentSend)
+        if (nbSends < context->GetSendIndex())
         {
             currentSend = nbSends;
         }

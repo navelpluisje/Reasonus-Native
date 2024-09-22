@@ -16,7 +16,7 @@
 #include "csurf_automation_manager.cpp"
 #include "csurf_general_control_manager.cpp"
 #include "csurf_last_touched_fx_manager.hpp"
-#include "csurf_channel_context.cpp"
+#include "csurf_channel_context_manager.hpp"
 #include "csurf_navigator.hpp"
 #include "controls/csurf_button.hpp"
 #include "csurf_utils.hpp"
@@ -35,7 +35,7 @@ class CSurf_FaderPort : public IReaperControlSurface
 
   CSurf_Context *context;
   CSurf_SessionManager *sessionManager;
-  CSurf_ChannelContext *channelContext;
+  CSurf_ChannelContextManager *channelContextManager;
   CSurf_Navigator *trackNavigator;
   CSurf_MixManager *mixManager;
   CSurf_TransportManager *transportManager;
@@ -59,7 +59,7 @@ class CSurf_FaderPort : public IReaperControlSurface
      */
     if (evt->midi_message[0] >= FADER_1 && evt->midi_message[0] <= FADER_8)
     {
-      channelContext->HandleFaderMove(evt->midi_message[0] - FADER_1, evt->midi_message[2], evt->midi_message[1]);
+      channelContextManager->HandleFaderMove(evt->midi_message[0] - FADER_1, evt->midi_message[2], evt->midi_message[1]);
       if (context->GetLastTouchedFxMode() && evt->midi_message[0] == FADER_8)
       {
         lastTouchedFxManager->HandleFaderMove(evt->midi_message[2], evt->midi_message[1]);
@@ -73,14 +73,7 @@ class CSurf_FaderPort : public IReaperControlSurface
     {
       if (evt->midi_message[1] == ENCODER_PAN)
       {
-        if (context->GetPanEncoderMode() == PanEncoderPanMode)
-        {
-          // Handle the pan pan mode
-        }
-        if (context->GetPanEncoderMode() == PanEncoderNavigateMode)
-        {
-          trackNavigator->HandlePanEncoderChange(evt->midi_message[2]);
-        }
+        generalControlManager->HandleEncoderChange(evt->midi_message[2]);
       }
       if (evt->midi_message[1] == ENCODER_NAV)
       {
@@ -107,21 +100,21 @@ class CSurf_FaderPort : public IReaperControlSurface
        */
       else if (evt->midi_message[1] >= BTN_SELECT_1 && evt->midi_message[1] <= BTN_SELECT_8)
       {
-        channelContext->HandleSelectClick(evt->midi_message[1] - BTN_SELECT_1);
+        channelContextManager->HandleSelectClick(evt->midi_message[1] - BTN_SELECT_1);
       }
       /**
        * Track Mute Buttons
        */
       else if (evt->midi_message[1] >= BTN_MUTE_1 && evt->midi_message[1] <= BTN_MUTE_8)
       {
-        channelContext->HandleMuteClick(evt->midi_message[1] - BTN_MUTE_1);
+        channelContextManager->HandleMuteClick(evt->midi_message[1] - BTN_MUTE_1);
       }
       /**
        * Track Solo Buttons
        */
       else if (evt->midi_message[1] >= BTN_SOLO_1 && evt->midi_message[1] <= BTN_SOLO_8)
       {
-        channelContext->HandleSoloClick(evt->midi_message[1] - BTN_SOLO_1);
+        channelContextManager->HandleSoloClick(evt->midi_message[1] - BTN_SOLO_1);
       }
 
       /**
@@ -129,19 +122,19 @@ class CSurf_FaderPort : public IReaperControlSurface
        */
       else if (evt->midi_message[1] == BTN_TRACK)
       {
-        channelContext->handleTrackButtonClick();
+        channelContextManager->HandleTrackButtonClick();
       }
       else if (evt->midi_message[1] == BTN_EDIT_PLUGINS)
       {
-        channelContext->handlePluginsButtonClick();
+        channelContextManager->HandlePluginsButtonClick();
       }
       else if (evt->midi_message[1] == BTN_SEND)
       {
-        channelContext->handleSendButtonClick();
+        channelContextManager->HandleSendButtonClick();
       }
       else if (evt->midi_message[1] == BTN_PAN)
       {
-        channelContext->handlePanButtonClick();
+        channelContextManager->HandlePanButtonClick();
       }
 
       /**
@@ -203,6 +196,10 @@ class CSurf_FaderPort : public IReaperControlSurface
       /**
        * General Control Management
        */
+      else if (evt->midi_message[1] == ENCODER_CLICK_PAN)
+      {
+        generalControlManager->HandleEncoderClick();
+      }
       else if (evt->midi_message[1] == BTN_ARM)
       {
         generalControlManager->HandleArmButton(evt->midi_message[2]);
@@ -210,23 +207,23 @@ class CSurf_FaderPort : public IReaperControlSurface
       }
       else if (evt->midi_message[1] == BTN_SOLO_CLEAR)
       {
-        generalControlManager->handleSoloClearButton();
+        generalControlManager->HandleSoloClearButton();
       }
       else if (evt->midi_message[1] == BTN_MUTE_CLEAR)
       {
-        generalControlManager->handleMuteClearButton();
+        generalControlManager->HandleMuteClearButton();
       }
       else if (evt->midi_message[1] == BTN_BYPASS)
       {
-        generalControlManager->handleBypassButton();
+        generalControlManager->HandleBypassButton();
       }
       else if (evt->midi_message[1] == BTN_MACRO)
       {
-        generalControlManager->handleMacroButton();
+        generalControlManager->HandleMacroButton();
       }
       else if (evt->midi_message[1] == BTN_LINK)
       {
-        generalControlManager->handleLinkButton();
+        generalControlManager->HandleLinkButton();
       }
       else if (evt->midi_message[1] == BTN_SHIFT_LEFT)
       {
@@ -309,7 +306,7 @@ class CSurf_FaderPort : public IReaperControlSurface
       {
         sessionManager->HandlePrevButton(evt->midi_message[2]);
       }
-      else if (evt->midi_message[1] == BTN_SESSION_ENC_PUSH)
+      else if (evt->midi_message[1] == ENCODER_CLICK_NAV)
       {
         sessionManager->HandleEncoderClick();
       }
@@ -342,7 +339,7 @@ public:
 
     trackNavigator = new CSurf_Navigator(context);
     sessionManager = new CSurf_SessionManager(context, trackNavigator, m_midiout);
-    channelContext = new CSurf_ChannelContext(context, trackNavigator, m_midiout);
+    channelContextManager = new CSurf_ChannelContextManager(context, trackNavigator, m_midiout);
     mixManager = new CSurf_MixManager(context, trackNavigator, m_midiout);
     transportManager = new CSurf_TransportManager(context, m_midiout);
     automationManager = new CSurf_AutomationManager(context, m_midiout);
@@ -445,7 +442,7 @@ public:
       DWORD now = timeGetTime();
       if ((now - surface_update_lastrun) >= 10)
       {
-        channelContext->UpdateTracks();
+        channelContextManager->UpdateTracks();
         if (context->GetLastTouchedFxMode())
         {
           lastTouchedFxManager->UpdateTrack();

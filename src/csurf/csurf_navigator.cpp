@@ -283,7 +283,3 @@ int CSurf_Navigator::GetTrackCount()
 {
     return context->GetNbTracks();
 }
-
-// char buffer[250];
-// snprintf(buffer, sizeof(buffer), "Zone -- %s\n\n", sourceFilePath_.c_str());
-// ShowConsoleMsg(buffer);

@@ -58,7 +58,6 @@ enum Btn_Types
 
     // Session Navigator
     BTN_PREV = 0x2e,
-    BTN_SESSION_ENC_PUSH = 0x53,
     BTN_NEXT = 0x2f,
     BTN_CHANNEL = 0x36,
     BTN_ZOOM = 0x37,
@@ -112,7 +111,10 @@ enum Btn_Value
 enum Encoders
 {
     ENCODER_PAN = 0x10,
+    ENCODER_CLICK_PAN = 0x20,
     ENCODER_NAV = 0x3c,
+    ENCODER_CLICK_NAV = 0x53,
+
 };
 
 #endif

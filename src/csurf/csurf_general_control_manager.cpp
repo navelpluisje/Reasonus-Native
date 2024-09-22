@@ -51,6 +51,39 @@ protected:
         shiftLeftButton->SetValue(context->GetShiftLeft() ? BTN_VALUE_ON : BTN_VALUE_OFF);
     };
 
+    void UpdatePanValue(int val)
+    {
+        double pan1, pan2 = 0.0;
+        int panMode;
+        MediaTrack *media_track = GetSelectedTrack(0, 0);
+        GetTrackUIPan(media_track, &pan1, &pan2, &panMode);
+
+        if (context->GetPanPushMode())
+        {
+            double newValue = int(panToNormalized(pan1) * 127.0) + val;
+            newValue = newValue < 0 ? 0 : newValue > 127 ? 127
+                                                         : newValue;
+            SetMediaTrackInfo_Value(media_track, "D_PAN", normalizedToPan(newValue / 127));
+        }
+        else
+        {
+            double newValue = int(panToNormalized(pan2) * 127.0) + val;
+            newValue = newValue < 0 ? 0 : newValue > 127 ? 127
+                                                         : newValue;
+            SetMediaTrackInfo_Value(media_track, "D_WIDTH", normalizedToPan(newValue / 127));
+        }
+    }
+
+    void IncrementPan(int val)
+    {
+        UpdatePanValue(val);
+    }
+
+    void DecrementPan(int val)
+    {
+        UpdatePanValue(val * -1);
+    }
+
     void SetButtonColors() {};
 
 public:
@@ -81,47 +114,71 @@ public:
         SetButtonValue();
     };
 
+    void HandleEncoderClick()
+    {
+        context->TogglePanPushMode();
+    }
+
+    void HandleEncoderChange(int val)
+    {
+        switch (context->GetPanEncoderMode())
+        {
+        case PanEncoderPanMode:
+            // Get the selected track
+            // Set pan width, depending on the mode
+            hasBit(val, 6) ? DecrementPan(1) : IncrementPan(1);
+            break;
+
+        case PanEncoderSendMode:
+            context->IncrementTrackSendIndex(hasBit(val, 6) ? -1 : 1);
+            break;
+
+        case PanEncoderReceiveMode:
+            context->IncrementTrackReceiveIndex(hasBit(val, 6) ? -1 : 1);
+            break;
+
+        default:
+        }
+    }
+
     void HandleArmButton(int val)
     {
-        int time = timeGetTime();
-        armState.active = val > 0;
-
-        if (armState.start == 0)
+        if (context->GetShiftLeft())
         {
-            armState.start = time;
+            Main_OnCommandEx(40490, 0, 0); // Track: Arm all tracks for recording
+        }
+        else if (context->GetShiftRight())
+        {
+            Main_OnCommandEx(40491, 0, 0); // Track: Unarm all tracks for recording
         }
         else
         {
-            if (time - armState.start < TOGGLE_SPEED)
-            {
-                armState.ToggleInvert();
-            }
-            armState.start = 0;
+            armState.SetValue(val > 0);
+            context->SetArm(armState.invert ? !armState.active : armState.active);
         }
-        context->SetArm(armState.invert ? !armState.active : armState.active);
 
         SetButtonValue();
     }
 
-    void handleSoloClearButton()
+    void HandleSoloClearButton()
     {
         Main_OnCommandEx(40340, 0, 0); // Track: Unsolo all tracks
     };
 
-    void handleMuteClearButton()
+    void HandleMuteClearButton()
     {
         Main_OnCommandEx(40339, 0, 0); // Track: Unmute all tracks
     };
 
-    void handleBypassButton()
+    void HandleBypassButton()
     {
         context->GetShiftLeft() ? Main_OnCommandEx(40344, 0, 0) // Track: Toggle FX bypass on all tracks
                                 : Main_OnCommandEx(8, 0, 0);    // Track: Toggle FX bypass for selected tracks
     };
 
-    void handleMacroButton() {};
+    void HandleMacroButton() {};
 
-    void handleLinkButton()
+    void HandleLinkButton()
     {
         if (context->GetShiftLeft())
         {
@@ -136,21 +193,7 @@ public:
 
     void HandleShiftButton(int val)
     {
-        int time = timeGetTime();
-        shiftState.active = val > 0;
-
-        if (shiftState.start == 0)
-        {
-            shiftState.start = time;
-        }
-        else
-        {
-            if (time - shiftState.start < TOGGLE_SPEED)
-            {
-                shiftState.ToggleInvert();
-            }
-            shiftState.start = 0;
-        }
+        shiftState.SetValue(val > 0);
         context->SetShiftLeft(shiftState.invert ? !shiftState.active : shiftState.active);
 
         SetButtonValue();

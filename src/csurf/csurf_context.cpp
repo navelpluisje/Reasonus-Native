@@ -10,6 +10,9 @@ class CSurf_Context
     bool lastTouchedFxMode;
     int nbTracks = 8;
     PanEncoderMode panEncoderMode = PanEncoderPanMode;
+    bool panPushModePan = true;
+    int sendIndex = 0;
+    int receiveIndex = 0;
 
 public:
     CSurf_Context()
@@ -34,6 +37,30 @@ public:
 
     void SetNbTracks(int count) { nbTracks = count; }
     int GetNbTracks() { return nbTracks; }
+
+    void TogglePanPushMode() { panPushModePan = !panPushModePan; }
+    void ResetPanPushMode() { panPushModePan = true; }
+    bool GetPanPushMode() { return panPushModePan; }
+
+    void IncrementTrackSendIndex(int val)
+    {
+        if (sendIndex + val >= 0)
+        {
+            sendIndex += val;
+        }
+    }
+    void ResetTrackSendIndex() { sendIndex = 0; }
+    int GetSendIndex() { return sendIndex; }
+
+    void IncrementTrackReceiveIndex(int val)
+    {
+        if (sendIndex + val >= 0)
+        {
+            sendIndex += val;
+        }
+    }
+    void ResetTrackReceiveIndex() { sendIndex = 0; }
+    int GetReceiveIndex() { return sendIndex; }
 };
 
 #endif
