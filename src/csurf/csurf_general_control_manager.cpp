@@ -127,6 +127,10 @@ public:
             hasBit(val, 6) ? DecrementPan(1) : IncrementPan(1);
             break;
 
+        case PanEncoderPluginMode:
+            context->IncrementTrackPluginIndex(hasBit(val, 6) ? -1 : 1);
+            break;
+
         case PanEncoderSendMode:
             context->IncrementTrackSendIndex(hasBit(val, 6) ? -1 : 1);
             break;

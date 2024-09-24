@@ -4,6 +4,7 @@
 enum PanEncoderMode
 {
     PanEncoderPanMode,
+    PanEncoderPluginMode,
     PanEncoderSendMode,
     PanEncoderReceiveMode,
 };

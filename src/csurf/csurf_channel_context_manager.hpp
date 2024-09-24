@@ -2,6 +2,7 @@
 #define CSURF_CHANNEL_CONTEXT_MANAGER_H_
 
 #include "csurf_track_manager.cpp"
+#include "csurf_plugins_manager.cpp"
 #include "csurf_sends_manager.cpp"
 #include "csurf_receives_manager.cpp"
 #include "controls/csurf_button.hpp"

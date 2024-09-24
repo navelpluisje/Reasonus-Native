@@ -103,6 +103,14 @@ double panToNormalized(double val);
  */
 double int14ToVol(unsigned char msb, unsigned char lsb);
 
+/**
+ * @brief Strip the type from the plugin name
+ *
+ * @param name The full plugin name
+ * @return string
+ */
+string StripFxType(char *name);
+
 void logInteger(const char *key, int value);
 
 void logDouble(const char *key, double value);

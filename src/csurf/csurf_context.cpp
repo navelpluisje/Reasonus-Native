@@ -1,4 +1,5 @@
 #include "csurf_context_resources.hpp"
+
 #ifndef CSURF_CONTEXT_H_
 #define CSURF_CONTEXT_H_
 
@@ -13,6 +14,7 @@ class CSurf_Context
     bool panPushModePan = true;
     int sendIndex = 0;
     int receiveIndex = 0;
+    int pluginIndex = 0;
 
 public:
     CSurf_Context()
@@ -54,13 +56,23 @@ public:
 
     void IncrementTrackReceiveIndex(int val)
     {
-        if (sendIndex + val >= 0)
+        if (receiveIndex + val >= 0)
         {
-            sendIndex += val;
+            receiveIndex += val;
         }
     }
-    void ResetTrackReceiveIndex() { sendIndex = 0; }
-    int GetReceiveIndex() { return sendIndex; }
+    void ResetTrackReceiveIndex() { receiveIndex = 0; }
+    int GetReceiveIndex() { return receiveIndex; }
+
+    void IncrementTrackPluginIndex(int val)
+    {
+        if (pluginIndex + val >= 0)
+        {
+            pluginIndex += val;
+        }
+    }
+    void ResetTrackPluginIndex() { pluginIndex = 0; }
+    int GetPluginIndex() { return pluginIndex; }
 };
 
 #endif

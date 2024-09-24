@@ -68,6 +68,19 @@ double int14ToVol(unsigned char msb, unsigned char lsb)
     return DB2VAL(pos);
 }
 
+string StripFxType(char *name)
+{
+    string s = string(name);
+    string delimiter = ": ";
+    int pos = s.find(delimiter) + size(delimiter);
+    if (pos < 0)
+    {
+        return s;
+    }
+    s.erase(0, pos);
+    return s;
+}
+
 void logInteger(const char *key, int value)
 {
     char buffer[250];

@@ -1,4 +1,3 @@
-
 #include "csurf_navigator.hpp"
 #include "csurf_utils.hpp"
 #include <reaper_plugin_functions.h>

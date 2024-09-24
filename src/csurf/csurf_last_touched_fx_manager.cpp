@@ -1,19 +1,5 @@
-
 #include "csurf_last_touched_fx_manager.hpp"
 #include "csurf_utils.hpp"
-
-string StripFxType(char *name)
-{
-    string s = string(name);
-    string delimiter = ": ";
-    int pos = s.find(delimiter) + size(delimiter);
-    if (pos < 0)
-    {
-        return s;
-    }
-    s.erase(0, pos);
-    return s;
-}
 
 CSurf_LastTouchedFXManager::CSurf_LastTouchedFXManager(
     CSurf_Track *track,

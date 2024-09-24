@@ -35,7 +35,18 @@ void CSurf_ChannelContextManager::HandleTrackButtonClick()
         context->ResetPanPushMode();
     }
 };
-void CSurf_ChannelContextManager::HandlePluginsButtonClick() {};
+
+void CSurf_ChannelContextManager::HandlePluginsButtonClick()
+{
+    if (channelMode != PluginMode)
+    {
+        SetButtonValues(PluginMode);
+        channelManager = new CSurf_PluginsManager(tracks, navigator, context, m_midiout);
+        context->SetPanEncoderMode(PanEncoderPluginMode);
+        context->ResetPanPushMode();
+    }
+};
+
 void CSurf_ChannelContextManager::HandleSendButtonClick()
 {
     if (channelMode != SendMode)
@@ -45,6 +56,7 @@ void CSurf_ChannelContextManager::HandleSendButtonClick()
         context->SetPanEncoderMode(PanEncoderSendMode);
     }
 };
+
 void CSurf_ChannelContextManager::HandlePanButtonClick()
 {
     if (channelMode != PanMode)
