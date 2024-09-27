@@ -100,6 +100,7 @@ public:
         {
             int flagsOut, faderValue = 0, valueBarValue = 0;
             int selectFlag = context->GetArm() ? 6 : 1;
+            double peak = 0.0;
             string strPan1, strPan2;
 
             CSurf_Track *track = tracks.at(i);
@@ -110,6 +111,10 @@ public:
             const char *trackName = GetTrackState(media_track, &flagsOut);
             GetFaderValue(media_track, &faderValue, &valueBarValue, &strPan1, &strPan2);
             Btn_Value selectValue = hasBit(flagsOut, selectFlag) ? BTN_VALUE_ON : BTN_VALUE_OFF;
+            if (media_track)
+            {
+                peak = (Track_GetPeakInfo(media_track, 0) + Track_GetPeakInfo(media_track, 1)) / 2;
+            }
 
             track->SetTrackColor(colorActive, colorDim);
             // If the track is armed always blink as an indication it is armed
@@ -119,6 +124,7 @@ public:
             track->SetFaderValue(faderValue, forceUpdate);
             track->SetValueBarMode(context->GetShiftLeft() ? VALUEBAR_MODE_FILL : VALUEBAR_MODE_BIPOLAR);
             track->SetValueBarValue(valueBarValue);
+            track->SetVuMeterValue(int(volToNormalized(peak) * 127.0));
 
             if (!context->GetShiftLeft())
             {

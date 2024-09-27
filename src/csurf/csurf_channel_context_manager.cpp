@@ -9,7 +9,8 @@ void CSurf_ChannelContextManager::SetButtonValues(ChannelMode mode)
                                                                                                       : BTN_VALUE_OFF);
     sendButton->SetValue(channelMode == SendMode ? BTN_VALUE_ON : channelMode == TrackSendMode ? BTN_VALUE_BLINK
                                                                                                : BTN_VALUE_OFF);
-    panButton->SetValue(channelMode == PanMode ? BTN_VALUE_ON : BTN_VALUE_OFF);
+    panButton->SetValue(channelMode == PanMode ? BTN_VALUE_ON : channelMode == TrackPanMode ? BTN_VALUE_BLINK
+                                                                                            : BTN_VALUE_OFF);
 }
 
 CSurf_ChannelContextManager::CSurf_ChannelContextManager(CSurf_Context *context, CSurf_Navigator *navigator, midi_Output *m_midiout) : m_midiout(m_midiout), navigator(navigator), context(context)
@@ -79,6 +80,12 @@ void CSurf_ChannelContextManager::HandlePanButtonClick()
     {
         SetButtonValues(PanMode);
         channelManager = new CSurf_ReceivesManager(tracks, navigator, context, m_midiout);
+        context->SetPanEncoderMode(PanEncoderReceiveMode);
+    }
+    else
+    {
+        SetButtonValues(TrackPanMode);
+        channelManager = new CSurf_TrackReceivesManager(tracks, navigator, context, m_midiout);
         context->SetPanEncoderMode(PanEncoderReceiveMode);
     }
 };

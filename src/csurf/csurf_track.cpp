@@ -12,6 +12,7 @@ CSurf_Track::CSurf_Track(int index, CSurf_Context *context, midi_Output *m_midio
     fader = new CSurf_Fader(index, 0, m_midiout);
     valueBar = new CSurf_Valuebar(index, 0, m_midiout);
     display = new CSurf_Display(index, m_midiout);
+    vuMeter = new CSurf_VuMeter(index, m_midiout);
 }
 
 void CSurf_Track::SetTrackColor(ButtonColor colorActive, ButtonColor colorDim)
@@ -58,6 +59,11 @@ void CSurf_Track::SetDisplayMode(DisplayMode mode, bool force)
 void CSurf_Track::SetDisplayLine(int line, Alignment alignment, const char *value, Inverted invert, bool force)
 {
     display->SetValue(line, alignment, value, invert, force);
+};
+
+void CSurf_Track::SetVuMeterValue(int value, bool force)
+{
+    vuMeter->SetValue(value, force);
 };
 
 #endif

@@ -7,6 +7,7 @@
 #include "csurf_sends_manager.cpp"
 #include "csurf_track_sends_manager.cpp"
 #include "csurf_receives_manager.cpp"
+#include "csurf_track_receives_manager.cpp"
 #include "controls/csurf_button.hpp"
 #include "csurf_track.hpp"
 

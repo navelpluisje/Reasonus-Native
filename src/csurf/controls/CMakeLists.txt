@@ -6,4 +6,5 @@ target_sources(${PROJECT_NAME}
         csurf_display.cpp
         csurf_fader.cpp
         csurf_valuebar.cpp
+        csurf_vu_meter.cpp
         )

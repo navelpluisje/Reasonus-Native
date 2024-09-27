@@ -7,6 +7,7 @@
 #include "controls/csurf_fader.hpp"
 #include "controls/csurf_valuebar.hpp"
 #include "csurf_context.cpp"
+#include "controls/csurf_vu_meter.hpp"
 
 inline Btn_Types SelectButtons[8] = {
     BTN_SELECT_1,
@@ -52,6 +53,7 @@ protected:
     CSurf_Fader *fader;
     CSurf_Valuebar *valueBar;
     CSurf_Display *display;
+    CSurf_VuMeter *vuMeter;
 
 public:
     CSurf_Track(int index, CSurf_Context *_context, midi_Output *m_midiout);
@@ -72,6 +74,8 @@ public:
 
     void SetDisplayMode(DisplayMode mode, bool force = false);
     void SetDisplayLine(int line, Alignment alignment, const char *value, Inverted invert = NON_INVERT, bool force = false);
+
+    void SetVuMeterValue(int value, bool force = false);
 };
 
 #endif
