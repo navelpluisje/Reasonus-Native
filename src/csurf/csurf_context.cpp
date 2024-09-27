@@ -1,7 +1,8 @@
-#include "csurf_context_resources.hpp"
-
 #ifndef CSURF_CONTEXT_H_
 #define CSURF_CONTEXT_H_
+
+#include "csurf_context_resources.hpp"
+#include <cstdlib>
 
 class CSurf_Context
 {
@@ -15,6 +16,9 @@ class CSurf_Context
     int sendIndex = 0;
     int receiveIndex = 0;
     int pluginIndex = 0;
+    int pluginCount = 0;
+    int channelManagerItemIndex = 0;
+    int channelManagerItemsCount = 0;
 
 public:
     CSurf_Context()
@@ -64,15 +68,30 @@ public:
     void ResetTrackReceiveIndex() { receiveIndex = 0; }
     int GetReceiveIndex() { return receiveIndex; }
 
-    void IncrementTrackPluginIndex(int val)
+    void UpdateChannelManagerItemIndex(int val)
     {
-        if (pluginIndex + val >= 0)
+        val < 0 ? DecrementChannelManagerItemIndex(abs(val))
+                : IncrementChannelmanagerItemIndex(val);
+    }
+    void IncrementChannelmanagerItemIndex(int val)
+    {
+        if ((pluginIndex + val + nbTracks) < pluginCount)
         {
             pluginIndex += val;
         }
     }
-    void ResetTrackPluginIndex() { pluginIndex = 0; }
-    int GetPluginIndex() { return pluginIndex; }
+    void DecrementChannelManagerItemIndex(int val)
+    {
+        if (pluginIndex - val > 0)
+        {
+            pluginIndex -= val;
+        }
+    }
+    void ResetChannelManagerItemIndex() { channelManagerItemIndex = 0; }
+    int GetChannelManagerItemIndex() { return channelManagerItemIndex; }
+    int GetChannelManagerItemIndex(int max) { return max < channelManagerItemIndex ? max : channelManagerItemIndex; }
+    void SetChannelManagerItemsCount(int count) { channelManagerItemsCount = count; }
+    void ResetChannelManagerItemsCount() { channelManagerItemsCount = 0; }
 };
 
 #endif

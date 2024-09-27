@@ -1,11 +1,14 @@
 #include "csurf_channel_context_manager.hpp"
+#include <reaper_plugin_functions.h>
 
 void CSurf_ChannelContextManager::SetButtonValues(ChannelMode mode)
 {
     channelMode = mode;
     trackButton->SetValue(channelMode == TrackMode ? BTN_VALUE_ON : BTN_VALUE_OFF);
-    pluginsButton->SetValue(channelMode == PluginMode ? BTN_VALUE_ON : BTN_VALUE_OFF);
-    sendButton->SetValue(channelMode == SendMode ? BTN_VALUE_ON : BTN_VALUE_OFF);
+    pluginsButton->SetValue(channelMode == PluginMode ? BTN_VALUE_ON : channelMode == TrackPluginMode ? BTN_VALUE_BLINK
+                                                                                                      : BTN_VALUE_OFF);
+    sendButton->SetValue(channelMode == SendMode ? BTN_VALUE_ON : channelMode == TrackSendMode ? BTN_VALUE_BLINK
+                                                                                               : BTN_VALUE_OFF);
     panButton->SetValue(channelMode == PanMode ? BTN_VALUE_ON : BTN_VALUE_OFF);
 }
 
@@ -45,6 +48,13 @@ void CSurf_ChannelContextManager::HandlePluginsButtonClick()
         context->SetPanEncoderMode(PanEncoderPluginMode);
         context->ResetPanPushMode();
     }
+    else
+    {
+        SetButtonValues(TrackPluginMode);
+        channelManager = new CSurf_TrackPluginsManager(tracks, navigator, context, m_midiout);
+        context->SetPanEncoderMode(PanEncoderPluginMode);
+        context->ResetPanPushMode();
+    }
 };
 
 void CSurf_ChannelContextManager::HandleSendButtonClick()
@@ -53,6 +63,12 @@ void CSurf_ChannelContextManager::HandleSendButtonClick()
     {
         SetButtonValues(SendMode);
         channelManager = new CSurf_SendsManager(tracks, navigator, context, m_midiout);
+        context->SetPanEncoderMode(PanEncoderSendMode);
+    }
+    else
+    {
+        SetButtonValues(TrackSendMode);
+        channelManager = new CSurf_TrackSendsManager(tracks, navigator, context, m_midiout);
         context->SetPanEncoderMode(PanEncoderSendMode);
     }
 };
@@ -68,7 +84,19 @@ void CSurf_ChannelContextManager::HandlePanButtonClick()
 };
 
 // ADD ALL THE TRACKMANAGERS METJODS HERE TO PROXY THEM
-void CSurf_ChannelContextManager::UpdateTracks() { channelManager->UpdateTracks(); }
+void CSurf_ChannelContextManager::UpdateTracks()
+{
+    if (channelMode == TrackPluginMode || channelMode == PluginMode)
+    {
+        int track, fx, _;
+        if (GetFocusedFX2(&track, &_, &fx))
+        {
+            // TODO: Implement fx control
+            // We can do some fx magic, but not now
+        }
+    }
+    channelManager->UpdateTracks();
+}
 void CSurf_ChannelContextManager::HandleMuteClick(int index) { channelManager->HandleMuteClick(index); }
 void CSurf_ChannelContextManager::HandleSoloClick(int index) { channelManager->HandleSoloClick(index); }
 void CSurf_ChannelContextManager::HandleSelectClick(int index) { channelManager->HandleSelectClick(index); }

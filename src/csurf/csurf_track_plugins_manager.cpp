@@ -1,6 +1,7 @@
-#ifndef CSURF_PLUGINS_MANAGER_C_
-#define CSURF_PLUGINS_MANAGER_C_
+#ifndef CSURF_TRACK_PLUGINS_MANAGER_C_
+#define CSURF_TRACK_PLUGINS_MANAGER_C_
 
+#include <reaper_plugin.h>
 #include "csurf_context.cpp"
 #include <WDL/ptrlist.h>
 #include "csurf_track.hpp"
@@ -10,11 +11,9 @@
 #include "csurf_utils.hpp"
 #include "csurf_daw.hpp"
 
-class CSurf_PluginsManager : public CSurf_ChannelManager
+class CSurf_TrackPluginsManager : public CSurf_ChannelManager
 {
 protected:
-    int nbPlugins = 0;
-    int nbTrackPlugins[8] = {0, 0, 0, 0, 0, 0, 0, 0};
     int currentPlugin = 0;
 
     void SetTrackColors(MediaTrack *media_track) override
@@ -50,61 +49,48 @@ protected:
     }
 
 public:
-    CSurf_PluginsManager(
+    CSurf_TrackPluginsManager(
         std::vector<CSurf_Track *> tracks,
         CSurf_Navigator *navigator,
         CSurf_Context *context,
         midi_Output *m_midiout) : CSurf_ChannelManager(tracks, navigator, context, m_midiout)
     {
         context->ResetChannelManagerItemIndex();
+        context->ResetChannelManagerItemsCount();
         UpdateTracks();
     }
-    ~CSurf_PluginsManager() {};
+    ~CSurf_TrackPluginsManager() {};
 
     void UpdateTracks() override
     {
-        nbPlugins = 0;
         currentPlugin = context->GetChannelManagerItemIndex();
 
         WDL_PtrList<MediaTrack> media_tracks = navigator->GetBankTracks();
+        MediaTrack *plugin_track = GetSelectedTrack(0, 0);
+        context->SetChannelManagerItemsCount(TrackFX_GetCount(plugin_track));
 
         for (int i = 0; i < navigator->GetTrackCount(); i++)
         {
-            MediaTrack *media_track = media_tracks.Get(i);
-            int _nbTrackPlugins = TrackFX_GetCount(media_track);
-            nbTrackPlugins[i] = _nbTrackPlugins;
-
-            if (_nbTrackPlugins > nbPlugins)
-            {
-                nbPlugins = _nbTrackPlugins;
-            }
-        }
-
-        if (nbPlugins < context->GetChannelManagerItemIndex())
-        {
-            currentPlugin = nbPlugins;
-        }
-
-        for (int i = 0; i < navigator->GetTrackCount(); i++)
-        {
-            int pluginIndex = nbTrackPlugins[i] < currentPlugin ? nbTrackPlugins[i] : currentPlugin;
-            int flagsOut, faderValue = 0, valueBarValue = 0;
             bool enabled = false, isOpen = false;
+            int pluginIndex = context->GetChannelManagerItemIndex() + i;
+            int flagsOut, faderValue = 0, valueBarValue = 0;
 
             CSurf_Track *track = tracks.at(i);
             MediaTrack *media_track = media_tracks.Get(i);
             SetTrackColors(media_track);
 
             GetFaderValue(media_track, &faderValue, &valueBarValue);
+            isOpen = TrackFX_GetOpen(plugin_track, pluginIndex);
 
             const char *trackName = GetTrackState(media_track, &flagsOut);
 
+            track->SetDisplayLine(0, ALIGN_LEFT, trackName, plugin_track == media_track ? INVERT : NON_INVERT);
+
             char pluginName[256] = "";
-            if (TrackFX_GetFXName(media_track, pluginIndex, pluginName, size(pluginName)))
+            if (TrackFX_GetFXName(plugin_track, pluginIndex, pluginName, size(pluginName)))
             {
                 track->SetDisplayLine(1, ALIGN_LEFT, StripFxType(pluginName).c_str(), INVERT);
-                enabled = TrackFX_GetEnabled(media_track, pluginIndex);
-                isOpen = TrackFX_GetOpen(media_track, pluginIndex);
+                enabled = TrackFX_GetEnabled(plugin_track, pluginIndex);
                 track->SetDisplayLine(2, ALIGN_CENTER, GetBypassedText(!enabled).c_str());
                 track->SetDisplayLine(3, ALIGN_CENTER, "");
             }
@@ -125,12 +111,11 @@ public:
             track->SetValueBarValue(valueBarValue);
 
             track->SetDisplayMode(DISPLAY_MODE_2);
-            track->SetDisplayLine(0, ALIGN_CENTER, trackName);
+            // track->SetDisplayLine(0, ALIGN_CENTER, trackName);
         }
     }
 
-    void
-    HandleSelectClick(int index) override
+    void HandleSelectClick(int index) override
     {
         int flagsOut = 0;
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
@@ -164,12 +149,12 @@ public:
 
     void HandleSoloClick(int index) override
     {
-        MediaTrack *media_track = navigator->GetTrackByIndex(index);
+        MediaTrack *plugin_track = GetSelectedTrack(0, 0);
 
         // First clean up all open fx windows and then open the plugin in a floating window
         Main_OnCommandStringEx("_S&M_WNCLS3"); // SWS/S&M: Close all floating FX windows
         Main_OnCommandStringEx("_S&M_WNCLS4"); // SWS/S&M: Close all FX chain windows
-        TrackFX_Show(media_track, currentPlugin, 3);
+        TrackFX_Show(plugin_track, index, 3);
     }
 
     void HandleFaderTouch() override

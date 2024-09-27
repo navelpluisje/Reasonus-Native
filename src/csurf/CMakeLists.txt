@@ -10,4 +10,5 @@ target_sources(${PROJECT_NAME}
         csurf_channel_context_manager.cpp
         csurf_navigator.cpp
         csurf_utils.cpp
+        csurf_daw.cpp
         )

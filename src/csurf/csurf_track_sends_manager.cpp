@@ -1,5 +1,5 @@
-#ifndef CSURF_SENDS_MANAGER_C_
-#define CSURF_SENDS_MANAGER_C_
+#ifndef CSURF_TRACK_SENDS_MANAGER_C_
+#define CSURF_TRACK_SENDS_MANAGER_C_
 
 #include "csurf_context.cpp"
 #include <WDL/ptrlist.h>
@@ -10,11 +10,9 @@
 #include "csurf_utils.hpp"
 #include "csurf_daw.hpp"
 
-class CSurf_SendsManager : public CSurf_ChannelManager
+class CSurf_TrackSendsManager : public CSurf_ChannelManager
 {
 protected:
-    int nbSends = 0;
-    int nbTrackSends[8] = {0, 0, 0, 0, 0, 0, 0, 0};
     int currentSend = 0;
     int sendModes[3] = {0, 1, 3};
 
@@ -54,66 +52,54 @@ protected:
     }
 
 public:
-    CSurf_SendsManager(
+    CSurf_TrackSendsManager(
         std::vector<CSurf_Track *> tracks,
         CSurf_Navigator *navigator,
         CSurf_Context *context,
         midi_Output *m_midiout) : CSurf_ChannelManager(tracks, navigator, context, m_midiout)
     {
         context->ResetTrackSendIndex();
+        context->ResetChannelManagerItemsCount();
+
         UpdateTracks();
     }
-    ~CSurf_SendsManager() {};
+    ~CSurf_TrackSendsManager() {};
 
     void UpdateTracks() override
     {
-        nbSends = 0;
-        currentSend = context->GetSendIndex();
+        currentSend = context->GetChannelManagerItemIndex();
 
         WDL_PtrList<MediaTrack> media_tracks = navigator->GetBankTracks();
+        MediaTrack *sends_track = GetSelectedTrack(0, 0);
+        context->SetChannelManagerItemsCount(GetTrackNumSends(sends_track, 0));
 
         for (int i = 0; i < navigator->GetTrackCount(); i++)
         {
-            MediaTrack *media_track = media_tracks.Get(i);
-            int _nbTrackSends = GetTrackNumSends(media_track, 0);
-            nbTrackSends[i] = _nbTrackSends;
-
-            if (_nbTrackSends > nbSends)
-            {
-                nbSends = _nbTrackSends;
-            }
-        }
-
-        if (nbSends < context->GetSendIndex())
-        {
-            currentSend = nbSends;
-        }
-
-        for (int i = 0; i < navigator->GetTrackCount(); i++)
-        {
-            int sendIndex = nbTrackSends[i] < currentSend ? nbTrackSends[i] : currentSend;
+            bool enabled = false;
+            int sendIndex = context->GetChannelManagerItemIndex() + i;
+            int flagsOut, pan, faderValue, valueBarValue = 0;
 
             CSurf_Track *track = tracks.at(i);
             MediaTrack *media_track = media_tracks.Get(i);
             SetTrackColors(media_track);
 
-            int pan, faderValue, valueBarValue = 0;
             string panStr;
-            GetFaderValue(media_track, sendIndex, &faderValue, &valueBarValue, &pan, &panStr);
+            GetFaderValue(sends_track, sendIndex, &faderValue, &valueBarValue, &pan, &panStr);
 
-            int flagsOut;
             const char *trackName = GetTrackState(media_track, &flagsOut);
 
             bool sendMute = false;
-            GetTrackSendUIMute(media_track, sendIndex, &sendMute);
+            GetTrackSendUIMute(sends_track, sendIndex, &sendMute);
 
-            int autoMode = (int)GetTrackSendInfo_Value(media_track, 0, sendIndex, "I_AUTOMODE");
-            int sendMode = (int)GetTrackSendInfo_Value(media_track, 0, sendIndex, "I_SENDMODE");
-            bool sendPhase = (bool)GetTrackSendInfo_Value(media_track, 0, sendIndex, "B_PHASE");
-            bool sendMono = (bool)GetTrackSendInfo_Value(media_track, 0, sendIndex, "B_MONO");
+            int autoMode = (int)GetTrackSendInfo_Value(sends_track, 0, sendIndex, "I_AUTOMODE");
+            int sendMode = (int)GetTrackSendInfo_Value(sends_track, 0, sendIndex, "I_SENDMODE");
+            bool sendPhase = (bool)GetTrackSendInfo_Value(sends_track, 0, sendIndex, "B_PHASE");
+            bool sendMono = (bool)GetTrackSendInfo_Value(sends_track, 0, sendIndex, "B_MONO");
+
+            track->SetDisplayLine(0, ALIGN_LEFT, trackName, sends_track == media_track ? INVERT : NON_INVERT);
 
             const char *sendName = "";
-            MediaTrack *destTrack = (MediaTrack *)GetSetTrackSendInfo(media_track, 0, sendIndex, "P_DESTTRACK", 0);
+            MediaTrack *destTrack = (MediaTrack *)GetSetTrackSendInfo(sends_track, 0, sendIndex, "P_DESTTRACK", 0);
             if (destTrack)
             {
                 sendName = (const char *)GetSetMediaTrackInfo(destTrack, "P_NAME", NULL);
@@ -139,7 +125,6 @@ public:
             track->SetValueBarValue(valueBarValue);
 
             track->SetDisplayMode(DISPLAY_MODE_2);
-            track->SetDisplayLine(0, ALIGN_CENTER, trackName);
         }
     }
 
@@ -161,31 +146,35 @@ public:
 
     void HandleMuteClick(int index) override
     {
-        MediaTrack *media_track = navigator->GetTrackByIndex(index);
+        MediaTrack *send_track = GetSelectedTrack(0, 0);
+        int sendIndex = context->GetChannelManagerItemIndex() + index;
+
         if (context->GetShiftLeft())
         {
-            int sendMode = GetTrackSendInfo_Value(media_track, 0, currentSend, "I_SENDMODE");
-            SetTrackSendInfo_Value(media_track, 0, currentSend, "I_SENDMODE", sendModes[(sendMode + 1) % 4]);
+            int sendMode = GetTrackSendInfo_Value(send_track, 0, sendIndex, "I_SENDMODE");
+            SetTrackSendInfo_Value(send_track, 0, sendIndex, "I_SENDMODE", sendModes[(sendMode + 1) % 4]);
         }
         else
         {
-            bool sendMute = GetTrackSendInfo_Value(media_track, 0, currentSend, "B_MUTE");
-            SetTrackSendInfo_Value(media_track, 0, currentSend, "B_MUTE", !sendMute);
+            bool sendMute = GetTrackSendInfo_Value(send_track, 0, sendIndex, "B_MUTE");
+            SetTrackSendInfo_Value(send_track, 0, sendIndex, "B_MUTE", !sendMute);
         }
     }
 
     void HandleSoloClick(int index) override
     {
-        MediaTrack *media_track = navigator->GetTrackByIndex(index);
+        MediaTrack *send_track = GetSelectedTrack(0, 0);
+        int sendIndex = context->GetChannelManagerItemIndex() + index;
+
         if (context->GetShiftLeft())
         {
-            bool sendMono = GetTrackSendInfo_Value(media_track, 0, currentSend, "B_MONO");
-            SetTrackSendInfo_Value(media_track, 0, currentSend, "B_MONO", !sendMono);
+            bool sendMono = GetTrackSendInfo_Value(send_track, 0, sendIndex, "B_MONO");
+            SetTrackSendInfo_Value(send_track, 0, sendIndex, "B_MONO", !sendMono);
         }
         else
         {
-            bool sendMute = GetTrackSendInfo_Value(media_track, 0, currentSend, "B_PHASE");
-            SetTrackSendInfo_Value(media_track, 0, currentSend, "B_PHASE", !sendMute);
+            bool sendMute = GetTrackSendInfo_Value(send_track, 0, sendIndex, "B_PHASE");
+            SetTrackSendInfo_Value(send_track, 0, sendIndex, "B_PHASE", !sendMute);
         }
     }
 
@@ -195,14 +184,16 @@ public:
 
     void HandleFaderMove(int index, int msb, int lsb) override
     {
-        MediaTrack *media_track = navigator->GetTrackByIndex(index);
+        MediaTrack *send_track = GetSelectedTrack(0, 0);
+        int sendIndex = context->GetChannelManagerItemIndex() + index;
+
         if (context->GetShiftLeft())
         {
-            SetTrackSendInfo_Value(media_track, 0, currentSend, "D_PAN", CSurf_OnSendPanChange(media_track, currentSend, normalizedToPan(int14ToNormalized(msb, lsb)), false));
+            SetTrackSendInfo_Value(send_track, 0, sendIndex, "D_PAN", CSurf_OnSendPanChange(send_track, sendIndex, normalizedToPan(int14ToNormalized(msb, lsb)), false));
         }
         else
         {
-            SetTrackSendInfo_Value(media_track, 0, currentSend, "D_VOL", CSurf_OnSendVolumeChange(media_track, currentSend, int14ToVol(msb, lsb), false));
+            SetTrackSendInfo_Value(send_track, 0, sendIndex, "D_VOL", CSurf_OnSendVolumeChange(send_track, sendIndex, int14ToVol(msb, lsb), false));
         }
     }
 };

@@ -75,7 +75,7 @@ void CSurf_Display::SetValue(int line, Alignment _alignment, const char *_value,
     string strVal = buffer;
 
     // If values have not changed, we do nothing
-    if (strVal == values[line] && alignment[line] == _alignment && !force)
+    if (strVal == values[line] && alignment[line] == _alignment && inverted[line] == invert && !force)
     {
         return;
     }

@@ -8,6 +8,7 @@
 #include "csurf_channel_manager.hpp"
 #include "csurf_navigator.hpp"
 #include <vector>
+#include "csurf_daw.hpp"
 
 class CSurf_ReceivesManager : public CSurf_ChannelManager
 {
@@ -153,11 +154,7 @@ public:
             return;
         }
 
-        for (int i = 0; i < navigator->GetTrackCount(); i++)
-        {
-            MediaTrack *media_track = navigator->GetTrackByIndex(i);
-            SetTrackSelected(media_track, false);
-        }
+        unSelectAllTracks();
         SetTrackSelected(media_track, true);
     }
 

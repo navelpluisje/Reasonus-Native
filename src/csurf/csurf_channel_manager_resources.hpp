@@ -43,7 +43,9 @@ enum ChannelMode
 {
     TrackMode,
     PluginMode,
+    TrackPluginMode,
     SendMode,
+    TrackSendMode,
     PanMode,
 };
 

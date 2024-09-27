@@ -128,15 +128,9 @@ public:
             break;
 
         case PanEncoderPluginMode:
-            context->IncrementTrackPluginIndex(hasBit(val, 6) ? -1 : 1);
-            break;
-
         case PanEncoderSendMode:
-            context->IncrementTrackSendIndex(hasBit(val, 6) ? -1 : 1);
-            break;
-
         case PanEncoderReceiveMode:
-            context->IncrementTrackReceiveIndex(hasBit(val, 6) ? -1 : 1);
+            context->UpdateChannelManagerItemIndex(hasBit(val, 6) ? -1 : 1);
             break;
 
         default:
