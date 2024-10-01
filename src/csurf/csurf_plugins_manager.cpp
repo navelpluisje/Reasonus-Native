@@ -57,6 +57,7 @@ public:
         midi_Output *m_midiout) : CSurf_ChannelManager(tracks, navigator, context, m_midiout)
     {
         context->ResetChannelManagerItemIndex();
+        context->SetChannelManagerType(Hui);
         UpdateTracks();
     }
     ~CSurf_PluginsManager() {};
@@ -64,8 +65,6 @@ public:
     void UpdateTracks() override
     {
         nbPlugins = 0;
-        currentPlugin = context->GetChannelManagerItemIndex();
-
         WDL_PtrList<MediaTrack> media_tracks = navigator->GetBankTracks();
 
         for (int i = 0; i < navigator->GetTrackCount(); i++)
@@ -79,6 +78,9 @@ public:
                 nbPlugins = _nbTrackPlugins;
             }
         }
+
+        context->SetChannelManagerItemsCount(nbPlugins);
+        currentPlugin = context->GetChannelManagerItemIndex();
 
         if (nbPlugins < context->GetChannelManagerItemIndex())
         {

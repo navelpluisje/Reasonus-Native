@@ -60,7 +60,8 @@ public:
         CSurf_Context *context,
         midi_Output *m_midiout) : CSurf_ChannelManager(tracks, navigator, context, m_midiout)
     {
-        context->ResetTrackReceiveIndex();
+        context->ResetChannelManagerItemIndex();
+        context->SetChannelManagerType(Hui);
         UpdateTracks();
     }
     ~CSurf_ReceivesManager() {};
@@ -68,7 +69,6 @@ public:
     void UpdateTracks() override
     {
         nbReceives = 0;
-        currentReceive = context->GetReceiveIndex();
         WDL_PtrList<MediaTrack> media_tracks = navigator->GetBankTracks();
 
         for (int i = 0; i < navigator->GetTrackCount(); i++)
@@ -83,7 +83,10 @@ public:
             }
         }
 
-        if (nbReceives < context->GetReceiveIndex())
+        context->SetChannelManagerItemsCount(nbReceives);
+        currentReceive = context->GetChannelManagerItemIndex();
+
+        if (nbReceives < context->GetChannelManagerItemIndex())
         {
             currentReceive = nbReceives;
         }

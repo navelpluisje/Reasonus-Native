@@ -130,7 +130,6 @@ public:
         if (isForwarding)
         {
             HandleForward();
-            ;
         }
 
         SetButtonValues();

@@ -3,6 +3,14 @@
 
 #include "csurf_context_resources.hpp"
 #include <cstdlib>
+#include <reaper_plugin_functions.h>
+#include "csurf_utils.hpp"
+
+enum ChannelManagerType
+{
+    Track,
+    Hui,
+};
 
 class CSurf_Context
 {
@@ -13,12 +21,9 @@ class CSurf_Context
     int nbTracks = 8;
     PanEncoderMode panEncoderMode = PanEncoderPanMode;
     bool panPushModePan = true;
-    int sendIndex = 0;
-    int receiveIndex = 0;
-    int pluginIndex = 0;
-    int pluginCount = 0;
     int channelManagerItemIndex = 0;
     int channelManagerItemsCount = 0;
+    ChannelManagerType channelManagerType;
 
 public:
     CSurf_Context()
@@ -48,50 +53,38 @@ public:
     void ResetPanPushMode() { panPushModePan = true; }
     bool GetPanPushMode() { return panPushModePan; }
 
-    void IncrementTrackSendIndex(int val)
-    {
-        if (sendIndex + val >= 0)
-        {
-            sendIndex += val;
-        }
-    }
-    void ResetTrackSendIndex() { sendIndex = 0; }
-    int GetSendIndex() { return sendIndex; }
-
-    void IncrementTrackReceiveIndex(int val)
-    {
-        if (receiveIndex + val >= 0)
-        {
-            receiveIndex += val;
-        }
-    }
-    void ResetTrackReceiveIndex() { receiveIndex = 0; }
-    int GetReceiveIndex() { return receiveIndex; }
-
     void UpdateChannelManagerItemIndex(int val)
     {
         val < 0 ? DecrementChannelManagerItemIndex(abs(val))
                 : IncrementChannelmanagerItemIndex(val);
     }
+
     void IncrementChannelmanagerItemIndex(int val)
     {
-        if ((pluginIndex + val + nbTracks) < pluginCount)
+        if ((channelManagerItemIndex + val + (channelManagerType == Hui ? 0 : nbTracks)) < channelManagerItemsCount)
         {
-            pluginIndex += val;
+            channelManagerItemIndex += val;
         }
     }
+
     void DecrementChannelManagerItemIndex(int val)
     {
-        if (pluginIndex - val > 0)
+        if (channelManagerItemIndex - val > 0)
         {
-            pluginIndex -= val;
+            channelManagerItemIndex -= val;
         }
     }
     void ResetChannelManagerItemIndex() { channelManagerItemIndex = 0; }
+
     int GetChannelManagerItemIndex() { return channelManagerItemIndex; }
+
     int GetChannelManagerItemIndex(int max) { return max < channelManagerItemIndex ? max : channelManagerItemIndex; }
+
     void SetChannelManagerItemsCount(int count) { channelManagerItemsCount = count; }
+
     void ResetChannelManagerItemsCount() { channelManagerItemsCount = 0; }
+
+    void SetChannelManagerType(ChannelManagerType type) { channelManagerType = type; }
 };
 
 #endif

@@ -47,6 +47,7 @@ class CSurf_FaderPort : public IReaperControlSurface
   CSurf_Track *lastTouchedFxTrack;
 
   DWORD surface_update_lastrun;
+  DWORD surface_update_keepalive;
 
   WDL_String descspace;
   char configtmp[1024];
@@ -370,9 +371,9 @@ public:
       m_midiout->Send(0xb0, 0x00, 0x06, -1);
       m_midiout->Send(0xb0, 0x20, 0x27, -1);
 
-      int x;
-      for (x = 0; x < 0x30; x++) // lights out
-        m_midiout->Send(0xa0, x, 0x00, -1);
+      // int x;
+      // for (x = 0; x < 0x30; x++) // lights out
+      //   m_midiout->Send(0xa0, x, 0x00, -1);
 
       m_midiout->Send(0x91, 0x00, 0x64, -1); // send these every so often?
     }
@@ -456,6 +457,11 @@ public:
         generalControlManager->Update();
 
         surface_update_lastrun = now;
+      }
+      if ((now - surface_update_keepalive) >= 900)
+      {
+        surface_update_keepalive = now;
+        m_midiout->Send(0xa0, 0x00, 0x00, -1);
       }
     }
   }
