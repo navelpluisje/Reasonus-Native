@@ -69,7 +69,7 @@ public:
 
     void DecrementChannelManagerItemIndex(int val)
     {
-        if (channelManagerItemIndex - val > 0)
+        if (channelManagerItemIndex - val >= 0)
         {
             channelManagerItemIndex -= val;
         }

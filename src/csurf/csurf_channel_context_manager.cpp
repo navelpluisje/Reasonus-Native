@@ -90,7 +90,7 @@ void CSurf_ChannelContextManager::HandlePanButtonClick()
     }
 };
 
-// ADD ALL THE TRACKMANAGERS METJODS HERE TO PROXY THEM
+// ADD ALL THE TRACKMANAGERS METHODS HERE TO PROXY THEM
 void CSurf_ChannelContextManager::UpdateTracks()
 {
     if (channelMode == TrackPluginMode || channelMode == PluginMode)

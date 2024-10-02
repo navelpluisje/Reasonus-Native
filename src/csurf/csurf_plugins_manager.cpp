@@ -82,14 +82,10 @@ public:
         context->SetChannelManagerItemsCount(nbPlugins);
         currentPlugin = context->GetChannelManagerItemIndex();
 
-        if (nbPlugins < context->GetChannelManagerItemIndex())
-        {
-            currentPlugin = nbPlugins;
-        }
-
         for (int i = 0; i < navigator->GetTrackCount(); i++)
         {
-            int pluginIndex = nbTrackPlugins[i] < currentPlugin ? nbTrackPlugins[i] : currentPlugin;
+            int pluginIndex = context->GetChannelManagerItemIndex(nbTrackPlugins[i] - 1);
+
             int flagsOut, faderValue = 0, valueBarValue = 0;
             bool enabled = false, isOpen = false;
 
@@ -108,7 +104,9 @@ public:
                 enabled = TrackFX_GetEnabled(media_track, pluginIndex);
                 isOpen = TrackFX_GetOpen(media_track, pluginIndex);
                 track->SetDisplayLine(2, ALIGN_CENTER, GetBypassedText(!enabled).c_str());
-                track->SetDisplayLine(3, ALIGN_CENTER, "");
+                char buffer[250];
+                snprintf(buffer, sizeof(buffer), "%d/%d", pluginIndex + 1, nbTrackPlugins[i]);
+                track->SetDisplayLine(3, ALIGN_CENTER, buffer);
             }
             else
             {
@@ -151,27 +149,29 @@ public:
     void HandleMuteClick(int index) override
     {
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
+        int pluginIndex = context->GetChannelManagerItemIndex(nbTrackPlugins[index] - 1);
 
         if (context->GetShiftLeft())
         {
-            bool offline = TrackFX_GetOffline(media_track, currentPlugin);
-            TrackFX_SetOffline(media_track, currentPlugin, !offline);
+            bool offline = TrackFX_GetOffline(media_track, pluginIndex);
+            TrackFX_SetOffline(media_track, pluginIndex, !offline);
         }
         else
         {
-            bool enabled = TrackFX_GetEnabled(media_track, currentPlugin);
-            TrackFX_SetEnabled(media_track, currentPlugin, !enabled);
+            bool enabled = TrackFX_GetEnabled(media_track, pluginIndex);
+            TrackFX_SetEnabled(media_track, pluginIndex, !enabled);
         }
     }
 
     void HandleSoloClick(int index) override
     {
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
+        int pluginIndex = context->GetChannelManagerItemIndex(nbTrackPlugins[index] - 1);
 
         // First clean up all open fx windows and then open the plugin in a floating window
         Main_OnCommandStringEx("_S&M_WNCLS3"); // SWS/S&M: Close all floating FX windows
         Main_OnCommandStringEx("_S&M_WNCLS4"); // SWS/S&M: Close all FX chain windows
-        TrackFX_Show(media_track, currentPlugin, 3);
+        TrackFX_Show(media_track, pluginIndex, 3);
     }
 
     void HandleFaderTouch() override

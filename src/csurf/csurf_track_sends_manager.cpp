@@ -13,7 +13,6 @@
 class CSurf_TrackSendsManager : public CSurf_ChannelManager
 {
 protected:
-    int currentSend = 0;
     int sendModes[3] = {0, 1, 3};
 
     void SetTrackColors(MediaTrack *media_track) override
@@ -60,6 +59,7 @@ public:
     {
         context->ResetChannelManagerItemIndex();
         context->ResetChannelManagerItemsCount();
+        context->SetChannelManagerType(Track);
 
         UpdateTracks();
     }
@@ -67,8 +67,6 @@ public:
 
     void UpdateTracks() override
     {
-        currentSend = context->GetChannelManagerItemIndex();
-
         WDL_PtrList<MediaTrack> media_tracks = navigator->GetBankTracks();
         MediaTrack *sends_track = GetSelectedTrack(0, 0);
         context->SetChannelManagerItemsCount(GetTrackNumSends(sends_track, 0));

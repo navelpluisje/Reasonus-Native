@@ -13,7 +13,6 @@
 class CSurf_TrackReceivesManager : public CSurf_ChannelManager
 {
 protected:
-    int currentReceive = 0;
     int sendModes[3] = {0, 1, 3};
 
     void SetTrackColors(MediaTrack *media_track) override
@@ -60,6 +59,7 @@ public:
     {
         context->ResetChannelManagerItemIndex();
         context->ResetChannelManagerItemsCount();
+        context->SetChannelManagerType(Track);
 
         UpdateTracks();
     }
@@ -67,11 +67,9 @@ public:
 
     void UpdateTracks() override
     {
-        currentReceive = context->GetChannelManagerItemIndex();
-
         WDL_PtrList<MediaTrack> media_tracks = navigator->GetBankTracks();
         MediaTrack *receives_track = GetSelectedTrack(0, 0);
-        context->SetChannelManagerItemsCount(GetTrackNumSends(receives_track, 0));
+        context->SetChannelManagerItemsCount(GetTrackNumSends(receives_track, -1));
 
         for (int i = 0; i < navigator->GetTrackCount(); i++)
         {
@@ -151,12 +149,12 @@ public:
         if (context->GetShiftLeft())
         {
             int sendMode = GetTrackSendInfo_Value(receives_track, -1, receiveIndex, "I_SENDMODE");
-            SetTrackSendInfo_Value(receives_track, 0, receiveIndex, "I_SENDMODE", sendModes[(sendMode + 1) % 4]);
+            SetTrackSendInfo_Value(receives_track, -1, receiveIndex, "I_SENDMODE", sendModes[(sendMode + 1) % 4]);
         }
         else
         {
             bool receiveMute = GetTrackSendInfo_Value(receives_track, -1, receiveIndex, "B_MUTE");
-            SetTrackSendInfo_Value(receives_track, 0, receiveIndex, "B_MUTE", !receiveMute);
+            SetTrackSendInfo_Value(receives_track, -1, receiveIndex, "B_MUTE", !receiveMute);
         }
     }
 
@@ -168,12 +166,12 @@ public:
         if (context->GetShiftLeft())
         {
             bool sendMono = GetTrackSendInfo_Value(receives_track, -1, receiveIndex, "B_MONO");
-            SetTrackSendInfo_Value(receives_track, 0, receiveIndex, "B_MONO", !sendMono);
+            SetTrackSendInfo_Value(receives_track, -1, receiveIndex, "B_MONO", !sendMono);
         }
         else
         {
             bool receiveMute = GetTrackSendInfo_Value(receives_track, -1, receiveIndex, "B_PHASE");
-            SetTrackSendInfo_Value(receives_track, 0, receiveIndex, "B_PHASE", !receiveMute);
+            SetTrackSendInfo_Value(receives_track, -1, receiveIndex, "B_PHASE", !receiveMute);
         }
     }
 

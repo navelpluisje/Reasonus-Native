@@ -133,28 +133,30 @@ public:
 
     void HandleMuteClick(int index) override
     {
-        MediaTrack *media_track = navigator->GetTrackByIndex(index);
+        MediaTrack *media_track = GetSelectedTrack(0, 0);
+        int pluginIndex = context->GetChannelManagerItemIndex() + index;
 
         if (context->GetShiftLeft())
         {
-            bool offline = TrackFX_GetOffline(media_track, currentPlugin);
-            TrackFX_SetOffline(media_track, currentPlugin, !offline);
+            bool offline = TrackFX_GetOffline(media_track, pluginIndex);
+            TrackFX_SetOffline(media_track, pluginIndex, !offline);
         }
         else
         {
-            bool enabled = TrackFX_GetEnabled(media_track, currentPlugin);
-            TrackFX_SetEnabled(media_track, currentPlugin, !enabled);
+            bool enabled = TrackFX_GetEnabled(media_track, pluginIndex);
+            TrackFX_SetEnabled(media_track, pluginIndex, !enabled);
         }
     }
 
     void HandleSoloClick(int index) override
     {
-        MediaTrack *plugin_track = GetSelectedTrack(0, 0);
+        MediaTrack *media_track = GetSelectedTrack(0, 0);
+        int pluginIndex = context->GetChannelManagerItemIndex() + index;
 
         // First clean up all open fx windows and then open the plugin in a floating window
         Main_OnCommandStringEx("_S&M_WNCLS3"); // SWS/S&M: Close all floating FX windows
         Main_OnCommandStringEx("_S&M_WNCLS4"); // SWS/S&M: Close all FX chain windows
-        TrackFX_Show(plugin_track, index, 3);
+        TrackFX_Show(media_track, pluginIndex, 3);
     }
 
     void HandleFaderTouch() override

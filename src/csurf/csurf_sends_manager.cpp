@@ -93,7 +93,7 @@ public:
 
         for (int i = 0; i < navigator->GetTrackCount(); i++)
         {
-            int sendIndex = nbTrackSends[i] < currentSend ? nbTrackSends[i] : currentSend;
+            int sendIndex = context->GetChannelManagerItemIndex(nbTrackSends[i] - 1);
 
             CSurf_Track *track = tracks.at(i);
             MediaTrack *media_track = media_tracks.Get(i);
@@ -109,7 +109,6 @@ public:
             bool sendMute = false;
             GetTrackSendUIMute(media_track, sendIndex, &sendMute);
 
-            int autoMode = (int)GetTrackSendInfo_Value(media_track, 0, sendIndex, "I_AUTOMODE");
             int sendMode = (int)GetTrackSendInfo_Value(media_track, 0, sendIndex, "I_SENDMODE");
             bool sendPhase = (bool)GetTrackSendInfo_Value(media_track, 0, sendIndex, "B_PHASE");
             bool sendMono = (bool)GetTrackSendInfo_Value(media_track, 0, sendIndex, "B_MONO");
@@ -122,7 +121,9 @@ public:
                 // Because of the const an being a pointer we need to do this here
                 track->SetDisplayLine(1, ALIGN_LEFT, sendName, INVERT);
                 track->SetDisplayLine(2, ALIGN_CENTER, GetSendModeString(sendMode).c_str());
-                track->SetDisplayLine(3, ALIGN_CENTER, GetAutomationString(autoMode).c_str());
+                char buffer[250];
+                snprintf(buffer, sizeof(buffer), "%d/%d", sendIndex + 1, nbTrackSends[i]);
+                track->SetDisplayLine(3, ALIGN_CENTER, buffer);
             }
             else
             {
