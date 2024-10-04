@@ -26,7 +26,16 @@ protected:
         if (!context->GetArm())
         {
             int trackColor = GetTrackColor(media_track);
-            ColorFromNative(trackColor, &red, &green, &blue);
+            if (trackColor == 0)
+            {
+                red = 0x7f;
+                green = 0x7f;
+                blue = 0x7f;
+            }
+            else
+            {
+                ColorFromNative(trackColor, &red, &green, &blue);
+            }
         }
         colorActive.SetColor(red / 2, green / 2, blue / 2);
         colorDim.SetColor(red / 4, green / 4, blue / 4);
@@ -84,29 +93,21 @@ public:
 
         for (int i = 0; i < navigator->GetTrackCount(); i++)
         {
+            int faderValue = 0, valueBarValue = 0;
             int pluginIndex = context->GetChannelManagerItemIndex(nbTrackPlugins[i] - 1);
-
-            int flagsOut, faderValue = 0, valueBarValue = 0;
-            bool enabled = false, isOpen = false;
 
             CSurf_Track *track = tracks.at(i);
             MediaTrack *media_track = media_tracks.Get(i);
             SetTrackColors(media_track);
-
             GetFaderValue(media_track, &faderValue, &valueBarValue);
 
-            const char *trackName = GetTrackState(media_track, &flagsOut);
+            track->SetDisplayLine(0, ALIGN_LEFT, DAW::GetTrackName(media_track).c_str());
 
-            char pluginName[256] = "";
-            if (TrackFX_GetFXName(media_track, pluginIndex, pluginName, size(pluginName)))
+            if (DAW::HasTrackFx(media_track, pluginIndex))
             {
-                track->SetDisplayLine(1, ALIGN_LEFT, StripFxType(pluginName).c_str(), INVERT);
-                enabled = TrackFX_GetEnabled(media_track, pluginIndex);
-                isOpen = TrackFX_GetOpen(media_track, pluginIndex);
-                track->SetDisplayLine(2, ALIGN_CENTER, GetBypassedText(!enabled).c_str());
-                char buffer[250];
-                snprintf(buffer, sizeof(buffer), "%d/%d", pluginIndex + 1, nbTrackPlugins[i]);
-                track->SetDisplayLine(3, ALIGN_CENTER, buffer);
+                track->SetDisplayLine(1, ALIGN_LEFT, DAW::GetTrackFxName(media_track, pluginIndex).c_str(), INVERT);
+                track->SetDisplayLine(2, ALIGN_CENTER, DAW::GetTrackFxSurfceEnabled(media_track, pluginIndex).c_str());
+                track->SetDisplayLine(3, ALIGN_CENTER, Progress(pluginIndex + 1, nbTrackPlugins[i]).c_str());
             }
             else
             {
@@ -116,33 +117,30 @@ public:
             }
 
             track->SetTrackColor(colorActive, colorDim);
-            track->SetSelectButtonValue(hasBit(flagsOut, 1) ? BTN_VALUE_ON : BTN_VALUE_OFF);
-            track->SetMuteButtonValue((context->GetShiftLeft() && enabled) ? BTN_VALUE_BLINK : enabled ? BTN_VALUE_ON
-                                                                                                       : BTN_VALUE_OFF);
-            track->SetSoloButtonValue(isOpen ? BTN_VALUE_ON : BTN_VALUE_OFF);
+            track->SetSelectButtonValue(DAW::IsTrackSelected(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF);
+            track->SetMuteButtonValue((context->GetShiftLeft() && DAW::GetTrackFxEnabled(media_track, pluginIndex)) ? BTN_VALUE_BLINK
+                                      : DAW::GetTrackFxEnabled(media_track, pluginIndex)                            ? BTN_VALUE_ON
+                                                                                                                    : BTN_VALUE_OFF);
+            track->SetSoloButtonValue(DAW::GetTrackFxPanelOpen(media_track, pluginIndex) ? BTN_VALUE_ON : BTN_VALUE_OFF);
             track->SetFaderValue(faderValue);
             track->SetValueBarMode(VALUEBAR_MODE_BIPOLAR);
             track->SetValueBarValue(valueBarValue);
 
             track->SetDisplayMode(DISPLAY_MODE_2);
-            track->SetDisplayLine(0, ALIGN_CENTER, trackName);
         }
     }
 
-    void
-    HandleSelectClick(int index) override
+    void HandleSelectClick(int index) override
     {
-        int flagsOut = 0;
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
-        GetTrackState(media_track, &flagsOut);
 
         if (context->GetArm())
         {
-            CSurf_SetSurfaceRecArm(media_track, CSurf_OnRecArmChange(media_track, !hasBit(flagsOut, 6)), NULL);
+            CSurf_SetSurfaceRecArm(media_track, CSurf_OnRecArmChange(media_track, !DAW::IsTrackArmed(media_track)), NULL);
             return;
         }
 
-        unSelectAllTracks();
+        DAW::UnSelectAllTracks();
         SetTrackSelected(media_track, true);
     }
 
@@ -153,13 +151,11 @@ public:
 
         if (context->GetShiftLeft())
         {
-            bool offline = TrackFX_GetOffline(media_track, pluginIndex);
-            TrackFX_SetOffline(media_track, pluginIndex, !offline);
+            TrackFX_SetOffline(media_track, pluginIndex, !DAW::GetTrackFxOffline(media_track, pluginIndex));
         }
         else
         {
-            bool enabled = TrackFX_GetEnabled(media_track, pluginIndex);
-            TrackFX_SetEnabled(media_track, pluginIndex, !enabled);
+            TrackFX_SetEnabled(media_track, pluginIndex, !DAW::GetTrackFxEnabled(media_track, pluginIndex));
         }
     }
 

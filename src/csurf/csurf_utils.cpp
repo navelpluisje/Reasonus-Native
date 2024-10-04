@@ -81,6 +81,52 @@ string StripFxType(char *name)
     return s;
 }
 
+string Progress(int current, int total)
+{
+    char buffer[127];
+    snprintf(buffer, sizeof(buffer), "%d/%d", current, total);
+    return string(buffer);
+}
+
+string GetSendModeString(int sendMode)
+{
+    switch (sendMode)
+    {
+    case 0:
+        return "Post-fdr";
+    case 1:
+        return "Pre-FX";
+    case 2:
+    case 3:
+        return "Post-FX";
+    default:
+        return "Post-fdr";
+    };
+}
+
+string GetAutomationString(int automationMode)
+{
+    switch (automationMode)
+    {
+    case -1:
+        return "Track";
+    case 0:
+        return "Trim";
+    case 1:
+        return "Read";
+    case 2:
+        return "Touch";
+    case 3:
+        return "Write";
+    case 4:
+        return "Latch";
+    case 5:
+        return "Preview";
+    default:
+        return "Trim";
+    };
+}
+
 void logInteger(const char *key, int value)
 {
     char buffer[250];

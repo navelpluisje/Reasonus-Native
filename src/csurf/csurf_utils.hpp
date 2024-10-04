@@ -111,6 +111,24 @@ double int14ToVol(unsigned char msb, unsigned char lsb);
  */
 string StripFxType(char *name);
 
+string Progress(int current, int total);
+
+/**
+ * @brief Get a string representation of the send mode
+ *
+ * @param sendMode The send mode
+ * @return string
+ */
+string GetSendModeString(int sendMode);
+
+/**
+ * @brief Get a string representation of the automtion mode
+ *
+ * @param automationMode The automation mode
+ * @return string
+ */
+string GetAutomationString(int automationMode);
+
 void logInteger(const char *key, int value);
 
 void logDouble(const char *key, double value);

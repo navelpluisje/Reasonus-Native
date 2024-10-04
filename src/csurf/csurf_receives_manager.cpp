@@ -16,7 +16,6 @@ protected:
     int nbReceives = 0;
     int nbTrackReceives[8] = {0, 0, 0, 0, 0, 0, 0, 0};
     int currentReceive = 0;
-    int sendModes[3] = {0, 1, 3};
 
     void SetTrackColors(MediaTrack *media_track) override
     {
@@ -27,7 +26,16 @@ protected:
         if (!context->GetArm())
         {
             int trackColor = GetTrackColor(media_track);
-            ColorFromNative(trackColor, &red, &green, &blue);
+            if (trackColor == 0)
+            {
+                red = 0x7f;
+                green = 0x7f;
+                blue = 0x7f;
+            }
+            else
+            {
+                ColorFromNative(trackColor, &red, &green, &blue);
+            }
         }
         colorActive.SetColor(red / 2, green / 2, blue / 2);
         colorDim.SetColor(red / 4, green / 4, blue / 4);
@@ -90,7 +98,7 @@ public:
         {
             int receiveIndex = context->GetChannelManagerItemIndex(nbTrackReceives[i] - 1);
 
-            int flagsOut, pan, faderValue, valueBarValue = 0;
+            int pan, faderValue, valueBarValue = 0;
             string panStr;
 
             CSurf_Track *track = tracks.at(i);
@@ -99,26 +107,11 @@ public:
 
             GetFaderValue(media_track, receiveIndex, &faderValue, &valueBarValue, &pan, &panStr);
 
-            const char *trackName = GetTrackState(media_track, &flagsOut);
-
-            bool receiveMute = false;
-            GetTrackReceiveUIMute(media_track, receiveIndex, &receiveMute);
-
-            int sendMode = (int)GetTrackSendInfo_Value(media_track, -1, receiveIndex, "I_SENDMODE");
-            bool sendPhase = (bool)GetTrackSendInfo_Value(media_track, -1, receiveIndex, "B_PHASE");
-            bool sendMono = (bool)GetTrackSendInfo_Value(media_track, -1, receiveIndex, "B_MONO");
-
-            const char *receiveName = "";
-            MediaTrack *destTrack = (MediaTrack *)GetSetTrackSendInfo(media_track, -1, receiveIndex, "P_SRCTRACK", 0);
-            if (destTrack)
+            if (DAW::HasTrackReceive(media_track, receiveIndex))
             {
-                receiveName = (const char *)GetSetMediaTrackInfo(destTrack, "P_NAME", NULL);
-                // Because of the const an being a pointer we need to do this here
-                track->SetDisplayLine(1, ALIGN_LEFT, receiveName, INVERT);
-                track->SetDisplayLine(2, ALIGN_CENTER, GetSendModeString(sendMode).c_str());
-                char buffer[250];
-                snprintf(buffer, sizeof(buffer), "%d/%d", receiveIndex + 1, nbTrackReceives[i]);
-                track->SetDisplayLine(3, ALIGN_CENTER, buffer);
+                track->SetDisplayLine(1, ALIGN_LEFT, DAW::GetTrackReceiveSrcName(media_track, receiveIndex).c_str(), INVERT);
+                track->SetDisplayLine(2, ALIGN_CENTER, DAW::GetTrackSurfaceReceiveMode(media_track, receiveIndex).c_str());
+                track->SetDisplayLine(3, ALIGN_CENTER, Progress(receiveIndex + 1, nbTrackReceives[i]).c_str());
             }
             else
             {
@@ -128,16 +121,19 @@ public:
             }
 
             track->SetTrackColor(colorActive, colorDim);
-            track->SetSelectButtonValue(hasBit(flagsOut, 1) ? BTN_VALUE_ON : BTN_VALUE_OFF);
-            track->SetMuteButtonValue((context->GetShiftLeft() && receiveMute) ? BTN_VALUE_BLINK : receiveMute ? BTN_VALUE_ON
-                                                                                                               : BTN_VALUE_OFF);
-            track->SetSoloButtonValue(((context->GetShiftLeft() && sendMono) || (!context->GetShiftLeft() && sendPhase)) ? BTN_VALUE_ON : BTN_VALUE_OFF);
+            track->SetSelectButtonValue(DAW::IsTrackSelected(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF);
+            track->SetMuteButtonValue((context->GetShiftLeft() && DAW::GetTrackReceiveMute(media_track, receiveIndex)) ? BTN_VALUE_BLINK
+                                      : DAW::GetTrackReceiveMute(media_track, receiveIndex)                            ? BTN_VALUE_ON
+                                                                                                                       : BTN_VALUE_OFF);
+            track->SetSoloButtonValue(((context->GetShiftLeft() && DAW::GetTrackReceiveMono(media_track, receiveIndex)) || (!context->GetShiftLeft() && DAW::GetTrackReceivePhase(media_track, receiveIndex)))
+                                          ? BTN_VALUE_ON
+                                          : BTN_VALUE_OFF);
             track->SetFaderValue(faderValue);
             track->SetValueBarMode(context->GetShiftLeft() ? VALUEBAR_MODE_FILL : VALUEBAR_MODE_BIPOLAR);
             track->SetValueBarValue(valueBarValue);
 
             track->SetDisplayMode(DISPLAY_MODE_2);
-            track->SetDisplayLine(0, ALIGN_CENTER, trackName);
+            track->SetDisplayLine(0, ALIGN_CENTER, DAW::GetTrackName(media_track).c_str());
         }
     }
 
@@ -153,7 +149,7 @@ public:
             return;
         }
 
-        unSelectAllTracks();
+        DAW::UnSelectAllTracks();
         SetTrackSelected(media_track, true);
     }
 
@@ -164,13 +160,11 @@ public:
 
         if (context->GetShiftLeft())
         {
-            int sendMode = GetTrackSendInfo_Value(media_track, -1, receiveIndex, "I_SENDMODE");
-            SetTrackSendInfo_Value(media_track, -1, receiveIndex, "I_SENDMODE", sendModes[(sendMode + 1) % 4]);
+            SetTrackSendInfo_Value(media_track, -1, receiveIndex, "I_SENDMODE", DAW::GetNextTrackReceiveMode(media_track, receiveIndex));
         }
         else
         {
-            bool receiveMute = GetTrackSendInfo_Value(media_track, -1, receiveIndex, "B_MUTE");
-            SetTrackSendInfo_Value(media_track, -1, receiveIndex, "B_MUTE", !receiveMute);
+            SetTrackSendInfo_Value(media_track, -1, receiveIndex, "B_MUTE", !DAW::GetTrackReceiveMute(media_track, receiveIndex));
         }
     }
 
@@ -181,13 +175,11 @@ public:
 
         if (context->GetShiftLeft())
         {
-            bool sendMono = GetTrackSendInfo_Value(media_track, -1, receiveIndex, "B_MONO");
-            SetTrackSendInfo_Value(media_track, -1, receiveIndex, "B_MONO", !sendMono);
+            SetTrackSendInfo_Value(media_track, -1, receiveIndex, "B_MONO", !DAW::GetTrackReceiveMono(media_track, receiveIndex));
         }
         else
         {
-            bool receiveMute = GetTrackSendInfo_Value(media_track, -1, receiveIndex, "B_PHASE");
-            SetTrackSendInfo_Value(media_track, -1, receiveIndex, "B_PHASE", !receiveMute);
+            SetTrackSendInfo_Value(media_track, -1, receiveIndex, "B_PHASE", !DAW::GetTrackReceivePhase(media_track, receiveIndex));
         }
     }
 
