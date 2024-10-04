@@ -127,6 +127,8 @@ string GetAutomationString(int automationMode)
     };
 }
 
+string GetReaSonusIniPath() { return string(GetResourcePath()) + "/ReaSonus/FP.ini"; }
+
 void logInteger(const char *key, int value)
 {
     char buffer[250];

@@ -129,6 +129,8 @@ string GetSendModeString(int sendMode);
  */
 string GetAutomationString(int automationMode);
 
+string GetReaSonusIniPath();
+
 void logInteger(const char *key, int value);
 
 void logDouble(const char *key, double value);

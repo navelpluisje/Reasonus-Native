@@ -12,6 +12,8 @@
 #define IDC_COMBO_MidiOut 1005
 #define IDC_STATIC 1006
 #define IDC_GROUP_MidiDevices 1007
+#define IDC_COMBO_Surface 1008
+#define IDC_GROUP_Surface 1009
 #define ID_QUIT 40000
 
 // Next default values for new objects

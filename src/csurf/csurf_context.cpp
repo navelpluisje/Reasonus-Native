@@ -26,7 +26,7 @@ class CSurf_Context
     ChannelManagerType channelManagerType;
 
 public:
-    CSurf_Context()
+    CSurf_Context(int nbChannels) : nbTracks(nbChannels)
     {
     }
     ~CSurf_Context() {}

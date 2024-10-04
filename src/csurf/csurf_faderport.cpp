@@ -319,9 +319,32 @@ public:
   {
     (void)indev;
     (void)outdev;
+
+    /**
+     * Fisrst e check if we have the ini file. If not we create it with default values
+     *
+     */
+    mINI::INIFile file(GetReaSonusIniPath());
+    mINI::INIStructure ini;
+    if (!file.read(ini))
+    {
+      ini["Surface"]["MidiIn"] = "0";
+      ini["Surface"]["MidiOut"] = "0";
+      ini["Surface"]["Surface"] = "0";
+      ini["Functions"]["1"] = "0";
+      ini["Functions"]["2"] = "0";
+      ini["Functions"]["3"] = "0";
+      ini["Functions"]["4"] = "0";
+      ini["Functions"]["5"] = "0";
+      ini["Functions"]["6"] = "0";
+      ini["Functions"]["7"] = "0";
+      ini["Functions"]["8"] = "0";
+      file.generate(ini);
+    };
+
     errStats = 0;
-    m_midi_in_dev = indev;
-    m_midi_out_dev = outdev;
+    m_midi_in_dev = stoi(ini["Surface"]["MidiIn"]);
+    m_midi_out_dev = stoi(ini["Surface"]["MidiOut"]);
 
     surface_update_lastrun = 0;
 
@@ -329,7 +352,7 @@ public:
     m_midiin = m_midi_in_dev >= 0 ? CreateMIDIInput(m_midi_in_dev) : NULL;
     m_midiout = m_midi_out_dev >= 0 ? CreateMIDIOutput(m_midi_out_dev, false, NULL) : NULL;
 
-    context = new CSurf_Context();
+    context = new CSurf_Context(stoi(ini["Surface"]["Surface"]));
 
     for (int i = 0; i < 8; i++)
     {
@@ -370,12 +393,6 @@ public:
     {
       m_midiout->Send(0xb0, 0x00, 0x06, -1);
       m_midiout->Send(0xb0, 0x20, 0x27, -1);
-
-      // int x;
-      // for (x = 0; x < 0x30; x++) // lights out
-      //   m_midiout->Send(0xa0, x, 0x00, -1);
-
-      m_midiout->Send(0x91, 0x00, 0x64, -1); // send these every so often?
     }
   }
 
@@ -458,7 +475,7 @@ public:
 
         surface_update_lastrun = now;
       }
-      if ((now - surface_update_keepalive) >= 900)
+      if ((now - surface_update_keepalive) >= 990)
       {
         surface_update_keepalive = now;
         m_midiout->Send(0xa0, 0x00, 0x00, -1);
@@ -466,6 +483,7 @@ public:
     }
   }
 
+  // Probably not needed
   // void SetTrackListChange()
   // {
   //   ShowConsoleMsg("SetTrackListChange");
