@@ -5,6 +5,7 @@
 #include "controls/csurf_button.hpp"
 #include "csurf_utils.hpp"
 #include "csurf_navigator.hpp"
+#include "csurf_faderport_ui.hpp"
 #include "controls/csurf_color_button.hpp"
 
 class CSurf_GeneralControlManager
@@ -30,6 +31,7 @@ protected:
     bool hasGlobalBypass;
     bool followCursor;
     bool lastTouchedFxMode;
+    bool functionsDialogOpen;
 
     void SetButtonValue()
     {
@@ -96,6 +98,7 @@ public:
         soloClearButton = new CSurf_Button(BTN_SOLO_CLEAR, BTN_VALUE_OFF, m_midiout);
         muteClearButton = new CSurf_Button(BTN_MUTE_CLEAR, BTN_VALUE_OFF, m_midiout);
         bypassButton = new CSurf_ColorButton(ButtonColorRed, ButtonColorWhiteDim, BTN_BYPASS, BTN_VALUE_OFF, m_midiout);
+        macroButton = new CSurf_ColorButton(ButtonColorWhite, ButtonColorWhiteDim, BTN_MACRO, BTN_VALUE_OFF, m_midiout);
         linkButton = new CSurf_ColorButton(ButtonColorGreen, ButtonColorGreenDim, BTN_LINK, BTN_VALUE_OFF, m_midiout);
         shiftLeftButton = new CSurf_Button(BTN_SHIFT_LEFT, BTN_VALUE_OFF, m_midiout);
     };
@@ -110,6 +113,7 @@ public:
         hasGlobalBypass = (bool)GetToggleCommandState(40344);
         followCursor = GetToggleCommandStringState("_REASONUS_TOGGLE_PLAY_CURSOR_COMMAND");
         lastTouchedFxMode = context->GetLastTouchedFxMode();
+        functionsDialogOpen = IsFunctionsDialogOpen();
 
         SetButtonValue();
     };
@@ -172,7 +176,17 @@ public:
                                 : Main_OnCommandEx(8, 0, 0);    // Track: Toggle FX bypass for selected tracks
     };
 
-    void HandleMacroButton() {};
+    void HandleMacroButton()
+    {
+        if (IsFunctionsDialogOpen())
+        {
+            HideFunctionsDialog();
+        }
+        else
+        {
+            ShowFunctionsDialog();
+        }
+    };
 
     void HandleLinkButton()
     {

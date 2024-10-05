@@ -129,6 +129,13 @@ string GetAutomationString(int automationMode)
 
 string GetReaSonusIniPath() { return string(GetResourcePath()) + "/ReaSonus/FP.ini"; }
 
+bool isInteger(string value)
+{
+    char *p;
+    strtol(value.c_str(), &p, 10);
+    return *p == 0;
+}
+
 void logInteger(const char *key, int value)
 {
     char buffer[250];

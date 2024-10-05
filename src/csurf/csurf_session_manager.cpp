@@ -6,6 +6,8 @@
 #include "csurf_context.cpp"
 #include "csurf_navigator.hpp"
 #include "csurf_session_manager_actions.hpp"
+#include "extern/ini.hpp"
+#include "csurf_faderport_ui.hpp"
 
 enum SessionTypes
 {
@@ -56,14 +58,32 @@ protected:
         markerButton->SetValue(session_type == Marker ? valueOn : BTN_VALUE_OFF);
     }
 
-    void handleFunction1() {}
-    void handleFunction2() {}
-    void handleFunction3() {}
-    void handleFunction4() {}
-    void handleFunction5() {}
-    void handleFunction6() {}
-    void handleFunction7() {}
-    void handleFunction8() {}
+    void handleFunctionKey(string key)
+    {
+        mINI::INIFile file(GetReaSonusIniPath());
+        mINI::INIStructure ini;
+        file.read(ini);
+
+        string actionId = ini["functions"][key];
+        if (actionId == "0")
+        {
+            int result = MB("There is no action assigned to this function.\nDo you want to assign an action?", "No action assigned", 1);
+            if (result == 1)
+            {
+                ShowFunctionsDialog();
+            }
+            return;
+        }
+
+        if (isInteger(actionId))
+        {
+            Main_OnCommandEx(stoi(actionId), 0, 0);
+        }
+        else
+        {
+            Main_OnCommandStringEx(actionId);
+        }
+    }
 
 public:
     CSurf_SessionManager(
@@ -96,7 +116,7 @@ public:
     {
         if (context->GetShiftLeft())
         {
-            handleFunction1();
+            handleFunctionKey("1");
             return;
         }
         session_type = Channel;
@@ -107,7 +127,7 @@ public:
     {
         if (context->GetShiftLeft())
         {
-            handleFunction2();
+            handleFunctionKey("2");
             return;
         }
         session_type = Zoom;
@@ -118,7 +138,7 @@ public:
     {
         if (context->GetShiftLeft())
         {
-            handleFunction3();
+            handleFunctionKey("3");
             return;
         }
         session_type = Scroll;
@@ -129,7 +149,7 @@ public:
     {
         if (context->GetShiftLeft())
         {
-            handleFunction4();
+            handleFunctionKey("4");
             return;
         }
         session_type = Bank;
@@ -140,7 +160,7 @@ public:
     {
         if (context->GetShiftLeft())
         {
-            handleFunction5();
+            handleFunctionKey("5");
             return;
         }
         session_type = Master;
@@ -151,7 +171,7 @@ public:
     {
         if (context->GetShiftLeft())
         {
-            handleFunction6();
+            handleFunctionKey("6");
             return;
         }
         session_type = Click;
@@ -162,7 +182,7 @@ public:
     {
         if (context->GetShiftLeft())
         {
-            handleFunction7();
+            handleFunctionKey("7");
             return;
         }
         // Once selected and repressing it again, it will create a region from the time selection
@@ -178,7 +198,7 @@ public:
     {
         if (context->GetShiftLeft())
         {
-            handleFunction8();
+            handleFunctionKey("8");
             return;
         }
         session_type = Marker;

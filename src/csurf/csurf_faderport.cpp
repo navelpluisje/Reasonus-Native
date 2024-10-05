@@ -20,12 +20,14 @@
 #include "csurf_navigator.hpp"
 #include "controls/csurf_button.hpp"
 #include "csurf_utils.hpp"
-#include "csurf_faderport_ui.cpp"
+#include "csurf_faderport_ui.hpp"
 #include <WDL/ptrlist.h>
 #include "../src/resource.h"
 #include <vector>
 #include <string>
 #include <swell/swell-functions.h>
+
+extern HWND g_hwnd;
 
 class CSurf_FaderPort : public IReaperControlSurface
 {

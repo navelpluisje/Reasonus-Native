@@ -131,6 +131,8 @@ string GetAutomationString(int automationMode);
 
 string GetReaSonusIniPath();
 
+bool isInteger(string value);
+
 void logInteger(const char *key, int value);
 
 void logDouble(const char *key, double value);
