@@ -222,7 +222,7 @@ static WDL_DLGRET dlgProcFunctions(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARA
     return 0;
 };
 
-void ShowFunctionsDialog()
+static void ShowFunctionsDialog()
 {
     if (s_hwndReaSonusFunctionsDlg == NULL)
     {
@@ -231,13 +231,13 @@ void ShowFunctionsDialog()
     ShowWindow(s_hwndReaSonusFunctionsDlg, SW_SHOW);
 }
 
-void HideFunctionsDialog()
+static void HideFunctionsDialog()
 {
     ShowWindow(s_hwndReaSonusFunctionsDlg, SW_HIDE);
     s_hwndReaSonusFunctionsDlg = NULL;
 }
 
-bool IsFunctionsDialogOpen()
+static bool IsFunctionsDialogOpen()
 {
     return s_hwndReaSonusFunctionsDlg != NULL;
 }

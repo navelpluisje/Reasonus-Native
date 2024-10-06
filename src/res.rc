@@ -96,6 +96,34 @@ BEGIN
 END
 
 
+IDD_DIALOG_REASONUS_NATIVE_FILTERS DIALOG DISCARDABLE  0, 0, 240, 215
+STYLE DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+CAPTION "ReaSonus FaderPort Native Function Keys"
+FONT DIALOG_FONT
+BEGIN
+    GROUPBOX        "Filter",IDC_GROUP_Surface,10,5,220,180
+    LTEXT           "Function Key 1",IDC_Function1Label1,20,27,54,8
+    EDITTEXT        IDC_EDIT_Function1,80,25,80,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_BUTTON_Action1,170,23,24,16
+    EDITTEXT        IDC_EDIT_Function2,80,45,80,12,ES_AUTOHSCROLL
+    LTEXT           "Function Key 2",IDC_Function1Label2,20,47,54,8
+    EDITTEXT        IDC_EDIT_Function3,80,65,80,12,ES_AUTOHSCROLL
+    LTEXT           "Function Key 3",IDC_Function1Label3,20,67,54,8
+    EDITTEXT        IDC_EDIT_Function4,80,85,80,12,ES_AUTOHSCROLL
+    LTEXT           "Function Key 4",IDC_Function1Label4,20,87,54,8
+    EDITTEXT        IDC_EDIT_Function5,80,105,80,12,ES_AUTOHSCROLL
+    LTEXT           "Function Key 5",IDC_Function1Label5,20,107,54,8
+    EDITTEXT        IDC_EDIT_Function6,80,125,80,12,ES_AUTOHSCROLL
+    LTEXT           "Function Key 6",IDC_Function1Label6,20,127,54,8
+    EDITTEXT        IDC_EDIT_Function7,80,145,80,12,ES_AUTOHSCROLL
+    LTEXT           "Function Key 7",IDC_Function1Label7,20,147,54,8
+    EDITTEXT        IDC_EDIT_Function8,80,165,80,12,ES_AUTOHSCROLL
+    LTEXT           "Function Key 8",IDC_Function1Label8,20,167,54,8
+    DEFPUSHBUTTON   "Save",IDOK,184,190,44,14
+    PUSHBUTTON      "Cancel",IDCANCEL,136,190,44,14
+END
+
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // DESIGNINFO
