@@ -252,6 +252,15 @@ namespace mINI
         }
         const_iterator begin() const { return data.begin(); }
         const_iterator end() const { return data.end(); }
+        std::vector<std::string> keys()
+        {
+            std::vector<std::string> keys;
+            for (auto &kvp : data)
+            {
+                keys.push_back(kvp.first);
+            }
+            return keys;
+        }
     };
 
     using INIStructure = INIMap<INIMap<std::string>>;

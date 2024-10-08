@@ -7,7 +7,9 @@
 #include "csurf_navigator.hpp"
 #include "csurf_session_manager_actions.hpp"
 #include "extern/ini.hpp"
-#include "csurf_faderport_ui.hpp"
+#include "csurf_faderport_ui_functions.hpp"
+
+using namespace CSURF_FADERPORT_UI_FUNCTIONS;
 
 enum SessionTypes
 {

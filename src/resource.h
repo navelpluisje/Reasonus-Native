@@ -37,6 +37,23 @@
 #define IDC_Function1Label7 1114
 #define IDC_Function1Label8 1115
 #define IDC_BUTTON_Action1 1116
+// The filters window controls
+#define IDC_LIST_Filters 1200
+#define IDC_BUTTON_ADD 1201
+#define IDC_BUTTON_REMOVE 1202
+#define IDC_BUTTON_UP 1203
+#define IDC_BUTTON_DOWN 1204
+#define IDC_EDIT_FilterName 1205
+#define IDC_EDIT_FilterText 1206
+#define IDC_BUTTON_ADD_TEXT 1207
+#define IDC_LIST_FilterText 1208
+#define IDC_CHECK_ShowSibblings 1209
+#define IDC_CHECK_ShowParents 1210
+#define IDC_CHECK_ShowChildren 1211
+#define IDC_CHECK_ShowTopLevel 1212
+#define IDC_CHECK_MatchMultiple 1213
+#define IDC_GROUP_Filter 1214
+#define IDC_BUTTON_REMOVE_TEXT 1215
 
 #define ID_QUIT 40000
 

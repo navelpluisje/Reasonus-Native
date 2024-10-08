@@ -5,8 +5,10 @@
 #include "controls/csurf_button.hpp"
 #include "csurf_utils.hpp"
 #include "csurf_navigator.hpp"
-#include "csurf_faderport_ui.hpp"
+#include "csurf_faderport_ui_functions.hpp"
 #include "controls/csurf_color_button.hpp"
+
+using namespace CSURF_FADERPORT_UI_FUNCTIONS;
 
 class CSurf_GeneralControlManager
 {
@@ -113,7 +115,7 @@ public:
         hasGlobalBypass = (bool)GetToggleCommandState(40344);
         followCursor = GetToggleCommandStringState("_REASONUS_TOGGLE_PLAY_CURSOR_COMMAND");
         lastTouchedFxMode = context->GetLastTouchedFxMode();
-        functionsDialogOpen = IsFunctionsDialogOpen();
+        functionsDialogOpen = CSURF_FADERPORT_UI_FUNCTIONS::IsFunctionsDialogOpen();
 
         SetButtonValue();
     };

@@ -1,0 +1,26 @@
+bool g_querying_action;
+
+void mytimer()
+{
+	WDL_ASSERT(g_querying_action == true);
+	const int res = PromptForAction(0,0,0);	
+	if (res == 0) return;
+	plugin_register("-timer",(void *)&mytimer);
+	g_querying_action = false;
+	if (res > 0)
+	{
+		// user selected the action res!
+	}
+	else
+	{
+		// user (e.g.) closed window without selecting an action
+	}
+}
+
+// when you want to prompt a user:
+PromptForAction(1,0,0);
+if (!g_querying_action)
+{
+	g_querying_action = true;
+	plugin_register("timer", (void *)&mytimer);
+}

@@ -3,4 +3,5 @@ target_sources(${PROJECT_NAME}
         toggle_play_cursor.cpp
         show_reaper_resource_path.cpp
         show_reasonus_function_window.cpp
+        show_reasonus_filters_window.cpp
         )

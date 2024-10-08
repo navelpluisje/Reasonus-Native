@@ -1,7 +1,7 @@
-#include "show_reasonus_function_window.hpp"
+#include "show_reasonus_filters_window.hpp"
 #include <gsl/gsl>
 #include <reaper_plugin_functions.h>
-#include "../csurf/csurf_faderport_ui_functions.hpp"
+#include "../csurf/csurf_faderport_ui_filters.hpp"
 
 #define STRINGIZE_DEF(x) #x
 #define STRINGIZE(x) STRINGIZE_DEF(x)
@@ -9,21 +9,20 @@
 #define max(a, b) ((a) > (b) ? (a) : (b))
 
 // confine my plugin to namespace
-namespace SHOW_REASONUS_FUNCTION_WINDOW
+namespace SHOW_REASONUS_FILTERS_WINDOW
 {
     // some global non-const variables
     // the necessary 'evil'
     int command_id{0};
-    bool toggle_action_state{false};
-    constexpr auto command_name = "REASONUS_SHOW_REASONUS_FUNCTION_WINDOW";
-    constexpr auto action_name = "Reasonus: Show the ReaSonus Functions window";
+    constexpr auto command_name = "REASONUS_SHOW_REASONUS_FILTERS_WINDOW";
+    constexpr auto action_name = "Reasonus: Show the ReaSonus Filters window";
     custom_action_register_t action = {0, command_name, action_name, nullptr};
 
     // the main function of my plugin
     // gets called via callback or timer
     void MainFunctionOfMyPlugin()
     {
-        CSURF_FADERPORT_UI_FUNCTIONS::ShowFunctionsDialog();
+        CSURF_FADERPORT_UI_FILTERS::ShowFiltersDialog();
     }
 
     // this gets called when my plugin action is run (e.g. from action list)
@@ -58,16 +57,23 @@ namespace SHOW_REASONUS_FUNCTION_WINDOW
         commitOut[min(commitOut_sz - 1, (int)strlen(commit))] = '\0'; // Ensure null termination
     }
 
+    // when my plugin gets loaded
+    // function to register my plugins 'stuff' with REAPER
     void Register()
     {
+        // register action name and get command_id
         command_id = plugin_register("custom_action", &action);
+        // plugin_register("toggleaction", (void *)ToggleActionCallback);
+
+        // register run action/command
         plugin_register("hookcommand2", (void *)OnAction);
     }
 
     auto Unregister() -> void
     {
         plugin_register("-custom_action", &action);
+        // plugin_register("-toggleaction", (void *)ToggleActionCallback);
         plugin_register("-hookcommand2", (void *)OnAction);
     }
 
-} // namespace TOGGLE_PLAY_CURSOR
+} // namespace SHOW_REASONUS_FILTERS_WINDOW
