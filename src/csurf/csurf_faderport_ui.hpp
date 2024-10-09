@@ -25,26 +25,26 @@ static WDL_DLGRET dlgProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
         char *noDeviceString = const_cast<char *>(__LOCALIZE("No device selected", "reasonus-faderport"));
         char *noSurfaceString = const_cast<char *>(__LOCALIZE("No surface selected", "reasonus-faderport"));
 
-        WDL_UTF8_HookComboBox(GetDlgItem(hwndDlg, IDC_COMBO_MidiIn));
-        WDL_UTF8_HookComboBox(GetDlgItem(hwndDlg, IDC_COMBO_MidiOut));
+        WDL_UTF8_HookComboBox(GetDlgItem(hwndDlg, IDC_COMBO_MIDI_IN));
+        WDL_UTF8_HookComboBox(GetDlgItem(hwndDlg, IDC_COMBO_MIDI_OUT));
         WDL_UTF8_HookComboBox(GetDlgItem(hwndDlg, IDC_COMBO_SURFACE));
 
         for (int i = 0; i <= GetNumMIDIInputs(); ++i)
         {
             if (i == 0)
             {
-                combo = AddComboEntry(hwndDlg, 0, noDeviceString, IDC_COMBO_MidiIn);
+                combo = AddComboEntry(hwndDlg, 0, noDeviceString, IDC_COMBO_MIDI_IN);
                 if (stoi(ini["Surface"]["MidiIn"]) == 0)
                 {
-                    SendDlgItemMessage(hwndDlg, IDC_COMBO_MidiIn, CB_SETCURSEL, combo, 0);
+                    SendDlgItemMessage(hwndDlg, IDC_COMBO_MIDI_IN, CB_SETCURSEL, combo, 0);
                 }
             }
             if (GetMIDIInputName(i, buf, sizeof(buf)))
             {
-                combo = AddComboEntry(hwndDlg, i, buf, IDC_COMBO_MidiIn);
+                combo = AddComboEntry(hwndDlg, i, buf, IDC_COMBO_MIDI_IN);
                 if (i == stoi(ini["Surface"]["MidiIn"]))
                 {
-                    SendDlgItemMessage(hwndDlg, IDC_COMBO_MidiIn, CB_SETCURSEL, combo, 0);
+                    SendDlgItemMessage(hwndDlg, IDC_COMBO_MIDI_IN, CB_SETCURSEL, combo, 0);
                 }
             }
         }
@@ -53,18 +53,18 @@ static WDL_DLGRET dlgProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
         {
             if (i == 0)
             {
-                combo = AddComboEntry(hwndDlg, 0, noDeviceString, IDC_COMBO_MidiOut);
+                combo = AddComboEntry(hwndDlg, 0, noDeviceString, IDC_COMBO_MIDI_OUT);
                 if (stoi(ini["Surface"]["MidiOut"]) == 0)
                 {
-                    SendDlgItemMessage(hwndDlg, IDC_COMBO_MidiOut, CB_SETCURSEL, combo, 0);
+                    SendDlgItemMessage(hwndDlg, IDC_COMBO_MIDI_OUT, CB_SETCURSEL, combo, 0);
                 }
             }
             if (GetMIDIOutputName(i, buf, sizeof(buf)))
             {
-                int dev = AddComboEntry(hwndDlg, i, buf, IDC_COMBO_MidiOut);
+                int dev = AddComboEntry(hwndDlg, i, buf, IDC_COMBO_MIDI_OUT);
                 if (i == stoi(ini["Surface"]["MidiOut"]))
                 {
-                    SendDlgItemMessage(hwndDlg, IDC_COMBO_MidiOut, CB_SETCURSEL, dev, 0);
+                    SendDlgItemMessage(hwndDlg, IDC_COMBO_MIDI_OUT, CB_SETCURSEL, dev, 0);
                 }
             }
         }
@@ -93,13 +93,13 @@ static WDL_DLGRET dlgProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
         {
             int indev = -1, outdev = -1, surface = -1;
 
-            int r = SendDlgItemMessage(hwndDlg, IDC_COMBO_MidiIn, CB_GETCURSEL, 0, 0);
+            int r = SendDlgItemMessage(hwndDlg, IDC_COMBO_MIDI_IN, CB_GETCURSEL, 0, 0);
             if (r != CB_ERR)
-                indev = SendDlgItemMessage(hwndDlg, IDC_COMBO_MidiIn, CB_GETITEMDATA, r, 0);
+                indev = SendDlgItemMessage(hwndDlg, IDC_COMBO_MIDI_IN, CB_GETITEMDATA, r, 0);
 
-            r = SendDlgItemMessage(hwndDlg, IDC_COMBO_MidiOut, CB_GETCURSEL, 0, 0);
+            r = SendDlgItemMessage(hwndDlg, IDC_COMBO_MIDI_OUT, CB_GETCURSEL, 0, 0);
             if (r != CB_ERR)
-                outdev = SendDlgItemMessage(hwndDlg, IDC_COMBO_MidiOut, CB_GETITEMDATA, r, 0);
+                outdev = SendDlgItemMessage(hwndDlg, IDC_COMBO_MIDI_OUT, CB_GETITEMDATA, r, 0);
 
             r = SendDlgItemMessage(hwndDlg, IDC_COMBO_SURFACE, CB_GETCURSEL, 0, 0);
             if (r != CB_ERR)

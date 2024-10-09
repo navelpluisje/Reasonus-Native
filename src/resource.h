@@ -14,15 +14,15 @@
 #define IDC_BUTTON1 1001
 #define IDC_LASTMSG 1002
 #define IDC_CHECK1 1003
-#define IDC_COMBO_MidiIn 1004
-#define IDC_COMBO_MidiOut 1005
+#define IDC_COMBO_MIDI_IN 1004
+#define IDC_COMBO_MIDI_OUT 1005
 #define IDC_STATIC 1006
 #define IDC_GROUP_MIDI_DEVICES 1007
+#define IDC_COMBO_SURFACE 1008
+#define IDC_GROUP_SURFACE 1009
 //========================================================
 // The functions dialog
 //========================================================
-#define IDC_COMBO_SURFACE 1008
-#define IDC_GROUP_SURFACE 1009
 #define IDC_EDIT_FUNCTION_1 1100
 #define IDC_EDIT_FUNCTION_2 1101
 #define IDC_EDIT_FUNCTION_3 1102
