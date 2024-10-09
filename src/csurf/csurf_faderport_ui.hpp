@@ -27,7 +27,7 @@ static WDL_DLGRET dlgProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
         WDL_UTF8_HookComboBox(GetDlgItem(hwndDlg, IDC_COMBO_MidiIn));
         WDL_UTF8_HookComboBox(GetDlgItem(hwndDlg, IDC_COMBO_MidiOut));
-        WDL_UTF8_HookComboBox(GetDlgItem(hwndDlg, IDC_COMBO_Surface));
+        WDL_UTF8_HookComboBox(GetDlgItem(hwndDlg, IDC_COMBO_SURFACE));
 
         for (int i = 0; i <= GetNumMIDIInputs(); ++i)
         {
@@ -69,20 +69,20 @@ static WDL_DLGRET dlgProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
             }
         }
 
-        combo = AddComboEntry(hwndDlg, 0, noSurfaceString, IDC_COMBO_Surface);
+        combo = AddComboEntry(hwndDlg, 0, noSurfaceString, IDC_COMBO_SURFACE);
         if (ini["Surface"]["Surface"] == "0")
         {
-            SendDlgItemMessage(hwndDlg, IDC_COMBO_Surface, CB_SETCURSEL, combo, 0);
+            SendDlgItemMessage(hwndDlg, IDC_COMBO_SURFACE, CB_SETCURSEL, combo, 0);
         }
-        combo = AddComboEntry(hwndDlg, 8, const_cast<char *>("Faderport 8"), IDC_COMBO_Surface);
+        combo = AddComboEntry(hwndDlg, 8, const_cast<char *>("Faderport 8"), IDC_COMBO_SURFACE);
         if (ini["Surface"]["Surface"] == "8")
         {
-            SendDlgItemMessage(hwndDlg, IDC_COMBO_Surface, CB_SETCURSEL, combo, 0);
+            SendDlgItemMessage(hwndDlg, IDC_COMBO_SURFACE, CB_SETCURSEL, combo, 0);
         }
-        combo = AddComboEntry(hwndDlg, 16, const_cast<char *>("Faderport 16"), IDC_COMBO_Surface);
+        combo = AddComboEntry(hwndDlg, 16, const_cast<char *>("Faderport 16"), IDC_COMBO_SURFACE);
         if (ini["Surface"]["Surface"] == "16")
         {
-            SendDlgItemMessage(hwndDlg, IDC_COMBO_Surface, CB_SETCURSEL, combo, 0);
+            SendDlgItemMessage(hwndDlg, IDC_COMBO_SURFACE, CB_SETCURSEL, combo, 0);
         }
         break;
     }
@@ -101,9 +101,9 @@ static WDL_DLGRET dlgProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
             if (r != CB_ERR)
                 outdev = SendDlgItemMessage(hwndDlg, IDC_COMBO_MidiOut, CB_GETITEMDATA, r, 0);
 
-            r = SendDlgItemMessage(hwndDlg, IDC_COMBO_Surface, CB_GETCURSEL, 0, 0);
+            r = SendDlgItemMessage(hwndDlg, IDC_COMBO_SURFACE, CB_GETCURSEL, 0, 0);
             if (r != CB_ERR)
-                surface = SendDlgItemMessage(hwndDlg, IDC_COMBO_Surface, CB_GETITEMDATA, r, 0);
+                surface = SendDlgItemMessage(hwndDlg, IDC_COMBO_SURFACE, CB_GETITEMDATA, r, 0);
 
             ini["Surface"]["MidiIn"] = to_string(indev);
             ini["Surface"]["MidiOut"] = to_string(outdev);

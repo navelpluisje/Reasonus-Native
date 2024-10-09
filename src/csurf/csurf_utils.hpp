@@ -133,6 +133,10 @@ string GetReaSonusIniPath();
 
 bool isInteger(string value);
 
+vector<string> split(string str, string delimiter);
+
+string join(vector<string> list, string delimiter);
+
 void logInteger(const char *key, int value);
 
 void logDouble(const char *key, double value);

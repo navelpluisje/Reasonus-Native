@@ -30,14 +30,14 @@ namespace CSURF_FADERPORT_UI_FUNCTIONS
     static void PopulateActionFields(HWND hwndDlg)
     {
         // Add the description to it
-        SetDlgItemText(hwndDlg, IDC_EDIT_Function1, const_cast<char *>(ini["Functions"]["1"].c_str()));
-        SetDlgItemText(hwndDlg, IDC_EDIT_Function2, const_cast<char *>(ini["Functions"]["2"].c_str()));
-        SetDlgItemText(hwndDlg, IDC_EDIT_Function3, const_cast<char *>(ini["Functions"]["3"].c_str()));
-        SetDlgItemText(hwndDlg, IDC_EDIT_Function4, const_cast<char *>(ini["Functions"]["4"].c_str()));
-        SetDlgItemText(hwndDlg, IDC_EDIT_Function5, const_cast<char *>(ini["Functions"]["5"].c_str()));
-        SetDlgItemText(hwndDlg, IDC_EDIT_Function6, const_cast<char *>(ini["Functions"]["6"].c_str()));
-        SetDlgItemText(hwndDlg, IDC_EDIT_Function7, const_cast<char *>(ini["Functions"]["7"].c_str()));
-        SetDlgItemText(hwndDlg, IDC_EDIT_Function8, const_cast<char *>(ini["Functions"]["8"].c_str()));
+        SetDlgItemText(hwndDlg, IDC_EDIT_FUNCTION_1, const_cast<char *>(ini["Functions"]["1"].c_str()));
+        SetDlgItemText(hwndDlg, IDC_EDIT_FUNCTION_2, const_cast<char *>(ini["Functions"]["2"].c_str()));
+        SetDlgItemText(hwndDlg, IDC_EDIT_FUNCTION_3, const_cast<char *>(ini["Functions"]["3"].c_str()));
+        SetDlgItemText(hwndDlg, IDC_EDIT_FUNCTION_4, const_cast<char *>(ini["Functions"]["4"].c_str()));
+        SetDlgItemText(hwndDlg, IDC_EDIT_FUNCTION_5, const_cast<char *>(ini["Functions"]["5"].c_str()));
+        SetDlgItemText(hwndDlg, IDC_EDIT_FUNCTION_6, const_cast<char *>(ini["Functions"]["6"].c_str()));
+        SetDlgItemText(hwndDlg, IDC_EDIT_FUNCTION_7, const_cast<char *>(ini["Functions"]["7"].c_str()));
+        SetDlgItemText(hwndDlg, IDC_EDIT_FUNCTION_8, const_cast<char *>(ini["Functions"]["8"].c_str()));
     }
 
     static void mytimer()
@@ -100,21 +100,21 @@ namespace CSURF_FADERPORT_UI_FUNCTIONS
             // This can probably be removed
             case IDOK:
                 char buffer[255];
-                GetDlgItemText(hwndDlg, IDC_EDIT_Function1, buffer, size(buffer));
+                GetDlgItemText(hwndDlg, IDC_EDIT_FUNCTION_1, buffer, size(buffer));
                 ini["Functions"]["1"] = buffer;
-                GetDlgItemText(hwndDlg, IDC_EDIT_Function2, buffer, size(buffer));
+                GetDlgItemText(hwndDlg, IDC_EDIT_FUNCTION_2, buffer, size(buffer));
                 ini["Functions"]["2"] = buffer;
-                GetDlgItemText(hwndDlg, IDC_EDIT_Function3, buffer, size(buffer));
+                GetDlgItemText(hwndDlg, IDC_EDIT_FUNCTION_3, buffer, size(buffer));
                 ini["Functions"]["3"] = buffer;
-                GetDlgItemText(hwndDlg, IDC_EDIT_Function4, buffer, size(buffer));
+                GetDlgItemText(hwndDlg, IDC_EDIT_FUNCTION_4, buffer, size(buffer));
                 ini["Functions"]["4"] = buffer;
-                GetDlgItemText(hwndDlg, IDC_EDIT_Function5, buffer, size(buffer));
+                GetDlgItemText(hwndDlg, IDC_EDIT_FUNCTION_5, buffer, size(buffer));
                 ini["Functions"]["5"] = buffer;
-                GetDlgItemText(hwndDlg, IDC_EDIT_Function6, buffer, size(buffer));
+                GetDlgItemText(hwndDlg, IDC_EDIT_FUNCTION_6, buffer, size(buffer));
                 ini["Functions"]["6"] = buffer;
-                GetDlgItemText(hwndDlg, IDC_EDIT_Function7, buffer, size(buffer));
+                GetDlgItemText(hwndDlg, IDC_EDIT_FUNCTION_7, buffer, size(buffer));
                 ini["Functions"]["7"] = buffer;
-                GetDlgItemText(hwndDlg, IDC_EDIT_Function8, buffer, size(buffer));
+                GetDlgItemText(hwndDlg, IDC_EDIT_FUNCTION_8, buffer, size(buffer));
                 ini["Functions"]["8"] = buffer;
 
                 static mINI::INIFile file(GetReaSonusIniPath());
@@ -127,35 +127,35 @@ namespace CSURF_FADERPORT_UI_FUNCTIONS
                 HideFunctionsDialog();
                 break;
 
-            case IDC_BUTTON_Action1:
+            case IDC_BUTTON_ACTION_1:
                 PromptForFunctionAction(hwndDlg, "1");
                 break;
 
-            case IDC_BUTTON_Action2:
+            case IDC_BUTTON_ACTION_2:
                 PromptForFunctionAction(hwndDlg, "2");
                 break;
 
-            case IDC_BUTTON_Action3:
+            case IDC_BUTTON_ACTION_3:
                 PromptForFunctionAction(hwndDlg, "3");
                 break;
 
-            case IDC_BUTTON_Action4:
+            case IDC_BUTTON_ACTION_4:
                 PromptForFunctionAction(hwndDlg, "4");
                 break;
 
-            case IDC_BUTTON_Action5:
+            case IDC_BUTTON_ACTION_5:
                 PromptForFunctionAction(hwndDlg, "5");
                 break;
 
-            case IDC_BUTTON_Action6:
+            case IDC_BUTTON_ACTION_6:
                 PromptForFunctionAction(hwndDlg, "6");
                 break;
 
-            case IDC_BUTTON_Action7:
+            case IDC_BUTTON_ACTION_7:
                 PromptForFunctionAction(hwndDlg, "7");
                 break;
 
-            case IDC_BUTTON_Action8:
+            case IDC_BUTTON_ACTION_8:
                 PromptForFunctionAction(hwndDlg, "8");
                 break;
             }
