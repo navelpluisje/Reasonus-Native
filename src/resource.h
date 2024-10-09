@@ -18,6 +18,9 @@
 #define IDC_COMBO_MidiOut 1005
 #define IDC_STATIC 1006
 #define IDC_GROUP_MIDI_DEVICES 1007
+//========================================================
+// The functions dialog
+//========================================================
 #define IDC_COMBO_SURFACE 1008
 #define IDC_GROUP_SURFACE 1009
 #define IDC_EDIT_FUNCTION_1 1100
@@ -28,14 +31,6 @@
 #define IDC_EDIT_FUNCTION_6 1105
 #define IDC_EDIT_FUNCTION_7 1106
 #define IDC_EDIT_FUNCTION_8 1107
-#define IDC_FUNCTION_LABEL_1 1108
-#define IDC_FUNCTION_LABEL_2 1109
-#define IDC_FUNCTION_LABEL_3 1110
-#define IDC_FUNCTION_LABEL_4 1111
-#define IDC_FUNCTION_LABEL_5 1112
-#define IDC_FUNCTION_LABEL_6 1113
-#define IDC_FUNCTION_LABEL_7 1114
-#define IDC_FUNCTION_LABEL_8 1115
 #define IDC_BUTTON_ACTION_1 1116
 #define IDC_BUTTON_ACTION_2 1117
 #define IDC_BUTTON_ACTION_3 1118
@@ -44,7 +39,21 @@
 #define IDC_BUTTON_ACTION_6 1121
 #define IDC_BUTTON_ACTION_7 1122
 #define IDC_BUTTON_ACTION_8 1123
+#define IDC_BUTTON_INFO_1 1124
+#define IDC_BUTTON_INFO_2 1125
+#define IDC_BUTTON_INFO_3 1126
+#define IDC_BUTTON_INFO_4 1127
+#define IDC_BUTTON_INFO_5 1128
+#define IDC_BUTTON_INFO_6 1129
+#define IDC_BUTTON_INFO_7 1130
+#define IDC_BUTTON_INFO_8 1131
+#define IDC_GROUP_FUNCTION_INFO 1132
+#define IDC_FUNCTION_INFO_ID 1133
+#define IDC_FUNCTION_INFO_TYPE 1134
+#define IDC_FUNCTION_INFO_NAME 1135
+//========================================================
 // The filters window controls
+//========================================================
 #define IDC_LIST_FILTERS 1200
 #define IDC_BUTTON_ADD_FILTER 1201
 #define IDC_BUTTON_REMOVE_FILTER 1202
