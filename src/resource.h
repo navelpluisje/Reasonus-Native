@@ -37,6 +37,13 @@
 #define IDC_Function1Label7 1114
 #define IDC_Function1Label8 1115
 #define IDC_BUTTON_Action1 1116
+#define IDC_BUTTON_Action2 1117
+#define IDC_BUTTON_Action3 1118
+#define IDC_BUTTON_Action4 1119
+#define IDC_BUTTON_Action5 1120
+#define IDC_BUTTON_Action6 1121
+#define IDC_BUTTON_Action7 1122
+#define IDC_BUTTON_Action8 1123
 // The filters window controls
 #define IDC_LIST_Filters 1200
 #define IDC_BUTTON_ADD 1201

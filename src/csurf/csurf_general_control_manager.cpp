@@ -115,7 +115,7 @@ public:
         hasGlobalBypass = (bool)GetToggleCommandState(40344);
         followCursor = GetToggleCommandStringState("_REASONUS_TOGGLE_PLAY_CURSOR_COMMAND");
         lastTouchedFxMode = context->GetLastTouchedFxMode();
-        functionsDialogOpen = CSURF_FADERPORT_UI_FUNCTIONS::IsFunctionsDialogOpen();
+        functionsDialogOpen = IsFunctionsDialogOpen();
 
         SetButtonValue();
     };

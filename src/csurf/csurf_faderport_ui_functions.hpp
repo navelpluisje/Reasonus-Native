@@ -20,7 +20,64 @@ using namespace std;
 
 namespace CSURF_FADERPORT_UI_FUNCTIONS
 {
+    // static mINI::INIFile file(GetReaSonusIniPath());
+    static mINI::INIStructure ini;
     static HWND s_hwndReaSonusFunctionsDlg = NULL;
+    static string functionsDlgSelectedFunction = "";
+    static bool g_querying_action = false;
+    static HWND s_hwndDlg;
+
+    static void PopulateActionFields(HWND hwndDlg)
+    {
+        // Add the description to it
+        SetDlgItemText(hwndDlg, IDC_EDIT_Function1, const_cast<char *>(ini["Functions"]["1"].c_str()));
+        SetDlgItemText(hwndDlg, IDC_EDIT_Function2, const_cast<char *>(ini["Functions"]["2"].c_str()));
+        SetDlgItemText(hwndDlg, IDC_EDIT_Function3, const_cast<char *>(ini["Functions"]["3"].c_str()));
+        SetDlgItemText(hwndDlg, IDC_EDIT_Function4, const_cast<char *>(ini["Functions"]["4"].c_str()));
+        SetDlgItemText(hwndDlg, IDC_EDIT_Function5, const_cast<char *>(ini["Functions"]["5"].c_str()));
+        SetDlgItemText(hwndDlg, IDC_EDIT_Function6, const_cast<char *>(ini["Functions"]["6"].c_str()));
+        SetDlgItemText(hwndDlg, IDC_EDIT_Function7, const_cast<char *>(ini["Functions"]["7"].c_str()));
+        SetDlgItemText(hwndDlg, IDC_EDIT_Function8, const_cast<char *>(ini["Functions"]["8"].c_str()));
+    }
+
+    static void mytimer()
+    {
+        WDL_ASSERT(g_querying_action == true);
+        const int actionId = PromptForAction(0, 0, 0);
+        if (actionId == 0)
+        {
+            return;
+        }
+        plugin_register("-timer", (void *)&mytimer);
+        g_querying_action = false;
+        if (actionId > 0)
+        {
+            static mINI::INIFile file(GetReaSonusIniPath());
+            ini["Functions"][functionsDlgSelectedFunction] = to_string(actionId);
+            file.write(ini);
+            PopulateActionFields(s_hwndDlg);
+        }
+        PromptForAction(-1, 0, 0);
+    }
+
+    static void PromptForFunctionAction(HWND hwndDlg, string index)
+    {
+        functionsDlgSelectedFunction = index;
+        s_hwndDlg = hwndDlg;
+        PromptForAction(1, 0, 0);
+
+        if (!g_querying_action)
+        {
+            g_querying_action = true;
+            plugin_register("timer", (void *)&mytimer);
+        }
+    }
+
+    static void HideFunctionsDialog()
+    {
+        ShowWindow(s_hwndReaSonusFunctionsDlg, SW_HIDE);
+        s_hwndReaSonusFunctionsDlg = NULL;
+    }
 
     /**
      * FUNCTIONS DIALOG
@@ -28,29 +85,19 @@ namespace CSURF_FADERPORT_UI_FUNCTIONS
     static WDL_DLGRET dlgProcFunctions(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
     {
         (void)lParam;
-        mINI::INIFile file(GetReaSonusIniPath());
-        mINI::INIStructure ini;
-        file.read(ini);
 
         switch (uMsg)
         {
         case WM_INITDIALOG:
         {
-            SetDlgItemText(hwndDlg, IDC_EDIT_Function1, const_cast<char *>(ini["Functions"]["1"].c_str()));
-            SetDlgItemText(hwndDlg, IDC_EDIT_Function2, const_cast<char *>(ini["Functions"]["2"].c_str()));
-            SetDlgItemText(hwndDlg, IDC_EDIT_Function3, const_cast<char *>(ini["Functions"]["3"].c_str()));
-            SetDlgItemText(hwndDlg, IDC_EDIT_Function4, const_cast<char *>(ini["Functions"]["4"].c_str()));
-            SetDlgItemText(hwndDlg, IDC_EDIT_Function5, const_cast<char *>(ini["Functions"]["5"].c_str()));
-            SetDlgItemText(hwndDlg, IDC_EDIT_Function6, const_cast<char *>(ini["Functions"]["6"].c_str()));
-            SetDlgItemText(hwndDlg, IDC_EDIT_Function7, const_cast<char *>(ini["Functions"]["7"].c_str()));
-            SetDlgItemText(hwndDlg, IDC_EDIT_Function8, const_cast<char *>(ini["Functions"]["8"].c_str()));
-
+            PopulateActionFields(hwndDlg);
             break;
         }
+
         case WM_COMMAND:
             switch (LOWORD(wParam))
             {
-            // Handle save click
+            // This can probably be removed
             case IDOK:
                 char buffer[255];
                 GetDlgItemText(hwndDlg, IDC_EDIT_Function1, buffer, size(buffer));
@@ -70,22 +117,51 @@ namespace CSURF_FADERPORT_UI_FUNCTIONS
                 GetDlgItemText(hwndDlg, IDC_EDIT_Function8, buffer, size(buffer));
                 ini["Functions"]["8"] = buffer;
 
+                static mINI::INIFile file(GetReaSonusIniPath());
                 file.write(ini);
-                ShowWindow(s_hwndReaSonusFunctionsDlg, SW_HIDE);
+                HideFunctionsDialog();
                 break;
 
             // Handle Cancel click
             case IDCANCEL:
-                ShowWindow(s_hwndReaSonusFunctionsDlg, SW_HIDE);
+                HideFunctionsDialog();
                 break;
 
             case IDC_BUTTON_Action1:
-                ShowActionList(0, NULL);
+                PromptForFunctionAction(hwndDlg, "1");
+                break;
+
+            case IDC_BUTTON_Action2:
+                PromptForFunctionAction(hwndDlg, "2");
+                break;
+
+            case IDC_BUTTON_Action3:
+                PromptForFunctionAction(hwndDlg, "3");
+                break;
+
+            case IDC_BUTTON_Action4:
+                PromptForFunctionAction(hwndDlg, "4");
+                break;
+
+            case IDC_BUTTON_Action5:
+                PromptForFunctionAction(hwndDlg, "5");
+                break;
+
+            case IDC_BUTTON_Action6:
+                PromptForFunctionAction(hwndDlg, "6");
+                break;
+
+            case IDC_BUTTON_Action7:
+                PromptForFunctionAction(hwndDlg, "7");
+                break;
+
+            case IDC_BUTTON_Action8:
+                PromptForFunctionAction(hwndDlg, "8");
                 break;
             }
             break;
         case WM_CLOSE:
-            ShowWindow(s_hwndReaSonusFunctionsDlg, SW_HIDE);
+            HideFunctionsDialog();
             break;
         }
         return 0;
@@ -93,17 +169,14 @@ namespace CSURF_FADERPORT_UI_FUNCTIONS
 
     static void ShowFunctionsDialog()
     {
+        static mINI::INIFile file(GetReaSonusIniPath());
+        file.read(ini);
+
         if (s_hwndReaSonusFunctionsDlg == NULL)
         {
             s_hwndReaSonusFunctionsDlg = CreateDialog(g_hInst, MAKEINTRESOURCE(IDD_DIALOG_REASONUS_NATIVE_FUNCTIONS), g_hwnd, dlgProcFunctions);
         }
         ShowWindow(s_hwndReaSonusFunctionsDlg, SW_SHOW);
-    }
-
-    static void HideFunctionsDialog()
-    {
-        ShowWindow(s_hwndReaSonusFunctionsDlg, SW_HIDE);
-        s_hwndReaSonusFunctionsDlg = NULL;
     }
 
     static bool IsFunctionsDialogOpen()

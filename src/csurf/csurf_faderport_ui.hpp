@@ -3,6 +3,8 @@
 
 #include "../src/resource.h"
 #include "csurf_faderport_ui_utils.hpp"
+#include "extern/ini.hpp"
+#include "csurf_utils.hpp"
 
 extern HWND g_hwnd;
 

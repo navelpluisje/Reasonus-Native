@@ -26,6 +26,7 @@
 #include <vector>
 #include <string>
 #include <swell/swell-functions.h>
+#include <localize/localize.h>
 
 extern HWND g_hwnd;
 
