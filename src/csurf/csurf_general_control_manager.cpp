@@ -6,9 +6,11 @@
 #include "csurf_utils.hpp"
 #include "csurf_navigator.hpp"
 #include "csurf_faderport_ui_functions.hpp"
+#include "csurf_faderport_ui_filters.hpp"
 #include "controls/csurf_color_button.hpp"
 
 using namespace CSURF_FADERPORT_UI_FUNCTIONS;
+using namespace CSURF_FADERPORT_UI_FILTERS;
 
 class CSurf_GeneralControlManager
 {
@@ -180,13 +182,13 @@ public:
 
     void HandleMacroButton()
     {
-        if (IsFunctionsDialogOpen())
+        if (context->GetShiftLeft())
         {
-            HideFunctionsDialog();
+            IsFunctionsDialogOpen() ? HideFunctionsDialog() : ShowFunctionsDialog();
         }
         else
         {
-            ShowFunctionsDialog();
+            IsFiltersDialogOpen() ? HideFiltersDialog() : ShowFiltersDialog();
         }
     };
 

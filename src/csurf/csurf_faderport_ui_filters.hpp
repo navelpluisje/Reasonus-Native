@@ -344,6 +344,11 @@ namespace CSURF_FADERPORT_UI_FILTERS
         }
         ShowWindow(s_hwndReaSonusFiltersDlg, SW_SHOW);
     }
+
+    static bool IsFiltersDialogOpen()
+    {
+        return s_hwndReaSonusFiltersDlg != NULL;
+    }
 } // namespace
 
 #endif

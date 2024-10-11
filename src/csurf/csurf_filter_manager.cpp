@@ -156,7 +156,6 @@ public:
         int filterIndex = context->GetChannelManagerItemIndex() + index;
         if (context->GetShiftLeft())
         {
-
             Main_OnCommandStringEx("_REASONUS_SHOW_REASONUS_FILTERS_WINDOW");
         }
         else
