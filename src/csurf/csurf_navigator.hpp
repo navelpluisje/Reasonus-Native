@@ -17,6 +17,7 @@ enum NavigatorFilter
     TrackInstrumentsFilter,
     TrackTopFoldersFilter,
     TrackAllFoldersFilter,
+    TrackCustomFilter,
 };
 
 class CSurf_Navigator
@@ -48,6 +49,8 @@ class CSurf_Navigator
 
     void HandleTracksAllFoldersFilter();
 
+    void HandleTracksCustomFilter(string filter);
+
 public:
     CSurf_Navigator(CSurf_Context *context);
 
@@ -67,7 +70,9 @@ public:
 
     bool HasTracksWithMute();
 
-    void handleFilter(NavigatorFilter filter);
+    void HandleFilter(NavigatorFilter filter);
+
+    void HandleCustomFilter(string filterName);
 
     void UpdateTrackCount();
 

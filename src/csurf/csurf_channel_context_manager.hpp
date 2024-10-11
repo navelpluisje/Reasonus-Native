@@ -16,6 +16,7 @@ class CSurf_ChannelContextManager
     CSurf_ChannelManager *channelManager = NULL;
     std::vector<CSurf_Track *> tracks;
 
+    ChannelMode prevChannelMode = TrackMode;
     ChannelMode channelMode = TrackMode;
     midi_Output *m_midiout;
     CSurf_Navigator *navigator;
@@ -35,11 +36,15 @@ public:
 
     void HandleTrackButtonClick();
 
-    void HandlePluginsButtonClick();
+    void HandlePluginsButtonClick(bool track = false);
 
-    void HandleSendButtonClick();
+    void HandleSendButtonClick(bool track = false);
 
-    void HandlePanButtonClick();
+    void HandlePanButtonClick(bool track = false);
+
+    void HandleMixButtonClick();
+
+    void ResetMixButtonClick();
 
     // ADD ALL THE TRACKMANAGERS METHODS HERE TO PROXY THEM
     void UpdateTracks();

@@ -94,7 +94,11 @@ class CSurf_FaderPort : public IReaperControlSurface
        * The next and previous button light up when pressed so need the '0' value when releasing
        */
       if (!evt->midi_message[2] && !(
-                                       evt->midi_message[1] == BTN_NEXT || evt->midi_message[1] == BTN_PREV || evt->midi_message[1] == BTN_SHIFT_LEFT || evt->midi_message[1] == BTN_SHIFT_RIGHT || evt->midi_message[1] == BTN_ARM))
+                                       evt->midi_message[1] == BTN_NEXT ||
+                                       evt->midi_message[1] == BTN_PREV ||
+                                       evt->midi_message[1] == BTN_SHIFT_LEFT ||
+                                       evt->midi_message[1] == BTN_SHIFT_RIGHT ||
+                                       evt->midi_message[1] == BTN_ARM))
       {
         return;
       }
@@ -367,7 +371,7 @@ public:
     trackNavigator = new CSurf_Navigator(context);
     sessionManager = new CSurf_SessionManager(context, trackNavigator, m_midiout);
     channelContextManager = new CSurf_ChannelContextManager(context, trackNavigator, m_midiout);
-    mixManager = new CSurf_MixManager(context, trackNavigator, m_midiout);
+    mixManager = new CSurf_MixManager(context, trackNavigator, channelContextManager, m_midiout);
     transportManager = new CSurf_TransportManager(context, m_midiout);
     automationManager = new CSurf_AutomationManager(context, m_midiout);
     generalControlManager = new CSurf_GeneralControlManager(context, trackNavigator, m_midiout);

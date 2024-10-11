@@ -1,6 +1,9 @@
 #include "csurf_navigator.hpp"
 #include "csurf_utils.hpp"
+#include "csurf_daw.hpp"
 #include <reaper_plugin_functions.h>
+#include "extern/ini.hpp"
+#include "csurf_navigator_filters.hpp"
 
 void CSurf_Navigator::GetAllVisibleTracks(WDL_PtrList<MediaTrack> &tracks, bool &hasSolo, bool &hasMute)
 {
@@ -57,6 +60,66 @@ void CSurf_Navigator::HandleAllTracksFilter()
     {
         tracks[i] = true;
     }
+
+    SetTrackUIVisibility(tracks);
+}
+
+void CSurf_Navigator::HandleTracksCustomFilter(string filterName)
+{
+    mINI::INIFile file(GetReaSonusIniPath());
+    mINI::INIStructure ini;
+    file.read(ini);
+    mINI::INIMap<string> filter = ini[filterName];
+
+    map<int, bool> tracks;
+    map<int, bool> filterTracks;
+    map<int, bool> allTracks;
+    map<int, bool> childTracks;
+    map<int, bool> parentTracks;
+    map<int, bool> sibblingTracks;
+
+    bool stop = false;
+    for (int i = 0; i < CountTracks(0); i++)
+    {
+        allTracks[i] = false;
+        if (!stop)
+        {
+            MediaTrack *media_track = GetTrack(0, i);
+            string trackName = DAW::GetTrackName(media_track);
+            bool isChild = GetTrackDepth(media_track) > 0;
+
+            if (FuzzyMatch(trackName, filter["text"]) && !(isChild && filter["top-level"] == "1"))
+            {
+                filterTracks[i] = true;
+                if (filter["match-multiple"] == "0")
+                {
+                    stop = true;
+                }
+            }
+        }
+    }
+
+    tracks.insert(filterTracks.begin(), filterTracks.end());
+
+    if (filter["children"] == "1")
+    {
+        childTracks = GetChildTracks(filterTracks);
+        tracks.insert(childTracks.begin(), childTracks.end());
+    }
+
+    if (filter["parents"] == "1")
+    {
+        parentTracks = GetParentTracks(filterTracks);
+        tracks.insert(parentTracks.begin(), parentTracks.end());
+    }
+
+    if (filter["sibblings"] == "1")
+    {
+        sibblingTracks = GetSibblingTracks(filterTracks);
+        tracks.insert(sibblingTracks.begin(), sibblingTracks.end());
+    }
+
+    tracks.insert(allTracks.begin(), allTracks.end());
 
     SetTrackUIVisibility(tracks);
 }
@@ -245,7 +308,7 @@ bool CSurf_Navigator::HasTracksWithMute()
     return hasMute;
 };
 
-void CSurf_Navigator::handleFilter(NavigatorFilter filter)
+void CSurf_Navigator::HandleFilter(NavigatorFilter filter)
 {
     switch (filter)
     {
@@ -270,6 +333,11 @@ void CSurf_Navigator::handleFilter(NavigatorFilter filter)
     default:
         HandleAllTracksFilter();
     }
+}
+
+void CSurf_Navigator::HandleCustomFilter(string filterName)
+{
+    HandleTracksCustomFilter(filterName);
 }
 
 void CSurf_Navigator::UpdateTrackCount()

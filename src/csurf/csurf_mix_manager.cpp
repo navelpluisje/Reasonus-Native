@@ -4,12 +4,14 @@
 #include "controls/csurf_color_button.hpp"
 #include "csurf_navigator.hpp"
 #include "csurf_context.cpp"
+#include "csurf_channel_context_manager.hpp"
 
 class CSurf_MixManager
 {
 protected:
     CSurf_Context *context;
     CSurf_Navigator *trackNavigator;
+    CSurf_ChannelContextManager *channelContextManager;
     midi_Output *m_midiout;
 
     NavigatorFilter trackFilter = TrackAllFilter;
@@ -25,7 +27,7 @@ protected:
 
     void SetButtonValue()
     {
-        mixAudioButton->SetValue(BTN_VALUE_OFF);
+        mixAudioButton->SetValue(trackFilter == TrackCustomFilter ? BTN_VALUE_ON : BTN_VALUE_OFF);
         mixViButton->SetValue(trackFilter == TrackInstrumentsFilter ? BTN_VALUE_ON : BTN_VALUE_OFF);
         mixBusButton->SetValue((trackFilter == TrackAllFoldersFilter || trackFilter == TrackTopFoldersFilter) ? BTN_VALUE_ON : BTN_VALUE_OFF);
         mixVcaButton->SetValue((trackFilter == TrackSendsFilter || trackFilter == TrackReceivesFilter) ? BTN_VALUE_ON : BTN_VALUE_OFF);
@@ -37,7 +39,8 @@ public:
     CSurf_MixManager(
         CSurf_Context *context,
         CSurf_Navigator *trackNavigator,
-        midi_Output *m_midiout) : context(context), trackNavigator(trackNavigator), m_midiout(m_midiout)
+        CSurf_ChannelContextManager *channelContextManager,
+        midi_Output *m_midiout) : context(context), trackNavigator(trackNavigator), channelContextManager(channelContextManager), m_midiout(m_midiout)
     {
         mixAudioButton = new CSurf_ColorButton(ButtonColorWhite, ButtonColorWhiteDim, BTN_AUDIO, BTN_VALUE_OFF, m_midiout);
         mixViButton = new CSurf_ColorButton(ButtonColorWhite, ButtonColorWhiteDim, BTN_VI, BTN_VALUE_OFF, m_midiout);
@@ -52,13 +55,16 @@ public:
 
     void HandleMixAudioButton()
     {
+        trackFilter = TrackCustomFilter;
+        channelContextManager->HandleMixButtonClick();
         SetButtonValue();
     }
 
     void HandleMixViButton()
     {
         trackFilter = TrackInstrumentsFilter;
-        trackNavigator->handleFilter(TrackInstrumentsFilter);
+        trackNavigator->HandleFilter(TrackInstrumentsFilter);
+        channelContextManager->ResetMixButtonClick();
         SetButtonValue();
     }
 
@@ -68,14 +74,15 @@ public:
         {
             mixBusButton->SetColor(ButtonColorYellow, ButtonColorRed);
             trackFilter = TrackAllFoldersFilter;
-            trackNavigator->handleFilter(TrackAllFoldersFilter);
+            trackNavigator->HandleFilter(TrackAllFoldersFilter);
         }
         else
         {
             mixBusButton->SetColor(ButtonColorWhite, ButtonColorWhiteDim);
             trackFilter = TrackTopFoldersFilter;
-            trackNavigator->handleFilter(TrackTopFoldersFilter);
+            trackNavigator->HandleFilter(TrackTopFoldersFilter);
         }
+        channelContextManager->ResetMixButtonClick();
         SetButtonValue();
     }
 
@@ -85,21 +92,23 @@ public:
         {
             mixVcaButton->SetColor(ButtonColorYellow, ButtonColorRed);
             trackFilter = TrackReceivesFilter;
-            trackNavigator->handleFilter(TrackReceivesFilter);
+            trackNavigator->HandleFilter(TrackReceivesFilter);
         }
         else
         {
             mixVcaButton->SetColor(ButtonColorWhite, ButtonColorWhiteDim);
             trackFilter = TrackSendsFilter;
-            trackNavigator->handleFilter(TrackSendsFilter);
+            trackNavigator->HandleFilter(TrackSendsFilter);
         }
+        channelContextManager->ResetMixButtonClick();
         SetButtonValue();
     }
 
     void HandleMixAllButton()
     {
         trackFilter = TrackAllFilter;
-        trackNavigator->handleFilter(TrackAllFilter);
+        trackNavigator->HandleFilter(TrackAllFilter);
+        channelContextManager->ResetMixButtonClick();
         SetButtonValue();
     }
 

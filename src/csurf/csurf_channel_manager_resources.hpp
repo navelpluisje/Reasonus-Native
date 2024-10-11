@@ -48,6 +48,7 @@ enum ChannelMode
     TrackSendMode,
     PanMode,
     TrackPanMode,
+    MixMode,
 };
 
 #endif
