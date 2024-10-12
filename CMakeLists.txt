@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 3.15)
 
+if(APPLE)
+  set(CMAKE_C_COMPILER $ENV{TOOLCHAIN_PREFIX}-gcc)
+  set(CMAKE_CXX_COMPILER $ENV{TOOLCHAIN_PREFIX}-g++)
+endif()
+
 project(ReasonusNative VERSION 0.0.0 LANGUAGES C CXX)
 
 find_package(Git)
