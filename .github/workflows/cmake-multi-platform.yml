@@ -86,6 +86,7 @@ jobs:
             choco install ninja
           elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
             brew install make
+            ATH="/opt/homebrew/opt/make/libexec/gnubin:$PATH"
               :
           fi
 
