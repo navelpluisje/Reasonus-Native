@@ -20,8 +20,8 @@ jobs:
     strategy:
       matrix:
         include:
-          # - os: macos-latest
-          #   arch: arm64;x86_64
+          - os: macos-latest
+            arch: arm64;x86_64
           # - os: ubuntu-latest
           #   arch: x86_64
           # - os: ubuntu-latest
@@ -30,12 +30,12 @@ jobs:
           #   arch: i686
           # - os: ubuntu-latest
           #   arch: armv7l
-          - os: windows-latest
-            arch: x64
-            win_build_type: RelWithDebInfo
-          - os: windows-latest
-            arch: x86
-            win_build_type: Release
+          # - os: windows-latest
+          #   arch: x64
+          #   win_build_type: RelWithDebInfo
+          # - os: windows-latest
+          #   arch: x86
+          #   win_build_type: Release
 
     steps:
       - uses: actions/checkout@v2
