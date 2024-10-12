@@ -274,6 +274,11 @@ namespace CSURF_FADERPORT_UI_FILTERS
                 mINI::INIFile file(GetReaSonusIniPath());
                 string filter = filtersDlgFilterKeys[filtersDlgSelectedFilter];
 
+                if (filter.empty())
+                {
+                    break;
+                }
+
                 char buffer[255];
                 GetDlgItemText(hwndDlg, IDC_EDIT_FILTER_NAME, buffer, size(buffer));
                 ini[filter]["name"] = buffer;
