@@ -12,11 +12,11 @@ build_script:
     -DVCPKG_TARGET_TRIPLET=arch-env -DVCPKG_CHAINLOAD_TOOLCHAIN_FILE=$TOOLCHAIN
     -DCMAKE_OSX_ARCHITECTURES=$ARCH -DCMAKE_OSX_DEPLOYMENT_TARGET=$DEPLOY_TARGET
   - cmake --build build
-  - cd build 
+  - cd build
   - if [ "$ARCH" == "arm64;x86_64" ]; then sudo cpack && rm *.dylib; fi
 
 for:
-  - matrix: { only: [ appveyor_build_worker_image: &linux Ubuntu1804 ] }
+  - matrix: { only: [appveyor_build_worker_image: &linux Ubuntu1804] }
     cache:
       - build/vcpkg_installed -> vcpkg.json, cmake/vcpkg-triplets/arch-env.cmake
     install: |-
@@ -34,8 +34,9 @@ for:
         sudo apt-get update -qq
         sudo apt-get install -qq aptitude > /dev/null
         sudo aptitude install -yR ${native[@]} ${target[@]/%/:$arch} > /dev/null
+        sudo apt-get install -qq php > /dev/null
       }
-      
+
       sudo update-alternatives --set gcc /usr/bin/gcc-7
 
       case $ARCH in
@@ -61,9 +62,15 @@ for:
     artifacts:
       - path: build/reaper_*.so
 
-  - matrix: { only: [ appveyor_build_worker_image: macos-catalina,
-                      appveyor_build_worker_image: macos-monterey,
-                      appveyor_build_worker_image: macos-mojave ] }
+  - matrix:
+      {
+        only:
+          [
+            appveyor_build_worker_image: macos-catalina,
+            appveyor_build_worker_image: macos-monterey,
+            appveyor_build_worker_image: macos-mojave,
+          ],
+      }
     cache:
       # - build/vcpkg_installed -> vcpkg.json, cmake/vcpkg-triplets/arch-env.cmake
     install:
@@ -81,7 +88,7 @@ for:
       - path: build/reaper_*.dylib
       - path: build/*.pkg
 
-  - matrix: { only: [ appveyor_build_worker_image: &windows Visual Studio 2022 ] }
+  - matrix: { only: [appveyor_build_worker_image: &windows Visual Studio 2022] }
 
     cache:
       - build\vcpkg_installed -> vcpkg.json
@@ -138,7 +145,7 @@ environment:
 deploy:
   provider: GitHub
   draft: true
-  description: ''
+  description: ""
   force_update: true
   auth_token:
     secure: Rk8do2Q/etdabjwIABBRdTJu1a4wYVu9Ltz8HJuC0wc3rz+hHUMGa3N7vTlsrd7z
