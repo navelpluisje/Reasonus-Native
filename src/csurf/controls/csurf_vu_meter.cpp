@@ -2,7 +2,10 @@
 
 void CSurf_VuMeter::SendValue()
 {
-    m_midiout->Send(channelVuMeter, value, 0, -1);
+    if (m_midiout)
+    {
+        m_midiout->Send(channelVuMeter, value, 0, -1);
+    }
 };
 
 CSurf_VuMeter::CSurf_VuMeter(int channel, midi_Output *m_midiout) : m_midiout(m_midiout)

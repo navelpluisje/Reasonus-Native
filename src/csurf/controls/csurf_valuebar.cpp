@@ -2,12 +2,18 @@
 
 void CSurf_Valuebar::SendValue()
 {
-    m_midiout->Send(0xb0, channelValuebar, value, -1);
+    if (m_midiout)
+    {
+        m_midiout->Send(0xb0, channelValuebar, value, -1);
+    }
 };
 
 void CSurf_Valuebar::SendMode()
 {
-    m_midiout->Send(0xb0, channelValuebarMode, valuebarMode, -1);
+    if (m_midiout)
+    {
+        m_midiout->Send(0xb0, channelValuebarMode, valuebarMode, -1);
+    }
 };
 
 CSurf_Valuebar::CSurf_Valuebar(int channel, double value, midi_Output *m_midiout) : value(value), m_midiout(m_midiout)

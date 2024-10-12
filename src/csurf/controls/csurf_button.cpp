@@ -4,8 +4,12 @@
 
 void CSurf_Button::SendValue()
 {
-    m_midiout->Send(MIDI_MESSAGE_BUTTON, type, value, -1);
-};
+    if (m_midiout)
+    {
+
+        m_midiout->Send(MIDI_MESSAGE_BUTTON, type, value, -1);
+    }
+}
 
 CSurf_Button::CSurf_Button(Btn_Types type, Btn_Value value, midi_Output *m_midiout) : value(value), type(type), m_midiout(m_midiout)
 {
@@ -20,4 +24,4 @@ void CSurf_Button::SetValue(Btn_Value _value, bool force)
     }
     value = _value;
     this->SendValue();
-};
+}

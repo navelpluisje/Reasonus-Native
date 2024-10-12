@@ -2,7 +2,10 @@
 
 void CSurf_Fader::SendValue()
 {
-    m_midiout->Send(0xe0 + channel, value & 0x7f, (value >> 7) & 0x7f, -1);
+    if (m_midiout)
+    {
+        m_midiout->Send(0xe0 + channel, value & 0x7f, (value >> 7) & 0x7f, -1);
+    }
 };
 
 void CSurf_Fader::SetValue(int _value, bool force)

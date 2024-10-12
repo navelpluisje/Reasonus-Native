@@ -40,7 +40,10 @@ void CSurf_Display::SendValue(int line)
 
     midiSysExData.evt.midi_message[midiSysExData.evt.size++] = 0xF7;
 
-    m_midiout->SendMsg(&midiSysExData.evt, 0);
+    if (m_midiout)
+    {
+        m_midiout->SendMsg(&midiSysExData.evt, 0);
+    }
 };
 
 void CSurf_Display::SendMode()
@@ -64,7 +67,10 @@ void CSurf_Display::SendMode()
 
     midiSysExData.evt.midi_message[midiSysExData.evt.size++] = 0xF7;
 
-    m_midiout->SendMsg(&midiSysExData.evt, 0);
+    if (m_midiout)
+    {
+        m_midiout->SendMsg(&midiSysExData.evt, 0);
+    }
 };
 
 void CSurf_Display::SetValue(int line, Alignment _alignment, const char *_value, Inverted invert, bool force)

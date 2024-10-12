@@ -10,17 +10,23 @@ CSurf_ColorButton::CSurf_ColorButton(ButtonColor _colorActive, ButtonColor _colo
 
 void CSurf_ColorButton::SendValue()
 {
-    m_midiout->Send(MIDI_MESSAGE_BUTTON, type, value, -1);
-    SendColor();
+    if (m_midiout)
+    {
+        m_midiout->Send(MIDI_MESSAGE_BUTTON, type, value, -1);
+        SendColor();
+    }
 };
 
 void CSurf_ColorButton::SendColor()
 {
     ButtonColor color = value == 0 ? colorDim : colorActive;
+    if (m_midiout)
+    {
 
-    m_midiout->Send(MIDI_MESSAGE_COLOR_RED, type, color.red, -1);
-    m_midiout->Send(MIDI_MESSAGE_COLOR_GREEN, type, color.green, -1);
-    m_midiout->Send(MIDI_MESSAGE_COLOR_BLUE, type, color.blue, -1);
+        m_midiout->Send(MIDI_MESSAGE_COLOR_RED, type, color.red, -1);
+        m_midiout->Send(MIDI_MESSAGE_COLOR_GREEN, type, color.green, -1);
+        m_midiout->Send(MIDI_MESSAGE_COLOR_BLUE, type, color.blue, -1);
+    }
 };
 
 void CSurf_ColorButton::SetValue(Btn_Value _value, bool force)
