@@ -22,14 +22,14 @@ jobs:
         include:
           # - os: macos-latest
           #   arch: arm64;x86_64
-          - os: ubuntu-latest
-            arch: x86_64
-          - os: ubuntu-latest
-            arch: aarch64
-          - os: ubuntu-latest
-            arch: i686
-          - os: ubuntu-latest
-            arch: armv7l
+          # - os: ubuntu-latest
+          #   arch: x86_64
+          # - os: ubuntu-latest
+          #   arch: aarch64
+          # - os: ubuntu-latest
+          #   arch: i686
+          # - os: ubuntu-latest
+          #   arch: armv7l
           - os: windows-latest
             arch: x64
             win_build_type: RelWithDebInfo
