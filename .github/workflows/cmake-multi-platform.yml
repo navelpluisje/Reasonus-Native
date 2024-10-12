@@ -85,6 +85,7 @@ jobs:
           elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
             choco install ninja
           elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
+            brew install make
               :
           fi
 
