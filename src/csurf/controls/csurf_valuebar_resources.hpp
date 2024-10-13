@@ -11,6 +11,14 @@ enum ChannelValueBar
     VALUEBAR_6 = 0x35,
     VALUEBAR_7 = 0x36,
     VALUEBAR_8 = 0x37,
+    VALUEBAR_9 = 0x40,
+    VALUEBAR_10 = 0x41,
+    VALUEBAR_11 = 0x42,
+    VALUEBAR_12 = 0x43,
+    VALUEBAR_13 = 0x44,
+    VALUEBAR_14 = 0x45,
+    VALUEBAR_15 = 0x46,
+    VALUEBAR_16 = 0x47,
 };
 
 enum ChannelValueBarMode
@@ -23,6 +31,14 @@ enum ChannelValueBarMode
     VALUEBAR_MODE_6 = 0x3d,
     VALUEBAR_MODE_7 = 0x3e,
     VALUEBAR_MODE_8 = 0x3f,
+    VALUEBAR_MODE_9 = 0x48,
+    VALUEBAR_MODE_10 = 0x49,
+    VALUEBAR_MODE_11 = 0x4a,
+    VALUEBAR_MODE_12 = 0x4b,
+    VALUEBAR_MODE_13 = 0x4c,
+    VALUEBAR_MODE_14 = 0x4d,
+    VALUEBAR_MODE_15 = 0x4e,
+    VALUEBAR_MODE_16 = 0x4f,
 };
 
 enum ValuebarMode

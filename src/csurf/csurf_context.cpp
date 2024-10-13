@@ -18,7 +18,7 @@ class CSurf_Context
     bool shift_right;
     bool arm;
     bool lastTouchedFxMode;
-    int nbTracks = 8;
+    int nbChannels = 8;
     PanEncoderMode panEncoderMode = PanEncoderPanMode;
     bool panPushModePan = true;
     int channelManagerItemIndex = 0;
@@ -26,7 +26,7 @@ class CSurf_Context
     ChannelManagerType channelManagerType;
 
 public:
-    CSurf_Context(int nbChannels) : nbTracks(nbChannels)
+    CSurf_Context(int nbChannels) : nbChannels(nbChannels)
     {
     }
     ~CSurf_Context() {}
@@ -46,8 +46,11 @@ public:
     void ToggleLastTouchedFxMode() { lastTouchedFxMode = !lastTouchedFxMode; }
     bool GetLastTouchedFxMode() { return lastTouchedFxMode; }
 
-    void SetNbTracks(int count) { nbTracks = count; }
-    int GetNbTracks() { return nbTracks; }
+    void SetNbChannels(int count) { nbChannels = count; }
+    int GetNbChannels()
+    {
+        return lastTouchedFxMode ? nbChannels - 1 : nbChannels;
+    }
 
     void TogglePanPushMode() { panPushModePan = !panPushModePan; }
     void ResetPanPushMode() { panPushModePan = true; }
@@ -61,7 +64,7 @@ public:
 
     void IncrementChannelmanagerItemIndex(int val)
     {
-        if ((channelManagerItemIndex + val + (channelManagerType == Hui ? 0 : nbTracks)) < channelManagerItemsCount)
+        if ((channelManagerItemIndex + val + (channelManagerType == Hui ? 0 : nbChannels)) < channelManagerItemsCount)
         {
             channelManagerItemIndex += val;
         }

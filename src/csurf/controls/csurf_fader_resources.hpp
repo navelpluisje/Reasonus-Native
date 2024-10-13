@@ -12,6 +12,14 @@ enum Faders
     FADER_6 = 0xe5,
     FADER_7 = 0xe6,
     FADER_8 = 0xe7,
+    FADER_9 = 0xe8,
+    FADER_10 = 0xe9,
+    FADER_11 = 0xea,
+    FADER_12 = 0xeb,
+    FADER_13 = 0xec,
+    FADER_14 = 0xed,
+    FADER_15 = 0xee,
+    FADER_16 = 0xef,
 };
 
 #endif

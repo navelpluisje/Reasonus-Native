@@ -80,7 +80,7 @@ public:
         MediaTrack *sends_track = GetSelectedTrack(0, 0);
         context->SetChannelManagerItemsCount(GetTrackNumSends(sends_track, 0));
 
-        for (int i = 0; i < navigator->GetTrackCount(); i++)
+        for (int i = 0; i < context->GetNbChannels(); i++)
         {
             int sendIndex = context->GetChannelManagerItemIndex() + i;
             int pan, faderValue, valueBarValue = 0;

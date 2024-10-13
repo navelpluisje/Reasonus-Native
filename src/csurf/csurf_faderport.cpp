@@ -61,10 +61,12 @@ class CSurf_FaderPort : public IReaperControlSurface
     /**
      * Fader values
      */
-    if (evt->midi_message[0] >= FADER_1 && evt->midi_message[0] <= FADER_8)
+    if (evt->midi_message[0] >= FADER_1 && evt->midi_message[0] <= FADER_16)
     {
       channelContextManager->HandleFaderMove(evt->midi_message[0] - FADER_1, evt->midi_message[2], evt->midi_message[1]);
-      if (context->GetLastTouchedFxMode() && evt->midi_message[0] == FADER_8)
+      if (
+          (context->GetNbChannels() == 8 && context->GetLastTouchedFxMode() && evt->midi_message[0] == FADER_8) ||
+          (context->GetNbChannels() == 16 && context->GetLastTouchedFxMode() && evt->midi_message[0] == FADER_16))
       {
         lastTouchedFxManager->HandleFaderMove(evt->midi_message[2], evt->midi_message[1]);
       }
@@ -110,6 +112,14 @@ class CSurf_FaderPort : public IReaperControlSurface
       {
         channelContextManager->HandleSelectClick(evt->midi_message[1] - BTN_SELECT_1);
       }
+      else if (evt->midi_message[1] == BTN_SELECT_9)
+      {
+        channelContextManager->HandleSelectClick(8);
+      }
+      else if (evt->midi_message[1] >= BTN_SELECT_10 && evt->midi_message[1] <= BTN_SELECT_16)
+      {
+        channelContextManager->HandleSelectClick(evt->midi_message[1] - 0x20 + 8);
+      }
       /**
        * Track Mute Buttons
        */
@@ -117,12 +127,20 @@ class CSurf_FaderPort : public IReaperControlSurface
       {
         channelContextManager->HandleMuteClick(evt->midi_message[1] - BTN_MUTE_1);
       }
+      else if (evt->midi_message[1] >= BTN_MUTE_9 && evt->midi_message[1] <= BTN_MUTE_16)
+      {
+        channelContextManager->HandleMuteClick(evt->midi_message[1] - BTN_MUTE_9 + 8);
+      }
       /**
        * Track Solo Buttons
        */
       else if (evt->midi_message[1] >= BTN_SOLO_1 && evt->midi_message[1] <= BTN_SOLO_8)
       {
         channelContextManager->HandleSoloClick(evt->midi_message[1] - BTN_SOLO_1);
+      }
+      else if (evt->midi_message[1] >= BTN_SOLO_9 && evt->midi_message[1] <= BTN_SOLO_16)
+      {
+        channelContextManager->HandleSoloClick(evt->midi_message[1] - BTN_SOLO_9 + 8);
       }
 
       /**
@@ -361,12 +379,12 @@ public:
 
     context = new CSurf_Context(stoi(ini["Surface"]["Surface"]));
 
-    for (int i = 0; i < 8; i++)
+    for (int i = 0; i < context->GetNbChannels(); i++)
     {
       CSurf_Track *track = new CSurf_Track(i, context, m_midiout);
       tracks.push_back(track);
     }
-    lastTouchedFxTrack = new CSurf_Track(7, context, m_midiout);
+    lastTouchedFxTrack = new CSurf_Track(context->GetNbChannels() - 1, context, m_midiout);
 
     trackNavigator = new CSurf_Navigator(context);
     sessionManager = new CSurf_SessionManager(context, trackNavigator, m_midiout);
@@ -462,10 +480,11 @@ public:
         OnMIDIEvent(evts);
       }
     }
+
     if (m_midiout)
     {
       DWORD now = timeGetTime();
-      if ((now - surface_update_lastrun) >= 10)
+      if ((now - surface_update_lastrun) >= 50)
       {
         channelContextManager->UpdateTracks();
         if (context->GetLastTouchedFxMode())

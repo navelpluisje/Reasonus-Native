@@ -9,7 +9,7 @@
 #include "csurf_context.cpp"
 #include "controls/csurf_vu_meter.hpp"
 
-inline Btn_Types SelectButtons[8] = {
+inline Btn_Types SelectButtons[16] = {
     BTN_SELECT_1,
     BTN_SELECT_2,
     BTN_SELECT_3,
@@ -18,9 +18,17 @@ inline Btn_Types SelectButtons[8] = {
     BTN_SELECT_6,
     BTN_SELECT_7,
     BTN_SELECT_8,
+    BTN_SELECT_9,
+    BTN_SELECT_10,
+    BTN_SELECT_11,
+    BTN_SELECT_12,
+    BTN_SELECT_13,
+    BTN_SELECT_14,
+    BTN_SELECT_15,
+    BTN_SELECT_16,
 };
 
-inline Btn_Types SoloButtons[8] = {
+inline Btn_Types SoloButtons[16] = {
     BTN_SOLO_1,
     BTN_SOLO_2,
     BTN_SOLO_3,
@@ -29,9 +37,17 @@ inline Btn_Types SoloButtons[8] = {
     BTN_SOLO_6,
     BTN_SOLO_7,
     BTN_SOLO_8,
+    BTN_SOLO_9,
+    BTN_SOLO_10,
+    BTN_SOLO_11,
+    BTN_SOLO_12,
+    BTN_SOLO_13,
+    BTN_SOLO_14,
+    BTN_SOLO_15,
+    BTN_SOLO_16,
 };
 
-inline Btn_Types MuteButtons[8] = {
+inline Btn_Types MuteButtons[16] = {
     BTN_MUTE_1,
     BTN_MUTE_2,
     BTN_MUTE_3,
@@ -40,6 +56,14 @@ inline Btn_Types MuteButtons[8] = {
     BTN_MUTE_6,
     BTN_MUTE_7,
     BTN_MUTE_8,
+    BTN_MUTE_9,
+    BTN_MUTE_10,
+    BTN_MUTE_11,
+    BTN_MUTE_12,
+    BTN_MUTE_13,
+    BTN_MUTE_14,
+    BTN_MUTE_15,
+    BTN_MUTE_16,
 };
 
 class CSurf_Track

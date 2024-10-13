@@ -87,7 +87,7 @@ public:
             forceUpdate = true;
         }
 
-        for (int i = 0; i < navigator->GetTrackCount(); i++)
+        for (int i = 0; i < context->GetNbChannels(); i++)
         {
             int faderValue = 0, valueBarValue = 0;
             string strPan1, strPan2;
@@ -159,7 +159,7 @@ public:
             return;
         }
 
-        for (int i = 0; i < 8; i++)
+        for (int i = 0; i < context->GetNbChannels(); i++)
         {
             MediaTrack *media_track = navigator->GetTrackByIndex(i);
             SetTrackSelected(media_track, false);

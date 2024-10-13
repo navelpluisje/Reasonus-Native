@@ -109,7 +109,7 @@ public:
         WDL_PtrList<MediaTrack> media_tracks = navigator->GetBankTracks();
         context->SetChannelManagerItemsCount(filters.size() + 1);
 
-        for (int i = 0; i < navigator->GetTrackCount(); i++)
+        for (int i = 0; i < context->GetNbChannels(); i++)
         {
             int filterIndex = context->GetChannelManagerItemIndex() + i;
             int faderValue = 0, valueBarValue = 0;

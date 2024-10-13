@@ -30,7 +30,7 @@ CSurf_ChannelContextManager::CSurf_ChannelContextManager(
     sendButton = new CSurf_Button(BTN_SEND, BTN_VALUE_OFF, m_midiout);
     panButton = new CSurf_Button(BTN_PAN, BTN_VALUE_OFF, m_midiout);
 
-    for (int i = 0; i < navigator->GetTrackCount(); i++)
+    for (int i = 0; i < context->GetNbChannels(); i++)
     {
         CSurf_Track *track = new CSurf_Track(i, context, m_midiout);
         tracks.push_back(track);

@@ -78,7 +78,7 @@ public:
         MediaTrack *plugin_track = GetSelectedTrack(0, 0);
         context->SetChannelManagerItemsCount(TrackFX_GetCount(plugin_track));
 
-        for (int i = 0; i < navigator->GetTrackCount(); i++)
+        for (int i = 0; i < context->GetNbChannels(); i++)
         {
             int pluginIndex = context->GetChannelManagerItemIndex() + i;
             int faderValue = 0, valueBarValue = 0;

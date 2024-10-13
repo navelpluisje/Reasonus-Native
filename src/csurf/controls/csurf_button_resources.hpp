@@ -23,6 +23,15 @@ enum Btn_Types
     BTN_SOLO_7 = 0x0e,
     BTN_SOLO_8 = 0x0f,
 
+    BTN_SOLO_9 = 0x50,
+    BTN_SOLO_10 = 0x51,
+    BTN_SOLO_11 = 0x52,
+    BTN_SOLO_12 = 0x53,
+    BTN_SOLO_13 = 0x54,
+    BTN_SOLO_14 = 0x55,
+    BTN_SOLO_15 = 0x56,
+    BTN_SOLO_16 = 0x57,
+
     BTN_MUTE_1 = 0x10,
     BTN_MUTE_2 = 0x11,
     BTN_MUTE_3 = 0x12,
@@ -32,6 +41,15 @@ enum Btn_Types
     BTN_MUTE_7 = 0x16,
     BTN_MUTE_8 = 0x17,
 
+    BTN_MUTE_9 = 0x78,
+    BTN_MUTE_10 = 0x79,
+    BTN_MUTE_11 = 0x7a,
+    BTN_MUTE_12 = 0x7b,
+    BTN_MUTE_13 = 0x7c,
+    BTN_MUTE_14 = 0x7d,
+    BTN_MUTE_15 = 0x7e,
+    BTN_MUTE_16 = 0x7f,
+
     BTN_SELECT_1 = 0x18,
     BTN_SELECT_2 = 0x19,
     BTN_SELECT_3 = 0x1a,
@@ -40,6 +58,15 @@ enum Btn_Types
     BTN_SELECT_6 = 0x1d,
     BTN_SELECT_7 = 0x1e,
     BTN_SELECT_8 = 0x1f,
+
+    BTN_SELECT_9 = 0x07,
+    BTN_SELECT_10 = 0x21,
+    BTN_SELECT_11 = 0x22,
+    BTN_SELECT_12 = 0x23,
+    BTN_SELECT_13 = 0x24,
+    BTN_SELECT_14 = 0x25,
+    BTN_SELECT_15 = 0x26,
+    BTN_SELECT_16 = 0x27,
 
     BTN_TOUCH_1 = 0x68,
     BTN_TOUCH_2 = 0x69,

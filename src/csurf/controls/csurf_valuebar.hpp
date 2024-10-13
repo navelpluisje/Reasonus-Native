@@ -8,7 +8,7 @@
 
 using namespace std;
 
-static ChannelValueBar channelValuebars[8] = {
+static ChannelValueBar channelValuebars[16] = {
     VALUEBAR_1,
     VALUEBAR_2,
     VALUEBAR_3,
@@ -17,9 +17,17 @@ static ChannelValueBar channelValuebars[8] = {
     VALUEBAR_6,
     VALUEBAR_7,
     VALUEBAR_8,
+    VALUEBAR_9,
+    VALUEBAR_10,
+    VALUEBAR_11,
+    VALUEBAR_12,
+    VALUEBAR_13,
+    VALUEBAR_14,
+    VALUEBAR_15,
+    VALUEBAR_16,
 };
 
-static ChannelValueBarMode channelValuebarModes[8] = {
+static ChannelValueBarMode channelValuebarModes[16] = {
     VALUEBAR_MODE_1,
     VALUEBAR_MODE_2,
     VALUEBAR_MODE_3,
@@ -28,6 +36,14 @@ static ChannelValueBarMode channelValuebarModes[8] = {
     VALUEBAR_MODE_6,
     VALUEBAR_MODE_7,
     VALUEBAR_MODE_8,
+    VALUEBAR_MODE_9,
+    VALUEBAR_MODE_10,
+    VALUEBAR_MODE_11,
+    VALUEBAR_MODE_12,
+    VALUEBAR_MODE_13,
+    VALUEBAR_MODE_14,
+    VALUEBAR_MODE_15,
+    VALUEBAR_MODE_16,
 };
 
 class CSurf_Valuebar

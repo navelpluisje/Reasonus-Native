@@ -79,7 +79,7 @@ public:
         nbReceives = 0;
         WDL_PtrList<MediaTrack> media_tracks = navigator->GetBankTracks();
 
-        for (int i = 0; i < navigator->GetTrackCount(); i++)
+        for (int i = 0; i < context->GetNbChannels(); i++)
         {
             MediaTrack *media_track = media_tracks.Get(i);
             int _nbTrackReceives = GetTrackNumSends(media_track, -1);
@@ -94,7 +94,7 @@ public:
         context->SetChannelManagerItemsCount(nbReceives);
         currentReceive = context->GetChannelManagerItemIndex();
 
-        for (int i = 0; i < navigator->GetTrackCount(); i++)
+        for (int i = 0; i < context->GetNbChannels(); i++)
         {
             int receiveIndex = context->GetChannelManagerItemIndex(nbTrackReceives[i] - 1);
 

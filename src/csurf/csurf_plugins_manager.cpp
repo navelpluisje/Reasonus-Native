@@ -76,7 +76,7 @@ public:
         nbPlugins = 0;
         WDL_PtrList<MediaTrack> media_tracks = navigator->GetBankTracks();
 
-        for (int i = 0; i < navigator->GetTrackCount(); i++)
+        for (int i = 0; i < context->GetNbChannels(); i++)
         {
             MediaTrack *media_track = media_tracks.Get(i);
             int _nbTrackPlugins = TrackFX_GetCount(media_track);
@@ -91,7 +91,7 @@ public:
         context->SetChannelManagerItemsCount(nbPlugins);
         currentPlugin = context->GetChannelManagerItemIndex();
 
-        for (int i = 0; i < navigator->GetTrackCount(); i++)
+        for (int i = 0; i < context->GetNbChannels(); i++)
         {
             int faderValue = 0, valueBarValue = 0;
             int pluginIndex = context->GetChannelManagerItemIndex(nbTrackPlugins[i] - 1);

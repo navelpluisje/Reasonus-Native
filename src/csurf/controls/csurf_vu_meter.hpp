@@ -8,7 +8,7 @@
 
 using namespace std;
 
-static ChannelVuMeter channelVuMeters[8] = {
+static ChannelVuMeter channelVuMeters[16] = {
     VU_METER_1,
     VU_METER_2,
     VU_METER_3,
@@ -17,6 +17,14 @@ static ChannelVuMeter channelVuMeters[8] = {
     VU_METER_6,
     VU_METER_7,
     VU_METER_8,
+    VU_METER_9,
+    VU_METER_10,
+    VU_METER_11,
+    VU_METER_12,
+    VU_METER_13,
+    VU_METER_14,
+    VU_METER_15,
+    VU_METER_16,
 };
 
 class CSurf_VuMeter

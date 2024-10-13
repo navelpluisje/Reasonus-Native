@@ -201,7 +201,6 @@ public:
         else
         {
             context->ToggleLastTouchedFxMode();
-            trackNavigator->UpdateTrackCount();
         }
     };
 

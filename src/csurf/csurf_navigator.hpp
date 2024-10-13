@@ -73,10 +73,6 @@ public:
     void HandleFilter(NavigatorFilter filter);
 
     void HandleCustomFilter(string filterName);
-
-    void UpdateTrackCount();
-
-    int GetTrackCount();
 };
 
 #endif
