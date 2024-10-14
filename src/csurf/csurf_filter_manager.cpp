@@ -187,7 +187,10 @@ public:
         CSurf_SetSurfaceSolo(media_track, CSurf_OnSoloChange(media_track, !DAW::IsTrackSoloed(media_track)), NULL);
     }
 
-    void HandleFaderTouch() override {}
+    void HandleFaderTouch(int index) override
+    {
+        (void)index;
+    }
 
     void HandleFaderMove(int index, int msb, int lsb) override
     {

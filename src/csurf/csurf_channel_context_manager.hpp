@@ -46,12 +46,15 @@ public:
 
     void ResetMixButtonClick();
 
+    void HandleEditPluginClick(int trackId, int pluginId);
+
     // ADD ALL THE TRACKMANAGERS METHODS HERE TO PROXY THEM
     void UpdateTracks();
     void HandleMuteClick(int index);
     void HandleSoloClick(int index);
     void HandleSelectClick(int index);
     void HandleFaderMove(int index, int msb, int lsb);
+    void HandleFaderTouch(int index);
 };
 
 #endif

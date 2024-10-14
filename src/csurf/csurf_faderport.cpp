@@ -71,6 +71,13 @@ class CSurf_FaderPort : public IReaperControlSurface
         lastTouchedFxManager->HandleFaderMove(evt->midi_message[2], evt->midi_message[1]);
       }
     }
+    /**
+     * Fader Touch
+     */
+    else if (evt->midi_message[1] >= FADER_TOUCH_1 && evt->midi_message[1] <= FADER_TOUCH_16)
+    {
+      channelContextManager->HandleFaderTouch(evt->midi_message[1] - FADER_TOUCH_1);
+    }
 
     /**
      * ENCODERS & VALUEBAR

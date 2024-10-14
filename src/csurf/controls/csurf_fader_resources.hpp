@@ -1,7 +1,7 @@
 #ifndef CSURF_FADER_RESOURCES_H_
 #define CSURF_FADER_RESOURCES_H_
 
-// Buttons
+// Faders
 enum Faders
 {
     FADER_1 = 0xe0,
@@ -20,6 +20,26 @@ enum Faders
     FADER_14 = 0xed,
     FADER_15 = 0xee,
     FADER_16 = 0xef,
+};
+
+enum FaderTouch
+{
+    FADER_TOUCH_1 = 0x68,
+    FADER_TOUCH_2 = 0x69,
+    FADER_TOUCH_3 = 0x6a,
+    FADER_TOUCH_4 = 0x6b,
+    FADER_TOUCH_5 = 0x6c,
+    FADER_TOUCH_6 = 0x6d,
+    FADER_TOUCH_7 = 0x6e,
+    FADER_TOUCH_8 = 0x6f,
+    FADER_TOUCH_9 = 0x70,
+    FADER_TOUCH_10 = 0x71,
+    FADER_TOUCH_11 = 0x72,
+    FADER_TOUCH_12 = 0x73,
+    FADER_TOUCH_13 = 0x74,
+    FADER_TOUCH_14 = 0x75,
+    FADER_TOUCH_15 = 0x76,
+    FADER_TOUCH_16 = 0x77,
 };
 
 #endif

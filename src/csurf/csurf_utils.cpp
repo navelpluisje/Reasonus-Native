@@ -130,6 +130,11 @@ string GetAutomationString(int automationMode)
 
 string GetReaSonusIniPath() { return string(GetResourcePath()) + "/ReaSonus/FP.ini"; }
 
+string GetReaSonusPluginPath(string pluginName)
+{
+    return string(GetResourcePath()) + "/ReaSonus/Plugins/" + pluginName + ".ini";
+}
+
 bool isInteger(string value)
 {
     char *p;

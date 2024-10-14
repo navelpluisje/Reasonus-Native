@@ -115,6 +115,28 @@ bool DAW::GetTrackFxPanelOpen(MediaTrack *media_track, int fx)
     return ::TrackFX_GetOpen(media_track, fx);
 }
 
+string DAW::GetTrackFxParamName(MediaTrack *media_track, int fx, int param)
+{
+    char paramName[256] = "";
+    if (TrackFX_GetParamName(media_track, fx, param, paramName, size(paramName)))
+    {
+        return paramName;
+    }
+    return "No FX";
+}
+
+int DAW::GetTrackFxParamNbSteps(MediaTrack *media_track, int fx, int param)
+{
+    int nbSteps = 0;
+    double stepOut, _;
+    bool isToggle;
+    if (TrackFX_GetParameterStepSizes(media_track, fx, param, &stepOut, &_, &_, &isToggle))
+    {
+        nbSteps = (int)round(1.0 / stepOut) + 1;
+    }
+    return nbSteps;
+}
+
 bool DAW::HasTrackReceive(MediaTrack *media_track, int receive)
 {
     return GetSetTrackSendInfo(media_track, -1, receive, "P_SRCTRACK", 0) ? true : false;

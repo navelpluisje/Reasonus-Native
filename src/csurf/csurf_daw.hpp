@@ -33,6 +33,9 @@ public:
     static string GetTrackFxSurfceEnabled(MediaTrack *media_track, int fx);
     static bool GetTrackFxPanelOpen(MediaTrack *media_track, int fx);
 
+    static string GetTrackFxParamName(MediaTrack *media_track, int fx, int param);
+    static int GetTrackFxParamNbSteps(MediaTrack *media_track, int fx, int param);
+
     static bool HasTrackReceive(MediaTrack *media_track, int receive);
     static string GetTrackReceiveSrcName(MediaTrack *media_track, int receive);
     static int GetTrackReceiveMode(MediaTrack *media_track, int receive);

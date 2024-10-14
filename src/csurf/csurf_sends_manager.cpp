@@ -182,8 +182,9 @@ public:
         }
     }
 
-    void HandleFaderTouch() override
+    void HandleFaderTouch(int index) override
     {
+        (void)index;
     }
 
     void HandleFaderMove(int index, int msb, int lsb) override

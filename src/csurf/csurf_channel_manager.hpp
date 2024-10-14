@@ -32,6 +32,7 @@ public:
         CSurf_Navigator *navigator,
         CSurf_Context *context,
         midi_Output *m_midiout) : tracks(tracks), navigator(navigator), context(context), m_midiout(m_midiout) {};
+
     virtual ~CSurf_ChannelManager() {};
 
     virtual void UpdateTracks() {};
@@ -51,7 +52,10 @@ public:
         (void)index;
     };
 
-    virtual void HandleFaderTouch() {};
+    virtual void HandleFaderTouch(int index)
+    {
+        (void)index;
+    };
 
     virtual void HandleFaderMove(int index, int msb, int lsb)
     {

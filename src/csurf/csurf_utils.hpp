@@ -131,6 +131,8 @@ string GetAutomationString(int automationMode);
 
 string GetReaSonusIniPath();
 
+string GetReaSonusPluginPath(string pluginName);
+
 bool isInteger(string value);
 
 vector<string> split(string str, string delimiter);

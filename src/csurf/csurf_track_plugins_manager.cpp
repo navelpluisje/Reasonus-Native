@@ -157,8 +157,9 @@ public:
         TrackFX_Show(media_track, pluginIndex, 3);
     }
 
-    void HandleFaderTouch() override
+    void HandleFaderTouch(int index) override
     {
+        (void)index;
     }
 
     void HandleFaderMove(int index, int msb, int lsb) override

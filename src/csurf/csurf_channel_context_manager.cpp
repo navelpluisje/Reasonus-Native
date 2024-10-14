@@ -1,5 +1,6 @@
 #include "csurf_channel_context_manager.hpp"
 #include "csurf_filter_manager.cpp"
+#include "csurf_plugin_learn_manager.cpp"
 #include <reaper_plugin_functions.h>
 
 void CSurf_ChannelContextManager::SetButtonValues(ChannelMode mode)
@@ -123,6 +124,11 @@ void CSurf_ChannelContextManager::ResetMixButtonClick()
     }
 };
 
+void CSurf_ChannelContextManager::HandleEditPluginClick(int trackId, int pluginId)
+{
+    channelManager = new CSurf_PluginLearnManager(tracks, navigator, context, m_midiout);
+};
+
 // ADD ALL THE TRACKMANAGERS METHODS HERE TO PROXY THEM
 void CSurf_ChannelContextManager::UpdateTracks()
 {
@@ -145,3 +151,4 @@ void CSurf_ChannelContextManager::HandleSelectClick(int index)
     ResetMixButtonClick();
 }
 void CSurf_ChannelContextManager::HandleFaderMove(int index, int msb, int lsb) { channelManager->HandleFaderMove(index, msb, lsb); }
+void CSurf_ChannelContextManager::HandleFaderTouch(int index) { channelManager->HandleFaderTouch(index); }
