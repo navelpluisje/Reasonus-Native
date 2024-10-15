@@ -3,9 +3,9 @@
 #include "csurf_plugin_learn_manager.cpp"
 #include <reaper_plugin_functions.h>
 
-void CSurf_ChannelContextManager::SetButtonValues(ChannelMode mode)
+void CSurf_ChannelContextManager::SetButtonValues(ChannelMode channelMode)
 {
-    channelMode = mode;
+    context->SetChannelMode(channelMode);
     trackButton->SetValue(channelMode == TrackMode ? BTN_VALUE_ON : BTN_VALUE_OFF);
     pluginsButton->SetValue(channelMode == PluginMode
                                 ? BTN_VALUE_ON
@@ -42,7 +42,7 @@ CSurf_ChannelContextManager::CSurf_ChannelContextManager(
 
 void CSurf_ChannelContextManager::HandleTrackButtonClick()
 {
-    if (channelMode != TrackMode)
+    if (context->GetChannelMode() != TrackMode)
     {
         SetButtonValues(TrackMode);
         channelManager = new CSurf_TrackManager(tracks, navigator, context, m_midiout);
@@ -53,7 +53,7 @@ void CSurf_ChannelContextManager::HandleTrackButtonClick()
 
 void CSurf_ChannelContextManager::HandlePluginsButtonClick(bool track)
 {
-    if (channelMode != PluginMode && !track)
+    if (context->GetChannelMode() != PluginMode && !track)
     {
         SetButtonValues(PluginMode);
         channelManager = new CSurf_PluginsManager(tracks, navigator, context, m_midiout);
@@ -71,7 +71,7 @@ void CSurf_ChannelContextManager::HandlePluginsButtonClick(bool track)
 
 void CSurf_ChannelContextManager::HandleSendButtonClick(bool track)
 {
-    if (channelMode != SendMode && !track)
+    if (context->GetChannelMode() != SendMode && !track)
     {
         SetButtonValues(SendMode);
         channelManager = new CSurf_SendsManager(tracks, navigator, context, m_midiout);
@@ -87,7 +87,7 @@ void CSurf_ChannelContextManager::HandleSendButtonClick(bool track)
 
 void CSurf_ChannelContextManager::HandlePanButtonClick(bool track)
 {
-    if (channelMode != PanMode && !track)
+    if (context->GetChannelMode() != PanMode && !track)
     {
         SetButtonValues(PanMode);
         channelManager = new CSurf_ReceivesManager(tracks, navigator, context, m_midiout);
@@ -103,10 +103,10 @@ void CSurf_ChannelContextManager::HandlePanButtonClick(bool track)
 
 void CSurf_ChannelContextManager::HandleMixButtonClick()
 {
-    if (channelMode != MixMode)
+    if (context->GetChannelMode() != MixMode)
     {
-        prevChannelMode = channelMode;
-        channelMode = MixMode;
+        prevChannelMode = context->GetChannelMode();
+        context->SetChannelMode(MixMode);
         channelManager = new CSurf_FilterManager(tracks, navigator, context, m_midiout);
         context->SetPanEncoderMode(PanEncoderReceiveMode);
     }
@@ -118,21 +118,23 @@ void CSurf_ChannelContextManager::HandleMixButtonClick()
 
 void CSurf_ChannelContextManager::ResetMixButtonClick()
 {
-    if (channelMode == MixMode)
+    if (context->GetChannelMode() == MixMode)
     {
         HandleTrackButtonClick();
     }
 };
 
-void CSurf_ChannelContextManager::HandleEditPluginClick(int trackId, int pluginId)
+void CSurf_ChannelContextManager::HandleLinkButtonClick()
 {
+    prevChannelMode = context->GetChannelMode();
+    context->SetChannelMode(PluginEditMode);
     channelManager = new CSurf_PluginLearnManager(tracks, navigator, context, m_midiout);
 };
 
 // ADD ALL THE TRACKMANAGERS METHODS HERE TO PROXY THEM
 void CSurf_ChannelContextManager::UpdateTracks()
 {
-    if (channelMode == TrackPluginMode || channelMode == PluginMode)
+    if (context->GetChannelMode() == TrackPluginMode || context->GetChannelMode() == PluginMode)
     {
         int track, fx, _;
         if (GetFocusedFX2(&track, &_, &fx))

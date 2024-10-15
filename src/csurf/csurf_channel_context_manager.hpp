@@ -17,7 +17,6 @@ class CSurf_ChannelContextManager
     std::vector<CSurf_Track *> tracks;
 
     ChannelMode prevChannelMode = TrackMode;
-    ChannelMode channelMode = TrackMode;
     midi_Output *m_midiout;
     CSurf_Navigator *navigator;
     CSurf_Context *context;
@@ -46,7 +45,7 @@ public:
 
     void ResetMixButtonClick();
 
-    void HandleEditPluginClick(int trackId, int pluginId);
+    void HandleLinkButtonClick();
 
     // ADD ALL THE TRACKMANAGERS METHODS HERE TO PROXY THEM
     void UpdateTracks();

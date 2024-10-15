@@ -5,17 +5,14 @@
 #include <WDL/ptrlist.h>
 #include "csurf_track.hpp"
 #include "csurf_channel_manager.hpp"
+#include "csurf_faderport_ui_plugin_edit.hpp"
 #include "csurf_navigator.hpp"
 #include "extern/ini.hpp"
 #include <vector>
 #include "csurf_daw.hpp"
 #include "csurf_utils.hpp"
 
-struct Filter
-{
-    string name;
-    string id;
-};
+using namespace CSURF_FADERPORT_UI_PLUGIN_EDIT;
 
 class CSurf_PluginLearnManager : public CSurf_ChannelManager
 {
@@ -23,38 +20,18 @@ protected:
     bool hasLastTouchedFxEnabled = false;
     mINI::INIStructure ini;
     string fileName;
-    vector<Filter> filters;
+    int updateCount;
 
-    void SetTrackColors(MediaTrack *media_track) override
+    string getParamKey(string prefix, int index)
     {
-        int red = 0xff;
-        int green = 0x00;
-        int blue = 0x00;
-
-        if (!context->GetArm())
-        {
-
-            int trackColor = GetTrackColor(media_track);
-            if (trackColor == 0)
-            {
-                red = 0x7f;
-                green = 0x7f;
-                blue = 0x7f;
-            }
-            else
-            {
-                ColorFromNative(trackColor, &red, &green, &blue);
-            }
-        }
-        colorActive.SetColor(red / 2, green / 2, blue / 2);
-        colorDim.SetColor(red / 4, green / 4, blue / 4);
+        string controlIndex = to_string(context->GetChannelManagerItemIndex() + index);
+        return prefix + controlIndex;
     }
 
     void GetCurrentPlugin()
     {
-        int trackId, itemNumber, takeId, pluginId, paramId;
-
-        GetTouchedOrFocusedFX(1, &trackId, &itemNumber, &takeId, &pluginId, &paramId);
+        int trackId = context->GetPluginEditTrackId();
+        int pluginId = context->GetPluginEditPluginId();
         MediaTrack *media_track = GetTrack(0, trackId);
         string pluginName = DAW::GetTrackFxName(media_track, pluginId);
         fileName = GetReaSonusPluginPath(pluginName);
@@ -65,35 +42,14 @@ protected:
             ini["Global"];
             ini["Global"]["origName"] = pluginName;
             ini["Global"]["name"] = pluginName;
-            file.generate(ini);
+            file.generate(ini, true);
         }
     }
 
-    void GetFaderValue(MediaTrack *media_track, int *faderValue, int *valueBarValue, string *_pan1, string *_pan2)
+    void SaveIniFile()
     {
-        int panMode = 0;
-        double volume, pan1, pan2 = 0.0;
-
-        GetTrackUIVolPan(media_track, &volume, &pan1);
-        GetTrackUIPan(media_track, &pan1, &pan2, &panMode);
-        *_pan1 = GetPanString(pan1, panMode);
-        *_pan2 = GetWidthString(pan2, panMode);
-
-        if (context->GetShiftLeft())
-        {
-            *faderValue = int(panToNormalized(pan1) * 16383.0);
-            *valueBarValue = int(volToNormalized(volume) * 127);
-        }
-        else if (context->GetShiftRight() && panMode > 4)
-        {
-            *faderValue = int(panToNormalized(pan2) * 16383.0);
-            *valueBarValue = int(volToNormalized(volume) * 127);
-        }
-        else
-        {
-            *faderValue = int(volToNormalized(volume) * 16383.0);
-            *valueBarValue = int(panToNormalized(pan1) * 127);
-        }
+        mINI::INIFile file(fileName);
+        file.write(ini, true);
     }
 
 public:
@@ -104,14 +60,31 @@ public:
         midi_Output *m_midiout) : CSurf_ChannelManager(tracks, navigator, context, m_midiout)
     {
         context->ResetChannelManagerItemIndex();
-        context->ResetChannelManagerItemsCount();
+        context->SetChannelManagerItemsCount(127);
         GetCurrentPlugin();
         UpdateTracks();
+        colorActive = ButtonColorWhiteDim;
+        colorDim = ButtonColorWhiteDim;
     }
+
     ~CSurf_PluginLearnManager() {};
 
     void UpdateTracks() override
     {
+        string paramKey;
+        int trackId, itemNumber, takeId, pluginId, paramId;
+        if (GetTouchedOrFocusedFX(0, &trackId, &itemNumber, &takeId, &pluginId, &paramId))
+        {
+            context->SetPluginEditParamId(paramId);
+        }
+
+        if (updateCount > 100)
+        {
+            mINI::INIFile file(fileName);
+            file.read(ini);
+        }
+        updateCount += 1;
+
         for (int i = 0; i < context->GetNbChannels(); i++)
         {
             string filterIndex = to_string(context->GetChannelManagerItemIndex() + i);
@@ -128,20 +101,28 @@ public:
 
             track->SetDisplayMode(DISPLAY_MODE_2, forceUpdate);
 
-            // if (filterIndex < (int)filters.size())
-            // {
-            //     Filter f = filters.at(filterIndex);
-            //     track->SetDisplayLine(1, ALIGN_CENTER, "Filter", INVERT, forceUpdate);
-            //     track->SetDisplayLine(2, ALIGN_CENTER, filters.at(filterIndex).name.c_str(), NON_INVERT, forceUpdate);
-            //     track->SetDisplayLine(3, ALIGN_CENTER, "", NON_INVERT, forceUpdate);
-            // }
-            // else
-            // {
-            track->SetDisplayLine(0, ALIGN_CENTER, "Free", INVERT, forceUpdate);
-            track->SetDisplayLine(1, ALIGN_CENTER, "", NON_INVERT, forceUpdate);
-            track->SetDisplayLine(2, ALIGN_CENTER, "Free", NON_INVERT, forceUpdate);
-            track->SetDisplayLine(3, ALIGN_CENTER, "", NON_INVERT, forceUpdate);
-            // }
+            paramKey = getParamKey("Select_", i);
+            if (ini.has(paramKey))
+            {
+                track->SetDisplayLine(0, ALIGN_CENTER, ini[paramKey]["name"].c_str(), INVERT, forceUpdate);
+            }
+            else
+            {
+                track->SetDisplayLine(0, ALIGN_CENTER, "Free", INVERT, forceUpdate);
+            }
+
+            paramKey = getParamKey("Fader_", i);
+            if (ini.has(paramKey))
+            {
+                track->SetDisplayLine(2, ALIGN_CENTER, ini[paramKey]["name"].c_str(), INVERT, forceUpdate);
+            }
+            else
+            {
+                track->SetDisplayLine(2, ALIGN_CENTER, "Free", INVERT, forceUpdate);
+            }
+
+            track->SetDisplayLine(1, ALIGN_CENTER, "", NON_INVERT, true);
+            track->SetDisplayLine(3, ALIGN_CENTER, "", NON_INVERT, true);
         }
 
         forceUpdate = false;
@@ -149,15 +130,30 @@ public:
 
     void HandleSelectClick(int index) override
     {
-        int trackId, itemNumber, takeId, pluginId, paramId;
-        if (!GetTouchedOrFocusedFX(0, &trackId, &itemNumber, &takeId, &pluginId, &paramId))
-        {
-            return;
-        }
-        string controlIndex = to_string(context->GetChannelManagerItemIndex() + index);
-        string paramKey = "Select_" + controlIndex;
+        int controlIndex = context->GetChannelManagerItemIndex() + index;
+        int trackId = context->GetPluginEditTrackId();
+        int pluginId = context->GetPluginEditPluginId();
+        int paramId = context->GetPluginEditParamId();
 
-        if (!context->GetShiftLeft())
+        string paramKey = getParamKey("Select_", controlIndex);
+
+        if (context->GetShiftLeft())
+        {
+            // Show the edit screen
+            if (!IsPluginEditDialogOpen())
+            {
+                ShowPluginEditDialog(fileName, controlIndex);
+            }
+        }
+        else if (context->GetShiftRight())
+        {
+            if (ini.has(paramKey))
+            {
+                ini.remove(paramKey);
+                SaveIniFile();
+            }
+        }
+        else
         {
             MediaTrack *media_track = GetTrack(0, trackId);
             string paramName = DAW::GetTrackFxParamName(media_track, pluginId, paramId);
@@ -172,28 +168,31 @@ public:
             ini[paramKey]["param"] = to_string(paramId);
             ini[paramKey]["steps"] = to_string(nbSteps);
 
-            mINI::INIFile file(fileName);
-            file.write(ini);
+            SaveIniFile();
         }
         // Open the dialog
     }
 
     void HandleMuteClick(int index) override
     {
+        (void)index;
         // If in edit mode
         // Edit the current assignment
         // Else do nothing
     }
 
-    void HandleSoloClick(int index) override {}
+    void HandleSoloClick(int index) override
+    {
+        (void)index;
+    }
 
     void HandleFaderTouch(int index) override
     {
-        int trackId, itemNumber, takeId, pluginId, paramId;
-        if (!GetTouchedOrFocusedFX(0, &trackId, &itemNumber, &takeId, &pluginId, &paramId))
-        {
-            return;
-        }
+        int trackId = context->GetPluginEditTrackId();
+        int pluginId = context->GetPluginEditPluginId();
+        int paramId = context->GetPluginEditParamId();
+
+        string paramKey = getParamKey("Fader_", index);
 
         if (!context->GetShiftLeft())
         {
@@ -201,21 +200,26 @@ public:
             MediaTrack *media_track = GetTrack(0, trackId);
             string paramName = DAW::GetTrackFxParamName(media_track, pluginId, paramId);
 
-            if (!ini.has("Fader_" + controlIndex))
+            if (!ini.has(paramKey))
             {
-                ini["Fader_" + controlIndex];
+                ini[paramKey];
             }
-            ini["Fader_" + controlIndex]["origName"] = paramName;
-            ini["Fader_" + controlIndex]["name"] = paramName;
-            ini["Fader_" + controlIndex]["param"] = to_string(paramId);
+            ini[paramKey]["origName"] = paramName;
+            ini[paramKey]["name"] = paramName;
+            ini[paramKey]["param"] = to_string(paramId);
 
-            mINI::INIFile file(fileName);
-            file.write(ini);
+            SaveIniFile();
+        }
+        else
+        {
+            if (ini.has(paramKey))
+            {
+                ini.remove(paramKey);
+                SaveIniFile();
+            }
         }
         // Open the fader dialog
     }
-
-    void HandleFaderMove(int index, int msb, int lsb) override {}
 };
 
 #endif

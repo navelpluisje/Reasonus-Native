@@ -6,12 +6,6 @@
 #include <reaper_plugin_functions.h>
 #include "csurf_utils.hpp"
 
-enum ChannelManagerType
-{
-    Track,
-    Hui,
-};
-
 class CSurf_Context
 {
     bool shift_left;
@@ -23,6 +17,10 @@ class CSurf_Context
     bool panPushModePan = true;
     int channelManagerItemIndex = 0;
     int channelManagerItemsCount = 0;
+    int pluginEditTrackId;
+    int pluginEditPluginId;
+    int pluginEditParamId;
+    ChannelMode channelMode = TrackMode;
     ChannelManagerType channelManagerType;
 
 public:
@@ -86,6 +84,18 @@ public:
     void SetChannelManagerItemsCount(int count) { channelManagerItemsCount = count; }
 
     void ResetChannelManagerItemsCount() { channelManagerItemsCount = 0; }
+
+    void SetChannelMode(ChannelMode _channelMode) { channelMode = _channelMode; }
+    ChannelMode GetChannelMode() { return channelMode; }
+
+    void SetPluginEditTrackId(int trackId) { pluginEditTrackId = trackId; };
+    int GetPluginEditTrackId() { return pluginEditTrackId; };
+
+    void SetPluginEditPluginId(int pluginId) { pluginEditPluginId = pluginId; };
+    int GetPluginEditPluginId() { return pluginEditPluginId; };
+
+    void SetPluginEditParamId(int pluginId) { pluginEditParamId = pluginId; };
+    int GetPluginEditParamId() { return pluginEditParamId; };
 
     void SetChannelManagerType(ChannelManagerType type) { channelManagerType = type; }
 };

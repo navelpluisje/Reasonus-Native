@@ -1,11 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
 
-if(APPLE)
-  set(CMAKE_C_COMPILER /usr/bin/gcc)
-  set(CMAKE_CXX_COMPILER /usr/bin/g++)
-  set(CMAKE_MAKE_PROGRAM /usr/bin/make)
-endif()
-
 project(ReasonusNative VERSION 0.0.0 LANGUAGES C CXX)
 
 find_package(Git)

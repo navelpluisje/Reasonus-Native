@@ -39,16 +39,4 @@ string GetAutomationString(int automationMode);
  */
 string GetSendModeString(int sendMode);
 
-enum ChannelMode
-{
-    TrackMode,
-    PluginMode,
-    TrackPluginMode,
-    SendMode,
-    TrackSendMode,
-    PanMode,
-    TrackPanMode,
-    MixMode,
-};
-
 #endif

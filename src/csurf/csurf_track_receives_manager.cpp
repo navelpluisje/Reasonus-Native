@@ -168,10 +168,6 @@ public:
         }
     }
 
-    void HandleFaderTouch() override
-    {
-    }
-
     void HandleFaderMove(int index, int msb, int lsb) override
     {
         MediaTrack *receives_track = GetSelectedTrack(0, 0);

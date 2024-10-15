@@ -164,10 +164,21 @@ public:
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
         int pluginIndex = context->GetChannelManagerItemIndex(nbTrackPlugins[index] - 1);
 
-        // First clean up all open fx windows and then open the plugin in a floating window
-        Main_OnCommandStringEx("_S&M_WNCLS3"); // SWS/S&M: Close all floating FX windows
-        Main_OnCommandStringEx("_S&M_WNCLS4"); // SWS/S&M: Close all FX chain windows
-        TrackFX_Show(media_track, pluginIndex, 3);
+        context->SetPluginEditTrackId(navigator->GetOffset() + index);
+        context->SetPluginEditPluginId(pluginIndex);
+
+        if (DAW::GetTrackFxPanelOpen(media_track, pluginIndex))
+        {
+            TrackFX_Show(media_track, pluginIndex, 0);
+            TrackFX_Show(media_track, pluginIndex, 2);
+        }
+        else
+        {
+            // First clean up all open fx windows and then open the plugin in a floating window
+            Main_OnCommandStringEx("_S&M_WNCLS3"); // SWS/S&M: Close all floating FX windows
+            Main_OnCommandStringEx("_S&M_WNCLS4"); // SWS/S&M: Close all FX chain windows
+            TrackFX_Show(media_track, pluginIndex, 3);
+        }
     }
 
     void HandleFaderTouch(int index) override

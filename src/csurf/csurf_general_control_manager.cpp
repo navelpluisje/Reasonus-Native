@@ -8,6 +8,7 @@
 #include "csurf_faderport_ui_functions.hpp"
 #include "csurf_faderport_ui_filters.hpp"
 #include "controls/csurf_color_button.hpp"
+#include "csurf_channel_context_manager.hpp"
 
 using namespace CSURF_FADERPORT_UI_FUNCTIONS;
 using namespace CSURF_FADERPORT_UI_FILTERS;
@@ -25,6 +26,7 @@ protected:
 
     CSurf_Context *context;
     CSurf_Navigator *trackNavigator;
+    CSurf_ChannelContextManager *channelContextManager;
     midi_Output *m_midiout;
 
     ShiftState armState;
@@ -96,7 +98,8 @@ public:
     CSurf_GeneralControlManager(
         CSurf_Context *context,
         CSurf_Navigator *trackNavigator,
-        midi_Output *m_midiout) : context(context), trackNavigator(trackNavigator), m_midiout(m_midiout)
+        CSurf_ChannelContextManager *channelContextManager,
+        midi_Output *m_midiout) : context(context), trackNavigator(trackNavigator), channelContextManager(channelContextManager), m_midiout(m_midiout)
     {
         armButton = new CSurf_Button(BTN_ARM, BTN_VALUE_OFF, m_midiout);
         soloClearButton = new CSurf_Button(BTN_SOLO_CLEAR, BTN_VALUE_OFF, m_midiout);
@@ -200,7 +203,16 @@ public:
         }
         else
         {
-            context->ToggleLastTouchedFxMode();
+            if (context->GetChannelMode() == TrackPluginMode ||
+                context->GetChannelMode() == PluginMode ||
+                context->GetChannelMode() == PluginEditMode)
+            {
+                channelContextManager->HandleLinkButtonClick();
+            }
+            else
+            {
+                context->ToggleLastTouchedFxMode();
+            }
         }
     };
 

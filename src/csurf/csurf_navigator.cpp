@@ -256,6 +256,11 @@ void CSurf_Navigator::SetOffset(int offset)
     }
 }
 
+int CSurf_Navigator::GetOffset()
+{
+    return track_offset;
+}
+
 void CSurf_Navigator::IncrementOffset(int count)
 {
     if ((track_offset + count) <= (tracks.GetSize() - context->GetNbChannels()))

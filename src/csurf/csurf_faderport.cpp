@@ -399,7 +399,7 @@ public:
     mixManager = new CSurf_MixManager(context, trackNavigator, channelContextManager, m_midiout);
     transportManager = new CSurf_TransportManager(context, m_midiout);
     automationManager = new CSurf_AutomationManager(context, m_midiout);
-    generalControlManager = new CSurf_GeneralControlManager(context, trackNavigator, m_midiout);
+    generalControlManager = new CSurf_GeneralControlManager(context, trackNavigator, channelContextManager, m_midiout);
     lastTouchedFxManager = new CSurf_LastTouchedFXManager(lastTouchedFxTrack, context, m_midiout);
 
     if (errStats)

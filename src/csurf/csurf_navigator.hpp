@@ -60,6 +60,8 @@ public:
 
     void SetOffset(int offset);
 
+    int GetOffset();
+
     void IncrementOffset(int count);
 
     void DecrementOffset(int count);
