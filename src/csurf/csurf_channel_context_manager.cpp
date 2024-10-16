@@ -1,6 +1,7 @@
 #include "csurf_channel_context_manager.hpp"
 #include "csurf_filter_manager.cpp"
 #include "csurf_plugin_learn_manager.cpp"
+#include "csurf_plugin_control_manager.cpp"
 #include <reaper_plugin_functions.h>
 
 void CSurf_ChannelContextManager::SetButtonValues(ChannelMode channelMode)
@@ -126,23 +127,31 @@ void CSurf_ChannelContextManager::ResetMixButtonClick()
 
 void CSurf_ChannelContextManager::HandleLinkButtonClick()
 {
-    prevChannelMode = context->GetChannelMode();
-    context->SetChannelMode(PluginEditMode);
-    channelManager = new CSurf_PluginLearnManager(tracks, navigator, context, m_midiout);
+    if (context->GetChannelMode() == PluginEditMode)
+    {
+        context->SetChannelMode(PluginControlMode);
+        channelManager = new CSurf_PluginControlManager(tracks, navigator, context, m_midiout);
+    }
+    else
+    {
+        prevChannelMode = context->GetChannelMode();
+        context->SetChannelMode(PluginEditMode);
+        channelManager = new CSurf_PluginLearnManager(tracks, navigator, context, m_midiout);
+    }
 };
 
 // ADD ALL THE TRACKMANAGERS METHODS HERE TO PROXY THEM
 void CSurf_ChannelContextManager::UpdateTracks()
 {
-    if (context->GetChannelMode() == TrackPluginMode || context->GetChannelMode() == PluginMode)
-    {
-        int track, fx, _;
-        if (GetFocusedFX2(&track, &_, &fx))
-        {
-            // TODO: Implement fx control
-            // We can do some fx magic, but not now
-        }
-    }
+    // if (context->GetChannelMode() == TrackPluginMode || context->GetChannelMode() == PluginMode)
+    // {
+    //     int track, fx, _;
+    //     if (GetFocusedFX2(&track, &_, &fx))
+    //     {
+    //         // TODO: Implement fx control
+    //         // We can do some fx magic, but not now
+    //     }
+    // }
     channelManager->UpdateTracks();
 }
 void CSurf_ChannelContextManager::HandleMuteClick(int index) { channelManager->HandleMuteClick(index); }

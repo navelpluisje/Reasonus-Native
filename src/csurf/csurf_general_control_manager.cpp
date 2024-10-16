@@ -205,6 +205,7 @@ public:
         {
             if (context->GetChannelMode() == TrackPluginMode ||
                 context->GetChannelMode() == PluginMode ||
+                context->GetChannelMode() == PluginControlMode ||
                 context->GetChannelMode() == PluginEditMode)
             {
                 channelContextManager->HandleLinkButtonClick();

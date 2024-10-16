@@ -12,6 +12,7 @@ enum ChannelMode
     TrackPanMode,
     MixMode,
     PluginEditMode,
+    PluginControlMode,
 };
 
 enum ChannelManagerType
