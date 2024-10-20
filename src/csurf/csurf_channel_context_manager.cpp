@@ -155,7 +155,9 @@ void CSurf_ChannelContextManager::HandleMuteClick(int index) { channelManager->H
 void CSurf_ChannelContextManager::HandleSoloClick(int index)
 {
     channelManager->HandleSoloClick(index);
-    if ((context->GetChannelMode() == TrackPluginMode || context->GetChannelMode() == PluginMode) && (context->GetPluginEditPluginId() > -1))
+    if (context->GetPluginControl() &&
+        (context->GetChannelMode() == TrackPluginMode || context->GetChannelMode() == PluginMode) &&
+        (context->GetPluginEditPluginId() > -1))
     {
         if (!hasPluginConfigFile(context->GetPluginEditTrack(), context->GetPluginEditPluginId()))
         {

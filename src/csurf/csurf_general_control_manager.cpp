@@ -212,8 +212,9 @@ public:
         }
         else
         {
-            if (context->GetChannelMode() == PluginControlMode ||
-                context->GetChannelMode() == PluginEditMode)
+            if (context->GetPluginControl() &&
+                (context->GetChannelMode() == PluginControlMode ||
+                 context->GetChannelMode() == PluginEditMode))
             {
                 channelContextManager->HandleLinkButtonClick();
             }

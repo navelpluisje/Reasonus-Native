@@ -20,7 +20,7 @@
 #include "csurf_navigator.hpp"
 #include "controls/csurf_button.hpp"
 #include "csurf_utils.hpp"
-#include "csurf_faderport_ui.hpp"
+#include "csurf_faderport_ui_init.hpp"
 #include <WDL/ptrlist.h>
 #include "../src/resource.h"
 #include <vector>
@@ -29,6 +29,8 @@
 #include <localize/localize.h>
 
 extern HWND g_hwnd;
+
+using namespace CSURF_FADERPORT_UI_INIT;
 
 class CSurf_FaderPort : public IReaperControlSurface
 {
@@ -390,6 +392,7 @@ public:
     m_midiout = m_midi_out_dev >= 0 ? CreateMIDIOutput(m_midi_out_dev, false, NULL) : NULL;
 
     context = new CSurf_Context(stoi(ini["Surface"]["Surface"]));
+    context->SetPluginControl(ini["Surface"].has("disable-plugins") && ini["Surface"]["disable-plugins"] != "1");
 
     for (int i = 0; i < context->GetNbChannels(); i++)
     {
@@ -543,15 +546,9 @@ static IReaperControlSurface *createFunc(const char *type_string, const char *co
   return new CSurf_FaderPort(parms[2], parms[3], errStats);
 }
 
-static HWND configFunc(const char *type_string, HWND parent, const char *initConfigString)
-{
-  (void)type_string;
-  return CreateDialogParam(g_hInst, MAKEINTRESOURCE(IDD_DIALOG_REASONUS_NATIVE), parent, dlgProc, (LPARAM)initConfigString);
-}
-
 reaper_csurf_reg_t csurf_faderport_reg = {
     "REASONUS_FADERPORT",
     "ReaSonus FaderPort",
     createFunc,
-    configFunc,
+    CreateInitDialog,
 };

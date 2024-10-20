@@ -20,7 +20,6 @@ using namespace std;
 
 namespace CSURF_FADERPORT_UI_FUNCTIONS
 {
-    // static mINI::INIFile file(GetReaSonusIniPath());
     static mINI::INIStructure ini;
     static HWND s_hwndReaSonusFunctionsDlg = NULL;
     static string functionsDlgSelectedFunction = "";

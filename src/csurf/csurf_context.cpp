@@ -8,15 +8,26 @@
 
 class CSurf_Context
 {
+    // Global settings
+    bool plugin_control;
+    int nbChannels = 8;
+
+    // Shift keys
     bool shift_left;
     bool shift_right;
     bool arm;
+
+    // Last touched fx
     bool lastTouchedFxMode;
-    int nbChannels = 8;
+
+    // Pan encoder modes
     PanEncoderMode panEncoderMode = PanEncoderPanMode;
     bool panPushModePan = true;
+
+    // Channel manager
     int channelManagerItemIndex = 0;
     int channelManagerItemsCount = 0;
+
     // Plugin Edit fields
     MediaTrack *pluginEditTrack;
     int pluginEditPluginId;
@@ -30,6 +41,9 @@ public:
     {
     }
     ~CSurf_Context() {}
+
+    void SetPluginControl(bool enabled) { plugin_control = enabled; }
+    bool GetPluginControl() { return plugin_control; }
 
     void SetShiftLeft(bool val) { shift_left = val; }
     bool GetShiftLeft() { return shift_left; }
