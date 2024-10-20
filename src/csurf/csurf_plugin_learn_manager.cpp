@@ -29,9 +29,8 @@ protected:
 
     void GetCurrentPlugin()
     {
-        int trackId = context->GetPluginEditTrackId();
         int pluginId = context->GetPluginEditPluginId();
-        MediaTrack *media_track = GetTrack(0, trackId);
+        MediaTrack *media_track = context->GetPluginEditTrack();
         string pluginName = DAW::GetTrackFxName(media_track, pluginId);
         fileName = GetReaSonusPluginPath(pluginName);
 
@@ -130,7 +129,6 @@ public:
     void HandleSelectClick(int index) override
     {
         int controlIndex = context->GetChannelManagerItemIndex() + index;
-        int trackId = context->GetPluginEditTrackId();
         int pluginId = context->GetPluginEditPluginId();
         int paramId = context->GetPluginEditParamId();
 
@@ -154,7 +152,7 @@ public:
         }
         else
         {
-            MediaTrack *media_track = GetTrack(0, trackId);
+            MediaTrack *media_track = context->GetPluginEditTrack();
             string paramName = DAW::GetTrackFxParamName(media_track, pluginId, paramId);
             int nbSteps = DAW::GetTrackFxParamNbSteps(media_track, pluginId, paramId);
 
@@ -188,7 +186,6 @@ public:
     void HandleFaderTouch(int index) override
     {
         int controlIndex = context->GetChannelManagerItemIndex() + index;
-        int trackId = context->GetPluginEditTrackId();
         int pluginId = context->GetPluginEditPluginId();
         int paramId = context->GetPluginEditParamId();
 
@@ -213,7 +210,7 @@ public:
         }
         else
         {
-            MediaTrack *media_track = GetTrack(0, trackId);
+            MediaTrack *media_track = context->GetPluginEditTrack();
             string paramName = DAW::GetTrackFxParamName(media_track, pluginId, paramId);
 
             if (!ini.has(paramKey))

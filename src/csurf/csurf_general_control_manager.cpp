@@ -127,7 +127,16 @@ public:
 
     void HandleEncoderClick()
     {
-        context->TogglePanPushMode();
+        if (context->GetShiftLeft())
+        {
+            MediaTrack *media_track = GetSelectedTrack(0, 0);
+            SetMediaTrackInfo_Value(media_track, "D_PAN", 0);
+            SetMediaTrackInfo_Value(media_track, "D_WIDTH", 0);
+        }
+        else
+        {
+            context->TogglePanPushMode();
+        }
     }
 
     void HandleEncoderChange(int val)
@@ -203,9 +212,7 @@ public:
         }
         else
         {
-            if (context->GetChannelMode() == TrackPluginMode ||
-                context->GetChannelMode() == PluginMode ||
-                context->GetChannelMode() == PluginControlMode ||
+            if (context->GetChannelMode() == PluginControlMode ||
                 context->GetChannelMode() == PluginEditMode)
             {
                 channelContextManager->HandleLinkButtonClick();

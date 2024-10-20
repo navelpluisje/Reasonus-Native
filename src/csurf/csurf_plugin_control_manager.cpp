@@ -29,9 +29,8 @@ protected:
 
     void GetCurrentPlugin()
     {
-        int trackId = context->GetPluginEditTrackId();
+        MediaTrack *media_track = context->GetPluginEditTrack();
         int pluginId = context->GetPluginEditPluginId();
-        MediaTrack *media_track = GetTrack(0, trackId);
         string pluginName = DAW::GetTrackFxName(media_track, pluginId);
         fileName = GetReaSonusPluginPath(pluginName);
 
@@ -134,9 +133,8 @@ public:
     {
         double min, max = 0.0;
         int controlIndex = context->GetChannelManagerItemIndex() + index;
-        int trackId = context->GetPluginEditTrackId();
+        MediaTrack *media_track = context->GetPluginEditTrack();
         int pluginId = context->GetPluginEditPluginId();
-        MediaTrack *media_track = GetTrack(0, trackId);
         string paramKey = getParamKey("Select_", controlIndex);
 
         if (ini.has(paramKey))
@@ -166,14 +164,13 @@ public:
     void HandleFaderMove(int index, int msb, int lsb) override
     {
         int controlIndex = context->GetChannelManagerItemIndex() + index;
-        int trackId = context->GetPluginEditTrackId();
         int pluginId = context->GetPluginEditPluginId();
 
         string paramKey = getParamKey("Fader_", controlIndex);
 
         if (ini.has(paramKey))
         {
-            MediaTrack *media_track = GetTrack(0, trackId);
+            MediaTrack *media_track = context->GetPluginEditTrack();
             double value = int14ToNormalized(msb, lsb);
 
             TrackFX_SetParam(media_track, pluginId, stoi(ini[paramKey]["param"]), value);

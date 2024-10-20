@@ -182,6 +182,16 @@ string join(vector<string> list, string delimiter)
     return result;
 }
 
+bool hasPluginConfigFile(MediaTrack *media_track, int pluginId)
+{
+    char buffer[255];
+    if (!TrackFX_GetFXName(media_track, pluginId, buffer, sizeof(buffer)))
+    {
+        return false;
+    }
+    return file_exists(GetReaSonusPluginPath(StripFxType(buffer)).c_str());
+}
+
 void logInteger(const char *key, int value)
 {
     char buffer[250];

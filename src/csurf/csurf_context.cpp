@@ -17,9 +17,11 @@ class CSurf_Context
     bool panPushModePan = true;
     int channelManagerItemIndex = 0;
     int channelManagerItemsCount = 0;
-    int pluginEditTrackId;
+    // Plugin Edit fields
+    MediaTrack *pluginEditTrack;
     int pluginEditPluginId;
     int pluginEditParamId;
+
     ChannelMode channelMode = TrackMode;
     ChannelManagerType channelManagerType;
 
@@ -88,8 +90,8 @@ public:
     void SetChannelMode(ChannelMode _channelMode) { channelMode = _channelMode; }
     ChannelMode GetChannelMode() { return channelMode; }
 
-    void SetPluginEditTrackId(int trackId) { pluginEditTrackId = trackId; };
-    int GetPluginEditTrackId() { return pluginEditTrackId; };
+    void SetPluginEditTrack(MediaTrack *track) { pluginEditTrack = track; };
+    MediaTrack *GetPluginEditTrack() { return pluginEditTrack; };
 
     void SetPluginEditPluginId(int pluginId) { pluginEditPluginId = pluginId; };
     int GetPluginEditPluginId() { return pluginEditPluginId; };

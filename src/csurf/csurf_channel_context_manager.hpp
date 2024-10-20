@@ -29,7 +29,10 @@ class CSurf_ChannelContextManager
     void SetButtonValues(ChannelMode mode);
 
 public:
-    CSurf_ChannelContextManager(CSurf_Context *context, CSurf_Navigator *navigator, midi_Output *m_midiout);
+    CSurf_ChannelContextManager(
+        CSurf_Context *context,
+        CSurf_Navigator *navigator,
+        midi_Output *m_midiout);
 
     ~CSurf_ChannelContextManager() {};
 
@@ -46,6 +49,8 @@ public:
     void ResetMixButtonClick();
 
     void HandleLinkButtonClick();
+
+    void SetPluginControlMode();
 
     // ADD ALL THE TRACKMANAGERS METHODS HERE TO PROXY THEM
     void UpdateTracks();

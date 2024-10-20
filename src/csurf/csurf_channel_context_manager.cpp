@@ -140,22 +140,38 @@ void CSurf_ChannelContextManager::HandleLinkButtonClick()
     }
 };
 
+void CSurf_ChannelContextManager::SetPluginControlMode()
+{
+    context->SetChannelMode(PluginControlMode);
+    channelManager = new CSurf_PluginControlManager(tracks, navigator, context, m_midiout);
+}
+
 // ADD ALL THE TRACKMANAGERS METHODS HERE TO PROXY THEM
 void CSurf_ChannelContextManager::UpdateTracks()
 {
-    // if (context->GetChannelMode() == TrackPluginMode || context->GetChannelMode() == PluginMode)
-    // {
-    //     int track, fx, _;
-    //     if (GetFocusedFX2(&track, &_, &fx))
-    //     {
-    //         // TODO: Implement fx control
-    //         // We can do some fx magic, but not now
-    //     }
-    // }
     channelManager->UpdateTracks();
 }
 void CSurf_ChannelContextManager::HandleMuteClick(int index) { channelManager->HandleMuteClick(index); }
-void CSurf_ChannelContextManager::HandleSoloClick(int index) { channelManager->HandleSoloClick(index); }
+void CSurf_ChannelContextManager::HandleSoloClick(int index)
+{
+    channelManager->HandleSoloClick(index);
+    if ((context->GetChannelMode() == TrackPluginMode || context->GetChannelMode() == PluginMode) && (context->GetPluginEditPluginId() > -1))
+    {
+        if (!hasPluginConfigFile(context->GetPluginEditTrack(), context->GetPluginEditPluginId()))
+        {
+            if (context->GetShiftLeft() && MB("Do you want to configure this plugin?", "No plugin configuration", 1) == 1)
+            {
+                context->SetChannelMode(PluginEditMode);
+                channelManager = new CSurf_PluginLearnManager(tracks, navigator, context, m_midiout);
+            }
+        }
+        else
+        {
+            context->SetChannelMode(PluginControlMode);
+            channelManager = new CSurf_PluginControlManager(tracks, navigator, context, m_midiout);
+        }
+    }
+}
 void CSurf_ChannelContextManager::HandleSelectClick(int index)
 {
     channelManager->HandleSelectClick(index);

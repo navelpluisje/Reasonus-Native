@@ -71,13 +71,6 @@ class CSurf_FaderPort : public IReaperControlSurface
         lastTouchedFxManager->HandleFaderMove(evt->midi_message[2], evt->midi_message[1]);
       }
     }
-    /**
-     * Fader Touch
-     */
-    else if (evt->midi_message[1] >= FADER_TOUCH_1 && evt->midi_message[1] <= FADER_TOUCH_16)
-    {
-      channelContextManager->HandleFaderTouch(evt->midi_message[1] - FADER_TOUCH_1);
-    }
 
     /**
      * ENCODERS & VALUEBAR
@@ -113,6 +106,14 @@ class CSurf_FaderPort : public IReaperControlSurface
       }
 
       /**
+       * Fader Touch
+       */
+      else if (evt->midi_message[1] >= FADER_TOUCH_1 && evt->midi_message[1] <= FADER_TOUCH_16)
+      {
+        channelContextManager->HandleFaderTouch(evt->midi_message[1] - FADER_TOUCH_1);
+      }
+
+      /**
        * Track Select Buttons
        */
       else if (evt->midi_message[1] >= BTN_SELECT_1 && evt->midi_message[1] <= BTN_SELECT_8)
@@ -145,9 +146,13 @@ class CSurf_FaderPort : public IReaperControlSurface
       {
         channelContextManager->HandleSoloClick(evt->midi_message[1] - BTN_SOLO_1);
       }
-      else if (evt->midi_message[1] >= BTN_SOLO_9 && evt->midi_message[1] <= BTN_SOLO_16)
+      else if (evt->midi_message[1] >= BTN_SOLO_9 && evt->midi_message[1] <= BTN_SOLO_14)
       {
         channelContextManager->HandleSoloClick(evt->midi_message[1] - BTN_SOLO_9 + 8);
+      }
+      else if (evt->midi_message[1] == BTN_SOLO_14 || evt->midi_message[1] == BTN_SOLO_15)
+      {
+        channelContextManager->HandleSoloClick(evt->midi_message[1] == BTN_SOLO_14 ? 14 : 15);
       }
 
       /**

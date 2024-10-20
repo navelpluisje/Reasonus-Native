@@ -112,6 +112,10 @@ string DAW::GetTrackFxSurfceEnabled(MediaTrack *media_track, int fx)
 
 bool DAW::GetTrackFxPanelOpen(MediaTrack *media_track, int fx)
 {
+    if (TrackFX_GetCount(media_track) < 1)
+    {
+        return false;
+    }
     return ::TrackFX_GetOpen(media_track, fx);
 }
 

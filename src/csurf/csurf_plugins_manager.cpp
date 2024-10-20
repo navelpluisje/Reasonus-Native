@@ -118,10 +118,14 @@ public:
 
             track->SetTrackColor(colorActive, colorDim);
             track->SetSelectButtonValue(DAW::IsTrackSelected(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF);
-            track->SetMuteButtonValue((context->GetShiftLeft() && DAW::GetTrackFxEnabled(media_track, pluginIndex)) ? BTN_VALUE_BLINK
-                                      : DAW::GetTrackFxEnabled(media_track, pluginIndex)                            ? BTN_VALUE_ON
-                                                                                                                    : BTN_VALUE_OFF);
-            track->SetSoloButtonValue(DAW::GetTrackFxPanelOpen(media_track, pluginIndex) ? BTN_VALUE_ON : BTN_VALUE_OFF);
+            track->SetMuteButtonValue((context->GetShiftLeft() && DAW::GetTrackFxEnabled(media_track, pluginIndex))
+                                          ? BTN_VALUE_BLINK
+                                      : DAW::GetTrackFxEnabled(media_track, pluginIndex) ? BTN_VALUE_ON
+                                                                                         : BTN_VALUE_OFF);
+            track->SetSoloButtonValue(DAW::GetTrackFxPanelOpen(media_track, pluginIndex)
+                                          ? BTN_VALUE_BLINK
+                                      : hasPluginConfigFile(media_track, pluginIndex) ? BTN_VALUE_ON
+                                                                                      : BTN_VALUE_OFF);
             track->SetFaderValue(faderValue);
             track->SetValueBarMode(VALUEBAR_MODE_BIPOLAR);
             track->SetValueBarValue(valueBarValue);
@@ -164,13 +168,14 @@ public:
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
         int pluginIndex = context->GetChannelManagerItemIndex(nbTrackPlugins[index] - 1);
 
-        context->SetPluginEditTrackId(navigator->GetOffset() + index);
-        context->SetPluginEditPluginId(pluginIndex);
-
+        // If the current plugin window is open, close it
+        // Otherwise Close all other open windows and open the plugin window
         if (DAW::GetTrackFxPanelOpen(media_track, pluginIndex))
         {
             TrackFX_Show(media_track, pluginIndex, 0);
             TrackFX_Show(media_track, pluginIndex, 2);
+            context->SetPluginEditTrack(NULL);
+            context->SetPluginEditPluginId(-1);
         }
         else
         {
@@ -178,12 +183,10 @@ public:
             Main_OnCommandStringEx("_S&M_WNCLS3"); // SWS/S&M: Close all floating FX windows
             Main_OnCommandStringEx("_S&M_WNCLS4"); // SWS/S&M: Close all FX chain windows
             TrackFX_Show(media_track, pluginIndex, 3);
+            context->SetPluginEditTrack(media_track);
+            context->SetPluginEditPluginId(pluginIndex);
+            // We need to check if the plugin is available and then set the correct manager
         }
-    }
-
-    void HandleFaderTouch(int index) override
-    {
-        (void)index;
     }
 
     void HandleFaderMove(int index, int msb, int lsb) override

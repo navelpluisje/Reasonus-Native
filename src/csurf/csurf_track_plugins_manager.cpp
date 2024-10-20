@@ -108,7 +108,10 @@ public:
             track->SetMuteButtonValue((context->GetShiftLeft() && DAW::GetTrackFxEnabled(plugin_track, pluginIndex)) ? BTN_VALUE_BLINK
                                       : DAW::GetTrackFxEnabled(plugin_track, pluginIndex)                            ? BTN_VALUE_ON
                                                                                                                      : BTN_VALUE_OFF);
-            track->SetSoloButtonValue(DAW::GetTrackFxPanelOpen(plugin_track, pluginIndex) ? BTN_VALUE_ON : BTN_VALUE_OFF);
+            track->SetSoloButtonValue(DAW::GetTrackFxPanelOpen(media_track, pluginIndex)
+                                          ? BTN_VALUE_BLINK
+                                      : hasPluginConfigFile(media_track, pluginIndex) ? BTN_VALUE_ON
+                                                                                      : BTN_VALUE_OFF);
             track->SetFaderValue(faderValue);
             track->SetValueBarMode(VALUEBAR_MODE_BIPOLAR);
             track->SetValueBarValue(valueBarValue);
@@ -151,15 +154,22 @@ public:
         MediaTrack *media_track = GetSelectedTrack(0, 0);
         int pluginIndex = context->GetChannelManagerItemIndex() + index;
 
-        // First clean up all open fx windows and then open the plugin in a floating window
-        Main_OnCommandStringEx("_S&M_WNCLS3"); // SWS/S&M: Close all floating FX windows
-        Main_OnCommandStringEx("_S&M_WNCLS4"); // SWS/S&M: Close all FX chain windows
-        TrackFX_Show(media_track, pluginIndex, 3);
-    }
-
-    void HandleFaderTouch(int index) override
-    {
-        (void)index;
+        if (DAW::GetTrackFxPanelOpen(media_track, pluginIndex))
+        {
+            TrackFX_Show(media_track, pluginIndex, 0);
+            TrackFX_Show(media_track, pluginIndex, 2);
+            context->SetPluginEditTrack(NULL);
+            context->SetPluginEditPluginId(-1);
+        }
+        else
+        {
+            // First clean up all open fx windows and then open the plugin in a floating window
+            Main_OnCommandStringEx("_S&M_WNCLS3"); // SWS/S&M: Close all floating FX windows
+            Main_OnCommandStringEx("_S&M_WNCLS4"); // SWS/S&M: Close all FX chain windows
+            TrackFX_Show(media_track, pluginIndex, 3);
+            context->SetPluginEditTrack(media_track);
+            context->SetPluginEditPluginId(pluginIndex);
+        }
     }
 
     void HandleFaderMove(int index, int msb, int lsb) override
