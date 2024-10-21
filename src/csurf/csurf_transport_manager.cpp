@@ -27,15 +27,12 @@ class CSurf_TransportManager
 
     void SetButtonValues()
     {
-        playButton->SetValue(isPaused ? BTN_VALUE_BLINK : isPlaying ? BTN_VALUE_ON
-                                                                    : BTN_VALUE_OFF);
+        playButton->SetValue(ButtonBlinkOnOff(isPaused, isPlaying));
         stopButton->SetValue(isStopped ? BTN_VALUE_ON : BTN_VALUE_OFF);
         recordButton->SetValue(isRecording ? BTN_VALUE_ON : BTN_VALUE_OFF);
         repeatButton->SetValue(isRepeat ? BTN_VALUE_ON : BTN_VALUE_OFF);
-        rewindButton->SetValue(isRewinding && isFastFwdRwd ? BTN_VALUE_BLINK : isRewinding ? BTN_VALUE_ON
-                                                                                           : BTN_VALUE_OFF);
-        forwardButton->SetValue(isForwarding && isFastFwdRwd ? BTN_VALUE_BLINK : isForwarding ? BTN_VALUE_ON
-                                                                                              : BTN_VALUE_OFF);
+        rewindButton->SetValue(ButtonBlinkOnOff(isRewinding && isFastFwdRwd, isRewinding));
+        forwardButton->SetValue(ButtonBlinkOnOff(isForwarding && isFastFwdRwd, isForwarding));
     };
 
     void StopRewindOrForward()

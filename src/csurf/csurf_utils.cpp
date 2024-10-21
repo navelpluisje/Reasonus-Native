@@ -1,4 +1,5 @@
 #include "csurf_utils.hpp"
+#include "csurf_daw.hpp"
 #include <db2val.h>
 #include <reaper_plugin_functions.h>
 #include <string>
@@ -69,7 +70,7 @@ double int14ToVol(unsigned char msb, unsigned char lsb)
     return DB2VAL(pos);
 }
 
-string StripFxType(char *name)
+string StripPluginNamePrefixes(char *name)
 {
     string s = string(name);
     string delimiter = ": ";
@@ -79,6 +80,19 @@ string StripFxType(char *name)
         return s;
     }
     s.erase(0, pos);
+    return s;
+}
+
+string StripPluginChannelPostfix(char *name)
+{
+    string s = string(name);
+    string delimiter = " (32 out)";
+    int pos = s.find(delimiter);
+    if (pos < 0)
+    {
+        return s;
+    }
+    s.erase(s.find(delimiter), size(delimiter));
     return s;
 }
 
@@ -130,9 +144,13 @@ string GetAutomationString(int automationMode)
 
 string GetReaSonusIniPath() { return string(GetResourcePath()) + "/ReaSonus/FP.ini"; }
 
-string GetReaSonusPluginPath(string pluginName)
+string GetReaSonusPluginPath(string developer, string pluginName, bool create)
 {
-    return string(GetResourcePath()) + "/ReaSonus/Plugins/" + pluginName + ".ini";
+    if (create)
+    {
+        RecursiveCreateDirectory((string(GetResourcePath()) + "/ReaSonus/Plugins/" + developer).c_str(), 0);
+    }
+    return string(GetResourcePath()) + "/ReaSonus/Plugins/" + developer + "/" + pluginName + ".ini";
 }
 
 bool isInteger(string value)
@@ -184,12 +202,10 @@ string join(vector<string> list, string delimiter)
 
 bool hasPluginConfigFile(MediaTrack *media_track, int pluginId)
 {
-    char buffer[255];
-    if (!TrackFX_GetFXName(media_track, pluginId, buffer, sizeof(buffer)))
-    {
-        return false;
-    }
-    return file_exists(GetReaSonusPluginPath(StripFxType(buffer)).c_str());
+    string pluginName = DAW::GetTrackFxName(media_track, pluginId);
+    string developerName = DAW::GetTrackFxDeveloper(media_track, pluginId);
+
+    return file_exists(GetReaSonusPluginPath(developerName, pluginName).c_str());
 }
 
 void logInteger(const char *key, int value)

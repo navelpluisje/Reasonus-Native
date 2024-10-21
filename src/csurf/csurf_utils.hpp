@@ -109,7 +109,15 @@ double int14ToVol(unsigned char msb, unsigned char lsb);
  * @param name The full plugin name
  * @return string
  */
-string StripFxType(char *name);
+string StripPluginNamePrefixes(char *name);
+
+/**
+ * @brief Strip the final out info when applicable
+ *
+ * @param name
+ * @return string
+ */
+string StripPluginChannelPostfix(char *name);
 
 string Progress(int current, int total);
 
@@ -131,7 +139,7 @@ string GetAutomationString(int automationMode);
 
 string GetReaSonusIniPath();
 
-string GetReaSonusPluginPath(string pluginName);
+string GetReaSonusPluginPath(string developer, string pluginName, bool create = false);
 
 bool isInteger(string value);
 

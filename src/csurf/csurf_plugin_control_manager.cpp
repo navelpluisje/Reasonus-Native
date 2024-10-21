@@ -32,7 +32,8 @@ protected:
         MediaTrack *media_track = context->GetPluginEditTrack();
         int pluginId = context->GetPluginEditPluginId();
         string pluginName = DAW::GetTrackFxName(media_track, pluginId);
-        fileName = GetReaSonusPluginPath(pluginName);
+        string developerName = DAW::GetTrackFxDeveloper(media_track, pluginId);
+        fileName = GetReaSonusPluginPath(developerName, pluginName);
 
         mINI::INIFile file(fileName);
         if (!file.read(ini))
@@ -40,6 +41,7 @@ protected:
             ini["Global"];
             ini["Global"]["origName"] = pluginName;
             ini["Global"]["name"] = pluginName;
+            ini["Global"]["developer"] = developerName;
             file.generate(ini, true);
         }
     }
@@ -70,15 +72,10 @@ public:
     void UpdateTracks() override
     {
         string paramKey;
-        int trackId, itemNumber, takeId, pluginId, paramId;
         double min, max = 0.0;
 
-        if (GetTouchedOrFocusedFX(1, &trackId, &itemNumber, &takeId, &pluginId, &paramId))
-        {
-            context->SetPluginEditParamId(paramId);
-        }
-
-        MediaTrack *media_track = GetTrack(0, trackId);
+        MediaTrack *media_track = context->GetPluginEditTrack();
+        int pluginId = context->GetPluginEditPluginId();
 
         for (int i = 0; i < context->GetNbChannels(); i++)
         {

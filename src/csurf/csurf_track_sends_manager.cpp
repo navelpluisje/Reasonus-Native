@@ -109,10 +109,7 @@ public:
 
             track->SetTrackColor(colorActive, colorDim);
             track->SetSelectButtonValue(DAW::IsTrackSelected(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF);
-            track->SetMuteButtonValue((context->GetShiftLeft() && DAW::GetTrackSendMute(sends_track, sendIndex))
-                                          ? BTN_VALUE_BLINK
-                                      : DAW::GetTrackSendMute(sends_track, sendIndex) ? BTN_VALUE_ON
-                                                                                      : BTN_VALUE_OFF);
+            track->SetMuteButtonValue(ButtonBlinkOnOff((context->GetShiftLeft() && DAW::GetTrackSendMute(sends_track, sendIndex)), DAW::GetTrackSendMute(sends_track, sendIndex)));
             track->SetSoloButtonValue(((context->GetShiftLeft() && DAW::GetTrackSendMono(sends_track, sendIndex)) || (!context->GetShiftLeft() && DAW::GetTrackSendPhase(sends_track, sendIndex)))
                                           ? BTN_VALUE_ON
                                           : BTN_VALUE_OFF);

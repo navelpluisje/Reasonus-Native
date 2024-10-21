@@ -27,7 +27,8 @@ public:
     static int GetTrackSurfacePeakInfo(MediaTrack *media_track);
 
     static bool HasTrackFx(MediaTrack *media_track, int fx);
-    static string GetTrackFxName(MediaTrack *media_track, int fx);
+    static string GetTrackFxName(MediaTrack *media_track, int fx, bool full = false);
+    static string GetTrackFxDeveloper(MediaTrack *media_track, int fx);
     static bool GetTrackFxEnabled(MediaTrack *media_track, int fx);
     static bool GetTrackFxOffline(MediaTrack *media_track, int fx);
     static string GetTrackFxSurfceEnabled(MediaTrack *media_track, int fx);

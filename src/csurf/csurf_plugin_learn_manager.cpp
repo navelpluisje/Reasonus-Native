@@ -31,15 +31,18 @@ protected:
     {
         int pluginId = context->GetPluginEditPluginId();
         MediaTrack *media_track = context->GetPluginEditTrack();
+        string fullName = DAW::GetTrackFxName(media_track, pluginId, true);
         string pluginName = DAW::GetTrackFxName(media_track, pluginId);
-        fileName = GetReaSonusPluginPath(pluginName);
+        string developerName = DAW::GetTrackFxDeveloper(media_track, pluginId);
+        fileName = GetReaSonusPluginPath(developerName, pluginName);
 
         mINI::INIFile file(fileName);
         if (!file.read(ini))
         {
             ini["Global"];
-            ini["Global"]["origName"] = pluginName;
+            ini["Global"]["origName"] = fullName;
             ini["Global"]["name"] = pluginName;
+            ini["Global"]["developer"] = pluginName;
             file.generate(ini, true);
         }
     }

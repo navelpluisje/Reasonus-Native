@@ -108,24 +108,19 @@ public:
                 track->SetDisplayLine(1, ALIGN_LEFT, DAW::GetTrackFxName(media_track, pluginIndex).c_str(), INVERT);
                 track->SetDisplayLine(2, ALIGN_CENTER, DAW::GetTrackFxSurfceEnabled(media_track, pluginIndex).c_str());
                 track->SetDisplayLine(3, ALIGN_CENTER, Progress(pluginIndex + 1, nbTrackPlugins[i]).c_str());
+                track->SetMuteButtonValue(ButtonBlinkOnOff((context->GetShiftLeft() && !DAW::GetTrackFxEnabled(media_track, pluginIndex)), !DAW::GetTrackFxEnabled(media_track, pluginIndex)));
             }
             else
             {
                 track->SetDisplayLine(1, ALIGN_LEFT, "No Fx", INVERT);
                 track->SetDisplayLine(2, ALIGN_CENTER, "");
                 track->SetDisplayLine(3, ALIGN_CENTER, "");
+                track->SetMuteButtonValue(BTN_VALUE_OFF);
             }
 
             track->SetTrackColor(colorActive, colorDim);
             track->SetSelectButtonValue(DAW::IsTrackSelected(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF);
-            track->SetMuteButtonValue((context->GetShiftLeft() && DAW::GetTrackFxEnabled(media_track, pluginIndex))
-                                          ? BTN_VALUE_BLINK
-                                      : DAW::GetTrackFxEnabled(media_track, pluginIndex) ? BTN_VALUE_ON
-                                                                                         : BTN_VALUE_OFF);
-            track->SetSoloButtonValue(DAW::GetTrackFxPanelOpen(media_track, pluginIndex)
-                                          ? BTN_VALUE_BLINK
-                                      : hasPluginConfigFile(media_track, pluginIndex) ? BTN_VALUE_ON
-                                                                                      : BTN_VALUE_OFF);
+            track->SetSoloButtonValue(ButtonBlinkOnOff(DAW::GetTrackFxPanelOpen(media_track, pluginIndex), hasPluginConfigFile(media_track, pluginIndex)));
             track->SetFaderValue(faderValue);
             track->SetValueBarMode(VALUEBAR_MODE_BIPOLAR);
             track->SetValueBarValue(valueBarValue);

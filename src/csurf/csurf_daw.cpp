@@ -1,9 +1,16 @@
 #include "csurf_daw.hpp"
+#include <vector>
+#include <string>
 #include <reaper_plugin_functions.h>
 #include "csurf_utils.hpp"
 
 int DAW::sendModes[3] = {0, 1, 3};
 
+using namespace std;
+
+/************************************************************************
+ * Track
+ ************************************************************************/
 void DAW::UnSelectAllTracks()
 {
     for (int i = 0; i < CountTracks(0); i++)
@@ -79,20 +86,50 @@ int DAW::GetTrackSurfacePeakInfo(MediaTrack *media_track)
     return int(volToNormalized(GetTrackPeakInfo(media_track)) * 127.0);
 }
 
+/************************************************************************
+ * Track FX
+ ************************************************************************/
 bool DAW::HasTrackFx(MediaTrack *media_track, int fx)
 {
     char pluginName[256] = "";
     return TrackFX_GetFXName(media_track, fx, pluginName, size(pluginName));
 }
 
-string DAW::GetTrackFxName(MediaTrack *media_track, int fx)
+string DAW::GetTrackFxName(MediaTrack *media_track, int fx, bool full)
 {
     char pluginName[256] = "";
-    if (TrackFX_GetFXName(media_track, fx, pluginName, size(pluginName)))
+    if (!TrackFX_GetFXName(media_track, fx, pluginName, size(pluginName)))
     {
-        return StripFxType(pluginName);
+        return "No FX";
     }
-    return "No FX";
+    if (full)
+    {
+        return StripPluginNamePrefixes(pluginName);
+    }
+    vector<string> pluginNameParts = split(StripPluginNamePrefixes(StripPluginChannelPostfix(pluginName).data()), " (");
+    if (pluginNameParts.size() > 1)
+    {
+        pluginNameParts.pop_back();
+    }
+
+    return join(pluginNameParts, " (");
+}
+
+string DAW::GetTrackFxDeveloper(MediaTrack *media_track, int fx)
+{
+    char pluginName[256] = "";
+    if (!TrackFX_GetFXName(media_track, fx, pluginName, size(pluginName)))
+    {
+        return "No Dev";
+    }
+    vector<string> pluginNameParts = split(StripPluginNamePrefixes(StripPluginChannelPostfix(pluginName).data()), " (");
+    string developer = pluginNameParts.at(pluginNameParts.size() - 1);
+    if (!developer.empty())
+    {
+        developer.pop_back();
+    }
+
+    return developer;
 }
 
 bool DAW::GetTrackFxEnabled(MediaTrack *media_track, int fx)
@@ -119,6 +156,9 @@ bool DAW::GetTrackFxPanelOpen(MediaTrack *media_track, int fx)
     return ::TrackFX_GetOpen(media_track, fx);
 }
 
+/************************************************************************
+ * Track FX Param
+ ************************************************************************/
 string DAW::GetTrackFxParamName(MediaTrack *media_track, int fx, int param)
 {
     char paramName[256] = "";
@@ -141,6 +181,9 @@ int DAW::GetTrackFxParamNbSteps(MediaTrack *media_track, int fx, int param)
     return nbSteps;
 }
 
+/************************************************************************
+ * Track Receive
+ ************************************************************************/
 bool DAW::HasTrackReceive(MediaTrack *media_track, int receive)
 {
     return GetSetTrackSendInfo(media_track, -1, receive, "P_SRCTRACK", 0) ? true : false;
@@ -198,6 +241,9 @@ int DAW::GetNextTrackReceiveMode(MediaTrack *media_track, int send)
     return sendModes[(GetTrackReceiveMode(media_track, send) + 1) % 4];
 }
 
+/************************************************************************
+ * Track Send
+ ************************************************************************/
 bool DAW::HasTrackSend(MediaTrack *media_track, int send)
 {
     return GetSetTrackSendInfo(media_track, 0, send, "P_DESTTRACK", 0) ? true : false;

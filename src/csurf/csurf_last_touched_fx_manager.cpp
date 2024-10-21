@@ -50,7 +50,7 @@ void CSurf_LastTouchedFXManager::UpdateTrack()
 
     track->SetDisplayMode(DISPLAY_MODE_2, forceUpdate);
     track->SetDisplayLine(0, ALIGN_LEFT, trackName, NON_INVERT, forceUpdate);
-    track->SetDisplayLine(1, ALIGN_LEFT, paramNumber < 0 ? "No Param" : StripFxType(fxName).c_str(), INVERT, forceUpdate);
+    track->SetDisplayLine(1, ALIGN_LEFT, paramNumber < 0 ? "No Param" : StripPluginNamePrefixes(fxName).c_str(), INVERT, forceUpdate);
     track->SetDisplayLine(2, ALIGN_LEFT, paramNumber < 0 ? "  " : string(paramName).c_str(), NON_INVERT, forceUpdate);
     track->SetDisplayLine(3, ALIGN_CENTER, paramNumber < 0 ? "  " : paramValueString, NON_INVERT, forceUpdate);
     track->SetFaderValue((int)(paramValue * 16383.0), forceUpdate);
