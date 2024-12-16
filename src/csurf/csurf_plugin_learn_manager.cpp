@@ -49,6 +49,7 @@ protected:
 
     void SaveIniFile()
     {
+        ShowConsoleMsg(fileName.c_str());
         mINI::INIFile file(fileName);
         file.write(ini, true);
     }
@@ -190,7 +191,12 @@ public:
     {
         int controlIndex = context->GetChannelManagerItemIndex() + index;
         int pluginId = context->GetPluginEditPluginId();
-        int paramId = context->GetPluginEditParamId();
+        // int paramId = context->GetPluginEditParamId();
+        int trackId, itemNumber, takeId, _pluginId, paramId;
+        if (GetTouchedOrFocusedFX(0, &trackId, &itemNumber, &takeId, &_pluginId, &paramId))
+        {
+            context->SetPluginEditParamId(paramId);
+        }
 
         string paramKey = getParamKey("Fader_", controlIndex);
 

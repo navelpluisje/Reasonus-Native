@@ -2,6 +2,7 @@
 !.vscode/launch.json
 **/.DS_Store
 /*build*
+/*out*
 /lib
 /WDL
 /.idea

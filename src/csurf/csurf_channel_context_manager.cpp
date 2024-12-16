@@ -32,6 +32,14 @@ CSurf_ChannelContextManager::CSurf_ChannelContextManager(
     channelManager = new CSurf_TrackManager(tracks, navigator, context, m_midiout);
 }
 
+CSurf_ChannelContextManager::~CSurf_ChannelContextManager()
+{
+    delete channelManager;
+    delete navigator;
+    delete context;
+    tracks.clear();
+};
+
 void CSurf_ChannelContextManager::HandleTrackButtonClick()
 {
     if (context->GetChannelMode() != TrackMode)

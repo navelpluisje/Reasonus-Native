@@ -138,9 +138,21 @@ public:
         {
             int paramId = stoi(ini[paramKey]["param"]);
 
-            int nbSteps = stoi(ini[paramKey]["steps"]) - 1;
+            int nbSteps = stoi(ini[paramKey]["steps"]);
             double value = TrackFX_GetParam(media_track, pluginId, paramId, &min, &max);
-            double newValue = ((int)(value * nbSteps + 1) % (nbSteps + 1)) / nbSteps;
+            double stepSize = max / (nbSteps - 1);
+            double newValue = value + stepSize;
+            if (newValue > 1.0)
+            {
+                newValue = 0.0;
+            }
+
+            // double newValue = ((int)(value * nbSteps + 1) % (nbSteps + 1)) / nbSteps;
+
+            logDouble("max", max);
+            logDouble("value", value);
+            logDouble("newValue", newValue);
+
             TrackFX_SetParam(media_track, pluginId, paramId, newValue);
         }
     }

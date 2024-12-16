@@ -81,7 +81,7 @@ protected:
 
 public:
     CSurf_Track(int index, CSurf_Context *_context, midi_Output *m_midiout);
-    ~CSurf_Track() {};
+    ~CSurf_Track();
 
     void SetTrackColor(ButtonColor colorActive, ButtonColor colorDim);
 

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 
-project(ReasonusNative VERSION 0.0.0 LANGUAGES C CXX)
+project(MyPlugin VERSION 0.0.1 LANGUAGES C CXX)
 
 find_package(Git)
 if(GIT_FOUND)
@@ -36,12 +36,18 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # path for external 3rd party library dependencies 
 include(FetchContent)
-set(PROJECT_LIB_DIR ${PROJECT_SOURCE_DIR}/lib)
+set(PROJECT_LIB_DIR ${PROJECT_SOURCE_DIR}/third_party)
+
+FetchContent_Declare(reaper-sdk
+    GIT_REPOSITORY https://github.com/justinfrankel/reaper-sdk
+    GIT_TAG        "origin/main" # or specify a tag or branch here
+    SOURCE_DIR     "${PROJECT_LIB_DIR}/reaper-sdk"
+    )
 
 FetchContent_Declare(WDL
     GIT_REPOSITORY https://github.com/justinfrankel/WDL
-    GIT_TAG        "origin/main" # or specify a tag or branch here
     SOURCE_DIR     "${PROJECT_LIB_DIR}/WDL"
+    GIT_TAG        "origin/main"
     )
 
 FetchContent_Declare(GSL
@@ -50,7 +56,7 @@ FetchContent_Declare(GSL
     SOURCE_DIR     "${PROJECT_LIB_DIR}/GSL"
 )
 
-FetchContent_MakeAvailable(GSL WDL)
+FetchContent_MakeAvailable(reaper-sdk GSL WDL)
 
 # symlink WDL to reaper-sdk
 execute_process(
@@ -58,7 +64,7 @@ execute_process(
             # source
             "${PROJECT_LIB_DIR}/WDL/WDL"
             # target
-            ${PROJECT_SOURCE_DIR}/WDL
+            ${PROJECT_LIB_DIR}/reaper-sdk/WDL
 )
 
 if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
@@ -70,13 +76,27 @@ if(DEFINED ENV{VCPKG_DEFAULT_TRIPLET} AND NOT DEFINED VCPKG_TARGET_TRIPLET)
   set(VCPKG_TARGET_TRIPLET "$ENV{VCPKG_DEFAULT_TRIPLET}" CACHE STRING "")
 endif()
 
-FILE(GLOB header_paths 
-    ${PROJECT_SOURCE_DIR}/sdk
+set(header_paths 
+    ${PROJECT_LIB_DIR}/reaper-sdk/sdk
+    # add possible include directories for reaper plugin
     )
 
-add_library(reaper-sdk IMPORTED INTERFACE)
-target_include_directories(reaper-sdk INTERFACE ${header_paths})
+file(GLOB_RECURSE headers CONFIGURE_DEPENDS ${PROJECT_LIB_DIR}/*.h*)
+foreach(header ${headers})
+    if(WIN32)
+        set_source_files_properties(${header} PROPERTIES COMPILE_FLAGS "/W0")
+    else()
+        set_source_files_properties(${header} PROPERTIES COMPILE_FLAGS "-w")
+    endif()
+endforeach()
+
+add_library(reaper-sdk INTERFACE)
+target_include_directories(reaper-sdk 
+    INTERFACE 
+    ${header_paths}
+    )
 target_link_libraries(reaper-sdk INTERFACE GSL)
+target_include_directories(reaper-sdk INTERFACE ${CMAKE_BINARY_DIR})
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
@@ -84,13 +104,6 @@ find_package(WDL REQUIRED)
 
 if(NOT WIN32)
   find_package(SWELL REQUIRED)
-  
-  add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/src/res.rc_mac_dlg
-    COMMAND ${SWELL_RESGEN} ${CMAKE_CURRENT_SOURCE_DIR}/src/res.rc)
-
-  add_custom_target( generate
-    ALL ${SWELL_RESGEN} ${CMAKE_CURRENT_SOURCE_DIR}/src/res.rc
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/res.rc)
 endif()
 
 target_link_libraries(reaper-sdk INTERFACE WDL::WDL)
@@ -116,7 +129,6 @@ configure_file(
   "${PROJECT_SOURCE_DIR}/config.h.in"
   "${PROJECT_BINARY_DIR}/config.h"
 )
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_BINARY_DIR})
 
 if(WIN32)
   foreach(arg
@@ -159,25 +171,32 @@ if(NOT CMAKE_PROJECT_VERSION_TWEAK EQUAL "1")
   )
 endif()
 else()
-  add_compile_options(-fsigned-char -fstack-protector-strong -fdiagnostics-color)
+  set_target_properties(
+    ${PROJECT_NAME} 
+    PROPERTIES 
+    COMPILE_OPTIONS 
+    -fno-unsigned-char 
+    -fstack-protector-strong 
+    -fdiagnostics-color
+    )
 endif()
 
-
-set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 23)
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 17)
 
 if(WIN32)
-  target_compile_options(
-    ${PROJECT_NAME} 
-      PRIVATE 
-      /W3 /WX
-      )
-  target_compile_definitions(${PROJECT_NAME} PRIVATE NOMINMAX UNICODE)
+    target_compile_options(
+        ${PROJECT_NAME} 
+        PRIVATE 
+        /W3
+        /wd4996
+        )
+    target_compile_definitions(${PROJECT_NAME} PRIVATE NOMINMAX UNICODE)
 else()
-  target_compile_options(
-    ${PROJECT_NAME}
-      PRIVATE
-      -Wall -Wextra -Wno-missing-field-initializers -Wpedantic 
-  )
+    target_compile_options(
+        ${PROJECT_NAME}
+        PRIVATE
+        -Wall -Wextra -Wpedantic 
+    )
 endif()
 
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)

@@ -34,7 +34,7 @@ public:
         CSurf_Navigator *navigator,
         midi_Output *m_midiout);
 
-    ~CSurf_ChannelContextManager() {};
+    ~CSurf_ChannelContextManager();
 
     void HandleTrackButtonClick();
 

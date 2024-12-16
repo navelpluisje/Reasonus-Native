@@ -18,7 +18,6 @@ extern "C"
       REAPER_PLUGIN_HINSTANCE hInstance, reaper_plugin_info_t *reaper_plugin_info) -> int
   {
     g_hInst = hInstance;
-    g_hwnd = reaper_plugin_info->hwnd_main;
 
     if (!reaper_plugin_info || reaper_plugin_info->caller_version != REAPER_PLUGIN_VERSION || !reaper_plugin_info->GetFunc)
     {

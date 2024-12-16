@@ -171,12 +171,15 @@ string DAW::GetTrackFxParamName(MediaTrack *media_track, int fx, int param)
 
 int DAW::GetTrackFxParamNbSteps(MediaTrack *media_track, int fx, int param)
 {
-    int nbSteps = 0;
+    int nbSteps = 1;
     double stepOut, _;
     bool isToggle;
     if (TrackFX_GetParameterStepSizes(media_track, fx, param, &stepOut, &_, &_, &isToggle))
     {
-        nbSteps = (int)round(1.0 / stepOut) + 1;
+        if (stepOut > 0)
+        {
+            nbSteps = (int)round(1.0 / stepOut) + 1;
+        }
     }
     return nbSteps;
 }

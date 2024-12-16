@@ -11,7 +11,7 @@ enum Btn_Types
     BTN_BYPASS = 0x03,
     BTN_MACRO = 0x04,
     BTN_LINK = 0x05,
-    BTN_SHIFT_LEFT = 0x06,
+    BTN_SHIFT_LEFT = 0x46,
 
     // Channel Strip Controls
     BTN_SOLO_1 = 0x08,
@@ -101,7 +101,7 @@ enum Btn_Types
     BTN_BUS = 0x40,
     BTN_VCA = 0x41,
     BTN_ALL = 0x42,
-    BTN_SHIFT_RIGHT = 0x46,
+    BTN_SHIFT_RIGHT = 0x06,
 
     // Automation
     BTN_READ = 0x4a,
@@ -144,16 +144,8 @@ enum Encoders
 
 };
 
-static Btn_Value ButtonOnBlinkOff(bool on, bool blink)
-{
-    return on ? BTN_VALUE_ON : blink ? BTN_VALUE_BLINK
-                                     : BTN_VALUE_OFF;
-}
+Btn_Value ButtonOnBlinkOff(bool on, bool blink);
 
-static Btn_Value ButtonBlinkOnOff(bool blink, bool on)
-{
-    return blink ? BTN_VALUE_BLINK : on ? BTN_VALUE_ON
-                                        : BTN_VALUE_OFF;
-}
+Btn_Value ButtonBlinkOnOff(bool blink, bool on);
 
 #endif
