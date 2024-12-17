@@ -3,7 +3,6 @@
 
 #include <wdltypes.h>
 #include <win32_utf8.h>
-#include <localize.h>
 #include <string>
 #include <WDL/swell/swell-types.h>
 #include <reaper_plugin_functions.h>

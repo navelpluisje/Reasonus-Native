@@ -3,11 +3,10 @@
 
 #include <wdltypes.h>
 #include <win32_utf8.h>
-#include <localize.h>
 #include <string>
 #include <WDL/swell/swell-types.h>
 #include <reaper_plugin_functions.h>
-#include "../src/resource.h"
+#include "../../src/resource.h"
 #include "extern/ini.hpp"
 #include "csurf_utils.hpp"
 #include "csurf_faderport_ui_utils.hpp"

@@ -2,7 +2,7 @@
 #define _CSURF_H_
 
 #include <reaper_plugin.h>
-#include <localize.h>
+#include <localize/localize.h>
 
 #include <WDL/wdlstring.h>
 #include <WDL/win32_utf8.h>
