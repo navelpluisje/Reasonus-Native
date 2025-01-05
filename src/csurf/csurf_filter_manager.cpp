@@ -6,7 +6,7 @@
 #include "csurf_track.hpp"
 #include "csurf_channel_manager.hpp"
 #include "csurf_navigator.hpp"
-#include "extern/ini.hpp"
+#include <mINI/ini.h>
 #include <vector>
 #include "csurf_daw.hpp"
 #include "csurf_utils.hpp"
@@ -33,7 +33,7 @@ protected:
         if (!context->GetArm())
         {
 
-            int trackColor = GetTrackColor(media_track);
+            int trackColor = ::GetTrackColor(media_track);
             if (trackColor == 0)
             {
                 red = 0x7f;

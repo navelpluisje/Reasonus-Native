@@ -18,13 +18,20 @@ protected:
 
     void SetTrackColors(MediaTrack *media_track) override
     {
+        if (!media_track)
+        {
+            colorActive.SetColor(ButtonColorWhite);
+            colorDim.SetColor(ButtonColorWhiteDim);
+            return;
+        }
+
         int red = 0xff;
         int green = 0x00;
         int blue = 0x00;
 
         if (!context->GetArm())
         {
-            int trackColor = GetTrackColor(media_track);
+            int trackColor = ::GetTrackColor(media_track);
             if (trackColor == 0)
             {
                 red = 0x7f;
@@ -88,7 +95,14 @@ public:
             SetTrackColors(media_track);
             GetFaderValue(media_track, &faderValue, &valueBarValue);
 
-            track->SetDisplayLine(0, ALIGN_LEFT, DAW::GetTrackName(media_track).c_str(), plugin_track == media_track ? INVERT : NON_INVERT);
+            if (!media_track)
+            {
+                track->SetDisplayLine(0, ALIGN_LEFT, "", NON_INVERT);
+            }
+            else
+            {
+                track->SetDisplayLine(0, ALIGN_LEFT, DAW::GetTrackName(media_track).c_str(), plugin_track == media_track ? INVERT : NON_INVERT);
+            }
 
             if (DAW::HasTrackFx(plugin_track, pluginIndex))
             {

@@ -1,10 +1,10 @@
-#include "csurf_channel_context_manager.hpp"
+#include "csurf_fader_manager.hpp"
 #include "csurf_filter_manager.cpp"
 #include "csurf_plugin_learn_manager.cpp"
 #include "csurf_plugin_control_manager.cpp"
 #include <reaper_plugin_functions.h>
 
-void CSurf_ChannelContextManager::SetButtonValues(ChannelMode channelMode)
+void CSurf_FaderManager::SetButtonValues(ChannelMode channelMode)
 {
     context->SetChannelMode(channelMode);
     trackButton->SetValue(channelMode == TrackMode ? BTN_VALUE_ON : BTN_VALUE_OFF);
@@ -13,7 +13,7 @@ void CSurf_ChannelContextManager::SetButtonValues(ChannelMode channelMode)
     panButton->SetValue(ButtonOnBlinkOff(channelMode == PanMode, channelMode == TrackPanMode));
 }
 
-CSurf_ChannelContextManager::CSurf_ChannelContextManager(
+CSurf_FaderManager::CSurf_FaderManager(
     CSurf_Context *context,
     CSurf_Navigator *navigator,
     midi_Output *m_midiout) : m_midiout(m_midiout), navigator(navigator), context(context)
@@ -32,7 +32,7 @@ CSurf_ChannelContextManager::CSurf_ChannelContextManager(
     channelManager = new CSurf_TrackManager(tracks, navigator, context, m_midiout);
 }
 
-CSurf_ChannelContextManager::~CSurf_ChannelContextManager()
+CSurf_FaderManager::~CSurf_FaderManager()
 {
     delete channelManager;
     delete navigator;
@@ -40,7 +40,7 @@ CSurf_ChannelContextManager::~CSurf_ChannelContextManager()
     tracks.clear();
 };
 
-void CSurf_ChannelContextManager::HandleTrackButtonClick()
+void CSurf_FaderManager::HandleTrackButtonClick()
 {
     if (context->GetChannelMode() != TrackMode)
     {
@@ -51,7 +51,7 @@ void CSurf_ChannelContextManager::HandleTrackButtonClick()
     }
 };
 
-void CSurf_ChannelContextManager::HandlePluginsButtonClick(bool track)
+void CSurf_FaderManager::HandlePluginsButtonClick(bool track)
 {
     bool cameFromPlugin = (context->GetChannelMode() == PluginEditMode || context->GetChannelMode() == PluginControlMode);
 
@@ -71,7 +71,7 @@ void CSurf_ChannelContextManager::HandlePluginsButtonClick(bool track)
     }
 };
 
-void CSurf_ChannelContextManager::HandleSendButtonClick(bool track)
+void CSurf_FaderManager::HandleSendButtonClick(bool track)
 {
     if (context->GetChannelMode() != SendMode && !track)
     {
@@ -87,7 +87,7 @@ void CSurf_ChannelContextManager::HandleSendButtonClick(bool track)
     }
 };
 
-void CSurf_ChannelContextManager::HandlePanButtonClick(bool track)
+void CSurf_FaderManager::HandlePanButtonClick(bool track)
 {
     if (context->GetChannelMode() != PanMode && !track)
     {
@@ -103,7 +103,7 @@ void CSurf_ChannelContextManager::HandlePanButtonClick(bool track)
     }
 };
 
-void CSurf_ChannelContextManager::HandleMixButtonClick()
+void CSurf_FaderManager::HandleMixButtonClick()
 {
     if (context->GetChannelMode() != MixMode)
     {
@@ -118,7 +118,7 @@ void CSurf_ChannelContextManager::HandleMixButtonClick()
     }
 };
 
-void CSurf_ChannelContextManager::ResetMixButtonClick()
+void CSurf_FaderManager::ResetMixButtonClick()
 {
     if (context->GetChannelMode() == MixMode)
     {
@@ -126,7 +126,7 @@ void CSurf_ChannelContextManager::ResetMixButtonClick()
     }
 };
 
-void CSurf_ChannelContextManager::HandleLinkButtonClick()
+void CSurf_FaderManager::HandleLinkButtonClick()
 {
     if (context->GetChannelMode() == PluginEditMode)
     {
@@ -141,24 +141,24 @@ void CSurf_ChannelContextManager::HandleLinkButtonClick()
     }
 };
 
-void CSurf_ChannelContextManager::SetPluginControlMode()
+void CSurf_FaderManager::SetPluginControlMode()
 {
     context->SetChannelMode(PluginControlMode);
     channelManager = new CSurf_PluginControlManager(tracks, navigator, context, m_midiout);
 }
 
 // ADD ALL THE TRACKMANAGERS METHODS HERE TO PROXY THEM
-void CSurf_ChannelContextManager::UpdateTracks()
+void CSurf_FaderManager::UpdateTracks()
 {
     channelManager->UpdateTracks();
 }
 
-void CSurf_ChannelContextManager::HandleMuteClick(int index)
+void CSurf_FaderManager::HandleMuteClick(int index)
 {
     channelManager->HandleMuteClick(index);
 }
 
-void CSurf_ChannelContextManager::HandleSoloClick(int index)
+void CSurf_FaderManager::HandleSoloClick(int index)
 {
     channelManager->HandleSoloClick(index);
     prevChannelMode = context->GetChannelMode();
@@ -183,18 +183,18 @@ void CSurf_ChannelContextManager::HandleSoloClick(int index)
     }
 }
 
-void CSurf_ChannelContextManager::HandleSelectClick(int index)
+void CSurf_FaderManager::HandleSelectClick(int index)
 {
     channelManager->HandleSelectClick(index);
     ResetMixButtonClick();
 }
 
-void CSurf_ChannelContextManager::HandleFaderMove(int index, int msb, int lsb)
+void CSurf_FaderManager::HandleFaderMove(int index, int msb, int lsb)
 {
     channelManager->HandleFaderMove(index, msb, lsb);
 }
 
-void CSurf_ChannelContextManager::HandleFaderTouch(int index)
+void CSurf_FaderManager::HandleFaderTouch(int index)
 {
     channelManager->HandleFaderTouch(index);
 }

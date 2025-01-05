@@ -7,7 +7,7 @@
 #include "csurf_channel_manager.hpp"
 #include "csurf_faderport_ui_plugin_edit.hpp"
 #include "csurf_navigator.hpp"
-#include "extern/ini.hpp"
+#include <mINI/ini.h>
 #include <vector>
 #include "csurf_daw.hpp"
 #include "csurf_utils.hpp"
@@ -49,7 +49,6 @@ protected:
 
     void SaveIniFile()
     {
-        ShowConsoleMsg(fileName.c_str());
         mINI::INIFile file(fileName);
         file.write(ini, true);
     }
@@ -210,7 +209,6 @@ public:
         }
         else if (context->GetShiftRight())
         {
-            ShowConsoleMsg("RightShift\n");
             if (ini.has(paramKey))
             {
                 ini.remove(paramKey);

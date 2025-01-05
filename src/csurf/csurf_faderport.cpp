@@ -16,7 +16,7 @@
 #include "csurf_automation_manager.cpp"
 #include "csurf_general_control_manager.cpp"
 #include "csurf_last_touched_fx_manager.hpp"
-#include "csurf_channel_context_manager.hpp"
+#include "csurf_fader_manager.hpp"
 #include "csurf_navigator.hpp"
 #include "controls/csurf_button.hpp"
 #include "csurf_utils.hpp"
@@ -40,7 +40,7 @@ class CSurf_FaderPort : public IReaperControlSurface
 
   CSurf_Context *context;
   CSurf_SessionManager *sessionManager;
-  CSurf_ChannelContextManager *channelContextManager;
+  CSurf_FaderManager *faderManager;
   CSurf_Navigator *trackNavigator;
   CSurf_MixManager *mixManager;
   CSurf_TransportManager *transportManager;
@@ -65,7 +65,7 @@ class CSurf_FaderPort : public IReaperControlSurface
      */
     if (evt->midi_message[0] >= FADER_1 && evt->midi_message[0] <= FADER_16)
     {
-      channelContextManager->HandleFaderMove(evt->midi_message[0] - FADER_1, evt->midi_message[2], evt->midi_message[1]);
+      faderManager->HandleFaderMove(evt->midi_message[0] - FADER_1, evt->midi_message[2], evt->midi_message[1]);
       if (
           (context->GetNbChannels() == 8 && context->GetLastTouchedFxMode() && evt->midi_message[0] == FADER_8) ||
           (context->GetNbChannels() == 16 && context->GetLastTouchedFxMode() && evt->midi_message[0] == FADER_16))
@@ -112,7 +112,7 @@ class CSurf_FaderPort : public IReaperControlSurface
        */
       else if (evt->midi_message[1] >= FADER_TOUCH_1 && evt->midi_message[1] <= FADER_TOUCH_16)
       {
-        channelContextManager->HandleFaderTouch(evt->midi_message[1] - FADER_TOUCH_1);
+        faderManager->HandleFaderTouch(evt->midi_message[1] - FADER_TOUCH_1);
       }
 
       /**
@@ -120,41 +120,41 @@ class CSurf_FaderPort : public IReaperControlSurface
        */
       else if (evt->midi_message[1] >= BTN_SELECT_1 && evt->midi_message[1] <= BTN_SELECT_8)
       {
-        channelContextManager->HandleSelectClick(evt->midi_message[1] - BTN_SELECT_1);
+        faderManager->HandleSelectClick(evt->midi_message[1] - BTN_SELECT_1);
       }
       else if (evt->midi_message[1] == BTN_SELECT_9)
       {
-        channelContextManager->HandleSelectClick(8);
+        faderManager->HandleSelectClick(8);
       }
       else if (evt->midi_message[1] >= BTN_SELECT_10 && evt->midi_message[1] <= BTN_SELECT_16)
       {
-        channelContextManager->HandleSelectClick(evt->midi_message[1] - 0x20 + 8);
+        faderManager->HandleSelectClick(evt->midi_message[1] - 0x20 + 8);
       }
       /**
        * Track Mute Buttons
        */
       else if (evt->midi_message[1] >= BTN_MUTE_1 && evt->midi_message[1] <= BTN_MUTE_8)
       {
-        channelContextManager->HandleMuteClick(evt->midi_message[1] - BTN_MUTE_1);
+        faderManager->HandleMuteClick(evt->midi_message[1] - BTN_MUTE_1);
       }
       else if (evt->midi_message[1] >= BTN_MUTE_9 && evt->midi_message[1] <= BTN_MUTE_16)
       {
-        channelContextManager->HandleMuteClick(evt->midi_message[1] - BTN_MUTE_9 + 8);
+        faderManager->HandleMuteClick(evt->midi_message[1] - BTN_MUTE_9 + 8);
       }
       /**
        * Track Solo Buttons
        */
       else if (evt->midi_message[1] >= BTN_SOLO_1 && evt->midi_message[1] <= BTN_SOLO_8)
       {
-        channelContextManager->HandleSoloClick(evt->midi_message[1] - BTN_SOLO_1);
+        faderManager->HandleSoloClick(evt->midi_message[1] - BTN_SOLO_1);
       }
       else if (evt->midi_message[1] >= BTN_SOLO_9 && evt->midi_message[1] <= BTN_SOLO_14)
       {
-        channelContextManager->HandleSoloClick(evt->midi_message[1] - BTN_SOLO_9 + 8);
+        faderManager->HandleSoloClick(evt->midi_message[1] - BTN_SOLO_9 + 8);
       }
       else if (evt->midi_message[1] == BTN_SOLO_14 || evt->midi_message[1] == BTN_SOLO_15)
       {
-        channelContextManager->HandleSoloClick(evt->midi_message[1] == BTN_SOLO_14 ? 14 : 15);
+        faderManager->HandleSoloClick(evt->midi_message[1] == BTN_SOLO_14 ? 14 : 15);
       }
 
       /**
@@ -162,19 +162,19 @@ class CSurf_FaderPort : public IReaperControlSurface
        */
       else if (evt->midi_message[1] == BTN_TRACK)
       {
-        channelContextManager->HandleTrackButtonClick();
+        faderManager->HandleTrackButtonClick();
       }
       else if (evt->midi_message[1] == BTN_EDIT_PLUGINS)
       {
-        channelContextManager->HandlePluginsButtonClick();
+        faderManager->HandlePluginsButtonClick();
       }
       else if (evt->midi_message[1] == BTN_SEND)
       {
-        channelContextManager->HandleSendButtonClick();
+        faderManager->HandleSendButtonClick();
       }
       else if (evt->midi_message[1] == BTN_PAN)
       {
-        channelContextManager->HandlePanButtonClick();
+        faderManager->HandlePanButtonClick();
       }
 
       /**
@@ -360,7 +360,7 @@ public:
     (void)outdev;
 
     /**
-     * Fisrst e check if we have the ini file. If not we create it with default values
+     * First we check if we have the ini file. If not we create it with default values
      *
      */
     RecursiveCreateDirectory((string(GetResourcePath()) + "/ReaSonus/Plugins").c_str(), 0);
@@ -372,6 +372,7 @@ public:
       ini["Surface"]["MidiOut"] = "0";
       ini["Surface"]["Surface"] = "0";
       ini["Surface"]["Disable-Plugins"] = "0";
+      ini["Surface"]["Swap-Shift-Button"] = "0";
       ini["Functions"]["1"] = "0";
       ini["Functions"]["2"] = "0";
       ini["Functions"]["3"] = "0";
@@ -381,7 +382,7 @@ public:
       ini["Functions"]["7"] = "0";
       ini["Functions"]["8"] = "0";
       ini["Filters"]["Nb-Filters"] = "0";
-      file.generate(ini);
+      file.generate(ini, true);
     };
 
     errStats = 0;
@@ -396,6 +397,7 @@ public:
 
     context = new CSurf_Context(stoi(ini["Surface"]["Surface"]));
     context->SetPluginControl(ini["Surface"].has("disable-plugins") && ini["Surface"]["disable-plugins"] != "1");
+    context->SetSwapShiftButtons(ini["Surface"].has("swap-shift-buttons") && ini["Surface"]["swap-shift-buttons"] == "1");
 
     for (int i = 0; i < context->GetNbChannels(); i++)
     {
@@ -406,11 +408,11 @@ public:
 
     trackNavigator = new CSurf_Navigator(context);
     sessionManager = new CSurf_SessionManager(context, trackNavigator, m_midiout);
-    channelContextManager = new CSurf_ChannelContextManager(context, trackNavigator, m_midiout);
-    mixManager = new CSurf_MixManager(context, trackNavigator, channelContextManager, m_midiout);
+    faderManager = new CSurf_FaderManager(context, trackNavigator, m_midiout);
+    mixManager = new CSurf_MixManager(context, trackNavigator, faderManager, m_midiout);
     transportManager = new CSurf_TransportManager(context, m_midiout);
     automationManager = new CSurf_AutomationManager(context, m_midiout);
-    generalControlManager = new CSurf_GeneralControlManager(context, trackNavigator, channelContextManager, m_midiout);
+    generalControlManager = new CSurf_GeneralControlManager(context, trackNavigator, faderManager, m_midiout);
     lastTouchedFxManager = new CSurf_LastTouchedFXManager(lastTouchedFxTrack, context, m_midiout);
 
     if (errStats)
@@ -502,9 +504,9 @@ public:
     if (m_midiout)
     {
       DWORD now = timeGetTime();
-      if ((now - surface_update_lastrun) >= 50)
+      if ((now - surface_update_lastrun) >= 100)
       {
-        channelContextManager->UpdateTracks();
+        faderManager->UpdateTracks();
         if (context->GetLastTouchedFxMode())
         {
           lastTouchedFxManager->UpdateTrack();
@@ -535,7 +537,8 @@ public:
 
   void OnTrackSelection(MediaTrack *media_track)
   {
-    int trackId = GetMediaTrackInfo_Value(media_track, "IP_TRACKNUMBER");
+    int trackId = ::GetMediaTrackInfo_Value(media_track, "IP_TRACKNUMBER");
+
     trackNavigator->SetOffset(trackId - 1);
   }
 };

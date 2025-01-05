@@ -2,7 +2,7 @@
 #include "csurf_utils.hpp"
 #include "csurf_daw.hpp"
 #include <reaper_plugin_functions.h>
-#include "extern/ini.hpp"
+#include <mINI/ini.h>
 #include "csurf_navigator_filters.hpp"
 
 void CSurf_Navigator::GetAllVisibleTracks(WDL_PtrList<MediaTrack> &tracks, bool &hasSolo, bool &hasMute)
@@ -128,10 +128,10 @@ void CSurf_Navigator::HandleTracksWithSendsFilter()
 {
     map<int, bool> tracks = {};
 
-    for (int i = 0; i < CountTracks(0); i++)
+    for (int i = 0; i < ::CountTracks(0); i++)
     {
         MediaTrack *media_track = GetTrack(0, i);
-        bool hasSends = (bool)GetTrackNumSends(media_track, 0);
+        bool hasSends = (bool)::GetTrackNumSends(media_track, 0);
         tracks[i] = hasSends;
     }
 
@@ -142,10 +142,10 @@ void CSurf_Navigator::HandleTracksWithReceivesFilter()
 {
     map<int, bool> tracks = {};
 
-    for (int i = 0; i < CountTracks(0); i++)
+    for (int i = 0; i < ::CountTracks(0); i++)
     {
         MediaTrack *media_track = GetTrack(0, i);
-        bool hasReceives = (bool)GetTrackNumSends(media_track, -1);
+        bool hasReceives = (bool)::GetTrackNumSends(media_track, -1);
         tracks[i] = hasReceives;
     }
 
@@ -156,26 +156,103 @@ void CSurf_Navigator::HandleTracksWithHardwareOutputsFilter()
 {
     map<int, bool> tracks = {};
 
-    for (int i = 0; i < CountTracks(0); i++)
+    for (int i = 0; i < ::CountTracks(0); i++)
     {
         MediaTrack *media_track = GetTrack(0, i);
-        bool hasHardwareOutputs = (bool)GetTrackNumSends(media_track, 1);
+        bool hasHardwareOutputs = (bool)::GetTrackNumSends(media_track, 1);
         tracks[i] = hasHardwareOutputs;
     }
 
     SetTrackUIVisibility(tracks);
 }
 
-void CSurf_Navigator::HandleTracksWithinstrumentsFilter()
+void CSurf_Navigator::HandleTracksWithInstrumentsFilter()
 {
     map<int, bool> tracks = {};
 
-    for (int i = 0; i < CountTracks(0); i++)
+    for (int i = 0; i < ::CountTracks(0); i++)
     {
         MediaTrack *media_track = GetTrack(0, i);
-        int hasInstruments = TrackFX_GetInstrument(media_track);
+        int hasInstruments = ::TrackFX_GetInstrument(media_track);
 
         tracks[i] = hasInstruments > -1;
+    }
+
+    SetTrackUIVisibility(tracks);
+}
+
+void CSurf_Navigator::HandleTracksWithEffectsFilter()
+{
+    map<int, bool> tracks = {};
+
+    for (int i = 0; i < ::CountTracks(0); i++)
+    {
+        MediaTrack *media_track = GetTrack(0, i);
+        tracks[i] = DAW::TrackHasFx(media_track);
+    }
+
+    SetTrackUIVisibility(tracks);
+}
+
+void CSurf_Navigator::HandleTracksWithMidiFilter()
+{
+    map<int, bool> tracks = {};
+
+    for (int i = 0; i < ::CountTracks(0); i++)
+    {
+        bool hasMidi = false;
+        MediaTrack *media_track = GetTrack(0, i);
+
+        for (int i = 0; i < ::GetTrackNumMediaItems(media_track); i++)
+        {
+            MediaItem *media_item = ::GetTrackMediaItem(media_track, i);
+            hasMidi = DAW::MediaItemHasMidi(media_item);
+            if (hasMidi)
+            {
+                break;
+            }
+        }
+
+        tracks[i] = hasMidi;
+    }
+
+    SetTrackUIVisibility(tracks);
+}
+
+void CSurf_Navigator::HandleTracksWithAudioFilter()
+{
+    map<int, bool> tracks = {};
+
+    for (int i = 0; i < ::CountTracks(0); i++)
+    {
+        bool hasAudio = false;
+        MediaTrack *media_track = GetTrack(0, i);
+
+        for (int i = 0; i < ::GetTrackNumMediaItems(media_track); i++)
+        {
+            MediaItem *media_item = ::GetTrackMediaItem(media_track, i);
+            hasAudio = DAW::MediaItemHasAudio(media_item);
+            if (hasAudio)
+            {
+                break;
+            }
+        }
+
+        tracks[i] = hasAudio;
+    }
+
+    SetTrackUIVisibility(tracks);
+}
+
+void CSurf_Navigator::HandleTracksAreVcaFilter()
+{
+    map<int, bool> tracks = {};
+
+    for (int i = 0; i < ::CountTracks(0); i++)
+    {
+        MediaTrack *media_track = GetTrack(0, i);
+        bool isVCA = GetSetTrackGroupMembership(media_track, "VOLUME_VCA_LEAD", 0, 0) == 1;
+        tracks[i] = isVCA;
     }
 
     SetTrackUIVisibility(tracks);
@@ -237,16 +314,28 @@ WDL_PtrList<MediaTrack> CSurf_Navigator::GetBankTracks()
 {
     WDL_PtrList<MediaTrack> bank;
     GetAllVisibleTracks(tracks, hasSolo, hasMute);
-    for (int i = track_offset; i < track_offset + context->GetNbChannels(); i++)
+    int channelCount = context->GetNbChannels() > tracks.GetSize() ? context->GetNbChannels() : tracks.GetSize();
+    for (int i = track_offset; i < track_offset + channelCount; i++)
     {
-        bank.Add(tracks.Get(i));
+        if (i > track_offset + channelCount)
+        {
+            bank.Add(NULL);
+        }
+        else
+        {
+            bank.Add(tracks.Get(i));
+        }
     }
     return bank;
 }
 
 void CSurf_Navigator::SetOffset(int offset)
 {
-    if (offset > (tracks.GetSize() - context->GetNbChannels()))
+    if (tracks.GetSize() < context->GetNbChannels())
+    {
+        track_offset = 0;
+    }
+    else if (offset > (tracks.GetSize() - context->GetNbChannels()))
     {
         track_offset = tracks.GetSize() - context->GetNbChannels();
     }
@@ -327,13 +416,25 @@ void CSurf_Navigator::HandleFilter(NavigatorFilter filter)
         HandleTracksWithHardwareOutputsFilter();
         break;
     case TrackInstrumentsFilter:
-        HandleTracksWithinstrumentsFilter();
+        HandleTracksWithInstrumentsFilter();
+        break;
+    case TrackEffectsFilter:
+        HandleTracksWithEffectsFilter();
         break;
     case TrackTopFoldersFilter:
         HandleTracksTopFoldersFilter();
         break;
     case TrackAllFoldersFilter:
         HandleTracksAllFoldersFilter();
+        break;
+    case TrackWithMidiFilter:
+        HandleTracksWithMidiFilter();
+        break;
+    case TrackWithAudioFilter:
+        HandleTracksWithAudioFilter();
+        break;
+    case TrackIsVcaFilter:
+        HandleTracksAreVcaFilter();
         break;
     default:
         HandleAllTracksFilter();

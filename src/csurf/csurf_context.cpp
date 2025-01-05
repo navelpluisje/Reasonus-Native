@@ -10,6 +10,7 @@ class CSurf_Context
 {
     // Global settings
     bool plugin_control;
+    bool swap_shift_buttons;
     int nbChannels = 8;
 
     // Shift keys
@@ -45,11 +46,44 @@ public:
     void SetPluginControl(bool enabled) { plugin_control = enabled; }
     bool GetPluginControl() { return plugin_control; }
 
-    void SetShiftLeft(bool val) { shift_left = val; }
-    bool GetShiftLeft() { return shift_left; }
+    void SetSwapShiftButtons(bool enabled)
+    {
+        swap_shift_buttons = enabled;
+    }
 
-    void SetShiftRight(bool val) { shift_right = val; }
-    bool GetShiftRight() { return shift_right; }
+    bool GetSwapShiftButtons() { return swap_shift_buttons; }
+
+    void SetShiftLeft(bool val)
+    {
+        if (swap_shift_buttons)
+        {
+            shift_right = val;
+        }
+        else
+        {
+            shift_left = val;
+        }
+    }
+    bool GetShiftLeft()
+    {
+        return shift_left;
+    }
+
+    void SetShiftRight(bool val)
+    {
+        if (swap_shift_buttons)
+        {
+            shift_left = val;
+        }
+        else
+        {
+            shift_right = val;
+        }
+    }
+    bool GetShiftRight()
+    {
+        return shift_right;
+    }
 
     void SetArm(bool val) { arm = val; }
     bool GetArm() { return arm; }

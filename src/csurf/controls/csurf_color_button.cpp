@@ -22,7 +22,6 @@ void CSurf_ColorButton::SendColor()
     ButtonColor color = value == 0 ? colorDim : colorActive;
     if (m_midiout)
     {
-
         m_midiout->Send(MIDI_MESSAGE_COLOR_RED, type, color.red, -1);
         m_midiout->Send(MIDI_MESSAGE_COLOR_GREEN, type, color.green, -1);
         m_midiout->Send(MIDI_MESSAGE_COLOR_BLUE, type, color.blue, -1);

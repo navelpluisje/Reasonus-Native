@@ -8,7 +8,7 @@
 #include "csurf_faderport_ui_functions.hpp"
 #include "csurf_faderport_ui_filters.hpp"
 #include "controls/csurf_color_button.hpp"
-#include "csurf_channel_context_manager.hpp"
+#include "csurf_fader_manager.hpp"
 
 using namespace CSURF_FADERPORT_UI_FUNCTIONS;
 using namespace CSURF_FADERPORT_UI_FILTERS;
@@ -26,7 +26,7 @@ protected:
 
     CSurf_Context *context;
     CSurf_Navigator *trackNavigator;
-    CSurf_ChannelContextManager *channelContextManager;
+    CSurf_FaderManager *faderManager;
     midi_Output *m_midiout;
 
     ShiftState armState;
@@ -56,7 +56,9 @@ protected:
         soloClearButton->SetValue(hasSolo ? BTN_VALUE_ON : BTN_VALUE_OFF);
         muteClearButton->SetValue(hasMute ? BTN_VALUE_ON : BTN_VALUE_OFF);
         linkButton->SetValue(context->GetLastTouchedFxMode() ? BTN_VALUE_ON : BTN_VALUE_OFF);
-        shiftLeftButton->SetValue(context->GetShiftLeft() ? BTN_VALUE_ON : BTN_VALUE_OFF);
+        shiftLeftButton->SetValue((context->GetShiftLeft() || (context->GetShiftRight() && context->GetSwapShiftButtons()))
+                                      ? BTN_VALUE_ON
+                                      : BTN_VALUE_OFF);
     };
 
     void UpdatePanValue(int val)
@@ -98,8 +100,8 @@ public:
     CSurf_GeneralControlManager(
         CSurf_Context *context,
         CSurf_Navigator *trackNavigator,
-        CSurf_ChannelContextManager *channelContextManager,
-        midi_Output *m_midiout) : context(context), trackNavigator(trackNavigator), channelContextManager(channelContextManager), m_midiout(m_midiout)
+        CSurf_FaderManager *faderManager,
+        midi_Output *m_midiout) : context(context), trackNavigator(trackNavigator), faderManager(faderManager), m_midiout(m_midiout)
     {
         armButton = new CSurf_Button(BTN_ARM, BTN_VALUE_OFF, m_midiout);
         soloClearButton = new CSurf_Button(BTN_SOLO_CLEAR, BTN_VALUE_OFF, m_midiout);
@@ -216,7 +218,7 @@ public:
                 (context->GetChannelMode() == PluginControlMode ||
                  context->GetChannelMode() == PluginEditMode))
             {
-                channelContextManager->HandleLinkButtonClick();
+                faderManager->HandleLinkButtonClick();
             }
             else
             {

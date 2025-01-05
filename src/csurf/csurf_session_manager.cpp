@@ -6,7 +6,7 @@
 #include "csurf_context.cpp"
 #include "csurf_navigator.hpp"
 #include "csurf_session_manager_actions.hpp"
-#include "extern/ini.hpp"
+#include <mINI/ini.h>
 #include "csurf_faderport_ui_functions.hpp"
 
 using namespace CSURF_FADERPORT_UI_FUNCTIONS;
@@ -228,6 +228,7 @@ public:
                                     : Main_OnCommandEx(1011, 0, 0); // View: Zoom out horizontal
             break;
         case Scroll:
+            // TODO: Change to up/down, left/right scrolling
             Main_OnCommandEx(40286, 0, 0); // Track: Go to previous track
             break;
         case Bank:
@@ -301,6 +302,7 @@ public:
         switch (session_type)
         {
         case Channel:
+            // TODO: Navigate to next track, previous track
             break;
         case Zoom:
             context->GetShiftLeft() ? Main_OnCommandEx(40111, 0, 0) // View: Zoom in vertical
@@ -315,18 +317,19 @@ public:
             break;
         case Master:
             Main_OnCommandStringEx("_XENAKIOS_NUDMASVOL1DBU"); // Xenakios/SWS: Nudge master volume 1 dB up
+            // TODO: Add master pan with left shift
             break;
         case Click:
             IncrementMetronomeVolume();
             break;
         case Section:
-            context->GetShiftLeft()    ? Main_OnCommandEx(40105, 0, 0)  // View: Move cursor left one pixel, View: Move cursor right one pixel
-            : context->GetShiftRight() ? Main_OnCommandEx(40103, 0, 0)  // Time selection: Move cursor left, creating time selection, Time selection: Move cursor left, creating time selection
-                                       : Main_OnCommandEx(41044, 0, 0); // View: Move cursor left one pixel, View: Move cursor right one pixel
+            context->GetShiftLeft()    ? Main_OnCommandEx(40105, 0, 0)  // View: Move cursor right one pixel
+            : context->GetShiftRight() ? Main_OnCommandEx(40103, 0, 0)  // Time selection: Move cursor right, creating time selection
+                                       : Main_OnCommandEx(41044, 0, 0); // Move edit cursor forward one beat
             break;
         case Marker:
-            context->GetShiftLeft() ? Main_OnCommandEx(40105, 0, 0)  // View: Move cursor left one pixel, View: Move cursor right one pixel
-                                    : Main_OnCommandEx(41044, 0, 0); // Move edit cursor back one beat, Move edit cursor forward one beat
+            context->GetShiftLeft() ? Main_OnCommandEx(40105, 0, 0)  // View: Move cursor right one pixel
+                                    : Main_OnCommandEx(41044, 0, 0); // Move edit cursor forward one beat
             break;
         }
     }

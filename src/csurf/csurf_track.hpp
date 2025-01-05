@@ -83,6 +83,8 @@ public:
     CSurf_Track(int index, CSurf_Context *_context, midi_Output *m_midiout);
     ~CSurf_Track();
 
+    void ClearTrack();
+
     void SetTrackColor(ButtonColor colorActive, ButtonColor colorDim);
 
     void SetSelectButtonValue(Btn_Value value, bool force = false);

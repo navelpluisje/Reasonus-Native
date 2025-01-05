@@ -3,7 +3,7 @@
 
 #include "../src/resource.h"
 #include "csurf_faderport_ui_utils.hpp"
-#include "extern/ini.hpp"
+#include <mINI/ini.h>
 #include "csurf_utils.hpp"
 #include <swell/swell-functions.h>
 #include <localize/localize.h>
@@ -21,7 +21,7 @@ namespace CSURF_FADERPORT_UI_INIT
         mINI::INIFile file(GetReaSonusIniPath());
 
         ini["surface"][key] = to_string(IsDlgButtonChecked(hwndDlg, checkBox));
-        file.write(ini);
+        file.write(ini, true);
     }
 
     static WDL_DLGRET dlgProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -100,6 +100,7 @@ namespace CSURF_FADERPORT_UI_INIT
                 SendDlgItemMessage(hwndDlg, IDC_COMBO_SURFACE, CB_SETCURSEL, combo, 0);
             }
             SendMessage(GetDlgItem(hwndDlg, IDC_CHECK_INIT_DIS_PLUGIN), BM_SETCHECK, ini["Surface"]["disable-plugins"] == "1" ? BST_CHECKED : BST_UNCHECKED, 0);
+            SendMessage(GetDlgItem(hwndDlg, IDC_CHECK_INIT_SWAP_SHIFT), BM_SETCHECK, ini["Surface"]["swap-shift-buttons"] == "1" ? BST_CHECKED : BST_UNCHECKED, 0);
 
             break;
         }
@@ -115,6 +116,12 @@ namespace CSURF_FADERPORT_UI_INIT
             case IDC_CHECK_INIT_DIS_PLUGIN:
             {
                 SaveCheckBoxValue(hwndDlg, "disable-plugins", IDC_CHECK_INIT_DIS_PLUGIN);
+                break;
+            }
+
+            case IDC_CHECK_INIT_SWAP_SHIFT:
+            {
+                SaveCheckBoxValue(hwndDlg, "swap-shift-buttons", IDC_CHECK_INIT_SWAP_SHIFT);
                 break;
             }
             }
@@ -142,7 +149,7 @@ namespace CSURF_FADERPORT_UI_INIT
                 ini["Surface"]["MidiIn"] = to_string(indev);
                 ini["Surface"]["MidiOut"] = to_string(outdev);
                 ini["Surface"]["Surface"] = to_string(surface);
-                file.write(ini);
+                file.write(ini, true);
             }
             break;
         }

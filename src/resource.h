@@ -23,6 +23,7 @@
 #define IDC_GROUP_SURFACE 1009
 #define IDC_GROUP_SETTINGS 1010
 #define IDC_CHECK_INIT_DIS_PLUGIN 1011
+#define IDC_CHECK_INIT_SWAP_SHIFT 1012
 #define IDC_BUTTON_DOCUMENTTION 1041
 //========================================================
 // The functions dialog

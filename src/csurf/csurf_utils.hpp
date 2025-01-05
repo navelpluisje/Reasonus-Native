@@ -119,6 +119,14 @@ string StripPluginNamePrefixes(char *name);
  */
 string StripPluginChannelPostfix(char *name);
 
+/**
+ * @brief Check if the prefix of the fx tells it is actuielly an fx and not an instrument
+ *
+ * @param name
+ * @return bool
+ */
+bool IsPluginFX(string name);
+
 string Progress(int current, int total);
 
 /**

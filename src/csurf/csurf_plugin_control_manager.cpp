@@ -7,7 +7,7 @@
 #include "csurf_channel_manager.hpp"
 #include "csurf_faderport_ui_plugin_edit.hpp"
 #include "csurf_navigator.hpp"
-#include "extern/ini.hpp"
+#include <mINI/ini.h>
 #include <vector>
 #include "csurf_daw.hpp"
 #include "csurf_utils.hpp"
@@ -146,12 +146,6 @@ public:
             {
                 newValue = 0.0;
             }
-
-            // double newValue = ((int)(value * nbSteps + 1) % (nbSteps + 1)) / nbSteps;
-
-            logDouble("max", max);
-            logDouble("value", value);
-            logDouble("newValue", newValue);
 
             TrackFX_SetParam(media_track, pluginId, paramId, newValue);
         }

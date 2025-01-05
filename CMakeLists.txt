@@ -56,7 +56,13 @@ FetchContent_Declare(GSL
     SOURCE_DIR     "${PROJECT_LIB_DIR}/GSL"
 )
 
-FetchContent_MakeAvailable(reaper-sdk GSL WDL)
+FetchContent_Declare(mINI
+    GIT_REPOSITORY "https://github.com/metayeti/mINI"
+    GIT_TAG        "origin/master"
+    SOURCE_DIR     "${PROJECT_LIB_DIR}/mINI"
+)
+
+FetchContent_MakeAvailable(WDL reaper-sdk GSL mINI)
 
 # symlink WDL to reaper-sdk
 execute_process(
@@ -91,12 +97,14 @@ foreach(header ${headers})
 endforeach()
 
 add_library(reaper-sdk INTERFACE)
-target_include_directories(reaper-sdk 
+target_include_directories(reaper-sdk   
     INTERFACE 
     ${header_paths}
     )
 target_link_libraries(reaper-sdk INTERFACE GSL)
 target_include_directories(reaper-sdk INTERFACE ${CMAKE_BINARY_DIR})
+
+target_link_libraries(reaper-sdk INTERFACE mINI)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
@@ -195,7 +203,7 @@ else()
     target_compile_options(
         ${PROJECT_NAME}
         PRIVATE
-        -Wall -Wextra -Wpedantic 
+        -Wall -Wextra -Wpedantic
     )
 endif()
 
@@ -274,6 +282,7 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
                 "${CMAKE_CURRENT_BINARY_DIR}/link_readme.txt")
     set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_BINARY_DIR}/link_readme.txt")
 endif()
+
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
     execute_process(
         COMMAND ${CMAKE_COMMAND} -E create_symlink

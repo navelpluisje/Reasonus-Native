@@ -25,7 +25,7 @@ protected:
 
         if (!context->GetArm())
         {
-            int trackColor = GetTrackColor(media_track);
+            int trackColor = ::GetTrackColor(media_track);
             if (trackColor == 0)
             {
                 red = 0x7f;
@@ -103,6 +103,11 @@ public:
 
             CSurf_Track *track = tracks.at(i);
             MediaTrack *media_track = media_tracks.Get(i);
+            if (!media_track)
+            {
+                track->ClearTrack();
+                continue;
+            }
             SetTrackColors(media_track);
 
             GetFaderValue(media_track, receiveIndex, &faderValue, &valueBarValue, &pan, &panStr);

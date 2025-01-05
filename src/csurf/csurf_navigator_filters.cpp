@@ -2,7 +2,7 @@
 #include "csurf_utils.hpp"
 #include "csurf_daw.hpp"
 #include <reaper_plugin_functions.h>
-#include "extern/ini.hpp"
+#include <mINI/ini.h>
 
 map<int, bool> GetSibblingTracks(map<int, bool> tracks)
 {

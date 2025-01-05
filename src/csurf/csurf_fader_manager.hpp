@@ -1,5 +1,5 @@
-#ifndef CSURF_CHANNEL_CONTEXT_MANAGER_H_
-#define CSURF_CHANNEL_CONTEXT_MANAGER_H_
+#ifndef csurf_fader_manager_H_
+#define csurf_fader_manager_H_
 
 #include "csurf_track_manager.cpp"
 #include "csurf_plugins_manager.cpp"
@@ -11,7 +11,7 @@
 #include "controls/csurf_button.hpp"
 #include "csurf_track.hpp"
 
-class CSurf_ChannelContextManager
+class CSurf_FaderManager
 {
     CSurf_ChannelManager *channelManager = NULL;
     std::vector<CSurf_Track *> tracks;
@@ -29,12 +29,12 @@ class CSurf_ChannelContextManager
     void SetButtonValues(ChannelMode mode);
 
 public:
-    CSurf_ChannelContextManager(
+    CSurf_FaderManager(
         CSurf_Context *context,
         CSurf_Navigator *navigator,
         midi_Output *m_midiout);
 
-    ~CSurf_ChannelContextManager();
+    ~CSurf_FaderManager();
 
     void HandleTrackButtonClick();
 

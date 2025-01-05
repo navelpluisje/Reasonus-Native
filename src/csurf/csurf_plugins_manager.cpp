@@ -25,7 +25,7 @@ protected:
 
         if (!context->GetArm())
         {
-            int trackColor = GetTrackColor(media_track);
+            int trackColor = ::GetTrackColor(media_track);
             if (trackColor == 0)
             {
                 red = 0x7f;
@@ -98,13 +98,17 @@ public:
 
             CSurf_Track *track = tracks.at(i);
             MediaTrack *media_track = media_tracks.Get(i);
+            if (!media_track)
+            {
+                track->ClearTrack();
+                continue;
+            }
             SetTrackColors(media_track);
             GetFaderValue(media_track, &faderValue, &valueBarValue);
 
-            track->SetDisplayLine(0, ALIGN_LEFT, DAW::GetTrackName(media_track).c_str());
-
             if (DAW::HasTrackFx(media_track, pluginIndex))
             {
+                track->SetDisplayLine(0, ALIGN_LEFT, DAW::GetTrackName(media_track).c_str());
                 track->SetDisplayLine(1, ALIGN_LEFT, DAW::GetTrackFxName(media_track, pluginIndex).c_str(), INVERT);
                 track->SetDisplayLine(2, ALIGN_CENTER, DAW::GetTrackFxSurfceEnabled(media_track, pluginIndex).c_str());
                 track->SetDisplayLine(3, ALIGN_CENTER, Progress(pluginIndex + 1, nbTrackPlugins[i]).c_str());
@@ -112,6 +116,7 @@ public:
             }
             else
             {
+                track->SetDisplayLine(0, ALIGN_LEFT, DAW::GetTrackName(media_track).c_str());
                 track->SetDisplayLine(1, ALIGN_LEFT, "No Fx", INVERT);
                 track->SetDisplayLine(2, ALIGN_CENTER, "");
                 track->SetDisplayLine(3, ALIGN_CENTER, "");

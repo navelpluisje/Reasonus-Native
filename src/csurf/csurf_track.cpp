@@ -22,6 +22,21 @@ CSurf_Track::~CSurf_Track()
     delete vuMeter;
 };
 
+void CSurf_Track::ClearTrack()
+{
+    this->SetTrackColor(ButtonColorWhite, ButtonColorWhiteDim);
+    this->SetDisplayLine(0, ALIGN_LEFT, "", NON_INVERT, true);
+    this->SetDisplayLine(1, ALIGN_LEFT, "", NON_INVERT, true);
+    this->SetDisplayLine(2, ALIGN_CENTER, "", NON_INVERT, true);
+    this->SetDisplayLine(3, ALIGN_CENTER, "", NON_INVERT, true);
+    this->SetMuteButtonValue(BTN_VALUE_OFF);
+    this->SetSoloButtonValue(BTN_VALUE_OFF);
+    this->SetSelectButtonValue(BTN_VALUE_OFF);
+    this->SetValueBarValue(0);
+    this->SetFaderValue(0);
+    this->SetVuMeterValue(0);
+}
+
 void CSurf_Track::SetTrackColor(ButtonColor colorActive, ButtonColor colorDim)
 {
 

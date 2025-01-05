@@ -96,6 +96,21 @@ string StripPluginChannelPostfix(char *name)
     return s;
 }
 
+bool IsPluginFX(string name)
+{
+    string delimiter = ": ";
+    int pos = name.find(delimiter);
+    // If we can not find the delimiter, we can not determine the type of plugin, so asume it's an effect
+    if (pos < 0)
+    {
+        return true;
+    }
+    name.erase(pos, name.length());
+    name.erase(0, name.length() - 1);
+
+    return name != "i";
+}
+
 string Progress(int current, int total)
 {
     char buffer[127];

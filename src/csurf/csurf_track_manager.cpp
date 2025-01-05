@@ -24,7 +24,7 @@ protected:
         if (!context->GetArm())
         {
 
-            int trackColor = GetTrackColor(media_track);
+            int trackColor = ::GetTrackColor(media_track);
             if (trackColor == 0)
             {
                 red = 0x7f;
@@ -76,7 +76,7 @@ public:
     {
         UpdateTracks();
     }
-    ~CSurf_TrackManager() {};
+    ~CSurf_TrackManager() {}
 
     void UpdateTracks() override
     {
@@ -94,6 +94,12 @@ public:
 
             CSurf_Track *track = tracks.at(i);
             MediaTrack *media_track = media_tracks.Get(i);
+
+            if (!media_track || CountTracks(0) < i)
+            {
+                track->ClearTrack();
+                continue;
+            }
             SetTrackColors(media_track);
 
             bool isSelected = DAW::IsTrackSelected(media_track);
@@ -109,19 +115,10 @@ public:
             track->SetMuteButtonValue(DAW::IsTrackMuted(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
             track->SetSoloButtonValue(DAW::IsTrackSoloed(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
             track->SetFaderValue(faderValue, forceUpdate);
-            track->SetValueBarMode(context->GetShiftLeft() ? VALUEBAR_MODE_FILL : VALUEBAR_MODE_BIPOLAR);
+            track->SetValueBarMode((context->GetShiftLeft() || context->GetArm()) ? VALUEBAR_MODE_FILL : VALUEBAR_MODE_BIPOLAR);
             track->SetValueBarValue(valueBarValue);
-            track->SetVuMeterValue(DAW::GetTrackSurfacePeakInfo(media_track));
 
-            if (!context->GetShiftLeft())
-            {
-                track->SetDisplayMode(DISPLAY_MODE_8, forceUpdate);
-                track->SetDisplayLine(0, ALIGN_LEFT, DAW::GetTrackName(media_track).c_str(), NON_INVERT, forceUpdate);
-                track->SetDisplayLine(1, ALIGN_CENTER, DAW::GetTrackIndex(media_track).c_str(), NON_INVERT, forceUpdate);
-                track->SetDisplayLine(2, ALIGN_CENTER, context->GetPanPushMode() ? strPan1.c_str() : strPan2.c_str(), NON_INVERT, forceUpdate);
-                track->SetDisplayLine(3, ALIGN_CENTER, string("").c_str(), NON_INVERT, forceUpdate);
-            }
-            else if (media_track)
+            if (context->GetShiftLeft() || context->GetShiftRight())
             {
                 track->SetDisplayMode(DISPLAY_MODE_2, forceUpdate);
                 track->SetDisplayLine(0, ALIGN_CENTER, DAW::GetTrackName(media_track).c_str(), NON_INVERT, forceUpdate);
@@ -129,13 +126,23 @@ public:
                 track->SetDisplayLine(2, ALIGN_CENTER, strPan1.c_str(), NON_INVERT, forceUpdate);
                 track->SetDisplayLine(3, ALIGN_CENTER, strPan2.c_str(), NON_INVERT, forceUpdate);
             }
-            else
+            else if (context->GetArm() && isArmed)
             {
                 track->SetDisplayMode(DISPLAY_MODE_2, forceUpdate);
-                track->SetDisplayLine(0, ALIGN_CENTER, "", NON_INVERT, forceUpdate);
-                track->SetDisplayLine(1, ALIGN_CENTER, "", NON_INVERT, forceUpdate);
-                track->SetDisplayLine(2, ALIGN_CENTER, "", NON_INVERT, forceUpdate);
-                track->SetDisplayLine(3, ALIGN_CENTER, "", NON_INVERT, forceUpdate);
+                track->SetDisplayLine(0, ALIGN_CENTER, DAW::GetTrackName(media_track).c_str(), NON_INVERT, forceUpdate);
+                track->SetDisplayLine(1, ALIGN_CENTER, DAW::GetTrackInputName(media_track).c_str(), NON_INVERT, forceUpdate);
+                track->SetDisplayLine(2, ALIGN_CENTER, DAW::GetTrackMonitorMode(media_track).c_str(), NON_INVERT, forceUpdate);
+                track->SetDisplayLine(3, ALIGN_CENTER, DAW::GetTrackRecordingMode(media_track).c_str(), NON_INVERT, forceUpdate);
+            }
+            else
+            {
+                track->SetVuMeterValue(DAW::GetTrackSurfacePeakInfo(media_track));
+
+                track->SetDisplayMode(DISPLAY_MODE_8, forceUpdate);
+                track->SetDisplayLine(0, ALIGN_LEFT, DAW::GetTrackName(media_track).c_str(), NON_INVERT, forceUpdate);
+                track->SetDisplayLine(1, ALIGN_CENTER, DAW::GetTrackIndex(media_track).c_str(), NON_INVERT, forceUpdate);
+                track->SetDisplayLine(2, ALIGN_CENTER, context->GetPanPushMode() ? strPan1.c_str() : strPan2.c_str(), NON_INVERT, forceUpdate);
+                track->SetDisplayLine(3, ALIGN_CENTER, string("").c_str(), NON_INVERT, forceUpdate);
             }
         }
 

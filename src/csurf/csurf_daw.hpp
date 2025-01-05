@@ -22,10 +22,14 @@ public:
     static int GetTrackPanMode(MediaTrack *media_track);
     static string GetTrackName(MediaTrack *media_track);
     static string GetTrackIndex(MediaTrack *media_track);
+    static string GetTrackInputName(MediaTrack *media_track);
+    static string GetTrackMonitorMode(MediaTrack *media_track);
+    static string GetTrackRecordingMode(MediaTrack *media_track);
 
     static double GetTrackPeakInfo(MediaTrack *media_track);
     static int GetTrackSurfacePeakInfo(MediaTrack *media_track);
 
+    static bool TrackHasFx(MediaTrack *media_track);
     static bool HasTrackFx(MediaTrack *media_track, int fx);
     static string GetTrackFxName(MediaTrack *media_track, int fx, bool full = false);
     static string GetTrackFxDeveloper(MediaTrack *media_track, int fx);
@@ -58,6 +62,9 @@ public:
     static bool GetTrackSendPhase(MediaTrack *media_track, int send);
     static bool GetTrackSendMono(MediaTrack *media_track, int send);
     static int GetNextTrackSendMode(MediaTrack *media_track, int receive);
+
+    static bool MediaItemHasMidi(MediaItem *media_item);
+    static bool MediaItemHasAudio(MediaItem *media_item);
 };
 
 #endif

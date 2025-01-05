@@ -14,6 +14,13 @@ struct ButtonColor
         blue = _blue;
     }
 
+    void SetColor(ButtonColor color)
+    {
+        red = color.red;
+        green = color.green;
+        blue = color.blue;
+    }
+
     bool IsColor(ButtonColor color)
     {
         return color.blue == blue && color.red == red && color.green == green;

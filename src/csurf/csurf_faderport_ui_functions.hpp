@@ -7,8 +7,8 @@
 #include <WDL/swell/swell-types.h>
 #include <reaper_plugin_functions.h>
 #include "../src/resource.h"
-#include "extern/ini.hpp"
 #include "csurf_utils.hpp"
+#include <mINI/ini.h>
 #include <localize/localize.h>
 #include "csurf_faderport_ui_utils.hpp"
 #include <swell/swell-functions.h>
