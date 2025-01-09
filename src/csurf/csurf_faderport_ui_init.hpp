@@ -14,7 +14,7 @@ using namespace std;
 
 namespace CSURF_FADERPORT_UI_INIT
 {
-    static mINI::INIStructure ini;
+    mINI::INIStructure ini;
 
     static void SaveCheckBoxValue(HWND hwndDlg, string key, int checkBox)
     {
@@ -32,8 +32,8 @@ namespace CSURF_FADERPORT_UI_INIT
         case WM_INITDIALOG:
         {
             mINI::INIFile file(GetReaSonusIniPath());
-            mINI::INIStructure ini;
-            file.read(ini);
+            // mINI::INIStructure ini;
+            // file.read(ini);
 
             int combo;
             char buf[255];
@@ -64,7 +64,7 @@ namespace CSURF_FADERPORT_UI_INIT
                 }
             }
 
-            for (int i = 1; i <= GetNumMIDIOutputs(); ++i)
+            for (int i = 0; i <= GetNumMIDIOutputs(); ++i)
             {
                 if (i == 0)
                 {

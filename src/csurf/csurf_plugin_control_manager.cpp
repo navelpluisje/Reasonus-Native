@@ -88,8 +88,7 @@ public:
             track->SetSelectButtonValue(BTN_VALUE_OFF, forceUpdate);
             track->SetMuteButtonValue(BTN_VALUE_OFF, forceUpdate);
             track->SetSoloButtonValue(BTN_VALUE_OFF, forceUpdate);
-            track->SetValueBarMode(VALUEBAR_MODE_NORMAL);
-            track->SetValueBarValue(0);
+            track->SetValueBarMode(VALUEBAR_MODE_FILL);
 
             track->SetDisplayMode(DISPLAY_MODE_2, forceUpdate);
 
@@ -102,7 +101,7 @@ public:
             }
             else
             {
-                track->SetDisplayLine(0, ALIGN_CENTER, "Free", INVERT, forceUpdate);
+                track->SetDisplayLine(0, ALIGN_CENTER, "", NON_INVERT, forceUpdate);
                 track->SetDisplayLine(1, ALIGN_CENTER, "", NON_INVERT, true);
             }
 
@@ -114,12 +113,15 @@ public:
                 track->SetDisplayLine(3, ALIGN_CENTER, buffer, NON_INVERT, forceUpdate);
                 double value = TrackFX_GetParam(media_track, pluginId, stoi(ini[paramKey]["param"]), &min, &max);
                 track->SetFaderValue((int)(value * 16383.0), forceUpdate);
+                track->SetValueBarValue((int)(value * 127.0));
             }
             else
             {
-                track->SetDisplayLine(2, ALIGN_CENTER, "Free", INVERT, forceUpdate);
+                track->SetDisplayLine(2, ALIGN_CENTER, "", NON_INVERT, forceUpdate);
                 track->SetDisplayLine(3, ALIGN_CENTER, "", NON_INVERT, true);
                 track->SetFaderValue(0, forceUpdate);
+                track->SetValueBarMode(VALUEBAR_MODE_OFF);
+                track->SetValueBarValue(0);
             }
         }
 
@@ -139,15 +141,19 @@ public:
             int paramId = stoi(ini[paramKey]["param"]);
 
             int nbSteps = stoi(ini[paramKey]["steps"]);
+            if (nbSteps == 1)
+            {
+                nbSteps = 2;
+            }
             double value = TrackFX_GetParam(media_track, pluginId, paramId, &min, &max);
             double stepSize = max / (nbSteps - 1);
-            double newValue = value + stepSize;
-            if (newValue > 1.0)
+            double newValue = int((value + stepSize) * 100);
+            if (newValue > 100)
             {
-                newValue = 0.0;
+                newValue = 0;
             }
 
-            TrackFX_SetParam(media_track, pluginId, paramId, newValue);
+            TrackFX_SetParam(media_track, pluginId, paramId, newValue / 100);
         }
     }
 

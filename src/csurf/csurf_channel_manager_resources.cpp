@@ -12,24 +12,19 @@
  * @param panMode The pan mode
  * @return string
  */
-string GetPanString(double pan, int panMode)
+string GetPanString(double pan)
 {
     int panInt = (int)(pan * 100.0);
     string strVal = to_string(abs(panInt));
-    if (panMode == 6)
+    if (panInt < 0)
     {
-        panInt = (panInt + 100) / 2;
-        return to_string(panInt) + "L";
+        return strVal + "%L";
     }
-    if (pan < 0)
+    if (panInt > 0)
     {
-        return "L" + strVal;
+        return strVal + "%R";
     }
-    if (pan > 0)
-    {
-        return "R" + strVal;
-    }
-    return "<C>";
+    return "Center";
 }
 
 /**
@@ -41,12 +36,11 @@ string GetPanString(double pan, int panMode)
  */
 string GetWidthString(double width, int panMode)
 {
-    int panInt = ((int)(width * 100.0) + 100) / 2;
-    panInt = (panInt + 100) / 2;
-    string strVal = to_string(abs(panInt));
     if (panMode == 6)
     {
-        return to_string(panInt) + "R";
+        return GetPanString(width);
     }
-    return "W" + strVal;
+    int panInt = (int)(width * 100.0);
+    string strVal = to_string(panInt);
+    return strVal + "W";
 }

@@ -47,7 +47,7 @@ protected:
 
         GetTrackUIVolPan(media_track, &volume, &pan1);
         GetTrackUIPan(media_track, &pan1, &pan2, &panMode);
-        *_pan1 = GetPanString(pan1, panMode);
+        *_pan1 = GetPanString(pan1);
         *_pan2 = GetWidthString(pan2, panMode);
 
         if (context->GetShiftLeft())

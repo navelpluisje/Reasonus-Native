@@ -53,7 +53,7 @@ protected:
         double volume, pan = 0.0;
 
         GetTrackSendUIVolPan(media_track, sendIndex, &volume, &pan);
-        *panStr = GetPanString(pan, 0);
+        *panStr = GetPanString(pan);
         *_pan = pan;
 
         if (context->GetShiftLeft())

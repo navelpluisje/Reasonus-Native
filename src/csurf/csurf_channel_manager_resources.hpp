@@ -12,7 +12,7 @@ using namespace std;
  * @param panMode The pan mode
  * @return string
  */
-string GetPanString(double pan, int panMode);
+string GetPanString(double pan);
 
 /**
  * @brief Get a string representation of the width value and the panMode. If panMode is 5, it will return the right pan representation
