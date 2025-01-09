@@ -4,7 +4,7 @@
 /*build*
 /*out*
 /lib
-/third_party
+/third_party/*
 /WDL
 /.idea
 /.vs
