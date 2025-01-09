@@ -58,19 +58,6 @@ namespace CSURF_FADERPORT_UI_FILTERS
         return filterTextList;
     }
 
-    static string GenerateFilterKey()
-    {
-        srand(time(0));
-        string p = "filter_";
-        char a[] = "abcdefghijklmnopqrstuvwxyz";
-        for (int i = 0; i < 24; i++)
-        {
-            char rnd = a[(rand() + 100) % 26];
-            p += rnd;
-        }
-        return p;
-    }
-
     static void HideFiltersDialog()
     {
         ShowWindow(s_hwndReaSonusFiltersDlg, SW_HIDE);
@@ -232,7 +219,7 @@ namespace CSURF_FADERPORT_UI_FILTERS
             {
                 mINI::INIFile file(GetReaSonusIniPath());
 
-                string newKey = GenerateFilterKey();
+                string newKey = GenerateUniqueKey("Filter_");
                 ini["filters"][ini["filters"]["nb-filters"]] = newKey;
                 ini["filters"]["nb-filters"] = to_string(stoi(ini["filters"]["nb-filters"]) + 1);
                 ini[newKey];

@@ -261,3 +261,15 @@ void readAndCreateIni(mINI::INIStructure &data)
     };
     file.read(data);
 }
+
+string GenerateUniqueKey(string prefix)
+{
+    srand(time(0));
+    char a[] = "abcdefghijklmnopqrstuvwxyz0123456789";
+    for (int i = 0; i < 24; i++)
+    {
+        char rnd = a[(rand() + 100) % 36];
+        prefix += rnd;
+    }
+    return prefix;
+};

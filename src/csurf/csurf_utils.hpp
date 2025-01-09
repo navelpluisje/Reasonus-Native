@@ -169,4 +169,11 @@ void logDouble(const char *key, double value);
  */
 void readAndCreateIni(mINI::INIStructure &data);
 
+/**
+ * @brief Create a unique key
+ *
+ * @param prefix The prefix used for the key
+ */
+string GenerateUniqueKey(string prefix);
+
 #endif // CSURF_UTILS_H_
