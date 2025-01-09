@@ -302,7 +302,7 @@ public:
         switch (session_type)
         {
         case Channel:
-            // TODO: Navigate to next track, previous track
+            trackNavigator->IncrementOffset(context->GetShiftLeft() ? context->GetNbChannels() : 1);
             break;
         case Zoom:
             context->GetShiftLeft() ? Main_OnCommandEx(40111, 0, 0) // View: Zoom in vertical
@@ -339,6 +339,7 @@ public:
         switch (session_type)
         {
         case Channel:
+            trackNavigator->DecrementOffset(context->GetShiftLeft() ? context->GetNbChannels() : 1);
             break;
         case Zoom:
             context->GetShiftLeft() ? Main_OnCommandEx(40112, 0, 0) // View: Zoom out vertical

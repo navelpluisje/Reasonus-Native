@@ -65,12 +65,15 @@ class CSurf_FaderPort : public IReaperControlSurface
      */
     if (evt->midi_message[0] >= FADER_1 && evt->midi_message[0] <= FADER_16)
     {
-      faderManager->HandleFaderMove(evt->midi_message[0] - FADER_1, evt->midi_message[2], evt->midi_message[1]);
       if (
-          (context->GetNbChannels() == 8 && context->GetLastTouchedFxMode() && evt->midi_message[0] == FADER_8) ||
-          (context->GetNbChannels() == 16 && context->GetLastTouchedFxMode() && evt->midi_message[0] == FADER_16))
+          (context->GetNbChannels() == 7 && context->GetLastTouchedFxMode() && evt->midi_message[0] == FADER_8) ||
+          (context->GetNbChannels() == 15 && context->GetLastTouchedFxMode() && evt->midi_message[0] == FADER_16))
       {
         lastTouchedFxManager->HandleFaderMove(evt->midi_message[2], evt->midi_message[1]);
+      }
+      else
+      {
+        faderManager->HandleFaderMove(evt->midi_message[0] - FADER_1, evt->midi_message[2], evt->midi_message[1]);
       }
     }
 
