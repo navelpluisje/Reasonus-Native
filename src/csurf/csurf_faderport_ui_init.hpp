@@ -162,7 +162,7 @@ namespace CSURF_FADERPORT_UI_INIT
         (void)type_string;
 
         static mINI::INIFile file(GetReaSonusIniPath());
-        file.read(ini);
+        readAndCreateIni(ini);
 
         return CreateDialogParam(g_hInst, MAKEINTRESOURCE(IDD_DIALOG_REASONUS_NATIVE), parent, dlgProc, (LPARAM)initConfigString);
     }

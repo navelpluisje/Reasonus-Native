@@ -363,27 +363,8 @@ public:
      * First we check if we have the ini file. If not we create it with default values
      *
      */
-    RecursiveCreateDirectory((string(GetResourcePath()) + "/ReaSonus/Plugins").c_str(), 0);
-    mINI::INIFile file(GetReaSonusIniPath());
     mINI::INIStructure ini;
-    if (!file.read(ini))
-    {
-      ini["Surface"]["MidiIn"] = "0";
-      ini["Surface"]["MidiOut"] = "0";
-      ini["Surface"]["Surface"] = "0";
-      ini["Surface"]["Disable-Plugins"] = "0";
-      ini["Surface"]["Swap-Shift-Button"] = "0";
-      ini["Functions"]["1"] = "0";
-      ini["Functions"]["2"] = "0";
-      ini["Functions"]["3"] = "0";
-      ini["Functions"]["4"] = "0";
-      ini["Functions"]["5"] = "0";
-      ini["Functions"]["6"] = "0";
-      ini["Functions"]["7"] = "0";
-      ini["Functions"]["8"] = "0";
-      ini["Filters"]["Nb-Filters"] = "0";
-      file.generate(ini, true);
-    };
+    readAndCreateIni(ini);
 
     errStats = 0;
     m_midi_in_dev = stoi(ini["Surface"]["MidiIn"]);

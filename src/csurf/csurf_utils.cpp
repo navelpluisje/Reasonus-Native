@@ -236,3 +236,28 @@ void logDouble(const char *key, double value)
     snprintf(buffer, sizeof(buffer), "%s: %f\n", key, value);
     ShowConsoleMsg(buffer);
 }
+
+void readAndCreateIni(mINI::INIStructure &data)
+{
+    mINI::INIFile file(GetReaSonusIniPath());
+    if (!file.read(data))
+    {
+        RecursiveCreateDirectory((string(GetResourcePath()) + "/ReaSonus/Plugins").c_str(), 0);
+        data["Surface"]["MidiIn"] = "0";
+        data["Surface"]["MidiOut"] = "0";
+        data["Surface"]["Surface"] = "0";
+        data["Surface"]["Disable-Plugins"] = "0";
+        data["Surface"]["Swap-Shift-Buttons"] = "0";
+        data["Functions"]["1"] = "0";
+        data["Functions"]["2"] = "0";
+        data["Functions"]["3"] = "0";
+        data["Functions"]["4"] = "0";
+        data["Functions"]["5"] = "0";
+        data["Functions"]["6"] = "0";
+        data["Functions"]["7"] = "0";
+        data["Functions"]["8"] = "0";
+        data["Filters"]["Nb-Filters"] = "0";
+        file.generate(data, true);
+    };
+    file.read(data);
+}

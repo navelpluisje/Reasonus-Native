@@ -3,6 +3,7 @@
 
 #include <string>
 #include <reaper_plugin_functions.h>
+#include <mINI/ini.h>
 
 using namespace std;
 
@@ -160,5 +161,12 @@ bool hasPluginConfigFile(MediaTrack *media_track, int pluginId);
 void logInteger(const char *key, int value);
 
 void logDouble(const char *key, double value);
+
+/**
+ * @brief Check if we have the FP.ini available. If not, we create it
+ *
+ * @param data The data object to write the ini data to
+ */
+void readAndCreateIni(mINI::INIStructure &data);
 
 #endif // CSURF_UTILS_H_
