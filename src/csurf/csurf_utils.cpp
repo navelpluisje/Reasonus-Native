@@ -186,7 +186,7 @@ vector<string> split(string str, string delimiter)
         {
             // Find the index of occurrence
             int idx = str.find(delimiter, start);
-            if (idx == string::npos)
+            if (idx == static_cast<int>(string::npos))
             {
                 break;
             }
