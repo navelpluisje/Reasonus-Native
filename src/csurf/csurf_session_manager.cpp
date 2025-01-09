@@ -6,7 +6,7 @@
 #include "csurf_context.cpp"
 #include "csurf_navigator.hpp"
 #include "csurf_session_manager_actions.hpp"
-#include <mINI/ini.h>
+#include <mini/ini.h>
 #include "csurf_faderport_ui_functions.hpp"
 
 using namespace CSURF_FADERPORT_UI_FUNCTIONS;

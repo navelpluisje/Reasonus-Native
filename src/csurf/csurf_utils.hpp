@@ -3,7 +3,7 @@
 
 #include <string>
 #include <reaper_plugin_functions.h>
-#include <mINI/ini.h>
+#include <mini/ini.h>
 
 using namespace std;
 

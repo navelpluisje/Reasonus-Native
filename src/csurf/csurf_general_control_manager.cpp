@@ -154,8 +154,6 @@ public:
         case PanEncoderReceiveMode:
             context->UpdateChannelManagerItemIndex(hasBit(val, 6) ? -1 : 1);
             break;
-
-        default:
         }
     }
 

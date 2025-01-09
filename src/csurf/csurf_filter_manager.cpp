@@ -6,7 +6,7 @@
 #include "csurf_track.hpp"
 #include "csurf_channel_manager.hpp"
 #include "csurf_navigator.hpp"
-#include <mINI/ini.h>
+#include <mini/ini.h>
 #include <vector>
 #include "csurf_daw.hpp"
 #include "csurf_utils.hpp"

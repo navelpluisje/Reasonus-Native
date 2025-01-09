@@ -2,7 +2,7 @@
 #include "csurf_utils.hpp"
 #include "csurf_daw.hpp"
 #include <reaper_plugin_functions.h>
-#include <mINI/ini.h>
+#include <mini/ini.h>
 #include "csurf_navigator_filters.hpp"
 
 void CSurf_Navigator::GetAllVisibleTracks(WDL_PtrList<MediaTrack> &tracks, bool &hasSolo, bool &hasMute)
