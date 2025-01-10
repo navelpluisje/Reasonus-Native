@@ -9,6 +9,11 @@ int DAW::sendModes[3] = {0, 1, 3};
 
 using namespace std;
 
+int csurfRound(double val)
+{
+    return (int)(val + 0.5);
+}
+
 /************************************************************************
  * Track
  ************************************************************************/
@@ -277,7 +282,7 @@ int DAW::GetTrackFxParamNbSteps(MediaTrack *media_track, int fx, int param)
     {
         if (stepOut > 0)
         {
-            nbSteps = (int)round(1.0 / stepOut) + 1;
+            nbSteps = csurfRound(1.0 / stepOut) + 1;
         }
     }
     return nbSteps;
