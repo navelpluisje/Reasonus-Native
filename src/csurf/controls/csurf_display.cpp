@@ -1,5 +1,6 @@
 #include "csurf_display.hpp"
 #include <reaper_plugin.h>
+#include <WDL/wdltypes.h> // might be unnecessary in future
 #include <reaper_plugin_functions.h>
 #include "../csurf_utils.hpp"
 

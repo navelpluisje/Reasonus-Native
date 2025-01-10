@@ -1,6 +1,4 @@
 #include "show_reaper_resource_path.hpp"
-#include <gsl/gsl>
-#include <reaper_plugin_functions.h>
 
 #define STRINGIZE_DEF(x) #x
 #define STRINGIZE(x) STRINGIZE_DEF(x)

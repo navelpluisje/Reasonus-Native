@@ -1,6 +1,7 @@
 #include "csurf_utils.hpp"
 #include "csurf_daw.hpp"
 #include <db2val.h>
+#include <WDL/wdltypes.h> // might be unnecessary in future
 #include <reaper_plugin_functions.h>
 #include <string>
 #include <vector>

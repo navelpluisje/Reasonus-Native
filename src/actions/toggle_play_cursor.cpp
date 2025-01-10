@@ -1,6 +1,4 @@
 #include "toggle_play_cursor.hpp"
-#include <gsl/gsl>
-#include <reaper_plugin_functions.h>
 
 #define STRINGIZE_DEF(x) #x
 #define STRINGIZE(x) STRINGIZE_DEF(x)

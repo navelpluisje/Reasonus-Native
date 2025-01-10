@@ -2,6 +2,7 @@
 #define CSURF_UTILS_H_
 
 #include <string>
+#include <WDL/wdltypes.h> // might be unnecessary in future
 #include <reaper_plugin_functions.h>
 #include <mini/ini.h>
 

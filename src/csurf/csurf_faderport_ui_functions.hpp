@@ -5,6 +5,7 @@
 #include <win32_utf8.h>
 #include <string>
 #include <WDL/swell/swell-types.h>
+#include <WDL/wdltypes.h> // might be unnecessary in future
 #include <reaper_plugin_functions.h>
 #include "../src/resource.h"
 #include "csurf_utils.hpp"

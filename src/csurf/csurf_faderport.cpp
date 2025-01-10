@@ -7,6 +7,7 @@
 #define LOCALIZE_IMPORT_PREFIX "csurf_"
 #include <reaper_plugin.h>
 #include <localize-import.h>
+#include <WDL/wdltypes.h> // might be unnecessary in future
 #include <reaper_plugin_functions.h>
 #include <string>
 #include "csurf.h"

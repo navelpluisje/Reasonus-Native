@@ -1,5 +1,3 @@
-#include <reaper_plugin.h>
-#include <reaper_plugin_functions.h>
 #include "csurf_button.hpp"
 
 void CSurf_Button::SendValue()

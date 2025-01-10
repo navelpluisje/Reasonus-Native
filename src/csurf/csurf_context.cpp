@@ -3,6 +3,7 @@
 
 #include "csurf_context_resources.hpp"
 #include <cstdlib>
+#include <WDL/wdltypes.h> // might be unnecessary in future
 #include <reaper_plugin_functions.h>
 #include "csurf_utils.hpp"
 

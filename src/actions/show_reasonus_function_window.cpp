@@ -1,6 +1,4 @@
 #include "show_reasonus_function_window.hpp"
-#include <gsl/gsl>
-#include <reaper_plugin_functions.h>
 #include "../csurf/csurf_faderport_ui_functions.hpp"
 
 #define STRINGIZE_DEF(x) #x

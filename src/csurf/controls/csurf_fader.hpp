@@ -2,6 +2,7 @@
 #define CSURF_FADER_H_
 
 #include <reaper_plugin.h>
+#include <WDL/wdltypes.h> // might be unnecessary in future
 #include "csurf_fader_resources.hpp"
 
 using namespace std;

@@ -1,6 +1,4 @@
 #include "show_reasonus_filters_window.hpp"
-#include <gsl/gsl>
-#include <reaper_plugin_functions.h>
 #include "../csurf/csurf_faderport_ui_filters.hpp"
 
 #define STRINGIZE_DEF(x) #x
