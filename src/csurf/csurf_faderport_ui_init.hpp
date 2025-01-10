@@ -1,7 +1,7 @@
 #ifndef CSURF_FADERPORT_UI_H_
 #define CSURF_FADERPORT_UI_H_
 
-#include "../src/resource.h"
+#include "../resource.h"
 #include "csurf_faderport_ui_utils.hpp"
 #include <mini/ini.h>
 #include "csurf_utils.hpp"

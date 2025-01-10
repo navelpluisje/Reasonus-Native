@@ -23,7 +23,7 @@
 #include "csurf_utils.hpp"
 #include "csurf_faderport_ui_init.hpp"
 #include <WDL/ptrlist.h>
-#include "../src/resource.h"
+#include "../resource.h"
 #include <vector>
 #include <string>
 #include <swell/swell-functions.h>
