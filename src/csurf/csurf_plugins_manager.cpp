@@ -14,7 +14,7 @@ class CSurf_PluginsManager : public CSurf_ChannelManager
 {
 protected:
     int nbPlugins = 0;
-    int nbTrackPlugins[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+    int nbTrackPlugins[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     int currentPlugin = 0;
 
     void SetTrackColors(MediaTrack *media_track) override

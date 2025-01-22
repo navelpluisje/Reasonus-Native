@@ -14,7 +14,7 @@ class CSurf_ReceivesManager : public CSurf_ChannelManager
 {
 protected:
     int nbReceives = 0;
-    int nbTrackReceives[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+    int nbTrackReceives[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     int currentReceive = 0;
 
     void SetTrackColors(MediaTrack *media_track) override
