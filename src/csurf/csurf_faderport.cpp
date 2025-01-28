@@ -5,11 +5,14 @@
 ** License: LGPL.
 */
 #define LOCALIZE_IMPORT_PREFIX "csurf_"
+#include <string>
+#include <vector>
 #include <reaper_plugin.h>
 #include <localize-import.h>
+#include <WDL/localize/localize.h>
 #include <WDL/wdltypes.h> // might be unnecessary in future
+#include <WDL/ptrlist.h>
 #include <reaper_plugin_functions.h>
-#include <string>
 #include "csurf.h"
 #include "csurf_session_manager.cpp"
 #include "csurf_transport_manager.cpp"
@@ -19,15 +22,10 @@
 #include "csurf_last_touched_fx_manager.hpp"
 #include "csurf_fader_manager.hpp"
 #include "csurf_navigator.hpp"
-#include "controls/csurf_button.hpp"
 #include "csurf_utils.hpp"
 #include "csurf_faderport_ui_init.hpp"
-#include <WDL/ptrlist.h>
+#include "controls/csurf_button.hpp"
 #include "../resource.h"
-#include <vector>
-#include <string>
-#include <swell/swell-functions.h>
-#include <localize/localize.h>
 
 extern HWND g_hwnd;
 

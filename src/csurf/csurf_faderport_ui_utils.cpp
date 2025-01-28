@@ -1,6 +1,6 @@
-#include <WDL/swell/swell-types.h>
-#include <swell/swell-functions.h>
 #include "csurf_faderport_ui_utils.hpp"
+#include <swell/swell-types.h>
+#include <swell/swell-functions.h>
 
 void parseParms(const char *str, int parms[4])
 {

@@ -93,7 +93,7 @@ public:
             track->SetDisplayMode(DISPLAY_MODE_2, forceUpdate);
 
             paramKey = getParamKey("Select_", filterIndex);
-            if (ini.has(paramKey))
+            if (ini.has(paramKey) && ini[paramKey]["param"] != "")
             {
                 track->SetDisplayLine(0, ALIGN_CENTER, ini[paramKey]["name"].c_str(), INVERT, forceUpdate);
                 TrackFX_GetFormattedParamValue(media_track, pluginId, stoi(ini[paramKey]["param"]), buffer, sizeof(buffer));
@@ -106,7 +106,7 @@ public:
             }
 
             paramKey = getParamKey("Fader_", filterIndex);
-            if (ini.has(paramKey))
+            if (ini.has(paramKey) && ini[paramKey]["param"] != "")
             {
                 track->SetDisplayLine(2, ALIGN_CENTER, ini[paramKey]["name"].c_str(), INVERT, forceUpdate);
                 TrackFX_GetFormattedParamValue(media_track, pluginId, stoi(ini[paramKey]["param"]), buffer, sizeof(buffer));
@@ -136,7 +136,7 @@ public:
         int pluginId = context->GetPluginEditPluginId();
         string paramKey = getParamKey("Select_", controlIndex);
 
-        if (ini.has(paramKey))
+        if (ini.has(paramKey) && ini[paramKey]["param"] != "")
         {
             int paramId = stoi(ini[paramKey]["param"]);
 

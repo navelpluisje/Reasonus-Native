@@ -2,8 +2,7 @@
 #define CSURF_FADERPORT_UI_UTILS_H_
 
 #include <string>
-#include <WDL/swell/swell-types.h>
-#include <swell/swell-functions.h>
+#include <swell/swell-types.h>
 
 using namespace std;
 

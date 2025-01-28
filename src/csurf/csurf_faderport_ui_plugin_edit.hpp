@@ -1,18 +1,15 @@
 #ifndef CSURF_FADERPORT_UI_PLUGIN_EDIT_H_
 #define CSURF_FADERPORT_UI_PLUGIN_EDIT_H_
 
-#include <wdltypes.h>
-#include <win32_utf8.h>
 #include <string>
-#include <WDL/swell/swell-types.h>
 #include <WDL/wdltypes.h> // might be unnecessary in future
+#include <WDL/win32_utf8.h>
+#include <WDL/localize/localize.h>
 #include <reaper_plugin_functions.h>
-#include "../resource.h"
 #include <mini/ini.h>
+#include "../resource.h"
 #include "csurf_utils.hpp"
 #include "csurf_faderport_ui_utils.hpp"
-#include <localize/localize.h>
-#include <swell/swell-functions.h>
 
 extern HWND g_hwnd;
 

@@ -1,12 +1,11 @@
 #ifndef CSURF_FADERPORT_UI_H_
 #define CSURF_FADERPORT_UI_H_
 
-#include "../resource.h"
-#include "csurf_faderport_ui_utils.hpp"
 #include <mini/ini.h>
+#include <WDL/localize/localize.h>
 #include "csurf_utils.hpp"
-#include <swell/swell-functions.h>
-#include <localize/localize.h>
+#include "csurf_faderport_ui_utils.hpp"
+#include "../resource.h"
 
 extern HWND g_hwnd;
 
