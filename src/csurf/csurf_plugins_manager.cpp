@@ -34,7 +34,7 @@ protected:
             }
             else
             {
-                ColorFromNative(trackColor, &red, &green, &blue);
+                ::ColorFromNative(trackColor, &red, &green, &blue);
             }
         }
         colorActive.SetColor(red / 2, green / 2, blue / 2);
@@ -46,8 +46,8 @@ protected:
         int panMode = 0;
         double volume, pan1, pan2 = 0.0;
 
-        GetTrackUIVolPan(media_track, &volume, &pan1);
-        GetTrackUIPan(media_track, &pan1, &pan2, &panMode);
+        ::GetTrackUIVolPan(media_track, &volume, &pan1);
+        ::GetTrackUIPan(media_track, &pan1, &pan2, &panMode);
 
         *faderValue = int(volToNormalized(volume) * 16383.0);
         *valueBarValue = int(panToNormalized(pan1) * 127);
@@ -79,7 +79,7 @@ public:
         for (int i = 0; i < context->GetNbChannels(); i++)
         {
             MediaTrack *media_track = media_tracks.Get(i);
-            int _nbTrackPlugins = TrackFX_GetCount(media_track);
+            int _nbTrackPlugins = ::TrackFX_GetCount(media_track);
             nbTrackPlugins[i] = _nbTrackPlugins;
 
             if (_nbTrackPlugins > nbPlugins)
@@ -140,12 +140,12 @@ public:
 
         if (context->GetArm())
         {
-            CSurf_SetSurfaceRecArm(media_track, CSurf_OnRecArmChange(media_track, !DAW::IsTrackArmed(media_track)), NULL);
+            ::CSurf_SetSurfaceRecArm(media_track, ::CSurf_OnRecArmChange(media_track, !DAW::IsTrackArmed(media_track)), NULL);
             return;
         }
 
         DAW::UnSelectAllTracks();
-        SetTrackSelected(media_track, true);
+        ::SetTrackSelected(media_track, true);
     }
 
     void HandleMuteClick(int index) override
@@ -155,11 +155,11 @@ public:
 
         if (context->GetShiftLeft())
         {
-            TrackFX_SetOffline(media_track, pluginIndex, !DAW::GetTrackFxOffline(media_track, pluginIndex));
+            ::TrackFX_SetOffline(media_track, pluginIndex, !DAW::GetTrackFxOffline(media_track, pluginIndex));
         }
         else
         {
-            TrackFX_SetEnabled(media_track, pluginIndex, !DAW::GetTrackFxEnabled(media_track, pluginIndex));
+            ::TrackFX_SetEnabled(media_track, pluginIndex, !DAW::GetTrackFxEnabled(media_track, pluginIndex));
         }
     }
 
@@ -172,17 +172,16 @@ public:
         // Otherwise Close all other open windows and open the plugin window
         if (DAW::GetTrackFxPanelOpen(media_track, pluginIndex))
         {
-            TrackFX_Show(media_track, pluginIndex, 0);
-            TrackFX_Show(media_track, pluginIndex, 2);
+            ::TrackFX_Show(media_track, pluginIndex, 0);
+            ::TrackFX_Show(media_track, pluginIndex, 2);
             context->SetPluginEditTrack(NULL);
             context->SetPluginEditPluginId(-1);
         }
         else
         {
             // First clean up all open fx windows and then open the plugin in a floating window
-            Main_OnCommandStringEx("_S&M_WNCLS3"); // SWS/S&M: Close all floating FX windows
-            Main_OnCommandStringEx("_S&M_WNCLS4"); // SWS/S&M: Close all FX chain windows
-            TrackFX_Show(media_track, pluginIndex, 3);
+            Main_OnCommandStringEx("_REASONUS_CLOSE_ALL_FLOATING_FX_WINDOWS_COMMAND"); // SWS/S&M: Close all floating FX and chanin windows
+            ::TrackFX_Show(media_track, pluginIndex, 3);
             context->SetPluginEditTrack(media_track);
             context->SetPluginEditPluginId(pluginIndex);
             // We need to check if the plugin is available and then set the correct manager
@@ -193,7 +192,7 @@ public:
     {
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
         // Because it is the fx navigation, the fader will only change the channels volume
-        CSurf_SetSurfaceVolume(media_track, CSurf_OnVolumeChange(media_track, int14ToVol(msb, lsb), false), NULL);
+        ::CSurf_SetSurfaceVolume(media_track, ::CSurf_OnVolumeChange(media_track, int14ToVol(msb, lsb), false), NULL);
     }
 };
 

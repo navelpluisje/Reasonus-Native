@@ -65,6 +65,7 @@ FetchContent_Declare(mINI
 FetchContent_MakeAvailable(WDL reaper-sdk GSL mINI)
 
 # symlink WDL to reaper-sdk
+if (UNIX)
 execute_process(
     COMMAND ${CMAKE_COMMAND} -E create_symlink
             # source
@@ -72,6 +73,11 @@ execute_process(
             # target
             ${PROJECT_LIB_DIR}/reaper-sdk/WDL
 )
+else()
+    file(TO_NATIVE_PATH "${PROJECT_LIB_DIR}/WDL/WDL" _dstDir)
+    file(TO_NATIVE_PATH "${PROJECT_LIB_DIR}/reaper-sdk/WDL" _srcDir)
+    execute_process(COMMAND cmd.exe /c mklink /J "${_dstDir}" "${_srcDir}")
+endif()
 
 if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
   set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
@@ -166,18 +172,18 @@ if(WIN32)
     $<$<NOT:$<CONFIG:Debug>>:/Zc:inline>
   )
 
-if(NOT CMAKE_PROJECT_VERSION_TWEAK EQUAL "1")
-  add_link_options(
-    # Remove unreferenced code
-    $<$<NOT:$<CONFIG:Debug>>:/OPT:REF>
+  if(NOT CMAKE_PROJECT_VERSION_TWEAK EQUAL "1")
+    add_link_options(
+      # Remove unreferenced code
+      $<$<NOT:$<CONFIG:Debug>>:/OPT:REF>
 
-    # Remove duplicate sections
-    $<$<NOT:$<CONFIG:Debug>>:/OPT:ICF>
+      # Remove duplicate sections
+      $<$<NOT:$<CONFIG:Debug>>:/OPT:ICF>
 
-    # Use relative path to the PDB file to avoid exposing the full path
-    /PDBALTPATH:%_PDB%
-  )
-endif()
+      # Use relative path to the PDB file to avoid exposing the full path
+      /PDBALTPATH:%_PDB%
+    )
+  endif()
 else()
   set_target_properties(
     ${PROJECT_NAME} 
@@ -274,6 +280,7 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 endif()
 
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
+  if(UNIX)
     execute_process(
         COMMAND ${CMAKE_COMMAND} -E create_symlink
                 # source
@@ -281,9 +288,16 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
                 # target
                 "${CMAKE_CURRENT_BINARY_DIR}/link_readme.txt")
     set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_BINARY_DIR}/link_readme.txt")
+  else()
+#    file(TO_NATIVE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/README.md" _dstDir)
+#    file(TO_NATIVE_PATH "${CMAKE_CURRENT_BINARY_DIR}/link_readme.txt" _srcDir)
+#    execute_process(COMMAND cmd.exe /c mklink /J "${_dstDir}" "${_srcDir}")
+#    set(CPACK_RESOURCE_FILE_README "${_srcDir}")
+  endif()
 endif()
 
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
+  if(UNIX)
     execute_process(
         COMMAND ${CMAKE_COMMAND} -E create_symlink
                 # source
@@ -291,6 +305,12 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
                 # target
                 "${CMAKE_CURRENT_BINARY_DIR}/link_license.txt")
     set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_BINARY_DIR}/link_license.txt")
+#  else()
+#    file(TO_NATIVE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE" _dstDir)
+#    file(TO_NATIVE_PATH "${CMAKE_CURRENT_BINARY_DIR}/link_license.txt" _srcDir)
+#    execute_process(COMMAND cmd.exe /c mklink /J "${_dstDir}" "${_srcDir}")
+#    set(CPACK_RESOURCE_FILE_README "${_srcDir}")
+  endif()
 endif()
 
 set(CPACK_NSIS_PACKAGE_NAME "${PROJECT_NAME}")

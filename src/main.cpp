@@ -7,6 +7,7 @@
 #include "actions/show_reaper_resource_path.hpp"
 #include "actions/show_reasonus_function_window.hpp"
 #include "actions/show_reasonus_filters_window.hpp"
+#include "actions/close_all_floating_fx_windows.hpp"
 #include "resource.h"
 
 extern reaper_csurf_reg_t csurf_faderport_reg;
@@ -43,6 +44,7 @@ extern "C"
       SHOW_REAPER_RESOURCE_PATH::Register();
       SHOW_REASONUS_FUNCTION_WINDOW::Register();
       SHOW_REASONUS_FILTERS_WINDOW::Register();
+      CLOSE_ALL_FLOATING_FX_WINDOWS::Register();
       reaper_plugin_info->Register("csurf", &csurf_faderport_reg);
       return 1;
     }
@@ -51,6 +53,7 @@ extern "C"
     SHOW_REAPER_RESOURCE_PATH::Unregister();
     SHOW_REASONUS_FUNCTION_WINDOW::Unregister();
     SHOW_REASONUS_FILTERS_WINDOW::Unregister();
+    CLOSE_ALL_FLOATING_FX_WINDOWS::Unregister();
     return 0;
   }
 };

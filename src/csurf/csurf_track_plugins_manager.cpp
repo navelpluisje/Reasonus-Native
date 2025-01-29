@@ -173,8 +173,7 @@ public:
         else
         {
             // First clean up all open fx windows and then open the plugin in a floating window
-            Main_OnCommandStringEx("_S&M_WNCLS3"); // SWS/S&M: Close all floating FX windows
-            Main_OnCommandStringEx("_S&M_WNCLS4"); // SWS/S&M: Close all FX chain windows
+            Main_OnCommandStringEx("_REASONUS_CLOSE_ALL_FLOATING_FX_WINDOWS_COMMAND"); // SWS/S&M: Close all floating FX and chain windows
             TrackFX_Show(media_track, pluginIndex, 3);
             context->SetPluginEditTrack(media_track);
             context->SetPluginEditPluginId(pluginIndex);
