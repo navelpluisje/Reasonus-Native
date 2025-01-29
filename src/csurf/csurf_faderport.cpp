@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 #include <reaper_plugin.h>
-#include <localize-import.h>
+#include <WDL/localize/localize-import.h>
 #include <WDL/localize/localize.h>
 #include <WDL/wdltypes.h> // might be unnecessary in future
 #include <WDL/ptrlist.h>

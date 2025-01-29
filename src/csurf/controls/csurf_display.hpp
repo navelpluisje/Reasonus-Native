@@ -5,13 +5,11 @@
 #include "csurf_display_resources.hpp"
 #include <string>
 
-using namespace std;
-
 class CSurf_Display
 {
 protected:
     int channel;
-    string values[4] = {"", "", "", ""};
+    std::string values[4] = {"", "", "", ""};
     Inverted inverted[4] = {NON_INVERT, NON_INVERT, NON_INVERT, NON_INVERT};
     Alignment alignment[4] = {ALIGN_LEFT, ALIGN_LEFT, ALIGN_LEFT, ALIGN_LEFT};
     DisplayMode displayMode;

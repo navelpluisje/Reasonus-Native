@@ -6,8 +6,6 @@
 #include <reaper_plugin_functions.h>
 #include <mini/ini.h>
 
-using namespace std;
-
 const int TOGGLE_SPEED = 150;
 
 const int AUTOMATION_OFF = -1;
@@ -49,9 +47,9 @@ struct ShiftState
     }
 };
 
-void Main_OnCommandStringEx(string action_name, int flag = 0, ReaProject *proj = 0);
+void Main_OnCommandStringEx(std::string action_name, int flag = 0, ReaProject *proj = 0);
 
-bool GetToggleCommandStringState(string action_name);
+bool GetToggleCommandStringState(std::string action_name);
 
 /**
  * @brief Check if the bit with index key is set in val
@@ -109,17 +107,17 @@ double int14ToVol(unsigned char msb, unsigned char lsb);
  * @brief Strip the type from the plugin name
  *
  * @param name The full plugin name
- * @return string
+ * @return std::string
  */
-string StripPluginNamePrefixes(char *name);
+std::string StripPluginNamePrefixes(char *name);
 
 /**
  * @brief Strip the final out info when applicable
  *
  * @param name
- * @return string
+ * @return std::string
  */
-string StripPluginChannelPostfix(char *name);
+std::string StripPluginChannelPostfix(char *name);
 
 /**
  * @brief Check if the prefix of the fx tells it is actuielly an fx and not an instrument
@@ -127,35 +125,35 @@ string StripPluginChannelPostfix(char *name);
  * @param name
  * @return bool
  */
-bool IsPluginFX(string name);
+bool IsPluginFX(std::string name);
 
-string Progress(int current, int total);
+std::string Progress(int current, int total);
 
 /**
- * @brief Get a string representation of the send mode
+ * @brief Get a std::string representation of the send mode
  *
  * @param sendMode The send mode
- * @return string
+ * @return std::string
  */
-string GetSendModeString(int sendMode);
+std::string GetSendModeString(int sendMode);
 
 /**
- * @brief Get a string representation of the automtion mode
+ * @brief Get a std::string representation of the automtion mode
  *
  * @param automationMode The automation mode
- * @return string
+ * @return std::string
  */
-string GetAutomationString(int automationMode);
+std::string GetAutomationString(int automationMode);
 
-string GetReaSonusIniPath();
+std::string GetReaSonusIniPath();
 
-string GetReaSonusPluginPath(string developer, string pluginName, bool create = false);
+std::string GetReaSonusPluginPath(std::string developer, std::string pluginName, bool create = false);
 
-bool isInteger(string value);
+bool isInteger(std::string value);
 
-vector<string> split(string str, string delimiter);
+std::vector<std::string> split(std::string str, std::string delimiter);
 
-string join(vector<string> list, string delimiter);
+std::string join(std::vector<std::string> list, std::string delimiter);
 
 bool hasPluginConfigFile(MediaTrack *media_track, int pluginId);
 
@@ -175,6 +173,6 @@ void readAndCreateIni(mINI::INIStructure &data);
  *
  * @param prefix The prefix used for the key
  */
-string GenerateUniqueKey(string prefix);
+std::string GenerateUniqueKey(std::string prefix);
 
 #endif // CSURF_UTILS_H_

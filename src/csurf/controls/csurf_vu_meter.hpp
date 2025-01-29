@@ -6,8 +6,6 @@
 #include <reaper_plugin.h>
 #include "csurf_vu_meter_resources.hpp"
 
-using namespace std;
-
 static ChannelVuMeter channelVuMeters[16] = {
     VU_METER_1,
     VU_METER_2,

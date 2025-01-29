@@ -1,9 +1,9 @@
+#include <string>
 #include "csurf_channel_manager_resources.hpp"
 #include "csurf_context.cpp"
 #include "csurf_navigator.hpp"
 #include "controls/csurf_button.hpp"
 #include "csurf_track.hpp"
-#include <vector>
 
 /**
  * @brief Get a string representation of the pan value and the panMode. If panMode is 5, it will return the left pan representation
@@ -12,10 +12,10 @@
  * @param panMode The pan mode
  * @return string
  */
-string GetPanString(double pan)
+std::string GetPanString(double pan)
 {
     int panInt = (int)(pan * 100.0);
-    string strVal = to_string(abs(panInt));
+    std::string strVal = std::to_string(abs(panInt));
     if (panInt < 0)
     {
         return strVal + "%L";
@@ -34,13 +34,13 @@ string GetPanString(double pan)
  * @param panMode The pan mode
  * @return string
  */
-string GetWidthString(double width, int panMode)
+std::string GetWidthString(double width, int panMode)
 {
     if (panMode == 6)
     {
         return GetPanString(width);
     }
     int panInt = (int)(width * 100.0);
-    string strVal = to_string(panInt);
+    std::string strVal = std::to_string(panInt);
     return strVal + "W";
 }

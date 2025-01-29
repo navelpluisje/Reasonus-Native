@@ -7,8 +7,6 @@
 
 int DAW::sendModes[3] = {0, 1, 3};
 
-using namespace std;
-
 int csurfRound(double val)
 {
     return (int)(val + 0.5);
@@ -65,7 +63,7 @@ int DAW::GetTrackPanMode(MediaTrack *media_track)
     return panMode;
 }
 
-string DAW::GetTrackName(MediaTrack *media_track)
+std::string DAW::GetTrackName(MediaTrack *media_track)
 {
     if (!media_track)
     {
@@ -75,15 +73,15 @@ string DAW::GetTrackName(MediaTrack *media_track)
     char trackName[256];
     ::GetTrackName(media_track, trackName, sizeof(trackName));
 
-    return string(trackName);
+    return std::string(trackName);
 }
 
-string DAW::GetTrackIndex(MediaTrack *media_track)
+std::string DAW::GetTrackIndex(MediaTrack *media_track)
 {
-    return to_string((int)GetMediaTrackInfo_Value(media_track, "IP_TRACKNUMBER"));
+    return std::to_string((int)GetMediaTrackInfo_Value(media_track, "IP_TRACKNUMBER"));
 }
 
-string DAW::GetTrackInputName(MediaTrack *media_track)
+std::string DAW::GetTrackInputName(MediaTrack *media_track)
 {
     int inputCode = int(::GetMediaTrackInfo_Value(media_track, "I_RECINPUT"));
     if (hasBit(inputCode, 12))
@@ -91,17 +89,17 @@ string DAW::GetTrackInputName(MediaTrack *media_track)
         char midiDeviceName[256];
         int midiDeviceId = (inputCode >> 5) & ((1 << 6) - 1);
         ::GetMIDIInputName(midiDeviceId, midiDeviceName, sizeof(midiDeviceName));
-        return string(midiDeviceName);
+        return std::string(midiDeviceName);
     }
     else
     {
         int inputChannel = inputCode & ((1 << 5) - 1);
         const char *inputName = ::GetInputChannelName(inputChannel);
-        return string(inputName);
+        return std::string(inputName);
     }
 }
 
-string DAW::GetTrackMonitorMode(MediaTrack *media_track)
+std::string DAW::GetTrackMonitorMode(MediaTrack *media_track)
 {
     int monitorMode = int(::GetMediaTrackInfo_Value(media_track, "I_RECMON"));
 
@@ -121,7 +119,7 @@ string DAW::GetTrackMonitorMode(MediaTrack *media_track)
     }
 }
 
-string DAW::GetTrackRecordingMode(MediaTrack *media_track)
+std::string DAW::GetTrackRecordingMode(MediaTrack *media_track)
 {
     int recordingMode = int(::GetMediaTrackInfo_Value(media_track, "I_RECMODE"));
 
@@ -183,7 +181,7 @@ bool DAW::TrackHasFx(MediaTrack *media_track)
 
     for (int i = 0; i < ::TrackFX_GetCount(media_track); i++)
     {
-        ::TrackFX_GetFXName(media_track, i, pluginName, size(pluginName));
+        ::TrackFX_GetFXName(media_track, i, pluginName, std::size(pluginName));
         hasFx = IsPluginFX(pluginName);
         if (hasFx)
         {
@@ -196,13 +194,13 @@ bool DAW::TrackHasFx(MediaTrack *media_track)
 bool DAW::HasTrackFx(MediaTrack *media_track, int fx)
 {
     char pluginName[256] = "";
-    return TrackFX_GetFXName(media_track, fx, pluginName, size(pluginName));
+    return TrackFX_GetFXName(media_track, fx, pluginName, std::size(pluginName));
 }
 
-string DAW::GetTrackFxName(MediaTrack *media_track, int fx, bool full)
+std::string DAW::GetTrackFxName(MediaTrack *media_track, int fx, bool full)
 {
     char pluginName[256] = "";
-    if (!::TrackFX_GetFXName(media_track, fx, pluginName, size(pluginName)))
+    if (!::TrackFX_GetFXName(media_track, fx, pluginName, std::size(pluginName)))
     {
         return "No FX";
     }
@@ -210,7 +208,7 @@ string DAW::GetTrackFxName(MediaTrack *media_track, int fx, bool full)
     {
         return StripPluginNamePrefixes(pluginName);
     }
-    vector<string> pluginNameParts = split(StripPluginNamePrefixes(StripPluginChannelPostfix(pluginName).data()), " (");
+    std::vector<std::string> pluginNameParts = split(StripPluginNamePrefixes(StripPluginChannelPostfix(pluginName).data()), " (");
     if (pluginNameParts.size() > 1)
     {
         pluginNameParts.pop_back();
@@ -219,15 +217,15 @@ string DAW::GetTrackFxName(MediaTrack *media_track, int fx, bool full)
     return join(pluginNameParts, " (");
 }
 
-string DAW::GetTrackFxDeveloper(MediaTrack *media_track, int fx)
+std::string DAW::GetTrackFxDeveloper(MediaTrack *media_track, int fx)
 {
     char pluginName[256] = "";
-    if (!::TrackFX_GetFXName(media_track, fx, pluginName, size(pluginName)))
+    if (!::TrackFX_GetFXName(media_track, fx, pluginName, std::size(pluginName)))
     {
         return "No Dev";
     }
-    vector<string> pluginNameParts = split(StripPluginNamePrefixes(StripPluginChannelPostfix(pluginName).data()), " (");
-    string developer = pluginNameParts.at(pluginNameParts.size() - 1);
+    std::vector<std::string> pluginNameParts = split(StripPluginNamePrefixes(StripPluginChannelPostfix(pluginName).data()), " (");
+    std::string developer = pluginNameParts.at(pluginNameParts.size() - 1);
     if (!developer.empty())
     {
         developer.pop_back();
@@ -246,7 +244,7 @@ bool DAW::GetTrackFxOffline(MediaTrack *media_track, int fx)
     return ::TrackFX_GetOffline(media_track, fx);
 }
 
-string DAW::GetTrackFxSurfceEnabled(MediaTrack *media_track, int fx)
+std::string DAW::GetTrackFxSurfceEnabled(MediaTrack *media_track, int fx)
 {
     return ::TrackFX_GetEnabled(media_track, fx) ? "Enabled" : "Bypassed";
 }
@@ -263,10 +261,10 @@ bool DAW::GetTrackFxPanelOpen(MediaTrack *media_track, int fx)
 /************************************************************************
  * Track FX Param
  ************************************************************************/
-string DAW::GetTrackFxParamName(MediaTrack *media_track, int fx, int param)
+std::string DAW::GetTrackFxParamName(MediaTrack *media_track, int fx, int param)
 {
     char paramName[256] = "";
-    if (TrackFX_GetParamName(media_track, fx, param, paramName, size(paramName)))
+    if (TrackFX_GetParamName(media_track, fx, param, paramName, std::size(paramName)))
     {
         return paramName;
     }
@@ -296,7 +294,7 @@ bool DAW::HasTrackReceive(MediaTrack *media_track, int receive)
     return GetSetTrackSendInfo(media_track, -1, receive, "P_SRCTRACK", 0) ? true : false;
 }
 
-string DAW::GetTrackReceiveSrcName(MediaTrack *media_track, int receive)
+std::string DAW::GetTrackReceiveSrcName(MediaTrack *media_track, int receive)
 {
     MediaTrack *srcTrack = (MediaTrack *)GetSetTrackSendInfo(media_track, -1, receive, "P_SRCTRACK", 0);
     if (srcTrack)
@@ -316,12 +314,12 @@ int DAW::GetTrackReceiveAutoMode(MediaTrack *media_track, int receive)
     return (int)GetTrackSendInfo_Value(media_track, -1, receive, "I_AUTOMODE");
 }
 
-string DAW::GetTrackSurfaceReceiveMode(MediaTrack *media_track, int receive)
+std::string DAW::GetTrackSurfaceReceiveMode(MediaTrack *media_track, int receive)
 {
     return GetSendModeString(GetTrackReceiveMode(media_track, receive));
 }
 
-string DAW::GetTrackSurfaceReceiveAutoMode(MediaTrack *media_track, int receive)
+std::string DAW::GetTrackSurfaceReceiveAutoMode(MediaTrack *media_track, int receive)
 {
     return GetAutomationString(GetTrackReceiveAutoMode(media_track, receive));
 }
@@ -356,7 +354,7 @@ bool DAW::HasTrackSend(MediaTrack *media_track, int send)
     return GetSetTrackSendInfo(media_track, 0, send, "P_DESTTRACK", 0) ? true : false;
 }
 
-string DAW::GetTrackSendDestName(MediaTrack *media_track, int send)
+std::string DAW::GetTrackSendDestName(MediaTrack *media_track, int send)
 {
     MediaTrack *destTrack = (MediaTrack *)GetSetTrackSendInfo(media_track, 0, send, "P_SRCTRACK", 0);
     if (destTrack)
@@ -376,12 +374,12 @@ int DAW::GetTrackSendAutoMode(MediaTrack *media_track, int send)
     return (int)GetTrackSendInfo_Value(media_track, 0, send, "I_AUTOMODE");
 }
 
-string DAW::GetTrackSurfaceSendMode(MediaTrack *media_track, int send)
+std::string DAW::GetTrackSurfaceSendMode(MediaTrack *media_track, int send)
 {
     return GetSendModeString(GetTrackSendMode(media_track, send));
 }
 
-string DAW::GetTrackSurfaceSendAutoMode(MediaTrack *media_track, int send)
+std::string DAW::GetTrackSurfaceSendAutoMode(MediaTrack *media_track, int send)
 {
     return GetAutomationString(GetTrackSendAutoMode(media_track, send));
 }

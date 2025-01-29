@@ -5,9 +5,9 @@
 #include <reaper_plugin_functions.h>
 #include <mini/ini.h>
 
-map<int, bool> GetSibblingTracks(map<int, bool> tracks)
+std::map<int, bool> GetSibblingTracks(std::map<int, bool> tracks)
 {
-    map<int, bool> response;
+    std::map<int, bool> response;
 
     for (auto const &track : tracks)
     {
@@ -42,9 +42,9 @@ map<int, bool> GetSibblingTracks(map<int, bool> tracks)
     return response;
 }
 
-map<int, bool> GetParentTracks(map<int, bool> tracks)
+std::map<int, bool> GetParentTracks(std::map<int, bool> tracks)
 {
-    map<int, bool> response;
+    std::map<int, bool> response;
 
     for (auto const &track : tracks)
     {
@@ -72,9 +72,9 @@ map<int, bool> GetParentTracks(map<int, bool> tracks)
     return response;
 }
 
-map<int, bool> GetChildTracks(map<int, bool> tracks)
+std::map<int, bool> GetChildTracks(std::map<int, bool> tracks)
 {
-    map<int, bool> response;
+    std::map<int, bool> response;
 
     for (auto const &track : tracks)
     {
@@ -98,14 +98,14 @@ map<int, bool> GetChildTracks(map<int, bool> tracks)
     return response;
 }
 
-bool FuzzyMatch(string trackName, string matches)
+bool FuzzyMatch(std::string trackName, std::string matches)
 {
     bool match = false;
 
-    for (const string &val : split(matches, ","))
+    for (const std::string &val : split(matches, ","))
     {
-        string::size_type found = trackName.find(val);
-        match = match || found != string::npos;
+        std::string::size_type found = trackName.find(val);
+        match = match || found != std::string::npos;
     }
 
     return match;

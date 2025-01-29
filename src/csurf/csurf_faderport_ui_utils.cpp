@@ -1,6 +1,9 @@
 #include "csurf_faderport_ui_utils.hpp"
-#include <swell/swell-types.h>
-#include <swell/swell-functions.h>
+#if __APPLE__ || __linux
+#include <WDL/swell/swell-types.h>
+#include <WDL/swell/swell-functions.h>
+#endif
+
 
 void parseParms(const char *str, int parms[4])
 {
@@ -32,7 +35,7 @@ int AddComboEntry(HWND hwndDlg, int x, char *buf, int comboId)
     return a;
 }
 
-void AddListEntry(HWND hwndDlg, string buf, int listId)
+void AddListEntry(HWND hwndDlg, std::string buf, int listId)
 {
     SendDlgItemMessage(hwndDlg, listId, LB_ADDSTRING, 0, (LPARAM)buf.c_str());
 }

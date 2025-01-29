@@ -6,8 +6,6 @@
 #include <map>
 #include <reaper_plugin.h>
 
-using namespace std;
-
 enum NavigatorFilter
 {
     /**
@@ -70,7 +68,7 @@ class CSurf_Navigator
 
     void GetAllVisibleTracks(WDL_PtrList<MediaTrack> &tracks, bool &hasSolo, bool &hasMute);
 
-    void SetTrackUIVisibility(map<int, bool> &tracks);
+    void SetTrackUIVisibility(std::map<int, bool> &tracks);
 
     void HandleAllTracksFilter();
 
@@ -94,7 +92,7 @@ class CSurf_Navigator
 
     void HandleTracksAreVcaFilter();
 
-    void HandleTracksCustomFilter(string filter);
+    void HandleTracksCustomFilter(std::string filter);
 
 public:
     CSurf_Navigator(CSurf_Context *context);
@@ -119,7 +117,7 @@ public:
 
     void HandleFilter(NavigatorFilter filter);
 
-    void HandleCustomFilter(string filterName);
+    void HandleCustomFilter(std::string filterName);
 };
 
 #endif

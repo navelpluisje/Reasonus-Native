@@ -13,8 +13,6 @@
 
 extern HWND g_hwnd;
 
-using namespace std;
-
 enum FilterListDirection
 {
     FilterListUp = -1,
@@ -25,15 +23,15 @@ namespace CSURF_FADERPORT_UI_FILTERS
 {
     static mINI::INIStructure ini;
     static HWND s_hwndReaSonusFiltersDlg = NULL;
-    static vector<mINI::INIMap<string>> filtersDlgFilters;
-    static vector<string> filtersDlgFilterKeys;
-    static vector<string> filtersDlgFilterText;
+    static std::vector<mINI::INIMap<std::string>> filtersDlgFilters;
+    static std::vector<std::string> filtersDlgFilterKeys;
+    static std::vector<std::string> filtersDlgFilterText;
     static int filtersDlgSelectedFilter = -1;
     static int filtersDlgSelectedFilterText = -1;
 
-    static vector<string> GetFiltersKeys()
+    static std::vector<std::string> GetFiltersKeys()
     {
-        vector<string> filterKeys;
+        std::vector<std::string> filterKeys;
         mINI::INIFile file(GetReaSonusIniPath());
         file.read(ini);
 
@@ -41,18 +39,18 @@ namespace CSURF_FADERPORT_UI_FILTERS
 
         for (int i = 0; i < nbFilters; i++)
         {
-            filterKeys.push_back(ini["filters"][to_string(i)]);
+            filterKeys.push_back(ini["filters"][std::to_string(i)]);
         }
         return filterKeys;
     }
 
-    static vector<string> GetFilterText()
+    static std::vector<std::string> GetFilterText()
     {
         mINI::INIFile file(GetReaSonusIniPath());
         file.read(ini);
 
-        string filterText = ini[filtersDlgFilterKeys[filtersDlgSelectedFilter]]["text"];
-        vector<string> filterTextList = split(filterText, ",");
+        std::string filterText = ini[filtersDlgFilterKeys[filtersDlgSelectedFilter]]["text"];
+        std::vector<std::string> filterTextList = split(filterText, ",");
         return filterTextList;
     }
 
@@ -68,8 +66,8 @@ namespace CSURF_FADERPORT_UI_FILTERS
         filtersDlgFilterKeys = GetFiltersKeys();
 
         SendMessage(GetDlgItem(hwndDlg, IDC_LIST_FILTERS), LB_RESETCONTENT, 0, 0);
-        vector<string> keys = GetFiltersKeys();
-        for (const string &key : keys)
+        std::vector<std::string> keys = GetFiltersKeys();
+        for (const std::string &key : keys)
         {
             AddListEntry(hwndDlg, ini[key]["name"], IDC_LIST_FILTERS);
         }
@@ -83,7 +81,7 @@ namespace CSURF_FADERPORT_UI_FILTERS
 
         SendMessage(GetDlgItem(hwndDlg, IDC_LIST_FILTER_TEXT), LB_RESETCONTENT, 0, 0);
 
-        for (const string &value : filtersDlgFilterText)
+        for (const std::string &value : filtersDlgFilterText)
         {
             AddListEntry(hwndDlg, value, IDC_LIST_FILTER_TEXT);
         }
@@ -94,7 +92,7 @@ namespace CSURF_FADERPORT_UI_FILTERS
     {
         if (filtersDlgSelectedFilter < 0)
         {
-            SetDlgItemText(hwndDlg, IDC_EDIT_FILTER_NAME, "");
+            SetDlgItemText(hwndDlg, IDC_EDIT_FILTER_NAME, std::string("").c_str());
             SendMessage(GetDlgItem(hwndDlg, IDC_CHECK_SHOW_SIBBLINGS), BM_SETCHECK, BST_UNCHECKED, 0);
             SendMessage(GetDlgItem(hwndDlg, IDC_CHECK_SHOW_PARENTS), BM_SETCHECK, BST_UNCHECKED, 0);
             SendMessage(GetDlgItem(hwndDlg, IDC_CHECK_SHOW_CHILDREN), BM_SETCHECK, BST_UNCHECKED, 0);
@@ -102,7 +100,7 @@ namespace CSURF_FADERPORT_UI_FILTERS
             SendMessage(GetDlgItem(hwndDlg, IDC_CHECK_MATCH_MULTIPLE), BM_SETCHECK, BST_UNCHECKED, 0);
             return;
         }
-        string filterKey = filtersDlgFilterKeys[filtersDlgSelectedFilter];
+        std::string filterKey = filtersDlgFilterKeys[filtersDlgSelectedFilter];
         SetDlgItemText(hwndDlg, IDC_EDIT_FILTER_NAME, const_cast<char *>(ini[filterKey]["name"].c_str()));
         SendMessage(GetDlgItem(hwndDlg, IDC_CHECK_SHOW_SIBBLINGS), BM_SETCHECK, ini[filterKey]["sibblings"] == "1" ? BST_CHECKED : BST_UNCHECKED, 0);
         SendMessage(GetDlgItem(hwndDlg, IDC_CHECK_SHOW_PARENTS), BM_SETCHECK, ini[filterKey]["parents"] == "1" ? BST_CHECKED : BST_UNCHECKED, 0);
@@ -117,10 +115,10 @@ namespace CSURF_FADERPORT_UI_FILTERS
         mINI::INIFile file(GetReaSonusIniPath());
 
         ini["filters"].clear();
-        ini["filters"]["nb-filters"] = to_string(filtersDlgFilterKeys.size());
+        ini["filters"]["nb-filters"] = std::to_string(filtersDlgFilterKeys.size());
         for (int i = 0; i < (int)filtersDlgFilterKeys.size(); i++)
         {
-            ini["filters"][to_string(i)] = filtersDlgFilterKeys.at(i);
+            ini["filters"][std::to_string(i)] = filtersDlgFilterKeys.at(i);
         }
         file.write(ini, true);
     }
@@ -132,7 +130,7 @@ namespace CSURF_FADERPORT_UI_FILTERS
             return false;
         }
 
-        string selectedFilter = filtersDlgFilterKeys[filtersDlgSelectedFilter];
+        std::string selectedFilter = filtersDlgFilterKeys[filtersDlgSelectedFilter];
         filtersDlgFilterKeys.erase(filtersDlgFilterKeys.begin() + filtersDlgSelectedFilter);
         filtersDlgFilterKeys.insert(filtersDlgFilterKeys.begin() + filtersDlgSelectedFilter + dir, selectedFilter);
 
@@ -140,12 +138,12 @@ namespace CSURF_FADERPORT_UI_FILTERS
         return true;
     }
 
-    static void SaveCheckBoxValue(HWND hwndDlg, string key, int checkBox)
+    static void SaveCheckBoxValue(HWND hwndDlg, std::string key, int checkBox)
     {
         mINI::INIFile file(GetReaSonusIniPath());
-        string filter = filtersDlgFilterKeys[filtersDlgSelectedFilter];
+        std::string filter = filtersDlgFilterKeys[filtersDlgSelectedFilter];
 
-        ini[filter][key] = to_string(IsDlgButtonChecked(hwndDlg, checkBox));
+        ini[filter][key] = std::to_string(IsDlgButtonChecked(hwndDlg, checkBox));
         file.write(ini);
     }
 
@@ -189,10 +187,10 @@ namespace CSURF_FADERPORT_UI_FILTERS
                 mINI::INIFile file(GetReaSonusIniPath());
                 char buffer[255];
 
-                GetDlgItemText(hwndDlg, IDC_EDIT_FilterText, buffer, size(buffer));
+                GetDlgItemText(hwndDlg, IDC_EDIT_FilterText, buffer, std::size(buffer));
                 filtersDlgFilterText.push_back(buffer);
-                SetDlgItemText(hwndDlg, IDC_EDIT_FilterText, const_cast<char *>(""));
-                string filter = filtersDlgFilterKeys[filtersDlgSelectedFilter];
+                SetDlgItemText(hwndDlg, IDC_EDIT_FilterText, std::string("").c_str());
+                std::string filter = filtersDlgFilterKeys[filtersDlgSelectedFilter];
                 ini[filter]["text"] = join(filtersDlgFilterText, ",");
 
                 file.write(ini);
@@ -205,7 +203,7 @@ namespace CSURF_FADERPORT_UI_FILTERS
                 mINI::INIFile file(GetReaSonusIniPath());
 
                 filtersDlgFilterText.erase(filtersDlgFilterText.begin() + filtersDlgSelectedFilterText);
-                string filter = filtersDlgFilterKeys[filtersDlgSelectedFilter];
+                std::string filter = filtersDlgFilterKeys[filtersDlgSelectedFilter];
                 ini[filter]["text"] = join(filtersDlgFilterText, ",");
 
                 file.write(ini);
@@ -217,9 +215,9 @@ namespace CSURF_FADERPORT_UI_FILTERS
             {
                 mINI::INIFile file(GetReaSonusIniPath());
 
-                string newKey = GenerateUniqueKey("Filter_");
+                std::string newKey = GenerateUniqueKey("Filter_");
                 ini["filters"][ini["filters"]["nb-filters"]] = newKey;
-                ini["filters"]["nb-filters"] = to_string(stoi(ini["filters"]["nb-filters"]) + 1);
+                ini["filters"]["nb-filters"] = std::to_string(stoi(ini["filters"]["nb-filters"]) + 1);
                 ini[newKey];
                 ini[newKey]["name"] = "New Filter";
                 ini[newKey]["text"] = "";
@@ -256,7 +254,7 @@ namespace CSURF_FADERPORT_UI_FILTERS
             case IDC_EDIT_FILTER_NAME:
             {
                 mINI::INIFile file(GetReaSonusIniPath());
-                string filter = filtersDlgFilterKeys[filtersDlgSelectedFilter];
+                std::string filter = filtersDlgFilterKeys[filtersDlgSelectedFilter];
 
                 if (filter.empty())
                 {
@@ -264,7 +262,7 @@ namespace CSURF_FADERPORT_UI_FILTERS
                 }
 
                 char buffer[255];
-                GetDlgItemText(hwndDlg, IDC_EDIT_FILTER_NAME, buffer, size(buffer));
+                GetDlgItemText(hwndDlg, IDC_EDIT_FILTER_NAME, std::string(buffer).c_str(), std::size(buffer));
                 ini[filter]["name"] = buffer;
                 file.write(ini);
                 break;

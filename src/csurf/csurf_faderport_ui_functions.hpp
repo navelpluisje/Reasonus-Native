@@ -13,13 +13,11 @@
 
 extern HWND g_hwnd;
 
-using namespace std;
-
 namespace CSURF_FADERPORT_UI_FUNCTIONS
 {
     static mINI::INIStructure ini;
     static HWND s_hwndReaSonusFunctionsDlg = NULL;
-    static string functionsDlgSelectedFunction = "";
+    static std::string functionsDlgSelectedFunction = "";
     static bool g_querying_action = false;
     static HWND s_hwndDlg;
 
@@ -48,14 +46,14 @@ namespace CSURF_FADERPORT_UI_FUNCTIONS
         if (actionId > 0)
         {
             static mINI::INIFile file(GetReaSonusIniPath());
-            ini["Functions"][functionsDlgSelectedFunction] = to_string(actionId);
+            ini["Functions"][functionsDlgSelectedFunction] = std::to_string(actionId);
             file.write(ini);
             PopulateActionFields(s_hwndDlg);
         }
         PromptForAction(-1, 0, 0);
     }
 
-    static void PromptForFunctionAction(HWND hwndDlg, string index)
+    static void PromptForFunctionAction(HWND hwndDlg, std::string index)
     {
         functionsDlgSelectedFunction = index;
         s_hwndDlg = hwndDlg;
@@ -68,16 +66,16 @@ namespace CSURF_FADERPORT_UI_FUNCTIONS
         }
     }
 
-    static void ShowFunctionInfo(HWND hwndDlg, string index)
+    static void ShowFunctionInfo(HWND hwndDlg, std::string index)
     {
         int actionId = stoi(ini["Functions"][index]);
         const char *fullName = kbd_getTextFromCmd(actionId, 0);
-        vector<string> actionInfo = split(fullName, ":");
+        std::vector<std::string> actionInfo = split(fullName, ":");
 
-        SetDlgItemText(hwndDlg, IDC_GROUP_FUNCTION_INFO, const_cast<char *>(("Function Info " + index).c_str()));
-        SetDlgItemText(hwndDlg, IDC_FUNCTION_INFO_ID, const_cast<char *>(ini["Functions"][index].c_str()));
-        SetDlgItemText(hwndDlg, IDC_FUNCTION_INFO_TYPE, const_cast<char *>(actionInfo[0].c_str()));
-        SetDlgItemText(hwndDlg, IDC_FUNCTION_INFO_NAME, const_cast<char *>(actionInfo[1].c_str()));
+        SetDlgItemText(hwndDlg, IDC_GROUP_FUNCTION_INFO, ("Function Info " + index).c_str());
+        SetDlgItemText(hwndDlg, IDC_FUNCTION_INFO_ID, ini["Functions"][index].c_str());
+        SetDlgItemText(hwndDlg, IDC_FUNCTION_INFO_TYPE, actionInfo[0].c_str());
+        SetDlgItemText(hwndDlg, IDC_FUNCTION_INFO_NAME, actionInfo[1].c_str());
     }
 
     static void HideFunctionsDialog()

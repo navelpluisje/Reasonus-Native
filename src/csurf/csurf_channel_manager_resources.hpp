@@ -3,8 +3,6 @@
 
 #include <string>
 
-using namespace std;
-
 /**
  * @brief Get a string representation of the pan value and the panMode. If panMode is 5, it will return the left pan representation
  *
@@ -12,7 +10,7 @@ using namespace std;
  * @param panMode The pan mode
  * @return string
  */
-string GetPanString(double pan);
+std::string GetPanString(double pan);
 
 /**
  * @brief Get a string representation of the width value and the panMode. If panMode is 5, it will return the right pan representation
@@ -21,7 +19,7 @@ string GetPanString(double pan);
  * @param panMode The pan mode
  * @return string
  */
-string GetWidthString(double width, int panMode);
+std::string GetWidthString(double width, int panMode);
 
 /**
  * @brief Get a string representation of the automtion mode
@@ -29,7 +27,7 @@ string GetWidthString(double width, int panMode);
  * @param automationMode The automation mode
  * @return string
  */
-string GetAutomationString(int automationMode);
+std::string GetAutomationString(int automationMode);
 
 /**
  * @brief Get a string representation of the send mode
@@ -37,6 +35,6 @@ string GetAutomationString(int automationMode);
  * @param sendMode The send mode
  * @return string
  */
-string GetSendModeString(int sendMode);
+std::string GetSendModeString(int sendMode);
 
 #endif

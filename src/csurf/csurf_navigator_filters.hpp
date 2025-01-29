@@ -4,14 +4,12 @@
 #include <map>
 #include <string>
 
-using namespace std;
+std::map<int, bool> GetSibblingTracks(std::map<int, bool> tracks);
 
-map<int, bool> GetSibblingTracks(map<int, bool> tracks);
+std::map<int, bool> GetParentTracks(std::map<int, bool> tracks);
 
-map<int, bool> GetParentTracks(map<int, bool> tracks);
+std::map<int, bool> GetChildTracks(std::map<int, bool> tracks);
 
-map<int, bool> GetChildTracks(map<int, bool> tracks);
-
-bool FuzzyMatch(string trackName, string matches);
+bool FuzzyMatch(std::string trackName, std::string matches);
 
 #endif

@@ -1,20 +1,18 @@
 #include "csurf_utils.hpp"
 #include "csurf_daw.hpp"
-#include <db2val.h>
+#include <WDL/db2val.h>
 #include <WDL/wdltypes.h> // might be unnecessary in future
 #include <reaper_plugin_functions.h>
 #include <string>
 #include <vector>
 
-using namespace std;
-
-void Main_OnCommandStringEx(string action_name, int flag, ReaProject *proj)
+void Main_OnCommandStringEx(std::string action_name, int flag, ReaProject *proj)
 {
     int actionId = NamedCommandLookup(action_name.c_str());
     Main_OnCommandEx(actionId, flag, proj);
 }
 
-bool GetToggleCommandStringState(string action_name)
+bool GetToggleCommandStringState(std::string action_name)
 {
     int actionId = NamedCommandLookup(action_name.c_str());
     return GetToggleCommandState(actionId);
@@ -71,10 +69,10 @@ double int14ToVol(unsigned char msb, unsigned char lsb)
     return DB2VAL(pos);
 }
 
-string StripPluginNamePrefixes(char *name)
+std::string StripPluginNamePrefixes(char *name)
 {
-    string s = string(name);
-    string delimiter = ": ";
+    std::string s = std::string(name);
+    std::string delimiter = ": ";
     int pos = s.find(delimiter) + size(delimiter);
     if (pos < 0)
     {
@@ -84,10 +82,10 @@ string StripPluginNamePrefixes(char *name)
     return s;
 }
 
-string StripPluginChannelPostfix(char *name)
+std::string StripPluginChannelPostfix(char *name)
 {
-    string s = string(name);
-    string delimiter = " (32 out)";
+    std::string s = std::string(name);
+    std::string delimiter = " (32 out)";
     int pos = s.find(delimiter);
     if (pos < 0)
     {
@@ -97,9 +95,9 @@ string StripPluginChannelPostfix(char *name)
     return s;
 }
 
-bool IsPluginFX(string name)
+bool IsPluginFX(std::string name)
 {
-    string delimiter = ": ";
+    std::string delimiter = ": ";
     int pos = name.find(delimiter);
     // If we can not find the delimiter, we can not determine the type of plugin, so asume it's an effect
     if (pos < 0)
@@ -112,14 +110,14 @@ bool IsPluginFX(string name)
     return name != "i";
 }
 
-string Progress(int current, int total)
+std::string Progress(int current, int total)
 {
     char buffer[127];
     snprintf(buffer, sizeof(buffer), "%d/%d", current, total);
-    return string(buffer);
+    return std::string(buffer);
 }
 
-string GetSendModeString(int sendMode)
+std::string GetSendModeString(int sendMode)
 {
     switch (sendMode)
     {
@@ -135,7 +133,7 @@ string GetSendModeString(int sendMode)
     };
 }
 
-string GetAutomationString(int automationMode)
+std::string GetAutomationString(int automationMode)
 {
     switch (automationMode)
     {
@@ -158,27 +156,27 @@ string GetAutomationString(int automationMode)
     };
 }
 
-string GetReaSonusIniPath() { return string(GetResourcePath()) + "/ReaSonus/FP.ini"; }
+std::string GetReaSonusIniPath() { return std::string(GetResourcePath()) + "/ReaSonus/FP.ini"; }
 
-string GetReaSonusPluginPath(string developer, string pluginName, bool create)
+std::string GetReaSonusPluginPath(std::string developer, std::string pluginName, bool create)
 {
     if (create)
     {
-        RecursiveCreateDirectory((string(GetResourcePath()) + "/ReaSonus/Plugins/" + developer).c_str(), 0);
+        RecursiveCreateDirectory((std::string(GetResourcePath()) + "/ReaSonus/Plugins/" + developer).c_str(), 0);
     }
-    return string(GetResourcePath()) + "/ReaSonus/Plugins/" + developer + "/" + pluginName + ".ini";
+    return std::string(GetResourcePath()) + "/ReaSonus/Plugins/" + developer + "/" + pluginName + ".ini";
 }
 
-bool isInteger(string value)
+bool isInteger(std::string value)
 {
     char *p;
     strtol(value.c_str(), &p, 10);
     return *p == 0;
 }
 
-vector<string> split(string str, string delimiter)
+std::vector<std::string> split(std::string str, std::string delimiter)
 {
-    vector<string> v;
+    std::vector<std::string> v;
 
     if (!str.empty())
     {
@@ -187,7 +185,7 @@ vector<string> split(string str, string delimiter)
         {
             // Find the index of occurrence
             int idx = str.find(delimiter, start);
-            if (idx == static_cast<int>(string::npos))
+            if (idx == static_cast<int>(std::string::npos))
             {
                 break;
             }
@@ -204,11 +202,11 @@ vector<string> split(string str, string delimiter)
     return v;
 }
 
-string join(vector<string> list, string delimiter)
+std::string join(std::vector<std::string> list, std::string delimiter)
 {
-    string result = "";
+    std::string result = "";
     int count = 0;
-    for (const string &key : list)
+    for (const std::string &key : list)
     {
         result += (count > 0 ? delimiter : "") + key;
         count++;
@@ -218,8 +216,8 @@ string join(vector<string> list, string delimiter)
 
 bool hasPluginConfigFile(MediaTrack *media_track, int pluginId)
 {
-    string pluginName = DAW::GetTrackFxName(media_track, pluginId);
-    string developerName = DAW::GetTrackFxDeveloper(media_track, pluginId);
+    std::string pluginName = DAW::GetTrackFxName(media_track, pluginId);
+    std::string developerName = DAW::GetTrackFxDeveloper(media_track, pluginId);
 
     return file_exists(GetReaSonusPluginPath(developerName, pluginName).c_str());
 }
@@ -243,7 +241,7 @@ void readAndCreateIni(mINI::INIStructure &data)
     mINI::INIFile file(GetReaSonusIniPath());
     if (!file.read(data))
     {
-        RecursiveCreateDirectory((string(GetResourcePath()) + "/ReaSonus/Plugins").c_str(), 0);
+        RecursiveCreateDirectory((std::string(GetResourcePath()) + "/ReaSonus/Plugins").c_str(), 0);
         data["Surface"]["MidiIn"] = "0";
         data["Surface"]["MidiOut"] = "0";
         data["Surface"]["Surface"] = "0";
@@ -263,9 +261,9 @@ void readAndCreateIni(mINI::INIStructure &data)
     file.read(data);
 }
 
-string GenerateUniqueKey(string prefix)
+std::string GenerateUniqueKey(std::string prefix)
 {
-    srand(time(0));
+    srand(time((int)0));
     char a[] = "abcdefghijklmnopqrstuvwxyz0123456789";
     for (int i = 0; i < 24; i++)
     {

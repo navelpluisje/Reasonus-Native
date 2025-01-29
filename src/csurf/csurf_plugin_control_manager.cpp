@@ -18,12 +18,12 @@ class CSurf_PluginControlManager : public CSurf_ChannelManager
 {
 protected:
     mINI::INIStructure ini;
-    string fileName;
+    std::string fileName;
     int updateCount;
 
-    string getParamKey(string prefix, int index)
+    std::string getParamKey(std::string prefix, int index)
     {
-        string controlIndex = to_string(context->GetChannelManagerItemIndex() + index);
+        std::string controlIndex = std::to_string(context->GetChannelManagerItemIndex() + index);
         return prefix + controlIndex;
     }
 
@@ -31,8 +31,8 @@ protected:
     {
         MediaTrack *media_track = context->GetPluginEditTrack();
         int pluginId = context->GetPluginEditPluginId();
-        string pluginName = DAW::GetTrackFxName(media_track, pluginId);
-        string developerName = DAW::GetTrackFxDeveloper(media_track, pluginId);
+        std::string pluginName = DAW::GetTrackFxName(media_track, pluginId);
+        std::string developerName = DAW::GetTrackFxDeveloper(media_track, pluginId);
         fileName = GetReaSonusPluginPath(developerName, pluginName);
 
         mINI::INIFile file(fileName);
@@ -71,7 +71,7 @@ public:
 
     void UpdateTracks() override
     {
-        string paramKey;
+        std::string paramKey;
         double min, max = 0.0;
 
         MediaTrack *media_track = context->GetPluginEditTrack();
@@ -134,7 +134,7 @@ public:
         int controlIndex = context->GetChannelManagerItemIndex() + index;
         MediaTrack *media_track = context->GetPluginEditTrack();
         int pluginId = context->GetPluginEditPluginId();
-        string paramKey = getParamKey("Select_", controlIndex);
+        std::string paramKey = getParamKey("Select_", controlIndex);
 
         if (ini.has(paramKey) && ini[paramKey]["param"] != "")
         {
@@ -175,7 +175,7 @@ public:
         int controlIndex = context->GetChannelManagerItemIndex() + index;
         int pluginId = context->GetPluginEditPluginId();
 
-        string paramKey = getParamKey("Fader_", controlIndex);
+        std::string paramKey = getParamKey("Fader_", controlIndex);
 
         if (ini.has(paramKey))
         {

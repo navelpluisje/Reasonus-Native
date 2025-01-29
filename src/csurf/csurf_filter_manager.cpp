@@ -13,8 +13,8 @@
 
 struct Filter
 {
-    string name;
-    string id;
+    std::string name;
+    std::string id;
 };
 
 class CSurf_FilterManager : public CSurf_ChannelManager
@@ -22,7 +22,7 @@ class CSurf_FilterManager : public CSurf_ChannelManager
 protected:
     bool hasLastTouchedFxEnabled = false;
     mINI::INIStructure ini;
-    vector<Filter> filters;
+    std::vector<Filter> filters;
 
     void SetTrackColors(MediaTrack *media_track) override
     {
@@ -57,13 +57,13 @@ protected:
 
         for (int i = 0; i < nbFilters; i++)
         {
-            string filterId = ini["Filters"][to_string(i)];
+            std::string filterId = ini["Filters"][std::to_string(i)];
             Filter filter{ini[filterId]["name"], filterId};
             filters.push_back(filter);
         }
     }
 
-    void GetFaderValue(MediaTrack *media_track, int *faderValue, int *valueBarValue, string *_pan1, string *_pan2)
+    void GetFaderValue(MediaTrack *media_track, int *faderValue, int *valueBarValue, std::string *_pan1, std::string *_pan2)
     {
         int panMode = 0;
         double volume, pan1, pan2 = 0.0;
@@ -113,7 +113,7 @@ public:
         {
             int filterIndex = context->GetChannelManagerItemIndex() + i;
             int faderValue = 0, valueBarValue = 0;
-            string strPan1, strPan2;
+            std::string strPan1, strPan2;
 
             CSurf_Track *track = tracks.at(i);
             MediaTrack *media_track = media_tracks.Get(i);

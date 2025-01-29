@@ -46,7 +46,7 @@ protected:
         colorDim.SetColor(red / 4, green / 4, blue / 4);
     }
 
-    void GetFaderValue(MediaTrack *media_track, int receiveIndex, int *faderValue, int *valueBarValue, int *_pan, string *panStr)
+    void GetFaderValue(MediaTrack *media_track, int receiveIndex, int *faderValue, int *valueBarValue, int *_pan, std::string *panStr)
     {
         double volume, pan = 0.0;
 
@@ -96,7 +96,7 @@ public:
             MediaTrack *media_track = media_tracks.Get(i);
             SetTrackColors(media_track);
 
-            string panStr;
+            std::string panStr;
             GetFaderValue(receives_track, receiveIndex, &faderValue, &valueBarValue, &pan, &panStr);
 
             if (!media_track)

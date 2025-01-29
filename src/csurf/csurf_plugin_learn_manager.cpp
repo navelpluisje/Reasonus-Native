@@ -18,12 +18,12 @@ class CSurf_PluginLearnManager : public CSurf_ChannelManager
 {
 protected:
     mINI::INIStructure ini;
-    string fileName;
+    std::string fileName;
     int updateCount;
 
-    string getParamKey(string prefix, int index)
+    std::string getParamKey(std::string prefix, int index)
     {
-        string controlIndex = to_string(context->GetChannelManagerItemIndex() + index);
+        std::string controlIndex = std::to_string(context->GetChannelManagerItemIndex() + index);
         return prefix + controlIndex;
     }
 
@@ -31,9 +31,9 @@ protected:
     {
         int pluginId = context->GetPluginEditPluginId();
         MediaTrack *media_track = context->GetPluginEditTrack();
-        string fullName = DAW::GetTrackFxName(media_track, pluginId, true);
-        string pluginName = DAW::GetTrackFxName(media_track, pluginId);
-        string developerName = DAW::GetTrackFxDeveloper(media_track, pluginId);
+        std::string fullName = DAW::GetTrackFxName(media_track, pluginId, true);
+        std::string pluginName = DAW::GetTrackFxName(media_track, pluginId);
+        std::string developerName = DAW::GetTrackFxDeveloper(media_track, pluginId);
         fileName = GetReaSonusPluginPath(developerName, pluginName);
 
         mINI::INIFile file(fileName);
@@ -72,7 +72,7 @@ public:
 
     void UpdateTracks() override
     {
-        string paramKey;
+        std::string paramKey;
         int trackId, itemNumber, takeId, pluginId, paramId;
         if (GetTouchedOrFocusedFX(0, &trackId, &itemNumber, &takeId, &pluginId, &paramId))
         {
@@ -135,7 +135,7 @@ public:
         int pluginId = context->GetPluginEditPluginId();
         int paramId = context->GetPluginEditParamId();
 
-        string paramKey = getParamKey("Select_", controlIndex);
+        std::string paramKey = getParamKey("Select_", controlIndex);
 
         if (context->GetShiftLeft())
         {
@@ -156,7 +156,7 @@ public:
         else
         {
             MediaTrack *media_track = context->GetPluginEditTrack();
-            string paramName = DAW::GetTrackFxParamName(media_track, pluginId, paramId);
+            std::string paramName = DAW::GetTrackFxParamName(media_track, pluginId, paramId);
             int nbSteps = DAW::GetTrackFxParamNbSteps(media_track, pluginId, paramId);
 
             if (!ini.has(paramKey))
@@ -165,8 +165,8 @@ public:
             }
             ini[paramKey]["origName"] = paramName;
             ini[paramKey]["name"] = paramName;
-            ini[paramKey]["param"] = to_string(paramId);
-            ini[paramKey]["steps"] = to_string(nbSteps);
+            ini[paramKey]["param"] = std::to_string(paramId);
+            ini[paramKey]["steps"] = std::to_string(nbSteps);
 
             SaveIniFile();
         }
@@ -197,7 +197,7 @@ public:
             context->SetPluginEditParamId(paramId);
         }
 
-        string paramKey = getParamKey("Fader_", controlIndex);
+        std::string paramKey = getParamKey("Fader_", controlIndex);
 
         if (context->GetShiftLeft())
         {
@@ -218,7 +218,7 @@ public:
         else
         {
             MediaTrack *media_track = context->GetPluginEditTrack();
-            string paramName = DAW::GetTrackFxParamName(media_track, pluginId, paramId);
+            std::string paramName = DAW::GetTrackFxParamName(media_track, pluginId, paramId);
 
             if (!ini.has(paramKey))
             {
@@ -226,7 +226,7 @@ public:
             }
             ini[paramKey]["origName"] = paramName;
             ini[paramKey]["name"] = paramName;
-            ini[paramKey]["param"] = to_string(paramId);
+            ini[paramKey]["param"] = std::to_string(paramId);
 
             SaveIniFile();
         }

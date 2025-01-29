@@ -60,13 +60,13 @@ protected:
         markerButton->SetValue(session_type == Marker ? valueOn : BTN_VALUE_OFF);
     }
 
-    void handleFunctionKey(string key)
+    void handleFunctionKey(std::string key)
     {
         mINI::INIFile file(GetReaSonusIniPath());
         mINI::INIStructure ini;
         file.read(ini);
 
-        string actionId = ini["functions"][key];
+        std::string actionId = ini["functions"][key];
         if (actionId == "0")
         {
             int result = MB("There is no action assigned to this function.\nDo you want to assign an action?", "No action assigned", 1);

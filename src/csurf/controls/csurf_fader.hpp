@@ -5,8 +5,6 @@
 #include <WDL/wdltypes.h> // might be unnecessary in future
 #include "csurf_fader_resources.hpp"
 
-using namespace std;
-
 class CSurf_Fader
 {
 protected:

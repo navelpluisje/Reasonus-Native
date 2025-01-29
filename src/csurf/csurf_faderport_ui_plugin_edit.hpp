@@ -13,8 +13,6 @@
 
 extern HWND g_hwnd;
 
-using namespace std;
-
 enum FilterListDirection
 {
     FilterListUp = -1,
@@ -25,8 +23,8 @@ namespace CSURF_FADERPORT_UI_PLUGIN_EDIT
 {
     static mINI::INIStructure ini;
     static HWND s_hwndReaSonusPluginEditDlg = NULL;
-    static string fileName;
-    static string controlIndex;
+    static std::string fileName;
+    static std::string controlIndex;
 
     static void HidePluginEditDialog()
     {
@@ -64,7 +62,7 @@ namespace CSURF_FADERPORT_UI_PLUGIN_EDIT
         }
     }
 
-    static void StoreField(string controlName, string fieldName, string value)
+    static void StoreField(std::string controlName, std::string fieldName, std::string value)
     {
         if (ini[controlName][fieldName] != value)
         {
@@ -98,40 +96,40 @@ namespace CSURF_FADERPORT_UI_PLUGIN_EDIT
             case IDC_EDIT_PLUGIN_EDIT_SELECT_NAME:
             {
                 char buffer[255];
-                GetDlgItemText(hwndDlg, IDC_EDIT_PLUGIN_EDIT_SELECT_NAME, buffer, size(buffer));
-                StoreField("Select_" + controlIndex, "name", string(buffer));
+                GetDlgItemText(hwndDlg, IDC_EDIT_PLUGIN_EDIT_SELECT_NAME, buffer, std::size(buffer));
+                StoreField("Select_" + controlIndex, "name", std::string(buffer));
                 break;
             }
 
             case IDC_EDIT_PLUGIN_EDIT_SELECT_PARAM_ID:
             {
                 char buffer[255];
-                GetDlgItemText(hwndDlg, IDC_EDIT_PLUGIN_EDIT_SELECT_PARAM_ID, buffer, size(buffer));
-                StoreField("Select_" + controlIndex, "param", string(buffer));
+                GetDlgItemText(hwndDlg, IDC_EDIT_PLUGIN_EDIT_SELECT_PARAM_ID, buffer, std::size(buffer));
+                StoreField("Select_" + controlIndex, "param", std::string(buffer));
                 break;
             }
 
             case IDC_EDIT_PLUGIN_EDIT_SELECT_NB_STEPS:
             {
                 char buffer[255];
-                GetDlgItemText(hwndDlg, IDC_EDIT_PLUGIN_EDIT_SELECT_NB_STEPS, buffer, size(buffer));
-                StoreField("Select_" + controlIndex, "steps", string(buffer));
+                GetDlgItemText(hwndDlg, IDC_EDIT_PLUGIN_EDIT_SELECT_NB_STEPS, buffer, std::size(buffer));
+                StoreField("Select_" + controlIndex, "steps", std::string(buffer));
                 break;
             }
 
             case IDC_EDIT_PLUGIN_EDIT_FADER_NAME:
             {
                 char buffer[255];
-                GetDlgItemText(hwndDlg, IDC_EDIT_PLUGIN_EDIT_FADER_NAME, buffer, size(buffer));
-                StoreField("Fader_" + controlIndex, "name", string(buffer));
+                GetDlgItemText(hwndDlg, IDC_EDIT_PLUGIN_EDIT_FADER_NAME, buffer, std::size(buffer));
+                StoreField("Fader_" + controlIndex, "name", std::string(buffer));
                 break;
             }
 
             case IDC_EDIT_PLUGIN_EDIT_FADER_PARAM_ID:
             {
                 char buffer[255];
-                GetDlgItemText(hwndDlg, IDC_EDIT_PLUGIN_EDIT_FADER_PARAM_ID, buffer, size(buffer));
-                StoreField("Fader_" + controlIndex, "param", string(buffer));
+                GetDlgItemText(hwndDlg, IDC_EDIT_PLUGIN_EDIT_FADER_PARAM_ID, buffer, std::size(buffer));
+                StoreField("Fader_" + controlIndex, "param", std::string(buffer));
                 break;
             }
 
@@ -149,10 +147,10 @@ namespace CSURF_FADERPORT_UI_PLUGIN_EDIT
         return 0;
     };
 
-    static void ShowPluginEditDialog(string _fileName, int index)
+    static void ShowPluginEditDialog(std::string _fileName, int index)
     {
         fileName = _fileName;
-        controlIndex = to_string(index);
+        controlIndex = std::to_string(index);
 
         static mINI::INIFile file(fileName);
         file.read(ini);
