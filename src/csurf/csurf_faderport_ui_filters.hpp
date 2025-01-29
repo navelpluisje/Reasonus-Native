@@ -262,7 +262,7 @@ namespace CSURF_FADERPORT_UI_FILTERS
                 }
 
                 char buffer[255];
-                GetDlgItemText(hwndDlg, IDC_EDIT_FILTER_NAME, std::string(buffer).c_str(), std::size(buffer));
+                GetDlgItemText(hwndDlg, IDC_EDIT_FILTER_NAME, buffer, std::size(buffer));
                 ini[filter]["name"] = buffer;
                 file.write(ini);
                 break;

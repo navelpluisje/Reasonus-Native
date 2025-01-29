@@ -263,7 +263,7 @@ void readAndCreateIni(mINI::INIStructure &data)
 
 std::string GenerateUniqueKey(std::string prefix)
 {
-    srand(time((int)0));
+    srand(std::time(0));
     char a[] = "abcdefghijklmnopqrstuvwxyz0123456789";
     for (int i = 0; i < 24; i++)
     {
