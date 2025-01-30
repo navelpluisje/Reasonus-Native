@@ -157,7 +157,7 @@ public:
 
     void HandleShiftButton(int val)
     {
-        int time = timeGetTime();
+        int time = GetTickCount();
         shiftState.active = val > 0;
 
         if (shiftState.start == 0)

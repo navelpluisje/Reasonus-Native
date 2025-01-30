@@ -4,6 +4,7 @@
 #include <string>
 #include <mini/ini.h>
 #include <WDL/localize/localize.h>
+#include <WDL/win32_utf8.h>
 #include "csurf_utils.hpp"
 #include "csurf_faderport_ui_utils.hpp"
 #include "../resource.h"

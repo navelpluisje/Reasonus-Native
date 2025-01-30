@@ -28,6 +28,7 @@
 #include "../resource.h"
 
 extern HWND g_hwnd;
+extern REAPER_PLUGIN_HINSTANCE g_hInst;
 
 using namespace CSURF_FADERPORT_UI_INIT;
 
@@ -473,7 +474,7 @@ public:
   {
     if (m_midiin)
     {
-      m_midiin->SwapBufsPrecise(timeGetTime(), 0.0);
+      m_midiin->SwapBufsPrecise(GetTickCount(), 0.0);
       int l = 0;
       MIDI_eventlist *list = m_midiin->GetReadBuf();
       MIDI_event_t *evts;
@@ -486,7 +487,7 @@ public:
 
     if (m_midiout)
     {
-      DWORD now = timeGetTime();
+      DWORD now = GetTickCount();
       if ((now - surface_update_lastrun) >= 100)
       {
         faderManager->UpdateTracks();
@@ -520,7 +521,7 @@ public:
 
   void OnTrackSelection(MediaTrack *media_track)
   {
-    int trackId = ::GetMediaTrackInfo_Value(media_track, "IP_TRACKNUMBER");
+    int trackId = (int)::GetMediaTrackInfo_Value(media_track, "IP_TRACKNUMBER");
 
     trackNavigator->SetOffset(trackId - 1);
   }

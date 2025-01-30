@@ -24,7 +24,7 @@ struct ShiftState
 
     void SetValue(bool value)
     {
-        int time = timeGetTime();
+        int time = GetTickCount();
         active = value;
 
         if (start == 0)

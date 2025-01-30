@@ -12,6 +12,7 @@
 #include "csurf_faderport_ui_utils.hpp"
 
 extern HWND g_hwnd;
+extern REAPER_PLUGIN_HINSTANCE g_hInst;
 
 namespace CSURF_FADERPORT_UI_FUNCTIONS
 {

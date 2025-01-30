@@ -204,7 +204,7 @@ if(WIN32)
         /W3
         /wd4996
         )
-    target_compile_definitions(${PROJECT_NAME} PRIVATE NOMINMAX UNICODE)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE NOMINMAX)
 else()
     target_compile_options(
         ${PROJECT_NAME}
