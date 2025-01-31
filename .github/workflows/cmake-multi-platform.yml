@@ -155,7 +155,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           # Might need a version or something here
-          name: reasonus-native
+          name: reasonus-native-*
           path: ./artifacts
 
       - name: Create Release
