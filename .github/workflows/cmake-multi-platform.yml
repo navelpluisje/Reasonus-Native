@@ -147,47 +147,48 @@ jobs:
             ./*.exe
             ./*.pkg
 
-      - name: Release
-        uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
         with:
+          # Might need a version or something here
+          pattern: reasonus-native-*
+          path: ./artifacts
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: ${{ github.ref_name }}
           draft: true
-          files: |
-            reasonus-native-*
+          prerelease: false
 
-  # release:
-  #   needs: build
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Download artifact
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         # Might need a version or something here
-  #         pattern: reasonus-native-*
-  #         path: ./artifacts
+      - name: Upload Release Assets
+        run: |
+          for file in ./artifacts/*; do
+            if [ -f "$file" ]; then
+              echo "Uploading $file"
+              curl \
+                -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+                -H "Content-Type: $(file -b --mime-type $file)" \
+                --data-binary @"$file" \
+                "${{ steps.create_release.outputs.upload_url }}=$(basename $file)"
+            fi
+          done
 
-  #     - name: Create Release
-  #       id: create_release
-  #       uses: actions/create-release@v1
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
-  #       with:
-  #         tag_name: ${{ github.ref_name }}
-  #         release_name: ${{ github.ref_name }}
-  #         draft: true
-  #         prerelease: false
-
-  #     - name: Upload Release Assets
-  #       run: |
-  #         for file in ./artifacts/*; do
-  #           if [ -f "$file" ]; then
-  #             echo "Uploading $file"
-  #             curl \
-  #               -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-  #               -H "Content-Type: $(file -b --mime-type $file)" \
-  #               --data-binary @"$file" \
-  #               "${{ steps.create_release.outputs.upload_url }}=$(basename $file)"
-  #           fi
-  #         done
+      # - name: Release
+      #   uses: softprops/action-gh-release@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     draft: true
+      #     files: |
+      #       out/**/*setup*.exe
+      #       out/**/*.zip
+      #       out/**/RELEASES
