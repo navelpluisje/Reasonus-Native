@@ -38,8 +38,8 @@ void CSurf_LastTouchedFXManager::UpdateTrack()
         {
             trackName = (const char *)GetSetMediaTrackInfo(media_track, "P_NAME", NULL);
             TrackFX_GetFXName(media_track, fxNumber, fxName, sizeof(fxName));
-            TrackFX_GetParamName(media_track, fxNumber, paramNumber, paramName, size(paramName));
-            TrackFX_GetFormattedParamValue(media_track, fxNumber, paramNumber, paramValueString, size(paramValueString));
+            TrackFX_GetParamName(media_track, fxNumber, paramNumber, paramName, std::size(paramName));
+            TrackFX_GetFormattedParamValue(media_track, fxNumber, paramNumber, paramValueString, std::size(paramValueString));
             paramValue = TrackFX_GetParam(media_track, fxNumber, paramNumber, &min, &max);
         }
     }
@@ -51,7 +51,7 @@ void CSurf_LastTouchedFXManager::UpdateTrack()
     track->SetDisplayMode(DISPLAY_MODE_2, forceUpdate);
     track->SetDisplayLine(0, ALIGN_LEFT, trackName, NON_INVERT, forceUpdate);
     track->SetDisplayLine(1, ALIGN_LEFT, paramNumber < 0 ? "No Param" : StripPluginNamePrefixes(fxName).c_str(), INVERT, forceUpdate);
-    track->SetDisplayLine(2, ALIGN_LEFT, paramNumber < 0 ? "  " : string(paramName).c_str(), NON_INVERT, forceUpdate);
+    track->SetDisplayLine(2, ALIGN_LEFT, paramNumber < 0 ? "  " : std::string(paramName).c_str(), NON_INVERT, forceUpdate);
     track->SetDisplayLine(3, ALIGN_CENTER, paramNumber < 0 ? "  " : paramValueString, NON_INVERT, forceUpdate);
     track->SetFaderValue((int)(paramValue * 16383.0), forceUpdate);
 

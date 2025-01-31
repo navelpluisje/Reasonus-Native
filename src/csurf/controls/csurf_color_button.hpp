@@ -4,8 +4,6 @@
 #include "csurf_button.hpp"
 #include "csurf_color_button_colors.hpp"
 
-using namespace std;
-
 class CSurf_ColorButton : public CSurf_Button
 {
 protected:

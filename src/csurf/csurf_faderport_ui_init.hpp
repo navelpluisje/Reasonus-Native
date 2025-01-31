@@ -1,25 +1,25 @@
 #ifndef CSURF_FADERPORT_UI_H_
 #define CSURF_FADERPORT_UI_H_
 
+#include <string>
 #include <mini/ini.h>
 #include <WDL/localize/localize.h>
+#include <WDL/win32_utf8.h>
 #include "csurf_utils.hpp"
 #include "csurf_faderport_ui_utils.hpp"
 #include "../resource.h"
 
 extern HWND g_hwnd;
 
-using namespace std;
-
 namespace CSURF_FADERPORT_UI_INIT
 {
     mINI::INIStructure ini;
 
-    static void SaveCheckBoxValue(HWND hwndDlg, string key, int checkBox)
+    static void SaveCheckBoxValue(HWND hwndDlg, std::string key, int checkBox)
     {
         mINI::INIFile file(GetReaSonusIniPath());
 
-        ini["surface"][key] = to_string(IsDlgButtonChecked(hwndDlg, checkBox));
+        ini["surface"][key] = std::to_string(IsDlgButtonChecked(hwndDlg, checkBox));
         file.write(ini, true);
     }
 
@@ -145,9 +145,9 @@ namespace CSURF_FADERPORT_UI_INIT
                 if (r != CB_ERR)
                     surface = SendDlgItemMessage(hwndDlg, IDC_COMBO_SURFACE, CB_GETITEMDATA, r, 0);
 
-                ini["Surface"]["MidiIn"] = to_string(indev);
-                ini["Surface"]["MidiOut"] = to_string(outdev);
-                ini["Surface"]["Surface"] = to_string(surface);
+                ini["Surface"]["MidiIn"] = std::to_string(indev);
+                ini["Surface"]["MidiOut"] = std::to_string(outdev);
+                ini["Surface"]["Surface"] = std::to_string(surface);
                 file.write(ini, true);
             }
             break;

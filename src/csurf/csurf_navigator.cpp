@@ -38,7 +38,7 @@ void CSurf_Navigator::GetAllVisibleTracks(WDL_PtrList<MediaTrack> &tracks, bool 
     hasMute = _mute;
 }
 
-void CSurf_Navigator::SetTrackUIVisibility(map<int, bool> &tracks)
+void CSurf_Navigator::SetTrackUIVisibility(std::map<int, bool> &tracks)
 {
     PreventUIRefresh(1);
 
@@ -55,7 +55,7 @@ void CSurf_Navigator::SetTrackUIVisibility(map<int, bool> &tracks)
 
 void CSurf_Navigator::HandleAllTracksFilter()
 {
-    map<int, bool> tracks = {};
+    std::map<int, bool> tracks = {};
 
     for (int i = 0; i < CountTracks(0); i++)
     {
@@ -65,19 +65,19 @@ void CSurf_Navigator::HandleAllTracksFilter()
     SetTrackUIVisibility(tracks);
 }
 
-void CSurf_Navigator::HandleTracksCustomFilter(string filterName)
+void CSurf_Navigator::HandleTracksCustomFilter(std::string filterName)
 {
     mINI::INIFile file(GetReaSonusIniPath());
     mINI::INIStructure ini;
     file.read(ini);
-    mINI::INIMap<string> filter = ini[filterName];
+    mINI::INIMap<std::string> filter = ini[filterName];
 
-    map<int, bool> tracks;
-    map<int, bool> filterTracks;
-    map<int, bool> allTracks;
-    map<int, bool> childTracks;
-    map<int, bool> parentTracks;
-    map<int, bool> sibblingTracks;
+    std::map<int, bool> tracks;
+    std::map<int, bool> filterTracks;
+    std::map<int, bool> allTracks;
+    std::map<int, bool> childTracks;
+    std::map<int, bool> parentTracks;
+    std::map<int, bool> sibblingTracks;
 
     bool stop = false;
     for (int i = 0; i < CountTracks(0); i++)
@@ -86,7 +86,7 @@ void CSurf_Navigator::HandleTracksCustomFilter(string filterName)
         if (!stop)
         {
             MediaTrack *media_track = GetTrack(0, i);
-            string trackName = DAW::GetTrackName(media_track);
+            std::string trackName = DAW::GetTrackName(media_track);
             bool isChild = GetTrackDepth(media_track) > 0;
 
             if (FuzzyMatch(trackName, filter["text"]) && !(isChild && filter["top-level"] == "1"))
@@ -127,7 +127,7 @@ void CSurf_Navigator::HandleTracksCustomFilter(string filterName)
 
 void CSurf_Navigator::HandleTracksWithSendsFilter()
 {
-    map<int, bool> tracks = {};
+    std::map<int, bool> tracks = {};
 
     for (int i = 0; i < ::CountTracks(0); i++)
     {
@@ -141,7 +141,7 @@ void CSurf_Navigator::HandleTracksWithSendsFilter()
 
 void CSurf_Navigator::HandleTracksWithReceivesFilter()
 {
-    map<int, bool> tracks = {};
+    std::map<int, bool> tracks = {};
 
     for (int i = 0; i < ::CountTracks(0); i++)
     {
@@ -155,7 +155,7 @@ void CSurf_Navigator::HandleTracksWithReceivesFilter()
 
 void CSurf_Navigator::HandleTracksWithHardwareOutputsFilter()
 {
-    map<int, bool> tracks = {};
+    std::map<int, bool> tracks = {};
 
     for (int i = 0; i < ::CountTracks(0); i++)
     {
@@ -169,7 +169,7 @@ void CSurf_Navigator::HandleTracksWithHardwareOutputsFilter()
 
 void CSurf_Navigator::HandleTracksWithInstrumentsFilter()
 {
-    map<int, bool> tracks = {};
+    std::map<int, bool> tracks = {};
 
     for (int i = 0; i < ::CountTracks(0); i++)
     {
@@ -184,7 +184,7 @@ void CSurf_Navigator::HandleTracksWithInstrumentsFilter()
 
 void CSurf_Navigator::HandleTracksWithEffectsFilter()
 {
-    map<int, bool> tracks = {};
+    std::map<int, bool> tracks = {};
 
     for (int i = 0; i < ::CountTracks(0); i++)
     {
@@ -197,7 +197,7 @@ void CSurf_Navigator::HandleTracksWithEffectsFilter()
 
 void CSurf_Navigator::HandleTracksWithMidiFilter()
 {
-    map<int, bool> tracks = {};
+    std::map<int, bool> tracks = {};
 
     for (int i = 0; i < ::CountTracks(0); i++)
     {
@@ -222,7 +222,7 @@ void CSurf_Navigator::HandleTracksWithMidiFilter()
 
 void CSurf_Navigator::HandleTracksWithAudioFilter()
 {
-    map<int, bool> tracks = {};
+    std::map<int, bool> tracks = {};
 
     for (int i = 0; i < ::CountTracks(0); i++)
     {
@@ -247,7 +247,7 @@ void CSurf_Navigator::HandleTracksWithAudioFilter()
 
 void CSurf_Navigator::HandleTracksAreVcaFilter()
 {
-    map<int, bool> tracks = {};
+    std::map<int, bool> tracks = {};
 
     for (int i = 0; i < ::CountTracks(0); i++)
     {
@@ -261,7 +261,7 @@ void CSurf_Navigator::HandleTracksAreVcaFilter()
 
 void CSurf_Navigator::HandleTracksTopFoldersFilter()
 {
-    map<int, bool> tracks = {};
+    std::map<int, bool> tracks = {};
     int depth = 0;
 
     for (int i = 0; i < CountTracks(0); i++)
@@ -282,7 +282,7 @@ void CSurf_Navigator::HandleTracksTopFoldersFilter()
 
 void CSurf_Navigator::HandleTracksAllFoldersFilter()
 {
-    map<int, bool> tracks = {};
+    std::map<int, bool> tracks = {};
 
     for (int i = 0; i < CountTracks(0); i++)
     {
@@ -442,7 +442,7 @@ void CSurf_Navigator::HandleFilter(NavigatorFilter filter)
     }
 }
 
-void CSurf_Navigator::HandleCustomFilter(string filterName)
+void CSurf_Navigator::HandleCustomFilter(std::string filterName)
 {
     HandleTracksCustomFilter(filterName);
 }

@@ -1,3 +1,4 @@
+#include <string>
 #include "csurf_display.hpp"
 #include <reaper_plugin.h>
 #include <WDL/wdltypes.h> // might be unnecessary in future
@@ -79,7 +80,7 @@ void CSurf_Display::SetValue(int line, Alignment _alignment, const char *_value,
     // We have to convert the char array to a string. Somehow the simple conversion makes it crash
     char buffer[250];
     snprintf(buffer, sizeof(buffer), "%s", _value);
-    string strVal = buffer;
+    std::string strVal = buffer;
 
     // If values have not changed, we do nothing
     if (strVal == values[line] && alignment[line] == _alignment && inverted[line] == invert && !force)

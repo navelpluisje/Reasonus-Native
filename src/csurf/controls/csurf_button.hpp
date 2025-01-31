@@ -6,8 +6,6 @@
 #include <reaper_plugin_functions.h>
 #include "csurf_button_resources.hpp"
 
-using namespace std;
-
 class CSurf_Button
 {
 protected:

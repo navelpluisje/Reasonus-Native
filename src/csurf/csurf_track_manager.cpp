@@ -40,7 +40,7 @@ protected:
         colorDim.SetColor(red / 4, green / 4, blue / 4);
     }
 
-    void GetFaderValue(MediaTrack *media_track, int *faderValue, int *valueBarValue, string *_pan1, string *_pan2)
+    void GetFaderValue(MediaTrack *media_track, int *faderValue, int *valueBarValue, std::string *_pan1, std::string *_pan2)
     {
         int panMode = 0;
         double volume, pan1, pan2 = 0.0;
@@ -90,7 +90,7 @@ public:
         for (int i = 0; i < context->GetNbChannels(); i++)
         {
             int faderValue = 0, valueBarValue = 0;
-            string strPan1, strPan2;
+            std::string strPan1, strPan2;
 
             CSurf_Track *track = tracks.at(i);
             MediaTrack *media_track = media_tracks.Get(i);
@@ -142,7 +142,7 @@ public:
                 track->SetDisplayLine(0, ALIGN_LEFT, DAW::GetTrackName(media_track).c_str(), NON_INVERT, forceUpdate);
                 track->SetDisplayLine(1, ALIGN_CENTER, DAW::GetTrackIndex(media_track).c_str(), NON_INVERT, forceUpdate);
                 track->SetDisplayLine(2, ALIGN_CENTER, context->GetPanPushMode() ? strPan1.c_str() : strPan2.c_str(), NON_INVERT, forceUpdate);
-                track->SetDisplayLine(3, ALIGN_CENTER, string("").c_str(), NON_INVERT, forceUpdate);
+                track->SetDisplayLine(3, ALIGN_CENTER, std::string("").c_str(), NON_INVERT, forceUpdate);
             }
         }
 

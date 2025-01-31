@@ -6,8 +6,6 @@
 #include <reaper_plugin.h>
 #include "csurf_valuebar_resources.hpp"
 
-using namespace std;
-
 static ChannelValueBar channelValuebars[16] = {
     VALUEBAR_1,
     VALUEBAR_2,

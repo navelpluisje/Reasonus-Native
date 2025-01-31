@@ -59,7 +59,7 @@ protected:
         *valueBarValue = int(panToNormalized(pan1) * 127);
     }
 
-    string GetBypassedText(bool bypassed)
+    std::string GetBypassedText(bool bypassed)
     {
         return bypassed ? "Bypassed" : "Enabled";
     }
