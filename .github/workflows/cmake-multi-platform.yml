@@ -155,11 +155,7 @@ jobs:
         with:
           draft: true
           files: |
-            ./reaper_*.dll
-            ./reaper_*.pdb
-            ./reaper_*.dylib
-            ./reaper_*.so
-            ./*.exe
+            reasonus-native-*
 
   # release:
   #   needs: build
