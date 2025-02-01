@@ -3,7 +3,7 @@ name: Reasonus Build
 on:
   push:
     tags:
-      - 'v[0-9]+\.[0-9]+\.[0-9]+([-\.]\S+)?'
+      - 'v[0-9]+\.[0-9]+\.[0-9]+(-*)?'
 env:
   VS_PATH: "%ProgramFiles%\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Auxiliary\\Build"
   MACOSX_DEPLOYMENT_TARGET: 11.0
