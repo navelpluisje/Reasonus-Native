@@ -184,8 +184,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
+          draft: true
           token: ${{ secrets.GITHUB_TOKEN }}
-          files: ./artifacts/*
+          files: ./**/*
 
           # upload_url: ${{ steps.create_release.outputs.upload_url }}
           # asset_path: reasonus-native-${{ matrix.os }}-${{ matrix.arch }}
