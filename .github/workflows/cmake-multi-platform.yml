@@ -179,28 +179,31 @@ jobs:
           draft: true
           prerelease: false
 
-      # - name: upload artifact
-      #   uses: actions/upload-release-asset@v1
-      #   env:
-      #     GITHUB_TOKEN: ${{ github.token }}
-      #   with:
-      #     upload_url: ${{ steps.create_release.outputs.upload_url }}
-      #     asset_path: reasonus-native-${{ matrix.os }}-${{ matrix.arch }}
-      #     asset_name: reasonus-native-${{ matrix.os }}-${{ matrix.arch }}
-      #     asset_content_type: application/gzip
+      - name: upload artifact
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          files: ./artifacts/*
 
-      - name: Upload Release Assets
-        run: |
-          for file in ./artifacts/*; do
-            echo "Uploading $file"
-            if [ -f "$file" ]; then
-              curl \
-                -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-                -H "Content-Type: $(file -b --mime-type $file)" \
-                --data-binary @"$file" \
-                "${{ steps.create_release.outputs.upload_url }}=$(basename $file)"
-            fi
-          done
+          # upload_url: ${{ steps.create_release.outputs.upload_url }}
+          # asset_path: reasonus-native-${{ matrix.os }}-${{ matrix.arch }}
+          # asset_name: reasonus-native-${{ matrix.os }}-${{ matrix.arch }}
+          # asset_content_type: application/gzip
+
+      # - name: Upload Release Assets
+      #   run: |
+      #     for file in ./artifacts/*; do
+      #       echo "Uploading $file"
+      #       if [ -f "$file" ]; then
+      #         curl \
+      #           -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+      #           -H "Content-Type: $(file -b --mime-type $file)" \
+      #           --data-binary @"$file" \
+      #           "${{ steps.create_release.outputs.upload_url }}=$(basename $file)"
+      #       fi
+      #     done
 
   # - name: Release
   #   uses: softprops/action-gh-release@v1
