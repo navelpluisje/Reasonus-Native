@@ -192,8 +192,8 @@ jobs:
       - name: Upload Release Assets
         run: |
           for file in ./artifacts/*; do
+            echo "Uploading $file"
             if [ -f "$file" ]; then
-              echo "Uploading $file"
               curl \
                 -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
                 -H "Content-Type: $(file -b --mime-type $file)" \
