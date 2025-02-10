@@ -20,6 +20,7 @@ target_sources(${PROJECT_NAME}
         csurf_plugins_manager.cpp
         csurf_receives_manager.cpp
         csurf_sends_manager.cpp
+        csurf_faderport_ui_plugin_edit.cpp
 
         csurf_track.cpp
         csurf_utils.cpp

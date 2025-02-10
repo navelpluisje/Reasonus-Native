@@ -63,6 +63,7 @@ void CSurf_Navigator::HandleAllTracksFilter()
     }
 
     SetTrackUIVisibility(tracks);
+    SetOffset(0);
 }
 
 void CSurf_Navigator::HandleTracksCustomFilter(std::string filterName)
@@ -123,6 +124,7 @@ void CSurf_Navigator::HandleTracksCustomFilter(std::string filterName)
     tracks.insert(allTracks.begin(), allTracks.end());
 
     SetTrackUIVisibility(tracks);
+    SetOffset(0);
 }
 
 void CSurf_Navigator::HandleTracksWithSendsFilter()
@@ -137,6 +139,7 @@ void CSurf_Navigator::HandleTracksWithSendsFilter()
     }
 
     SetTrackUIVisibility(tracks);
+    SetOffset(0);
 }
 
 void CSurf_Navigator::HandleTracksWithReceivesFilter()
@@ -151,6 +154,7 @@ void CSurf_Navigator::HandleTracksWithReceivesFilter()
     }
 
     SetTrackUIVisibility(tracks);
+    SetOffset(0);
 }
 
 void CSurf_Navigator::HandleTracksWithHardwareOutputsFilter()
@@ -165,6 +169,7 @@ void CSurf_Navigator::HandleTracksWithHardwareOutputsFilter()
     }
 
     SetTrackUIVisibility(tracks);
+    SetOffset(0);
 }
 
 void CSurf_Navigator::HandleTracksWithInstrumentsFilter()
@@ -180,6 +185,7 @@ void CSurf_Navigator::HandleTracksWithInstrumentsFilter()
     }
 
     SetTrackUIVisibility(tracks);
+    SetOffset(0);
 }
 
 void CSurf_Navigator::HandleTracksWithEffectsFilter()
@@ -193,6 +199,7 @@ void CSurf_Navigator::HandleTracksWithEffectsFilter()
     }
 
     SetTrackUIVisibility(tracks);
+    SetOffset(0);
 }
 
 void CSurf_Navigator::HandleTracksWithMidiFilter()
@@ -218,6 +225,7 @@ void CSurf_Navigator::HandleTracksWithMidiFilter()
     }
 
     SetTrackUIVisibility(tracks);
+    SetOffset(0);
 }
 
 void CSurf_Navigator::HandleTracksWithAudioFilter()
@@ -243,6 +251,7 @@ void CSurf_Navigator::HandleTracksWithAudioFilter()
     }
 
     SetTrackUIVisibility(tracks);
+    SetOffset(0);
 }
 
 void CSurf_Navigator::HandleTracksAreVcaFilter()
@@ -257,6 +266,7 @@ void CSurf_Navigator::HandleTracksAreVcaFilter()
     }
 
     SetTrackUIVisibility(tracks);
+    SetOffset(0);
 }
 
 void CSurf_Navigator::HandleTracksTopFoldersFilter()
@@ -278,6 +288,7 @@ void CSurf_Navigator::HandleTracksTopFoldersFilter()
     }
 
     SetTrackUIVisibility(tracks);
+    SetOffset(0);
 }
 
 void CSurf_Navigator::HandleTracksAllFoldersFilter()
@@ -292,6 +303,7 @@ void CSurf_Navigator::HandleTracksAllFoldersFilter()
     }
 
     SetTrackUIVisibility(tracks);
+    SetOffset(0);
 }
 
 void CSurf_Navigator::UpdateMixerPosition()

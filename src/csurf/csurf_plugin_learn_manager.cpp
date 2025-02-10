@@ -12,8 +12,6 @@
 #include "csurf_daw.hpp"
 #include "csurf_utils.hpp"
 
-using namespace CSURF_FADERPORT_UI_PLUGIN_EDIT;
-
 class CSurf_PluginLearnManager : public CSurf_ChannelManager
 {
 protected:
@@ -140,9 +138,9 @@ public:
         if (context->GetShiftLeft())
         {
             // Show the edit screen
-            if (!IsPluginEditDialogOpen())
+            if (!CSURF_FADERPORT_UI_PLUGIN_EDIT::IsPluginEditDialogOpen())
             {
-                ShowPluginEditDialog(fileName, controlIndex);
+                CSURF_FADERPORT_UI_PLUGIN_EDIT::ShowPluginEditDialog(fileName, controlIndex);
             }
         }
         else if (context->GetShiftRight())
@@ -202,9 +200,9 @@ public:
         if (context->GetShiftLeft())
         {
             // Show the edit screen
-            if (!IsPluginEditDialogOpen())
+            if (!CSURF_FADERPORT_UI_PLUGIN_EDIT::IsPluginEditDialogOpen())
             {
-                ShowPluginEditDialog(fileName, controlIndex);
+                CSURF_FADERPORT_UI_PLUGIN_EDIT::ShowPluginEditDialog(fileName, controlIndex);
             }
         }
         else if (context->GetShiftRight())
