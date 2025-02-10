@@ -26,7 +26,7 @@ enum Btn_Types
     BTN_SOLO_9 = 0x50,
     BTN_SOLO_10 = 0x51,
     BTN_SOLO_11 = 0x52,
-    BTN_SOLO_12 = 0x53,
+    BTN_SOLO_12 = 0x58,
     BTN_SOLO_13 = 0x54,
     BTN_SOLO_14 = 0x55,
     BTN_SOLO_15 = 0x59,

@@ -396,7 +396,7 @@ public:
             break;
         case Section:
             context->GetShiftLeft()    ? Main_OnCommandEx(41041, 0, 0)  // Move edit cursor to start of current measure
-            : context->GetShiftRight() ? Main_OnCommandEx(40615, 0, 0)  // Markers: Delete region near cursor
+            : context->GetShiftRight() ? Main_OnCommandEx(40306, 0, 0)  // Markers: Insert region from time selection and edit...
                                        : Main_OnCommandEx(40616, 0, 0); // Markers: Edit region near cursor
             break;
         case Marker:

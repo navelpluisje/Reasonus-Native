@@ -151,13 +151,17 @@ class CSurf_FaderPort : public IReaperControlSurface
       {
         faderManager->HandleSoloClick(evt->midi_message[1] - BTN_SOLO_1);
       }
-      else if (evt->midi_message[1] >= BTN_SOLO_9 && evt->midi_message[1] <= BTN_SOLO_14)
+      else if (evt->midi_message[1] >= BTN_SOLO_9 && evt->midi_message[1] <= BTN_SOLO_14 && evt->midi_message[1] != BTN_SOLO_12 && evt->midi_message[1] != ENCODER_CLICK_NAV)
       {
         faderManager->HandleSoloClick(evt->midi_message[1] - BTN_SOLO_9 + 8);
       }
       else if (evt->midi_message[1] == BTN_SOLO_14 || evt->midi_message[1] == BTN_SOLO_15)
       {
         faderManager->HandleSoloClick(evt->midi_message[1] == BTN_SOLO_14 ? 14 : 15);
+      }
+      else if (evt->midi_message[1] == BTN_SOLO_12)
+      {
+        faderManager->HandleSoloClick(12);
       }
 
       /**

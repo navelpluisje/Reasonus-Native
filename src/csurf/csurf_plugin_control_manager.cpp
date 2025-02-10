@@ -12,8 +12,6 @@
 #include "csurf_daw.hpp"
 #include "csurf_utils.hpp"
 
-using namespace CSURF_FADERPORT_UI_PLUGIN_EDIT;
-
 class CSurf_PluginControlManager : public CSurf_ChannelManager
 {
 protected:
