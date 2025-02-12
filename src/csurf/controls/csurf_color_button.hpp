@@ -7,20 +7,19 @@
 class CSurf_ColorButton : public CSurf_Button
 {
 protected:
-    ButtonColor colorActive = ButtonColorWhite;
-    ButtonColor colorDim = ButtonColorWhiteDim;
+    ButtonColor color = ButtonColorWhite;
 
     void SendValue();
 
     void SendColor();
 
 public:
-    CSurf_ColorButton(ButtonColor colorActive, ButtonColor colorDim, Btn_Types type, Btn_Value value, midi_Output *m_midiout);
+    CSurf_ColorButton(ButtonColor color, Btn_Types type, Btn_Value value, midi_Output *m_midiout);
     ~CSurf_ColorButton() {};
 
     virtual void SetValue(Btn_Value value, bool force = false) override;
 
-    void SetColor(ButtonColor colorActive, ButtonColor colorDim, bool force = false);
+    void SetColor(ButtonColor color, bool force = false);
 };
 
 #endif // CSURF_COLOR_BUTTON_H_

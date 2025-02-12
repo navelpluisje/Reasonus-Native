@@ -106,9 +106,9 @@ public:
         armButton = new CSurf_Button(BTN_ARM, BTN_VALUE_OFF, m_midiout);
         soloClearButton = new CSurf_Button(BTN_SOLO_CLEAR, BTN_VALUE_OFF, m_midiout);
         muteClearButton = new CSurf_Button(BTN_MUTE_CLEAR, BTN_VALUE_OFF, m_midiout);
-        bypassButton = new CSurf_ColorButton(ButtonColorRed, ButtonColorWhiteDim, BTN_BYPASS, BTN_VALUE_OFF, m_midiout);
-        macroButton = new CSurf_ColorButton(ButtonColorWhite, ButtonColorWhiteDim, BTN_MACRO, BTN_VALUE_OFF, m_midiout);
-        linkButton = new CSurf_ColorButton(ButtonColorGreen, ButtonColorGreenDim, BTN_LINK, BTN_VALUE_OFF, m_midiout);
+        bypassButton = new CSurf_ColorButton(ButtonColorRed, BTN_BYPASS, BTN_VALUE_OFF, m_midiout);
+        macroButton = new CSurf_ColorButton(ButtonColorWhite, BTN_MACRO, BTN_VALUE_OFF, m_midiout);
+        linkButton = new CSurf_ColorButton(ButtonColorGreen, BTN_LINK, BTN_VALUE_OFF, m_midiout);
         shiftLeftButton = new CSurf_Button(BTN_SHIFT_LEFT, BTN_VALUE_OFF, m_midiout);
     };
 

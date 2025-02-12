@@ -45,8 +45,7 @@ protected:
                 ColorFromNative(trackColor, &red, &green, &blue);
             }
         }
-        colorActive.SetColor(red / 2, green / 2, blue / 2);
-        colorDim.SetColor(red / 4, green / 4, blue / 4);
+        color.SetColor(red / 2, green / 2, blue / 2);
     }
 
     void GetFilters()
@@ -121,7 +120,7 @@ public:
 
             GetFaderValue(media_track, &faderValue, &valueBarValue, &strPan1, &strPan2);
 
-            track->SetTrackColor(colorActive, colorDim);
+            track->SetTrackColor(color);
             // If the track is armed always blink as an indication it is armed
             track->SetSelectButtonValue(BTN_VALUE_OFF, forceUpdate);
             track->SetMuteButtonValue(DAW::IsTrackMuted(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);

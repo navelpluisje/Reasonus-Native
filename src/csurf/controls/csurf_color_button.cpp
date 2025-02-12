@@ -1,9 +1,8 @@
 #include "csurf_color_button.hpp"
 
-CSurf_ColorButton::CSurf_ColorButton(ButtonColor _colorActive, ButtonColor _colorDim, Btn_Types type, Btn_Value value, midi_Output *m_midiout) : CSurf_Button(type, value, m_midiout)
+CSurf_ColorButton::CSurf_ColorButton(ButtonColor _color, Btn_Types type, Btn_Value value, midi_Output *m_midiout) : CSurf_Button(type, value, m_midiout)
 {
-    colorActive = _colorActive;
-    colorDim = _colorDim;
+    color = _color;
     SendValue();
     SendColor();
 };
@@ -13,13 +12,11 @@ void CSurf_ColorButton::SendValue()
     if (m_midiout)
     {
         m_midiout->Send(MIDI_MESSAGE_BUTTON, type, value, -1);
-        SendColor();
     }
 };
 
 void CSurf_ColorButton::SendColor()
 {
-    ButtonColor color = value == 0 ? colorDim : colorActive;
     if (m_midiout)
     {
         m_midiout->Send(MIDI_MESSAGE_COLOR_RED, type, color.red, -1);
@@ -38,12 +35,11 @@ void CSurf_ColorButton::SetValue(Btn_Value _value, bool force)
     this->SendValue();
 };
 
-void CSurf_ColorButton::SetColor(ButtonColor _colorActive, ButtonColor _colorDim, bool force)
+void CSurf_ColorButton::SetColor(ButtonColor _color, bool force)
 {
-    if (!colorActive.IsColor(_colorActive) || !colorDim.IsColor(_colorDim) || force)
+    if (!color.IsColor(_color) || force)
     {
-        colorActive = _colorActive;
-        colorDim = _colorDim;
+        color = _color;
         SendColor();
     }
 };

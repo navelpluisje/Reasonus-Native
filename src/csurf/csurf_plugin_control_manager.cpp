@@ -61,8 +61,7 @@ public:
         context->SetChannelManagerItemsCount(127);
         GetCurrentPlugin();
         UpdateTracks();
-        colorActive = ButtonColorWhiteDim;
-        colorDim = ButtonColorWhiteDim;
+        color = ButtonColorWhiteDim;
     }
 
     ~CSurf_PluginControlManager() {};
@@ -80,7 +79,7 @@ public:
             char buffer[255];
             int filterIndex = context->GetChannelManagerItemIndex() + i;
             CSurf_Track *track = tracks.at(i);
-            track->SetTrackColor(colorActive, colorDim);
+            track->SetTrackColor(color);
 
             // If the track is armed always blink as an indication it is armed
             track->SetSelectButtonValue(BTN_VALUE_OFF, forceUpdate);

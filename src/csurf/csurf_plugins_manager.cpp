@@ -37,8 +37,7 @@ protected:
                 ::ColorFromNative(trackColor, &red, &green, &blue);
             }
         }
-        colorActive.SetColor(red / 2, green / 2, blue / 2);
-        colorDim.SetColor(red / 4, green / 4, blue / 4);
+        color.SetColor(red / 2, green / 2, blue / 2);
     }
 
     void GetFaderValue(MediaTrack *media_track, int *faderValue, int *valueBarValue)
@@ -123,7 +122,7 @@ public:
                 track->SetMuteButtonValue(BTN_VALUE_OFF);
             }
 
-            track->SetTrackColor(colorActive, colorDim);
+            track->SetTrackColor(color);
             track->SetSelectButtonValue(DAW::IsTrackSelected(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF);
             track->SetSoloButtonValue(ButtonBlinkOnOff(DAW::GetTrackFxPanelOpen(media_track, pluginIndex), hasPluginConfigFile(media_track, pluginIndex)));
             track->SetFaderValue(faderValue);

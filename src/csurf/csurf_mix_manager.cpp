@@ -44,11 +44,11 @@ public:
         CSurf_FaderManager *faderManager,
         midi_Output *m_midiout) : context(context), trackNavigator(trackNavigator), faderManager(faderManager), m_midiout(m_midiout)
     {
-        mixAudioButton = new CSurf_ColorButton(ButtonColorWhite, ButtonColorWhiteDim, BTN_AUDIO, BTN_VALUE_OFF, m_midiout);
-        mixViButton = new CSurf_ColorButton(ButtonColorWhite, ButtonColorWhiteDim, BTN_VI, BTN_VALUE_OFF, m_midiout);
-        mixBusButton = new CSurf_ColorButton(ButtonColorWhite, ButtonColorWhiteDim, BTN_BUS, BTN_VALUE_OFF, m_midiout);
-        mixVcaButton = new CSurf_ColorButton(ButtonColorWhite, ButtonColorWhiteDim, BTN_VCA, BTN_VALUE_OFF, m_midiout);
-        mixAllButton = new CSurf_ColorButton(ButtonColorWhite, ButtonColorWhiteDim, BTN_ALL, BTN_VALUE_ON, m_midiout);
+        mixAudioButton = new CSurf_ColorButton(ButtonColorWhite, BTN_AUDIO, BTN_VALUE_OFF, m_midiout);
+        mixViButton = new CSurf_ColorButton(ButtonColorWhite, BTN_VI, BTN_VALUE_OFF, m_midiout);
+        mixBusButton = new CSurf_ColorButton(ButtonColorWhite, BTN_BUS, BTN_VALUE_OFF, m_midiout);
+        mixVcaButton = new CSurf_ColorButton(ButtonColorWhite, BTN_VCA, BTN_VALUE_OFF, m_midiout);
+        mixAllButton = new CSurf_ColorButton(ButtonColorWhite, BTN_ALL, BTN_VALUE_ON, m_midiout);
         shiftRightButton = new CSurf_Button(BTN_SHIFT_RIGHT, BTN_VALUE_OFF, m_midiout);
 
         HandleMixAllButton(BTN_VALUE_ON);
@@ -62,7 +62,7 @@ public:
             return;
         }
 
-        mixAudioButton->SetColor(ButtonColorWhite, ButtonColorWhiteDim);
+        mixAudioButton->SetColor(ButtonColorWhite);
         trackFilter = TrackWithAudioFilter;
         trackNavigator->HandleFilter(TrackWithAudioFilter);
         faderManager->ResetMixButtonClick();
@@ -78,13 +78,13 @@ public:
 
         if (context->GetShiftLeft())
         {
-            mixViButton->SetColor(ButtonColorYellow, ButtonColorWhiteDim);
+            mixViButton->SetColor(ButtonColorYellow);
             trackFilter = TrackWithMidiFilter;
             trackNavigator->HandleFilter(TrackWithMidiFilter);
         }
         else
         {
-            mixViButton->SetColor(ButtonColorWhite, ButtonColorWhiteDim);
+            mixViButton->SetColor(ButtonColorWhite);
             trackFilter = TrackInstrumentsFilter;
             trackNavigator->HandleFilter(TrackInstrumentsFilter);
         }
@@ -101,19 +101,19 @@ public:
 
         if (context->GetShiftRight())
         {
-            mixBusButton->SetColor(ButtonColorGreen, ButtonColorWhiteDim);
+            mixBusButton->SetColor(ButtonColorGreen);
             trackFilter = TrackAllFoldersFilter;
             trackNavigator->HandleFilter(TrackAllFoldersFilter);
         }
         else if (context->GetShiftLeft())
         {
-            mixBusButton->SetColor(ButtonColorYellow, ButtonColorWhiteDim);
+            mixBusButton->SetColor(ButtonColorYellow);
             trackFilter = TrackHarwareOutputFilter;
             trackNavigator->HandleFilter(TrackHarwareOutputFilter);
         }
         else
         {
-            mixBusButton->SetColor(ButtonColorWhite, ButtonColorWhiteDim);
+            mixBusButton->SetColor(ButtonColorWhite);
             trackFilter = TrackTopFoldersFilter;
             trackNavigator->HandleFilter(TrackTopFoldersFilter);
         }
@@ -130,19 +130,19 @@ public:
 
         if (context->GetShiftRight())
         {
-            mixVcaButton->SetColor(ButtonColorGreen, ButtonColorWhiteDim);
+            mixVcaButton->SetColor(ButtonColorGreen);
             trackFilter = TrackReceivesFilter;
             trackNavigator->HandleFilter(TrackReceivesFilter);
         }
         else if (context->GetShiftLeft())
         {
-            mixVcaButton->SetColor(ButtonColorYellow, ButtonColorWhiteDim);
+            mixVcaButton->SetColor(ButtonColorYellow);
             trackFilter = TrackEffectsFilter;
             trackNavigator->HandleFilter(TrackEffectsFilter);
         }
         else
         {
-            mixVcaButton->SetColor(ButtonColorWhite, ButtonColorWhiteDim);
+            mixVcaButton->SetColor(ButtonColorWhite);
             trackFilter = TrackIsVcaFilter;
             trackNavigator->HandleFilter(TrackIsVcaFilter);
         }
@@ -159,20 +159,20 @@ public:
 
         if (context->GetShiftRight())
         {
-            mixAllButton->SetColor(ButtonColorGreen, ButtonColorWhiteDim);
+            mixAllButton->SetColor(ButtonColorGreen);
             trackFilter = TrackSendsFilter;
             trackNavigator->HandleFilter(TrackSendsFilter);
             faderManager->ResetMixButtonClick();
         }
         else if (context->GetShiftLeft())
         {
-            mixAllButton->SetColor(ButtonColorYellow, ButtonColorWhiteDim);
+            mixAllButton->SetColor(ButtonColorYellow);
             trackFilter = TrackCustomFilter;
             faderManager->HandleMixButtonClick();
         }
         else
         {
-            mixAllButton->SetColor(ButtonColorWhite, ButtonColorWhiteDim);
+            mixAllButton->SetColor(ButtonColorWhite);
             trackFilter = TrackAllFilter;
             trackNavigator->HandleFilter(TrackAllFilter);
             faderManager->ResetMixButtonClick();
@@ -182,11 +182,6 @@ public:
 
     void HandleShiftButton(int value)
     {
-        if (value == 0)
-        {
-            return;
-        }
-
         int time = GetTickCount();
         shiftState.active = value > 0;
 
