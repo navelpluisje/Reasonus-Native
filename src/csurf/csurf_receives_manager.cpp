@@ -156,8 +156,13 @@ public:
         SetTrackSelected(media_track, true);
     }
 
-    void HandleMuteClick(int index) override
+    void HandleMuteClick(int index, int value) override
     {
+        if (value == 0)
+        {
+            return;
+        }
+
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
         int receiveIndex = context->GetChannelManagerItemIndex(nbTrackReceives[index] - 1);
 
@@ -171,8 +176,13 @@ public:
         }
     }
 
-    void HandleSoloClick(int index) override
+    void HandleSoloClick(int index, int value) override
     {
+        if (value == 0)
+        {
+            return;
+        }
+
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
         int receiveIndex = context->GetChannelManagerItemIndex(nbTrackReceives[index] - 1);
 

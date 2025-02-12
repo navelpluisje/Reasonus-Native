@@ -78,7 +78,7 @@ class CSurf_FaderPort : public IReaperControlSurface
     }
 
     /**
-     * ENCODERS & VALUEBAR
+     * ENCODERS
      */
     else if (evt->midi_message[0] == MIDI_MESSAGE_ENDCODER)
     {
@@ -100,22 +100,22 @@ class CSurf_FaderPort : public IReaperControlSurface
       /**
        * The next and previous button light up when pressed so need the '0' value when releasing
        */
-      if (!evt->midi_message[2] && !(
-                                       evt->midi_message[1] == BTN_NEXT ||
-                                       evt->midi_message[1] == BTN_PREV ||
-                                       evt->midi_message[1] == BTN_SHIFT_LEFT ||
-                                       evt->midi_message[1] == BTN_SHIFT_RIGHT ||
-                                       evt->midi_message[1] == BTN_ARM))
-      {
-        return;
-      }
+      // if (!evt->midi_message[2] && !(
+      //                                  evt->midi_message[1] == BTN_NEXT ||
+      //                                  evt->midi_message[1] == BTN_PREV ||
+      //                                  evt->midi_message[1] == BTN_SHIFT_LEFT ||
+      //                                  evt->midi_message[1] == BTN_SHIFT_RIGHT ||
+      //                                  evt->midi_message[1] == BTN_ARM))
+      // {
+      //   return;
+      // }
 
       /**
        * Fader Touch
        */
-      else if (evt->midi_message[1] >= FADER_TOUCH_1 && evt->midi_message[1] <= FADER_TOUCH_16)
+      if (evt->midi_message[1] >= FADER_TOUCH_1 && evt->midi_message[1] <= FADER_TOUCH_16)
       {
-        faderManager->HandleFaderTouch(evt->midi_message[1] - FADER_TOUCH_1);
+        faderManager->HandleFaderTouch(evt->midi_message[1] - FADER_TOUCH_1, evt->midi_message[2]);
       }
 
       /**
@@ -123,45 +123,45 @@ class CSurf_FaderPort : public IReaperControlSurface
        */
       else if (evt->midi_message[1] >= BTN_SELECT_1 && evt->midi_message[1] <= BTN_SELECT_8)
       {
-        faderManager->HandleSelectClick(evt->midi_message[1] - BTN_SELECT_1);
+        faderManager->HandleSelectClick(evt->midi_message[1] - BTN_SELECT_1, evt->midi_message[2]);
       }
       else if (evt->midi_message[1] == BTN_SELECT_9)
       {
-        faderManager->HandleSelectClick(8);
+        faderManager->HandleSelectClick(8, evt->midi_message[2]);
       }
       else if (evt->midi_message[1] >= BTN_SELECT_10 && evt->midi_message[1] <= BTN_SELECT_16)
       {
-        faderManager->HandleSelectClick(evt->midi_message[1] - 0x20 + 8);
+        faderManager->HandleSelectClick(evt->midi_message[1] - 0x20 + 8, evt->midi_message[2]);
       }
       /**
        * Track Mute Buttons
        */
       else if (evt->midi_message[1] >= BTN_MUTE_1 && evt->midi_message[1] <= BTN_MUTE_8)
       {
-        faderManager->HandleMuteClick(evt->midi_message[1] - BTN_MUTE_1);
+        faderManager->HandleMuteClick(evt->midi_message[1] - BTN_MUTE_1, evt->midi_message[2]);
       }
       else if (evt->midi_message[1] >= BTN_MUTE_9 && evt->midi_message[1] <= BTN_MUTE_16)
       {
-        faderManager->HandleMuteClick(evt->midi_message[1] - BTN_MUTE_9 + 8);
+        faderManager->HandleMuteClick(evt->midi_message[1] - BTN_MUTE_9 + 8, evt->midi_message[2]);
       }
       /**
        * Track Solo Buttons
        */
       else if (evt->midi_message[1] >= BTN_SOLO_1 && evt->midi_message[1] <= BTN_SOLO_8)
       {
-        faderManager->HandleSoloClick(evt->midi_message[1] - BTN_SOLO_1);
+        faderManager->HandleSoloClick(evt->midi_message[1] - BTN_SOLO_1, evt->midi_message[2]);
       }
       else if (evt->midi_message[1] >= BTN_SOLO_9 && evt->midi_message[1] <= BTN_SOLO_14 && evt->midi_message[1] != BTN_SOLO_12 && evt->midi_message[1] != ENCODER_CLICK_NAV)
       {
-        faderManager->HandleSoloClick(evt->midi_message[1] - BTN_SOLO_9 + 8);
+        faderManager->HandleSoloClick(evt->midi_message[1] - BTN_SOLO_9 + 8, evt->midi_message[2]);
       }
       else if (evt->midi_message[1] == BTN_SOLO_14 || evt->midi_message[1] == BTN_SOLO_15)
       {
-        faderManager->HandleSoloClick(evt->midi_message[1] == BTN_SOLO_14 ? 14 : 15);
+        faderManager->HandleSoloClick(evt->midi_message[1] == BTN_SOLO_14 ? 14 : 15, evt->midi_message[2]);
       }
       else if (evt->midi_message[1] == BTN_SOLO_12)
       {
-        faderManager->HandleSoloClick(12);
+        faderManager->HandleSoloClick(12, evt->midi_message[2]);
       }
 
       /**
@@ -169,19 +169,19 @@ class CSurf_FaderPort : public IReaperControlSurface
        */
       else if (evt->midi_message[1] == BTN_TRACK)
       {
-        faderManager->HandleTrackButtonClick();
+        faderManager->HandleTrackButtonClick(evt->midi_message[2]);
       }
       else if (evt->midi_message[1] == BTN_EDIT_PLUGINS)
       {
-        faderManager->HandlePluginsButtonClick();
+        faderManager->HandlePluginsButtonClick(evt->midi_message[2]);
       }
       else if (evt->midi_message[1] == BTN_SEND)
       {
-        faderManager->HandleSendButtonClick();
+        faderManager->HandleSendButtonClick(evt->midi_message[2]);
       }
       else if (evt->midi_message[1] == BTN_PAN)
       {
-        faderManager->HandlePanButtonClick();
+        faderManager->HandlePanButtonClick(evt->midi_message[2]);
       }
 
       /**
@@ -189,27 +189,27 @@ class CSurf_FaderPort : public IReaperControlSurface
        */
       else if (evt->midi_message[1] == BTN_PLAY)
       {
-        transportManager->HandlePlayButton();
+        transportManager->HandlePlayButton(evt->midi_message[2]);
       }
       else if (evt->midi_message[1] == BTN_STOP)
       {
-        transportManager->HandleStopButton();
+        transportManager->HandleStopButton(evt->midi_message[2]);
       }
       else if (evt->midi_message[1] == BTN_RECORD)
       {
-        transportManager->HandleRecordButton();
+        transportManager->HandleRecordButton(evt->midi_message[2]);
       }
       else if (evt->midi_message[1] == BTN_REWIND)
       {
-        transportManager->HandleRewindButton();
+        transportManager->HandleRewindButton(evt->midi_message[2]);
       }
       else if (evt->midi_message[1] == BTN_FORWARD)
       {
-        transportManager->HandleForwardButton();
+        transportManager->HandleForwardButton(evt->midi_message[2]);
       }
       else if (evt->midi_message[1] == BTN_LOOP)
       {
-        transportManager->HandleRepeatButton();
+        transportManager->HandleRepeatButton(evt->midi_message[2]);
       }
 
       /**
@@ -217,23 +217,23 @@ class CSurf_FaderPort : public IReaperControlSurface
        */
       else if (evt->midi_message[1] == BTN_AUDIO)
       {
-        mixManager->HandleMixAudioButton();
+        mixManager->HandleMixAudioButton(evt->midi_message[2]);
       }
       else if (evt->midi_message[1] == BTN_VI)
       {
-        mixManager->HandleMixViButton();
+        mixManager->HandleMixViButton(evt->midi_message[2]);
       }
       else if (evt->midi_message[1] == BTN_BUS)
       {
-        mixManager->HandleMixBusButton();
+        mixManager->HandleMixBusButton(evt->midi_message[2]);
       }
       else if (evt->midi_message[1] == BTN_VCA)
       {
-        mixManager->HandleMixVcaButton();
+        mixManager->HandleMixVcaButton(evt->midi_message[2]);
       }
       else if (evt->midi_message[1] == BTN_ALL)
       {
-        mixManager->HandleMixAllButton();
+        mixManager->HandleMixAllButton(evt->midi_message[2]);
       }
       else if (evt->midi_message[1] == BTN_SHIFT_RIGHT)
       {
@@ -245,7 +245,7 @@ class CSurf_FaderPort : public IReaperControlSurface
        */
       else if (evt->midi_message[1] == ENCODER_CLICK_PAN)
       {
-        generalControlManager->HandleEncoderClick();
+        generalControlManager->HandleEncoderClick(evt->midi_message[2]);
       }
       else if (evt->midi_message[1] == BTN_ARM)
       {
@@ -254,23 +254,23 @@ class CSurf_FaderPort : public IReaperControlSurface
       }
       else if (evt->midi_message[1] == BTN_SOLO_CLEAR)
       {
-        generalControlManager->HandleSoloClearButton();
+        generalControlManager->HandleSoloClearButton(evt->midi_message[2]);
       }
       else if (evt->midi_message[1] == BTN_MUTE_CLEAR)
       {
-        generalControlManager->HandleMuteClearButton();
+        generalControlManager->HandleMuteClearButton(evt->midi_message[2]);
       }
       else if (evt->midi_message[1] == BTN_BYPASS)
       {
-        generalControlManager->HandleBypassButton();
+        generalControlManager->HandleBypassButton(evt->midi_message[2]);
       }
       else if (evt->midi_message[1] == BTN_MACRO)
       {
-        generalControlManager->HandleMacroButton();
+        generalControlManager->HandleMacroButton(evt->midi_message[2]);
       }
       else if (evt->midi_message[1] == BTN_LINK)
       {
-        generalControlManager->HandleLinkButton();
+        generalControlManager->HandleLinkButton(evt->midi_message[2]);
       }
       else if (evt->midi_message[1] == BTN_SHIFT_LEFT)
       {
@@ -283,31 +283,31 @@ class CSurf_FaderPort : public IReaperControlSurface
        */
       else if (evt->midi_message[1] == BTN_LATCH)
       {
-        automationManager->HandleLatchButton();
+        automationManager->HandleLatchButton(evt->midi_message[2]);
       }
       else if (evt->midi_message[1] == BTN_TRIM)
       {
-        automationManager->HandleTrimButton();
+        automationManager->HandleTrimButton(evt->midi_message[2]);
       }
       else if (evt->midi_message[1] == BTN_OFF)
       {
-        automationManager->HandleOffButton();
+        automationManager->HandleOffButton(evt->midi_message[2]);
       }
       else if (evt->midi_message[1] == BTN_TOUCH)
       {
-        automationManager->HandleTouchButton();
+        automationManager->HandleTouchButton(evt->midi_message[2]);
       }
       else if (evt->midi_message[1] == BTN_WRITE)
       {
-        automationManager->HandleWriteButton();
+        automationManager->HandleWriteButton(evt->midi_message[2]);
       }
       else if (evt->midi_message[1] == BTN_WRITE)
       {
-        automationManager->HandleWriteButton();
+        automationManager->HandleWriteButton(evt->midi_message[2]);
       }
       else if (evt->midi_message[1] == BTN_READ)
       {
-        automationManager->HandleReadButton();
+        automationManager->HandleReadButton(evt->midi_message[2]);
       }
 
       /**
@@ -315,35 +315,35 @@ class CSurf_FaderPort : public IReaperControlSurface
        */
       else if (evt->midi_message[1] == BTN_CHANNEL)
       {
-        sessionManager->HandleChannelButton();
+        sessionManager->HandleChannelButton(evt->midi_message[2]);
       }
       else if (evt->midi_message[1] == BTN_ZOOM)
       {
-        sessionManager->HandleZoomButton();
+        sessionManager->HandleZoomButton(evt->midi_message[2]);
       }
       else if (evt->midi_message[1] == BTN_SCROLL)
       {
-        sessionManager->HandleScrollButton();
+        sessionManager->HandleScrollButton(evt->midi_message[2]);
       }
       else if (evt->midi_message[1] == BTN_BANK)
       {
-        sessionManager->HandleBankButton();
+        sessionManager->HandleBankButton(evt->midi_message[2]);
       }
       else if (evt->midi_message[1] == BTN_MASTER)
       {
-        sessionManager->HandleMasterButton();
+        sessionManager->HandleMasterButton(evt->midi_message[2]);
       }
       else if (evt->midi_message[1] == BTN_CLICK)
       {
-        sessionManager->HandleClickButton();
+        sessionManager->HandleClickButton(evt->midi_message[2]);
       }
       else if (evt->midi_message[1] == BTN_SECTION)
       {
-        sessionManager->HandleSectionButton();
+        sessionManager->HandleSectionButton(evt->midi_message[2]);
       }
       else if (evt->midi_message[1] == BTN_MARKER)
       {
-        sessionManager->HandleMarkerButton();
+        sessionManager->HandleMarkerButton(evt->midi_message[2]);
       }
       else if (evt->midi_message[1] == BTN_NEXT)
       {

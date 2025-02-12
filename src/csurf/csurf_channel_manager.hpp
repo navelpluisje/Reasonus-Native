@@ -47,14 +47,16 @@ public:
         (void)index;
     };
 
-    virtual void HandleMuteClick(int index)
+    virtual void HandleMuteClick(int index, int value)
     {
         (void)index;
+        (void)value;
     };
 
-    virtual void HandleSoloClick(int index)
+    virtual void HandleSoloClick(int index, int value)
     {
         (void)index;
+        (void)value;
     };
 
     virtual void HandleFaderTouch(int index)

@@ -141,23 +141,23 @@ public:
         }
     }
 
-    void HandleEncoderChange(int val)
+    void HandleEncoderChange(int value)
     {
         switch (context->GetPanEncoderMode())
         {
         case PanEncoderPanMode:
-            hasBit(val, 6) ? DecrementPan(1) : IncrementPan(1);
+            hasBit(value, 6) ? DecrementPan(1) : IncrementPan(1);
             break;
 
         case PanEncoderPluginMode:
         case PanEncoderSendMode:
         case PanEncoderReceiveMode:
-            context->UpdateChannelManagerItemIndex(hasBit(val, 6) ? -1 : 1);
+            context->UpdateChannelManagerItemIndex(hasBit(value, 6) ? -1 : 1);
             break;
         }
     }
 
-    void HandleArmButton(int val)
+    void HandleArmButton(int value)
     {
         if (context->GetShiftLeft())
         {
@@ -169,31 +169,51 @@ public:
         }
         else
         {
-            armState.SetValue(val > 0);
+            armState.SetValue(value > 0);
             context->SetArm(armState.invert ? !armState.active : armState.active);
         }
 
         SetButtonValue();
     }
 
-    void HandleSoloClearButton()
+    void HandleSoloClearButton(int value)
     {
+        if (value == 0)
+        {
+            return;
+        }
+
         Main_OnCommandEx(40340, 0, 0); // Track: Unsolo all tracks
     };
 
-    void HandleMuteClearButton()
+    void HandleMuteClearButton(int value)
     {
+        if (value == 0)
+        {
+            return;
+        }
+
         Main_OnCommandEx(40339, 0, 0); // Track: Unmute all tracks
     };
 
-    void HandleBypassButton()
+    void HandleBypassButton(int value)
     {
+        if (value == 0)
+        {
+            return;
+        }
+
         context->GetShiftLeft() ? Main_OnCommandEx(40344, 0, 0) // Track: Toggle FX bypass on all tracks
                                 : Main_OnCommandEx(8, 0, 0);    // Track: Toggle FX bypass for selected tracks
     };
 
-    void HandleMacroButton()
+    void HandleMacroButton(int value)
     {
+        if (value == 0)
+        {
+            return;
+        }
+
         if (context->GetShiftLeft())
         {
             IsFunctionsDialogOpen() ? HideFunctionsDialog() : ShowFunctionsDialog();
@@ -204,8 +224,13 @@ public:
         }
     };
 
-    void HandleLinkButton()
+    void HandleLinkButton(int value)
     {
+        if (value == 0)
+        {
+            return;
+        }
+
         if (context->GetShiftLeft())
         {
             Main_OnCommandStringEx("_REASONUS_TOGGLE_PLAY_CURSOR_COMMAND");
@@ -225,9 +250,9 @@ public:
         }
     };
 
-    void HandleShiftButton(int val)
+    void HandleShiftButton(int value)
     {
-        shiftState.SetValue(val > 0);
+        shiftState.SetValue(value > 0);
         context->SetShiftLeft(shiftState.invert ? !shiftState.active : shiftState.active);
 
         SetButtonValue();

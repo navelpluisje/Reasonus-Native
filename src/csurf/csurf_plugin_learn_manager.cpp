@@ -171,17 +171,19 @@ public:
         // Open the dialog
     }
 
-    void HandleMuteClick(int index) override
+    void HandleMuteClick(int index, int value) override
     {
         (void)index;
+        (void)value;
         // If in edit mode
         // Edit the current assignment
         // Else do nothing
     }
 
-    void HandleSoloClick(int index) override
+    void HandleSoloClick(int index, int value) override
     {
         (void)index;
+        (void)value;
     }
 
     void HandleFaderTouch(int index) override
