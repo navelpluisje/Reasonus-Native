@@ -12,6 +12,7 @@ class CSurf_Context
     // Global settings
     bool plugin_control;
     bool swap_shift_buttons;
+    bool mute_solo_momentary;
     int nbChannels = 8;
 
     // Shift keys
@@ -53,6 +54,13 @@ public:
     }
 
     bool GetSwapShiftButtons() { return swap_shift_buttons; }
+
+    void SetMuteSoloMomentary(bool enabled)
+    {
+        mute_solo_momentary = enabled;
+    }
+
+    bool GetMuteSoloMomentary() { return mute_solo_momentary; }
 
     void SetShiftLeft(bool val)
     {

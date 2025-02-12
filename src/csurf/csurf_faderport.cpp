@@ -245,7 +245,7 @@ class CSurf_FaderPort : public IReaperControlSurface
        */
       else if (evt->midi_message[1] == ENCODER_CLICK_PAN)
       {
-        generalControlManager->HandleEncoderClick(evt->midi_message[2]);
+        generalControlManager->HandleEncoderClick();
       }
       else if (evt->midi_message[1] == BTN_ARM)
       {
@@ -386,6 +386,7 @@ public:
     context = new CSurf_Context(stoi(ini["Surface"]["Surface"]));
     context->SetPluginControl(ini["Surface"].has("disable-plugins") && ini["Surface"]["disable-plugins"] != "1");
     context->SetSwapShiftButtons(ini["Surface"].has("swap-shift-buttons") && ini["Surface"]["swap-shift-buttons"] == "1");
+    context->SetMuteSoloMomentary(ini["Surface"].has("mute-solo-momentary") && ini["Surface"]["mute-solo-momentary"] == "1");
 
     for (int i = 0; i < context->GetNbChannels(); i++)
     {

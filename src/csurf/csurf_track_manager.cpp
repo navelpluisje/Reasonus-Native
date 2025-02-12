@@ -182,7 +182,7 @@ public:
     {
         int now = GetTickCount();
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
-        if (value == 0)
+        if (value == 0 && context->GetMuteSoloMomentary())
         {
             if (now - mute_start > MOMENTARY_TIMEOUT)
             {
@@ -190,7 +190,7 @@ public:
             }
             mute_start = 0;
         }
-        else
+        else if (value > 0)
         {
             mute_start = now;
             CSurf_SetSurfaceMute(media_track, CSurf_OnMuteChange(media_track, !DAW::IsTrackMuted(media_track)), NULL);
@@ -201,7 +201,7 @@ public:
     {
         int now = GetTickCount();
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
-        if (value == 0)
+        if (value == 0 && context->GetMuteSoloMomentary())
         {
             if (now - solo_start > MOMENTARY_TIMEOUT)
             {
@@ -209,7 +209,7 @@ public:
             }
             solo_start = 0;
         }
-        else
+        else if (value > 0)
         {
             solo_start = now;
             CSurf_SetSurfaceSolo(media_track, CSurf_OnSoloChange(media_track, !DAW::IsTrackSoloed(media_track)), NULL);
