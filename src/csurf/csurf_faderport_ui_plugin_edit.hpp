@@ -9,7 +9,6 @@
 #include <mini/ini.h>
 
 extern HWND g_hwnd;
-extern REAPER_PLUGIN_HINSTANCE g_hInst;
 
 enum FilterListDirection
 {
