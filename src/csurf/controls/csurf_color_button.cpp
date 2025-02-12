@@ -12,7 +12,6 @@ void CSurf_ColorButton::SendValue()
     if (m_midiout)
     {
         m_midiout->Send(MIDI_MESSAGE_BUTTON, type, value, -1);
-        // SendColor();
     }
 };
 
