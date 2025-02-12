@@ -28,22 +28,22 @@ struct ButtonColor
 };
 
 static ButtonColor ButtonColorWhite = {0x7f, 0x7f, 0x7f};
-static ButtonColor ButtonColorWhiteDim = {0x4f, 0x4f, 0x4f};
+static ButtonColor ButtonColorWhiteDim = {0x7f, 0x7f, 0x7f};
 
 static ButtonColor ButtonColorRed = {0x7f, 0x00, 0x00};
-static ButtonColor ButtonColorRedDim = {0x4f, 0x00, 0x00};
+static ButtonColor ButtonColorRedDim = {0x7f, 0x00, 0x00};
 
 static ButtonColor ButtonColorGreen = {0x00, 0x7f, 0x00};
-static ButtonColor ButtonColorGreenDim = {0x00, 0x4f, 0x00};
+static ButtonColor ButtonColorGreenDim = {0x00, 0x7f, 0x00};
 
 static ButtonColor ButtonColorYellow = {0x7f, 0x7f, 0x00};
-static ButtonColor ButtonColorYellowDim = {0x4f, 0x4f, 0x00};
+static ButtonColor ButtonColorYellowDim = {0x7f, 0x7f, 0x00};
 
 static ButtonColor ButtonColorPurple = {0x1b, 0x00, 0x7f};
-static ButtonColor ButtonColorPurpleDim = {0x11, 0x00, 0x4f};
+static ButtonColor ButtonColorPurpleDim = {0x1b, 0x00, 0x7f};
 
 static ButtonColor ButtonColorBlue = {0x00, 0x1b, 0x7f};
-static ButtonColor ButtonColorBlueDim = {0x00, 0x03, 0x4f};
+static ButtonColor ButtonColorBlueDim = {0x00, 0x1b, 0x7f};
 
 static ButtonColor ButtonColorBlack = {0x00, 0x00, 0x00};
 

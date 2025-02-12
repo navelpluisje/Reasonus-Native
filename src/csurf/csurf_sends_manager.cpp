@@ -21,8 +21,7 @@ protected:
     {
         if (!media_track)
         {
-            colorActive.SetColor(ButtonColorWhite);
-            colorDim.SetColor(ButtonColorWhiteDim);
+            color.SetColor(ButtonColorWhite);
             return;
         }
 
@@ -44,8 +43,7 @@ protected:
                 ColorFromNative(trackColor, &red, &green, &blue);
             }
         }
-        colorActive.SetColor(red / 2, green / 2, blue / 2);
-        colorDim.SetColor(red / 4, green / 4, blue / 4);
+        color.SetColor(red / 2, green / 2, blue / 2);
     }
 
     void GetFaderValue(MediaTrack *media_track, int sendIndex, int *faderValue, int *valueBarValue, int *_pan, std::string *panStr)
@@ -133,7 +131,7 @@ public:
                 track->SetDisplayLine(3, ALIGN_CENTER, "");
             }
 
-            track->SetTrackColor(colorActive, colorDim);
+            track->SetTrackColor(color);
             track->SetSelectButtonValue(DAW::IsTrackSelected(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF);
             track->SetMuteButtonValue(ButtonBlinkOnOff((context->GetShiftLeft() && DAW::GetTrackSendMute(media_track, sendIndex)), DAW::GetTrackSendMute(media_track, sendIndex)));
             track->SetSoloButtonValue(((context->GetShiftLeft() && DAW::GetTrackSendMono(media_track, sendIndex)) || (!context->GetShiftLeft() && DAW::GetTrackSendPhase(media_track, sendIndex)))

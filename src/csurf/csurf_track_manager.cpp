@@ -40,8 +40,7 @@ protected:
                 ColorFromNative(trackColor, &red, &green, &blue);
             }
         }
-        colorActive.SetColor(red / 2, green / 2, blue / 2);
-        colorDim.SetColor(red / 4, green / 4, blue / 4);
+        color.SetColor(red / 2, green / 2, blue / 2);
     }
 
     void GetFaderValue(MediaTrack *media_track, int *faderValue, int *valueBarValue, std::string *_pan1, std::string *_pan2)
@@ -113,7 +112,7 @@ public:
             Btn_Value selectValue = (context->GetArm() && isArmed) || (!context->GetArm() && isSelected) ? BTN_VALUE_ON
                                                                                                          : BTN_VALUE_OFF;
 
-            track->SetTrackColor(colorActive, colorDim);
+            track->SetTrackColor(color);
             // If the track is armed always blink as an indication it is armed
             track->SetSelectButtonValue((!context->GetArm() && isArmed) ? BTN_VALUE_BLINK : selectValue, forceUpdate);
             track->SetMuteButtonValue(DAW::IsTrackMuted(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);

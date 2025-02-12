@@ -60,21 +60,21 @@ protected:
     {
         if (context->GetShiftLeft())
         {
-            latchButton->SetColor(ButtonColorGreen, ButtonColorGreenDim);
-            trimButton->SetColor(ButtonColorYellow, ButtonColorYellowDim);
-            offButton->SetColor(ButtonColorYellow, ButtonColorYellowDim);
-            touchButton->SetColor(ButtonColorBlack, ButtonColorBlack);
-            writeButton->SetColor(ButtonColorBlack, ButtonColorBlack);
-            readButton->SetColor(ButtonColorBlack, ButtonColorBlack);
+            latchButton->SetColor(ButtonColorGreen);
+            trimButton->SetColor(ButtonColorYellow);
+            offButton->SetColor(ButtonColorYellow);
+            touchButton->SetColor(ButtonColorBlack);
+            writeButton->SetColor(ButtonColorBlack);
+            readButton->SetColor(ButtonColorBlack);
             return;
         }
 
-        latchButton->SetColor(ButtonColorPurple, ButtonColorPurpleDim);
-        trimButton->SetColor(ButtonColorWhite, ButtonColorWhiteDim);
-        offButton->SetColor(ButtonColorBlue, ButtonColorBlueDim);
-        touchButton->SetColor(ButtonColorYellow, ButtonColorYellowDim);
-        writeButton->SetColor(ButtonColorRed, ButtonColorRedDim);
-        readButton->SetColor(ButtonColorGreen, ButtonColorGreenDim);
+        latchButton->SetColor(ButtonColorPurple);
+        trimButton->SetColor(ButtonColorWhite);
+        offButton->SetColor(ButtonColorBlue);
+        touchButton->SetColor(ButtonColorYellow);
+        writeButton->SetColor(ButtonColorRed);
+        readButton->SetColor(ButtonColorGreen);
     }
 
 public:
@@ -82,12 +82,12 @@ public:
         CSurf_Context *context,
         midi_Output *m_midiout) : context(context), m_midiout(m_midiout)
     {
-        latchButton = new CSurf_ColorButton(ButtonColorPurple, ButtonColorPurpleDim, BTN_LATCH, BTN_VALUE_OFF, m_midiout);
-        trimButton = new CSurf_ColorButton(ButtonColorWhite, ButtonColorWhiteDim, BTN_TRIM, BTN_VALUE_OFF, m_midiout);
-        offButton = new CSurf_ColorButton(ButtonColorBlue, ButtonColorBlueDim, BTN_OFF, BTN_VALUE_OFF, m_midiout);
-        touchButton = new CSurf_ColorButton(ButtonColorYellow, ButtonColorYellowDim, BTN_TOUCH, BTN_VALUE_OFF, m_midiout);
-        writeButton = new CSurf_ColorButton(ButtonColorRed, ButtonColorRedDim, BTN_WRITE, BTN_VALUE_OFF, m_midiout);
-        readButton = new CSurf_ColorButton(ButtonColorGreen, ButtonColorGreenDim, BTN_READ, BTN_VALUE_OFF, m_midiout);
+        latchButton = new CSurf_ColorButton(ButtonColorPurple, BTN_LATCH, BTN_VALUE_OFF, m_midiout);
+        trimButton = new CSurf_ColorButton(ButtonColorWhite, BTN_TRIM, BTN_VALUE_OFF, m_midiout);
+        offButton = new CSurf_ColorButton(ButtonColorBlue, BTN_OFF, BTN_VALUE_OFF, m_midiout);
+        touchButton = new CSurf_ColorButton(ButtonColorYellow, BTN_TOUCH, BTN_VALUE_OFF, m_midiout);
+        writeButton = new CSurf_ColorButton(ButtonColorRed, BTN_WRITE, BTN_VALUE_OFF, m_midiout);
+        readButton = new CSurf_ColorButton(ButtonColorGreen, BTN_READ, BTN_VALUE_OFF, m_midiout);
     };
     ~CSurf_AutomationManager() {};
 
