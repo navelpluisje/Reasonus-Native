@@ -85,7 +85,7 @@ public:
 
     void ClearTrack();
 
-    void SetTrackColor(ButtonColor colorActive, ButtonColor colorDim);
+    void SetTrackColor(ButtonColor color);
 
     void SetSelectButtonValue(Btn_Value value, bool force = false);
 

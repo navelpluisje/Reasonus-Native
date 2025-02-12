@@ -6,7 +6,7 @@
 
 CSurf_Track::CSurf_Track(int index, CSurf_Context *context, midi_Output *m_midiout) : context(context)
 {
-    selectButton = new CSurf_ColorButton(ButtonColorWhite, ButtonColorWhiteDim, SelectButtons[index], BTN_VALUE_OFF, m_midiout);
+    selectButton = new CSurf_ColorButton(ButtonColorWhite, SelectButtons[index], BTN_VALUE_OFF, m_midiout);
     soloButton = new CSurf_Button(SoloButtons[index], BTN_VALUE_OFF, m_midiout);
     muteButton = new CSurf_Button(MuteButtons[index], BTN_VALUE_OFF, m_midiout);
     fader = new CSurf_Fader(index, 0, m_midiout);
@@ -24,7 +24,7 @@ CSurf_Track::~CSurf_Track()
 
 void CSurf_Track::ClearTrack()
 {
-    this->SetTrackColor(ButtonColorWhite, ButtonColorWhiteDim);
+    this->SetTrackColor(ButtonColorWhite);
     this->SetDisplayLine(0, ALIGN_LEFT, "", NON_INVERT, true);
     this->SetDisplayLine(1, ALIGN_LEFT, "", NON_INVERT, true);
     this->SetDisplayLine(2, ALIGN_CENTER, "", NON_INVERT, true);
@@ -37,10 +37,9 @@ void CSurf_Track::ClearTrack()
     this->SetVuMeterValue(0);
 }
 
-void CSurf_Track::SetTrackColor(ButtonColor colorActive, ButtonColor colorDim)
+void CSurf_Track::SetTrackColor(ButtonColor color)
 {
-
-    selectButton->SetColor(colorActive, colorDim);
+    selectButton->SetColor(color);
 }
 
 void CSurf_Track::SetSelectButtonValue(Btn_Value value, bool force)

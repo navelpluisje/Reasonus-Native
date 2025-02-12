@@ -16,8 +16,7 @@ protected:
     CSurf_Context *context;
     midi_Output *m_midiout;
 
-    ButtonColor colorActive;
-    ButtonColor colorDim;
+    ButtonColor color;
 
     bool forceUpdate = false;
 

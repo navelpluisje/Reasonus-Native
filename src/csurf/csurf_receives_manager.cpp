@@ -37,8 +37,7 @@ protected:
                 ColorFromNative(trackColor, &red, &green, &blue);
             }
         }
-        colorActive.SetColor(red / 2, green / 2, blue / 2);
-        colorDim.SetColor(red / 4, green / 4, blue / 4);
+        color.SetColor(red / 2, green / 2, blue / 2);
     }
 
     void GetFaderValue(MediaTrack *media_track, int receiveIndex, int *faderValue, int *valueBarValue, int *_pan, std::string *panStr)
@@ -125,7 +124,7 @@ public:
                 track->SetDisplayLine(3, ALIGN_CENTER, "");
             }
 
-            track->SetTrackColor(colorActive, colorDim);
+            track->SetTrackColor(color);
             track->SetSelectButtonValue(DAW::IsTrackSelected(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF);
             track->SetMuteButtonValue(ButtonBlinkOnOff((context->GetShiftLeft() && DAW::GetTrackReceiveMute(media_track, receiveIndex)), DAW::GetTrackReceiveMute(media_track, receiveIndex)));
             track->SetSoloButtonValue(((context->GetShiftLeft() && DAW::GetTrackReceiveMono(media_track, receiveIndex)) || (!context->GetShiftLeft() && DAW::GetTrackReceivePhase(media_track, receiveIndex)))
