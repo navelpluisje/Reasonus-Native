@@ -41,9 +41,9 @@ CSurf_FaderManager::~CSurf_FaderManager()
     tracks.clear();
 };
 
-void CSurf_FaderManager::HandleTrackButtonClick()
+void CSurf_FaderManager::HandleTrackButtonClick(int value)
 {
-    if (context->GetChannelMode() != TrackMode)
+    if (context->GetChannelMode() != TrackMode && value > 0)
     {
         SetButtonValues(TrackMode);
         channelManager = new CSurf_TrackManager(tracks, navigator, context, m_midiout);
@@ -52,8 +52,13 @@ void CSurf_FaderManager::HandleTrackButtonClick()
     }
 };
 
-void CSurf_FaderManager::HandlePluginsButtonClick(bool track)
+void CSurf_FaderManager::HandlePluginsButtonClick(int value, bool track)
 {
+    if (value == 0)
+    {
+        return;
+    }
+
     bool cameFromPlugin = (context->GetChannelMode() == PluginEditMode || context->GetChannelMode() == PluginControlMode);
 
     if ((context->GetChannelMode() != PluginMode && !track && !cameFromPlugin) || (prevChannelMode == PluginMode && cameFromPlugin))
@@ -72,8 +77,13 @@ void CSurf_FaderManager::HandlePluginsButtonClick(bool track)
     }
 };
 
-void CSurf_FaderManager::HandleSendButtonClick(bool track)
+void CSurf_FaderManager::HandleSendButtonClick(int value, bool track)
 {
+    if (value == 0)
+    {
+        return;
+    }
+
     if (context->GetChannelMode() != SendMode && !track)
     {
         SetButtonValues(SendMode);
@@ -88,8 +98,13 @@ void CSurf_FaderManager::HandleSendButtonClick(bool track)
     }
 };
 
-void CSurf_FaderManager::HandlePanButtonClick(bool track)
+void CSurf_FaderManager::HandlePanButtonClick(int value, bool track)
 {
+    if (value == 0)
+    {
+        return;
+    }
+
     if (context->GetChannelMode() != PanMode && !track)
     {
         SetButtonValues(PanMode);
@@ -123,7 +138,7 @@ void CSurf_FaderManager::ResetMixButtonClick()
 {
     if (context->GetChannelMode() == MixMode)
     {
-        HandleTrackButtonClick();
+        HandleTrackButtonClick(BTN_VALUE_ON);
     }
 };
 
@@ -154,14 +169,20 @@ void CSurf_FaderManager::UpdateTracks()
     channelManager->UpdateTracks();
 }
 
-void CSurf_FaderManager::HandleMuteClick(int index)
+void CSurf_FaderManager::HandleMuteClick(int index, int value)
 {
-    channelManager->HandleMuteClick(index);
+    channelManager->HandleMuteClick(index, value);
 }
 
-void CSurf_FaderManager::HandleSoloClick(int index)
+void CSurf_FaderManager::HandleSoloClick(int index, int value)
 {
-    channelManager->HandleSoloClick(index);
+    channelManager->HandleSoloClick(index, value);
+
+    if (value == 0)
+    {
+        return;
+    }
+
     prevChannelMode = context->GetChannelMode();
 
     if (context->GetPluginControl() &&
@@ -184,8 +205,13 @@ void CSurf_FaderManager::HandleSoloClick(int index)
     }
 }
 
-void CSurf_FaderManager::HandleSelectClick(int index)
+void CSurf_FaderManager::HandleSelectClick(int index, int value)
 {
+    if (value == 0)
+    {
+        return;
+    }
+
     channelManager->HandleSelectClick(index);
     ResetMixButtonClick();
 }
@@ -195,7 +221,12 @@ void CSurf_FaderManager::HandleFaderMove(int index, int msb, int lsb)
     channelManager->HandleFaderMove(index, msb, lsb);
 }
 
-void CSurf_FaderManager::HandleFaderTouch(int index)
+void CSurf_FaderManager::HandleFaderTouch(int index, int value)
 {
+    if (value == 0)
+    {
+        return;
+    }
+
     channelManager->HandleFaderTouch(index);
 }

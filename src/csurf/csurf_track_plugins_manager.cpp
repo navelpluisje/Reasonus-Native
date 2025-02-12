@@ -143,8 +143,13 @@ public:
         SetTrackSelected(media_track, true);
     }
 
-    void HandleMuteClick(int index) override
+    void HandleMuteClick(int index, int value) override
     {
+        if (value == 0)
+        {
+            return;
+        }
+
         MediaTrack *media_track = GetSelectedTrack(0, 0);
         int pluginIndex = context->GetChannelManagerItemIndex() + index;
 
@@ -158,8 +163,13 @@ public:
         }
     }
 
-    void HandleSoloClick(int index) override
+    void HandleSoloClick(int index, int value) override
     {
+        if (value == 0)
+        {
+            return;
+        }
+
         MediaTrack *media_track = GetSelectedTrack(0, 0);
         int pluginIndex = context->GetChannelManagerItemIndex() + index;
 

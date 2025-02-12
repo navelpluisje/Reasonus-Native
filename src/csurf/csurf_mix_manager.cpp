@@ -51,12 +51,17 @@ public:
         mixAllButton = new CSurf_ColorButton(ButtonColorWhite, ButtonColorWhiteDim, BTN_ALL, BTN_VALUE_ON, m_midiout);
         shiftRightButton = new CSurf_Button(BTN_SHIFT_RIGHT, BTN_VALUE_OFF, m_midiout);
 
-        HandleMixAllButton();
+        HandleMixAllButton(BTN_VALUE_ON);
     }
     ~CSurf_MixManager() {};
 
-    void HandleMixAudioButton()
+    void HandleMixAudioButton(int value)
     {
+        if (value == 0)
+        {
+            return;
+        }
+
         mixAudioButton->SetColor(ButtonColorWhite, ButtonColorWhiteDim);
         trackFilter = TrackWithAudioFilter;
         trackNavigator->HandleFilter(TrackWithAudioFilter);
@@ -64,8 +69,13 @@ public:
         SetButtonValue();
     }
 
-    void HandleMixViButton()
+    void HandleMixViButton(int value)
     {
+        if (value == 0)
+        {
+            return;
+        }
+
         if (context->GetShiftLeft())
         {
             mixViButton->SetColor(ButtonColorYellow, ButtonColorWhiteDim);
@@ -82,8 +92,13 @@ public:
         SetButtonValue();
     }
 
-    void HandleMixBusButton()
+    void HandleMixBusButton(int value)
     {
+        if (value == 0)
+        {
+            return;
+        }
+
         if (context->GetShiftRight())
         {
             mixBusButton->SetColor(ButtonColorGreen, ButtonColorWhiteDim);
@@ -106,8 +121,13 @@ public:
         SetButtonValue();
     }
 
-    void HandleMixVcaButton()
+    void HandleMixVcaButton(int value)
     {
+        if (value == 0)
+        {
+            return;
+        }
+
         if (context->GetShiftRight())
         {
             mixVcaButton->SetColor(ButtonColorGreen, ButtonColorWhiteDim);
@@ -130,8 +150,13 @@ public:
         SetButtonValue();
     }
 
-    void HandleMixAllButton()
+    void HandleMixAllButton(int value)
     {
+        if (value == 0)
+        {
+            return;
+        }
+
         if (context->GetShiftRight())
         {
             mixAllButton->SetColor(ButtonColorGreen, ButtonColorWhiteDim);
@@ -155,10 +180,15 @@ public:
         SetButtonValue();
     }
 
-    void HandleShiftButton(int val)
+    void HandleShiftButton(int value)
     {
+        if (value == 0)
+        {
+            return;
+        }
+
         int time = GetTickCount();
-        shiftState.active = val > 0;
+        shiftState.active = value > 0;
 
         if (shiftState.start == 0)
         {

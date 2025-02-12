@@ -36,13 +36,13 @@ public:
 
     ~CSurf_FaderManager();
 
-    void HandleTrackButtonClick();
+    void HandleTrackButtonClick(int value);
 
-    void HandlePluginsButtonClick(bool track = false);
+    void HandlePluginsButtonClick(int value, bool track = false);
 
-    void HandleSendButtonClick(bool track = false);
+    void HandleSendButtonClick(int value, bool track = false);
 
-    void HandlePanButtonClick(bool track = false);
+    void HandlePanButtonClick(int value, bool track = false);
 
     void HandleMixButtonClick();
 
@@ -54,11 +54,11 @@ public:
 
     // ADD ALL THE TRACKMANAGERS METHODS HERE TO PROXY THEM
     void UpdateTracks();
-    void HandleMuteClick(int index);
-    void HandleSoloClick(int index);
-    void HandleSelectClick(int index);
+    void HandleMuteClick(int index, int value);
+    void HandleSoloClick(int index, int value);
+    void HandleSelectClick(int index, int value);
     void HandleFaderMove(int index, int msb, int lsb);
-    void HandleFaderTouch(int index);
+    void HandleFaderTouch(int index, int value);
 };
 
 #endif

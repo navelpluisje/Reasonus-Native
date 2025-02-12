@@ -114,8 +114,13 @@ public:
         SetButtonValue();
     };
 
-    void HandleLatchButton()
+    void HandleLatchButton(int value)
     {
+        if (value == 0)
+        {
+            return;
+        }
+
         if (context->GetShiftRight())
         {
             SetGlobalAutomationOverride(AUTOMATION_LATCH);
@@ -130,8 +135,13 @@ public:
         SetTrackAutomationMode(media_track, AUTOMATION_LATCH);
     };
 
-    void HandleTrimButton()
+    void HandleTrimButton(int value)
     {
+        if (value == 0)
+        {
+            return;
+        }
+
         if (context->GetShiftRight())
         {
             SetGlobalAutomationOverride(AUTOMATION_TRIM);
@@ -146,8 +156,13 @@ public:
         SetTrackAutomationMode(media_track, AUTOMATION_TRIM);
     };
 
-    void HandleOffButton()
+    void HandleOffButton(int value)
     {
+        if (value == 0)
+        {
+            return;
+        }
+
         if (context->GetShiftRight())
         {
             SetGlobalAutomationOverride(AUTOMATION_PREVIEW);
@@ -162,8 +177,13 @@ public:
         SetTrackAutomationMode(media_track, AUTOMATION_PREVIEW);
     };
 
-    void HandleTouchButton()
+    void HandleTouchButton(int value)
     {
+        if (value == 0)
+        {
+            return;
+        }
+
         if (context->GetShiftRight())
         {
             SetGlobalAutomationOverride(AUTOMATION_TOUCH);
@@ -177,8 +197,13 @@ public:
         SetTrackAutomationMode(media_track, AUTOMATION_TOUCH);
     };
 
-    void HandleWriteButton()
+    void HandleWriteButton(int value)
     {
+        if (value == 0)
+        {
+            return;
+        }
+
         if (context->GetShiftRight())
         {
             SetGlobalAutomationOverride(AUTOMATION_WRITE);
@@ -192,8 +217,13 @@ public:
         SetTrackAutomationMode(media_track, AUTOMATION_WRITE);
     };
 
-    void HandleReadButton()
+    void HandleReadButton(int value)
     {
+        if (value == 0)
+        {
+            return;
+        }
+
         if (context->GetShiftRight())
         {
             SetGlobalAutomationOverride(AUTOMATION_READ);

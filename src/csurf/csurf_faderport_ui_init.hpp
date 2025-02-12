@@ -100,6 +100,7 @@ namespace CSURF_FADERPORT_UI_INIT
             }
             SendMessage(GetDlgItem(hwndDlg, IDC_CHECK_INIT_DIS_PLUGIN), BM_SETCHECK, ini["Surface"]["disable-plugins"] == "1" ? BST_CHECKED : BST_UNCHECKED, 0);
             SendMessage(GetDlgItem(hwndDlg, IDC_CHECK_INIT_SWAP_SHIFT), BM_SETCHECK, ini["Surface"]["swap-shift-buttons"] == "1" ? BST_CHECKED : BST_UNCHECKED, 0);
+            SendMessage(GetDlgItem(hwndDlg, IDC_CHECK_INIT_MUTE_MOMENTARY), BM_SETCHECK, ini["Surface"]["mute-solo-momentary"] == "1" ? BST_CHECKED : BST_UNCHECKED, 0);
 
             break;
         }
@@ -121,6 +122,11 @@ namespace CSURF_FADERPORT_UI_INIT
             case IDC_CHECK_INIT_SWAP_SHIFT:
             {
                 SaveCheckBoxValue(hwndDlg, "swap-shift-buttons", IDC_CHECK_INIT_SWAP_SHIFT);
+                break;
+            }
+            case IDC_CHECK_INIT_MUTE_MOMENTARY:
+            {
+                SaveCheckBoxValue(hwndDlg, "mute-solo-momentary", IDC_CHECK_INIT_MUTE_MOMENTARY);
                 break;
             }
             }
