@@ -10,8 +10,12 @@
 #include "csurf_daw.hpp"
 #include "csurf_utils.hpp"
 
+const int MOMENTARY_TIMEOUT = 500;
 class CSurf_TrackManager : public CSurf_ChannelManager
 {
+    int mute_start = 0;
+    int solo_start = 0;
+
 protected:
     bool hasLastTouchedFxEnabled = false;
 
@@ -174,16 +178,42 @@ public:
         SetTrackSelected(media_track, true);
     }
 
-    void HandleMuteClick(int index) override
+    void HandleMuteClick(int index, int value) override
     {
+        int now = GetTickCount();
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
-        CSurf_SetSurfaceMute(media_track, CSurf_OnMuteChange(media_track, !DAW::IsTrackMuted(media_track)), NULL);
+        if (value == 0 && context->GetMuteSoloMomentary())
+        {
+            if (now - mute_start > MOMENTARY_TIMEOUT)
+            {
+                CSurf_SetSurfaceMute(media_track, CSurf_OnMuteChange(media_track, !DAW::IsTrackMuted(media_track)), NULL);
+            }
+            mute_start = 0;
+        }
+        else if (value > 0)
+        {
+            mute_start = now;
+            CSurf_SetSurfaceMute(media_track, CSurf_OnMuteChange(media_track, !DAW::IsTrackMuted(media_track)), NULL);
+        }
     }
 
-    void HandleSoloClick(int index) override
+    void HandleSoloClick(int index, int value) override
     {
+        int now = GetTickCount();
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
-        CSurf_SetSurfaceSolo(media_track, CSurf_OnSoloChange(media_track, !DAW::IsTrackSoloed(media_track)), NULL);
+        if (value == 0 && context->GetMuteSoloMomentary())
+        {
+            if (now - solo_start > MOMENTARY_TIMEOUT)
+            {
+                CSurf_SetSurfaceSolo(media_track, CSurf_OnSoloChange(media_track, !DAW::IsTrackSoloed(media_track)), NULL);
+            }
+            solo_start = 0;
+        }
+        else if (value > 0)
+        {
+            solo_start = now;
+            CSurf_SetSurfaceSolo(media_track, CSurf_OnSoloChange(media_track, !DAW::IsTrackSoloed(media_track)), NULL);
+        }
     }
 
     void HandleFaderTouch(int index) override

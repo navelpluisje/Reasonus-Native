@@ -175,14 +175,24 @@ public:
         }
     }
 
-    void HandleMuteClick(int index) override
+    void HandleMuteClick(int index, int value) override
     {
+        if (value == 0)
+        {
+            return;
+        }
+
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
         CSurf_SetSurfaceMute(media_track, CSurf_OnMuteChange(media_track, !DAW::IsTrackMuted(media_track)), NULL);
     }
 
-    void HandleSoloClick(int index) override
+    void HandleSoloClick(int index, int value) override
     {
+        if (value == 0)
+        {
+            return;
+        }
+
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
         CSurf_SetSurfaceSolo(media_track, CSurf_OnSoloChange(media_track, !DAW::IsTrackSoloed(media_track)), NULL);
     }

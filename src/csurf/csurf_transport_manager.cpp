@@ -132,20 +132,35 @@ public:
         SetButtonValues();
     }
 
-    void HandlePlayButton()
+    void HandlePlayButton(int value)
     {
+        if (value == 0)
+        {
+            return;
+        }
+
         StopRewindOrForward();
         CSurf_OnPlay();
     };
 
-    void HandleStopButton()
+    void HandleStopButton(int value)
     {
+        if (value == 0)
+        {
+            return;
+        }
+
         StopRewindOrForward();
         CSurf_OnStop();
     };
 
-    void HandleRepeatButton()
+    void HandleRepeatButton(int value)
     {
+        if (value == 0)
+        {
+            return;
+        }
+
         if (context->GetShiftLeft())
         {
             GetSetRepeatEx(0, 0);
@@ -157,13 +172,23 @@ public:
         }
     };
 
-    void HandleRecordButton()
+    void HandleRecordButton(int value)
     {
+        if (value == 0)
+        {
+            return;
+        }
+
         CSurf_OnRecord();
     };
 
-    void HandleRewindButton()
+    void HandleRewindButton(int value)
     {
+        if (value == 0)
+        {
+            return;
+        }
+
         if (context->GetShiftLeft())
         {
             CSurf_GoStart();
@@ -173,8 +198,13 @@ public:
         SetRewindingState();
     };
 
-    void HandleForwardButton()
+    void HandleForwardButton(int value)
     {
+        if (value == 0)
+        {
+            return;
+        }
+
         if (context->GetShiftLeft())
         {
             CSurf_GoEnd();

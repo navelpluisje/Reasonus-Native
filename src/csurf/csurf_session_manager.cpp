@@ -114,8 +114,13 @@ public:
         SetButtonValues();
     }
 
-    void HandleChannelButton()
+    void HandleChannelButton(int value)
     {
+        if (value == 0)
+        {
+            return;
+        }
+
         if (context->GetShiftLeft())
         {
             handleFunctionKey("1");
@@ -125,8 +130,13 @@ public:
         SetButtonValues();
     }
 
-    void HandleZoomButton()
+    void HandleZoomButton(int value)
     {
+        if (value == 0)
+        {
+            return;
+        }
+
         if (context->GetShiftLeft())
         {
             handleFunctionKey("2");
@@ -136,8 +146,13 @@ public:
         SetButtonValues();
     }
 
-    void HandleScrollButton()
+    void HandleScrollButton(int value)
     {
+        if (value == 0)
+        {
+            return;
+        }
+
         if (context->GetShiftLeft())
         {
             handleFunctionKey("3");
@@ -147,8 +162,13 @@ public:
         SetButtonValues();
     }
 
-    void HandleBankButton()
+    void HandleBankButton(int value)
     {
+        if (value == 0)
+        {
+            return;
+        }
+
         if (context->GetShiftLeft())
         {
             handleFunctionKey("4");
@@ -158,8 +178,13 @@ public:
         SetButtonValues();
     }
 
-    void HandleMasterButton()
+    void HandleMasterButton(int value)
     {
+        if (value == 0)
+        {
+            return;
+        }
+
         if (context->GetShiftLeft())
         {
             handleFunctionKey("5");
@@ -169,8 +194,13 @@ public:
         SetButtonValues();
     }
 
-    void HandleClickButton()
+    void HandleClickButton(int value)
     {
+        if (value == 0)
+        {
+            return;
+        }
+
         if (context->GetShiftLeft())
         {
             handleFunctionKey("6");
@@ -180,8 +210,13 @@ public:
         SetButtonValues();
     }
 
-    void HandleSectionButton()
+    void HandleSectionButton(int value)
     {
+        if (value == 0)
+        {
+            return;
+        }
+
         if (context->GetShiftLeft())
         {
             handleFunctionKey("7");
@@ -196,8 +231,13 @@ public:
         SetButtonValues();
     }
 
-    void HandleMarkerButton()
+    void HandleMarkerButton(int value)
     {
+        if (value == 0)
+        {
+            return;
+        }
+
         if (context->GetShiftLeft())
         {
             handleFunctionKey("8");
@@ -207,9 +247,9 @@ public:
         SetButtonValues();
     }
 
-    void HandlePrevButton(int val)
+    void HandlePrevButton(int value)
     {
-        if (!val)
+        if (!value)
         {
             prevButton->SetValue(BTN_VALUE_OFF);
             return;
@@ -252,9 +292,9 @@ public:
         }
     }
 
-    void HandleNextButton(int val)
+    void HandleNextButton(int value)
     {
-        if (!val)
+        if (!value)
         {
             nextButton->SetValue(BTN_VALUE_OFF);
             return;
