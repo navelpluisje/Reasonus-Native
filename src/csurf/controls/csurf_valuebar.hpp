@@ -58,7 +58,7 @@ protected:
     void SendMode();
 
 public:
-    CSurf_Valuebar(int channel, double value, midi_Output *m_midiout);
+    CSurf_Valuebar(int channel, int value, midi_Output *m_midiout);
 
     ~CSurf_Valuebar() {};
 

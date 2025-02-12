@@ -15,7 +15,7 @@ protected:
     void SendValue();
 
 public:
-    CSurf_Fader(int channel, double value, midi_Output *m_midiout) : value(value), channel(channel), m_midiout(m_midiout) {};
+    CSurf_Fader(int channel, int value, midi_Output *m_midiout) : value(value), channel(channel), m_midiout(m_midiout) {};
 
     ~CSurf_Fader() {};
 

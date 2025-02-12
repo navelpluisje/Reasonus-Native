@@ -106,7 +106,7 @@ public:
     void UpdateTracks() override
     {
         WDL_PtrList<MediaTrack> media_tracks = navigator->GetBankTracks();
-        context->SetChannelManagerItemsCount(filters.size() + 1);
+        context->SetChannelManagerItemsCount(static_cast<int>(filters.size()) + 1);
 
         for (int i = 0; i < context->GetNbChannels(); i++)
         {

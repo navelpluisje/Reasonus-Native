@@ -2,6 +2,8 @@
 #include "csurf_utils.hpp"
 #include "csurf_faderport_ui_utils.hpp"
 
+extern REAPER_PLUGIN_HINSTANCE g_hInst;
+
 namespace CSURF_FADERPORT_UI_PLUGIN_EDIT
 {
     namespace
