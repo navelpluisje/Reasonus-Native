@@ -44,7 +44,7 @@ protected:
         color.SetColor(red / 2, green / 2, blue / 2);
     }
 
-    void GetFaderValue(MediaTrack *media_track, int receiveIndex, int *faderValue, int *valueBarValue, int *_pan, std::string *panStr)
+    void GetFaderValue(MediaTrack *media_track, int receiveIndex, int *faderValue, int *valueBarValue, double *_pan, std::string *panStr)
     {
         double volume, pan = 0.0;
 
@@ -88,7 +88,8 @@ public:
         for (int i = 0; i < context->GetNbChannels(); i++)
         {
             int receiveIndex = context->GetChannelManagerItemIndex() + i;
-            int pan, faderValue, valueBarValue = 0;
+            int faderValue, valueBarValue = 0;
+            double pan = 0.0;
 
             CSurf_Track *track = tracks.at(i);
             MediaTrack *media_track = media_tracks.Get(i);
