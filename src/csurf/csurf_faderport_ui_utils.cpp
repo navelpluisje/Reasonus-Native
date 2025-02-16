@@ -2,6 +2,8 @@
 #if __APPLE__ || __linux
 #include <WDL/swell/swell-types.h>
 #include <WDL/swell/swell-functions.h>
+#else
+#include <windowsx.h>
 #endif
 
 

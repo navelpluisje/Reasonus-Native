@@ -3,7 +3,6 @@
 
 #include <string>
 #include <mini/ini.h>
-#include <WDL/localize/localize.h>
 #include <WDL/win32_utf8.h>
 #include "csurf_utils.hpp"
 #include "csurf_faderport_ui_utils.hpp"
@@ -31,13 +30,12 @@ namespace CSURF_FADERPORT_UI_INIT
         case WM_INITDIALOG:
         {
             mINI::INIFile file(GetReaSonusIniPath());
-            // mINI::INIStructure ini;
-            // file.read(ini);
+            readAndCreateIni(ini);
 
             int combo;
             char buf[255];
-            char *noDeviceString = const_cast<char *>(__LOCALIZE("No device selected", "reasonus-faderport"));
-            char *noSurfaceString = const_cast<char *>(__LOCALIZE("No surface selected", "reasonus-faderport"));
+            char *noDeviceString = "No device selected";
+            char *noSurfaceString = "No surface selected";
 
             WDL_UTF8_HookComboBox(GetDlgItem(hwndDlg, IDC_COMBO_MIDI_IN));
             WDL_UTF8_HookComboBox(GetDlgItem(hwndDlg, IDC_COMBO_MIDI_OUT));
@@ -104,6 +102,7 @@ namespace CSURF_FADERPORT_UI_INIT
 
             break;
         }
+
         case WM_COMMAND:
             switch (LOWORD(wParam))
             {
@@ -129,7 +128,9 @@ namespace CSURF_FADERPORT_UI_INIT
                 SaveCheckBoxValue(hwndDlg, "mute-solo-momentary", IDC_CHECK_INIT_MUTE_MOMENTARY);
                 break;
             }
-            }
+            break;
+        }
+
         case WM_USER + 1024:
         {
 
@@ -165,10 +166,6 @@ namespace CSURF_FADERPORT_UI_INIT
     static HWND CreateInitDialog(const char *type_string, HWND parent, const char *initConfigString)
     {
         (void)type_string;
-
-        static mINI::INIFile file(GetReaSonusIniPath());
-        readAndCreateIni(ini);
-
         return CreateDialogParam(g_hInst, MAKEINTRESOURCE(IDD_DIALOG_REASONUS_NATIVE), parent, dlgProc, (LPARAM)initConfigString);
     }
 }

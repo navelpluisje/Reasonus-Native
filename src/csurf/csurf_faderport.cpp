@@ -4,12 +4,10 @@
 ** Copyright (C) 2007-2008 Cockos Incorporated
 ** License: LGPL.
 */
-#define LOCALIZE_IMPORT_PREFIX "csurf_"
+
 #include <string>
 #include <vector>
 #include <reaper_plugin.h>
-#include <WDL/localize/localize-import.h>
-#include <WDL/localize/localize.h>
 #include <WDL/wdltypes.h> // might be unnecessary in future
 #include <WDL/ptrlist.h>
 #include <reaper_plugin_functions.h>
@@ -29,8 +27,6 @@
 
 extern HWND g_hwnd;
 extern REAPER_PLUGIN_HINSTANCE g_hInst;
-
-using namespace CSURF_FADERPORT_UI_INIT;
 
 class CSurf_FaderPort : public IReaperControlSurface
 {
@@ -97,19 +93,6 @@ class CSurf_FaderPort : public IReaperControlSurface
      */
     else if (evt->midi_message[0] == MIDI_MESSAGE_BUTTON)
     {
-      /**
-       * The next and previous button light up when pressed so need the '0' value when releasing
-       */
-      // if (!evt->midi_message[2] && !(
-      //                                  evt->midi_message[1] == BTN_NEXT ||
-      //                                  evt->midi_message[1] == BTN_PREV ||
-      //                                  evt->midi_message[1] == BTN_SHIFT_LEFT ||
-      //                                  evt->midi_message[1] == BTN_SHIFT_RIGHT ||
-      //                                  evt->midi_message[1] == BTN_ARM))
-      // {
-      //   return;
-      // }
-
       /**
        * Fader Touch
        */
@@ -456,8 +439,8 @@ public:
 
   const char *GetDescString()
   {
-    descspace.SetFormatted(512, __LOCALIZE_VERFMT("ReaSonus FaderPort (dev %d, %d)", "reasonus-faderport"), m_midi_in_dev, m_midi_out_dev);
-    return descspace.Get();
+    snprintf(configtmp, 100, "ReaSonus FaderPort (dev %d, %d)", m_midi_in_dev, m_midi_out_dev);
+    return configtmp;
   }
 
   const char *GetConfigString() // string of configuration data
@@ -545,5 +528,5 @@ reaper_csurf_reg_t csurf_faderport_reg = {
     "REASONUS_FADERPORT",
     "ReaSonus FaderPort",
     createFunc,
-    CreateInitDialog,
+    CSURF_FADERPORT_UI_INIT::CreateInitDialog,
 };

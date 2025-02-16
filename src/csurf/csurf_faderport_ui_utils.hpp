@@ -4,11 +4,11 @@
 #include <cstdio>
 #include <string>
 #include <WDL/wdltypes.h> // might be unnecessary in future
-// #include <WDL/win32_utf8.h>
+#include <WDL/win32_utf8.h>
 
-#if __APPLE__ || __linux
-#include <WDL/swell/swell-types.h>
-#endif
+// #if __APPLE__ || __linux__
+// #include <WDL/swell/swell-types.h>
+// #endif
 
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
