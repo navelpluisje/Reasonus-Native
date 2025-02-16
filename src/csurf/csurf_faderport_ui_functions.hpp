@@ -2,10 +2,6 @@
 #define CSURF_FADERPORT_UI_FUNCTIONS_H_
 
 #include <string>
-#include <WDL/wdltypes.h> // might be unnecessary in future
-#include <WDL/win32_utf8.h>
-#include <WDL/localize/localize.h>
-#include <reaper_plugin_functions.h>
 #include <mini/ini.h>
 #include "../resource.h"
 #include "csurf_utils.hpp"
