@@ -14,6 +14,7 @@ extern reaper_csurf_reg_t csurf_faderport_reg;
 
 REAPER_PLUGIN_HINSTANCE g_hInst; // used for dialogs, if any
 HWND g_hwnd;
+
 reaper_plugin_info_t *g_reaper_plugin_info;
 
 extern "C"

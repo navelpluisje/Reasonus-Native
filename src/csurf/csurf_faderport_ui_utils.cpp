@@ -1,9 +1,7 @@
 #include "csurf_faderport_ui_utils.hpp"
-#if __APPLE__ || __linux
+#if __APPLE__ || __linux__
 #include <WDL/swell/swell-types.h>
 #include <WDL/swell/swell-functions.h>
-#else
-#include <windowsx.h>
 #endif
 
 

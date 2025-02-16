@@ -9,6 +9,7 @@
 #include "../resource.h"
 
 extern HWND g_hwnd;
+extern REAPER_PLUGIN_HINSTANCE g_hInst;
 
 namespace CSURF_FADERPORT_UI_INIT
 {
