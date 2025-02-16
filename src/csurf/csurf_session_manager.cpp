@@ -410,8 +410,13 @@ public:
         }
     }
 
-    void HandleEncoderClick()
+    void HandleEncoderClick(int value)
     {
+        if (value == 0)
+        {
+            return;
+        }
+
         switch (session_type)
         {
         case Channel:
