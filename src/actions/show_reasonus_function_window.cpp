@@ -68,4 +68,4 @@ namespace SHOW_REASONUS_FUNCTION_WINDOW
         plugin_register("-hookcommand2", (void *)OnAction);
     }
 
-} // namespace TOGGLE_PLAY_CURSOR
+} // namespace SHOW_REASONUS_FUNCTION_WINDOW

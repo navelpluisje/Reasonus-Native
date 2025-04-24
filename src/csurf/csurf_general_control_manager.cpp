@@ -10,9 +10,6 @@
 #include "controls/csurf_color_button.hpp"
 #include "csurf_fader_manager.hpp"
 
-using namespace CSURF_FADERPORT_UI_FUNCTIONS;
-using namespace CSURF_FADERPORT_UI_FILTERS;
-
 class CSurf_GeneralControlManager
 {
 protected:
@@ -122,7 +119,7 @@ public:
         hasGlobalBypass = (bool)GetToggleCommandState(40344);
         followCursor = GetToggleCommandStringState("_REASONUS_TOGGLE_PLAY_CURSOR_COMMAND");
         lastTouchedFxMode = context->GetLastTouchedFxMode();
-        functionsDialogOpen = IsFunctionsDialogOpen();
+        functionsDialogOpen = CSURF_FADERPORT_UI_FUNCTIONS::IsFunctionsDialogOpen();
 
         SetButtonValue();
     };
@@ -221,11 +218,15 @@ public:
 
         if (context->GetShiftLeft())
         {
-            IsFunctionsDialogOpen() ? HideFunctionsDialog() : ShowFunctionsDialog();
+            CSURF_FADERPORT_UI_FUNCTIONS::IsFunctionsDialogOpen() 
+                ? CSURF_FADERPORT_UI_FUNCTIONS::HideFunctionsDialog() 
+                : CSURF_FADERPORT_UI_FUNCTIONS::ShowFunctionsDialog();
         }
         else
         {
-            IsFiltersDialogOpen() ? HideFiltersDialog() : ShowFiltersDialog();
+            CSURF_FADERPORT_UI_FILTERS::IsFiltersDialogOpen() 
+                ? CSURF_FADERPORT_UI_FILTERS::HideFiltersDialog() 
+                : CSURF_FADERPORT_UI_FILTERS::ShowFiltersDialog();
         }
     };
 

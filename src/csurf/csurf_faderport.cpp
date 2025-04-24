@@ -4,12 +4,10 @@
 ** Copyright (C) 2007-2008 Cockos Incorporated
 ** License: LGPL.
 */
-#define LOCALIZE_IMPORT_PREFIX "csurf_"
+
 #include <string>
 #include <vector>
 #include <reaper_plugin.h>
-#include <WDL/localize/localize-import.h>
-#include <WDL/localize/localize.h>
 #include <WDL/wdltypes.h> // might be unnecessary in future
 #include <WDL/ptrlist.h>
 #include <reaper_plugin_functions.h>
@@ -29,8 +27,6 @@
 
 extern HWND g_hwnd;
 extern REAPER_PLUGIN_HINSTANCE g_hInst;
-
-using namespace CSURF_FADERPORT_UI_INIT;
 
 class CSurf_FaderPort : public IReaperControlSurface
 {
@@ -97,19 +93,6 @@ class CSurf_FaderPort : public IReaperControlSurface
      */
     else if (evt->midi_message[0] == MIDI_MESSAGE_BUTTON)
     {
-      /**
-       * The next and previous button light up when pressed so need the '0' value when releasing
-       */
-      // if (!evt->midi_message[2] && !(
-      //                                  evt->midi_message[1] == BTN_NEXT ||
-      //                                  evt->midi_message[1] == BTN_PREV ||
-      //                                  evt->midi_message[1] == BTN_SHIFT_LEFT ||
-      //                                  evt->midi_message[1] == BTN_SHIFT_RIGHT ||
-      //                                  evt->midi_message[1] == BTN_ARM))
-      // {
-      //   return;
-      // }
-
       /**
        * Fader Touch
        */
@@ -374,8 +357,8 @@ public:
     readAndCreateIni(ini);
 
     errStats = 0;
-    m_midi_in_dev = stoi(ini["Surface"]["MidiIn"]);
-    m_midi_out_dev = stoi(ini["Surface"]["MidiOut"]);
+    m_midi_in_dev = stoi(ini["surface"]["midiin"]);
+    m_midi_out_dev = stoi(ini["surface"]["midiout"]);
 
     surface_update_lastrun = 0;
 
@@ -383,10 +366,10 @@ public:
     m_midiin = m_midi_in_dev >= 0 ? CreateMIDIInput(m_midi_in_dev) : NULL;
     m_midiout = m_midi_out_dev >= 0 ? CreateMIDIOutput(m_midi_out_dev, false, NULL) : NULL;
 
-    context = new CSurf_Context(stoi(ini["Surface"]["Surface"]));
-    context->SetPluginControl(ini["Surface"].has("disable-plugins") && ini["Surface"]["disable-plugins"] != "1");
-    context->SetSwapShiftButtons(ini["Surface"].has("swap-shift-buttons") && ini["Surface"]["swap-shift-buttons"] == "1");
-    context->SetMuteSoloMomentary(ini["Surface"].has("mute-solo-momentary") && ini["Surface"]["mute-solo-momentary"] == "1");
+    context = new CSurf_Context(stoi(ini["surface"]["surface"]));
+    context->SetPluginControl(ini["surface"].has("disable-plugins") && ini["surface"]["disable-plugins"] != "1");
+    context->SetSwapShiftButtons(ini["surface"].has("swap-shift-buttons") && ini["surface"]["swap-shift-buttons"] == "1");
+    context->SetMuteSoloMomentary(ini["surface"].has("mute-solo-momentary") && ini["surface"]["mute-solo-momentary"] == "1");
 
     for (int i = 0; i < context->GetNbChannels(); i++)
     {
@@ -456,8 +439,8 @@ public:
 
   const char *GetDescString()
   {
-    descspace.SetFormatted(512, __LOCALIZE_VERFMT("ReaSonus FaderPort (dev %d, %d)", "reasonus-faderport"), m_midi_in_dev, m_midi_out_dev);
-    return descspace.Get();
+    snprintf(configtmp, 100, "ReaSonus FaderPort (dev %d, %d)", m_midi_in_dev, m_midi_out_dev);
+    return configtmp;
   }
 
   const char *GetConfigString() // string of configuration data
@@ -545,5 +528,5 @@ reaper_csurf_reg_t csurf_faderport_reg = {
     "REASONUS_FADERPORT",
     "ReaSonus FaderPort",
     createFunc,
-    CreateInitDialog,
+    CSURF_FADERPORT_UI_INIT::CreateInitDialog,
 };

@@ -1,8 +1,8 @@
 #include "csurf_daw.hpp"
 #include <vector>
 #include <string>
-#include <WDL/wdltypes.h> // might be unnecessary in future
-#include <reaper_plugin_functions.h>
+// #include <WDL/wdltypes.h> // might be unnecessary in future
+// #include <reaper_plugin_functions.h>
 #include "csurf_utils.hpp"
 
 int DAW::sendModes[3] = {0, 1, 3};
