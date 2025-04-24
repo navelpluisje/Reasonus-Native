@@ -2,7 +2,7 @@
 #define CSURF_FADERPORT_UI_FUNCTIONS_H_
 
 #include "../resource.h"
-#include <mini/ini.h>
+#include <string>
 
 extern HWND g_hwnd;
 

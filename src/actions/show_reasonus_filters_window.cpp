@@ -12,6 +12,7 @@ namespace SHOW_REASONUS_FILTERS_WINDOW
     // some global non-const variables
     // the necessary 'evil'
     int command_id{0};
+    bool toggle_action_state{false};
     constexpr auto command_name = "REASONUS_SHOW_REASONUS_FILTERS_WINDOW";
     constexpr auto action_name = "Reasonus: Show the ReaSonus Filters window";
     custom_action_register_t action = {0, command_name, action_name, nullptr};
@@ -55,22 +56,15 @@ namespace SHOW_REASONUS_FILTERS_WINDOW
         commitOut[min(commitOut_sz - 1, (int)strlen(commit))] = '\0'; // Ensure null termination
     }
 
-    // when my plugin gets loaded
-    // function to register my plugins 'stuff' with REAPER
     void Register()
     {
-        // register action name and get command_id
         command_id = plugin_register("custom_action", &action);
-        // plugin_register("toggleaction", (void *)ToggleActionCallback);
-
-        // register run action/command
         plugin_register("hookcommand2", (void *)OnAction);
     }
 
     auto Unregister() -> void
     {
         plugin_register("-custom_action", &action);
-        // plugin_register("-toggleaction", (void *)ToggleActionCallback);
         plugin_register("-hookcommand2", (void *)OnAction);
     }
 

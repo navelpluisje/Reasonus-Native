@@ -1,11 +1,6 @@
-#include "../resource.h"
 #include "csurf_utils.hpp"
 #include "csurf_faderport_ui_functions.hpp"
-// #include <string>
-// #include <mini/ini.h>
-// #include "../resource.h"
-// #include "csurf_utils.hpp"
-// #include "csurf_faderport_ui_utils.hpp"
+#include <mini/ini.h>
 
 extern HWND g_hwnd;
 extern REAPER_PLUGIN_HINSTANCE g_hInst;

@@ -47,7 +47,7 @@ namespace CSURF_FADERPORT_UI_INIT
                 if (i == 0)
                 {
                     combo = AddComboEntry(hwndDlg, 0, noDeviceString, IDC_COMBO_MIDI_IN);
-                    if (stoi(ini["Surface"]["MidiIn"]) == 0)
+                    if (stoi(ini["surface"]["midiin"]) == 0)
                     {
                         SendDlgItemMessage(hwndDlg, IDC_COMBO_MIDI_IN, CB_SETCURSEL, combo, 0);
                     }
@@ -55,7 +55,7 @@ namespace CSURF_FADERPORT_UI_INIT
                 if (GetMIDIInputName(i, buf, sizeof(buf)))
                 {
                     combo = AddComboEntry(hwndDlg, i, buf, IDC_COMBO_MIDI_IN);
-                    if (i == stoi(ini["Surface"]["MidiIn"]))
+                    if (i == stoi(ini["surface"]["midiin"]))
                     {
                         SendDlgItemMessage(hwndDlg, IDC_COMBO_MIDI_IN, CB_SETCURSEL, combo, 0);
                     }
@@ -67,7 +67,7 @@ namespace CSURF_FADERPORT_UI_INIT
                 if (i == 0)
                 {
                     combo = AddComboEntry(hwndDlg, 0, noDeviceString, IDC_COMBO_MIDI_OUT);
-                    if (stoi(ini["Surface"]["MidiOut"]) == 0)
+                    if (stoi(ini["surface"]["midiout"]) == 0)
                     {
                         SendDlgItemMessage(hwndDlg, IDC_COMBO_MIDI_OUT, CB_SETCURSEL, combo, 0);
                     }
@@ -75,7 +75,7 @@ namespace CSURF_FADERPORT_UI_INIT
                 if (GetMIDIOutputName(i, buf, sizeof(buf)))
                 {
                     int dev = AddComboEntry(hwndDlg, i, buf, IDC_COMBO_MIDI_OUT);
-                    if (i == stoi(ini["Surface"]["MidiOut"]))
+                    if (i == stoi(ini["surface"]["midiout"]))
                     {
                         SendDlgItemMessage(hwndDlg, IDC_COMBO_MIDI_OUT, CB_SETCURSEL, dev, 0);
                     }
@@ -83,23 +83,23 @@ namespace CSURF_FADERPORT_UI_INIT
             }
 
             combo = AddComboEntry(hwndDlg, 0, noSurfaceString, IDC_COMBO_SURFACE);
-            if (ini["Surface"]["Surface"] == "0")
+            if (ini["surface"]["surface"] == "0")
             {
                 SendDlgItemMessage(hwndDlg, IDC_COMBO_SURFACE, CB_SETCURSEL, combo, 0);
             }
             combo = AddComboEntry(hwndDlg, 8, const_cast<char *>("Faderport 8"), IDC_COMBO_SURFACE);
-            if (ini["Surface"]["Surface"] == "8")
+            if (ini["surface"]["surface"] == "8")
             {
                 SendDlgItemMessage(hwndDlg, IDC_COMBO_SURFACE, CB_SETCURSEL, combo, 0);
             }
             combo = AddComboEntry(hwndDlg, 16, const_cast<char *>("Faderport 16"), IDC_COMBO_SURFACE);
-            if (ini["Surface"]["Surface"] == "16")
+            if (ini["surface"]["surface"] == "16")
             {
                 SendDlgItemMessage(hwndDlg, IDC_COMBO_SURFACE, CB_SETCURSEL, combo, 0);
             }
-            SendMessage(GetDlgItem(hwndDlg, IDC_CHECK_INIT_DIS_PLUGIN), BM_SETCHECK, ini["Surface"]["disable-plugins"] == "1" ? BST_CHECKED : BST_UNCHECKED, 0);
-            SendMessage(GetDlgItem(hwndDlg, IDC_CHECK_INIT_SWAP_SHIFT), BM_SETCHECK, ini["Surface"]["swap-shift-buttons"] == "1" ? BST_CHECKED : BST_UNCHECKED, 0);
-            SendMessage(GetDlgItem(hwndDlg, IDC_CHECK_INIT_MUTE_MOMENTARY), BM_SETCHECK, ini["Surface"]["mute-solo-momentary"] == "1" ? BST_CHECKED : BST_UNCHECKED, 0);
+            SendMessage(GetDlgItem(hwndDlg, IDC_CHECK_INIT_DIS_PLUGIN), BM_SETCHECK, ini["surface"]["disable-plugins"] == "1" ? BST_CHECKED : BST_UNCHECKED, 0);
+            SendMessage(GetDlgItem(hwndDlg, IDC_CHECK_INIT_SWAP_SHIFT), BM_SETCHECK, ini["surface"]["swap-shift-buttons"] == "1" ? BST_CHECKED : BST_UNCHECKED, 0);
+            SendMessage(GetDlgItem(hwndDlg, IDC_CHECK_INIT_MUTE_MOMENTARY), BM_SETCHECK, ini["surface"]["mute-solo-momentary"] == "1" ? BST_CHECKED : BST_UNCHECKED, 0);
 
             break;
         }
@@ -153,9 +153,9 @@ namespace CSURF_FADERPORT_UI_INIT
                 if (r != CB_ERR)
                     surface = SendDlgItemMessage(hwndDlg, IDC_COMBO_SURFACE, CB_GETITEMDATA, r, 0);
 
-                ini["Surface"]["MidiIn"] = std::to_string(indev);
-                ini["Surface"]["MidiOut"] = std::to_string(outdev);
-                ini["Surface"]["Surface"] = std::to_string(surface);
+                ini["surface"]["midiin"] = std::to_string(indev);
+                ini["surface"]["midiout"] = std::to_string(outdev);
+                ini["surface"]["surface"] = std::to_string(surface);
                 file.write(ini, true);
             }
             break;

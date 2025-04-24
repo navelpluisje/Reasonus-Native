@@ -357,8 +357,8 @@ public:
     readAndCreateIni(ini);
 
     errStats = 0;
-    m_midi_in_dev = stoi(ini["Surface"]["MidiIn"]);
-    m_midi_out_dev = stoi(ini["Surface"]["MidiOut"]);
+    m_midi_in_dev = stoi(ini["surface"]["midiin"]);
+    m_midi_out_dev = stoi(ini["surface"]["midiout"]);
 
     surface_update_lastrun = 0;
 
@@ -366,10 +366,10 @@ public:
     m_midiin = m_midi_in_dev >= 0 ? CreateMIDIInput(m_midi_in_dev) : NULL;
     m_midiout = m_midi_out_dev >= 0 ? CreateMIDIOutput(m_midi_out_dev, false, NULL) : NULL;
 
-    context = new CSurf_Context(stoi(ini["Surface"]["Surface"]));
-    context->SetPluginControl(ini["Surface"].has("disable-plugins") && ini["Surface"]["disable-plugins"] != "1");
-    context->SetSwapShiftButtons(ini["Surface"].has("swap-shift-buttons") && ini["Surface"]["swap-shift-buttons"] == "1");
-    context->SetMuteSoloMomentary(ini["Surface"].has("mute-solo-momentary") && ini["Surface"]["mute-solo-momentary"] == "1");
+    context = new CSurf_Context(stoi(ini["surface"]["surface"]));
+    context->SetPluginControl(ini["surface"].has("disable-plugins") && ini["surface"]["disable-plugins"] != "1");
+    context->SetSwapShiftButtons(ini["surface"].has("swap-shift-buttons") && ini["surface"]["swap-shift-buttons"] == "1");
+    context->SetMuteSoloMomentary(ini["surface"].has("mute-solo-momentary") && ini["surface"]["mute-solo-momentary"] == "1");
 
     for (int i = 0; i < context->GetNbChannels(); i++)
     {
