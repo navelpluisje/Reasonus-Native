@@ -228,7 +228,7 @@ class CSurf_FaderPort : public IReaperControlSurface
        */
       else if (evt->midi_message[1] == ENCODER_CLICK_PAN)
       {
-        generalControlManager->HandleEncoderClick();
+        generalControlManager->HandleEncoderClick(evt->midi_message[2]);
       }
       else if (evt->midi_message[1] == BTN_ARM)
       {
@@ -338,7 +338,7 @@ class CSurf_FaderPort : public IReaperControlSurface
       }
       else if (evt->midi_message[1] == ENCODER_CLICK_NAV)
       {
-        sessionManager->HandleEncoderClick();
+        sessionManager->HandleEncoderClick(evt->midi_message[2]);
       }
     }
   }

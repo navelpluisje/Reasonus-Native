@@ -356,7 +356,7 @@ bool DAW::HasTrackSend(MediaTrack *media_track, int send)
 
 std::string DAW::GetTrackSendDestName(MediaTrack *media_track, int send)
 {
-    MediaTrack *destTrack = (MediaTrack *)GetSetTrackSendInfo(media_track, 0, send, "P_SRCTRACK", 0);
+    MediaTrack *destTrack = (MediaTrack *)GetSetTrackSendInfo(media_track, 0, send, "P_DESTTRACK", 0);
     if (destTrack)
     {
         return GetTrackName(destTrack);

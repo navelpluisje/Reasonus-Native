@@ -124,8 +124,13 @@ public:
         SetButtonValue();
     };
 
-    void HandleEncoderClick()
+    void HandleEncoderClick(int value)
     {
+        if (value == 0)
+        {
+            return;
+        }
+
         if (context->GetShiftLeft())
         {
             MediaTrack *media_track = GetSelectedTrack(0, 0);
