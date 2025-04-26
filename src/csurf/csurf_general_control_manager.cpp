@@ -153,7 +153,9 @@ public:
         switch (context->GetPanEncoderMode())
         {
         case PanEncoderPanMode:
-            hasBit(value, 6) ? DecrementPan(1) : IncrementPan(1);
+            hasBit(value, 6)
+                ? DecrementPan(value - 64)
+                : IncrementPan(value);
             break;
 
         case PanEncoderPluginMode:
