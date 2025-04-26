@@ -10,9 +10,6 @@
 #include "controls/csurf_color_button.hpp"
 #include "csurf_fader_manager.hpp"
 
-using namespace CSURF_FADERPORT_UI_FUNCTIONS;
-using namespace CSURF_FADERPORT_UI_FILTERS;
-
 class CSurf_GeneralControlManager
 {
 protected:
@@ -37,6 +34,7 @@ protected:
     bool hasGlobalBypass;
     bool followCursor;
     bool lastTouchedFxMode;
+
     bool functionsDialogOpen;
 
     void SetButtonValue()
@@ -46,11 +44,15 @@ protected:
         {
             bypassButton->SetValue(hasGlobalBypass ? BTN_VALUE_ON
                                                    : BTN_VALUE_OFF);
+            macroButton->SetColor(ButtonColorYellow);
+            macroButton->SetValue(CSURF_FADERPORT_UI_FUNCTIONS::IsFunctionsDialogOpen() ? BTN_VALUE_ON : BTN_VALUE_OFF);
         }
         else
         {
             bypassButton->SetValue(hasSelectedBypass ? BTN_VALUE_ON
                                                      : BTN_VALUE_OFF);
+            macroButton->SetColor(ButtonColorWhite);
+            macroButton->SetValue(CSURF_FADERPORT_UI_FILTERS::IsFiltersDialogOpen() ? BTN_VALUE_ON : BTN_VALUE_OFF);
         }
 
         soloClearButton->SetValue(hasSolo ? BTN_VALUE_ON : BTN_VALUE_OFF);
@@ -122,13 +124,18 @@ public:
         hasGlobalBypass = (bool)GetToggleCommandState(40344);
         followCursor = GetToggleCommandStringState("_REASONUS_TOGGLE_PLAY_CURSOR_COMMAND");
         lastTouchedFxMode = context->GetLastTouchedFxMode();
-        functionsDialogOpen = IsFunctionsDialogOpen();
+        functionsDialogOpen = CSURF_FADERPORT_UI_FUNCTIONS::IsFunctionsDialogOpen();
 
         SetButtonValue();
     };
 
-    void HandleEncoderClick()
+    void HandleEncoderClick(int value)
     {
+        if (value == 0)
+        {
+            return;
+        }
+
         if (context->GetShiftLeft())
         {
             MediaTrack *media_track = GetSelectedTrack(0, 0);
@@ -146,7 +153,9 @@ public:
         switch (context->GetPanEncoderMode())
         {
         case PanEncoderPanMode:
-            hasBit(value, 6) ? DecrementPan(1) : IncrementPan(1);
+            hasBit(value, 6)
+                ? DecrementPan(value - 64)
+                : IncrementPan(value);
             break;
 
         case PanEncoderPluginMode:
@@ -216,11 +225,11 @@ public:
 
         if (context->GetShiftLeft())
         {
-            IsFunctionsDialogOpen() ? HideFunctionsDialog() : ShowFunctionsDialog();
+            Main_OnCommandStringEx("_REASONUS_SHOW_REASONUS_FUNCTION_WINDOW", 0, 0);
         }
         else
         {
-            IsFiltersDialogOpen() ? HideFiltersDialog() : ShowFiltersDialog();
+            Main_OnCommandStringEx("_REASONUS_SHOW_REASONUS_FILTERS_WINDOW", 0, 0);
         }
     };
 

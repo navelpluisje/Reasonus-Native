@@ -6,6 +6,17 @@
 #include <string>
 #include <vector>
 
+#ifdef _WIN32
+#include <ShlObj_core.h>
+#endif
+
+const char pathSeparator =
+#ifdef _WIN32
+    '\\';
+#else
+    '/';
+#endif
+
 void Main_OnCommandStringEx(std::string action_name, int flag, ReaProject *proj)
 {
     int actionId = NamedCommandLookup(action_name.c_str());
@@ -156,15 +167,21 @@ std::string GetAutomationString(int automationMode)
     };
 }
 
-std::string GetReaSonusIniPath() { return std::string(GetResourcePath()) + "/ReaSonus/FP.ini"; }
+std::string GetReaSonusIniPath() { return std::string(GetResourcePath()) + pathSeparator + "ReaSonus" + pathSeparator + "FP.ini"; }
 
 std::string GetReaSonusPluginPath(std::string developer, std::string pluginName, bool create)
 {
+    std::string path = std::string(GetResourcePath()) + pathSeparator + "ReaSonus" + pathSeparator + "Plugins" + pathSeparator + developer;
+    
     if (create)
     {
-        RecursiveCreateDirectory((std::string(GetResourcePath()) + "/ReaSonus/Plugins/" + developer).c_str(), 0);
+        #ifdef _WIN32
+        SHCreateDirectoryEx( NULL, path.c_str(), NULL );
+        #else
+        RecursiveCreateDirectory(path.c_str(), 0);
+        #endif
     }
-    return std::string(GetResourcePath()) + "/ReaSonus/Plugins/" + developer + "/" + pluginName + ".ini";
+    return path + pathSeparator + pluginName + ".ini";
 }
 
 bool isInteger(std::string value)
@@ -241,21 +258,21 @@ void readAndCreateIni(mINI::INIStructure &data)
     mINI::INIFile file(GetReaSonusIniPath());
     if (!file.read(data))
     {
-        RecursiveCreateDirectory((std::string(GetResourcePath()) + "/ReaSonus/Plugins").c_str(), 0);
-        data["Surface"]["MidiIn"] = "0";
-        data["Surface"]["MidiOut"] = "0";
-        data["Surface"]["Surface"] = "0";
-        data["Surface"]["Disable-Plugins"] = "0";
-        data["Surface"]["Swap-Shift-Buttons"] = "0";
-        data["Functions"]["1"] = "0";
-        data["Functions"]["2"] = "0";
-        data["Functions"]["3"] = "0";
-        data["Functions"]["4"] = "0";
-        data["Functions"]["5"] = "0";
-        data["Functions"]["6"] = "0";
-        data["Functions"]["7"] = "0";
-        data["Functions"]["8"] = "0";
-        data["Filters"]["Nb-Filters"] = "0";
+        RecursiveCreateDirectory((std::string(GetResourcePath()) + pathSeparator + "ReaSonus" + pathSeparator + "Plugins").c_str(), 0);
+        data["surface"]["midiin"] = "0";
+        data["surface"]["midiout"] = "0";
+        data["surface"]["surface"] = "0";
+        data["surface"]["disable-plugins"] = "0";
+        data["surface"]["swap-shift-buttons"] = "0";
+        data["functions"]["1"] = "0";
+        data["functions"]["2"] = "0";
+        data["functions"]["3"] = "0";
+        data["functions"]["4"] = "0";
+        data["functions"]["5"] = "0";
+        data["functions"]["6"] = "0";
+        data["functions"]["7"] = "0";
+        data["functions"]["8"] = "0";
+        data["filters"]["nb-filters"] = "0";
         file.generate(data, true);
     };
     file.read(data);

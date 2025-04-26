@@ -1,8 +1,8 @@
 #include "csurf_daw.hpp"
 #include <vector>
 #include <string>
-#include <WDL/wdltypes.h> // might be unnecessary in future
-#include <reaper_plugin_functions.h>
+// #include <WDL/wdltypes.h> // might be unnecessary in future
+// #include <reaper_plugin_functions.h>
 #include "csurf_utils.hpp"
 
 int DAW::sendModes[3] = {0, 1, 3};
@@ -356,7 +356,7 @@ bool DAW::HasTrackSend(MediaTrack *media_track, int send)
 
 std::string DAW::GetTrackSendDestName(MediaTrack *media_track, int send)
 {
-    MediaTrack *destTrack = (MediaTrack *)GetSetTrackSendInfo(media_track, 0, send, "P_SRCTRACK", 0);
+    MediaTrack *destTrack = (MediaTrack *)GetSetTrackSendInfo(media_track, 0, send, "P_DESTTRACK", 0);
     if (destTrack)
     {
         return GetTrackName(destTrack);

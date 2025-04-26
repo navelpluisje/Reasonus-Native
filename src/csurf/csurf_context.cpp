@@ -3,8 +3,8 @@
 
 #include "csurf_context_resources.hpp"
 #include <cstdlib>
-#include <WDL/wdltypes.h> // might be unnecessary in future
-#include <reaper_plugin_functions.h>
+// #include <WDL/wdltypes.h> // might be unnecessary in future
+// #include <reaper_plugin_functions.h>
 #include "csurf_utils.hpp"
 
 class CSurf_Context
@@ -16,12 +16,12 @@ class CSurf_Context
     int nbChannels = 8;
 
     // Shift keys
-    bool shift_left;
-    bool shift_right;
-    bool arm;
+    bool shift_left = false;
+    bool shift_right = false;
+    bool arm = false;
 
     // Last touched fx
-    bool lastTouchedFxMode;
+    bool lastTouchedFxMode = false;
 
     // Pan encoder modes
     PanEncoderMode panEncoderMode = PanEncoderPanMode;
@@ -45,22 +45,34 @@ public:
     }
     ~CSurf_Context() {}
 
-    void SetPluginControl(bool enabled) { plugin_control = enabled; }
-    bool GetPluginControl() { return plugin_control; }
+    void SetPluginControl(bool enabled) 
+    { 
+        plugin_control = enabled; 
+    }
+
+    bool GetPluginControl() { 
+        return plugin_control; 
+    }
 
     void SetSwapShiftButtons(bool enabled)
     {
         swap_shift_buttons = enabled;
     }
 
-    bool GetSwapShiftButtons() { return swap_shift_buttons; }
+    bool GetSwapShiftButtons() 
+    { 
+        return swap_shift_buttons; 
+    }
 
     void SetMuteSoloMomentary(bool enabled)
     {
         mute_solo_momentary = enabled;
     }
 
-    bool GetMuteSoloMomentary() { return mute_solo_momentary; }
+    bool GetMuteSoloMomentary() 
+    { 
+        return mute_solo_momentary; 
+    }
 
     void SetShiftLeft(bool val)
     {
@@ -73,6 +85,7 @@ public:
             shift_left = val;
         }
     }
+
     bool GetShiftLeft()
     {
         return shift_left;
@@ -94,24 +107,60 @@ public:
         return shift_right;
     }
 
-    void SetArm(bool val) { arm = val; }
-    bool GetArm() { return arm; }
+    void SetArm(bool val) 
+    { 
+        arm = val; 
+    }
+    
+    bool GetArm() 
+    { 
+        return arm; 
+    }
 
-    void SetPanEncoderMode(PanEncoderMode val) { panEncoderMode = val; }
-    PanEncoderMode GetPanEncoderMode() { return panEncoderMode; }
+    void SetPanEncoderMode(PanEncoderMode val) 
+    { 
+        panEncoderMode = val; 
+    }
 
-    void ToggleLastTouchedFxMode() { lastTouchedFxMode = !lastTouchedFxMode; }
-    bool GetLastTouchedFxMode() { return lastTouchedFxMode; }
+    PanEncoderMode GetPanEncoderMode() 
+    {
+        return panEncoderMode; 
+    }
 
-    void SetNbChannels(int count) { nbChannels = count; }
+    void ToggleLastTouchedFxMode() 
+    { 
+        lastTouchedFxMode = !lastTouchedFxMode; 
+    }
+    
+    bool GetLastTouchedFxMode() 
+    { 
+        return lastTouchedFxMode; 
+    }
+
+    void SetNbChannels(int count) 
+    { 
+        nbChannels = count; 
+    }
+
     int GetNbChannels()
     {
         return lastTouchedFxMode ? nbChannels - 1 : nbChannels;
     }
 
-    void TogglePanPushMode() { panPushModePan = !panPushModePan; }
-    void ResetPanPushMode() { panPushModePan = true; }
-    bool GetPanPushMode() { return panPushModePan; }
+    void TogglePanPushMode() 
+    { 
+        panPushModePan = !panPushModePan; 
+    }
+
+    void ResetPanPushMode() 
+    { 
+        panPushModePan = true; 
+    }
+
+    bool GetPanPushMode() 
+    { 
+        return panPushModePan; 
+    }
 
     void UpdateChannelManagerItemIndex(int val)
     {
@@ -134,29 +183,76 @@ public:
             channelManagerItemIndex -= val;
         }
     }
-    void ResetChannelManagerItemIndex() { channelManagerItemIndex = 0; }
+    
+    void ResetChannelManagerItemIndex() 
+    { 
+        channelManagerItemIndex = 0; 
+    }
 
-    int GetChannelManagerItemIndex() { return channelManagerItemIndex; }
+    int GetChannelManagerItemIndex() 
+    { 
+        return channelManagerItemIndex; 
+    }
 
-    int GetChannelManagerItemIndex(int max) { return max < channelManagerItemIndex ? max : channelManagerItemIndex; }
+    int GetChannelManagerItemIndex(int max) 
+    { 
+        return max < channelManagerItemIndex ? max : channelManagerItemIndex; 
+    }
 
-    void SetChannelManagerItemsCount(int count) { channelManagerItemsCount = count; }
+    void SetChannelManagerItemsCount(int count) 
+    { 
+        channelManagerItemsCount = count; 
+    }
 
-    void ResetChannelManagerItemsCount() { channelManagerItemsCount = 0; }
+    void ResetChannelManagerItemsCount() 
+    { 
+        channelManagerItemsCount = 0; 
+    }
 
-    void SetChannelMode(ChannelMode _channelMode) { channelMode = _channelMode; }
-    ChannelMode GetChannelMode() { return channelMode; }
+    void SetChannelMode(ChannelMode _channelMode) 
+    { 
+        channelMode = _channelMode; 
+    }
+    
+    ChannelMode GetChannelMode() 
+    { 
+        return channelMode; 
+    }
 
-    void SetPluginEditTrack(MediaTrack *track) { pluginEditTrack = track; };
-    MediaTrack *GetPluginEditTrack() { return pluginEditTrack; };
+    void SetPluginEditTrack(MediaTrack *track) 
+    { 
+        pluginEditTrack = track; 
+    };
 
-    void SetPluginEditPluginId(int pluginId) { pluginEditPluginId = pluginId; };
-    int GetPluginEditPluginId() { return pluginEditPluginId; };
+    MediaTrack *GetPluginEditTrack() 
+    { 
+        return pluginEditTrack; 
+    };
 
-    void SetPluginEditParamId(int pluginId) { pluginEditParamId = pluginId; };
-    int GetPluginEditParamId() { return pluginEditParamId; };
+    void SetPluginEditPluginId(int pluginId) 
+    { 
+        pluginEditPluginId = pluginId; 
+    };
+    
+    int GetPluginEditPluginId() 
+    { 
+        return pluginEditPluginId; 
+    };
 
-    void SetChannelManagerType(ChannelManagerType type) { channelManagerType = type; }
+    void SetPluginEditParamId(int pluginId) 
+    { 
+        pluginEditParamId = pluginId; 
+    };
+    
+    int GetPluginEditParamId() 
+    { 
+        return pluginEditParamId; 
+    };
+
+    void SetChannelManagerType(ChannelManagerType type) 
+    { 
+        channelManagerType = type; 
+    }
 };
 
 #endif
