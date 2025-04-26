@@ -4,12 +4,11 @@
 #include <cstdio>
 #include <string>
 #include <WDL/wdltypes.h> // might be unnecessary in future
-// #include <WDL/win32_utf8.h>
+#include <WDL/win32_utf8.h>
 
-#if __APPLE__ || __linux
+#if __APPLE__ || __linux__
 #include <WDL/swell/swell-types.h>
 #endif
-
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
 #define SystemOpenURL(url) std::system("start " url);

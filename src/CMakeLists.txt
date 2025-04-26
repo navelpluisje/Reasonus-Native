@@ -1,8 +1,6 @@
-file(GLOB_RECURSE sources CONFIGURE_DEPENDS ./*.c* ./*.h*)
-
 target_sources(${PROJECT_NAME}
-
     PRIVATE
+    res.rc
         main.cpp
         ../third_party/WDL/WDL/win32_utf8.c
         )

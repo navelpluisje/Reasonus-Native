@@ -1,7 +1,7 @@
 #define REAPERAPI_IMPLEMENT
 
-#include <WDL/wdltypes.h> // might be unnecessary in future
-#include <reaper_plugin_functions.h>
+// #include <WDL/wdltypes.h> // might be unnecessary in future
+// #include <reaper_plugin_functions.h>
 
 #include "actions/toggle_play_cursor.hpp"
 #include "actions/show_reaper_resource_path.hpp"
@@ -14,6 +14,7 @@ extern reaper_csurf_reg_t csurf_faderport_reg;
 
 REAPER_PLUGIN_HINSTANCE g_hInst; // used for dialogs, if any
 HWND g_hwnd;
+
 reaper_plugin_info_t *g_reaper_plugin_info;
 
 extern "C"
@@ -28,41 +29,43 @@ extern "C"
       return 0;
     }
 
-    if (reaper_plugin_info != nullptr)
+    /**
+     * reaper_plugin_info is not available, so no need to run.
+     */
+    if (reaper_plugin_info == nullptr)
     {
-      g_hwnd = reaper_plugin_info->hwnd_main;
-      g_reaper_plugin_info = reaper_plugin_info;
-
-      // load Reaper API functions
-      // check that our plugin hasn't been already loaded
-      if (REAPERAPI_LoadAPI(reaper_plugin_info->GetFunc) > 0 || reaper_plugin_info->GetFunc("ReaScriptAPIFunctionExample"))
-      {
-        return 0;
-      }
-
-      TOGGLE_PLAY_CURSOR::Register();
-      SHOW_REAPER_RESOURCE_PATH::Register();
-      SHOW_REASONUS_FUNCTION_WINDOW::Register();
-      SHOW_REASONUS_FILTERS_WINDOW::Register();
-      CLOSE_ALL_FLOATING_FX_WINDOWS::Register();
-      reaper_plugin_info->Register("csurf", &csurf_faderport_reg);
-      return 1;
+      TOGGLE_PLAY_CURSOR::Unregister();
+      SHOW_REAPER_RESOURCE_PATH::Unregister();
+      SHOW_REASONUS_FUNCTION_WINDOW::Unregister();
+      SHOW_REASONUS_FILTERS_WINDOW::Unregister();
+      CLOSE_ALL_FLOATING_FX_WINDOWS::Unregister();
+      return 0;
     }
-    // quit
-    TOGGLE_PLAY_CURSOR::Unregister();
-    SHOW_REAPER_RESOURCE_PATH::Unregister();
-    SHOW_REASONUS_FUNCTION_WINDOW::Unregister();
-    SHOW_REASONUS_FILTERS_WINDOW::Unregister();
-    CLOSE_ALL_FLOATING_FX_WINDOWS::Unregister();
-    return 0;
+
+    g_hwnd = reaper_plugin_info->hwnd_main;
+    g_reaper_plugin_info = reaper_plugin_info;
+
+    // load Reaper API functions
+    // check that our plugin hasn't been already loaded
+    if (REAPERAPI_LoadAPI(reaper_plugin_info->GetFunc) > 0 || reaper_plugin_info->GetFunc("ReaScriptAPIFunctionExample"))
+    {
+      return 0;
+    }
+
+    TOGGLE_PLAY_CURSOR::Register();
+    SHOW_REAPER_RESOURCE_PATH::Register();
+    SHOW_REASONUS_FUNCTION_WINDOW::Register();
+    SHOW_REASONUS_FILTERS_WINDOW::Register();
+    CLOSE_ALL_FLOATING_FX_WINDOWS::Register();
+    reaper_plugin_info->Register("csurf", &csurf_faderport_reg);
+    return 1;
   }
 };
 
-#ifndef _WIN32 // import the resources. Note: if you do not have these files, run "php WDL/swell/mac_resgen.php res.rc" from this directory
+// import the resources. Note: if you do not have these files, run "php WDL/swell/mac_resgen.php res.rc" from this directory
+#if __APPLE__ || __linux__
 
 #include "WDL/swell/swell-dlggen.h"
 #include "res.rc_mac_dlg"
-#include "WDL/swell/swell-menugen.h"
-#include "res.rc_mac_menu"
 
 #endif

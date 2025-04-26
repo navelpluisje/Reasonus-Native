@@ -9,8 +9,6 @@
 #include <mini/ini.h>
 #include "csurf_faderport_ui_functions.hpp"
 
-using namespace CSURF_FADERPORT_UI_FUNCTIONS;
-
 enum SessionTypes
 {
     Channel,
@@ -72,7 +70,7 @@ protected:
             int result = MB("There is no action assigned to this function.\nDo you want to assign an action?", "No action assigned", 1);
             if (result == 1)
             {
-                ShowFunctionsDialog();
+                CSURF_FADERPORT_UI_FUNCTIONS::ShowFunctionsDialog();
             }
             return;
         }
@@ -410,8 +408,13 @@ public:
         }
     }
 
-    void HandleEncoderClick()
+    void HandleEncoderClick(int value)
     {
+        if (value == 0)
+        {
+            return;
+        }
+
         switch (session_type)
         {
         case Channel:

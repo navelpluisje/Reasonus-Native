@@ -1,8 +1,8 @@
 #include "csurf_navigator.hpp"
 #include "csurf_utils.hpp"
 #include "csurf_daw.hpp"
-#include <WDL/wdltypes.h> // might be unnecessary in future
-#include <reaper_plugin_functions.h>
+// #include <WDL/wdltypes.h> // might be unnecessary in future
+// #include <reaper_plugin_functions.h>
 #include <mini/ini.h>
 #include "csurf_navigator_filters.hpp"
 

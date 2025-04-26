@@ -33,6 +33,7 @@ void CSurf_Track::ClearTrack()
     this->SetSoloButtonValue(BTN_VALUE_OFF);
     this->SetSelectButtonValue(BTN_VALUE_OFF);
     this->SetValueBarValue(0);
+    this->SetValueBarMode(VALUEBAR_MODE_OFF);
     this->SetFaderValue(0);
     this->SetVuMeterValue(0);
 }

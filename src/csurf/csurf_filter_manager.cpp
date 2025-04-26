@@ -56,7 +56,7 @@ protected:
 
         for (int i = 0; i < nbFilters; i++)
         {
-            std::string filterId = ini["Filters"][std::to_string(i)];
+            std::string filterId = ini["filters"][std::to_string(i)];
             Filter filter{ini[filterId]["name"], filterId};
             filters.push_back(filter);
         }

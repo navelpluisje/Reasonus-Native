@@ -2,8 +2,8 @@
 #include "csurf_filter_manager.cpp"
 #include "csurf_plugin_learn_manager.cpp"
 #include "csurf_plugin_control_manager.cpp"
-#include <WDL/wdltypes.h> // might be unnecessary in future
-#include <reaper_plugin_functions.h>
+// #include <WDL/wdltypes.h> // might be unnecessary in future
+// #include <reaper_plugin_functions.h>
 
 void CSurf_FaderManager::SetButtonValues(ChannelMode channelMode)
 {
