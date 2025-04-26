@@ -34,6 +34,7 @@ protected:
     bool hasGlobalBypass;
     bool followCursor;
     bool lastTouchedFxMode;
+
     bool functionsDialogOpen;
 
     void SetButtonValue()
@@ -43,11 +44,15 @@ protected:
         {
             bypassButton->SetValue(hasGlobalBypass ? BTN_VALUE_ON
                                                    : BTN_VALUE_OFF);
+            macroButton->SetColor(ButtonColorYellow);
+            macroButton->SetValue(CSURF_FADERPORT_UI_FUNCTIONS::IsFunctionsDialogOpen() ? BTN_VALUE_ON : BTN_VALUE_OFF);
         }
         else
         {
             bypassButton->SetValue(hasSelectedBypass ? BTN_VALUE_ON
                                                      : BTN_VALUE_OFF);
+            macroButton->SetColor(ButtonColorWhite);
+            macroButton->SetValue(CSURF_FADERPORT_UI_FILTERS::IsFiltersDialogOpen() ? BTN_VALUE_ON : BTN_VALUE_OFF);
         }
 
         soloClearButton->SetValue(hasSolo ? BTN_VALUE_ON : BTN_VALUE_OFF);
@@ -218,15 +223,11 @@ public:
 
         if (context->GetShiftLeft())
         {
-            CSURF_FADERPORT_UI_FUNCTIONS::IsFunctionsDialogOpen() 
-                ? CSURF_FADERPORT_UI_FUNCTIONS::HideFunctionsDialog() 
-                : CSURF_FADERPORT_UI_FUNCTIONS::ShowFunctionsDialog();
+            Main_OnCommandStringEx("_REASONUS_SHOW_REASONUS_FUNCTION_WINDOW", 0, 0);
         }
         else
         {
-            CSURF_FADERPORT_UI_FILTERS::IsFiltersDialogOpen() 
-                ? CSURF_FADERPORT_UI_FILTERS::HideFiltersDialog() 
-                : CSURF_FADERPORT_UI_FILTERS::ShowFiltersDialog();
+            Main_OnCommandStringEx("_REASONUS_SHOW_REASONUS_FILTERS_WINDOW", 0, 0);
         }
     };
 

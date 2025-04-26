@@ -21,7 +21,27 @@ namespace SHOW_REASONUS_FILTERS_WINDOW
     // gets called via callback or timer
     void MainFunctionOfMyPlugin()
     {
-        CSURF_FADERPORT_UI_FILTERS::ShowFiltersDialog();
+        if (toggle_action_state) {
+            CSURF_FADERPORT_UI_FILTERS::ShowFiltersDialog();
+        } else {
+            CSURF_FADERPORT_UI_FILTERS::HideFiltersDialog();
+        }
+    }
+
+    // c++11 trailing return type syntax
+    // REAPER calls this to check this action it's toggle state
+    auto ToggleActionCallback(int command) -> int
+    {
+        if (command != command_id)
+        {
+            // not quite our command_id
+            return -1;
+        }
+        if (toggle_action_state) // if toggle_action_state == true
+        {
+            return 1;
+        }
+        return 0;
     }
 
     // this gets called when my plugin action is run (e.g. from action list)
@@ -40,6 +60,8 @@ namespace SHOW_REASONUS_FILTERS_WINDOW
             return false;
         }
 
+        // flip state on/off
+        toggle_action_state = !toggle_action_state;
         MainFunctionOfMyPlugin();
 
         return true;
@@ -59,12 +81,14 @@ namespace SHOW_REASONUS_FILTERS_WINDOW
     void Register()
     {
         command_id = plugin_register("custom_action", &action);
+        plugin_register("toggleaction", (void *)ToggleActionCallback);
         plugin_register("hookcommand2", (void *)OnAction);
     }
 
     auto Unregister() -> void
     {
         plugin_register("-custom_action", &action);
+        plugin_register("-toggleaction", (void *)ToggleActionCallback);
         plugin_register("-hookcommand2", (void *)OnAction);
     }
 
