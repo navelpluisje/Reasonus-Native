@@ -139,7 +139,7 @@ namespace CSURF_FADERPORT_UI_INIT
             {
                 static mINI::INIFile file(GetReaSonusIniPath());
 
-                int indev = -1, outdev = -1, surface = -1;
+                LRESULT indev = -1, outdev = -1, surface = -1;
 
                 int r = SendDlgItemMessage(hwndDlg, IDC_COMBO_MIDI_IN, CB_GETCURSEL, 0, 0);
                 if (r != CB_ERR)
