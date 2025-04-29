@@ -1,5 +1,5 @@
 #include "show_reasonus_function_window.hpp"
-#include "../csurf/csurf_faderport_ui_functions.hpp"
+#include "../csurf_faderport/csurf_fp_8_ui_functions.hpp"
 
 #define STRINGIZE_DEF(x) #x
 #define STRINGIZE(x) STRINGIZE_DEF(x)
@@ -21,10 +21,13 @@ namespace SHOW_REASONUS_FUNCTION_WINDOW
     // gets called via callback or timer
     void MainFunctionOfMyPlugin()
     {
-        if (toggle_action_state) {
-            CSURF_FADERPORT_UI_FUNCTIONS::ShowFunctionsDialog();
-        } else {
-            CSURF_FADERPORT_UI_FUNCTIONS::HideFunctionsDialog();
+        if (toggle_action_state)
+        {
+            CSURF_FP_UI_FUNCTIONS::ShowFunctionsDialog();
+        }
+        else
+        {
+            CSURF_FP_UI_FUNCTIONS::HideFunctionsDialog();
         }
     }
 
@@ -44,7 +47,6 @@ namespace SHOW_REASONUS_FUNCTION_WINDOW
         return 0;
     }
 
-
     // this gets called when my plugin action is run (e.g. from action list)
     bool OnAction(KbdSectionInfo *sec, int command, int val, int valhw, int relmode, HWND hwnd)
     {
@@ -55,13 +57,12 @@ namespace SHOW_REASONUS_FUNCTION_WINDOW
         (void)relmode;
         (void)hwnd;
 
-        
         // check command
         if (command != command_id)
         {
             return false;
         }
-        
+
         // flip state on/off
         toggle_action_state = !toggle_action_state;
         MainFunctionOfMyPlugin();

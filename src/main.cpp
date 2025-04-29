@@ -1,8 +1,5 @@
 #define REAPERAPI_IMPLEMENT
 
-// #include <WDL/wdltypes.h> // might be unnecessary in future
-// #include <reaper_plugin_functions.h>
-
 #include "actions/toggle_play_cursor.hpp"
 #include "actions/show_reaper_resource_path.hpp"
 #include "actions/show_reasonus_function_window.hpp"
@@ -11,6 +8,7 @@
 #include "resource.h"
 
 extern reaper_csurf_reg_t csurf_faderport_reg;
+extern reaper_csurf_reg_t csurf_faderport_v2_reg;
 
 REAPER_PLUGIN_HINSTANCE g_hInst; // used for dialogs, if any
 HWND g_hwnd;
@@ -58,6 +56,7 @@ extern "C"
     SHOW_REASONUS_FILTERS_WINDOW::Register();
     CLOSE_ALL_FLOATING_FX_WINDOWS::Register();
     reaper_plugin_info->Register("csurf", &csurf_faderport_reg);
+    reaper_plugin_info->Register("csurf", &csurf_faderport_v2_reg);
     return 1;
   }
 };

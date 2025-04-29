@@ -1,0 +1,11 @@
+target_sources(${PROJECT_NAME}
+    PRIVATE
+        csurf_faderport_v2.cpp
+        csurf_fp_v2_automation_manager.cpp
+        csurf_fp_v2_general_control_manager.cpp
+        csurf_fp_v2_navigator.cpp
+        csurf_fp_v2_session_manager.cpp
+        csurf_fp_v2_track_manager.cpp
+        csurf_fp_v2_track.cpp
+        csurf_fp_v2_ui_functions.cpp
+        )

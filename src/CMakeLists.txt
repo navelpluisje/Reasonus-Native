@@ -6,5 +6,8 @@ target_sources(${PROJECT_NAME}
         )
 
 add_subdirectory(actions)
-add_subdirectory(csurf)
+add_subdirectory(csurf_faderport)
+add_subdirectory(csurf_faderport_v2)
+add_subdirectory(controls)
+add_subdirectory(shared)
 

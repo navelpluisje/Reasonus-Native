@@ -1,5 +1,5 @@
 #include "show_reasonus_filters_window.hpp"
-#include "../csurf/csurf_faderport_ui_filters.hpp"
+#include "../csurf_faderport/csurf_fp_8_ui_filters.hpp"
 
 #define STRINGIZE_DEF(x) #x
 #define STRINGIZE(x) STRINGIZE_DEF(x)
@@ -21,10 +21,13 @@ namespace SHOW_REASONUS_FILTERS_WINDOW
     // gets called via callback or timer
     void MainFunctionOfMyPlugin()
     {
-        if (toggle_action_state) {
-            CSURF_FADERPORT_UI_FILTERS::ShowFiltersDialog();
-        } else {
-            CSURF_FADERPORT_UI_FILTERS::HideFiltersDialog();
+        if (toggle_action_state)
+        {
+            CSURF_FP_8_UI_FILTERS::ShowFiltersDialog();
+        }
+        else
+        {
+            CSURF_FP_8_UI_FILTERS::HideFiltersDialog();
         }
     }
 
