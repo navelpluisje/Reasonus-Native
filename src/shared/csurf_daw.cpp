@@ -155,6 +155,23 @@ std::string DAW::GetTrackRecordingMode(MediaTrack *media_track)
     }
 }
 
+bool DAW::GetTrackFxBypassed(MediaTrack *media_track)
+{
+    return !(bool)GetMediaTrackInfo_Value(media_track, "I_FXEN");
+}
+
+void DAW::ToggleTrackFxBypass(MediaTrack *media_track)
+{
+    if (DAW::GetTrackFxBypassed(media_track))
+    {
+        SetMediaTrackInfo_Value(media_track, "I_FXEN", 1.0);
+    }
+    else
+    {
+        SetMediaTrackInfo_Value(media_track, "I_FXEN", 0.0);
+    }
+}
+
 double DAW::GetTrackPeakInfo(MediaTrack *media_track)
 {
     if (media_track)

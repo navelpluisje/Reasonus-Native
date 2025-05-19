@@ -1,13 +1,14 @@
 #include "csurf_fp_v2_track.hpp"
 
-CSurf_FP_V2_Track::CSurf_FP_V2_Track(int index, CSurf_Context *context, midi_Output *m_midiout) : context(context)
+CSurf_FP_V2_Track::CSurf_FP_V2_Track(CSurf_Context *context, midi_Output *m_midiout) : context(context)
 {
-    soloButton = new CSurf_Button(BTN_SELECT_1, BTN_VALUE_OFF, m_midiout);
+    soloButton = new CSurf_Button(BTN_SOLO_1, BTN_VALUE_OFF, m_midiout);
     muteButton = new CSurf_Button(BTN_MUTE_1, BTN_VALUE_OFF, m_midiout);
     armButton = new CSurf_Button(BTN_ARM, BTN_VALUE_OFF, m_midiout);
     bypassButton = new CSurf_Button(BTN_BYPASS, BTN_VALUE_OFF, m_midiout);
-    fader = new CSurf_Fader(index, 0, m_midiout);
+    fader = new CSurf_Fader(0, 0, m_midiout);
 }
+
 CSurf_FP_V2_Track::~CSurf_FP_V2_Track()
 {
     delete fader;

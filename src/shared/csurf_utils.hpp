@@ -8,6 +8,9 @@
 
 const int TOGGLE_SPEED = 150;
 
+const std::string FP_V2 = "FP_V2";
+const std::string FP_8 = "FP";
+
 const int AUTOMATION_OFF = -1;
 const int AUTOMATION_TRIM = 0;
 const int AUTOMATION_READ = 1;
@@ -145,7 +148,7 @@ std::string GetSendModeString(int sendMode);
  */
 std::string GetAutomationString(int automationMode);
 
-std::string GetReaSonusIniPath();
+std::string GetReaSonusIniPath(std::string device);
 
 std::string GetReaSonusPluginPath(std::string developer, std::string pluginName, bool create = false);
 
@@ -166,7 +169,7 @@ void logDouble(const char *key, double value);
  *
  * @param data The data object to write the ini data to
  */
-void readAndCreateIni(mINI::INIStructure &data);
+void readAndCreateIni(mINI::INIStructure &data, std::string device);
 
 /**
  * @brief Create a unique key

@@ -19,10 +19,6 @@ protected:
     midi_Output *m_midiout;
 
     ShiftState shiftState;
-    bool hasSolo;
-    bool hasMute;
-    bool hasSelectedBypass;
-    bool hasGlobalBypass;
     bool followCursor;
     bool lastTouchedFxMode;
 
@@ -66,23 +62,23 @@ public:
             return;
         }
 
-        if (context->GetShiftLeft())
-        {
-            Main_OnCommandStringEx("_REASONUS_TOGGLE_PLAY_CURSOR_COMMAND");
-        }
-        else
-        {
-            if (context->GetPluginControl() &&
-                (context->GetChannelMode() == PluginControlMode ||
-                 context->GetChannelMode() == PluginEditMode))
-            {
-                context->ToggleLastTouchedFxMode();
-            }
-            else
-            {
-                context->ToggleLastTouchedFxMode();
-            }
-        }
+        // if (context->GetShiftLeft())
+        // {
+        //     Main_OnCommandStringEx("_REASONUS_TOGGLE_PLAY_CURSOR_COMMAND");
+        // }
+        // else
+        // {
+        //     if (context->GetPluginControl() &&
+        //         (context->GetChannelMode() == PluginControlMode ||
+        //          context->GetChannelMode() == PluginEditMode))
+        //     {
+        //         context->ToggleLastTouchedFxMode();
+        //     }
+        //     else
+        //     {
+        //         context->ToggleLastTouchedFxMode();
+        //     }
+        // }
     };
 
     void HandleShiftButton(int value)

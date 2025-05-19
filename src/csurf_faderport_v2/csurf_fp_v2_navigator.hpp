@@ -23,9 +23,7 @@ class CSurf_FP_V2_Navigator
 public:
     CSurf_FP_V2_Navigator(CSurf_Context *context);
 
-    MediaTrack *GetTrack();
-
-    WDL_PtrList<MediaTrack> GetBankTracks();
+    MediaTrack *GetControllerTrack();
 
     void SetOffset(int offset);
 

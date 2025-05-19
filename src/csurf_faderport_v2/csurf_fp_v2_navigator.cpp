@@ -14,7 +14,7 @@ void CSurf_FP_V2_Navigator::GetAllVisibleTracks(WDL_PtrList<MediaTrack> &tracks,
 
     for (int i = 0; i < CountTracks(0); i++)
     {
-        MediaTrack *media_track = GetTrack();
+        MediaTrack *media_track = GetTrack(0, i);
         bool visible = (bool)GetMediaTrackInfo_Value(media_track, "B_SHOWINMIXER");
         int solo = GetMediaTrackInfo_Value(media_track, "I_SOLO");
         bool mute = (bool)GetMediaTrackInfo_Value(media_track, "B_MUTE");
@@ -47,40 +47,25 @@ void CSurf_FP_V2_Navigator::GetAllVisibleTracks(WDL_PtrList<MediaTrack> &tracks,
 
 void CSurf_FP_V2_Navigator::UpdateMixerPosition()
 {
-    MediaTrack *media_track = GetTrack();
-    SetMixerScroll(media_track);
+    MediaTrack *media_track = GetControllerTrack();
+    if (media_track)
+    {
+        SetMixerScroll(media_track);
+    }
 };
 
 CSurf_FP_V2_Navigator::CSurf_FP_V2_Navigator(CSurf_Context *context) : context(context) {};
 
-MediaTrack *CSurf_FP_V2_Navigator::GetTrack()
+MediaTrack *CSurf_FP_V2_Navigator::GetControllerTrack()
 {
-    WDL_PtrList<MediaTrack> bank = GetBankTracks();
-    return bank.Get(0);
-}
-
-WDL_PtrList<MediaTrack> CSurf_FP_V2_Navigator::GetBankTracks()
-{
-    WDL_PtrList<MediaTrack> bank;
     GetAllVisibleTracks(tracks, hasSolo, hasMute);
-    int channelCount = context->GetNbChannels() > tracks.GetSize() ? context->GetNbChannels() : tracks.GetSize();
-    for (int i = track_offset; i < track_offset + channelCount; i++)
-    {
-        if (i > track_offset + channelCount)
-        {
-            bank.Add(NULL);
-        }
-        else
-        {
-            bank.Add(tracks.Get(i));
-        }
-    }
-    return bank;
+    return tracks.Get(track_offset);
 }
 
 void CSurf_FP_V2_Navigator::SetOffset(int offset)
 {
-    if (tracks.GetSize() < context->GetNbChannels())
+    logInteger("SetOffset", offset);
+    if (tracks.GetSize() == 0 || offset < 0)
     {
         track_offset = 0;
     }

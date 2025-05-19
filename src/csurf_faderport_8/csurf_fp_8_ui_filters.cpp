@@ -97,7 +97,7 @@ namespace CSURF_FP_8_UI_FILTERS
 
     void UpdateIniFiltersList()
     {
-        mINI::INIFile file(GetReaSonusIniPath());
+        mINI::INIFile file(GetReaSonusIniPath(FP_8));
 
         ini["filters"].clear();
         ini["filters"]["nb-filters"] = std::to_string(filtersDlgFilterKeys.size());
@@ -125,7 +125,7 @@ namespace CSURF_FP_8_UI_FILTERS
 
     void SaveCheckBoxValue(HWND hwndDlg, std::string key, int checkBox)
     {
-        mINI::INIFile file(GetReaSonusIniPath());
+        mINI::INIFile file(GetReaSonusIniPath(FP_8));
         std::string filter = filtersDlgFilterKeys[filtersDlgSelectedFilter];
 
         ini[filter][key] = std::to_string(IsDlgButtonChecked(hwndDlg, checkBox));
@@ -169,7 +169,7 @@ namespace CSURF_FP_8_UI_FILTERS
 
             case IDC_BUTTON_ADD_TEXT:
             {
-                mINI::INIFile file(GetReaSonusIniPath());
+                mINI::INIFile file(GetReaSonusIniPath(FP_8));
                 char buffer[255];
 
                 GetDlgItemText(hwndDlg, IDC_EDIT_FilterText, buffer, std::size(buffer));
@@ -185,7 +185,7 @@ namespace CSURF_FP_8_UI_FILTERS
 
             case IDC_BUTTON_REMOVE_TEXT:
             {
-                mINI::INIFile file(GetReaSonusIniPath());
+                mINI::INIFile file(GetReaSonusIniPath(FP_8));
 
                 filtersDlgFilterText.erase(filtersDlgFilterText.begin() + filtersDlgSelectedFilterText);
                 std::string filter = filtersDlgFilterKeys[filtersDlgSelectedFilter];
@@ -198,7 +198,7 @@ namespace CSURF_FP_8_UI_FILTERS
 
             case IDC_BUTTON_ADD_FILTER:
             {
-                mINI::INIFile file(GetReaSonusIniPath());
+                mINI::INIFile file(GetReaSonusIniPath(FP_8));
 
                 std::string newKey = GenerateUniqueKey("filter_");
                 ini["filters"][ini["filters"]["nb-filters"]] = newKey;
@@ -243,7 +243,7 @@ namespace CSURF_FP_8_UI_FILTERS
                     break;
                 }
 
-                mINI::INIFile file(GetReaSonusIniPath());
+                mINI::INIFile file(GetReaSonusIniPath(FP_8));
                 std::string filter = filtersDlgFilterKeys[filtersDlgSelectedFilter];
 
                 if (filter.empty())
@@ -313,7 +313,7 @@ namespace CSURF_FP_8_UI_FILTERS
 
     void ShowFiltersDialog()
     {
-        mINI::INIFile file(GetReaSonusIniPath());
+        mINI::INIFile file(GetReaSonusIniPath(FP_8));
         file.read(ini);
 
         filtersDlgFilterKeys = GetFiltersKeys();

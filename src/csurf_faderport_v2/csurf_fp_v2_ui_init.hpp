@@ -17,7 +17,7 @@ namespace CSURF_FP_V2_UI_INIT
 
     static void SaveCheckBoxValue(HWND hwndDlg, std::string key, int checkBox)
     {
-        mINI::INIFile file(GetReaSonusIniPath());
+        mINI::INIFile file(GetReaSonusIniPath(FP_V2));
 
         ini["surface"][key] = std::to_string(IsDlgButtonChecked(hwndDlg, checkBox));
         file.write(ini, true);
@@ -30,17 +30,15 @@ namespace CSURF_FP_V2_UI_INIT
         {
         case WM_INITDIALOG:
         {
-            mINI::INIFile file(GetReaSonusIniPath());
-            readAndCreateIni(ini);
+            mINI::INIFile file(GetReaSonusIniPath(FP_V2));
+            readAndCreateIni(ini, FP_V2);
 
             int combo;
             char buf[255];
             char *noDeviceString = "No device selected";
-            char *noSurfaceString = "No surface selected";
 
             WDL_UTF8_HookComboBox(GetDlgItem(hwndDlg, IDC_COMBO_MIDI_IN));
             WDL_UTF8_HookComboBox(GetDlgItem(hwndDlg, IDC_COMBO_MIDI_OUT));
-            WDL_UTF8_HookComboBox(GetDlgItem(hwndDlg, IDC_COMBO_SURFACE));
 
             for (int i = 0; i <= GetNumMIDIInputs(); ++i)
             {
@@ -82,23 +80,6 @@ namespace CSURF_FP_V2_UI_INIT
                 }
             }
 
-            combo = AddComboEntry(hwndDlg, 0, noSurfaceString, IDC_COMBO_SURFACE);
-            if (ini["surface"]["surface"] == "0")
-            {
-                SendDlgItemMessage(hwndDlg, IDC_COMBO_SURFACE, CB_SETCURSEL, combo, 0);
-            }
-            combo = AddComboEntry(hwndDlg, 8, const_cast<char *>("Faderport 8"), IDC_COMBO_SURFACE);
-            if (ini["surface"]["surface"] == "8")
-            {
-                SendDlgItemMessage(hwndDlg, IDC_COMBO_SURFACE, CB_SETCURSEL, combo, 0);
-            }
-            combo = AddComboEntry(hwndDlg, 16, const_cast<char *>("Faderport 16"), IDC_COMBO_SURFACE);
-            if (ini["surface"]["surface"] == "16")
-            {
-                SendDlgItemMessage(hwndDlg, IDC_COMBO_SURFACE, CB_SETCURSEL, combo, 0);
-            }
-            SendMessage(GetDlgItem(hwndDlg, IDC_CHECK_INIT_DIS_PLUGIN), BM_SETCHECK, ini["surface"]["disable-plugins"] == "1" ? BST_CHECKED : BST_UNCHECKED, 0);
-            SendMessage(GetDlgItem(hwndDlg, IDC_CHECK_INIT_SWAP_SHIFT), BM_SETCHECK, ini["surface"]["swap-shift-buttons"] == "1" ? BST_CHECKED : BST_UNCHECKED, 0);
             SendMessage(GetDlgItem(hwndDlg, IDC_CHECK_INIT_MUTE_MOMENTARY), BM_SETCHECK, ini["surface"]["mute-solo-momentary"] == "1" ? BST_CHECKED : BST_UNCHECKED, 0);
 
             break;
@@ -109,21 +90,10 @@ namespace CSURF_FP_V2_UI_INIT
             {
             case IDC_BUTTON_DOCUMENTTION:
             {
-                SystemOpenURL("https://navelpluisje.nl");
+                SystemOpenURL("https://navelpluisje.github.io/reasonus/documentation/faderport2/");
                 break;
             }
 
-            case IDC_CHECK_INIT_DIS_PLUGIN:
-            {
-                SaveCheckBoxValue(hwndDlg, "disable-plugins", IDC_CHECK_INIT_DIS_PLUGIN);
-                break;
-            }
-
-            case IDC_CHECK_INIT_SWAP_SHIFT:
-            {
-                SaveCheckBoxValue(hwndDlg, "swap-shift-buttons", IDC_CHECK_INIT_SWAP_SHIFT);
-                break;
-            }
             case IDC_CHECK_INIT_MUTE_MOMENTARY:
             {
                 SaveCheckBoxValue(hwndDlg, "mute-solo-momentary", IDC_CHECK_INIT_MUTE_MOMENTARY);
@@ -137,9 +107,9 @@ namespace CSURF_FP_V2_UI_INIT
 
             if (wParam > 1 && lParam)
             {
-                static mINI::INIFile file(GetReaSonusIniPath());
+                static mINI::INIFile file(GetReaSonusIniPath(FP_V2));
 
-                LRESULT indev = -1, outdev = -1, surface = -1;
+                LRESULT indev = -1, outdev = -1;
 
                 int r = SendDlgItemMessage(hwndDlg, IDC_COMBO_MIDI_IN, CB_GETCURSEL, 0, 0);
                 if (r != CB_ERR)
@@ -149,13 +119,8 @@ namespace CSURF_FP_V2_UI_INIT
                 if (r != CB_ERR)
                     outdev = SendDlgItemMessage(hwndDlg, IDC_COMBO_MIDI_OUT, CB_GETITEMDATA, r, 0);
 
-                r = SendDlgItemMessage(hwndDlg, IDC_COMBO_SURFACE, CB_GETCURSEL, 0, 0);
-                if (r != CB_ERR)
-                    surface = SendDlgItemMessage(hwndDlg, IDC_COMBO_SURFACE, CB_GETITEMDATA, r, 0);
-
                 ini["surface"]["midiin"] = std::to_string(indev);
                 ini["surface"]["midiout"] = std::to_string(outdev);
-                ini["surface"]["surface"] = std::to_string(surface);
                 file.write(ini, true);
             }
             break;
@@ -167,7 +132,7 @@ namespace CSURF_FP_V2_UI_INIT
     static HWND CreateInitDialog(const char *type_string, HWND parent, const char *initConfigString)
     {
         (void)type_string;
-        return CreateDialogParam(g_hInst, MAKEINTRESOURCE(IDD_DIALOG_REASONUS_NATIVE_V2), parent, dlgProc, (LPARAM)initConfigString);
+        return CreateDialogParam(g_hInst, MAKEINTRESOURCE(IDD_DIALOG_REASONUS_NATIVE_V2), parent, CSURF_FP_V2_UI_INIT::dlgProc, (LPARAM)initConfigString);
     }
 }
 #endif

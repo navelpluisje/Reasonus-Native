@@ -61,6 +61,7 @@ public:
 
     void Update()
     {
+        // Should be navigator->GetControllerTrack
         MediaTrack *media_track = GetSelectedTrack(0, 0);
         channelAutomationMode = GetTrackAutomationMode(media_track);
 

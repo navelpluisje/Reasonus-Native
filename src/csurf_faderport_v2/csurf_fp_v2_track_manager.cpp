@@ -3,7 +3,6 @@
 #include "../shared/csurf_context.cpp"
 #include "../shared/csurf_daw.hpp"
 #include "../shared/csurf_utils.hpp"
-#include "csurf_fp_v2_track.hpp"
 #include "csurf_fp_v2_track_manager.hpp"
 #include "csurf_fp_v2_navigator.hpp"
 
@@ -30,26 +29,20 @@ CSurf_FP_V2_TrackManager::CSurf_FP_V2_TrackManager(
     CSurf_FP_V2_Navigator *navigator,
     midi_Output *m_midiout) : navigator(navigator), context(context), m_midiout(m_midiout)
 {
-    soloButton = new CSurf_Button(BTN_SOLO_1, BTN_VALUE_OFF, m_midiout);
-    muteButton = new CSurf_Button(BTN_MUTE_1, BTN_VALUE_OFF, m_midiout);
-    fader = new CSurf_Fader(1, 0, m_midiout);
-
-    UpdateTracks();
+    track = new CSurf_FP_V2_Track(context, m_midiout);
 }
 
-void CSurf_FP_V2_TrackManager::UpdateTracks()
+void CSurf_FP_V2_TrackManager::UpdateTrack()
 {
-    WDL_PtrList<MediaTrack> media_tracks = navigator->GetBankTracks();
+    MediaTrack *media_track = navigator->GetControllerTrack();
 
-    if (hasLastTouchedFxEnabled != context->GetLastTouchedFxMode() && !context->GetLastTouchedFxMode())
-    {
-        forceUpdate = true;
-    }
+    // if (hasLastTouchedFxEnabled != context->GetLastTouchedFxMode() && !context->GetLastTouchedFxMode())
+    // {
+    //     forceUpdate = true;
+    // }
 
     int faderValue = 0;
     std::string strPan1, strPan2;
-
-    MediaTrack *media_track = navigator->GetTrack();
 
     if (!media_track || CountTracks(0) < 1)
     {
@@ -58,20 +51,24 @@ void CSurf_FP_V2_TrackManager::UpdateTracks()
         return;
     }
 
+    bool isArmed = DAW::IsTrackArmed(media_track);
+
     GetFaderValue(media_track, &faderValue);
 
     if (context->GetShiftLeft())
     {
-        SetMuteButtonValue(navigator->HasTracksWithMute() ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
-        SetSoloButtonValue(navigator->HasTracksWithSolo() ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
+        track->SetMuteButtonValue(navigator->HasTracksWithMute() ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
+        track->SetSoloButtonValue(navigator->HasTracksWithSolo() ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
     }
     else
     {
-        SetMuteButtonValue(DAW::IsTrackMuted(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
-        SetSoloButtonValue(DAW::IsTrackSoloed(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
+        track->SetMuteButtonValue(DAW::IsTrackMuted(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
+        track->SetSoloButtonValue(DAW::IsTrackSoloed(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
     }
 
-    SetFaderValue(faderValue, forceUpdate);
+    track->SetArmButtonValue(isArmed ? BTN_VALUE_ON : BTN_VALUE_OFF);
+    track->SetBypassButtonValue(DAW::GetTrackFxBypassed(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF);
+    track->SetFaderValue(faderValue, forceUpdate);
 
     hasLastTouchedFxEnabled = context->GetLastTouchedFxMode();
     forceUpdate = false;
@@ -97,7 +94,7 @@ void CSurf_FP_V2_TrackManager::HandleMuteClick(int index, int value)
     }
 
     int now = GetTickCount();
-    MediaTrack *media_track = navigator->GetTrack();
+    MediaTrack *media_track = navigator->GetControllerTrack();
 
     if (value == 0 && context->GetMuteSoloMomentary())
     {
@@ -116,6 +113,7 @@ void CSurf_FP_V2_TrackManager::HandleMuteClick(int index, int value)
 
 void CSurf_FP_V2_TrackManager::HandleSoloClick(int index, int value)
 {
+    (void)index;
     if (context->GetShiftLeft())
     {
         if (value == 0)
@@ -127,7 +125,7 @@ void CSurf_FP_V2_TrackManager::HandleSoloClick(int index, int value)
     }
 
     int now = GetTickCount();
-    MediaTrack *media_track = navigator->GetTrack();
+    MediaTrack *media_track = navigator->GetControllerTrack();
 
     if (value == 0 && context->GetMuteSoloMomentary())
     {
@@ -144,9 +142,47 @@ void CSurf_FP_V2_TrackManager::HandleSoloClick(int index, int value)
     }
 }
 
+void CSurf_FP_V2_TrackManager::HandleArmClick(int index, int value)
+{
+    (void)index;
+    if (value == 0)
+    {
+        return;
+    }
+
+    MediaTrack *media_track = navigator->GetControllerTrack();
+
+    if (context->GetShiftLeft())
+    {
+        Main_OnCommandEx(40490, 0, 0); // Track: Arm all tracks for recording
+        return;
+    }
+
+    CSurf_SetSurfaceRecArm(media_track, CSurf_OnRecArmChange(media_track, !DAW::IsTrackArmed(media_track)), NULL);
+}
+
+void CSurf_FP_V2_TrackManager::HandleBypassClick(int index, int value)
+{
+    (void)index;
+    if (value == 0)
+    {
+        return;
+    }
+
+    MediaTrack *media_track = navigator->GetControllerTrack();
+
+    if (value == 0)
+    {
+        return;
+    }
+
+    context->GetShiftLeft() ? Main_OnCommandEx(40344, 0, 0)          // Track: Toggle FX bypass on all tracks
+                            : DAW::ToggleTrackFxBypass(media_track); // Track: Toggle FX bypass for selected tracks
+}
+
 void CSurf_FP_V2_TrackManager::HandleFaderMove(int msb, int lsb)
 {
-    MediaTrack *media_track = navigator->GetTrack();
+    MediaTrack *media_track = navigator->GetControllerTrack();
 
     if (context->GetShiftLeft())
     {
@@ -156,19 +192,4 @@ void CSurf_FP_V2_TrackManager::HandleFaderMove(int msb, int lsb)
     {
         CSurf_SetSurfaceVolume(media_track, CSurf_OnVolumeChange(media_track, int14ToVol(msb, lsb), false), NULL);
     }
-}
-
-void CSurf_FP_V2_TrackManager::SetSoloButtonValue(Btn_Value value, bool force)
-{
-    soloButton->SetValue(value, force);
-}
-
-void CSurf_FP_V2_TrackManager::SetMuteButtonValue(Btn_Value value, bool force)
-{
-    muteButton->SetValue(value, force);
-}
-
-void CSurf_FP_V2_TrackManager::SetFaderValue(int value, bool force)
-{
-    fader->SetValue(value, force);
 }

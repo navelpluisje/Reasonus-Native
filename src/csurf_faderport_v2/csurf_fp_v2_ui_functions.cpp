@@ -36,7 +36,7 @@ namespace CSURF_FP_V2_UI_FUNCTIONS
         g_querying_action = false;
         if (actionId > 0)
         {
-            static mINI::INIFile file(GetReaSonusIniPath());
+            static mINI::INIFile file(GetReaSonusIniPath(FP_V2));
             ini["Functions"][functionsDlgSelectedFunction] = std::to_string(actionId);
             file.write(ini);
             PopulateActionFields(s_hwndDlg);
@@ -156,7 +156,7 @@ namespace CSURF_FP_V2_UI_FUNCTIONS
 
     void ShowFunctionsDialog()
     {
-        mINI::INIFile file(GetReaSonusIniPath());
+        mINI::INIFile file(GetReaSonusIniPath(FP_V2));
         file.read(ini);
 
         if (s_hwndReaSonusFunctionsDlg == NULL)

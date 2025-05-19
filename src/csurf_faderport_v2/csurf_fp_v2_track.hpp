@@ -21,7 +21,7 @@ protected:
     CSurf_Fader *fader;
 
 public:
-    CSurf_FP_V2_Track(int index, CSurf_Context *_context, midi_Output *m_midiout);
+    CSurf_FP_V2_Track(CSurf_Context *_context, midi_Output *m_midiout);
     ~CSurf_FP_V2_Track();
 
     void ClearTrack();

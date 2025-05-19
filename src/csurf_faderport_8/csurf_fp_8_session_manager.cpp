@@ -60,7 +60,7 @@ protected:
 
     void handleFunctionKey(std::string key)
     {
-        mINI::INIFile file(GetReaSonusIniPath());
+        mINI::INIFile file(GetReaSonusIniPath(FP_8));
         mINI::INIStructure ini;
         file.read(ini);
 

@@ -68,7 +68,7 @@ void CSurf_FP_8_Navigator::HandleAllTracksFilter()
 
 void CSurf_FP_8_Navigator::HandleTracksCustomFilter(std::string filterName)
 {
-    mINI::INIFile file(GetReaSonusIniPath());
+    mINI::INIFile file(GetReaSonusIniPath(FP_8));
     mINI::INIStructure ini;
     file.read(ini);
     mINI::INIMap<std::string> filter = ini[filterName];

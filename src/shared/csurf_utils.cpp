@@ -167,7 +167,7 @@ std::string GetAutomationString(int automationMode)
     };
 }
 
-std::string GetReaSonusIniPath() { return std::string(GetResourcePath()) + pathSeparator + "ReaSonus" + pathSeparator + "FP.ini"; }
+std::string GetReaSonusIniPath(std::string device) { return std::string(GetResourcePath()) + pathSeparator + "ReaSonus" + pathSeparator + device + ".ini"; }
 
 std::string GetReaSonusPluginPath(std::string developer, std::string pluginName, bool create)
 {
@@ -253,26 +253,30 @@ void logDouble(const char *key, double value)
     ShowConsoleMsg(buffer);
 }
 
-void readAndCreateIni(mINI::INIStructure &data)
+void readAndCreateIni(mINI::INIStructure &data, std::string device)
 {
-    mINI::INIFile file(GetReaSonusIniPath());
+    mINI::INIFile file(GetReaSonusIniPath(device));
     if (!file.read(data))
     {
         RecursiveCreateDirectory((std::string(GetResourcePath()) + pathSeparator + "ReaSonus" + pathSeparator + "Plugins").c_str(), 0);
         data["surface"]["midiin"] = "0";
         data["surface"]["midiout"] = "0";
-        data["surface"]["surface"] = "0";
-        data["surface"]["disable-plugins"] = "0";
-        data["surface"]["swap-shift-buttons"] = "0";
+        data["surface"]["mute-solo-momentary"] = "0";
         data["functions"]["1"] = "0";
         data["functions"]["2"] = "0";
         data["functions"]["3"] = "0";
         data["functions"]["4"] = "0";
-        data["functions"]["5"] = "0";
-        data["functions"]["6"] = "0";
-        data["functions"]["7"] = "0";
-        data["functions"]["8"] = "0";
-        data["filters"]["nb-filters"] = "0";
+        if (device == FP_8)
+        {
+            data["surface"]["surface"] = "0";
+            data["surface"]["disable-plugins"] = "0";
+            data["surface"]["swap-shift-buttons"] = "0";
+            data["functions"]["5"] = "0";
+            data["functions"]["6"] = "0";
+            data["functions"]["7"] = "0";
+            data["functions"]["8"] = "0";
+            data["filters"]["nb-filters"] = "0";
+        }
         file.generate(data, true);
     };
     file.read(data);

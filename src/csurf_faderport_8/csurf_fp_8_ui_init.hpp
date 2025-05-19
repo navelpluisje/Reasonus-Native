@@ -17,7 +17,7 @@ namespace CSURF_FP_8_UI_INIT
 
     static void SaveCheckBoxValue(HWND hwndDlg, std::string key, int checkBox)
     {
-        mINI::INIFile file(GetReaSonusIniPath());
+        mINI::INIFile file(GetReaSonusIniPath(FP_8));
 
         ini["surface"][key] = std::to_string(IsDlgButtonChecked(hwndDlg, checkBox));
         file.write(ini, true);
@@ -30,8 +30,8 @@ namespace CSURF_FP_8_UI_INIT
         {
         case WM_INITDIALOG:
         {
-            mINI::INIFile file(GetReaSonusIniPath());
-            readAndCreateIni(ini);
+            mINI::INIFile file(GetReaSonusIniPath(FP_8));
+            readAndCreateIni(ini, FP_8);
 
             int combo;
             char buf[255];
@@ -109,7 +109,7 @@ namespace CSURF_FP_8_UI_INIT
             {
             case IDC_BUTTON_DOCUMENTTION:
             {
-                SystemOpenURL("https://navelpluisje.nl");
+                SystemOpenURL("https://navelpluisje.github.io/reasonus/documentation/faderport8/");
                 break;
             }
 
@@ -137,7 +137,7 @@ namespace CSURF_FP_8_UI_INIT
 
             if (wParam > 1 && lParam)
             {
-                static mINI::INIFile file(GetReaSonusIniPath());
+                static mINI::INIFile file(GetReaSonusIniPath(FP_8));
 
                 LRESULT indev = -1, outdev = -1, surface = -1;
 
@@ -167,7 +167,7 @@ namespace CSURF_FP_8_UI_INIT
     static HWND CreateInitDialog(const char *type_string, HWND parent, const char *initConfigString)
     {
         (void)type_string;
-        return CreateDialogParam(g_hInst, MAKEINTRESOURCE(IDD_DIALOG_REASONUS_NATIVE), parent, dlgProc, (LPARAM)initConfigString);
+        return CreateDialogParam(g_hInst, MAKEINTRESOURCE(IDD_DIALOG_REASONUS_NATIVE), parent, CSURF_FP_8_UI_INIT::dlgProc, (LPARAM)initConfigString);
     }
 }
 #endif

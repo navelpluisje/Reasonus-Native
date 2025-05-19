@@ -13,9 +13,7 @@ protected:
     CSurf_Context *context;
     midi_Output *m_midiout;
 
-    CSurf_Button *soloButton;
-    CSurf_Button *muteButton;
-    CSurf_Fader *fader;
+    CSurf_FP_V2_Track *track;
 
     int mute_start = 0;
     int solo_start = 0;
@@ -40,7 +38,7 @@ public:
         delete m_midiout;
     };
 
-    void UpdateTracks();
+    void UpdateTrack();
 
     void ClearTrack();
 
@@ -48,15 +46,16 @@ public:
 
     void HandleSoloClick(int index, int value);
 
-    void HandleFaderTouch(int value) {};
+    void HandleArmClick(int index, int value);
+
+    void HandleBypassClick(int index, int value);
+
+    void HandleFaderTouch(int value)
+    {
+        (void)value;
+    }
 
     void HandleFaderMove(int msb, int lsb);
-
-    void SetSoloButtonValue(Btn_Value value, bool force = false);
-
-    void SetMuteButtonValue(Btn_Value value, bool force = false);
-
-    void SetFaderValue(int value, bool force = false);
 };
 
 #endif

@@ -50,7 +50,7 @@ protected:
 
     void GetFilters()
     {
-        mINI::INIFile file(GetReaSonusIniPath());
+        mINI::INIFile file(GetReaSonusIniPath(FP_8));
         file.read(ini);
         int nbFilters = stoi(ini["filters"]["nb-filters"]);
 

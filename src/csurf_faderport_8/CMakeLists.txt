@@ -1,9 +1,9 @@
 target_sources(${PROJECT_NAME}
     PRIVATE
+        csurf_fp_8_main.cpp
         csurf_fp_8_automation_manager.cpp
         csurf_fp_8_channel_manager_resources.cpp
         csurf_fp_8_fader_manager.cpp
-        csurf_faderport.cpp
         csurf_fp_8_filter_manager.cpp
         csurf_fp_8_general_control_manager.cpp
         csurf_fp_8_last_touched_fx_manager.cpp
@@ -17,6 +17,5 @@ target_sources(${PROJECT_NAME}
         csurf_fp_8_ui_plugin_edit.cpp
         csurf_fp_8_ui_functions.cpp
         csurf_fp_8_ui_filters.cpp
-
         csurf_fp_8_track.cpp
         )

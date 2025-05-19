@@ -1,5 +1,5 @@
 #include "show_reasonus_function_window.hpp"
-#include "../csurf_faderport/csurf_fp_8_ui_functions.hpp"
+#include "../csurf_faderport_8/csurf_fp_8_ui_functions.hpp"
 
 #define STRINGIZE_DEF(x) #x
 #define STRINGIZE(x) STRINGIZE_DEF(x)
