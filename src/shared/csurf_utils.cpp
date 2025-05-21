@@ -292,4 +292,16 @@ std::string GenerateUniqueKey(std::string prefix)
         prefix += rnd;
     }
     return prefix;
-};
+}
+
+int minmax(int min, int value, int max)
+{
+    return value < min ? min : value > max ? max
+                                           : value;
+}
+
+double minmax(double min, double value, double max)
+{
+    return value < min ? min : value > max ? max
+                                           : value;
+}

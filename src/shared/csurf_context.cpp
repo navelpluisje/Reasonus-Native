@@ -21,6 +21,9 @@ class CSurf_Context
     // Last touched fx
     bool lastTouchedFxMode = false;
 
+    // Make the fader control the master track for the FaderPort V2
+    bool masterFaderMode = false;
+
     // Pan encoder modes
     PanEncoderMode panEncoderMode = PanEncoderPanMode;
     bool panPushModePan = true;
@@ -131,9 +134,24 @@ public:
         lastTouchedFxMode = !lastTouchedFxMode;
     }
 
+    void SetLastTouchedFxMode(bool value)
+    {
+        lastTouchedFxMode = value;
+    }
+
     bool GetLastTouchedFxMode()
     {
         return lastTouchedFxMode;
+    }
+
+    void SetMasterFaderMode(bool value)
+    {
+        masterFaderMode = value;
+    }
+
+    bool GetMasterFaderMode()
+    {
+        return masterFaderMode;
     }
 
     void SetNbChannels(int count)

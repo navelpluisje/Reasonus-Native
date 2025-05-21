@@ -67,13 +67,9 @@ class CSurf_FaderPortV2 : public IReaperControlSurface
      */
     else if (evt->midi_message[0] == MIDI_MESSAGE_ENDCODER)
     {
-      if (evt->midi_message[1] == ENCODER_PAN)
-      {
-        // generalControlManager->HandleEncoderChange(evt->midi_message[2]);
-      }
       if (evt->midi_message[1] == ENCODER_NAV)
       {
-        // sessionManager->HandleSessionNavEncoderChange(evt->midi_message[2]);
+        sessionManager->HandleSessionNavEncoderChange(evt->midi_message[2]);
       }
     }
 
@@ -148,14 +144,10 @@ class CSurf_FaderPortV2 : public IReaperControlSurface
       {
         // generalControlManager->HandleEncoderClick(evt->midi_message[2]);
       }
-      else if (evt->midi_message[1] == BTN_LINK)
-      {
-        generalControlManager->HandleLinkButton(evt->midi_message[2]);
-      }
       else if (evt->midi_message[1] == BTN_SHIFT_LEFT)
       {
         generalControlManager->HandleShiftButton(evt->midi_message[2]);
-        // sessionManager->Refresh();
+        sessionManager->Refresh();
       }
 
       /**
@@ -177,6 +169,14 @@ class CSurf_FaderPortV2 : public IReaperControlSurface
       /**
        * Session Manager Buttons
        */
+      else if (evt->midi_message[1] == BTN_LINK)
+      {
+        sessionManager->HandleLinkButton(evt->midi_message[2]);
+      }
+      else if (evt->midi_message[1] == BTN_PAN)
+      {
+        sessionManager->HandlePanButton(evt->midi_message[2]);
+      }
       else if (evt->midi_message[1] == BTN_CHANNEL)
       {
         sessionManager->HandleChannelButton(evt->midi_message[2]);
@@ -246,15 +246,12 @@ public:
     context = new CSurf_Context(1);
     context->SetMuteSoloMomentary(ini["surface"].has("mute-solo-momentary") && ini["surface"]["mute-solo-momentary"] == "1");
 
-    // lastTouchedFxTrack = new CSurf_FP_8_Track(context->GetNbChannels() - 1, context, m_midiout);
-
     trackNavigator = new CSurf_FP_V2_Navigator(context);
     generalControlManager = new CSurf_FP_V2_GeneralControlManager(context, trackNavigator, m_midiout);
-    // sessionManager = new CSurf_FP_V2_SessionManager(context, trackNavigator, m_midiout);
+    sessionManager = new CSurf_FP_V2_SessionManager(context, trackNavigator, m_midiout);
     trackManager = new CSurf_FP_V2_TrackManager(context, trackNavigator, m_midiout);
     transportManager = new CSurf_TransportManager(context, m_midiout);
-    // automationManager = new CSurf_FP_V2_AutomationManager(context, m_midiout);
-    // lastTouchedFxManager = new CSurf_FP_8_LastTouchedFXManager(lastTouchedFxTrack, context, m_midiout);
+    automationManager = new CSurf_FP_V2_AutomationManager(context, trackNavigator, m_midiout);
 
     if (errStats)
     {
@@ -349,16 +346,9 @@ public:
       {
         trackManager->UpdateTrack();
         generalControlManager->Update();
-        // if (context->GetLastTouchedFxMode())
-        // {
-        //   lastTouchedFxManager->UpdateTrack();
-        // }
-        // else
-        // {
-        //   lastTouchedFxManager->resetLastTouchedFxEnabled();
-        // }
+        sessionManager->Update();
         transportManager->Update();
-        // automationManager->Update();
+        automationManager->Update();
 
         surface_update_lastrun = now;
       }

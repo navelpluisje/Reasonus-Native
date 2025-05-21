@@ -4,6 +4,7 @@
 #include "../controls/csurf_color_button.hpp"
 #include "../shared/csurf_context.cpp"
 #include "../shared/csurf_utils.hpp"
+#include "csurf_fp_v2_navigator.hpp"
 
 class CSurf_FP_V2_AutomationManager
 {
@@ -13,18 +14,18 @@ protected:
     CSurf_ColorButton *touchButton;
 
     CSurf_Context *context;
+    CSurf_FP_V2_Navigator *navigator;
     midi_Output *m_midiout;
 
     int channelAutomationMode;
-    int globalAutomationMode;
 
     void SetButtonValue()
     {
         if (context->GetShiftLeft())
         {
-            touchButton->SetValue(globalAutomationMode == AUTOMATION_LATCH ? BTN_VALUE_ON : BTN_VALUE_OFF);
-            writeButton->SetValue(globalAutomationMode == AUTOMATION_TRIM ? BTN_VALUE_ON : BTN_VALUE_OFF);
-            readButton->SetValue(globalAutomationMode == AUTOMATION_PREVIEW ? BTN_VALUE_ON : BTN_VALUE_OFF);
+            touchButton->SetValue(channelAutomationMode == AUTOMATION_LATCH ? BTN_VALUE_ON : BTN_VALUE_OFF);
+            writeButton->SetValue(channelAutomationMode == AUTOMATION_TRIM ? BTN_VALUE_ON : BTN_VALUE_OFF);
+            readButton->SetValue(channelAutomationMode == AUTOMATION_PREVIEW ? BTN_VALUE_ON : BTN_VALUE_OFF);
             return;
         }
 
@@ -37,9 +38,9 @@ protected:
     {
         if (context->GetShiftLeft())
         {
-            touchButton->SetColor(ButtonColorGreen);
-            writeButton->SetColor(ButtonColorYellow);
-            readButton->SetColor(ButtonColorYellow);
+            touchButton->SetColor(ButtonColorPurple);
+            writeButton->SetColor(ButtonColorWhite);
+            readButton->SetColor(ButtonColorBlue);
             return;
         }
 
@@ -51,18 +52,18 @@ protected:
 public:
     CSurf_FP_V2_AutomationManager(
         CSurf_Context *context,
-        midi_Output *m_midiout) : context(context), m_midiout(m_midiout)
+        CSurf_FP_V2_Navigator *navigator,
+        midi_Output *m_midiout) : context(context), navigator(navigator), m_midiout(m_midiout)
     {
-        touchButton = new CSurf_ColorButton(ButtonColorYellow, BTN_TOUCH, BTN_VALUE_OFF, m_midiout);
-        writeButton = new CSurf_ColorButton(ButtonColorRed, BTN_WRITE, BTN_VALUE_OFF, m_midiout);
         readButton = new CSurf_ColorButton(ButtonColorGreen, BTN_READ, BTN_VALUE_OFF, m_midiout);
+        writeButton = new CSurf_ColorButton(ButtonColorRed, BTN_WRITE, BTN_VALUE_OFF, m_midiout);
+        touchButton = new CSurf_ColorButton(ButtonColorYellow, BTN_TOUCH, BTN_VALUE_OFF, m_midiout);
     };
     ~CSurf_FP_V2_AutomationManager() {};
 
     void Update()
     {
-        // Should be navigator->GetControllerTrack
-        MediaTrack *media_track = GetSelectedTrack(0, 0);
+        MediaTrack *media_track = navigator->GetControllerTrack();
         channelAutomationMode = GetTrackAutomationMode(media_track);
 
         SetButtonColors();
@@ -76,7 +77,7 @@ public:
             return;
         }
 
-        MediaTrack *media_track = GetSelectedTrack(0, 0);
+        MediaTrack *media_track = navigator->GetControllerTrack();
         if (context->GetShiftLeft())
         {
             SetTrackAutomationMode(media_track, AUTOMATION_LATCH);
@@ -92,7 +93,7 @@ public:
             return;
         }
 
-        MediaTrack *media_track = GetSelectedTrack(0, 0);
+        MediaTrack *media_track = navigator->GetControllerTrack();
         if (context->GetShiftLeft())
         {
             SetTrackAutomationMode(media_track, AUTOMATION_TRIM);
@@ -108,7 +109,7 @@ public:
             return;
         }
 
-        MediaTrack *media_track = GetSelectedTrack(0, 0);
+        MediaTrack *media_track = navigator->GetControllerTrack();
         if (context->GetShiftLeft())
         {
             SetTrackAutomationMode(media_track, AUTOMATION_PREVIEW);

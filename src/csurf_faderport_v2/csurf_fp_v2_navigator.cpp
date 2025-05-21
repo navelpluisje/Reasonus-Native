@@ -1,8 +1,6 @@
 #include "csurf_fp_v2_navigator.hpp"
 #include "../shared/csurf_utils.hpp"
 #include "../shared/csurf_daw.hpp"
-// #include <WDL/wdltypes.h> // might be unnecessary in future
-// #include <reaper_plugin_functions.h>
 #include <mini/ini.h>
 
 void CSurf_FP_V2_Navigator::GetAllVisibleTracks(WDL_PtrList<MediaTrack> &tracks, bool &hasSolo, bool &hasMute)
@@ -64,7 +62,6 @@ MediaTrack *CSurf_FP_V2_Navigator::GetControllerTrack()
 
 void CSurf_FP_V2_Navigator::SetOffset(int offset)
 {
-    logInteger("SetOffset", offset);
     if (tracks.GetSize() == 0 || offset < 0)
     {
         track_offset = 0;

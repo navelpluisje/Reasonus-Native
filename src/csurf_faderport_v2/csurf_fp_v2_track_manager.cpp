@@ -12,6 +12,11 @@ void CSurf_FP_V2_TrackManager::GetFaderValue(MediaTrack *media_track, int *fader
 {
     double volume, pan1 = 0.0;
 
+    if (context->GetMasterFaderMode())
+    {
+        media_track = ::GetMasterTrack(0);
+    }
+
     GetTrackUIVolPan(media_track, &volume, &pan1);
 
     if (context->GetShiftLeft())
@@ -35,11 +40,6 @@ CSurf_FP_V2_TrackManager::CSurf_FP_V2_TrackManager(
 void CSurf_FP_V2_TrackManager::UpdateTrack()
 {
     MediaTrack *media_track = navigator->GetControllerTrack();
-
-    // if (hasLastTouchedFxEnabled != context->GetLastTouchedFxMode() && !context->GetLastTouchedFxMode())
-    // {
-    //     forceUpdate = true;
-    // }
 
     int faderValue = 0;
     std::string strPan1, strPan2;
@@ -68,7 +68,25 @@ void CSurf_FP_V2_TrackManager::UpdateTrack()
 
     track->SetArmButtonValue(isArmed ? BTN_VALUE_ON : BTN_VALUE_OFF);
     track->SetBypassButtonValue(DAW::GetTrackFxBypassed(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF);
-    track->SetFaderValue(faderValue, forceUpdate);
+
+    if (context->GetLastTouchedFxMode())
+    {
+        double paramValue = 0.0, min, max;
+        int trackNumber = -1;
+        int fxNumber = -1;
+        int paramNumber = -1;
+
+        GetLastTouchedFX(&trackNumber, &fxNumber, &paramNumber);
+        if (MediaTrack *media_track = GetTrack(0, trackNumber - 1))
+        {
+            paramValue = TrackFX_GetParam(media_track, fxNumber, paramNumber, &min, &max);
+            track->SetFaderValue((int)(paramValue * 16383.0), forceUpdate);
+        }
+    }
+    else
+    {
+        track->SetFaderValue(faderValue, forceUpdate);
+    }
 
     hasLastTouchedFxEnabled = context->GetLastTouchedFxMode();
     forceUpdate = false;
@@ -89,7 +107,7 @@ void CSurf_FP_V2_TrackManager::HandleMuteClick(int index, int value)
             return;
         }
 
-        Main_OnCommandEx(40344, 0, 0); // Track: Toggle FX bypass on all tracks
+        Main_OnCommandEx(40339, 0, 0); // Track: Unmute all tracks
         return;
     }
 
@@ -182,7 +200,27 @@ void CSurf_FP_V2_TrackManager::HandleBypassClick(int index, int value)
 
 void CSurf_FP_V2_TrackManager::HandleFaderMove(int msb, int lsb)
 {
+    if (context->GetLastTouchedFxMode())
+    {
+        int trackNumber = -1;
+        int fxNumber = -1;
+        int paramNumber = -1;
+
+        if (GetLastTouchedFX(&trackNumber, &fxNumber, &paramNumber))
+        {
+            if (MediaTrack *media_track = GetTrack(0, trackNumber - 1))
+            {
+                TrackFX_SetParam(media_track, fxNumber, paramNumber, int14ToNormalized(msb, lsb));
+            }
+        }
+        return;
+    }
+
     MediaTrack *media_track = navigator->GetControllerTrack();
+    if (context->GetMasterFaderMode())
+    {
+        media_track = ::GetMasterTrack(0);
+    }
 
     if (context->GetShiftLeft())
     {

@@ -48,6 +48,11 @@ struct ShiftState
     {
         invert = !invert;
     }
+
+    bool IsActive()
+    {
+        return invert ? !active : active;
+    }
 };
 
 void Main_OnCommandStringEx(std::string action_name, int flag = 0, ReaProject *proj = 0);
@@ -177,5 +182,8 @@ void readAndCreateIni(mINI::INIStructure &data, std::string device);
  * @param prefix The prefix used for the key
  */
 std::string GenerateUniqueKey(std::string prefix);
+
+int minmax(int min, int value, int max);
+double minmax(double min, double value, double max);
 
 #endif // CSURF_UTILS_H_

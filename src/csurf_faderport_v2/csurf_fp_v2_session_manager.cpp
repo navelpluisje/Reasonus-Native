@@ -8,6 +8,7 @@
 #include "csurf_fp_v2_navigator.hpp"
 #include "csurf_fp_v2_ui_functions.hpp"
 #include <mini/ini.h>
+#include "../controls/csurf_color_button.hpp"
 
 enum SessionTypes
 {
@@ -30,9 +31,10 @@ protected:
     SessionTypes session_type = Channel;
     bool handleFunctionKeys = false;
 
-    CSurf_Button *panButton;
-    CSurf_Button *channelButton;
-    CSurf_Button *scrollButton;
+    CSurf_ColorButton *linkButton;
+    CSurf_ColorButton *panButton;
+    CSurf_ColorButton *channelButton;
+    CSurf_ColorButton *scrollButton;
     CSurf_Button *masterButton;
     CSurf_Button *clickButton;
     CSurf_Button *sectionButton;
@@ -45,13 +47,33 @@ protected:
         // With shift engaged, blink the selected button
         Btn_Value valueOn = context->GetShiftLeft() ? BTN_VALUE_BLINK : BTN_VALUE_ON;
 
-        panButton->SetValue(session_type == Pan ? valueOn : BTN_VALUE_OFF);
+        linkButton->SetValue(GetToggleCommandStringState("_REASONUS_TOGGLE_PLAY_CURSOR_COMMAND") && context->GetShiftLeft()
+                                 ? BTN_VALUE_ON
+                             : context->GetLastTouchedFxMode()
+                                 ? valueOn
+                                 : BTN_VALUE_OFF);
+        panButton->SetValue(CSURF_FP_V2_UI_FUNCTIONS::IsFunctionsDialogOpen() && context->GetShiftLeft()
+                                ? BTN_VALUE_ON
+                            : session_type == Pan
+                                ? valueOn
+                                : BTN_VALUE_OFF);
         channelButton->SetValue(session_type == Channel ? valueOn : BTN_VALUE_OFF);
-        scrollButton->SetValue(session_type == Scroll ? valueOn : BTN_VALUE_OFF);
+        scrollButton->SetValue(session_type == Scroll
+                                   ? valueOn
+                               : session_type == Zoom
+                                   ? BTN_VALUE_ON
+                                   : BTN_VALUE_OFF);
         masterButton->SetValue(session_type == Master ? valueOn : BTN_VALUE_OFF);
         clickButton->SetValue(session_type == Click ? valueOn : BTN_VALUE_OFF);
         sectionButton->SetValue(session_type == Section ? valueOn : BTN_VALUE_OFF);
         markerButton->SetValue(session_type == Marker ? valueOn : BTN_VALUE_OFF);
+    }
+
+    void SetButtonColors()
+    {
+        linkButton->SetColor(context->GetShiftLeft() ? ButtonColorYellow : ButtonColorGreen);
+        panButton->SetColor(context->GetShiftLeft() ? ButtonColorYellow : ButtonColorWhite);
+        scrollButton->SetColor(session_type == Zoom ? ButtonColorYellow : ButtonColorWhite);
     }
 
     void handleFunctionKey(std::string key)
@@ -87,24 +109,99 @@ public:
         CSurf_FP_V2_Navigator *trackNavigator,
         midi_Output *m_midiout) : context(context), m_midiout(m_midiout), trackNavigator(trackNavigator)
     {
-        channelButton = new CSurf_Button(BTN_CHANNEL, BTN_VALUE_ON, m_midiout);
-        scrollButton = new CSurf_Button(BTN_SCROLL, BTN_VALUE_OFF, m_midiout);
+        linkButton = new CSurf_ColorButton(ButtonColorGreen, BTN_LINK, BTN_VALUE_OFF, m_midiout);
+        panButton = new CSurf_ColorButton(ButtonColorWhite, BTN_PAN, BTN_VALUE_OFF, m_midiout);
+        channelButton = new CSurf_ColorButton(ButtonColorWhite, BTN_CHANNEL, BTN_VALUE_ON, m_midiout);
+        scrollButton = new CSurf_ColorButton(ButtonColorWhite, BTN_SCROLL, BTN_VALUE_OFF, m_midiout);
         masterButton = new CSurf_Button(BTN_MASTER, BTN_VALUE_OFF, m_midiout);
         clickButton = new CSurf_Button(BTN_CLICK, BTN_VALUE_OFF, m_midiout);
         sectionButton = new CSurf_Button(BTN_SECTION, BTN_VALUE_OFF, m_midiout);
         markerButton = new CSurf_Button(BTN_MARKER, BTN_VALUE_OFF, m_midiout);
+
         prevButton = new CSurf_Button(BTN_PREV, BTN_VALUE_OFF, m_midiout);
         nextButton = new CSurf_Button(BTN_NEXT, BTN_VALUE_OFF, m_midiout);
     }
     ~CSurf_FP_V2_SessionManager();
 
-    void Refresh() { SetButtonValues(); }
+    void Refresh()
+    {
+        SetButtonValues();
+        SetButtonColors();
+    }
 
-    void SelectSession(SessionTypes _session_type)
+    void Update()
+    {
+        SetButtonValues();
+        SetButtonColors();
+    }
+
+    void SetSession(SessionTypes _session_type)
     {
         session_type = _session_type;
-        SetButtonValues();
+        context->SetMasterFaderMode(_session_type == Master);
     }
+
+    void resetPan()
+    {
+        MediaTrack *media_track = trackNavigator->GetControllerTrack();
+
+        if (context->GetShiftLeft())
+        {
+            SetMediaTrackInfo_Value(media_track, "D_WIDTH", 0);
+        }
+        else
+        {
+            SetMediaTrackInfo_Value(media_track, "D_PAN", 0);
+        }
+    }
+
+    void UpdatePanValue(int val)
+    {
+        double pan1, pan2 = 0.0;
+        int panMode;
+        MediaTrack *media_track = context->GetMasterFaderMode() ? GetMasterTrack(0) : trackNavigator->GetControllerTrack();
+        GetTrackUIPan(media_track, &pan1, &pan2, &panMode);
+
+        if (context->GetShiftLeft())
+        {
+            double newValue = int(panToNormalized(pan2) * 127.0) + val;
+            newValue = minmax(0.0, newValue, 127.0);
+            SetMediaTrackInfo_Value(media_track, "D_WIDTH", normalizedToPan(newValue / 127));
+        }
+        else
+        {
+            double newValue = int(panToNormalized(pan1) * 127.0) + val;
+            newValue = minmax(0.0, newValue, 127.0);
+            SetMediaTrackInfo_Value(media_track, "D_PAN", normalizedToPan(newValue / 127));
+        }
+    }
+
+    void IncrementPan(int val)
+    {
+        UpdatePanValue(val);
+    }
+
+    void DecrementPan(int val)
+    {
+        UpdatePanValue(val * -1);
+    }
+
+    void HandleLinkButton(int value)
+    {
+        if (value == 0)
+        {
+            return;
+        }
+
+        if (context->GetShiftLeft())
+        {
+            Main_OnCommandStringEx("_REASONUS_TOGGLE_PLAY_CURSOR_COMMAND");
+        }
+        else
+        {
+            context->ToggleLastTouchedFxMode();
+        }
+    };
 
     void HandlePanButton(int value)
     {
@@ -115,11 +212,17 @@ public:
 
         if (context->GetShiftLeft())
         {
-            // What do we do here
+            if (CSURF_FP_V2_UI_FUNCTIONS::IsFunctionsDialogOpen())
+            {
+                CSURF_FP_V2_UI_FUNCTIONS::HideFunctionsDialog();
+            }
+            else
+            {
+                CSURF_FP_V2_UI_FUNCTIONS::ShowFunctionsDialog();
+            }
             return;
         }
-        session_type = Pan;
-        SetButtonValues();
+        SetSession(Pan);
     }
 
     void HandleChannelButton(int value)
@@ -131,11 +234,10 @@ public:
 
         if (context->GetShiftLeft())
         {
-            // What do we do here
             return;
         }
-        session_type = Channel;
-        SetButtonValues();
+
+        SetSession(Channel);
     }
 
     void HandleScrollButton(int value)
@@ -147,12 +249,10 @@ public:
 
         if (context->GetShiftLeft())
         {
-            session_type = Zoom;
-            SetButtonValues();
+            SetSession(Zoom);
             return;
         }
-        session_type = Scroll;
-        SetButtonValues();
+        SetSession(Scroll);
     }
 
     void HandleMasterButton(int value)
@@ -167,8 +267,7 @@ public:
             handleFunctionKey("1");
             return;
         }
-        session_type = Master;
-        SetButtonValues();
+        SetSession(Master);
     }
 
     void HandleClickButton(int value)
@@ -183,8 +282,7 @@ public:
             handleFunctionKey("2");
             return;
         }
-        session_type = Click;
-        SetButtonValues();
+        SetSession(Click);
     }
 
     void HandleSectionButton(int value)
@@ -204,8 +302,7 @@ public:
         {
             Main_OnCommandEx(40306, 0, 0); // Markers: Insert region from time selection and edit...
         }
-        session_type = Section;
-        SetButtonValues();
+        SetSession(Section);
     }
 
     void HandleMarkerButton(int value)
@@ -220,8 +317,7 @@ public:
             handleFunctionKey("4");
             return;
         }
-        session_type = Marker;
-        SetButtonValues();
+        SetSession(Marker);
     }
 
     void HandlePrevButton(int value)
@@ -237,10 +333,10 @@ public:
         switch (session_type)
         {
         case Pan:
-            // What to do here?
+            Main_OnCommandEx(40286, 0, 0); // Track: Go to previous track
             break;
         case Channel:
-            trackNavigator->DecrementOffset(context->GetShiftLeft() ? context->GetNbChannels() : 1);
+            Main_OnCommandEx(40286, 0, 0); // Track: Go to previous track
             TrackList_UpdateAllExternalSurfaces();
             break;
         case Zoom:
@@ -252,7 +348,7 @@ public:
             Main_OnCommandEx(40286, 0, 0); // Track: Go to previous track
             break;
         case Master:
-            trackNavigator->DecrementOffset(context->GetShiftLeft() ? context->GetNbChannels() : 1);
+            Main_OnCommandEx(40286, 0, 0); // Track: Go to previous track
             TrackList_UpdateAllExternalSurfaces();
             break;
         case Click:
@@ -281,10 +377,10 @@ public:
         switch (session_type)
         {
         case Pan:
-            // What to do here?
+            Main_OnCommandEx(40285, 0, 0); // Track: Go to next track
             break;
         case Channel:
-            trackNavigator->IncrementOffset(context->GetShiftLeft() ? context->GetNbChannels() : 1);
+            Main_OnCommandEx(40285, 0, 0); // Track: Go to next track
             TrackList_UpdateAllExternalSurfaces();
             break;
         case Zoom:
@@ -295,7 +391,7 @@ public:
             Main_OnCommandEx(40285, 0, 0); // Track: Go to next track
             break;
         case Master:
-            trackNavigator->IncrementOffset(context->GetShiftLeft() ? context->GetNbChannels() : 1);
+            Main_OnCommandEx(40285, 0, 0); // Track: Go to next track
             TrackList_UpdateAllExternalSurfaces();
             break;
         case Click:
@@ -312,15 +408,15 @@ public:
         }
     }
 
-    void HandleEncoderIncrement()
+    void HandleEncoderIncrement(int value)
     {
         switch (session_type)
         {
         case Pan:
-            // What to do here
+            IncrementPan(value);
             break;
         case Channel:
-            trackNavigator->IncrementOffset(context->GetShiftLeft() ? context->GetNbChannels() : 1);
+            Main_OnCommandEx(40285, 0, 0); // Track: Go to next track
             break;
         case Zoom:
             context->GetShiftLeft() ? Main_OnCommandEx(40111, 0, 0) // View: Zoom in vertical
@@ -331,16 +427,14 @@ public:
                                     : Main_OnCommandEx(40139, 0, 0); // View: Scroll view up
             break;
         case Master:
-            Main_OnCommandStringEx("_XENAKIOS_NUDMASVOL1DBU"); // Xenakios/SWS: Nudge master volume 1 dB up
-            // TODO: Add master pan with left shift
+            IncrementPan(value);
             break;
         case Click:
             IncrementMetronomeVolume();
             break;
         case Section:
-            context->GetShiftLeft()    ? Main_OnCommandEx(40105, 0, 0)  // View: Move cursor right one pixel
-            : context->GetShiftRight() ? Main_OnCommandEx(40103, 0, 0)  // Time selection: Move cursor right, creating time selection
-                                       : Main_OnCommandEx(41044, 0, 0); // Move edit cursor forward one beat
+            context->GetShiftLeft() ? Main_OnCommandEx(40105, 0, 0)  // View: Move cursor right one pixel
+                                    : Main_OnCommandEx(41044, 0, 0); // Move edit cursor forward one beat
             break;
         case Marker:
             context->GetShiftLeft() ? Main_OnCommandEx(40105, 0, 0)  // View: Move cursor right one pixel
@@ -349,15 +443,15 @@ public:
         }
     }
 
-    void HandleEncoderDecrement()
+    void HandleEncoderDecrement(int value)
     {
         switch (session_type)
         {
         case Pan:
-            // What to d here
+            DecrementPan(value);
             break;
         case Channel:
-            trackNavigator->DecrementOffset(context->GetShiftLeft() ? context->GetNbChannels() : 1);
+            Main_OnCommandEx(40286, 0, 0); // Track: Go to previous track
             break;
         case Zoom:
             context->GetShiftLeft() ? Main_OnCommandEx(40112, 0, 0) // View: Zoom out vertical
@@ -368,15 +462,14 @@ public:
                                     : Main_OnCommandEx(40138, 0, 0); // View: Scroll view down
             break;
         case Master:
-            Main_OnCommandStringEx("_XENAKIOS_NUDMASVOL1DBD"); // Xenakios/SWS: Nudge master volume 1 dB down
+            DecrementPan(value);
             break;
         case Click:
             DecrementMetronomeVolume();
             break;
         case Section:
-            context->GetShiftLeft()    ? Main_OnCommandEx(40104, 0, 0)  // View: Move cursor left one pixel, View: Move cursor right one pixel
-            : context->GetShiftRight() ? Main_OnCommandEx(40102, 0, 0)  // Time selection: Move cursor left, creating time selection, Time selection: Move cursor left, creating time selection
-                                       : Main_OnCommandEx(41045, 0, 0); // Move edit cursor back one beat, Move edit cursor forward one beat
+            context->GetShiftLeft() ? Main_OnCommandEx(40104, 0, 0)  // View: Move cursor left one pixel, View: Move cursor right one pixel
+                                    : Main_OnCommandEx(41045, 0, 0); // Move edit cursor back one beat, Move edit cursor forward one beat
             break;
         case Marker:
             context->GetShiftLeft() ? Main_OnCommandEx(40104, 0, 0)  // View: Move cursor left one pixel, View: Move cursor right one pixel
@@ -395,7 +488,7 @@ public:
         switch (session_type)
         {
         case Pan:
-            // What to do here
+            resetPan();
             break;
         case Channel:
             break;
@@ -408,22 +501,19 @@ public:
                                     : Main_OnCommandEx(40913, 0, 0);               // Track: Vertical scroll selected tracks into view
             break;
         case Master:
-            context->GetShiftLeft() ? SetMasterPanToCenter()
-                                    : Main_OnCommandStringEx("_XENAKIOS_SETMASTVOLTO0"); // Xenakios/SWS: Set master volume to 0 dB
+            resetPan();
             break;
         case Click:
             context->GetShiftLeft() ? Main_OnCommandEx(40363, 0, 0)  // Options: Show metronome/pre-roll settings
                                     : Main_OnCommandEx(40364, 0, 0); // Options: Toggle metronome
             break;
         case Section:
-            context->GetShiftLeft()    ? Main_OnCommandEx(41041, 0, 0)  // Move edit cursor to start of current measure
-            : context->GetShiftRight() ? Main_OnCommandEx(40306, 0, 0)  // Markers: Insert region from time selection and edit...
-                                       : Main_OnCommandEx(40616, 0, 0); // Markers: Edit region near cursor
+            context->GetShiftLeft() ? Main_OnCommandEx(40306, 0, 0)  // Markers: Insert region from time selection and edit...
+                                    : Main_OnCommandEx(40616, 0, 0); // Markers: Edit region near cursor
             break;
         case Marker:
-            context->GetShiftLeft()    ? Main_OnCommandEx(40171, 0, 0)  // Markers: Insert and/or edit marker at current position
-            : context->GetShiftRight() ? Main_OnCommandEx(40613, 0, 0)  // Markers: Delete marker near cursor
-                                       : Main_OnCommandEx(40157, 0, 0); // Markers: Insert marker at current position
+            context->GetShiftLeft() ? Main_OnCommandEx(40613, 0, 0)  // Markers: Delete marker near cursor
+                                    : Main_OnCommandEx(40171, 0, 0); // Markers: Insert and/or edit marker at current position
             break;
         }
     }
@@ -432,11 +522,11 @@ public:
     {
         if (hasBit(value, 6))
         {
-            HandleEncoderDecrement();
+            HandleEncoderDecrement(value - 64);
         }
         else
         {
-            HandleEncoderIncrement();
+            HandleEncoderIncrement(value);
         }
     }
 };
