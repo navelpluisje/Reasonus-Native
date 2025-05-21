@@ -9,6 +9,7 @@
 #include "csurf_fp_v2_ui_functions.hpp"
 #include <mini/ini.h>
 #include "../controls/csurf_color_button.hpp"
+#include "../shared/csurf_daw.hpp"
 
 enum SessionTypes
 {
@@ -333,33 +334,36 @@ public:
         switch (session_type)
         {
         case Pan:
-            Main_OnCommandEx(40286, 0, 0); // Track: Go to previous track
+            context->GetShiftLeft() ? DAW::EditUndo()
+                                    : Main_OnCommandEx(40286, 0, 0); // Track: Go to previous track
             break;
         case Channel:
-            Main_OnCommandEx(40286, 0, 0); // Track: Go to previous track
-            TrackList_UpdateAllExternalSurfaces();
+            context->GetShiftLeft() ? DAW::EditUndo()
+                                    : Main_OnCommandEx(40286, 0, 0); // Track: Go to previous track
             break;
         case Zoom:
             context->GetShiftLeft() ? Main_OnCommandEx(40112, 0, 0) // View: Zoom out vertical
                                     : Main_OnCommandEx(1011, 0, 0); // View: Zoom out horizontal
             break;
         case Scroll:
-            // TODO: Change to up/down, left/right scrolling
-            Main_OnCommandEx(40286, 0, 0); // Track: Go to previous track
+            context->GetShiftLeft() ? DAW::EditUndo()
+                                    : Main_OnCommandEx(40286, 0, 0); // Track: Go to previous track
             break;
         case Master:
-            Main_OnCommandEx(40286, 0, 0); // Track: Go to previous track
-            TrackList_UpdateAllExternalSurfaces();
+            context->GetShiftLeft() ? DAW::EditUndo()
+                                    : Main_OnCommandEx(40286, 0, 0); // Track: Go to previous track
             break;
         case Click:
-            Main_OnCommandEx(42456, 0, 0); // Options: Set metronome speed to 1x
+            context->GetShiftLeft() ? DAW::EditUndo()
+                                    : Main_OnCommandEx(42456, 0, 0); // Options: Set metronome speed to 1x
             break;
         case Section:
             context->GetShiftLeft() ? Main_OnCommandEx(40625, 0, 0)               // Time selection: Set start point
                                     : Main_OnCommandStringEx("_SWS_SELPREVMORR"); // SWS: Goto/select previous marker/region
             break;
         case Marker:
-            Main_OnCommandStringEx("_SWS_SELPREVMORR"); // SWS: Goto/select previous marker/region
+            context->GetShiftLeft() ? Main_OnCommandEx(40029, 0, 0)               // Edit: Undo
+                                    : Main_OnCommandStringEx("_SWS_SELPREVMORR"); // SWS: Goto/select previous marker/region
             break;
         }
     }
@@ -377,25 +381,28 @@ public:
         switch (session_type)
         {
         case Pan:
-            Main_OnCommandEx(40285, 0, 0); // Track: Go to next track
+            context->GetShiftLeft() ? DAW::EditRedo()
+                                    : Main_OnCommandEx(40285, 0, 0); // Track: Go to next track
             break;
         case Channel:
-            Main_OnCommandEx(40285, 0, 0); // Track: Go to next track
-            TrackList_UpdateAllExternalSurfaces();
+            context->GetShiftLeft() ? DAW::EditRedo()
+                                    : Main_OnCommandEx(40285, 0, 0); // Track: Go to next track
             break;
         case Zoom:
             context->GetShiftLeft() ? Main_OnCommandEx(40111, 0, 0) // View: Zoom in vertical
                                     : Main_OnCommandEx(1012, 0, 0); // View: Zoom in horizontal
             break;
         case Scroll:
-            Main_OnCommandEx(40285, 0, 0); // Track: Go to next track
+            context->GetShiftLeft() ? DAW::EditRedo()
+                                    : Main_OnCommandEx(40285, 0, 0); // Track: Go to next track
             break;
         case Master:
-            Main_OnCommandEx(40285, 0, 0); // Track: Go to next track
-            TrackList_UpdateAllExternalSurfaces();
+            context->GetShiftLeft() ? DAW::EditRedo()
+                                    : Main_OnCommandEx(40285, 0, 0); // Track: Go to next track
             break;
         case Click:
-            Main_OnCommandEx(42457, 0, 0); // Options: Set metronome speed to 2x
+            context->GetShiftLeft() ? DAW::EditRedo()
+                                    : Main_OnCommandEx(42457, 0, 0); // Options: Set metronome speed to 2x
             break;
         case Section:
             context->GetShiftLeft() ? Main_OnCommandEx(40626, 0, 0)               // Time selection: Set end point
@@ -403,7 +410,8 @@ public:
 
             break;
         case Marker:
-            Main_OnCommandStringEx("_SWS_SELNEXTMORR"); // SWS: Goto/select next marker/region
+            context->GetShiftLeft() ? DAW::EditRedo()
+                                    : Main_OnCommandStringEx("_SWS_SELNEXTMORR"); // SWS: Goto/select next marker/region
             break;
         }
     }
@@ -488,7 +496,8 @@ public:
         switch (session_type)
         {
         case Pan:
-            resetPan();
+            context->GetShiftLeft() ? DAW::EditSave()
+                                    : resetPan();
             break;
         case Channel:
             break;
@@ -501,7 +510,8 @@ public:
                                     : Main_OnCommandEx(40913, 0, 0);               // Track: Vertical scroll selected tracks into view
             break;
         case Master:
-            resetPan();
+            context->GetShiftLeft() ? DAW::EditSave()
+                                    : resetPan();
             break;
         case Click:
             context->GetShiftLeft() ? Main_OnCommandEx(40363, 0, 0)  // Options: Show metronome/pre-roll settings

@@ -65,6 +65,10 @@ public:
 
     static bool MediaItemHasMidi(MediaItem *media_item);
     static bool MediaItemHasAudio(MediaItem *media_item);
+
+    static void EditSave();
+    static void EditUndo();
+    static void EditRedo();
 };
 
 #endif

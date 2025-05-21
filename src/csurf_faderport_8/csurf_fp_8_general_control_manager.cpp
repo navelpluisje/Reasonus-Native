@@ -73,15 +73,13 @@ protected:
         if (context->GetPanPushMode())
         {
             double newValue = int(panToNormalized(pan1) * 127.0) + val;
-            newValue = newValue < 0 ? 0 : newValue > 127 ? 127
-                                                         : newValue;
+            newValue = minmax(0.0, newValue, 127.0);
             SetMediaTrackInfo_Value(media_track, "D_PAN", normalizedToPan(newValue / 127));
         }
         else
         {
             double newValue = int(panToNormalized(pan2) * 127.0) + val;
-            newValue = newValue < 0 ? 0 : newValue > 127 ? 127
-                                                         : newValue;
+            newValue = minmax(0.0, newValue, 127.0);
             SetMediaTrackInfo_Value(media_track, "D_WIDTH", normalizedToPan(newValue / 127));
         }
     }
@@ -179,7 +177,7 @@ public:
         else
         {
             armState.SetValue(value > 0);
-            context->SetArm(armState.invert ? !armState.active : armState.active);
+            context->SetArm(armState.IsActive());
         }
 
         SetButtonValue();
@@ -262,7 +260,7 @@ public:
     void HandleShiftButton(int value)
     {
         shiftState.SetValue(value > 0);
-        context->SetShiftLeft(shiftState.invert ? !shiftState.active : shiftState.active);
+        context->SetShiftLeft(shiftState.IsActive());
 
         SetButtonValue();
     }

@@ -197,7 +197,7 @@ public:
             }
             shiftState.start = 0;
         }
-        context->SetShiftRight(shiftState.invert ? !shiftState.active : shiftState.active);
+        context->SetShiftRight(shiftState.IsActive());
 
         SetButtonValue();
     }

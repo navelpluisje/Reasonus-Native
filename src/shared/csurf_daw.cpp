@@ -456,3 +456,21 @@ bool DAW::MediaItemHasAudio(MediaItem *media_item)
 
     return hasAudio;
 }
+
+/************************************************************************
+ * Edit
+ ************************************************************************/
+void DAW::EditSave()
+{
+    ::Main_SaveProject(0, false);
+}
+
+void DAW::EditUndo()
+{
+    ::Undo_DoUndo2(0);
+}
+
+void DAW::EditRedo()
+{
+    ::Undo_DoRedo2(0);
+}

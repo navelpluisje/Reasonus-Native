@@ -13,8 +13,8 @@
 const int MOMENTARY_TIMEOUT = 500;
 class CSurf_FP_8_TrackManager : public CSurf_FP_8_ChannelManager
 {
-    int mute_start = 0;
-    int solo_start = 0;
+    int mute_start[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    int solo_start[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 protected:
     bool hasLastTouchedFxEnabled = false;
@@ -183,15 +183,15 @@ public:
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
         if (value == 0 && context->GetMuteSoloMomentary())
         {
-            if (now - mute_start > MOMENTARY_TIMEOUT)
+            if (now - mute_start[index] > MOMENTARY_TIMEOUT)
             {
                 CSurf_SetSurfaceMute(media_track, CSurf_OnMuteChange(media_track, !DAW::IsTrackMuted(media_track)), NULL);
             }
-            mute_start = 0;
+            mute_start[index] = 0;
         }
         else if (value > 0)
         {
-            mute_start = now;
+            mute_start[index] = now;
             CSurf_SetSurfaceMute(media_track, CSurf_OnMuteChange(media_track, !DAW::IsTrackMuted(media_track)), NULL);
         }
     }
@@ -202,15 +202,15 @@ public:
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
         if (value == 0 && context->GetMuteSoloMomentary())
         {
-            if (now - solo_start > MOMENTARY_TIMEOUT)
+            if (now - solo_start[index] > MOMENTARY_TIMEOUT)
             {
                 CSurf_SetSurfaceSolo(media_track, CSurf_OnSoloChange(media_track, !DAW::IsTrackSoloed(media_track)), NULL);
             }
-            solo_start = 0;
+            solo_start[index] = 0;
         }
         else if (value > 0)
         {
-            solo_start = now;
+            solo_start[index] = now;
             CSurf_SetSurfaceSolo(media_track, CSurf_OnSoloChange(media_track, !DAW::IsTrackSoloed(media_track)), NULL);
         }
     }
