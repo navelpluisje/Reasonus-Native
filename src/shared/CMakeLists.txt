@@ -1,0 +1,9 @@
+target_sources(${PROJECT_NAME}
+    PRIVATE
+        csurf_context.cpp
+        csurf_daw.cpp
+        csurf_transport_manager.cpp
+        csurf_faderport_ui_utils.cpp
+        csurf_utils.cpp
+        csurf_session_manager_actions.cpp
+        )
