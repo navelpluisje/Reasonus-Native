@@ -41,7 +41,7 @@ protected:
             ini["Global"]["origName"] = fullName;
             ini["Global"]["name"] = pluginName;
             ini["Global"]["developer"] = pluginName;
-            file.generate(ini, true);
+            (void)file.generate(ini, true);
         }
     }
 
