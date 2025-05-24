@@ -46,6 +46,8 @@ void CSurf_FP_8_FaderManager::HandleTrackButtonClick(int value)
         return;
     }
 
+    context->SetPluginEditPluginId(-1);
+
     if (context->GetChannelMode() != TrackMode)
     {
         SetButtonValues(TrackMode);
@@ -66,6 +68,8 @@ void CSurf_FP_8_FaderManager::HandlePluginsButtonClick(int value, bool track)
     {
         return;
     }
+
+    context->SetPluginEditPluginId(-1);
 
     bool cameFromPlugin = (context->GetChannelMode() == PluginEditMode || context->GetChannelMode() == PluginControlMode);
 
@@ -92,6 +96,8 @@ void CSurf_FP_8_FaderManager::HandleSendButtonClick(int value, bool track)
         return;
     }
 
+    context->SetPluginEditPluginId(-1);
+
     if (context->GetChannelMode() != SendMode && !track)
     {
         SetButtonValues(SendMode);
@@ -112,6 +118,8 @@ void CSurf_FP_8_FaderManager::HandlePanButtonClick(int value, bool track)
     {
         return;
     }
+
+    context->SetPluginEditPluginId(-1);
 
     if (context->GetChannelMode() != PanMode && !track)
     {
@@ -197,15 +205,7 @@ void CSurf_FP_8_FaderManager::HandleSoloClick(int index, int value)
         (context->GetChannelMode() == TrackPluginMode || context->GetChannelMode() == PluginMode) &&
         (context->GetPluginEditPluginId() > -1))
     {
-        if (!hasPluginConfigFile(context->GetPluginEditTrack(), context->GetPluginEditPluginId()))
-        {
-            if (context->GetShiftLeft() && MB("Do you want to configure this plugin?", "No plugin configuration", 1) == 1)
-            {
-                context->SetChannelMode(PluginEditMode);
-                channelManager = new CSurf_FP_8_PluginLearnManager(tracks, navigator, context, m_midiout);
-            }
-        }
-        else
+        if (hasPluginConfigFile(context->GetPluginEditTrack(), context->GetPluginEditPluginId()))
         {
             context->SetChannelMode(PluginControlMode);
             channelManager = new CSurf_FP_8_PluginControlManager(tracks, navigator, context, m_midiout);

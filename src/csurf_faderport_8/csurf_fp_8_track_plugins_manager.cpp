@@ -107,17 +107,18 @@ public:
                 track->SetDisplayLine(1, ALIGN_LEFT, DAW::GetTrackFxName(plugin_track, pluginIndex).c_str(), INVERT);
                 track->SetDisplayLine(2, ALIGN_CENTER, DAW::GetTrackFxSurfceEnabled(plugin_track, pluginIndex).c_str());
                 track->SetDisplayLine(3, ALIGN_CENTER, "");
+                track->SetMuteButtonValue(ButtonBlinkOnOff((context->GetShiftLeft() && !DAW::GetTrackFxEnabled(plugin_track, pluginIndex)), !DAW::GetTrackFxEnabled(plugin_track, pluginIndex)));
             }
             else
             {
                 track->SetDisplayLine(1, ALIGN_LEFT, "No Fx", INVERT);
                 track->SetDisplayLine(2, ALIGN_CENTER, "");
                 track->SetDisplayLine(3, ALIGN_CENTER, "");
+                track->SetMuteButtonValue(BTN_VALUE_OFF);
             }
 
             track->SetTrackColor(color);
             track->SetSelectButtonValue(DAW::IsTrackSelected(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF);
-            track->SetMuteButtonValue(ButtonBlinkOnOff((context->GetShiftLeft() && DAW::GetTrackFxEnabled(plugin_track, pluginIndex)), DAW::GetTrackFxEnabled(plugin_track, pluginIndex)));
             track->SetSoloButtonValue(ButtonBlinkOnOff(DAW::GetTrackFxPanelOpen(plugin_track, pluginIndex), hasPluginConfigFile(plugin_track, pluginIndex)));
             track->SetFaderValue(faderValue);
             track->SetValueBarMode(VALUEBAR_MODE_BIPOLAR);

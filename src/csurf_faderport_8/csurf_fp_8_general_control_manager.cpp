@@ -57,7 +57,8 @@ protected:
 
         soloClearButton->SetValue(hasSolo ? BTN_VALUE_ON : BTN_VALUE_OFF);
         muteClearButton->SetValue(hasMute ? BTN_VALUE_ON : BTN_VALUE_OFF);
-        linkButton->SetValue(context->GetLastTouchedFxMode() ? BTN_VALUE_ON : BTN_VALUE_OFF);
+        linkButton->SetValue(context->GetLastTouchedFxMode() ? BTN_VALUE_ON : context->GetChannelMode() == PluginEditMode ? BTN_VALUE_BLINK
+                                                                                                                          : BTN_VALUE_OFF);
         shiftLeftButton->SetValue((context->GetShiftLeft() || (context->GetShiftRight() && context->GetSwapShiftButtons()))
                                       ? BTN_VALUE_ON
                                       : BTN_VALUE_OFF);
@@ -245,8 +246,7 @@ public:
         else
         {
             if (context->GetPluginControl() &&
-                (context->GetChannelMode() == PluginControlMode ||
-                 context->GetChannelMode() == PluginEditMode))
+                (context->GetPluginEditPluginId() > -1))
             {
                 faderManager->HandleLinkButtonClick();
             }
