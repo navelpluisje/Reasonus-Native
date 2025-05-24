@@ -63,6 +63,11 @@ public:
     static bool GetTrackSendMono(MediaTrack *media_track, int send);
     static int GetNextTrackSendMode(MediaTrack *media_track, int receive);
 
+    static int GetProjectTimeMode();
+    static int GetProjectMeasureOffset();
+    static double GetProjectTimeOffset();
+    static std::vector<std::string> GetProjectTime(bool overwrite_time_code, int new_time_code);
+
     static bool MediaItemHasMidi(MediaItem *media_item);
     static bool MediaItemHasAudio(MediaItem *media_item);
 

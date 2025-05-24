@@ -2,8 +2,6 @@
 #include "csurf_fp_8_filter_manager.cpp"
 #include "csurf_fp_8_plugin_learn_manager.cpp"
 #include "csurf_fp_8_plugin_control_manager.cpp"
-// #include <WDL/wdltypes.h> // might be unnecessary in future
-// #include <reaper_plugin_functions.h>
 
 void CSurf_FP_8_FaderManager::SetButtonValues(ChannelMode channelMode)
 {
@@ -43,12 +41,22 @@ CSurf_FP_8_FaderManager::~CSurf_FP_8_FaderManager()
 
 void CSurf_FP_8_FaderManager::HandleTrackButtonClick(int value)
 {
-    if (context->GetChannelMode() != TrackMode && value > 0)
+    if (value == 0)
+    {
+        return;
+    }
+
+    if (context->GetChannelMode() != TrackMode)
     {
         SetButtonValues(TrackMode);
         channelManager = new CSurf_FP_8_TrackManager(tracks, navigator, context, m_midiout);
         context->SetPanEncoderMode(PanEncoderPanMode);
         context->ResetPanPushMode();
+        context->SetShowTimeCode(false);
+    }
+    else
+    {
+        context->ToggleShowTimeCode();
     }
 };
 

@@ -35,8 +35,8 @@ namespace CSURF_FP_8_UI_INIT
 
             int combo;
             char buf[255];
-            char *noDeviceString = "No device selected";
-            char *noSurfaceString = "No surface selected";
+            std::string noDeviceString = "No device selected";
+            std::string noSurfaceString = "No surface selected";
 
             WDL_UTF8_HookComboBox(GetDlgItem(hwndDlg, IDC_COMBO_MIDI_IN));
             WDL_UTF8_HookComboBox(GetDlgItem(hwndDlg, IDC_COMBO_MIDI_OUT));
@@ -46,7 +46,7 @@ namespace CSURF_FP_8_UI_INIT
             {
                 if (i == 0)
                 {
-                    combo = AddComboEntry(hwndDlg, 0, noDeviceString, IDC_COMBO_MIDI_IN);
+                    combo = AddComboEntry(hwndDlg, 0, const_cast<char *>(noDeviceString.c_str()), IDC_COMBO_MIDI_IN);
                     if (stoi(ini["surface"]["midiin"]) == 0)
                     {
                         SendDlgItemMessage(hwndDlg, IDC_COMBO_MIDI_IN, CB_SETCURSEL, combo, 0);
@@ -66,7 +66,7 @@ namespace CSURF_FP_8_UI_INIT
             {
                 if (i == 0)
                 {
-                    combo = AddComboEntry(hwndDlg, 0, noDeviceString, IDC_COMBO_MIDI_OUT);
+                    combo = AddComboEntry(hwndDlg, 0, const_cast<char *>(noDeviceString.c_str()), IDC_COMBO_MIDI_OUT);
                     if (stoi(ini["surface"]["midiout"]) == 0)
                     {
                         SendDlgItemMessage(hwndDlg, IDC_COMBO_MIDI_OUT, CB_SETCURSEL, combo, 0);
@@ -82,7 +82,7 @@ namespace CSURF_FP_8_UI_INIT
                 }
             }
 
-            combo = AddComboEntry(hwndDlg, 0, noSurfaceString, IDC_COMBO_SURFACE);
+            combo = AddComboEntry(hwndDlg, 0, const_cast<char *>(noSurfaceString.c_str()), IDC_COMBO_SURFACE);
             if (ini["surface"]["surface"] == "0")
             {
                 SendDlgItemMessage(hwndDlg, IDC_COMBO_SURFACE, CB_SETCURSEL, combo, 0);
@@ -97,9 +97,20 @@ namespace CSURF_FP_8_UI_INIT
             {
                 SendDlgItemMessage(hwndDlg, IDC_COMBO_SURFACE, CB_SETCURSEL, combo, 0);
             }
+
+            for (int i = 0; i < 6; i++)
+            {
+                int dev = AddComboEntry(hwndDlg, time_code_indexes[i], const_cast<char *>(time_code_names[i].c_str()), IDC_COMBO_INIT_TIME_CODE);
+                if (time_code_indexes[i] == stoi(ini["surface"]["time-code"]))
+                {
+                    SendDlgItemMessage(hwndDlg, IDC_COMBO_INIT_TIME_CODE, CB_SETCURSEL, dev, 0);
+                }
+            }
+
             SendMessage(GetDlgItem(hwndDlg, IDC_CHECK_INIT_DIS_PLUGIN), BM_SETCHECK, ini["surface"]["disable-plugins"] == "1" ? BST_CHECKED : BST_UNCHECKED, 0);
             SendMessage(GetDlgItem(hwndDlg, IDC_CHECK_INIT_SWAP_SHIFT), BM_SETCHECK, ini["surface"]["swap-shift-buttons"] == "1" ? BST_CHECKED : BST_UNCHECKED, 0);
             SendMessage(GetDlgItem(hwndDlg, IDC_CHECK_INIT_MUTE_MOMENTARY), BM_SETCHECK, ini["surface"]["mute-solo-momentary"] == "1" ? BST_CHECKED : BST_UNCHECKED, 0);
+            SendMessage(GetDlgItem(hwndDlg, IDC_CHECK_INIT_TIME_CODE), BM_SETCHECK, ini["surface"]["overwrite-time-code"] == "1" ? BST_CHECKED : BST_UNCHECKED, 0);
 
             break;
         }
@@ -129,6 +140,11 @@ namespace CSURF_FP_8_UI_INIT
                 SaveCheckBoxValue(hwndDlg, "mute-solo-momentary", IDC_CHECK_INIT_MUTE_MOMENTARY);
                 break;
             }
+            case IDC_CHECK_INIT_TIME_CODE:
+            {
+                SaveCheckBoxValue(hwndDlg, "overwrite-time-code", IDC_CHECK_INIT_TIME_CODE);
+                break;
+            }
             break;
             }
 
@@ -139,7 +155,7 @@ namespace CSURF_FP_8_UI_INIT
             {
                 static mINI::INIFile file(GetReaSonusIniPath(FP_8));
 
-                LRESULT indev = -1, outdev = -1, surface = -1;
+                LRESULT indev = -1, outdev = -1, surface = -1, time_code = -1;
 
                 int r = SendDlgItemMessage(hwndDlg, IDC_COMBO_MIDI_IN, CB_GETCURSEL, 0, 0);
                 if (r != CB_ERR)
@@ -153,9 +169,14 @@ namespace CSURF_FP_8_UI_INIT
                 if (r != CB_ERR)
                     surface = SendDlgItemMessage(hwndDlg, IDC_COMBO_SURFACE, CB_GETITEMDATA, r, 0);
 
+                r = SendDlgItemMessage(hwndDlg, IDC_COMBO_INIT_TIME_CODE, CB_GETCURSEL, 0, 0);
+                if (r != CB_ERR)
+                    time_code = SendDlgItemMessage(hwndDlg, IDC_COMBO_INIT_TIME_CODE, CB_GETITEMDATA, r, 0);
+
                 ini["surface"]["midiin"] = std::to_string(indev);
                 ini["surface"]["midiout"] = std::to_string(outdev);
                 ini["surface"]["surface"] = std::to_string(surface);
+                ini["surface"]["time-code"] = std::to_string(time_code);
                 file.write(ini, true);
             }
             break;

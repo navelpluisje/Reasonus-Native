@@ -1,7 +1,6 @@
 #ifndef CSURF_FP_8_TRACK_MANAGER_C_
 #define CSURF_FP_8_TRACK_MANAGER_C_
 
-#include "../shared/csurf_context.cpp"
 #include <WDL/ptrlist.h>
 #include "csurf_fp_8_track.hpp"
 #include "csurf_fp_8_channel_manager.hpp"
@@ -9,6 +8,7 @@
 #include <vector>
 #include "../shared/csurf_daw.hpp"
 #include "../shared/csurf_utils.hpp"
+#include "../shared/csurf_context.cpp"
 
 const int MOMENTARY_TIMEOUT = 500;
 class CSurf_FP_8_TrackManager : public CSurf_FP_8_ChannelManager
@@ -84,10 +84,16 @@ public:
     void UpdateTracks() override
     {
         WDL_PtrList<MediaTrack> media_tracks = navigator->GetBankTracks();
+        std::vector<std::string> time_code;
 
         if (hasLastTouchedFxEnabled != context->GetLastTouchedFxMode() && !context->GetLastTouchedFxMode())
         {
             forceUpdate = true;
+        }
+
+        if (context->GetShowTimeCode())
+        {
+            time_code = DAW::GetProjectTime(context->GetOverwriteTimeCode(), context->GetSurfaceTimeCode());
         }
 
         for (int i = 0; i < context->GetNbChannels(); i++)
@@ -140,12 +146,23 @@ public:
             else
             {
                 track->SetVuMeterValue(DAW::GetTrackSurfacePeakInfo(media_track));
+                int index = context->GetNbChannels() - (time_code.size() + i);
 
-                track->SetDisplayMode(DISPLAY_MODE_8, forceUpdate);
-                track->SetDisplayLine(0, ALIGN_LEFT, DAW::GetTrackName(media_track).c_str(), NON_INVERT, forceUpdate);
-                track->SetDisplayLine(1, ALIGN_CENTER, DAW::GetTrackIndex(media_track).c_str(), NON_INVERT, forceUpdate);
-                track->SetDisplayLine(2, ALIGN_CENTER, context->GetPanPushMode() ? strPan1.c_str() : strPan2.c_str(), NON_INVERT, forceUpdate);
-                track->SetDisplayLine(3, ALIGN_CENTER, std::string("").c_str(), NON_INVERT, forceUpdate);
+                if (index < 1)
+                {
+                    track->SetDisplayMode(DISPLAY_MODE_0, forceUpdate);
+                    track->SetDisplayLine(0, ALIGN_LEFT, DAW::GetTrackName(media_track).c_str(), NON_INVERT, forceUpdate);
+                    track->SetDisplayLine(1, ALIGN_CENTER, DAW::GetTrackIndex(media_track).c_str(), NON_INVERT, forceUpdate);
+                    track->SetDisplayLine(2, ALIGN_CENTER, time_code.at(abs(index)).c_str(), INVERT, forceUpdate);
+                }
+                else
+                {
+                    track->SetDisplayMode(DISPLAY_MODE_8, forceUpdate);
+                    track->SetDisplayLine(0, ALIGN_LEFT, DAW::GetTrackName(media_track).c_str(), NON_INVERT, forceUpdate);
+                    track->SetDisplayLine(1, ALIGN_CENTER, DAW::GetTrackIndex(media_track).c_str(), NON_INVERT, forceUpdate);
+                    track->SetDisplayLine(2, ALIGN_CENTER, context->GetPanPushMode() ? strPan1.c_str() : strPan2.c_str(), NON_INVERT, forceUpdate);
+                    track->SetDisplayLine(3, ALIGN_CENTER, std::string("").c_str(), NON_INVERT, forceUpdate);
+                }
             }
         }
 
