@@ -16,6 +16,7 @@ enum ChannelMode
     MixMode,
     PluginEditMode,
     PluginControlMode,
+    MenuMode
 };
 
 enum ChannelManagerType

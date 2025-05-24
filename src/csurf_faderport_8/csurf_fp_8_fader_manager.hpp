@@ -51,6 +51,8 @@ public:
 
     void HandleLinkButtonClick();
 
+    void HandleTouchButtonClick();
+
     void SetPluginControlMode();
 
     // ADD ALL THE TRACKMANAGERS METHODS HERE TO PROXY THEM

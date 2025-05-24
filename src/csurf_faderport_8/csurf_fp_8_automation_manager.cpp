@@ -4,6 +4,7 @@
 #include "../controls/csurf_color_button.hpp"
 #include "../shared/csurf_context.cpp"
 #include "../shared/csurf_utils.hpp"
+#include "csurf_fp_8_fader_manager.hpp"
 
 class CSurf_FP_8_AutomationManager
 {
@@ -16,6 +17,7 @@ protected:
     CSurf_ColorButton *readButton;
 
     CSurf_Context *context;
+    CSurf_FP_8_FaderManager *faderManager;
     midi_Output *m_midiout;
 
     int channelAutomationMode;
@@ -42,7 +44,7 @@ protected:
             latchButton->SetValue(canSafe ? BTN_VALUE_ON : BTN_VALUE_OFF);
             trimButton->SetValue(canRedo ? BTN_VALUE_ON : BTN_VALUE_OFF);
             offButton->SetValue(canUndo ? BTN_VALUE_ON : BTN_VALUE_OFF);
-            touchButton->SetValue(BTN_VALUE_OFF);
+            touchButton->SetValue(context->GetChannelMode() == MenuMode ? BTN_VALUE_ON : BTN_VALUE_OFF);
             writeButton->SetValue(BTN_VALUE_OFF);
             readButton->SetValue(BTN_VALUE_OFF);
             return;
@@ -51,7 +53,8 @@ protected:
         latchButton->SetValue(channelAutomationMode == AUTOMATION_LATCH ? BTN_VALUE_ON : BTN_VALUE_OFF);
         trimButton->SetValue(channelAutomationMode == AUTOMATION_TRIM ? BTN_VALUE_ON : BTN_VALUE_OFF);
         offButton->SetValue(channelAutomationMode == AUTOMATION_PREVIEW ? BTN_VALUE_ON : BTN_VALUE_OFF);
-        touchButton->SetValue(channelAutomationMode == AUTOMATION_TOUCH ? BTN_VALUE_ON : BTN_VALUE_OFF);
+        touchButton->SetValue(context->GetChannelMode() == MenuMode ? BTN_VALUE_BLINK : channelAutomationMode == AUTOMATION_TOUCH ? BTN_VALUE_ON
+                                                                                                                                  : BTN_VALUE_OFF);
         writeButton->SetValue(channelAutomationMode == AUTOMATION_WRITE ? BTN_VALUE_ON : BTN_VALUE_OFF);
         readButton->SetValue(channelAutomationMode == AUTOMATION_READ ? BTN_VALUE_ON : BTN_VALUE_OFF);
     }
@@ -80,7 +83,8 @@ protected:
 public:
     CSurf_FP_8_AutomationManager(
         CSurf_Context *context,
-        midi_Output *m_midiout) : context(context), m_midiout(m_midiout)
+        CSurf_FP_8_FaderManager *faderManager,
+        midi_Output *m_midiout) : context(context), faderManager(faderManager), m_midiout(m_midiout)
     {
         latchButton = new CSurf_ColorButton(ButtonColorPurple, BTN_LATCH, BTN_VALUE_OFF, m_midiout);
         trimButton = new CSurf_ColorButton(ButtonColorWhite, BTN_TRIM, BTN_VALUE_OFF, m_midiout);
@@ -191,6 +195,7 @@ public:
         }
         if (context->GetShiftLeft())
         {
+            faderManager->HandleTouchButtonClick();
             return;
         }
         MediaTrack *media_track = GetSelectedTrack(0, 0);

@@ -2,6 +2,7 @@
 #include "csurf_fp_8_filter_manager.cpp"
 #include "csurf_fp_8_plugin_learn_manager.cpp"
 #include "csurf_fp_8_plugin_control_manager.cpp"
+#include "csurf_fp_8_menu_manager.cpp"
 
 void CSurf_FP_8_FaderManager::SetButtonValues(ChannelMode channelMode)
 {
@@ -172,6 +173,12 @@ void CSurf_FP_8_FaderManager::HandleLinkButtonClick()
         channelManager = new CSurf_FP_8_PluginLearnManager(tracks, navigator, context, m_midiout);
     }
 };
+
+void CSurf_FP_8_FaderManager::HandleTouchButtonClick()
+{
+    context->SetChannelMode(MenuMode);
+    channelManager = new CSurf_FP_8_Menu_Manager(tracks, navigator, context, m_midiout);
+}
 
 void CSurf_FP_8_FaderManager::SetPluginControlMode()
 {
