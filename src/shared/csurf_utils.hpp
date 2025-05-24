@@ -19,6 +19,9 @@ const int AUTOMATION_LATCH = 4;
 const int AUTOMATION_PREVIEW = 5;
 const int AUTOMATION_WRITE = 3;
 
+const int time_code_indexes[6] = {0, 2, 3, 4, 5, 8};
+const std::string time_code_names[6] = {"Time", "Beats", "Seconds", "Samples", "Hr:Min:Sec:Fr", "Abs. Frames"};
+
 struct ShiftState
 {
     bool active = false;
@@ -160,6 +163,8 @@ std::string GetReaSonusPluginPath(std::string developer, std::string pluginName,
 bool isInteger(std::string value);
 
 std::vector<std::string> split(std::string str, std::string delimiter);
+
+std::vector<std::string> cutString(std::string str, size_t size);
 
 std::string join(std::vector<std::string> list, std::string delimiter);
 

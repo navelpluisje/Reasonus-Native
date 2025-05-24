@@ -458,6 +458,123 @@ bool DAW::MediaItemHasAudio(MediaItem *media_item)
 }
 
 /************************************************************************
+ * Project
+ ************************************************************************/
+int DAW::GetProjectTimeMode()
+{
+    int TimeModeIndex = ::projectconfig_var_getoffs("projtimemode2", 0);
+    int *timeMode2Ptr_ = (int *)projectconfig_var_addr(0, TimeModeIndex);
+    // Get theh actrual value and not the pointer
+    int val = *timeMode2Ptr_;
+
+    // This will get rid of all teh second measure data
+    return val & 255;
+}
+
+int DAW::GetProjectMeasureOffset()
+{
+    int TimeModeIndex = ::projectconfig_var_getoffs("projmeasoffs", 0);
+    int *timeMode2Ptr_ = (int *)projectconfig_var_addr(0, TimeModeIndex);
+    // Get theh actrual value and not the pointer
+    int val = *timeMode2Ptr_;
+
+    return val;
+}
+
+double DAW::GetProjectTimeOffset()
+{
+    int TimeModeIndex = ::projectconfig_var_getoffs("projtimeoffs", 0);
+    double *timeMode2Ptr_ = (double *)projectconfig_var_addr(0, TimeModeIndex);
+    // Get theh actrual value and not the pointer
+    double val = *timeMode2Ptr_;
+
+    return val;
+}
+
+std::vector<std::string> GetTimeSegments(double tpos, int proj_time_mode)
+{
+    char beatTime[128];
+    std::vector<std::string> value, hours, mins;
+
+    ::format_timestr_len(tpos, beatTime, sizeof beatTime, 0, proj_time_mode > -1 ? proj_time_mode : 2);
+
+    switch (proj_time_mode)
+    {
+    case -1: // Ruler, will be converted to Beat
+    case 1:  // Beats + Time
+    case 2:  // Beats
+        value = split(std::string(beatTime), ".");
+        // The first 2 items are 0-based so need an extra 1
+        value[0] = std::to_string(std::stoi(value[0]) + 1);
+        value[1] = std::to_string(std::stoi(value[1]) + 1);
+        break;
+
+    case 0: // Minutes:Seconds
+        hours = split(std::string(beatTime), ":");
+        mins = split(hours[1], ".");
+        value.push_back(hours.at(0));
+        value.push_back(mins.at(0));
+        value.push_back(mins.at(1));
+        break;
+
+    case 5: // Hours:Minutes:Seconds:Frames
+        value = split(std::string(beatTime), ":");
+        break;
+
+    case 3: // Seconds
+        value = split(std::string(beatTime), ".");
+        break;
+
+    case 4: // Samples
+    case 8: // Absolute Frames
+        value = cutString(beatTime, 3);
+        break;
+    }
+
+    return value;
+}
+
+std::vector<std::string> DAW::GetProjectTime(bool overwrite_time_code, int new_time_code)
+{
+    double play_position, play_offset;
+    double beat_length = 0, __ = 0;
+    int *_ = 0;
+
+    int proj_time_mode = new_time_code;
+    if (!overwrite_time_code)
+    {
+        proj_time_mode = DAW::GetProjectTimeMode();
+    }
+
+    int play_state = GetPlayStateEx(0);
+    bool is_playing = hasBit(play_state, 0);
+
+    if (is_playing)
+    {
+        play_position = ::GetPlayPositionEx(0);
+    }
+    else
+    {
+        play_position = ::GetCursorPositionEx(0);
+    }
+
+    switch (proj_time_mode)
+    {
+    case -1:
+    case 1:
+    case 2:
+        ::TimeMap_GetMeasureInfo(0, 0, &__, &beat_length, _, _, &__);
+        play_offset = ::TimeMap2_beatsToTime(0, (int)beat_length * GetProjectMeasureOffset(), _);
+        break;
+
+    default:
+        play_offset = GetProjectTimeOffset();
+    }
+
+    return GetTimeSegments(play_position + play_offset, proj_time_mode);
+}
+
+/************************************************************************
  * Edit
  ************************************************************************/
 void DAW::EditSave()

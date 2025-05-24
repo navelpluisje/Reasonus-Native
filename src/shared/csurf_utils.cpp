@@ -219,6 +219,24 @@ std::vector<std::string> split(std::string str, std::string delimiter)
     return v;
 }
 
+std::vector<std::string> cutString(std::string str, size_t size)
+{
+    std::vector<std::string> v;
+    std::string value = str;
+
+    while (value.length() > size)
+    {
+        auto pos = v.begin();
+        v.insert(pos, value.substr(value.length() - size, value.length() - 1));
+        value = value.substr(0, value.length() - size);
+    }
+
+    auto pos = v.begin();
+    v.insert(pos, value);
+
+    return v;
+}
+
 std::string join(std::vector<std::string> list, std::string delimiter)
 {
     std::string result = "";
@@ -271,6 +289,8 @@ void readAndCreateIni(mINI::INIStructure &data, std::string device)
             data["surface"]["surface"] = "0";
             data["surface"]["disable-plugins"] = "0";
             data["surface"]["swap-shift-buttons"] = "0";
+            data["surface"]["overwrite-time-code"] = "1";
+            data["surface"]["time-code"] = "2";
             data["functions"]["5"] = "0";
             data["functions"]["6"] = "0";
             data["functions"]["7"] = "0";
