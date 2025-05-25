@@ -84,7 +84,7 @@ public:
 
             tracks.at(2)->SetDisplayLine(i, ALIGN_LEFT, optionLabel.c_str(), option[1] == i ? INVERT : NON_INVERT);
         }
-        tracks.at(2)->SetDisplayLine(menu_options.at(option[0]).size(), ALIGN_LEFT, "<- Back", option[1] == static_cast<int>(menu_options.at(option[0]).size()) ? INVERT : NON_INVERT);
+        tracks.at(2)->SetDisplayLine(static_cast<int>(menu_options.at(option[0]).size()), ALIGN_LEFT, "<- Back", option[1] == static_cast<int>(menu_options.at(option[0]).size()) ? INVERT : NON_INVERT);
     }
 
     // Handle the encoder click
@@ -135,7 +135,7 @@ public:
     {
         (void)index;
         (void)value;
-        size_t maxItems = level == 0 ? 5 : menu_options.at(option[0]).size();
+        int maxItems = level == 0 ? 5 : static_cast<int>(menu_options.at(option[0]).size());
         option[level] = minmax(0, option[level] - 1, maxItems - (level == 0 ? 1 : 0));
     }
 

@@ -146,7 +146,7 @@ public:
             else
             {
                 track->SetVuMeterValue(DAW::GetTrackSurfacePeakInfo(media_track));
-                int index = context->GetNbChannels() - (time_code.size() + i);
+                int index = context->GetNbChannels() - (static_cast<int>(time_code.size()) + i);
 
                 if (index < 1)
                 {

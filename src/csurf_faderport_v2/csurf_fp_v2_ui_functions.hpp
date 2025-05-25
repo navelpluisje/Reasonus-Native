@@ -3,8 +3,6 @@
 
 #include "../resource.h"
 #include <string>
-#include <WDL/swell/swell-types.h>
-#include <wdltypes.h>
 
 extern HWND g_hwnd;
 
