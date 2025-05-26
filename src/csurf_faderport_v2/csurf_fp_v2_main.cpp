@@ -67,7 +67,7 @@ class CSurf_FaderPortV2 : public IReaperControlSurface
      */
     else if (evt->midi_message[0] == MIDI_MESSAGE_ENDCODER)
     {
-      if (evt->midi_message[1] == ENCODER_NAV)
+      if (evt->midi_message[1] == ENCODER_PAN)
       {
         sessionManager->HandleSessionNavEncoderChange(evt->midi_message[2]);
       }
@@ -140,10 +140,6 @@ class CSurf_FaderPortV2 : public IReaperControlSurface
       /**
        * General Control Management
        */
-      else if (evt->midi_message[1] == ENCODER_CLICK_PAN)
-      {
-        // generalControlManager->HandleEncoderClick(evt->midi_message[2]);
-      }
       else if (evt->midi_message[1] == BTN_SHIFT_LEFT)
       {
         generalControlManager->HandleShiftButton(evt->midi_message[2]);
@@ -213,7 +209,7 @@ class CSurf_FaderPortV2 : public IReaperControlSurface
       {
         sessionManager->HandlePrevButton(evt->midi_message[2]);
       }
-      else if (evt->midi_message[1] == ENCODER_CLICK_NAV)
+      else if (evt->midi_message[1] == ENCODER_CLICK_PAN)
       {
         sessionManager->HandleEncoderClick(evt->midi_message[2]);
       }

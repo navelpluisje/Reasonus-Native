@@ -44,12 +44,6 @@ public:
         mINI::INIFile file(GetReaSonusIniPath(FP_8));
         file.read(ini);
 
-        UpdateTracks();
-    }
-    ~CSurf_FP_8_Menu_Manager() {};
-
-    void UpdateTracks() override
-    {
         for (int i = 1; i < context->GetNbChannels(); i++)
         {
             CSurf_FP_8_Track *track = tracks.at(i);
@@ -68,23 +62,51 @@ public:
         tracks.at(0)->SetDisplayLine(1, ALIGN_CENTER, "FaderPort", NON_INVERT);
         tracks.at(0)->SetDisplayLine(2, ALIGN_CENTER, "Menu", INVERT);
 
-        for (int i = 0; i < static_cast<int>(menu_items.size()); i++)
-        {
-            tracks.at(1)->SetDisplayLine(i, ALIGN_LEFT, menu_items[i].c_str(), option[0] == i ? INVERT : NON_INVERT);
+        UpdateTracks();
+    }
+    ~CSurf_FP_8_Menu_Manager() {};
+
+    void UpdateTracks() override
+    {
+        int nb_menu_items =static_cast<int>(menu_items.size());
+        int nb_options = static_cast<int>(menu_options.at(option[0]).size());
+        int sel_option = option[1];
+
+        int option_offset = 0;
+        if (nb_options > 6 && sel_option >= (nb_options - 6) + 2) {
+            option_offset = nb_options - 6;
+        } else if (nb_options > 6 && sel_option > 2 ) {
+            option_offset = sel_option - 2;
         }
 
-        for (int i = 0; i < static_cast<int>(menu_options.at(option[0]).size()); i++)
+        for (int i = 0; i < 7; i++)
         {
-            std::string optionLabel = menu_options.at(option[0])[i][0];
-            std::string value = menu_options.at(option[0])[i][1];
-            if (value == ini["surface"][ini_keys[option[0]]])
-            {
-                optionLabel = ">" + optionLabel;
+            if (i < nb_menu_items) {
+                tracks.at(1)->SetDisplayLine(i, ALIGN_LEFT, menu_items[i].c_str(), option[0] == i ? INVERT : NON_INVERT);
+            } else {
+                tracks.at(1)->SetDisplayLine(i, ALIGN_LEFT, "", NON_INVERT);
             }
-
-            tracks.at(2)->SetDisplayLine(i, ALIGN_LEFT, optionLabel.c_str(), option[1] == i ? INVERT : NON_INVERT);
         }
-        tracks.at(2)->SetDisplayLine(static_cast<int>(menu_options.at(option[0]).size()), ALIGN_LEFT, "<- Back", option[1] == static_cast<int>(menu_options.at(option[0]).size()) ? INVERT : NON_INVERT);
+        
+        for (int i = 0; i < 7; i++)
+        {
+            int index = i + option_offset;
+
+            if (index < nb_options) {
+                std::string option_label = menu_options.at(option[0])[index][0];
+                std::string value = menu_options.at(option[0])[index][1];
+                
+                if (value == ini["surface"][ini_keys[option[0]]])
+                {
+                    option_label = ">" + option_label;
+                }
+                tracks.at(2)->SetDisplayLine(i, ALIGN_LEFT, option_label.c_str(), option[1] == index ? INVERT : NON_INVERT);
+            } else if (index == nb_options) {
+                tracks.at(2)->SetDisplayLine(i, ALIGN_LEFT, "<- Back", option[1] == nb_options ? INVERT : NON_INVERT);
+            } else {
+                tracks.at(2)->SetDisplayLine(i, ALIGN_LEFT, "", NON_INVERT);
+            }
+        }
     }
 
     // Handle the encoder click
