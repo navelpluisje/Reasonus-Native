@@ -21,9 +21,7 @@ protected:
 
     void SetButtonValue()
     {
-        shiftLeftButton->SetValue((context->GetShiftLeft() || (context->GetShiftRight() && context->GetSwapShiftButtons()))
-                                      ? BTN_VALUE_ON
-                                      : BTN_VALUE_OFF);
+        shiftLeftButton->SetValue(context->GetShiftLeft() ? BTN_VALUE_ON: BTN_VALUE_OFF);
     };
 
     void SetButtonColors() {};

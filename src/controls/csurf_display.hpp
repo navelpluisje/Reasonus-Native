@@ -9,9 +9,9 @@ class CSurf_Display
 {
 protected:
     int channel;
-    std::string values[4] = {"", "", "", ""};
-    Inverted inverted[4] = {NON_INVERT, NON_INVERT, NON_INVERT, NON_INVERT};
-    Alignment alignment[4] = {ALIGN_LEFT, ALIGN_LEFT, ALIGN_LEFT, ALIGN_LEFT};
+    std::string values[7] = {"", "", "", "", "", "", ""};
+    Inverted inverted[7] = {NON_INVERT, NON_INVERT, NON_INVERT, NON_INVERT, NON_INVERT, NON_INVERT, NON_INVERT};
+    Alignment alignment[7] = {ALIGN_LEFT, ALIGN_LEFT, ALIGN_LEFT, ALIGN_LEFT, ALIGN_LEFT, ALIGN_LEFT, ALIGN_LEFT};
     DisplayMode displayMode;
 
     midi_Output *m_midiout;

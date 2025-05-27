@@ -43,6 +43,7 @@ class CSurf_Context
     int pluginEditParamId;
 
     ChannelMode channelMode = TrackMode;
+    ChannelMode previousChannelMode = TrackMode;
     ChannelManagerType channelManagerType;
 
 public:
@@ -264,14 +265,25 @@ public:
         channelManagerItemsCount = 0;
     }
 
+    bool IsChannelMode(ChannelMode _channelMode)
+    {
+        return channelMode == _channelMode;
+    }
+
     void SetChannelMode(ChannelMode _channelMode)
     {
+        previousChannelMode = channelMode;
         channelMode = _channelMode;
     }
 
     ChannelMode GetChannelMode()
     {
         return channelMode;
+    }
+
+    ChannelMode GetPreviousChannelMode()
+    {
+        return previousChannelMode;
     }
 
     void SetPluginEditTrack(MediaTrack *track)

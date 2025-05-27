@@ -1,5 +1,6 @@
 #include <string>
 #include "csurf_display.hpp"
+#include "../shared/csurf_utils.hpp"
 #include <reaper_plugin.h>
 #include <WDL/wdltypes.h> // might be unnecessary in future
 #include <reaper_plugin_functions.h>
@@ -80,6 +81,10 @@ void CSurf_Display::SetValue(int line, Alignment _alignment, const char *_value,
     char buffer[250];
     snprintf(buffer, sizeof(buffer), "%s", _value);
     std::string strVal = buffer;
+
+    if (line > 6) {
+        return;
+    }
 
     // If values have not changed, we do nothing
     if (strVal == values[line] && alignment[line] == _alignment && inverted[line] == invert && !force)

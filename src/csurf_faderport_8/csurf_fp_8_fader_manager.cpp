@@ -2,14 +2,82 @@
 #include "csurf_fp_8_filter_manager.cpp"
 #include "csurf_fp_8_plugin_learn_manager.cpp"
 #include "csurf_fp_8_plugin_control_manager.cpp"
+#include "csurf_fp_8_menu_manager.cpp"
 
 void CSurf_FP_8_FaderManager::SetButtonValues(ChannelMode channelMode)
 {
-    context->SetChannelMode(channelMode);
     trackButton->SetValue(channelMode == TrackMode ? BTN_VALUE_ON : BTN_VALUE_OFF);
     pluginsButton->SetValue(ButtonOnBlinkOff(channelMode == PluginMode, channelMode == TrackPluginMode));
     sendButton->SetValue(ButtonOnBlinkOff(channelMode == SendMode, channelMode == TrackSendMode));
     panButton->SetValue(ButtonOnBlinkOff(channelMode == PanMode, channelMode == TrackPanMode));
+}
+
+void CSurf_FP_8_FaderManager::SetChannelMode(ChannelMode channelMode, bool updateButtons = false)
+{
+    context->SetChannelMode(channelMode);
+    if (updateButtons)
+    {
+        SetButtonValues(channelMode);
+    }
+
+    switch (channelMode)
+    {
+    case TrackMode:
+        channelManager = new CSurf_FP_8_TrackManager(tracks, navigator, context, m_midiout);
+        context->SetPanEncoderMode(PanEncoderPanMode);
+        context->ResetPanPushMode();
+        context->SetShowTimeCode(false);
+        break;
+
+    case PluginMode:
+        channelManager = new CSurf_FP_8_PluginsManager(tracks, navigator, context, m_midiout);
+        context->SetPanEncoderMode(PanEncoderPluginMode);
+        context->ResetPanPushMode();
+        break;
+
+    case TrackPluginMode:
+        channelManager = new CSurf_FP_8_TrackPluginsManager(tracks, navigator, context, m_midiout);
+        context->SetPanEncoderMode(PanEncoderPluginMode);
+        context->ResetPanPushMode();
+        break;
+
+    case SendMode:
+        channelManager = new CSurf_FP_8_SendsManager(tracks, navigator, context, m_midiout);
+        context->SetPanEncoderMode(PanEncoderSendMode);
+        break;
+
+    case TrackSendMode:
+        channelManager = new CSurf_FP_8_TrackSendsManager(tracks, navigator, context, m_midiout);
+        context->SetPanEncoderMode(PanEncoderSendMode);
+        break;
+
+    case PanMode:
+        channelManager = new CSurf_FP_8_ReceivesManager(tracks, navigator, context, m_midiout);
+        context->SetPanEncoderMode(PanEncoderReceiveMode);
+        break;
+
+    case TrackPanMode:
+        channelManager = new CSurf_FP_8_TrackReceivesManager(tracks, navigator, context, m_midiout);
+        context->SetPanEncoderMode(PanEncoderReceiveMode);
+        break;
+
+    case MixMode:
+        channelManager = new CSurf_FP_8_FilterManager(tracks, navigator, context, m_midiout);
+        context->SetPanEncoderMode(PanEncoderReceiveMode);
+        break;
+
+    case PluginControlMode:
+        channelManager = new CSurf_FP_8_PluginControlManager(tracks, navigator, context, m_midiout);
+        break;
+
+    case PluginEditMode:
+        channelManager = new CSurf_FP_8_PluginLearnManager(tracks, navigator, context, m_midiout);
+        break;
+
+    case MenuMode:
+        channelManager = new CSurf_FP_8_Menu_Manager(tracks, navigator, context, m_midiout);
+        break;
+    }
 }
 
 CSurf_FP_8_FaderManager::CSurf_FP_8_FaderManager(
@@ -50,11 +118,7 @@ void CSurf_FP_8_FaderManager::HandleTrackButtonClick(int value)
 
     if (context->GetChannelMode() != TrackMode)
     {
-        SetButtonValues(TrackMode);
-        channelManager = new CSurf_FP_8_TrackManager(tracks, navigator, context, m_midiout);
-        context->SetPanEncoderMode(PanEncoderPanMode);
-        context->ResetPanPushMode();
-        context->SetShowTimeCode(false);
+        SetChannelMode(TrackMode, true);
     }
     else
     {
@@ -70,22 +134,15 @@ void CSurf_FP_8_FaderManager::HandlePluginsButtonClick(int value, bool track)
     }
 
     context->SetPluginEditPluginId(-1);
+    bool cameFromPlugin = (context->IsChannelMode(PluginEditMode) || context->IsChannelMode(PluginControlMode));
 
-    bool cameFromPlugin = (context->GetChannelMode() == PluginEditMode || context->GetChannelMode() == PluginControlMode);
-
-    if ((context->GetChannelMode() != PluginMode && !track && !cameFromPlugin) || (prevChannelMode == PluginMode && cameFromPlugin))
+    if ((!context->IsChannelMode(PluginMode) && !track && !cameFromPlugin) || (prevChannelMode == PluginMode && cameFromPlugin))
     {
-        SetButtonValues(PluginMode);
-        channelManager = new CSurf_FP_8_PluginsManager(tracks, navigator, context, m_midiout);
-        context->SetPanEncoderMode(PanEncoderPluginMode);
-        context->ResetPanPushMode();
+        SetChannelMode(PluginMode, true);
     }
     else
     {
-        SetButtonValues(TrackPluginMode);
-        channelManager = new CSurf_FP_8_TrackPluginsManager(tracks, navigator, context, m_midiout);
-        context->SetPanEncoderMode(PanEncoderPluginMode);
-        context->ResetPanPushMode();
+        SetChannelMode(TrackPluginMode, true);
     }
 };
 
@@ -98,17 +155,13 @@ void CSurf_FP_8_FaderManager::HandleSendButtonClick(int value, bool track)
 
     context->SetPluginEditPluginId(-1);
 
-    if (context->GetChannelMode() != SendMode && !track)
+    if (!context->IsChannelMode(SendMode) && !track)
     {
-        SetButtonValues(SendMode);
-        channelManager = new CSurf_FP_8_SendsManager(tracks, navigator, context, m_midiout);
-        context->SetPanEncoderMode(PanEncoderSendMode);
+        SetChannelMode(SendMode, true);
     }
     else
     {
-        SetButtonValues(TrackSendMode);
-        channelManager = new CSurf_FP_8_TrackSendsManager(tracks, navigator, context, m_midiout);
-        context->SetPanEncoderMode(PanEncoderSendMode);
+        SetChannelMode(TrackSendMode, true);
     }
 };
 
@@ -121,28 +174,22 @@ void CSurf_FP_8_FaderManager::HandlePanButtonClick(int value, bool track)
 
     context->SetPluginEditPluginId(-1);
 
-    if (context->GetChannelMode() != PanMode && !track)
+    if (context->IsChannelMode(PanMode) && !track)
     {
-        SetButtonValues(PanMode);
-        channelManager = new CSurf_FP_8_ReceivesManager(tracks, navigator, context, m_midiout);
-        context->SetPanEncoderMode(PanEncoderReceiveMode);
+        SetChannelMode(PanMode, true);
     }
     else
     {
-        SetButtonValues(TrackPanMode);
-        channelManager = new CSurf_FP_8_TrackReceivesManager(tracks, navigator, context, m_midiout);
-        context->SetPanEncoderMode(PanEncoderReceiveMode);
+        SetChannelMode(TrackPanMode, true);
     }
 };
 
-void CSurf_FP_8_FaderManager::HandleMixButtonClick()
+void CSurf_FP_8_FaderManager::HandleMixAllButtonClick()
 {
-    if (context->GetChannelMode() != MixMode)
+    if (!context->IsChannelMode(MixMode))
     {
         prevChannelMode = context->GetChannelMode();
-        context->SetChannelMode(MixMode);
-        channelManager = new CSurf_FP_8_FilterManager(tracks, navigator, context, m_midiout);
-        context->SetPanEncoderMode(PanEncoderReceiveMode);
+        SetChannelMode(MixMode);
     }
     else
     {
@@ -152,7 +199,7 @@ void CSurf_FP_8_FaderManager::HandleMixButtonClick()
 
 void CSurf_FP_8_FaderManager::ResetMixButtonClick()
 {
-    if (context->GetChannelMode() == MixMode)
+    if (context->IsChannelMode(MixMode))
     {
         HandleTrackButtonClick(BTN_VALUE_ON);
     }
@@ -160,23 +207,33 @@ void CSurf_FP_8_FaderManager::ResetMixButtonClick()
 
 void CSurf_FP_8_FaderManager::HandleLinkButtonClick()
 {
-    if (context->GetChannelMode() == PluginEditMode)
+    if (context->IsChannelMode(PluginEditMode))
     {
-        context->SetChannelMode(PluginControlMode);
-        channelManager = new CSurf_FP_8_PluginControlManager(tracks, navigator, context, m_midiout);
+        SetChannelMode(PluginControlMode);
     }
     else
     {
         prevChannelMode = context->GetChannelMode();
-        context->SetChannelMode(PluginEditMode);
-        channelManager = new CSurf_FP_8_PluginLearnManager(tracks, navigator, context, m_midiout);
+        SetChannelMode(PluginEditMode);
     }
 };
 
+void CSurf_FP_8_FaderManager::HandleTouchButtonClick()
+{
+    if (context->IsChannelMode(MenuMode))
+    {
+        ChannelMode mode = context->GetPreviousChannelMode();
+        SetChannelMode(mode);
+    }
+    else
+    {
+        SetChannelMode(MenuMode);
+    }
+}
+
 void CSurf_FP_8_FaderManager::SetPluginControlMode()
 {
-    context->SetChannelMode(PluginControlMode);
-    channelManager = new CSurf_FP_8_PluginControlManager(tracks, navigator, context, m_midiout);
+    SetChannelMode(PluginControlMode);
 }
 
 // ADD ALL THE TRACKMANAGERS METHODS HERE TO PROXY THEM
@@ -188,6 +245,30 @@ void CSurf_FP_8_FaderManager::UpdateTracks()
 void CSurf_FP_8_FaderManager::HandleMuteClick(int index, int value)
 {
     channelManager->HandleMuteClick(index, value);
+}
+
+void CSurf_FP_8_FaderManager::HandleEncoderIncrement()
+{
+    if (context->IsChannelMode(MenuMode))
+    {
+        channelManager->HandleMuteClick(0, 0);
+    }
+}
+
+void CSurf_FP_8_FaderManager::HandleEncoderDecrement()
+{
+    if (context->IsChannelMode(MenuMode))
+    {
+        channelManager->HandleSoloClick(0, 0);
+    }
+}
+
+void CSurf_FP_8_FaderManager::HandleEncoderPush()
+{
+    if (context->IsChannelMode(MenuMode))
+    {
+        channelManager->HandleSelectClick(0);
+    }
 }
 
 void CSurf_FP_8_FaderManager::HandleSoloClick(int index, int value)
@@ -202,13 +283,12 @@ void CSurf_FP_8_FaderManager::HandleSoloClick(int index, int value)
     prevChannelMode = context->GetChannelMode();
 
     if (context->GetPluginControl() &&
-        (context->GetChannelMode() == TrackPluginMode || context->GetChannelMode() == PluginMode) &&
+        (context->IsChannelMode(TrackPluginMode) || context->IsChannelMode(PluginMode)) &&
         (context->GetPluginEditPluginId() > -1))
     {
         if (hasPluginConfigFile(context->GetPluginEditTrack(), context->GetPluginEditPluginId()))
         {
-            context->SetChannelMode(PluginControlMode);
-            channelManager = new CSurf_FP_8_PluginControlManager(tracks, navigator, context, m_midiout);
+            SetChannelMode(PluginControlMode);
         }
     }
 }

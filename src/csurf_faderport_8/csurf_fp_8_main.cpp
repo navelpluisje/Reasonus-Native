@@ -385,7 +385,7 @@ public:
     faderManager = new CSurf_FP_8_FaderManager(context, trackNavigator, m_midiout);
     mixManager = new CSurf_FP_8_MixManager(context, trackNavigator, faderManager, m_midiout);
     transportManager = new CSurf_TransportManager(context, m_midiout);
-    automationManager = new CSurf_FP_8_AutomationManager(context, m_midiout);
+    automationManager = new CSurf_FP_8_AutomationManager(context, faderManager, m_midiout);
     generalControlManager = new CSurf_FP_8_GeneralControlManager(context, trackNavigator, faderManager, m_midiout);
     lastTouchedFxManager = new CSurf_FP_8_LastTouchedFXManager(lastTouchedFxTrack, context, m_midiout);
 

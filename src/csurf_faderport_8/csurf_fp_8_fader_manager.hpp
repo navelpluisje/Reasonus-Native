@@ -29,6 +29,8 @@ class CSurf_FP_8_FaderManager
 
     void SetButtonValues(ChannelMode mode);
 
+    void SetChannelMode(ChannelMode mode, bool updateButtons);
+
 public:
     CSurf_FP_8_FaderManager(
         CSurf_Context *context,
@@ -45,13 +47,21 @@ public:
 
     void HandlePanButtonClick(int value, bool track = false);
 
-    void HandleMixButtonClick();
+    void HandleMixAllButtonClick();
 
     void ResetMixButtonClick();
 
     void HandleLinkButtonClick();
 
+    void HandleTouchButtonClick();
+
     void SetPluginControlMode();
+
+    void HandleEncoderIncrement();
+
+    void HandleEncoderDecrement();
+
+    void HandleEncoderPush();
 
     // ADD ALL THE TRACKMANAGERS METHODS HERE TO PROXY THEM
     void UpdateTracks();

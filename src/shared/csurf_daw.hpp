@@ -3,6 +3,7 @@
 
 #include <reaper_plugin.h>
 #include <string>
+#include <vector>
 
 class DAW
 {

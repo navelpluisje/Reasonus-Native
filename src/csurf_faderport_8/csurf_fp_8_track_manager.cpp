@@ -17,7 +17,7 @@ class CSurf_FP_8_TrackManager : public CSurf_FP_8_ChannelManager
     int solo_start[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 protected:
-    bool hasLastTouchedFxEnabled = false;
+    bool has_hast_touched_fx_enabled = false;
 
     void SetTrackColors(MediaTrack *media_track) override
     {
@@ -28,8 +28,8 @@ protected:
         if (!context->GetArm())
         {
 
-            int trackColor = ::GetTrackColor(media_track);
-            if (trackColor == 0)
+            int track_color = ::GetTrackColor(media_track);
+            if (track_color == 0)
             {
                 red = 0x7f;
                 green = 0x7f;
@@ -37,7 +37,7 @@ protected:
             }
             else
             {
-                ColorFromNative(trackColor, &red, &green, &blue);
+                ColorFromNative(track_color, &red, &green, &blue);
             }
         }
         color.SetColor(red / 2, green / 2, blue / 2);
@@ -45,20 +45,20 @@ protected:
 
     void GetFaderValue(MediaTrack *media_track, int *faderValue, int *valueBarValue, std::string *_pan1, std::string *_pan2)
     {
-        int panMode = 0;
+        int pan_mode = 0;
         double volume, pan1, pan2 = 0.0;
 
         GetTrackUIVolPan(media_track, &volume, &pan1);
-        GetTrackUIPan(media_track, &pan1, &pan2, &panMode);
+        GetTrackUIPan(media_track, &pan1, &pan2, &pan_mode);
         *_pan1 = GetPanString(pan1);
-        *_pan2 = GetWidthString(pan2, panMode);
+        *_pan2 = GetWidthString(pan2, pan_mode);
 
         if (context->GetShiftLeft())
         {
             *faderValue = int(panToNormalized(pan1) * 16383.0);
             *valueBarValue = int(volToNormalized(volume) * 127);
         }
-        else if (context->GetShiftRight() && panMode > 4)
+        else if (context->GetShiftRight() && pan_mode > 4)
         {
             *faderValue = int(panToNormalized(pan2) * 16383.0);
             *valueBarValue = int(volToNormalized(volume) * 127);
@@ -86,7 +86,7 @@ public:
         WDL_PtrList<MediaTrack> media_tracks = navigator->GetBankTracks();
         std::vector<std::string> time_code;
 
-        if (hasLastTouchedFxEnabled != context->GetLastTouchedFxMode() && !context->GetLastTouchedFxMode())
+        if (has_hast_touched_fx_enabled != context->GetLastTouchedFxMode() && !context->GetLastTouchedFxMode())
         {
             forceUpdate = true;
         }
@@ -98,7 +98,7 @@ public:
 
         for (int i = 0; i < context->GetNbChannels(); i++)
         {
-            int faderValue = 0, valueBarValue = 0;
+            int fader_value = 0, value_bar_value = 0;
             std::string strPan1, strPan2;
 
             CSurf_FP_8_Track *track = tracks.at(i);
@@ -114,7 +114,7 @@ public:
             bool isSelected = DAW::IsTrackSelected(media_track);
             bool isArmed = DAW::IsTrackArmed(media_track);
 
-            GetFaderValue(media_track, &faderValue, &valueBarValue, &strPan1, &strPan2);
+            GetFaderValue(media_track, &fader_value, &value_bar_value, &strPan1, &strPan2);
             Btn_Value selectValue = (context->GetArm() && isArmed) || (!context->GetArm() && isSelected) ? BTN_VALUE_ON
                                                                                                          : BTN_VALUE_OFF;
 
@@ -123,9 +123,9 @@ public:
             track->SetSelectButtonValue((!context->GetArm() && isArmed) ? BTN_VALUE_BLINK : selectValue, forceUpdate);
             track->SetMuteButtonValue(DAW::IsTrackMuted(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
             track->SetSoloButtonValue(DAW::IsTrackSoloed(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
-            track->SetFaderValue(faderValue, forceUpdate);
+            track->SetFaderValue(fader_value, forceUpdate);
             track->SetValueBarMode((context->GetShiftLeft() || context->GetArm()) ? VALUEBAR_MODE_FILL : VALUEBAR_MODE_BIPOLAR);
-            track->SetValueBarValue(valueBarValue);
+            track->SetValueBarValue(value_bar_value);
 
             if (context->GetShiftLeft() || context->GetShiftRight())
             {
@@ -146,7 +146,7 @@ public:
             else
             {
                 track->SetVuMeterValue(DAW::GetTrackSurfacePeakInfo(media_track));
-                int index = context->GetNbChannels() - (time_code.size() + i);
+                int index = context->GetNbChannels() - (static_cast<int>(time_code.size()) + i);
 
                 if (index < 1)
                 {
@@ -166,7 +166,7 @@ public:
             }
         }
 
-        hasLastTouchedFxEnabled = context->GetLastTouchedFxMode();
+        has_hast_touched_fx_enabled = context->GetLastTouchedFxMode();
         forceUpdate = false;
     }
 
