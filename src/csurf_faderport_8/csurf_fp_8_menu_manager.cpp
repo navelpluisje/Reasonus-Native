@@ -14,10 +14,6 @@
 class CSurf_FP_8_Menu_Manager : public CSurf_FP_8_ChannelManager
 {
 protected:
-    int nbSends = 0;
-    int nbTrackSends[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    int currentSend = 0;
-
     mINI::INIStructure ini;
 
     std::vector<std::string> menu_items = {"Plugin Ctr", "Swap Shift", "Moment", "Timecode", "Time type"};
@@ -27,7 +23,7 @@ protected:
         {{"Default", "0"}, {"Swap", "1"}},
         {{"Disable", "0"}, {"Enable", "1"}},
         {{"REAPER", "0"}, {"Overwrite", "1"}},
-        {{"Time", "0"}, {"Beats", "2"}, {"Seconds", "3"}, {"Samples", "4"}, {"Hr:Min:Sec:Fr", "5"}, {"Abs. Frames", "8"}},
+        {{"Time", "0"}, {"Beats", "2"}, {"Seconds", "3"}, {"Samples", "4"}, {"H:M:S:Fr", "5"}, {"Abs. Frames", "8"}},
     };
 
     int level = 0;
@@ -68,42 +64,50 @@ public:
 
     void UpdateTracks() override
     {
-        int nb_menu_items =static_cast<int>(menu_items.size());
+        int nb_menu_items = static_cast<int>(menu_items.size());
         int nb_options = static_cast<int>(menu_options.at(option[0]).size());
         int sel_option = option[1];
 
         int option_offset = 0;
-        if (nb_options > 6 && sel_option >= (nb_options - 6) + 2) {
+        if (nb_options > 6 && sel_option >= (nb_options - 6) + 2)
+        {
             option_offset = nb_options - 6;
-        } else if (nb_options > 6 && sel_option > 2 ) {
+        }
+        else if (nb_options > 6 && sel_option > 2)
+        {
             option_offset = sel_option - 2;
         }
 
         for (int i = 0; i < 7; i++)
         {
-            if (i < nb_menu_items) {
+            if (i < nb_menu_items)
+            {
                 tracks.at(1)->SetDisplayLine(i, ALIGN_LEFT, menu_items[i].c_str(), option[0] == i ? INVERT : NON_INVERT);
-            } else {
+            }
+            else
+            {
                 tracks.at(1)->SetDisplayLine(i, ALIGN_LEFT, "", NON_INVERT);
             }
-        }
-        
-        for (int i = 0; i < 7; i++)
-        {
+
             int index = i + option_offset;
 
-            if (index < nb_options) {
+            if (index < nb_options)
+            {
                 std::string option_label = menu_options.at(option[0])[index][0];
                 std::string value = menu_options.at(option[0])[index][1];
-                
+
                 if (value == ini["surface"][ini_keys[option[0]]])
                 {
                     option_label = ">" + option_label;
                 }
                 tracks.at(2)->SetDisplayLine(i, ALIGN_LEFT, option_label.c_str(), option[1] == index ? INVERT : NON_INVERT);
-            } else if (index == nb_options) {
+            }
+            else if (index == nb_options)
+            {
                 tracks.at(2)->SetDisplayLine(i, ALIGN_LEFT, "<- Back", option[1] == nb_options ? INVERT : NON_INVERT);
-            } else {
+            }
+            else
+            {
                 tracks.at(2)->SetDisplayLine(i, ALIGN_LEFT, "", NON_INVERT);
             }
         }
@@ -113,13 +117,13 @@ public:
     void HandleSelectClick(int index) override
     {
         (void)index;
-        int maxItems = level == 0 ? 5 : static_cast<int>(menu_options.at(option[0]).size());
-        if (level > 0 && option[1] == maxItems)
+        int max_items = level == 0 ? 5 : static_cast<int>(menu_options.at(option[0]).size());
+        if (level > 0 && option[1] == max_items)
         {
             level = 0;
             option[1] = -1;
         }
-        else if (level > 0 && option[1] < maxItems)
+        else if (level > 0 && option[1] < max_items)
         {
             ini["surface"][ini_keys[option[0]]] = menu_options[option[0]][option[1]][1];
             mINI::INIFile file(GetReaSonusIniPath(FP_8));
@@ -148,8 +152,8 @@ public:
     {
         (void)index;
         (void)value;
-        int maxItems = level == 0 ? 5 : static_cast<int>(menu_options.at(option[0]).size());
-        option[level] = minmax(0, option[level] + 1, maxItems - (level == 0 ? 1 : 0));
+        int max_items = level == 0 ? 5 : static_cast<int>(menu_options.at(option[0]).size());
+        option[level] = minmax(0, option[level] + 1, max_items - (level == 0 ? 1 : 0));
     }
 
     // Handle the encoder decrement
@@ -157,8 +161,8 @@ public:
     {
         (void)index;
         (void)value;
-        int maxItems = level == 0 ? 5 : static_cast<int>(menu_options.at(option[0]).size());
-        option[level] = minmax(0, option[level] - 1, maxItems - (level == 0 ? 1 : 0));
+        int max_items = level == 0 ? 5 : static_cast<int>(menu_options.at(option[0]).size());
+        option[level] = minmax(0, option[level] - 1, max_items - (level == 0 ? 1 : 0));
     }
 
     void HandleFaderTouch(int index) override
