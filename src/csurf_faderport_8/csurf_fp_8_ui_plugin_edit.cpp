@@ -59,7 +59,7 @@ namespace CSURF_FP_8_UI_PLUGIN_EDIT
         {
             mINI::INIFile file(fileName);
             ini[controlName][fieldName] = value;
-            file.write(ini);
+            file.write(ini, true);
         }
     }
 
