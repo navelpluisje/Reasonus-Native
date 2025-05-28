@@ -178,8 +178,17 @@ void logDouble(const char *key, double value);
  * @brief Check if we have the FP.ini available. If not, we create it
  *
  * @param data The data object to write the ini data to
+ * @param device Wether its a Faderport 8/16 or V2
  */
 void readAndCreateIni(mINI::INIStructure &data, std::string device);
+
+/**
+ * @brief Validate if the current ini still is valid. If not create a backup and update the current
+ *
+ * @param data The data object to write the ini data to
+ * @param device Wether its a Faderport 8/16 or V2
+ */
+void validateReaSonusIni(mINI::INIFile file, mINI::INIStructure &data, std::string device);
 
 /**
  * @brief Create a unique key

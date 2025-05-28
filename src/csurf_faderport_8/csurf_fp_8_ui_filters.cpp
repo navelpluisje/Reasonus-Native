@@ -129,7 +129,7 @@ namespace CSURF_FP_8_UI_FILTERS
         std::string filter = filtersDlgFilterKeys[filtersDlgSelectedFilter];
 
         ini[filter][key] = std::to_string(IsDlgButtonChecked(hwndDlg, checkBox));
-        file.write(ini);
+        file.write(ini, true);
     }
 
     WDL_DLGRET dlgProcFiters(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -178,7 +178,7 @@ namespace CSURF_FP_8_UI_FILTERS
                 std::string filter = filtersDlgFilterKeys[filtersDlgSelectedFilter];
                 ini[filter]["text"] = join(filtersDlgFilterText, ",");
 
-                file.write(ini);
+                file.write(ini, true);
                 PopulateFilterTextList(hwndDlg, filtersDlgSelectedFilterText);
                 break;
             }
@@ -191,7 +191,7 @@ namespace CSURF_FP_8_UI_FILTERS
                 std::string filter = filtersDlgFilterKeys[filtersDlgSelectedFilter];
                 ini[filter]["text"] = join(filtersDlgFilterText, ",");
 
-                file.write(ini);
+                file.write(ini, true);
                 PopulateFilterTextList(hwndDlg, filtersDlgSelectedFilterText - 1);
                 break;
             }
@@ -254,7 +254,7 @@ namespace CSURF_FP_8_UI_FILTERS
                 char buffer[255];
                 GetDlgItemText(hwndDlg, IDC_EDIT_FILTER_NAME, buffer, std::size(buffer));
                 ini[filter]["name"] = buffer;
-                file.write(ini);
+                file.write(ini, true);
                 break;
             }
 
