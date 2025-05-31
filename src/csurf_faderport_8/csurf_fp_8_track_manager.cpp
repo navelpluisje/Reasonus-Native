@@ -86,7 +86,7 @@ public:
         WDL_PtrList<MediaTrack> media_tracks = navigator->GetBankTracks();
         std::vector<std::string> time_code;
 
-        if (has_hast_touched_fx_enabled != context->GetLastTouchedFxMode() && !context->GetLastTouchedFxMode())
+        if (has_hast_touched_fx_enabled != context->GetLastTouchedFxMode())
         {
             forceUpdate = true;
         }
