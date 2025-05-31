@@ -13,15 +13,15 @@ protected:
     Inverted inverted[7] = {NON_INVERT, NON_INVERT, NON_INVERT, NON_INVERT, NON_INVERT, NON_INVERT, NON_INVERT};
     Alignment alignment[7] = {ALIGN_LEFT, ALIGN_LEFT, ALIGN_LEFT, ALIGN_LEFT, ALIGN_LEFT, ALIGN_LEFT, ALIGN_LEFT};
     DisplayMode displayMode;
-
     midi_Output *m_midiout;
+    int device_id;
 
     void SendValue(int line);
 
     void SendMode();
 
 public:
-    CSurf_Display(int channel, midi_Output *m_midiout) : channel(channel), m_midiout(m_midiout) {};
+    CSurf_Display(int channel, midi_Output *m_midiout, int device_id) : channel(channel), m_midiout(m_midiout), device_id(device_id) {};
 
     ~CSurf_Display() {};
 
