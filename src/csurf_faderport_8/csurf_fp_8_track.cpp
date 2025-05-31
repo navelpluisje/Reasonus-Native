@@ -6,12 +6,13 @@
 
 CSurf_FP_8_Track::CSurf_FP_8_Track(int index, CSurf_Context *context, midi_Output *m_midiout) : context(context)
 {
+    int device_id = context->GetNbChannels() == 8 ? SYSEX_DEVICE_FP8 : SYSEX_DEVICE_FP16;
     selectButton = new CSurf_ColorButton(ButtonColorWhite, SelectButtons[index], BTN_VALUE_OFF, m_midiout);
     soloButton = new CSurf_Button(SoloButtons[index], BTN_VALUE_OFF, m_midiout);
     muteButton = new CSurf_Button(MuteButtons[index], BTN_VALUE_OFF, m_midiout);
     fader = new CSurf_Fader(index, 0, m_midiout);
     valueBar = new CSurf_Valuebar(index, 0, m_midiout);
-    display = new CSurf_Display(index, m_midiout);
+    display = new CSurf_Display(index, m_midiout, device_id);
     vuMeter = new CSurf_VuMeter(index, m_midiout);
 }
 CSurf_FP_8_Track::~CSurf_FP_8_Track()
@@ -25,10 +26,10 @@ CSurf_FP_8_Track::~CSurf_FP_8_Track()
 void CSurf_FP_8_Track::ClearTrack()
 {
     this->SetTrackColor(ButtonColorWhite);
-    this->SetDisplayLine(0, ALIGN_LEFT, "", NON_INVERT, true);
-    this->SetDisplayLine(1, ALIGN_LEFT, "", NON_INVERT, true);
-    this->SetDisplayLine(2, ALIGN_CENTER, "", NON_INVERT, true);
-    this->SetDisplayLine(3, ALIGN_CENTER, "", NON_INVERT, true);
+    this->SetDisplayLine(0, ALIGN_LEFT, "", NON_INVERT, false);
+    this->SetDisplayLine(1, ALIGN_LEFT, "", NON_INVERT, false);
+    this->SetDisplayLine(2, ALIGN_CENTER, "", NON_INVERT, false);
+    this->SetDisplayLine(3, ALIGN_CENTER, "", NON_INVERT, false);
     this->SetMuteButtonValue(BTN_VALUE_OFF);
     this->SetSoloButtonValue(BTN_VALUE_OFF);
     this->SetSelectButtonValue(BTN_VALUE_OFF);
