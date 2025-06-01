@@ -47,23 +47,25 @@ std::map<int, bool> GetParentTracks(std::map<int, bool> tracks)
     for (auto const &track : tracks)
     {
         MediaTrack *media_track = GetTrack(0, track.first);
-        int trackDepth = GetTrackDepth(media_track);
-        int trackId = track.first - 1;
+        int track_depth = GetTrackDepth(media_track);
+        int track_id = track.first - 1;
 
-        if (trackDepth == 0)
+        if (track_depth == 0)
         {
             continue;
         }
 
-        while (trackDepth > 0)
+        while (track_depth > 0)
         {
-            MediaTrack *current_track = GetTrack(0, trackId);
-            if ((int)GetMediaTrackInfo_Value(current_track, "I_FOLDERDEPTH") == 1)
+            MediaTrack *current_track = GetTrack(0, track_id);
+            int current_track_depth = GetTrackDepth(current_track);
+
+            if ((int)GetMediaTrackInfo_Value(current_track, "I_FOLDERDEPTH") == 1 && current_track_depth < track_depth)
             {
-                response[trackId] = true;
+                response[track_id] = true;
+                track_depth = current_track_depth;
             }
-            trackId -= 1;
-            trackDepth = GetTrackDepth(current_track);
+            track_id -= 1;
         }
     }
 
