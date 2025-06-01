@@ -39,6 +39,39 @@ namespace CSURF_FP_8_UI_FILTERS
         return filterTextList;
     }
 
+    void createFilter(HWND hwndDlg)
+    {
+        mINI::INIFile file(GetReaSonusIniPath(FP_8));
+
+        std::string newKey = GenerateUniqueKey("filter_");
+        ini["filters"][ini["filters"]["nb-filters"]] = newKey;
+        ini["filters"]["nb-filters"] = std::to_string(stoi(ini["filters"]["nb-filters"]) + 1);
+        ini[newKey];
+        ini[newKey]["name"] = "New Filter";
+        ini[newKey]["text"] = "";
+        ini[newKey]["sibblings"] = "0";
+        ini[newKey]["parents"] = "0";
+        ini[newKey]["children"] = "0";
+        ini[newKey]["top-level"] = "0";
+        ini[newKey]["match-multiple"] = "0";
+        file.write(ini, true);
+
+        PopulateFiltersList(hwndDlg, stoi(ini["filters"]["nb-filters"]) - 1);
+    }
+
+    void readIni(HWND hwndDlg)
+    {
+        mINI::INIFile file(GetReaSonusIniPath(FP_8));
+        file.read(ini);
+
+        filtersDlgFilterKeys = GetFiltersKeys();
+        if (filtersDlgFilterKeys.size() == 0)
+        {
+            createFilter(hwndDlg);
+            filtersDlgFilterKeys = GetFiltersKeys();
+        }
+    }
+
     void HideFiltersDialog()
     {
         ShowWindow(s_hwndReaSonusFiltersDlg, SW_HIDE);
@@ -139,6 +172,7 @@ namespace CSURF_FP_8_UI_FILTERS
         {
         case WM_INITDIALOG:
         {
+            readIni(hwndDlg);
 
             WDL_UTF8_HookListView(GetDlgItem(hwndDlg, IDC_LIST_FILTERS));
             WDL_UTF8_HookListView(GetDlgItem(hwndDlg, IDC_LIST_FILTER_TEXT));
@@ -156,8 +190,13 @@ namespace CSURF_FP_8_UI_FILTERS
 
             case IDC_LIST_FILTERS:
             {
-                filtersDlgSelectedFilter = (int)SendDlgItemMessage(hwndDlg, IDC_LIST_FILTERS, LB_GETCURSEL, 0, 0);
-                PopulateFilter(hwndDlg);
+                int new_selected_filter = (int)SendDlgItemMessage(hwndDlg, IDC_LIST_FILTERS, LB_GETCURSEL, 0, 0);
+                if (new_selected_filter > -1 && new_selected_filter != filtersDlgSelectedFilter)
+                {
+                    filtersDlgSelectedFilter = new_selected_filter;
+                    PopulateFilter(hwndDlg);
+                }
+
                 break;
             }
 
@@ -192,28 +231,13 @@ namespace CSURF_FP_8_UI_FILTERS
                 ini[filter]["text"] = join(filtersDlgFilterText, ",");
 
                 file.write(ini, true);
-                PopulateFilterTextList(hwndDlg, filtersDlgSelectedFilterText - 1);
+                PopulateFilterTextList(hwndDlg, minmax(0, filtersDlgSelectedFilterText - 1, 999));
                 break;
             }
 
             case IDC_BUTTON_ADD_FILTER:
             {
-                mINI::INIFile file(GetReaSonusIniPath(FP_8));
-
-                std::string newKey = GenerateUniqueKey("filter_");
-                ini["filters"][ini["filters"]["nb-filters"]] = newKey;
-                ini["filters"]["nb-filters"] = std::to_string(stoi(ini["filters"]["nb-filters"]) + 1);
-                ini[newKey];
-                ini[newKey]["name"] = "New Filter";
-                ini[newKey]["text"] = "";
-                ini[newKey]["sibblings"] = "0";
-                ini[newKey]["parents"] = "0";
-                ini[newKey]["children"] = "0";
-                ini[newKey]["top-level"] = "0";
-                ini[newKey]["match-multiple"] = "0";
-                file.write(ini, true);
-
-                PopulateFiltersList(hwndDlg, stoi(ini["filters"]["nb-filters"]) - 1);
+                createFilter(hwndDlg);
                 break;
             }
 
@@ -240,7 +264,8 @@ namespace CSURF_FP_8_UI_FILTERS
             {
                 if (filtersDlgFilterKeys.size() == 0)
                 {
-                    break;
+                    createFilter(hwndDlg);
+                    filtersDlgSelectedFilter = 0;
                 }
 
                 mINI::INIFile file(GetReaSonusIniPath(FP_8));
@@ -313,11 +338,6 @@ namespace CSURF_FP_8_UI_FILTERS
 
     void ShowFiltersDialog()
     {
-        mINI::INIFile file(GetReaSonusIniPath(FP_8));
-        file.read(ini);
-
-        filtersDlgFilterKeys = GetFiltersKeys();
-
         if (s_hwndReaSonusFiltersDlg == NULL)
         {
             s_hwndReaSonusFiltersDlg = CreateDialog(g_hInst, MAKEINTRESOURCE(IDD_DIALOG_REASONUS_NATIVE_FILTERS), g_hwnd, dlgProcFiters);
