@@ -6,6 +6,7 @@
 #include "../shared/csurf_daw.hpp"
 #include <mini/ini.h>
 #include <WDL/ptrlist.h>
+#include <config.h>
 #include <vector>
 #include "csurf_fp_8_track.hpp"
 #include "csurf_fp_8_channel_manager.hpp"
@@ -40,7 +41,7 @@ public:
         mINI::INIFile file(GetReaSonusIniPath(FP_8));
         file.read(ini);
 
-        for (int i = 1; i < context->GetNbChannels(); i++)
+        for (int i = 1; i < context->GetNbChannels() - 1; i++)
         {
             CSurf_FP_8_Track *track = tracks.at(i);
             track->SetDisplayMode(DISPLAY_MODE_9);
@@ -57,6 +58,14 @@ public:
         tracks.at(0)->SetDisplayLine(0, ALIGN_CENTER, "ReaSonus", NON_INVERT);
         tracks.at(0)->SetDisplayLine(1, ALIGN_CENTER, "FaderPort", NON_INVERT);
         tracks.at(0)->SetDisplayLine(2, ALIGN_CENTER, "Menu", INVERT);
+
+        int last_display_index = context->GetNbChannels() - 1;
+        tracks.at(last_display_index)->SetValueBarMode(VALUEBAR_MODE_OFF);
+        tracks.at(last_display_index)->SetDisplayMode(DISPLAY_MODE_2);
+        tracks.at(last_display_index)->SetDisplayLine(0, ALIGN_CENTER, "Version", NON_INVERT);
+        tracks.at(last_display_index)->SetDisplayLine(1, ALIGN_CENTER, GIT_VERSION, NON_INVERT);
+        tracks.at(last_display_index)->SetDisplayLine(2, ALIGN_CENTER, "", NON_INVERT);
+        tracks.at(last_display_index)->SetDisplayLine(3, ALIGN_CENTER, "", NON_INVERT);
 
         UpdateTracks();
     }

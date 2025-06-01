@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.15)
 # Project Definition and Versioning
 # ------------------------------------------------------------------------------
 
-project(ReasonusNative VERSION 0.0.1 LANGUAGES C CXX)
+project(ReasonusNative VERSION 0.1.2 LANGUAGES C CXX)
 
 find_package(Git)
 if(GIT_FOUND)
@@ -14,7 +14,9 @@ if(GIT_FOUND)
     OUTPUT_VARIABLE GIT_LATEST_TAG
     OUTPUT_STRIP_TRAILING_WHITESPACE
   )
+
   if(NOT "${GIT_LATEST_TAG}" STREQUAL "")
+    set(GIT_ORIGINAL_VERSION ${GIT_LATEST_TAG})
     string(REGEX REPLACE "[^0-9.]" "" GIT_LATEST_TAG ${GIT_LATEST_TAG})
     if(NOT "${GIT_LATEST_TAG}" STREQUAL "")
       project(${PROJECT_NAME} VERSION ${GIT_LATEST_TAG} LANGUAGES C CXX)
