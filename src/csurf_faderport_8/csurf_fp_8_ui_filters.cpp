@@ -17,6 +17,8 @@ namespace CSURF_FP_8_UI_FILTERS
         std::vector<std::string> filtersDlgFilterText;
         int filtersDlgSelectedFilter = -1;
         int filtersDlgSelectedFilterText = -1;
+        int deleting_filter_start = 0;
+        int adding_filter_start = 0;
     }
 
     std::vector<std::string> GetFiltersKeys()
@@ -237,17 +239,29 @@ namespace CSURF_FP_8_UI_FILTERS
 
             case IDC_BUTTON_ADD_FILTER:
             {
-                createFilter(hwndDlg);
+                int time = GetTickCount();
+
+                if (adding_filter_start != time)
+                {
+                    adding_filter_start = time;
+                    createFilter(hwndDlg);
+                }
                 break;
             }
 
             case IDC_BUTTON_REMOVE_FILTER:
             {
-                ini.remove(filtersDlgFilterKeys.at(filtersDlgSelectedFilter));
-                filtersDlgFilterKeys.erase(filtersDlgFilterKeys.begin() + filtersDlgSelectedFilter);
+                int time = GetTickCount();
 
-                UpdateIniFiltersList();
-                PopulateFiltersList(hwndDlg, 0);
+                if (filtersDlgFilterKeys.size() > 1 && deleting_filter_start != time)
+                {
+                    deleting_filter_start = time;
+                    ini.remove(filtersDlgFilterKeys.at(filtersDlgSelectedFilter));
+                    filtersDlgFilterKeys.erase(filtersDlgFilterKeys.begin() + filtersDlgSelectedFilter);
+                    UpdateIniFiltersList();
+                    PopulateFiltersList(hwndDlg, 0);
+                }
+
                 break;
             }
 

@@ -336,12 +336,16 @@ void validateReaSonusIni(mINI::INIFile file, mINI::INIStructure &data, std::stri
 std::string GenerateUniqueKey(std::string prefix)
 {
     srand(std::time(0));
+    int now = GetTickCount();
+
     char a[] = "abcdefghijklmnopqrstuvwxyz0123456789";
     for (int i = 0; i < 24; i++)
     {
         char rnd = a[(rand() + 100) % 36];
         prefix += rnd;
     }
+    prefix += std::to_string(now);
+
     return prefix;
 }
 
