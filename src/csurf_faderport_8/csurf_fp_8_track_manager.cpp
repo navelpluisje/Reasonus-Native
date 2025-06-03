@@ -186,11 +186,10 @@ public:
             return;
         }
 
-        for (int i = 0; i < context->GetNbChannels(); i++)
-        {
-            MediaTrack *media_track = navigator->GetTrackByIndex(i);
-            SetTrackSelected(media_track, false);
-        }
+        /**
+         * Select a single track, so first unselect all the currently selected tracks
+         */
+        Main_OnCommandEx(40297, 0, 0);
         SetTrackSelected(media_track, true);
     }
 
