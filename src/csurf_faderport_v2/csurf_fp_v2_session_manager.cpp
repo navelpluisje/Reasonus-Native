@@ -1,3 +1,4 @@
+
 #ifndef CSURF_SESSION_MANAGER_V2_C_
 #define CSURF_SESSION_MANAGER_V2_C_
 
@@ -144,36 +145,43 @@ public:
 
     void resetPan()
     {
-        MediaTrack *media_track = trackNavigator->GetControllerTrack();
+        MediaTrack *media_track = context->GetMasterFaderMode() ? GetMasterTrack(0) : trackNavigator->GetControllerTrack();
 
-        if (context->GetShiftLeft())
-        {
-            SetMediaTrackInfo_Value(media_track, "D_WIDTH", 0);
-        }
-        else
+        int pan_mode = DAW::GetTrackPanMode(media_track);
+        if (pan_mode < 4)
         {
             SetMediaTrackInfo_Value(media_track, "D_PAN", 0);
+        }
+        if (pan_mode == 6)
+        {
+            SetMediaTrackInfo_Value(media_track, "D_DUALPANL", -1);
+            SetMediaTrackInfo_Value(media_track, "D_DUALPANR", 1);
+        }
+        if (pan_mode == 5)
+        {
+            SetMediaTrackInfo_Value(media_track, "D_PAN", 0);
+            SetMediaTrackInfo_Value(media_track, "D_WIDTH", 1);
         }
     }
 
     void UpdatePanValue(int val)
     {
         double pan1, pan2 = 0.0;
-        int panMode;
+        int pan_mode;
         MediaTrack *media_track = context->GetMasterFaderMode() ? GetMasterTrack(0) : trackNavigator->GetControllerTrack();
-        GetTrackUIPan(media_track, &pan1, &pan2, &panMode);
+        GetTrackUIPan(media_track, &pan1, &pan2, &pan_mode);
 
         if (context->GetShiftLeft())
         {
             double newValue = int(panToNormalized(pan2) * 127.0) + val;
             newValue = minmax(0.0, newValue, 127.0);
-            SetMediaTrackInfo_Value(media_track, "D_WIDTH", normalizedToPan(newValue / 127));
+            SetMediaTrackInfo_Value(media_track, pan_mode < 6 ? "D_WIDTH" : "D_DUALPANR", normalizedToPan(newValue / 127));
         }
         else
         {
             double newValue = int(panToNormalized(pan1) * 127.0) + val;
             newValue = minmax(0.0, newValue, 127.0);
-            SetMediaTrackInfo_Value(media_track, "D_PAN", normalizedToPan(newValue / 127));
+            SetMediaTrackInfo_Value(media_track, pan_mode < 6 ? "D_PAN" : "D_DUALPANL", normalizedToPan(newValue / 127));
         }
     }
 
@@ -298,10 +306,11 @@ public:
             handleFunctionKey("3");
             return;
         }
-        // Once selected and repressing it again, it will create a region from the time selection
+
+        // Once selected and repressing it again, it will edit the region near the cursor
         if (session_type == Section)
         {
-            Main_OnCommandEx(40306, 0, 0); // Markers: Insert region from time selection and edit...
+            Main_OnCommandEx(40616, 0, 0); // Markers: Edit region near cursor
         }
         SetSession(Section);
     }
@@ -317,6 +326,12 @@ public:
         {
             handleFunctionKey("4");
             return;
+        }
+
+        // Once selected and repressing it again, it will create a marker
+        if (session_type == Marker)
+        {
+            Main_OnCommandEx(40157, 0, 0); // Markers: Insert marker at current position
         }
         SetSession(Marker);
     }
@@ -518,8 +533,8 @@ public:
                                     : Main_OnCommandEx(40364, 0, 0); // Options: Toggle metronome
             break;
         case Section:
-            context->GetShiftLeft() ? Main_OnCommandEx(40306, 0, 0)  // Markers: Insert region from time selection and edit...
-                                    : Main_OnCommandEx(40616, 0, 0); // Markers: Edit region near cursor
+            context->GetShiftLeft() ? Main_OnCommandEx(40615, 0, 0)  // Markers: Delete region near cursor
+                                    : Main_OnCommandEx(40306, 0, 0); // Markers: Insert region from time selection and edit..
             break;
         case Marker:
             context->GetShiftLeft() ? Main_OnCommandEx(40613, 0, 0)  // Markers: Delete marker near cursor

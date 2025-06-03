@@ -68,21 +68,27 @@ protected:
     void UpdatePanValue(int val)
     {
         double pan1, pan2 = 0.0;
-        int panMode;
+        int pan_mode;
         MediaTrack *media_track = GetSelectedTrack(0, 0);
-        GetTrackUIPan(media_track, &pan1, &pan2, &panMode);
+        GetTrackUIPan(media_track, &pan1, &pan2, &pan_mode);
 
-        if (context->GetPanPushMode())
+        if (pan_mode < 4)
         {
             double newValue = int(panToNormalized(pan1) * 127.0) + val;
             newValue = minmax(0.0, newValue, 127.0);
             SetMediaTrackInfo_Value(media_track, "D_PAN", normalizedToPan(newValue / 127));
         }
+        else if (context->GetPanPushMode())
+        {
+            double newValue = int(panToNormalized(pan1) * 127.0) + val;
+            newValue = minmax(0.0, newValue, 127.0);
+            SetMediaTrackInfo_Value(media_track, pan_mode < 6 ? "D_PAN" : "D_DUALPANL", normalizedToPan(newValue / 127));
+        }
         else
         {
             double newValue = int(panToNormalized(pan2) * 127.0) + val;
             newValue = minmax(0.0, newValue, 127.0);
-            SetMediaTrackInfo_Value(media_track, "D_WIDTH", normalizedToPan(newValue / 127));
+            SetMediaTrackInfo_Value(media_track, pan_mode < 6 ? "D_WIDTH" : "D_DUALPANR", normalizedToPan(newValue / 127));
         }
     }
 
@@ -94,6 +100,39 @@ protected:
     void DecrementPan(int val)
     {
         UpdatePanValue(val * -1);
+    }
+
+    void resetPan()
+    {
+        MediaTrack *media_track = GetSelectedTrack(0, 0);
+
+        int pan_mode = DAW::GetTrackPanMode(media_track);
+        if (pan_mode < 4 && !context->GetPanPushMode())
+        {
+            SetMediaTrackInfo_Value(media_track, "D_PAN", 0);
+        }
+        if (pan_mode == 6)
+        {
+            if (context->GetPanPushMode())
+            {
+                SetMediaTrackInfo_Value(media_track, "D_DUALPANL", -1);
+            }
+            else
+            {
+                SetMediaTrackInfo_Value(media_track, "D_DUALPANR", 1);
+            }
+        }
+        if (pan_mode == 5)
+        {
+            if (context->GetPanPushMode())
+            {
+                SetMediaTrackInfo_Value(media_track, "D_PAN", 0);
+            }
+            else
+            {
+                SetMediaTrackInfo_Value(media_track, "D_WIDTH", 1);
+            }
+        }
     }
 
     void SetButtonColors() {};
@@ -144,9 +183,7 @@ public:
 
         if (context->GetShiftLeft())
         {
-            MediaTrack *media_track = GetSelectedTrack(0, 0);
-            SetMediaTrackInfo_Value(media_track, "D_PAN", 0);
-            SetMediaTrackInfo_Value(media_track, "D_WIDTH", 0);
+            resetPan();
         }
         else
         {
