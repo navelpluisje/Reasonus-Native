@@ -335,7 +335,7 @@ public:
         }
     }
 
-    void HandleEncoderIncrement()
+    void HandleEncoderIncrement(int value)
     {
         switch (session_type)
         {
@@ -354,8 +354,9 @@ public:
             trackNavigator->IncrementOffset(context->GetShiftLeft() ? 1 : context->GetNbChannels());
             break;
         case Master:
-            Main_OnCommandStringEx("_XENAKIOS_NUDMASVOL1DBU"); // Xenakios/SWS: Nudge master volume 1 dB up
-            // TODO: Add master pan with left shift
+            context->GetShiftLeft()    ? IncrementMasterPan(value, true)
+            : context->GetShiftRight() ? IncrementMasterPan(value, false)
+                                       : Main_OnCommandStringEx("_XENAKIOS_NUDMASVOL1DBU"); // Xenakios/SWS: Nudge master volume 1 dB up;
             break;
         case Click:
             IncrementMetronomeVolume();
@@ -372,7 +373,7 @@ public:
         }
     }
 
-    void HandleEncoderDecrement()
+    void HandleEncoderDecrement(int value)
     {
         switch (session_type)
         {
@@ -391,7 +392,9 @@ public:
             trackNavigator->DecrementOffset(context->GetShiftLeft() ? 1 : context->GetNbChannels());
             break;
         case Master:
-            Main_OnCommandStringEx("_XENAKIOS_NUDMASVOL1DBD"); // Xenakios/SWS: Nudge master volume 1 dB down
+            context->GetShiftLeft()    ? DecrementMasterPan(value, true)
+            : context->GetShiftRight() ? DecrementMasterPan(value, false)
+                                       : Main_OnCommandStringEx("_XENAKIOS_NUDMASVOL1DBD"); // Xenakios/SWS: Nudge master volume 1 dB down
             break;
         case Click:
             DecrementMetronomeVolume();
@@ -454,11 +457,11 @@ public:
     {
         if (hasBit(value, 6))
         {
-            HandleEncoderDecrement();
+            HandleEncoderDecrement(value - 64);
         }
         else
         {
-            HandleEncoderIncrement();
+            HandleEncoderIncrement(value);
         }
     }
 };
