@@ -106,7 +106,19 @@ public:
 
             if (!media_track || CountTracks(0) < i)
             {
-                track->ClearTrack();
+                int index = context->GetNbChannels() - (static_cast<int>(time_code.size()) + i);
+                if (index < 1)
+                {
+                    track->ClearTrack(false);
+                    track->SetDisplayMode(DISPLAY_MODE_0, forceUpdate);
+                    track->SetDisplayLine(0, ALIGN_LEFT, "", NON_INVERT, forceUpdate);
+                    track->SetDisplayLine(1, ALIGN_CENTER, "", NON_INVERT, forceUpdate);
+                    track->SetDisplayLine(2, ALIGN_CENTER, time_code.at(abs(index)).c_str(), INVERT, forceUpdate);
+                }
+                else
+                {
+                    track->ClearTrack(true);
+                }
                 continue;
             }
             SetTrackColors(media_track);
