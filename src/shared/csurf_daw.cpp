@@ -467,8 +467,8 @@ int DAW::GetProjectTimeMode()
     // Get theh actrual value and not the pointer
     int val = *timeMode2Ptr_;
 
-    // This will get rid of all teh second measure data
-    return val & 255;
+    // This will get rid of all the second measure data
+    return minmax(0, val, 256) & 255;
 }
 
 int DAW::GetProjectMeasureOffset()
