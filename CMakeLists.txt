@@ -81,18 +81,28 @@ FetchContent_Declare(mINI
 
 FetchContent_MakeAvailable(WDL reaper-sdk GSL mINI)
 
+
+# ------------------------------------------------------------------------------
+# Single file downloads
+# ------------------------------------------------------------------------------
+
+file(DOWNLOAD
+    https://github.com/cfillion/reaimgui/releases/download/v0.9.3.3/reaper_imgui_functions.h
+    ${PROJECT_LIB_DIR}/reaImgui/reaper_imgui_functions.h)
+
+
 # ------------------------------------------------------------------------------
 # Symlink WDL into reaper-sdk
 # ------------------------------------------------------------------------------
 
 if (UNIX)
-execute_process(
+  execute_process(
     COMMAND ${CMAKE_COMMAND} -E create_symlink
-            # source
-            "${PROJECT_LIB_DIR}/WDL/WDL"
-            # target
-            ${PROJECT_LIB_DIR}/reaper-sdk/WDL
-)
+      # source
+      "${PROJECT_LIB_DIR}/WDL/WDL"
+      # target
+      ${PROJECT_LIB_DIR}/reaper-sdk/WDL
+  )
 else()
     file(TO_NATIVE_PATH "${PROJECT_LIB_DIR}/WDL/WDL" _dstDir)
     file(TO_NATIVE_PATH "${PROJECT_LIB_DIR}/reaper-sdk/WDL" _srcDir)
@@ -135,14 +145,16 @@ endforeach()
 # ------------------------------------------------------------------------------
 
 add_library(reaper-sdk INTERFACE)
-target_include_directories(reaper-sdk   
-    INTERFACE 
-    ${header_paths}
-    )
+
+target_include_directories(reaper-sdk INTERFACE ${header_paths})
+
 target_link_libraries(reaper-sdk INTERFACE GSL)
 target_include_directories(reaper-sdk INTERFACE ${CMAKE_BINARY_DIR})
 
 target_link_libraries(reaper-sdk INTERFACE mINI)
+
+target_link_libraries(reaper-sdk INTERFACE ${PROJECT_LIB_DIR}/reaImgui/reaper_imgui_functions.h)
+target_include_directories(reaper-sdk INTERFACE ${PROJECT_LIB_DIR}/reaImgui)
 
 # ------------------------------------------------------------------------------
 # Find and Link WDL + SWELL

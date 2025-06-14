@@ -1,5 +1,4 @@
 #include "csurf_fp_v2_ui_test.hpp"
-#include "reaper_imgui_functions.h"
 
 constexpr const char *g_name{"ReaImGui C++ example"};
 static int g_actionId;

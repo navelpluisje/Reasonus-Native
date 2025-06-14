@@ -1,7 +1,7 @@
 #include <WDL/wdltypes.h> // might be unnecessary in future
 #include <reaper_plugin_functions.h>
 #include <memory>
-#include "reaper_imgui_functions.h"
+#include <reaper_imgui_functions.h>
 
 class Example
 {
