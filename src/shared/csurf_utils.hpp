@@ -19,6 +19,9 @@ const int AUTOMATION_LATCH = 4;
 const int AUTOMATION_PREVIEW = 5;
 const int AUTOMATION_WRITE = 3;
 
+const int time_code_indexes[6] = {0, 2, 3, 4, 5, 8};
+const std::string time_code_names[6] = {"Time", "Beats", "Seconds", "Samples", "Hr:Min:Sec:Fr", "Abs. Frames"};
+
 struct ShiftState
 {
     bool active = false;
@@ -161,6 +164,8 @@ bool isInteger(std::string value);
 
 std::vector<std::string> split(std::string str, std::string delimiter);
 
+std::vector<std::string> cutString(std::string str, size_t size);
+
 std::string join(std::vector<std::string> list, std::string delimiter);
 
 bool hasPluginConfigFile(MediaTrack *media_track, int pluginId);
@@ -173,8 +178,17 @@ void logDouble(const char *key, double value);
  * @brief Check if we have the FP.ini available. If not, we create it
  *
  * @param data The data object to write the ini data to
+ * @param device Wether its a Faderport 8/16 or V2
  */
 void readAndCreateIni(mINI::INIStructure &data, std::string device);
+
+/**
+ * @brief Validate if the current ini still is valid. If not create a backup and update the current
+ *
+ * @param data The data object to write the ini data to
+ * @param device Wether its a Faderport 8/16 or V2
+ */
+void validateReaSonusIni(mINI::INIFile file, mINI::INIStructure &data, std::string device);
 
 /**
  * @brief Create a unique key

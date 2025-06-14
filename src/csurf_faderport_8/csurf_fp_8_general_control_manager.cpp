@@ -2,13 +2,14 @@
 #define CSURF_FP_8_GENERAL_CONTROL_MANAGER_C_
 
 #include "../shared/csurf_context.cpp"
-#include "../controls/csurf_button.hpp"
 #include "../shared/csurf_utils.hpp"
+#include "../controls/csurf_button.hpp"
+#include "../controls/csurf_color_button.hpp"
 #include "csurf_fp_8_navigator.hpp"
 #include "csurf_fp_8_ui_functions.hpp"
 #include "csurf_fp_8_ui_filters.hpp"
-#include "../controls/csurf_color_button.hpp"
 #include "csurf_fp_8_fader_manager.hpp"
+#include "csurf_fp_8_menu_manager.cpp"
 
 class CSurf_FP_8_GeneralControlManager
 {
@@ -57,7 +58,8 @@ protected:
 
         soloClearButton->SetValue(hasSolo ? BTN_VALUE_ON : BTN_VALUE_OFF);
         muteClearButton->SetValue(hasMute ? BTN_VALUE_ON : BTN_VALUE_OFF);
-        linkButton->SetValue(context->GetLastTouchedFxMode() ? BTN_VALUE_ON : BTN_VALUE_OFF);
+        linkButton->SetValue(context->GetLastTouchedFxMode() ? BTN_VALUE_ON : context->GetChannelMode() == PluginEditMode ? BTN_VALUE_BLINK
+                                                                                                                          : BTN_VALUE_OFF);
         shiftLeftButton->SetValue((context->GetShiftLeft() || (context->GetShiftRight() && context->GetSwapShiftButtons()))
                                       ? BTN_VALUE_ON
                                       : BTN_VALUE_OFF);
@@ -134,6 +136,12 @@ public:
             return;
         }
 
+        if (context->GetChannelMode() == MenuMode)
+        {
+            faderManager->HandleEncoderPush();
+            return;
+        }
+
         if (context->GetShiftLeft())
         {
             MediaTrack *media_track = GetSelectedTrack(0, 0);
@@ -148,6 +156,14 @@ public:
 
     void HandleEncoderChange(int value)
     {
+        if (context->GetChannelMode() == MenuMode)
+        {
+            hasBit(value, 6)
+                ? faderManager->HandleEncoderDecrement()
+                : faderManager->HandleEncoderIncrement();
+            return;
+        }
+
         switch (context->GetPanEncoderMode())
         {
         case PanEncoderPanMode:
@@ -245,8 +261,7 @@ public:
         else
         {
             if (context->GetPluginControl() &&
-                (context->GetChannelMode() == PluginControlMode ||
-                 context->GetChannelMode() == PluginEditMode))
+                (context->GetPluginEditPluginId() > -1))
             {
                 faderManager->HandleLinkButtonClick();
             }

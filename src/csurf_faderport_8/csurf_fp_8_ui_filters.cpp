@@ -17,6 +17,8 @@ namespace CSURF_FP_8_UI_FILTERS
         std::vector<std::string> filtersDlgFilterText;
         int filtersDlgSelectedFilter = -1;
         int filtersDlgSelectedFilterText = -1;
+        int deleting_filter_start = 0;
+        int adding_filter_start = 0;
     }
 
     std::vector<std::string> GetFiltersKeys()
@@ -37,6 +39,39 @@ namespace CSURF_FP_8_UI_FILTERS
         std::string filterText = ini[filtersDlgFilterKeys[filtersDlgSelectedFilter]]["text"];
         std::vector<std::string> filterTextList = split(filterText, ",");
         return filterTextList;
+    }
+
+    void createFilter(HWND hwndDlg)
+    {
+        mINI::INIFile file(GetReaSonusIniPath(FP_8));
+
+        std::string newKey = GenerateUniqueKey("filter_");
+        ini["filters"][ini["filters"]["nb-filters"]] = newKey;
+        ini["filters"]["nb-filters"] = std::to_string(stoi(ini["filters"]["nb-filters"]) + 1);
+        ini[newKey];
+        ini[newKey]["name"] = "New Filter";
+        ini[newKey]["text"] = "";
+        ini[newKey]["sibblings"] = "0";
+        ini[newKey]["parents"] = "0";
+        ini[newKey]["children"] = "0";
+        ini[newKey]["top-level"] = "0";
+        ini[newKey]["match-multiple"] = "0";
+        file.write(ini, true);
+
+        PopulateFiltersList(hwndDlg, stoi(ini["filters"]["nb-filters"]) - 1);
+    }
+
+    void readIni(HWND hwndDlg)
+    {
+        mINI::INIFile file(GetReaSonusIniPath(FP_8));
+        file.read(ini);
+
+        filtersDlgFilterKeys = GetFiltersKeys();
+        if (filtersDlgFilterKeys.size() == 0)
+        {
+            createFilter(hwndDlg);
+            filtersDlgFilterKeys = GetFiltersKeys();
+        }
     }
 
     void HideFiltersDialog()
@@ -129,7 +164,7 @@ namespace CSURF_FP_8_UI_FILTERS
         std::string filter = filtersDlgFilterKeys[filtersDlgSelectedFilter];
 
         ini[filter][key] = std::to_string(IsDlgButtonChecked(hwndDlg, checkBox));
-        file.write(ini);
+        file.write(ini, true);
     }
 
     WDL_DLGRET dlgProcFiters(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -139,6 +174,7 @@ namespace CSURF_FP_8_UI_FILTERS
         {
         case WM_INITDIALOG:
         {
+            readIni(hwndDlg);
 
             WDL_UTF8_HookListView(GetDlgItem(hwndDlg, IDC_LIST_FILTERS));
             WDL_UTF8_HookListView(GetDlgItem(hwndDlg, IDC_LIST_FILTER_TEXT));
@@ -156,8 +192,13 @@ namespace CSURF_FP_8_UI_FILTERS
 
             case IDC_LIST_FILTERS:
             {
-                filtersDlgSelectedFilter = (int)SendDlgItemMessage(hwndDlg, IDC_LIST_FILTERS, LB_GETCURSEL, 0, 0);
-                PopulateFilter(hwndDlg);
+                int new_selected_filter = (int)SendDlgItemMessage(hwndDlg, IDC_LIST_FILTERS, LB_GETCURSEL, 0, 0);
+                if (new_selected_filter > -1 && new_selected_filter != filtersDlgSelectedFilter)
+                {
+                    filtersDlgSelectedFilter = new_selected_filter;
+                    PopulateFilter(hwndDlg);
+                }
+
                 break;
             }
 
@@ -178,7 +219,7 @@ namespace CSURF_FP_8_UI_FILTERS
                 std::string filter = filtersDlgFilterKeys[filtersDlgSelectedFilter];
                 ini[filter]["text"] = join(filtersDlgFilterText, ",");
 
-                file.write(ini);
+                file.write(ini, true);
                 PopulateFilterTextList(hwndDlg, filtersDlgSelectedFilterText);
                 break;
             }
@@ -191,39 +232,36 @@ namespace CSURF_FP_8_UI_FILTERS
                 std::string filter = filtersDlgFilterKeys[filtersDlgSelectedFilter];
                 ini[filter]["text"] = join(filtersDlgFilterText, ",");
 
-                file.write(ini);
-                PopulateFilterTextList(hwndDlg, filtersDlgSelectedFilterText - 1);
+                file.write(ini, true);
+                PopulateFilterTextList(hwndDlg, minmax(0, filtersDlgSelectedFilterText - 1, 999));
                 break;
             }
 
             case IDC_BUTTON_ADD_FILTER:
             {
-                mINI::INIFile file(GetReaSonusIniPath(FP_8));
+                int time = GetTickCount();
 
-                std::string newKey = GenerateUniqueKey("filter_");
-                ini["filters"][ini["filters"]["nb-filters"]] = newKey;
-                ini["filters"]["nb-filters"] = std::to_string(stoi(ini["filters"]["nb-filters"]) + 1);
-                ini[newKey];
-                ini[newKey]["name"] = "New Filter";
-                ini[newKey]["text"] = "";
-                ini[newKey]["sibblings"] = "0";
-                ini[newKey]["parents"] = "0";
-                ini[newKey]["children"] = "0";
-                ini[newKey]["top-level"] = "0";
-                ini[newKey]["match-multiple"] = "0";
-                file.write(ini, true);
-
-                PopulateFiltersList(hwndDlg, stoi(ini["filters"]["nb-filters"]) - 1);
+                if (adding_filter_start != time)
+                {
+                    adding_filter_start = time;
+                    createFilter(hwndDlg);
+                }
                 break;
             }
 
             case IDC_BUTTON_REMOVE_FILTER:
             {
-                ini.remove(filtersDlgFilterKeys.at(filtersDlgSelectedFilter));
-                filtersDlgFilterKeys.erase(filtersDlgFilterKeys.begin() + filtersDlgSelectedFilter);
+                int time = GetTickCount();
 
-                UpdateIniFiltersList();
-                PopulateFiltersList(hwndDlg, 0);
+                if (filtersDlgFilterKeys.size() > 1 && deleting_filter_start != time)
+                {
+                    deleting_filter_start = time;
+                    ini.remove(filtersDlgFilterKeys.at(filtersDlgSelectedFilter));
+                    filtersDlgFilterKeys.erase(filtersDlgFilterKeys.begin() + filtersDlgSelectedFilter);
+                    UpdateIniFiltersList();
+                    PopulateFiltersList(hwndDlg, 0);
+                }
+
                 break;
             }
 
@@ -240,7 +278,8 @@ namespace CSURF_FP_8_UI_FILTERS
             {
                 if (filtersDlgFilterKeys.size() == 0)
                 {
-                    break;
+                    createFilter(hwndDlg);
+                    filtersDlgSelectedFilter = 0;
                 }
 
                 mINI::INIFile file(GetReaSonusIniPath(FP_8));
@@ -254,7 +293,7 @@ namespace CSURF_FP_8_UI_FILTERS
                 char buffer[255];
                 GetDlgItemText(hwndDlg, IDC_EDIT_FILTER_NAME, buffer, std::size(buffer));
                 ini[filter]["name"] = buffer;
-                file.write(ini);
+                file.write(ini, true);
                 break;
             }
 
@@ -313,11 +352,6 @@ namespace CSURF_FP_8_UI_FILTERS
 
     void ShowFiltersDialog()
     {
-        mINI::INIFile file(GetReaSonusIniPath(FP_8));
-        file.read(ini);
-
-        filtersDlgFilterKeys = GetFiltersKeys();
-
         if (s_hwndReaSonusFiltersDlg == NULL)
         {
             s_hwndReaSonusFiltersDlg = CreateDialog(g_hInst, MAKEINTRESOURCE(IDD_DIALOG_REASONUS_NATIVE_FILTERS), g_hwnd, dlgProcFiters);

@@ -219,6 +219,24 @@ std::vector<std::string> split(std::string str, std::string delimiter)
     return v;
 }
 
+std::vector<std::string> cutString(std::string str, size_t size)
+{
+    std::vector<std::string> v;
+    std::string value = str;
+
+    while (value.length() > size)
+    {
+        auto pos = v.begin();
+        v.insert(pos, value.substr(value.length() - size, value.length() - 1));
+        value = value.substr(0, value.length() - size);
+    }
+
+    auto pos = v.begin();
+    v.insert(pos, value);
+
+    return v;
+}
+
 std::string join(std::vector<std::string> list, std::string delimiter)
 {
     std::string result = "";
@@ -271,6 +289,8 @@ void readAndCreateIni(mINI::INIStructure &data, std::string device)
             data["surface"]["surface"] = "0";
             data["surface"]["disable-plugins"] = "0";
             data["surface"]["swap-shift-buttons"] = "0";
+            data["surface"]["overwrite-time-code"] = "1";
+            data["surface"]["time-code"] = "2";
             data["functions"]["5"] = "0";
             data["functions"]["6"] = "0";
             data["functions"]["7"] = "0";
@@ -278,30 +298,71 @@ void readAndCreateIni(mINI::INIStructure &data, std::string device)
             data["filters"]["nb-filters"] = "0";
         }
         file.generate(data, true);
+    }
+    else
+    {
+        validateReaSonusIni(file, data, device);
     };
     file.read(data);
+}
+
+void validateReaSonusIni(mINI::INIFile file, mINI::INIStructure &data, std::string device)
+{
+    data["surface"]["midiin"] = data["surface"].has("midiin") ? data["surface"]["midiin"] : "0";
+    data["surface"]["midiout"] = data["surface"].has("midiout") ? data["surface"]["midiout"] : "0";
+    data["surface"]["mute-solo-momentary"] = data["surface"].has("mute-solo-momentary") ? data["surface"]["mute-solo-momentary"] : "0";
+    data["functions"]["1"] = data["functions"].has("1") ? data["functions"]["1"] : "0";
+    data["functions"]["2"] = data["functions"].has("2") ? data["functions"]["2"] : "0";
+    data["functions"]["3"] = data["functions"].has("3") ? data["functions"]["3"] : "0";
+    data["functions"]["4"] = data["functions"].has("4") ? data["functions"]["4"] : "0";
+
+    if (device == FP_8)
+    {
+        data["surface"]["surface"] = data["surface"].has("surface") ? data["surface"]["surface"] : "0";
+        data["surface"]["disable-plugins"] = data["surface"].has("disable-plugins") ? data["surface"]["disable-plugins"] : "0";
+        data["surface"]["swap-shift-buttons"] = data["surface"].has("swap-shift-buttons") ? data["surface"]["swap-shift-buttons"] : "0";
+        data["surface"]["overwrite-time-code"] = data["surface"].has("overwrite-time-code") ? data["surface"]["overwrite-time-code"] : "1";
+        data["surface"]["time-code"] = data["surface"].has("time-code") ? data["surface"]["time-code"] : "2";
+        data["functions"]["5"] = data["functions"].has("5") ? data["functions"]["5"] : "0";
+        data["functions"]["6"] = data["functions"].has("6") ? data["functions"]["6"] : "0";
+        data["functions"]["7"] = data["functions"].has("7") ? data["functions"]["7"] : "0";
+        data["functions"]["8"] = data["functions"].has("8") ? data["functions"]["8"] : "0";
+        data["filters"]["nb-filters"] = data["filters"].has("nb-filters") ? data["filters"]["nb-filters"] : "0";
+    }
+
+    file.write(data, true);
 }
 
 std::string GenerateUniqueKey(std::string prefix)
 {
     srand(std::time(0));
+    int now = GetTickCount();
+
     char a[] = "abcdefghijklmnopqrstuvwxyz0123456789";
     for (int i = 0; i < 24; i++)
     {
         char rnd = a[(rand() + 100) % 36];
         prefix += rnd;
     }
+    prefix += std::to_string(now);
+
     return prefix;
 }
 
 int minmax(int min, int value, int max)
 {
-    return value < min ? min : value > max ? max
-                                           : value;
+    return value < min
+               ? min
+           : value > max
+               ? max
+               : value;
 }
 
 double minmax(double min, double value, double max)
 {
-    return value < min ? min : value > max ? max
-                                           : value;
+    return value < min
+               ? min
+           : value > max
+               ? max
+               : value;
 }

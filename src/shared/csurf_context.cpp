@@ -11,12 +11,17 @@ class CSurf_Context
     bool plugin_control;
     bool swap_shift_buttons;
     bool mute_solo_momentary;
+    bool overwrite_time_code;
+    int surface_time_code;
     int nbChannels = 8;
 
     // Shift keys
     bool shift_left = false;
     bool shift_right = false;
     bool arm = false;
+
+    // track mode show the time code in the displays
+    bool showTimeCode = false;
 
     // Last touched fx
     bool lastTouchedFxMode = false;
@@ -38,12 +43,11 @@ class CSurf_Context
     int pluginEditParamId;
 
     ChannelMode channelMode = TrackMode;
+    ChannelMode previousChannelMode = TrackMode;
     ChannelManagerType channelManagerType;
 
 public:
-    CSurf_Context(int nbChannels) : nbChannels(nbChannels)
-    {
-    }
+    CSurf_Context(int nbChannels) : nbChannels(nbChannels) {}
     ~CSurf_Context() {}
 
     void SetPluginControl(bool enabled)
@@ -74,6 +78,26 @@ public:
     bool GetMuteSoloMomentary()
     {
         return mute_solo_momentary;
+    }
+
+    void SetOverwriteTimeCode(bool enabled)
+    {
+        overwrite_time_code = enabled;
+    }
+
+    bool GetOverwriteTimeCode()
+    {
+        return overwrite_time_code;
+    }
+
+    void SetSurfaceTimeCode(int value)
+    {
+        surface_time_code = value;
+    }
+
+    bool GetSurfaceTimeCode()
+    {
+        return surface_time_code;
     }
 
     void SetShiftLeft(bool val)
@@ -127,6 +151,21 @@ public:
     PanEncoderMode GetPanEncoderMode()
     {
         return panEncoderMode;
+    }
+
+    void SetShowTimeCode(bool value)
+    {
+        showTimeCode = value;
+    }
+
+    void ToggleShowTimeCode()
+    {
+        showTimeCode = !showTimeCode;
+    }
+
+    bool GetShowTimeCode()
+    {
+        return showTimeCode;
     }
 
     void ToggleLastTouchedFxMode()
@@ -226,14 +265,25 @@ public:
         channelManagerItemsCount = 0;
     }
 
+    bool IsChannelMode(ChannelMode _channelMode)
+    {
+        return channelMode == _channelMode;
+    }
+
     void SetChannelMode(ChannelMode _channelMode)
     {
+        previousChannelMode = channelMode;
         channelMode = _channelMode;
     }
 
     ChannelMode GetChannelMode()
     {
         return channelMode;
+    }
+
+    ChannelMode GetPreviousChannelMode()
+    {
+        return previousChannelMode;
     }
 
     void SetPluginEditTrack(MediaTrack *track)

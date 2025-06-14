@@ -4,6 +4,14 @@
 static const int HEADER_LENGTH = 5;
 static int SYSEX_HEADER[HEADER_LENGTH] = {0xf0, 0x00, 0x01, 0x06, 0x02};
 
+static int SYSEX_START = 0xf0;
+static int SYSEX_MANUFACTURER_1 = 0x00;
+static int SYSEX_MANUFACTURER_2 = 0x01;
+static int SYSEX_MANUFACTURER_3 = 0x06;
+static int SYSEX_DEVICE_FP8 = 0x02;
+static int SYSEX_DEVICE_FP16 = 0x16;
+static int SYSEX_END = 0xf7;
+
 enum DisplayActions
 {
     DISPLAY_ACTION_DISPLAY = 0x12,

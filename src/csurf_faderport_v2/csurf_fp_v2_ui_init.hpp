@@ -35,7 +35,7 @@ namespace CSURF_FP_V2_UI_INIT
 
             int combo;
             char buf[255];
-            char *noDeviceString = "No device selected";
+            std::string noDeviceString = "No device selected";
 
             WDL_UTF8_HookComboBox(GetDlgItem(hwndDlg, IDC_COMBO_MIDI_IN));
             WDL_UTF8_HookComboBox(GetDlgItem(hwndDlg, IDC_COMBO_MIDI_OUT));
@@ -44,7 +44,7 @@ namespace CSURF_FP_V2_UI_INIT
             {
                 if (i == 0)
                 {
-                    combo = AddComboEntry(hwndDlg, 0, noDeviceString, IDC_COMBO_MIDI_IN);
+                    combo = AddComboEntry(hwndDlg, 0, const_cast<char *>(noDeviceString.c_str()), IDC_COMBO_MIDI_IN);
                     if (stoi(ini["surface"]["midiin"]) == 0)
                     {
                         SendDlgItemMessage(hwndDlg, IDC_COMBO_MIDI_IN, CB_SETCURSEL, combo, 0);
@@ -64,7 +64,7 @@ namespace CSURF_FP_V2_UI_INIT
             {
                 if (i == 0)
                 {
-                    combo = AddComboEntry(hwndDlg, 0, noDeviceString, IDC_COMBO_MIDI_OUT);
+                    combo = AddComboEntry(hwndDlg, 0, const_cast<char *>(noDeviceString.c_str()), IDC_COMBO_MIDI_OUT);
                     if (stoi(ini["surface"]["midiout"]) == 0)
                     {
                         SendDlgItemMessage(hwndDlg, IDC_COMBO_MIDI_OUT, CB_SETCURSEL, combo, 0);

@@ -1,8 +1,6 @@
 #include "csurf_fp_8_navigator.hpp"
 #include "../shared/csurf_utils.hpp"
 #include "../shared/csurf_daw.hpp"
-// #include <WDL/wdltypes.h> // might be unnecessary in future
-// #include <reaper_plugin_functions.h>
 #include <mini/ini.h>
 #include "csurf_fp_8_navigator_filters.hpp"
 
@@ -42,10 +40,24 @@ void CSurf_FP_8_Navigator::SetTrackUIVisibility(std::map<int, bool> &tracks)
 {
     PreventUIRefresh(1);
 
+    bool set_next_visible_track_selected = false;
+
     for (auto const &track : tracks)
     {
         MediaTrack *media_track = GetTrack(0, track.first);
         SetMediaTrackInfo_Value(media_track, "B_SHOWINMIXER", track.second);
+
+        if (DAW::IsTrackSelected(media_track) && !track.second)
+        {
+            SetMediaTrackInfo_Value(media_track, "I_SELECTED", 0);
+            set_next_visible_track_selected = true;
+        }
+
+        if (set_next_visible_track_selected && track.second)
+        {
+            SetMediaTrackInfo_Value(media_track, "I_SELECTED", 1);
+            set_next_visible_track_selected = false;
+        }
     }
 
     PreventUIRefresh(-1);

@@ -12,7 +12,6 @@
 #include <WDL/ptrlist.h>
 #include <reaper_plugin_functions.h>
 #include "../controls/csurf_button.hpp"
-// #include "../csurf_faderport_8/csurf_fp_8_last_touched_fx_manager.hpp"
 #include "../resource.h"
 #include "../shared/csurf.h"
 #include "../shared/csurf_transport_manager.hpp"
@@ -40,10 +39,6 @@ class CSurf_FaderPortV2 : public IReaperControlSurface
   CSurf_TransportManager *transportManager;
   CSurf_FP_V2_AutomationManager *automationManager;
   CSurf_FP_V2_GeneralControlManager *generalControlManager;
-  // CSurf_FP_8_LastTouchedFXManager *lastTouchedFxManager;
-
-  // std::vector<CSurf_FP_8_Track *> tracks;
-  // CSurf_FP_8_Track *lastTouchedFxTrack;
 
   DWORD surface_update_lastrun;
   DWORD surface_update_keepalive;
@@ -67,7 +62,7 @@ class CSurf_FaderPortV2 : public IReaperControlSurface
      */
     else if (evt->midi_message[0] == MIDI_MESSAGE_ENDCODER)
     {
-      if (evt->midi_message[1] == ENCODER_NAV)
+      if (evt->midi_message[1] == ENCODER_PAN)
       {
         sessionManager->HandleSessionNavEncoderChange(evt->midi_message[2]);
       }
@@ -140,10 +135,6 @@ class CSurf_FaderPortV2 : public IReaperControlSurface
       /**
        * General Control Management
        */
-      else if (evt->midi_message[1] == ENCODER_CLICK_PAN)
-      {
-        // generalControlManager->HandleEncoderClick(evt->midi_message[2]);
-      }
       else if (evt->midi_message[1] == BTN_SHIFT_LEFT)
       {
         generalControlManager->HandleShiftButton(evt->midi_message[2]);
@@ -213,7 +204,7 @@ class CSurf_FaderPortV2 : public IReaperControlSurface
       {
         sessionManager->HandlePrevButton(evt->midi_message[2]);
       }
-      else if (evt->midi_message[1] == ENCODER_CLICK_NAV)
+      else if (evt->midi_message[1] == ENCODER_CLICK_PAN)
       {
         sessionManager->HandleEncoderClick(evt->midi_message[2]);
       }
@@ -228,7 +219,6 @@ public:
 
     /**
      * First we check if we have the ini file. If not we create it with default values
-     *
      */
     mINI::INIStructure ini;
     readAndCreateIni(ini, FP_V2);

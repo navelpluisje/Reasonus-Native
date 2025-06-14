@@ -42,7 +42,7 @@ namespace CSURF_FP_UI_FUNCTIONS
         {
             static mINI::INIFile file(GetReaSonusIniPath(FP_8));
             ini["Functions"][functionsDlgSelectedFunction] = std::to_string(actionId);
-            file.write(ini);
+            file.write(ini, true);
             PopulateActionFields(s_hwndDlg);
         }
         PromptForAction(-1, 0, 0);

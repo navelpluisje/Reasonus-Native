@@ -1,5 +1,6 @@
 #include <string>
 #include "csurf_display.hpp"
+#include "../shared/csurf_utils.hpp"
 #include <reaper_plugin.h>
 #include <WDL/wdltypes.h> // might be unnecessary in future
 #include <reaper_plugin_functions.h>
@@ -16,11 +17,11 @@ void CSurf_Display::SendValue(int line)
 
     midiSysExData.evt.frame_offset = 0;
     midiSysExData.evt.size = 0;
-    midiSysExData.evt.midi_message[midiSysExData.evt.size++] = SYSEX_HEADER[0];
-    midiSysExData.evt.midi_message[midiSysExData.evt.size++] = SYSEX_HEADER[1];
-    midiSysExData.evt.midi_message[midiSysExData.evt.size++] = SYSEX_HEADER[2];
-    midiSysExData.evt.midi_message[midiSysExData.evt.size++] = SYSEX_HEADER[3];
-    midiSysExData.evt.midi_message[midiSysExData.evt.size++] = SYSEX_HEADER[4];
+    midiSysExData.evt.midi_message[midiSysExData.evt.size++] = SYSEX_START;
+    midiSysExData.evt.midi_message[midiSysExData.evt.size++] = SYSEX_MANUFACTURER_1;
+    midiSysExData.evt.midi_message[midiSysExData.evt.size++] = SYSEX_MANUFACTURER_2;
+    midiSysExData.evt.midi_message[midiSysExData.evt.size++] = SYSEX_MANUFACTURER_3;
+    midiSysExData.evt.midi_message[midiSysExData.evt.size++] = device_id;
     midiSysExData.evt.midi_message[midiSysExData.evt.size++] = DISPLAY_ACTION_DISPLAY;
     midiSysExData.evt.midi_message[midiSysExData.evt.size++] = channel;
     midiSysExData.evt.midi_message[midiSysExData.evt.size++] = line;
@@ -39,7 +40,7 @@ void CSurf_Display::SendValue(int line)
         count++;
     }
 
-    midiSysExData.evt.midi_message[midiSysExData.evt.size++] = 0xF7;
+    midiSysExData.evt.midi_message[midiSysExData.evt.size++] = SYSEX_END;
 
     if (m_midiout)
     {
@@ -57,16 +58,16 @@ void CSurf_Display::SendMode()
 
     midiSysExData.evt.frame_offset = 0;
     midiSysExData.evt.size = 0;
-    midiSysExData.evt.midi_message[midiSysExData.evt.size++] = SYSEX_HEADER[0];
-    midiSysExData.evt.midi_message[midiSysExData.evt.size++] = SYSEX_HEADER[1];
-    midiSysExData.evt.midi_message[midiSysExData.evt.size++] = SYSEX_HEADER[2];
-    midiSysExData.evt.midi_message[midiSysExData.evt.size++] = SYSEX_HEADER[3];
-    midiSysExData.evt.midi_message[midiSysExData.evt.size++] = SYSEX_HEADER[4];
+    midiSysExData.evt.midi_message[midiSysExData.evt.size++] = SYSEX_START;
+    midiSysExData.evt.midi_message[midiSysExData.evt.size++] = SYSEX_MANUFACTURER_1;
+    midiSysExData.evt.midi_message[midiSysExData.evt.size++] = SYSEX_MANUFACTURER_2;
+    midiSysExData.evt.midi_message[midiSysExData.evt.size++] = SYSEX_MANUFACTURER_3;
+    midiSysExData.evt.midi_message[midiSysExData.evt.size++] = device_id;
     midiSysExData.evt.midi_message[midiSysExData.evt.size++] = DISPLAY_ACTION_MODE;
     midiSysExData.evt.midi_message[midiSysExData.evt.size++] = channel;
     midiSysExData.evt.midi_message[midiSysExData.evt.size++] = 0x00 + displayMode;
 
-    midiSysExData.evt.midi_message[midiSysExData.evt.size++] = 0xF7;
+    midiSysExData.evt.midi_message[midiSysExData.evt.size++] = SYSEX_END;
 
     if (m_midiout)
     {
@@ -79,10 +80,15 @@ void CSurf_Display::SetValue(int line, Alignment _alignment, const char *_value,
     // We have to convert the char array to a string. Somehow the simple conversion makes it crash
     char buffer[250];
     snprintf(buffer, sizeof(buffer), "%s", _value);
-    std::string strVal = buffer;
+    std::string strVal = std::string(buffer);
+
+    if (line > 6)
+    {
+        return;
+    }
 
     // If values have not changed, we do nothing
-    if (strVal == values[line] && alignment[line] == _alignment && inverted[line] == invert && !force)
+    if (strVal.compare(values[line]) == 0 && alignment[line] == _alignment && inverted[line] == invert && !force)
     {
         return;
     }

@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.15)
 
-project(ReasonusNative VERSION 0.0.1 LANGUAGES C CXX)
+# ------------------------------------------------------------------------------
+# Project Definition and Versioning
+# ------------------------------------------------------------------------------
+
+project(ReasonusNative VERSION 0.1.2 LANGUAGES C CXX)
 
 find_package(Git)
 if(GIT_FOUND)
@@ -10,7 +14,9 @@ if(GIT_FOUND)
     OUTPUT_VARIABLE GIT_LATEST_TAG
     OUTPUT_STRIP_TRAILING_WHITESPACE
   )
+
   if(NOT "${GIT_LATEST_TAG}" STREQUAL "")
+    set(GIT_ORIGINAL_VERSION ${GIT_LATEST_TAG})
     string(REGEX REPLACE "[^0-9.]" "" GIT_LATEST_TAG ${GIT_LATEST_TAG})
     if(NOT "${GIT_LATEST_TAG}" STREQUAL "")
       project(${PROJECT_NAME} VERSION ${GIT_LATEST_TAG} LANGUAGES C CXX)
@@ -18,6 +24,10 @@ if(GIT_FOUND)
   endif()
 endif()
 message("Project version: ${PROJECT_VERSION}")
+
+# ------------------------------------------------------------------------------
+# Build Number and Commit Info (e.g., for CI)
+# ------------------------------------------------------------------------------
 
 if(DEFINED ENV{APPVEYOR})
     set(CMAKE_PROJECT_VERSION_TWEAK $ENV{APPVEYOR_BUILD_NUMBER})
@@ -28,15 +38,22 @@ else()
 endif()
 set(CMAKE_PROJECT_VERSION_COMMIT "\"${CMAKE_PROJECT_VERSION_COMMIT}\"")
 
+# ------------------------------------------------------------------------------
+# General Build Settings
+# ------------------------------------------------------------------------------
+
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_VISIBILITY_PRESET "hidden")
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-# path for external 3rd party library dependencies 
+# ------------------------------------------------------------------------------
+# External Dependencies: FetchContent
+# ------------------------------------------------------------------------------
+
 include(FetchContent)
-set(PROJECT_LIB_DIR ${PROJECT_SOURCE_DIR}/third_party)
+set(PROJECT_LIB_DIR ${PROJECT_SOURCE_DIR}/lib)
 
 FetchContent_Declare(reaper-sdk
     GIT_REPOSITORY https://github.com/justinfrankel/reaper-sdk
@@ -64,7 +81,10 @@ FetchContent_Declare(mINI
 
 FetchContent_MakeAvailable(WDL reaper-sdk GSL mINI)
 
-# symlink WDL to reaper-sdk
+# ------------------------------------------------------------------------------
+# Symlink WDL into reaper-sdk
+# ------------------------------------------------------------------------------
+
 if (UNIX)
 execute_process(
     COMMAND ${CMAKE_COMMAND} -E create_symlink
@@ -79,6 +99,10 @@ else()
     execute_process(COMMAND cmd.exe /c mklink /J "${_dstDir}" "${_srcDir}")
 endif()
 
+# ------------------------------------------------------------------------------
+# VCPKG Integration
+# ------------------------------------------------------------------------------
+
 if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
   set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
     CACHE STRING "")
@@ -87,6 +111,10 @@ endif()
 if(DEFINED ENV{VCPKG_DEFAULT_TRIPLET} AND NOT DEFINED VCPKG_TARGET_TRIPLET)
   set(VCPKG_TARGET_TRIPLET "$ENV{VCPKG_DEFAULT_TRIPLET}" CACHE STRING "")
 endif()
+
+# ------------------------------------------------------------------------------
+# Header Paths and Compiler Flags
+# ------------------------------------------------------------------------------
 
 set(header_paths 
     ${PROJECT_LIB_DIR}/reaper-sdk/sdk
@@ -102,6 +130,10 @@ foreach(header ${headers})
     endif()
 endforeach()
 
+# ------------------------------------------------------------------------------
+# Setup Interface Library for reaper-sdk
+# ------------------------------------------------------------------------------
+
 add_library(reaper-sdk INTERFACE)
 target_include_directories(reaper-sdk   
     INTERFACE 
@@ -111,6 +143,10 @@ target_link_libraries(reaper-sdk INTERFACE GSL)
 target_include_directories(reaper-sdk INTERFACE ${CMAKE_BINARY_DIR})
 
 target_link_libraries(reaper-sdk INTERFACE mINI)
+
+# ------------------------------------------------------------------------------
+# Find and Link WDL + SWELL
+# ------------------------------------------------------------------------------
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
@@ -125,6 +161,10 @@ target_link_libraries(reaper-sdk INTERFACE WDL::WDL)
 if(SWELL_FOUND)
   target_link_libraries(reaper-sdk INTERFACE SWELL::swell)
 endif()
+
+# ------------------------------------------------------------------------------
+# Interprocedural Optimization (LTO)
+# ------------------------------------------------------------------------------
 
 set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_MINSIZEREL     ON)
 set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE        ON)
@@ -213,6 +253,10 @@ else()
     )
 endif()
 
+# ------------------------------------------------------------------------------
+# Installer Defaults and CPack Configuration
+# ------------------------------------------------------------------------------
+
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
   if(WIN32)
     set(USER_CONFIG_DIR "$ENV{APPDATA}")
@@ -222,8 +266,7 @@ if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     set(USER_CONFIG_DIR "~/.config")
   endif()
 
-  set(CMAKE_INSTALL_PREFIX "${USER_CONFIG_DIR}/REAPER" CACHE PATH
-    "REAPER resource path where to install ReaPack" FORCE)
+  set(CMAKE_INSTALL_PREFIX "${USER_CONFIG_DIR}/REAPER" CACHE PATH "REAPER resource path where to install ReaPack" FORCE)
 endif()
 
 if(CMAKE_OSX_ARCHITECTURES)
@@ -235,6 +278,8 @@ else()
 endif()
 
 STRING(TOLOWER "${ARCH_NAME}" ARCH_NAME)
+
+# Set output name (no "lib" prefix) and architecture
 set_target_properties(${PROJECT_NAME} PROPERTIES
   PREFIX "" # disable the "lib" prefix
   OUTPUT_NAME "reaper_${PROJECT_NAME}-${ARCH_NAME}"
@@ -280,37 +325,23 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 endif()
 
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
-  if(UNIX)
-    execute_process(
-        COMMAND ${CMAKE_COMMAND} -E create_symlink
-                # source
-                "${CMAKE_CURRENT_SOURCE_DIR}/README.md"
-                # target
-                "${CMAKE_CURRENT_BINARY_DIR}/link_readme.txt")
-    set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_BINARY_DIR}/link_readme.txt")
-  else()
-#    file(TO_NATIVE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/README.md" _dstDir)
-#    file(TO_NATIVE_PATH "${CMAKE_CURRENT_BINARY_DIR}/link_readme.txt" _srcDir)
-#    execute_process(COMMAND cmd.exe /c mklink /J "${_dstDir}" "${_srcDir}")
-#    set(CPACK_RESOURCE_FILE_README "${_srcDir}")
-  endif()
+  execute_process(
+    COMMAND ${CMAKE_COMMAND} -E create_symlink
+            # source
+            "${CMAKE_CURRENT_SOURCE_DIR}/README.md"
+            # target
+            "${CMAKE_CURRENT_BINARY_DIR}/link_readme.txt")
+  set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_BINARY_DIR}/link_readme.txt")
 endif()
 
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
-  if(UNIX)
-    execute_process(
-        COMMAND ${CMAKE_COMMAND} -E create_symlink
-                # source
-                "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE"
-                # target
-                "${CMAKE_CURRENT_BINARY_DIR}/link_license.txt")
-    set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_BINARY_DIR}/link_license.txt")
-#  else()
-#    file(TO_NATIVE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE" _dstDir)
-#    file(TO_NATIVE_PATH "${CMAKE_CURRENT_BINARY_DIR}/link_license.txt" _srcDir)
-#    execute_process(COMMAND cmd.exe /c mklink /J "${_dstDir}" "${_srcDir}")
-#    set(CPACK_RESOURCE_FILE_README "${_srcDir}")
-  endif()
+  execute_process(
+    COMMAND ${CMAKE_COMMAND} -E create_symlink
+            # source
+            "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE"
+            # target
+            "${CMAKE_CURRENT_BINARY_DIR}/link_license.txt")
+  set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_BINARY_DIR}/link_license.txt")
 endif()
 
 set(CPACK_NSIS_PACKAGE_NAME "${PROJECT_NAME}")

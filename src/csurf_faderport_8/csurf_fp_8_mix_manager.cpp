@@ -168,7 +168,7 @@ public:
         {
             mixAllButton->SetColor(ButtonColorYellow);
             trackFilter = TrackCustomFilter;
-            faderManager->HandleMixButtonClick();
+            faderManager->HandleMixAllButtonClick();
         }
         else
         {
