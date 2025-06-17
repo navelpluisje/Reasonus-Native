@@ -1,7 +1,10 @@
+#ifndef CSURF_FP_UI_TEST_V2_H_
+#define CSURF_FP_UI_TEST_V2_H_
+
 #include <WDL/wdltypes.h> // might be unnecessary in future
 #include <reaper_plugin_functions.h>
-#include <memory>
 #include <reaper_imgui_functions.h>
+#include <memory>
 
 class Example
 {
@@ -20,3 +23,5 @@ private:
     int m_click_count;
     char m_text[255];
 };
+
+#endif

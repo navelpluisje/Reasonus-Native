@@ -1,5 +1,5 @@
-#define REAIMGUIAPI_IMPLEMENT
 #define REAPERAPI_IMPLEMENT
+#define REAIMGUIAPI_IMPLEMENT
 
 #include "actions/toggle_play_cursor.hpp"
 #include "actions/show_reaper_resource_path.hpp"

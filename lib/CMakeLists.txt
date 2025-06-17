@@ -1,0 +1,1 @@
+target_compile_flags(${PROJECT_NAME} -w -Wunused-parameter)
