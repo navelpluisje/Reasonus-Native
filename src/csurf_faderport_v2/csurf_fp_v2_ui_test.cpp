@@ -1,7 +1,6 @@
 #include "csurf_fp_v2_ui_test.hpp"
 
 constexpr const char *g_name{"ReaImGui C++ example"};
-static int g_actionId;
 
 std::unique_ptr<Example> Example::s_inst;
 
