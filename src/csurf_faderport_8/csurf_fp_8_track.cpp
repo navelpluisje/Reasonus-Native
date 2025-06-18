@@ -23,15 +23,15 @@ CSurf_FP_8_Track::~CSurf_FP_8_Track()
     delete vuMeter;
 };
 
-void CSurf_FP_8_Track::ClearTrack(bool display)
+void CSurf_FP_8_Track::ClearTrack(bool display, bool forceUpdate)
 {
     this->SetTrackColor(ButtonColorWhite);
     if (display)
     {
-        this->SetDisplayLine(0, ALIGN_LEFT, "", NON_INVERT, false);
-        this->SetDisplayLine(1, ALIGN_LEFT, "", NON_INVERT, false);
-        this->SetDisplayLine(2, ALIGN_CENTER, "", NON_INVERT, false);
-        this->SetDisplayLine(3, ALIGN_CENTER, "", NON_INVERT, false);
+        this->SetDisplayLine(0, ALIGN_LEFT, "", NON_INVERT, forceUpdate);
+        this->SetDisplayLine(1, ALIGN_LEFT, "", NON_INVERT, forceUpdate);
+        this->SetDisplayLine(2, ALIGN_CENTER, "", NON_INVERT, forceUpdate);
+        this->SetDisplayLine(3, ALIGN_CENTER, "", NON_INVERT, forceUpdate);
     }
     this->SetMuteButtonValue(BTN_VALUE_OFF);
     this->SetSoloButtonValue(BTN_VALUE_OFF);

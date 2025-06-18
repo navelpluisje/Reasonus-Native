@@ -104,7 +104,7 @@ public:
             CSurf_FP_8_Track *track = tracks.at(i);
             MediaTrack *media_track = media_tracks.Get(i);
 
-            if (!media_track || CountTracks(0) < i)
+            if (!media_track || ::CountTracks(0) < i)
             {
                 int index = context->GetNbChannels() - (static_cast<int>(time_code.size()) + i);
                 if (index < 1)
@@ -117,7 +117,7 @@ public:
                 }
                 else
                 {
-                    track->ClearTrack(true);
+                    track->ClearTrack(true, forceUpdate);
                 }
                 continue;
             }

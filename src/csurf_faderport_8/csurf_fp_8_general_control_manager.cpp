@@ -297,7 +297,13 @@ public:
         }
         else
         {
+            if (::CountTracks(0) == 0)
+            {
+                return;
+            }
+
             if (context->GetPluginControl() &&
+                context->IsChannelMode(PluginControlMode) &&
                 (context->GetPluginEditPluginId() > -1))
             {
                 faderManager->HandleLinkButtonClick();
