@@ -60,6 +60,10 @@ struct ShiftState
 
 void Main_OnCommandStringEx(std::string action_name, int flag = 0, ReaProject *proj = 0);
 
+void SetActionState(int actionId);
+
+void SetActionState(std::string action_name);
+
 bool GetToggleCommandStringState(std::string action_name);
 
 /**

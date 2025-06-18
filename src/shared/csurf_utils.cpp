@@ -23,6 +23,21 @@ void Main_OnCommandStringEx(std::string action_name, int flag, ReaProject *proj)
     Main_OnCommandEx(actionId, flag, proj);
 }
 
+void SetActionState(int actionId)
+{
+    int state = GetToggleCommandStateEx(0, actionId);
+    if (state == 1)
+    {
+        Main_OnCommandEx(actionId, 0, 0);
+    }
+}
+
+void SetActionState(std::string action_name)
+{
+    int actionId = NamedCommandLookup(action_name.c_str());
+    SetActionState(actionId);
+}
+
 bool GetToggleCommandStringState(std::string action_name)
 {
     int actionId = NamedCommandLookup(action_name.c_str());
