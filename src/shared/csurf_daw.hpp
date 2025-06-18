@@ -4,6 +4,7 @@
 #include <reaper_plugin.h>
 #include <string>
 #include <vector>
+#include "../controls/csurf_color_button_colors.hpp"
 
 class DAW
 {
@@ -24,6 +25,7 @@ public:
     static std::string GetTrackInputName(MediaTrack *media_track);
     static std::string GetTrackMonitorMode(MediaTrack *media_track);
     static std::string GetTrackRecordingMode(MediaTrack *media_track);
+    static ButtonColor GetTrackColor(MediaTrack *media_track);
     static bool GetTrackFxBypassed(MediaTrack *media_track);
     static void ToggleTrackFxBypass(MediaTrack *media_track);
 

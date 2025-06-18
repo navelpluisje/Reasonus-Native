@@ -155,6 +155,23 @@ std::string DAW::GetTrackRecordingMode(MediaTrack *media_track)
     }
 }
 
+ButtonColor DAW::GetTrackColor(MediaTrack *media_track)
+{
+    ButtonColor color;
+    int red = 0x7f;
+    int green = 0x7f;
+    int blue = 0x7f;
+
+    int track_color = ::GetTrackColor(media_track);
+    if (track_color != 0)
+    {
+        ColorFromNative(track_color, &red, &green, &blue);
+    }
+    color.SetColor(red / 2, green / 2, blue / 2);
+
+    return color;
+}
+
 bool DAW::GetTrackFxBypassed(MediaTrack *media_track)
 {
     return !(bool)GetMediaTrackInfo_Value(media_track, "I_FXEN");
