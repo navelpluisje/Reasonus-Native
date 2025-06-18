@@ -338,12 +338,14 @@ namespace CSURF_FP_8_UI_FILTERS
 
             // Handle Cancel click
             case IDCANCEL:
+                SetActionState("_REASONUS_SHOW_REASONUS_FILTERS_WINDOW");
                 HideFiltersDialog();
                 break;
             }
             break;
 
         case WM_CLOSE:
+            SetActionState("_REASONUS_SHOW_REASONUS_FILTERS_WINDOW");
             HideFiltersDialog();
             break;
         }
