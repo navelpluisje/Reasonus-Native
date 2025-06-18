@@ -73,6 +73,10 @@ protected:
 
     void SetButtonColors()
     {
+        MediaTrack *media_track = trackNavigator->GetControllerTrack();
+        ButtonColor color = DAW::GetTrackColor(media_track);
+
+        channelButton->SetColor(color);
         linkButton->SetColor(context->GetShiftLeft() ? ButtonColorYellow : ButtonColorGreen);
         panButton->SetColor(context->GetShiftLeft() ? ButtonColorYellow : ButtonColorWhite);
         scrollButton->SetColor(session_type == Zoom ? ButtonColorYellow : ButtonColorWhite);
