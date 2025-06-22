@@ -424,6 +424,20 @@ public:
       {
         tracks.at(i)->ClearTrack(true, true);
       }
+      tracks.at(0)->SetDisplayMode(DISPLAY_MODE_3);
+      tracks.at(1)->SetDisplayMode(DISPLAY_MODE_3);
+      tracks.at(2)->SetDisplayMode(DISPLAY_MODE_3);
+      tracks.at(3)->SetDisplayMode(DISPLAY_MODE_3);
+      tracks.at((int)tracks.size() - 2)->SetDisplayMode(DISPLAY_MODE_3);
+      tracks.at((int)tracks.size() - 1)->SetDisplayMode(DISPLAY_MODE_3);
+      tracks.at(0)->SetDisplayLine(0, ALIGN_CENTER, "Good");
+      tracks.at(1)->SetDisplayLine(0, ALIGN_CENTER, "bye.");
+      tracks.at(0)->SetDisplayLine(1, ALIGN_CENTER, "Have");
+      tracks.at(1)->SetDisplayLine(1, ALIGN_CENTER, "a");
+      tracks.at(2)->SetDisplayLine(1, ALIGN_CENTER, "nice");
+      tracks.at(3)->SetDisplayLine(1, ALIGN_CENTER, "day");
+      tracks.at((int)tracks.size() - 2)->SetDisplayLine(0, ALIGN_RIGHT, "ReaS", INVERT);
+      tracks.at((int)tracks.size() - 1)->SetDisplayLine(0, ALIGN_LEFT, "onus", INVERT);
     }
 
     DELETE_ASYNC(m_midiout);
