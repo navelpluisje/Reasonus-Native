@@ -142,13 +142,15 @@ void CSurf_FP_8_FaderManager::HandlePluginsButtonClick(int value, bool track)
     context->SetPluginEditPluginId(-1);
     bool cameFromPlugin = (context->IsChannelMode(PluginEditMode) || context->IsChannelMode(PluginControlMode));
 
-    if ((!context->IsChannelMode(PluginMode) && !track && !cameFromPlugin) || (prevChannelMode == PluginMode && cameFromPlugin))
+    if ((!context->IsChannelMode(PluginMode) && !track && !cameFromPlugin) || (context->GetPreviousPluginChannelMode() == PluginMode && cameFromPlugin))
     {
+        context->SetPreviousPluginChannelMode(PluginMode);
         SetChannelMode(PluginMode, true);
     }
     else
     {
         SetChannelMode(TrackPluginMode, true);
+        context->SetPreviousPluginChannelMode(TrackPluginMode);
     }
 };
 

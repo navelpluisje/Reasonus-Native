@@ -324,7 +324,11 @@ public:
             }
 
             if (context->GetPluginControl() &&
-                context->IsChannelMode(PluginControlMode) &&
+                (context->IsChannelMode(PluginMode) ||
+                 context->IsChannelMode(TrackPluginMode) ||
+                 context->IsChannelMode(PluginControlMode) ||
+                 context->IsChannelMode(PluginEditMode)) &&
+
                 (context->GetPluginEditPluginId() > -1))
             {
                 faderManager->HandleLinkButtonClick();
