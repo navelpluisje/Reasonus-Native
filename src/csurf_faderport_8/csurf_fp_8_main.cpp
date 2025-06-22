@@ -419,10 +419,11 @@ public:
   {
     if (m_midiout)
     {
-      int x;
-      for (x = 0; x < 0x30; x++) // lights out§
-        m_midiout->Send(0xa0, x, 0x00, -1);
-      Sleep(5);
+      // Reset all displays, faders and track buttons after closing Reaper
+      for (int i = 0; i < (int)tracks.size(); i++)
+      {
+        tracks.at(i)->ClearTrack(true, true);
+      }
     }
 
     DELETE_ASYNC(m_midiout);
@@ -495,6 +496,16 @@ public:
 
         surface_update_lastrun = now;
       }
+      if ((now - surface_update_keepalive) >= 1200)
+      {
+        faderManager->Refresh(true);
+        sessionManager->Refresh(true);
+        mixManager->Refresh(true);
+        transportManager->Refresh(true);
+        automationManager->Refresh(true);
+        generalControlManager->Refresh(true);
+      }
+
       if ((now - surface_update_keepalive) >= 990)
       {
         surface_update_keepalive = now;
@@ -509,7 +520,8 @@ public:
   //   ShowConsoleMsg("SetTrackListChange");
   // }
 
-  void OnTrackSelection(MediaTrack *media_track)
+  void
+  OnTrackSelection(MediaTrack *media_track)
   {
     int trackId = (int)::GetMediaTrackInfo_Value(media_track, "IP_TRACKNUMBER");
 

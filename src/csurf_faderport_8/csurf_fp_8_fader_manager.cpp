@@ -4,12 +4,12 @@
 #include "csurf_fp_8_plugin_control_manager.cpp"
 #include "csurf_fp_8_menu_manager.cpp"
 
-void CSurf_FP_8_FaderManager::SetButtonValues(ChannelMode channelMode)
+void CSurf_FP_8_FaderManager::SetButtonValues(ChannelMode channelMode, bool force)
 {
-    trackButton->SetValue(channelMode == TrackMode ? BTN_VALUE_ON : BTN_VALUE_OFF);
-    pluginsButton->SetValue(ButtonOnBlinkOff(channelMode == PluginMode, channelMode == TrackPluginMode));
-    sendButton->SetValue(ButtonOnBlinkOff(channelMode == SendMode, channelMode == TrackSendMode));
-    panButton->SetValue(ButtonOnBlinkOff(channelMode == PanMode, channelMode == TrackPanMode));
+    trackButton->SetValue(channelMode == TrackMode ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+    pluginsButton->SetValue(ButtonOnBlinkOff(channelMode == PluginMode, channelMode == TrackPluginMode), force);
+    sendButton->SetValue(ButtonOnBlinkOff(channelMode == SendMode, channelMode == TrackSendMode), force);
+    panButton->SetValue(ButtonOnBlinkOff(channelMode == PanMode, channelMode == TrackPanMode), force);
 }
 
 void CSurf_FP_8_FaderManager::SetChannelMode(ChannelMode channelMode, bool updateButtons = false)
@@ -106,6 +106,12 @@ CSurf_FP_8_FaderManager::~CSurf_FP_8_FaderManager()
     delete context;
     tracks.clear();
 };
+
+void CSurf_FP_8_FaderManager::Refresh(bool force)
+{
+    SetChannelMode(TrackMode, true);
+    SetButtonValues(TrackMode, force);
+}
 
 void CSurf_FP_8_FaderManager::HandleTrackButtonClick(int value)
 {
