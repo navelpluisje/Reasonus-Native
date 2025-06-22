@@ -192,6 +192,12 @@ public:
             return;
         }
 
+        if (context->GetShiftRight())
+        {
+            DAW::SetSelectedTracksRange(media_track);
+            return;
+        }
+
         if (context->GetShiftLeft())
         {
             SetTrackSelected(media_track, !IsTrackSelected(media_track));

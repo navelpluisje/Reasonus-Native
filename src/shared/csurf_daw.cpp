@@ -172,6 +172,26 @@ ButtonColor DAW::GetTrackColor(MediaTrack *media_track)
     return color;
 }
 
+void DAW::SetSelectedTracksRange(MediaTrack *media_track)
+{
+    int index = (int)GetMediaTrackInfo_Value(media_track, "IP_TRACKNUMBER");
+    int selected_track_count = CountSelectedTracks(0);
+    int first_index = (int)GetMediaTrackInfo_Value(GetSelectedTrack(0, 0), "IP_TRACKNUMBER");
+    int last_index = (int)GetMediaTrackInfo_Value(GetSelectedTrack(0, selected_track_count - 1), "IP_TRACKNUMBER");
+    int start_index = index < first_index
+                          ? index
+                      : index < last_index
+                          ? first_index
+                          : last_index;
+    int end_index = index < first_index ? first_index : index;
+
+    for (int i = start_index - 1; i < end_index; i++)
+    {
+        MediaTrack *selectable_track = GetTrack(0, i);
+        SetTrackSelected(selectable_track, true);
+    }
+}
+
 bool DAW::GetTrackFxBypassed(MediaTrack *media_track)
 {
     return !(bool)GetMediaTrackInfo_Value(media_track, "I_FXEN");
