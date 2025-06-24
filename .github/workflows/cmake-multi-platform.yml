@@ -27,7 +27,8 @@ jobs:
           #   arch: armv7l
           - os: windows-latest
             arch: x64
-            win_build_type: RelWithDebInfo
+            win_build_type: Release
+            # win_build_type: RelWithDebInfo
           - os: windows-latest
             arch: x86
             win_build_type: Release
