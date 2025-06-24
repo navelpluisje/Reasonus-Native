@@ -25,16 +25,26 @@ protected:
 
     ShiftState shiftState;
 
-    void SetButtonValue()
+    void SetButtonValue(bool force = false)
     {
-        mixAudioButton->SetValue(trackFilter == TrackWithAudioFilter ? BTN_VALUE_ON : BTN_VALUE_OFF);
-        mixViButton->SetValue((trackFilter == TrackInstrumentsFilter || trackFilter == TrackWithMidiFilter) ? BTN_VALUE_ON : BTN_VALUE_OFF);
-        mixBusButton->SetValue((trackFilter == TrackTopFoldersFilter || trackFilter == TrackAllFoldersFilter || trackFilter == TrackHarwareOutputFilter) ? BTN_VALUE_ON : BTN_VALUE_OFF);
-        mixVcaButton->SetValue((trackFilter == TrackIsVcaFilter || trackFilter == TrackReceivesFilter || trackFilter == TrackEffectsFilter) ? BTN_VALUE_ON : BTN_VALUE_OFF);
-        mixAllButton->SetValue((trackFilter == TrackAllFilter || trackFilter == TrackCustomFilter || trackFilter == TrackSendsFilter) ? BTN_VALUE_ON : BTN_VALUE_OFF);
+        mixAudioButton->SetValue(trackFilter == TrackWithAudioFilter ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+        mixViButton->SetValue((trackFilter == TrackInstrumentsFilter || trackFilter == TrackWithMidiFilter) ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+        mixBusButton->SetValue((trackFilter == TrackTopFoldersFilter || trackFilter == TrackAllFoldersFilter || trackFilter == TrackHarwareOutputFilter) ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+        mixVcaButton->SetValue((trackFilter == TrackIsVcaFilter || trackFilter == TrackReceivesFilter || trackFilter == TrackEffectsFilter) ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+        mixAllButton->SetValue((trackFilter == TrackAllFilter || trackFilter == TrackCustomFilter || trackFilter == TrackSendsFilter) ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
         shiftRightButton->SetValue((context->GetShiftRight() || (context->GetShiftLeft() && context->GetSwapShiftButtons()))
                                        ? BTN_VALUE_ON
-                                       : BTN_VALUE_OFF);
+                                       : BTN_VALUE_OFF,
+                                   force);
+    }
+
+    void SetButtonColor(bool force = false)
+    {
+        mixAudioButton->SetColor(ButtonColorWhite, force);
+        mixViButton->SetColor(ButtonColorWhite, force);
+        mixBusButton->SetColor(ButtonColorWhite, force);
+        mixVcaButton->SetColor(ButtonColorWhite, force);
+        mixAllButton->SetColor(ButtonColorWhite, force);
     }
 
 public:
@@ -54,6 +64,12 @@ public:
         HandleMixAllButton(BTN_VALUE_ON);
     }
     ~CSurf_FP_8_MixManager() {};
+
+    void Refresh(bool force = false)
+    {
+        SetButtonValue(force);
+        SetButtonColor(force);
+    }
 
     void HandleMixAudioButton(int value)
     {

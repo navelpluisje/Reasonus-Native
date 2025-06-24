@@ -43,19 +43,19 @@ protected:
     CSurf_Button *prevButton;
     CSurf_Button *nextButton;
 
-    void SetButtonValues()
+    void SetButtonValues(bool force = false)
     {
         // With shift engaged, blink the selected button
         Btn_Value valueOn = context->GetShiftLeft() ? BTN_VALUE_BLINK : BTN_VALUE_ON;
 
-        channelButton->SetValue(session_type == Channel ? valueOn : BTN_VALUE_OFF);
-        zoomButton->SetValue(session_type == Zoom ? valueOn : BTN_VALUE_OFF);
-        scrollButton->SetValue(session_type == Scroll ? valueOn : BTN_VALUE_OFF);
-        bankButton->SetValue(session_type == Bank ? valueOn : BTN_VALUE_OFF);
-        masterButton->SetValue(session_type == Master ? valueOn : BTN_VALUE_OFF);
-        clickButton->SetValue(session_type == Click ? valueOn : BTN_VALUE_OFF);
-        sectionButton->SetValue(session_type == Section ? valueOn : BTN_VALUE_OFF);
-        markerButton->SetValue(session_type == Marker ? valueOn : BTN_VALUE_OFF);
+        channelButton->SetValue(session_type == Channel ? valueOn : BTN_VALUE_OFF, force);
+        zoomButton->SetValue(session_type == Zoom ? valueOn : BTN_VALUE_OFF, force);
+        scrollButton->SetValue(session_type == Scroll ? valueOn : BTN_VALUE_OFF, force);
+        bankButton->SetValue(session_type == Bank ? valueOn : BTN_VALUE_OFF, force);
+        masterButton->SetValue(session_type == Master ? valueOn : BTN_VALUE_OFF, force);
+        clickButton->SetValue(session_type == Click ? valueOn : BTN_VALUE_OFF, force);
+        sectionButton->SetValue(session_type == Section ? valueOn : BTN_VALUE_OFF, force);
+        markerButton->SetValue(session_type == Marker ? valueOn : BTN_VALUE_OFF, force);
     }
 
     void handleFunctionKey(std::string key)
@@ -104,7 +104,10 @@ public:
     }
     ~CSurf_FP_8_SessionManager();
 
-    void Refresh() { SetButtonValues(); }
+    void Refresh(bool force = false)
+    {
+        SetButtonValues(force);
+    }
 
     void SelectSession(SessionTypes _session_type)
     {

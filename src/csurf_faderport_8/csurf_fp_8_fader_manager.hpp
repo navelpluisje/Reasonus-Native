@@ -27,7 +27,7 @@ class CSurf_FP_8_FaderManager
     CSurf_Button *sendButton;
     CSurf_Button *panButton;
 
-    void SetButtonValues(ChannelMode mode);
+    void SetButtonValues(ChannelMode mode, bool force = false);
 
     void SetChannelMode(ChannelMode mode, bool updateButtons);
 
@@ -38,6 +38,8 @@ public:
         midi_Output *m_midiout);
 
     ~CSurf_FP_8_FaderManager();
+
+    void Refresh(bool force = false);
 
     void HandleTrackButtonClick(int value);
 

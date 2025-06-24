@@ -38,31 +38,40 @@ protected:
 
     bool functionsDialogOpen;
 
-    void SetButtonValue()
+    void SetButtonValue(bool force = false)
     {
-        armButton->SetValue(context->GetArm() ? BTN_VALUE_ON : BTN_VALUE_OFF);
+        armButton->SetValue(context->GetArm() ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
         if (context->GetShiftLeft())
         {
-            bypassButton->SetValue(hasGlobalBypass ? BTN_VALUE_ON
-                                                   : BTN_VALUE_OFF);
-            macroButton->SetColor(ButtonColorYellow);
-            macroButton->SetValue(CSURF_FP_UI_FUNCTIONS::IsFunctionsDialogOpen() ? BTN_VALUE_ON : BTN_VALUE_OFF);
+            bypassButton->SetValue(hasGlobalBypass
+                                       ? BTN_VALUE_ON
+                                       : BTN_VALUE_OFF,
+                                   force);
+            macroButton->SetColor(ButtonColorYellow, force);
+            macroButton->SetValue(CSURF_FP_UI_FUNCTIONS::IsFunctionsDialogOpen() ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
         }
         else
         {
-            bypassButton->SetValue(hasSelectedBypass ? BTN_VALUE_ON
-                                                     : BTN_VALUE_OFF);
-            macroButton->SetColor(ButtonColorWhite);
-            macroButton->SetValue(CSURF_FP_8_UI_FILTERS::IsFiltersDialogOpen() ? BTN_VALUE_ON : BTN_VALUE_OFF);
+            bypassButton->SetValue(hasSelectedBypass
+                                       ? BTN_VALUE_ON
+                                       : BTN_VALUE_OFF,
+                                   force);
+            macroButton->SetColor(ButtonColorWhite, force);
+            macroButton->SetValue(CSURF_FP_8_UI_FILTERS::IsFiltersDialogOpen() ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
         }
 
-        soloClearButton->SetValue(hasSolo ? BTN_VALUE_ON : BTN_VALUE_OFF);
-        muteClearButton->SetValue(hasMute ? BTN_VALUE_ON : BTN_VALUE_OFF);
-        linkButton->SetValue(context->GetLastTouchedFxMode() ? BTN_VALUE_ON : context->GetChannelMode() == PluginEditMode ? BTN_VALUE_BLINK
-                                                                                                                          : BTN_VALUE_OFF);
+        soloClearButton->SetValue(hasSolo ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+        muteClearButton->SetValue(hasMute ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+        linkButton->SetValue(context->GetLastTouchedFxMode()
+                                 ? BTN_VALUE_ON
+                             : context->GetChannelMode() == PluginEditMode
+                                 ? BTN_VALUE_BLINK
+                                 : BTN_VALUE_OFF,
+                             force);
         shiftLeftButton->SetValue((context->GetShiftLeft() || (context->GetShiftRight() && context->GetSwapShiftButtons()))
                                       ? BTN_VALUE_ON
-                                      : BTN_VALUE_OFF);
+                                      : BTN_VALUE_OFF,
+                                  force);
     };
 
     void UpdatePanValue(int val)
@@ -135,7 +144,12 @@ protected:
         }
     }
 
-    void SetButtonColors() {};
+    void SetButtonColors(bool force = false)
+    {
+        bypassButton->SetColor(ButtonColorRed, force);
+        macroButton->SetColor(ButtonColorWhite, force);
+        linkButton->SetColor(ButtonColorGreen, force);
+    };
 
 public:
     CSurf_FP_8_GeneralControlManager(
@@ -166,7 +180,14 @@ public:
         functionsDialogOpen = CSURF_FP_UI_FUNCTIONS::IsFunctionsDialogOpen();
 
         SetButtonValue();
+        SetButtonColors();
     };
+
+    void Refresh(bool force = false)
+    {
+        SetButtonValue(force);
+        SetButtonColors(force);
+    }
 
     void HandleEncoderClick(int value)
     {
@@ -297,7 +318,17 @@ public:
         }
         else
         {
+            if (::CountTracks(0) == 0)
+            {
+                return;
+            }
+
             if (context->GetPluginControl() &&
+                (context->IsChannelMode(PluginMode) ||
+                 context->IsChannelMode(TrackPluginMode) ||
+                 context->IsChannelMode(PluginControlMode) ||
+                 context->IsChannelMode(PluginEditMode)) &&
+
                 (context->GetPluginEditPluginId() > -1))
             {
                 faderManager->HandleLinkButtonClick();

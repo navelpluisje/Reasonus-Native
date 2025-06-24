@@ -105,9 +105,21 @@ public:
             CSurf_FP_8_Track *track = tracks.at(i);
             MediaTrack *media_track = media_tracks.Get(i);
 
-            if (!media_track || CountTracks(0) < i)
+            if (!media_track || ::CountTracks(0) < i)
             {
-                track->ClearTrack();
+                int index = context->GetNbChannels() - (static_cast<int>(time_code.size()) + i);
+                if (index < 1)
+                {
+                    track->ClearTrack(false);
+                    track->SetDisplayMode(DISPLAY_MODE_0, forceUpdate);
+                    track->SetDisplayLine(0, ALIGN_LEFT, "", NON_INVERT, forceUpdate);
+                    track->SetDisplayLine(1, ALIGN_CENTER, "", NON_INVERT, forceUpdate);
+                    track->SetDisplayLine(2, ALIGN_CENTER, time_code.at(abs(index)).c_str(), INVERT, forceUpdate);
+                }
+                else
+                {
+                    track->ClearTrack(true, forceUpdate);
+                }
                 continue;
             }
             SetTrackColors(media_track);
@@ -146,7 +158,7 @@ public:
             }
             else
             {
-                track->SetVuMeterValue(DAW::GetTrackSurfacePeakInfo(media_track));
+                track->SetVuMeterValue(DAW::GetTrackSurfacePeakInfo(media_track), true);
                 int index = context->GetNbChannels() - (static_cast<int>(time_code.size()) + i);
 
                 if (index < 1)
@@ -178,6 +190,12 @@ public:
         if (context->GetArm())
         {
             CSurf_SetSurfaceRecArm(media_track, CSurf_OnRecArmChange(media_track, !DAW::IsTrackArmed(media_track)), NULL);
+            return;
+        }
+
+        if (context->GetShiftRight())
+        {
+            DAW::SetSelectedTracksRange(media_track);
             return;
         }
 

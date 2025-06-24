@@ -2,6 +2,10 @@
 #include "csurf_fp_8_ui_functions.hpp"
 #include <mini/ini.h>
 
+#ifdef _WIN32
+    #include <windowsx.h>
+#endif
+
 extern HWND g_hwnd;
 extern REAPER_PLUGIN_HINSTANCE g_hInst;
 
@@ -14,6 +18,17 @@ namespace CSURF_FP_UI_FUNCTIONS
         std::string functionsDlgSelectedFunction = "";
         bool g_querying_action = false;
         HWND s_hwndDlg;
+        int positions[8][4] = {
+            {30, 44, 374, 64},
+            {30, 78, 374, 98},
+            {30, 112, 374, 132},
+            {30, 146, 374, 166},
+            {30, 180, 374, 200},
+            {30, 214, 374, 234},
+            {30, 248, 374, 268},
+            {30, 282, 374, 302},
+        };
+        int hoverIndex;
     }
 
     void PopulateActionFields(HWND hwndDlg)
@@ -32,12 +47,15 @@ namespace CSURF_FP_UI_FUNCTIONS
     {
         WDL_ASSERT(g_querying_action == true);
         const int actionId = PromptForAction(0, 0, 0);
+
         if (actionId == 0)
         {
             return;
         }
+
         plugin_register("-timer", (void *)&mytimer);
         g_querying_action = false;
+
         if (actionId > 0)
         {
             static mINI::INIFile file(GetReaSonusIniPath(FP_8));
@@ -45,6 +63,7 @@ namespace CSURF_FP_UI_FUNCTIONS
             file.write(ini, true);
             PopulateActionFields(s_hwndDlg);
         }
+
         PromptForAction(-1, 0, 0);
     }
 
@@ -63,14 +82,20 @@ namespace CSURF_FP_UI_FUNCTIONS
 
     void ShowFunctionInfo(HWND hwndDlg, std::string index)
     {
-        int actionId = stoi(ini["Functions"][index]);
+        int actionId = 0;
+
+        if (stoi(index) > 0)
+        {
+            actionId = stoi(ini["Functions"][index]);
+        }
+
         const char *fullName = kbd_getTextFromCmd(actionId, 0);
         std::vector<std::string> actionInfo = split(fullName, ":");
 
         SetDlgItemText(hwndDlg, IDC_GROUP_FUNCTION_INFO, ("Function Info " + index).c_str());
         SetDlgItemText(hwndDlg, IDC_FUNCTION_INFO_ID, ini["Functions"][index].c_str());
-        SetDlgItemText(hwndDlg, IDC_FUNCTION_INFO_TYPE, actionInfo[0].c_str());
-        SetDlgItemText(hwndDlg, IDC_FUNCTION_INFO_NAME, actionInfo[1].c_str());
+        SetDlgItemText(hwndDlg, IDC_FUNCTION_INFO_TYPE, actionInfo.size() > 0 ? actionInfo[0].c_str() : "");
+        SetDlgItemText(hwndDlg, IDC_FUNCTION_INFO_NAME, actionInfo.size() > 1 ? actionInfo[1].c_str() : "");
     }
 
     void HideFunctionsDialog()
@@ -94,10 +119,34 @@ namespace CSURF_FP_UI_FUNCTIONS
             break;
         }
 
+        case WM_MOUSEMOVE:
+        {
+            int xPos = GET_X_LPARAM(lParam);
+            int yPos = GET_Y_LPARAM(lParam);
+            int index = -1;
+
+            for (int i = 0; i < 8; i++)
+            {
+                if (positions[i][0] < xPos && xPos < positions[i][2] && positions[i][1] < yPos && yPos < positions[i][3])
+                {
+                    index = i;
+                }
+            }
+
+            if (hoverIndex != index)
+            {
+                hoverIndex = index;
+                ShowFunctionInfo(hwndDlg, std::to_string(index + 1));
+            }
+
+            break;
+        }
+
         case WM_COMMAND:
             switch (LOWORD(wParam))
             {
             case IDCANCEL:
+                SetActionState("_REASONUS_SHOW_REASONUS_FUNCTION_WINDOW");
                 HideFunctionsDialog();
                 break;
 
@@ -168,6 +217,7 @@ namespace CSURF_FP_UI_FUNCTIONS
 
             break;
         case WM_CLOSE:
+            SetActionState("_REASONUS_SHOW_REASONUS_FUNCTION_WINDOW");
             HideFunctionsDialog();
             break;
         }

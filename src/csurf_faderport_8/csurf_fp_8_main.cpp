@@ -418,10 +418,25 @@ public:
   {
     if (m_midiout)
     {
-      int x;
-      for (x = 0; x < 0x30; x++) // lights out§
-        m_midiout->Send(0xa0, x, 0x00, -1);
-      Sleep(5);
+      // Reset all displays, faders and track buttons after closing Reaper
+      for (int i = 0; i < (int)tracks.size(); i++)
+      {
+        tracks.at(i)->ClearTrack(true, true);
+      }
+      tracks.at(0)->SetDisplayMode(DISPLAY_MODE_3);
+      tracks.at(1)->SetDisplayMode(DISPLAY_MODE_3);
+      tracks.at(2)->SetDisplayMode(DISPLAY_MODE_3);
+      tracks.at(3)->SetDisplayMode(DISPLAY_MODE_3);
+      tracks.at((int)tracks.size() - 2)->SetDisplayMode(DISPLAY_MODE_3);
+      tracks.at((int)tracks.size() - 1)->SetDisplayMode(DISPLAY_MODE_3);
+      tracks.at(0)->SetDisplayLine(0, ALIGN_CENTER, "Good");
+      tracks.at(1)->SetDisplayLine(0, ALIGN_CENTER, "bye.");
+      tracks.at(0)->SetDisplayLine(1, ALIGN_CENTER, "Have");
+      tracks.at(1)->SetDisplayLine(1, ALIGN_CENTER, "a");
+      tracks.at(2)->SetDisplayLine(1, ALIGN_CENTER, "nice");
+      tracks.at(3)->SetDisplayLine(1, ALIGN_CENTER, "day");
+      tracks.at((int)tracks.size() - 2)->SetDisplayLine(0, ALIGN_RIGHT, "ReaS", INVERT);
+      tracks.at((int)tracks.size() - 1)->SetDisplayLine(0, ALIGN_LEFT, "onus", INVERT);
     }
 
     DELETE_ASYNC(m_midiout);
@@ -494,6 +509,16 @@ public:
 
         surface_update_lastrun = now;
       }
+      if ((now - surface_update_keepalive) >= 1200)
+      {
+        faderManager->Refresh(true);
+        sessionManager->Refresh(true);
+        mixManager->Refresh(true);
+        transportManager->Refresh(true);
+        automationManager->Refresh(true);
+        generalControlManager->Refresh(true);
+      }
+
       if ((now - surface_update_keepalive) >= 990)
       {
         surface_update_keepalive = now;
@@ -508,7 +533,8 @@ public:
   //   ShowConsoleMsg("SetTrackListChange");
   // }
 
-  void OnTrackSelection(MediaTrack *media_track)
+  void
+  OnTrackSelection(MediaTrack *media_track)
   {
     int trackId = (int)::GetMediaTrackInfo_Value(media_track, "IP_TRACKNUMBER");
 
