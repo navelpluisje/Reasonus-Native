@@ -26,9 +26,7 @@ public:
     static std::string GetTrackMonitorMode(MediaTrack *media_track);
     static std::string GetTrackRecordingMode(MediaTrack *media_track);
     static ButtonColor GetTrackColor(MediaTrack *media_track);
-    static bool GetTrackFxBypassed(MediaTrack *media_track);
-    static void ToggleTrackFxBypass(MediaTrack *media_track);
-
+    static void SetSelectedTracksRange(MediaTrack *media_track);
     static double GetTrackPeakInfo(MediaTrack *media_track);
     static int GetTrackSurfacePeakInfo(MediaTrack *media_track);
 
@@ -40,6 +38,8 @@ public:
     static bool GetTrackFxOffline(MediaTrack *media_track, int fx);
     static std::string GetTrackFxSurfceEnabled(MediaTrack *media_track, int fx);
     static bool GetTrackFxPanelOpen(MediaTrack *media_track, int fx);
+    static bool GetTrackFxBypassed(MediaTrack *media_track);
+    static void ToggleTrackFxBypass(MediaTrack *media_track);
 
     static std::string GetTrackFxParamName(MediaTrack *media_track, int fx, int param);
     static int GetTrackFxParamNbSteps(MediaTrack *media_track, int fx, int param);

@@ -25,14 +25,14 @@ class CSurf_TransportManager
 
     CSurf_Context *context;
 
-    void SetButtonValues()
+    void SetButtonValues(bool force = false)
     {
-        playButton->SetValue(ButtonBlinkOnOff(isPaused, isPlaying));
-        stopButton->SetValue(isStopped ? BTN_VALUE_ON : BTN_VALUE_OFF);
-        recordButton->SetValue(isRecording ? BTN_VALUE_ON : BTN_VALUE_OFF);
-        repeatButton->SetValue(isRepeat ? BTN_VALUE_ON : BTN_VALUE_OFF);
-        rewindButton->SetValue(ButtonBlinkOnOff(isRewinding && isFastFwdRwd, isRewinding));
-        forwardButton->SetValue(ButtonBlinkOnOff(isForwarding && isFastFwdRwd, isForwarding));
+        playButton->SetValue(ButtonBlinkOnOff(isPaused, isPlaying), force);
+        stopButton->SetValue(isStopped ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+        recordButton->SetValue(isRecording ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+        repeatButton->SetValue(isRepeat ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+        rewindButton->SetValue(ButtonBlinkOnOff(isRewinding && isFastFwdRwd, isRewinding), force);
+        forwardButton->SetValue(ButtonBlinkOnOff(isForwarding && isFastFwdRwd, isForwarding), force);
     };
 
     void StopRewindOrForward()
@@ -130,6 +130,11 @@ public:
         }
 
         SetButtonValues();
+    }
+
+    void Refresh(bool force = false)
+    {
+        SetButtonValues(force);
     }
 
     void HandlePlayButton(int value)

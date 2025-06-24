@@ -172,20 +172,23 @@ ButtonColor DAW::GetTrackColor(MediaTrack *media_track)
     return color;
 }
 
-bool DAW::GetTrackFxBypassed(MediaTrack *media_track)
+void DAW::SetSelectedTracksRange(MediaTrack *media_track)
 {
-    return !(bool)GetMediaTrackInfo_Value(media_track, "I_FXEN");
-}
+    int index = (int)GetMediaTrackInfo_Value(media_track, "IP_TRACKNUMBER");
+    int selected_track_count = CountSelectedTracks(0);
+    int first_index = (int)GetMediaTrackInfo_Value(GetSelectedTrack(0, 0), "IP_TRACKNUMBER");
+    int last_index = (int)GetMediaTrackInfo_Value(GetSelectedTrack(0, selected_track_count - 1), "IP_TRACKNUMBER");
+    int start_index = index < first_index
+                          ? index
+                      : index < last_index
+                          ? first_index
+                          : last_index;
+    int end_index = index < first_index ? first_index : index;
 
-void DAW::ToggleTrackFxBypass(MediaTrack *media_track)
-{
-    if (DAW::GetTrackFxBypassed(media_track))
+    for (int i = start_index - 1; i < end_index; i++)
     {
-        SetMediaTrackInfo_Value(media_track, "I_FXEN", 1.0);
-    }
-    else
-    {
-        SetMediaTrackInfo_Value(media_track, "I_FXEN", 0.0);
+        MediaTrack *selectable_track = GetTrack(0, i);
+        SetTrackSelected(selectable_track, true);
     }
 }
 
@@ -288,6 +291,23 @@ bool DAW::GetTrackFxPanelOpen(MediaTrack *media_track, int fx)
         return false;
     }
     return ::TrackFX_GetOpen(media_track, fx);
+}
+
+bool DAW::GetTrackFxBypassed(MediaTrack *media_track)
+{
+    return !(bool)GetMediaTrackInfo_Value(media_track, "I_FXEN");
+}
+
+void DAW::ToggleTrackFxBypass(MediaTrack *media_track)
+{
+    if (DAW::GetTrackFxBypassed(media_track))
+    {
+        SetMediaTrackInfo_Value(media_track, "I_FXEN", 1.0);
+    }
+    else
+    {
+        SetMediaTrackInfo_Value(media_track, "I_FXEN", 0.0);
+    }
 }
 
 /************************************************************************

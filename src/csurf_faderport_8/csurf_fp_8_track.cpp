@@ -37,7 +37,7 @@ void CSurf_FP_8_Track::ClearTrack(bool display, bool forceUpdate)
     this->SetSoloButtonValue(BTN_VALUE_OFF);
     this->SetSelectButtonValue(BTN_VALUE_OFF);
     this->SetValueBarValue(0);
-    this->SetFaderValue(0);
+    this->SetFaderValue(0, true);
     this->SetVuMeterValue(0);
     this->SetValueBarMode(VALUEBAR_MODE_OFF);
 }
