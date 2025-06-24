@@ -2,6 +2,7 @@
 #define CSURF_FP_8_RECEIVES_MANAGER_C_
 
 #include "../shared/csurf_context.cpp"
+#include <stdlib.h>
 #include <WDL/ptrlist.h>
 #include "csurf_fp_8_track.hpp"
 #include "../shared/csurf_utils.hpp"

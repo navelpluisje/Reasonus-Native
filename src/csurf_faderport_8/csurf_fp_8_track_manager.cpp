@@ -1,6 +1,7 @@
 #ifndef CSURF_FP_8_TRACK_MANAGER_C_
 #define CSURF_FP_8_TRACK_MANAGER_C_
 
+#include <stdlib.h>
 #include <WDL/ptrlist.h>
 #include "csurf_fp_8_track.hpp"
 #include "csurf_fp_8_channel_manager.hpp"

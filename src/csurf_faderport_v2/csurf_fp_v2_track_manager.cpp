@@ -1,5 +1,4 @@
 #include <vector>
-#include <WDL/ptrlist.h>
 #include "../shared/csurf_context.cpp"
 #include "../shared/csurf_daw.hpp"
 #include "../shared/csurf_utils.hpp"

@@ -3,6 +3,7 @@
 
 #include <reaper_plugin.h>
 #include "../shared/csurf_context.cpp"
+#include <stdlib.h>
 #include <WDL/ptrlist.h>
 #include "csurf_fp_8_track.hpp"
 #include "csurf_fp_8_channel_manager.hpp"

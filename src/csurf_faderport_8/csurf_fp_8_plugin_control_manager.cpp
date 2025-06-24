@@ -2,7 +2,6 @@
 #define CSURF_FP_8_PLUGIN_CONTROL_MANAGER_C_
 
 #include "../shared/csurf_context.cpp"
-#include <WDL/ptrlist.h>
 #include "csurf_fp_8_track.hpp"
 #include "csurf_fp_8_channel_manager.hpp"
 #include "csurf_fp_8_ui_plugin_edit.hpp"

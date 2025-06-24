@@ -2,7 +2,7 @@ target_sources(${PROJECT_NAME}
     PRIVATE
     res.rc
     main.cpp
-    ../lib/WDL/WDL/win32_utf8.c
+    # ../lib/WDL/WDL/win32_utf8.c
 )
 
 add_subdirectory(actions)
