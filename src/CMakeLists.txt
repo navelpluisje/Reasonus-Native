@@ -1,9 +1,17 @@
-target_sources(${PROJECT_NAME}
-    PRIVATE
-    res.rc
-    main.cpp
-    # ../lib/WDL/WDL/win32_utf8.c
-)
+if(WIN32)
+    target_sources(${PROJECT_NAME}
+        PRIVATE
+        res.rc
+        main.cpp
+        ../lib/WDL/WDL/win32_utf8.c
+    )
+else()
+    target_sources(${PROJECT_NAME}
+        PRIVATE
+        res.rc
+        main.cpp
+    )
+endif()
 
 add_subdirectory(actions)
 add_subdirectory(controls)
