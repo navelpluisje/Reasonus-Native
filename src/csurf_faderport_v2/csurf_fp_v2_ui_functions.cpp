@@ -2,6 +2,10 @@
 #include "csurf_fp_v2_ui_functions.hpp"
 #include <mini/ini.h>
 
+#ifdef _WIN32
+    #include <windowsx.h>
+#endif
+
 extern HWND g_hwnd;
 extern REAPER_PLUGIN_HINSTANCE g_hInst;
 
