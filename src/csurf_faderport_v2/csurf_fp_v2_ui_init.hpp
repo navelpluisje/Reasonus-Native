@@ -90,7 +90,7 @@ namespace CSURF_FP_V2_UI_INIT
             {
             case IDC_BUTTON_DOCUMENTTION:
             {
-                SystemOpenURL("https://navelpluisje.github.io/reasonus/documentation/faderport2/");
+                SystemOpenURL("https://navelpluisje.github.io/reasonus/documentation/faderportv2/");
                 break;
             }
 
