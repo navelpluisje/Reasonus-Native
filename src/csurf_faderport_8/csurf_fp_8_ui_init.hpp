@@ -4,6 +4,7 @@
 #include <string>
 #include <mini/ini.h>
 #include <WDL/win32_utf8.h>
+#include <config.h>
 #include "../shared/csurf_utils.hpp"
 #include "../shared/csurf_faderport_ui_utils.hpp"
 #include "../resource.h"
@@ -111,6 +112,8 @@ namespace CSURF_FP_8_UI_INIT
             SendMessage(GetDlgItem(hwndDlg, IDC_CHECK_INIT_SWAP_SHIFT), BM_SETCHECK, ini["surface"]["swap-shift-buttons"] == "1" ? BST_CHECKED : BST_UNCHECKED, 0);
             SendMessage(GetDlgItem(hwndDlg, IDC_CHECK_INIT_MUTE_MOMENTARY), BM_SETCHECK, ini["surface"]["mute-solo-momentary"] == "1" ? BST_CHECKED : BST_UNCHECKED, 0);
             SendMessage(GetDlgItem(hwndDlg, IDC_CHECK_INIT_TIME_CODE), BM_SETCHECK, ini["surface"]["overwrite-time-code"] == "1" ? BST_CHECKED : BST_UNCHECKED, 0);
+
+            SetDlgItemText(hwndDlg, IDC_VERSION, GIT_VERSION);
 
             break;
         }
