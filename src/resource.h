@@ -30,6 +30,8 @@
 #define IDC_CHECK_INIT_TIME_CODE 1014
 #define IDC_COMBO_INIT_TIME_CODE 1015
 #define IDC_BUTTON_DOCUMENTTION 1041
+#define IDC_VERSION 1042
+
 //========================================================
 // The functions dialog
 //========================================================
