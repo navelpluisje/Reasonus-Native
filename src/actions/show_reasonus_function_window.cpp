@@ -25,15 +25,15 @@ namespace SHOW_REASONUS_FUNCTION_WINDOW
     // gets called via callback or timer
     void MainFunctionOfMyPlugin()
     {
-        bool isFPv2 = file_exists(GetReaSonusIniPath(FP_8).c_str());
+        bool isFP8 = file_exists(GetReaSonusIniPath(FP_8).c_str());
 
         if (toggle_action_state)
         {
-            isFPv2 ? CSURF_FP_V2_UI_FUNCTIONS::ShowFunctionsDialog() : CSURF_FP_UI_FUNCTIONS::ShowFunctionsDialog();
+            isFP8 ? CSURF_FP_UI_FUNCTIONS::ShowFunctionsDialog() : CSURF_FP_V2_UI_FUNCTIONS::ShowFunctionsDialog();
         }
         else
         {
-            isFPv2 ? CSURF_FP_V2_UI_FUNCTIONS::HideFunctionsDialog() : CSURF_FP_UI_FUNCTIONS::HideFunctionsDialog();
+            isFP8 ? CSURF_FP_UI_FUNCTIONS::HideFunctionsDialog() : CSURF_FP_V2_UI_FUNCTIONS::HideFunctionsDialog();
         }
     }
 
