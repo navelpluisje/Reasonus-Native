@@ -11,13 +11,14 @@ A clear and concise description of what the bug is.
 
 **Operating System**
 
-- [] Windows 10
-- [] Mac OS
+- [ ] Windows 10
+- [ ] Mac OS
 
 **FaderPort Version**
 
-- [] FaderPort 8
-- [] FaderPort 16
+- [ ] FaderPort v2
+- [ ] FaderPort 8
+- [ ] FaderPort 16
 
 **To Reproduce**
 Steps to reproduce the behavior:
