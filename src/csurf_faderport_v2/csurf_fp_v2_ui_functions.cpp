@@ -3,7 +3,7 @@
 #include <mini/ini.h>
 
 #ifdef _WIN32
-    #include <windowsx.h>
+#include <windowsx.h>
 #endif
 
 extern HWND g_hwnd;
@@ -133,10 +133,6 @@ namespace CSURF_FP_V2_UI_FUNCTIONS
         case WM_COMMAND:
             switch (LOWORD(wParam))
             {
-            case IDCANCEL:
-                HideFunctionsDialog();
-                break;
-
             case IDC_BUTTON_ACTION_1:
                 PromptForFunctionAction(hwndDlg, "1");
                 break;
@@ -185,10 +181,18 @@ namespace CSURF_FP_V2_UI_FUNCTIONS
             case IDC_BUTTON_INFO_4:
                 ShowFunctionInfo(hwndDlg, "4");
                 break;
+
+            // Handle Cancel click
+            case IDCANCEL:
+                SetActionState("_REASONUS_SHOW_REASONUS_FUNCTION_WINDOW");
+                HideFunctionsDialog();
+                break;
             }
 
             break;
+
         case WM_CLOSE:
+            SetActionState("_REASONUS_SHOW_REASONUS_FUNCTION_WINDOW");
             HideFunctionsDialog();
             break;
         }
