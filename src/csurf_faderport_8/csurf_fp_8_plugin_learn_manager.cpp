@@ -166,6 +166,7 @@ public:
             ini[paramKey]["steps"] = std::to_string(nbSteps);
 
             SaveIniFile();
+            DAW::SetTrackFXParamUntouched(media_track, pluginId, paramId);
         }
         // Open the dialog
     }
@@ -228,6 +229,7 @@ public:
             ini[paramKey]["param"] = std::to_string(paramId);
 
             SaveIniFile();
+            DAW::SetTrackFXParamUntouched(media_track, pluginId, paramId);
         }
     }
 };
