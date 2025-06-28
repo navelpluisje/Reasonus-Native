@@ -43,6 +43,7 @@ public:
 
     static std::string GetTrackFxParamName(MediaTrack *media_track, int fx, int param);
     static int GetTrackFxParamNbSteps(MediaTrack *media_track, int fx, int param);
+    static void SetTrackFXParamUntouched(MediaTrack *media_track, int fx);
 
     static bool HasTrackReceive(MediaTrack *media_track, int receive);
     static std::string GetTrackReceiveSrcName(MediaTrack *media_track, int receive);

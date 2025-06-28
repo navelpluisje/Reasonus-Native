@@ -338,6 +338,11 @@ int DAW::GetTrackFxParamNbSteps(MediaTrack *media_track, int fx, int param)
     return nbSteps;
 }
 
+void DAW::SetTrackFXParamUntouched(MediaTrack *media_track, int fx)
+{
+    TrackFX_SetNamedConfigParm(media_track, fx, "last_touched", "-1");
+}
+
 /************************************************************************
  * Track Receive
  ************************************************************************/
