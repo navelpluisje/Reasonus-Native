@@ -109,6 +109,7 @@ namespace CSURF_FP_8_UI_INIT
             }
 
             SendMessage(GetDlgItem(hwndDlg, IDC_CHECK_INIT_DIS_PLUGIN), BM_SETCHECK, ini["surface"]["disable-plugins"] == "1" ? BST_CHECKED : BST_UNCHECKED, 0);
+            SendMessage(GetDlgItem(hwndDlg, IDC_CHECK_UNTOUCH_AFTER_LEARN), BM_SETCHECK, ini["surface"]["erase-last-param-after-learn"] == "1" ? BST_CHECKED : BST_UNCHECKED, 0);
             SendMessage(GetDlgItem(hwndDlg, IDC_CHECK_INIT_SWAP_SHIFT), BM_SETCHECK, ini["surface"]["swap-shift-buttons"] == "1" ? BST_CHECKED : BST_UNCHECKED, 0);
             SendMessage(GetDlgItem(hwndDlg, IDC_CHECK_INIT_MUTE_MOMENTARY), BM_SETCHECK, ini["surface"]["mute-solo-momentary"] == "1" ? BST_CHECKED : BST_UNCHECKED, 0);
             SendMessage(GetDlgItem(hwndDlg, IDC_CHECK_INIT_TIME_CODE), BM_SETCHECK, ini["surface"]["overwrite-time-code"] == "1" ? BST_CHECKED : BST_UNCHECKED, 0);
@@ -130,6 +131,12 @@ namespace CSURF_FP_8_UI_INIT
             case IDC_CHECK_INIT_DIS_PLUGIN:
             {
                 SaveCheckBoxValue(hwndDlg, "disable-plugins", IDC_CHECK_INIT_DIS_PLUGIN);
+                break;
+            }
+
+            case IDC_CHECK_UNTOUCH_AFTER_LEARN:
+            {
+                SaveCheckBoxValue(hwndDlg, "erase-last-param-after-learn", IDC_CHECK_UNTOUCH_AFTER_LEARN);
                 break;
             }
 
