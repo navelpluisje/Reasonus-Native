@@ -1,5 +1,8 @@
 #include "show_reasonus_function_window.hpp"
 #include "../csurf_faderport_8/csurf_fp_8_ui_functions.hpp"
+#include <mini/ini.h>
+#include "../shared/csurf_utils.hpp"
+#include "../csurf_faderport_v2/csurf_fp_v2_ui_functions.hpp"
 
 #define STRINGIZE_DEF(x) #x
 #define STRINGIZE(x) STRINGIZE_DEF(x)
@@ -16,18 +19,21 @@ namespace SHOW_REASONUS_FUNCTION_WINDOW
     constexpr auto command_name = "REASONUS_SHOW_REASONUS_FUNCTION_WINDOW";
     constexpr auto action_name = "Reasonus: Show the ReaSonus Functions window";
     custom_action_register_t action = {0, command_name, action_name, nullptr};
+    mINI::INIStructure ini;
 
     // the main function of my plugin
     // gets called via callback or timer
     void MainFunctionOfMyPlugin()
     {
+        bool isFP8 = file_exists(GetReaSonusIniPath(FP_8).c_str());
+
         if (toggle_action_state)
         {
-            CSURF_FP_UI_FUNCTIONS::ShowFunctionsDialog();
+            isFP8 ? CSURF_FP_UI_FUNCTIONS::ShowFunctionsDialog() : CSURF_FP_V2_UI_FUNCTIONS::ShowFunctionsDialog();
         }
         else
         {
-            CSURF_FP_UI_FUNCTIONS::HideFunctionsDialog();
+            isFP8 ? CSURF_FP_UI_FUNCTIONS::HideFunctionsDialog() : CSURF_FP_V2_UI_FUNCTIONS::HideFunctionsDialog();
         }
     }
 

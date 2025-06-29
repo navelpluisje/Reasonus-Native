@@ -83,7 +83,7 @@ public:
     CSurf_FP_8_Track(int index, CSurf_Context *_context, midi_Output *m_midiout);
     ~CSurf_FP_8_Track();
 
-    void ClearTrack(bool display = true);
+    void ClearTrack(bool display = true, bool forceUpdate = false);
 
     void SetTrackColor(ButtonColor color);
 

@@ -23,6 +23,21 @@ void Main_OnCommandStringEx(std::string action_name, int flag, ReaProject *proj)
     Main_OnCommandEx(actionId, flag, proj);
 }
 
+void SetActionState(int actionId)
+{
+    int state = GetToggleCommandStateEx(0, actionId);
+    if (state == 1)
+    {
+        Main_OnCommandEx(actionId, 0, 0);
+    }
+}
+
+void SetActionState(std::string action_name)
+{
+    int actionId = NamedCommandLookup(action_name.c_str());
+    SetActionState(actionId);
+}
+
 bool GetToggleCommandStringState(std::string action_name)
 {
     int actionId = NamedCommandLookup(action_name.c_str());
@@ -288,6 +303,7 @@ void readAndCreateIni(mINI::INIStructure &data, std::string device)
         {
             data["surface"]["surface"] = "0";
             data["surface"]["disable-plugins"] = "0";
+            data["surface"]["erase-last-param-after-learn"] = "0";
             data["surface"]["swap-shift-buttons"] = "0";
             data["surface"]["overwrite-time-code"] = "1";
             data["surface"]["time-code"] = "2";
@@ -320,6 +336,7 @@ void validateReaSonusIni(mINI::INIFile file, mINI::INIStructure &data, std::stri
     {
         data["surface"]["surface"] = data["surface"].has("surface") ? data["surface"]["surface"] : "0";
         data["surface"]["disable-plugins"] = data["surface"].has("disable-plugins") ? data["surface"]["disable-plugins"] : "0";
+        data["surface"]["erase-last-param-after-learn"] = data["surface"].has("erase-last-param-after-learn") ? data["surface"]["erase-last-param-after-learn"] : "0";
         data["surface"]["swap-shift-buttons"] = data["surface"].has("swap-shift-buttons") ? data["surface"]["swap-shift-buttons"] : "0";
         data["surface"]["overwrite-time-code"] = data["surface"].has("overwrite-time-code") ? data["surface"]["overwrite-time-code"] : "1";
         data["surface"]["time-code"] = data["surface"].has("time-code") ? data["surface"]["time-code"] : "2";

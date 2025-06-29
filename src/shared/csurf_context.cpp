@@ -8,11 +8,33 @@
 class CSurf_Context
 {
     // Global settings
+    /**
+     * @brief Wether or not you want to control plugins with ReaSonus
+     */
     bool plugin_control;
+    /**
+     * @brief Should the last touched parameter get 'untouched' after connectring it to a control
+     */
+    bool untouch_after_learn;
+    /**
+     * @brief Sap the left and right shift button behaviuour
+     */
     bool swap_shift_buttons;
+    /**
+     * @brief When engaged the mute and solo button behave as momentary buttons when pressing longer then 500ms
+     */
     bool mute_solo_momentary;
+    /**
+     * @brief When engaged you use your own selected timeocode. Otherwise the selected time code in Reaper will be used
+     */
     bool overwrite_time_code;
+    /**
+     * @brief When overwrite is true, this is the timecode used
+     */
     int surface_time_code;
+    /**
+     * @brief Number of channels
+     */
     int nbChannels = 8;
 
     // Shift keys
@@ -44,6 +66,7 @@ class CSurf_Context
 
     ChannelMode channelMode = TrackMode;
     ChannelMode previousChannelMode = TrackMode;
+    ChannelMode previousPluginChannelMode = TrackMode;
     ChannelManagerType channelManagerType;
 
 public:
@@ -58,6 +81,16 @@ public:
     bool GetPluginControl()
     {
         return plugin_control;
+    }
+
+    void SetUntouchAfterLearn(bool enabled)
+    {
+        untouch_after_learn = enabled;
+    }
+
+    bool GetUntouchAfterLearn()
+    {
+        return untouch_after_learn;
     }
 
     void SetSwapShiftButtons(bool enabled)
@@ -284,6 +317,16 @@ public:
     ChannelMode GetPreviousChannelMode()
     {
         return previousChannelMode;
+    }
+
+    void SetPreviousPluginChannelMode(ChannelMode _channelMode)
+    {
+        previousPluginChannelMode = _channelMode;
+    }
+
+    ChannelMode GetPreviousPluginChannelMode()
+    {
+        return previousPluginChannelMode;
     }
 
     void SetPluginEditTrack(MediaTrack *track)
