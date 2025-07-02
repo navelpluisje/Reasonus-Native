@@ -203,11 +203,20 @@ public:
 
     void ToggleLastTouchedFxMode()
     {
-        lastTouchedFxMode = !lastTouchedFxMode;
+        SetLastTouchedFxMode(!lastTouchedFxMode);
     }
 
+    /**
+     * @brief Set the Last Touched FX Mode. If value is true, reset master fader mode
+     *
+     * @param value
+     */
     void SetLastTouchedFxMode(bool value)
     {
+        if (value)
+        {
+            masterFaderMode = false;
+        }
         lastTouchedFxMode = value;
     }
 
@@ -216,8 +225,25 @@ public:
         return lastTouchedFxMode;
     }
 
+    /**
+     * @brief Toggle the master fader mode
+     */
+    void ToggleMasterFaderMode()
+    {
+        SetMasterFaderMode(!masterFaderMode);
+    }
+
+    /**
+     * @brief Set the Master Fader Mode. If value is true, reset last touched Fx mode
+     *
+     * @param value
+     */
     void SetMasterFaderMode(bool value)
     {
+        if (value)
+        {
+            lastTouchedFxMode = false;
+        }
         masterFaderMode = value;
     }
 
@@ -226,12 +252,33 @@ public:
         return masterFaderMode;
     }
 
+    /**
+     * @brief Set the Nb Channels. These are the nb of faders on the FaderPort
+     *
+     * @param count The number of faders
+     */
     void SetNbChannels(int count)
     {
         nbChannels = count;
     }
 
+    /**
+     * @brief Get the Nb Channels. These are the actual number if faders
+     *
+     * @return int The number of faders
+     */
     int GetNbChannels()
+    {
+        // TODO: Should be only nbChannels
+        return lastTouchedFxMode ? nbChannels - 1 : nbChannels;
+    }
+
+    /**
+     * @brief Get the Nb Bank Channels. When lastTouchedFxMode is set, this will be 1 less the the actual fader count
+     *
+     * @return int The number of bank channels
+     */
+    int GetNbBankChannels()
     {
         return lastTouchedFxMode ? nbChannels - 1 : nbChannels;
     }

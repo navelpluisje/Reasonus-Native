@@ -191,7 +191,10 @@ public:
             handleFunctionKey("5");
             return;
         }
-        session_type = Master;
+
+        // When masterfadermode enabled set master fader mode, otherwise the old way
+        context->SetMasterFaderMode(!context->GetMasterFaderMode());
+        // session_type = Master;
         SetButtonValues();
     }
 
