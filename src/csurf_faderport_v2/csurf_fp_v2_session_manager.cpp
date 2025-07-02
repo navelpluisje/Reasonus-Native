@@ -149,7 +149,7 @@ public:
 
     void resetPan()
     {
-        MediaTrack *media_track = context->GetMasterFaderMode() ? GetMasterTrack(0) : trackNavigator->GetControllerTrack();
+        MediaTrack *media_track = trackNavigator->GetControllerTrack();
 
         int pan_mode = DAW::GetTrackPanMode(media_track);
         if (pan_mode < 4)
@@ -172,7 +172,7 @@ public:
     {
         double pan1, pan2 = 0.0;
         int pan_mode;
-        MediaTrack *media_track = context->GetMasterFaderMode() ? GetMasterTrack(0) : trackNavigator->GetControllerTrack();
+        MediaTrack *media_track = trackNavigator->GetControllerTrack();
         GetTrackUIPan(media_track, &pan1, &pan2, &pan_mode);
 
         if (context->GetShiftLeft())
