@@ -44,7 +44,7 @@ void CSurf_FP_V2_TrackManager::UpdateTrack()
     int faderValue = 0;
     std::string strPan1, strPan2;
 
-    if (!media_track || CountTracks(0) < 1)
+    if (media_track == nullptr || CountTracks(0) < 1)
     {
         ClearTrack();
         forceUpdate = false;
@@ -94,6 +94,11 @@ void CSurf_FP_V2_TrackManager::UpdateTrack()
 
 void CSurf_FP_V2_TrackManager::ClearTrack()
 {
+    track->SetMuteButtonValue(BTN_VALUE_OFF);
+    track->SetSoloButtonValue(BTN_VALUE_OFF);
+    track->SetArmButtonValue(BTN_VALUE_OFF);
+
+    track->SetFaderValue(0, forceUpdate);
 }
 
 void CSurf_FP_V2_TrackManager::HandleMuteClick(int index, int value)
@@ -217,10 +222,6 @@ void CSurf_FP_V2_TrackManager::HandleFaderMove(int msb, int lsb)
     }
 
     MediaTrack *media_track = navigator->GetControllerTrack();
-    if (context->GetMasterFaderMode())
-    {
-        media_track = ::GetMasterTrack(0);
-    }
 
     if (context->GetShiftLeft())
     {

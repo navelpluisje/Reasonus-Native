@@ -535,12 +535,17 @@ public:
   //   ShowConsoleMsg("SetTrackListChange");
   // }
 
-  void
-  OnTrackSelection(MediaTrack *media_track)
+  void OnTrackSelection(MediaTrack *media_track)
   {
     int trackId = (int)::GetMediaTrackInfo_Value(media_track, "IP_TRACKNUMBER");
 
-    trackNavigator->SetOffset(trackId - 1);
+    /**
+     * Skip the master track selection
+     */
+    if (trackId > -1)
+    {
+      trackNavigator->SetOffset(trackId - 1);
+    }
   }
 };
 
