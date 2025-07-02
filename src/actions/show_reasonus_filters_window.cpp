@@ -68,7 +68,7 @@ namespace SHOW_REASONUS_FILTERS_WINDOW
 
         if (!isFP8)
         {
-            ShowMessageBox("The filters are not available for the FaderPort v2", "Not available", 0);
+            ShowMessageBox("The filters dialog is not available for the FaderPort v2", "Dialog not available", 0);
         }
         else
         {
