@@ -11,27 +11,31 @@ class CSurf_Context
     /**
      * @brief Wether or not you want to control plugins with ReaSonus
      */
-    bool plugin_control;
+    bool plugin_control_setting;
     /**
      * @brief Should the last touched parameter get 'untouched' after connectring it to a control
      */
-    bool untouch_after_learn;
+    bool untouch_after_learn_setting;
+    /**
+     * @brief Enable the last fader for master affter clicking themaster button
+     */
+    bool master_fader_mode_setting;
     /**
      * @brief Sap the left and right shift button behaviuour
      */
-    bool swap_shift_buttons;
+    bool swap_shift_buttons_setting;
     /**
      * @brief When engaged the mute and solo button behave as momentary buttons when pressing longer then 500ms
      */
-    bool mute_solo_momentary;
+    bool mute_solo_momentary_setting;
     /**
      * @brief When engaged you use your own selected timeocode. Otherwise the selected time code in Reaper will be used
      */
-    bool overwrite_time_code;
+    bool overwrite_time_code_setting;
     /**
      * @brief When overwrite is true, this is the timecode used
      */
-    int surface_time_code;
+    int surface_time_code_setting;
     /**
      * @brief Number of channels
      */
@@ -75,67 +79,77 @@ public:
 
     void SetPluginControl(bool enabled)
     {
-        plugin_control = enabled;
+        plugin_control_setting = enabled;
     }
 
     bool GetPluginControl()
     {
-        return plugin_control;
+        return plugin_control_setting;
     }
 
     void SetUntouchAfterLearn(bool enabled)
     {
-        untouch_after_learn = enabled;
+        untouch_after_learn_setting = enabled;
     }
 
     bool GetUntouchAfterLearn()
     {
-        return untouch_after_learn;
+        return untouch_after_learn_setting;
+    }
+
+    void SetMasterFaderModeEnabled(bool enabled)
+    {
+        master_fader_mode_setting = enabled;
+    }
+
+    bool GetMasterFaderModeEnabled()
+    {
+        return master_fader_mode_setting;
     }
 
     void SetSwapShiftButtons(bool enabled)
     {
-        swap_shift_buttons = enabled;
+        swap_shift_buttons_setting = enabled;
     }
 
     bool GetSwapShiftButtons()
     {
-        return swap_shift_buttons;
+        return swap_shift_buttons_setting;
     }
 
     void SetMuteSoloMomentary(bool enabled)
     {
-        mute_solo_momentary = enabled;
+        mute_solo_momentary_setting = enabled;
     }
 
     bool GetMuteSoloMomentary()
     {
-        return mute_solo_momentary;
+        return mute_solo_momentary_setting;
     }
 
     void SetOverwriteTimeCode(bool enabled)
     {
-        overwrite_time_code = enabled;
+        overwrite_time_code_setting = enabled;
     }
 
     bool GetOverwriteTimeCode()
     {
-        return overwrite_time_code;
+        return overwrite_time_code_setting;
     }
 
     void SetSurfaceTimeCode(int value)
     {
-        surface_time_code = value;
+        surface_time_code_setting = value;
     }
 
     bool GetSurfaceTimeCode()
     {
-        return surface_time_code;
+        return surface_time_code_setting;
     }
 
     void SetShiftLeft(bool val)
     {
-        if (swap_shift_buttons)
+        if (swap_shift_buttons_setting)
         {
             shift_right = val;
         }
@@ -152,7 +166,7 @@ public:
 
     void SetShiftRight(bool val)
     {
-        if (swap_shift_buttons)
+        if (swap_shift_buttons_setting)
         {
             shift_left = val;
         }
@@ -249,7 +263,7 @@ public:
 
     bool GetMasterFaderMode()
     {
-        return masterFaderMode;
+        return masterFaderMode && master_fader_mode_setting;
     }
 
     /**

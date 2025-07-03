@@ -17,11 +17,12 @@ class CSurf_FP_8_Menu_Manager : public CSurf_FP_8_ChannelManager
 protected:
     mINI::INIStructure ini;
 
-    std::vector<std::string> menu_items = {"Plugin Ctr", "Last Param", "Swap Shift", "Momentary", "Timecode", "Time type"};
-    std::vector<std::string> ini_keys = {"disable-plugins", "erase-last-param-after-learn", "swap-shift-buttons", "mute-solo-momentary", "overwrite-time-code", "time-code"};
+    std::vector<std::string> menu_items = {"Plugin Ctr", "Last Param", "Master Fad", "Swap Shift", "Momentary", "Timecode", "Time type"};
+    std::vector<std::string> ini_keys = {"disable-plugins", "erase-last-param-after-learn", "master-fader-mode", "swap-shift-buttons", "mute-solo-momentary", "overwrite-time-code", "time-code"};
     std::vector<std::vector<std::vector<std::string>>> menu_options = {
         {{"Disable", "1"}, {"Enable", "0"}},
         {{"Keep", "0"}, {"Untouch", "1"}},
+        {{"Disable", "0"}, {"Enable", "1"}},
         {{"Default", "0"}, {"Swap", "1"}},
         {{"Disable", "0"}, {"Enable", "1"}},
         {{"REAPER", "0"}, {"ReaSonus", "1"}},
@@ -31,6 +32,7 @@ protected:
     std::vector<std::vector<std::string>> menu_descriptions = {
         {"Do you", "want to", "controll", "plugins", "with", "ReaSonus", ""},
         {"Untouch", "last touched", "parameter", "after learn", "", "", ""},
+        {"Control the", "master tr.", "with the", "last fader", "", "", ""},
         {"Swap the", "shift btns", "", "", "", "", ""},
         {"Momentary", "push mode", "mute/solo", "buttons", "", "", ""},
         {"Which", "time code", "you want", "to use?", "Reaper or", "ReaSonus", ""},
@@ -156,6 +158,7 @@ public:
                 // Write all teh values to the context again so they get applied instantly
                 context->SetPluginControl(ini["surface"].has("disable-plugins") && ini["surface"]["disable-plugins"] != "1");
                 context->SetUntouchAfterLearn(ini["surface"].has("erase-last-param-after-learn") && ini["surface"]["erase-last-param-after-learn"] == "1");
+                context->SetMasterFaderModeEnabled(ini["surface"].has("master-fader-mode") && ini["surface"]["master-fader-mode"] == "1");
                 context->SetSwapShiftButtons(ini["surface"].has("swap-shift-buttons") && ini["surface"]["swap-shift-buttons"] == "1");
                 context->SetMuteSoloMomentary(ini["surface"].has("mute-solo-momentary") && ini["surface"]["mute-solo-momentary"] == "1");
                 context->SetOverwriteTimeCode(ini["surface"].has("overwrite-time-code") && ini["surface"]["overwrite-time-code"] == "1");
