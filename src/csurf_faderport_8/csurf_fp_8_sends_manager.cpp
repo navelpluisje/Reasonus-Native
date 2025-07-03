@@ -108,6 +108,7 @@ public:
 
             CSurf_FP_8_Track *track = tracks.at(i);
             MediaTrack *media_track = media_tracks.Get(i);
+
             if (!media_track)
             {
                 track->ClearTrack();

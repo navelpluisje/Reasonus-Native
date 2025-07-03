@@ -331,6 +331,10 @@ CSurf_FP_8_Navigator::CSurf_FP_8_Navigator(CSurf_Context *context) : context(con
 
 MediaTrack *CSurf_FP_8_Navigator::GetTrackByIndex(int index)
 {
+    if (context->GetMasterFaderMode() && index == context->GetNbChannels() - 1)
+    {
+        return ::GetMasterTrack(0);
+    }
     WDL_PtrList<MediaTrack> bank = GetBankTracks();
     return bank.Get(index);
 }
@@ -339,7 +343,9 @@ WDL_PtrList<MediaTrack> CSurf_FP_8_Navigator::GetBankTracks()
 {
     WDL_PtrList<MediaTrack> bank;
     GetAllVisibleTracks(tracks, hasSolo, hasMute);
-    int channelCount = context->GetNbChannels() > tracks.GetSize() ? context->GetNbChannels() : tracks.GetSize();
+
+    int channelCount = context->GetNbBankChannels() > tracks.GetSize() ? context->GetNbBankChannels() : tracks.GetSize();
+
     for (int i = track_offset; i < track_offset + channelCount; i++)
     {
         if (i > track_offset + channelCount)

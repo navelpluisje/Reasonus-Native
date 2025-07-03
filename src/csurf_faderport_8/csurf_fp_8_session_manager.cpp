@@ -52,7 +52,8 @@ protected:
         zoomButton->SetValue(session_type == Zoom ? valueOn : BTN_VALUE_OFF, force);
         scrollButton->SetValue(session_type == Scroll ? valueOn : BTN_VALUE_OFF, force);
         bankButton->SetValue(session_type == Bank ? valueOn : BTN_VALUE_OFF, force);
-        masterButton->SetValue(session_type == Master ? valueOn : BTN_VALUE_OFF, force);
+        masterButton->SetValue(context->GetMasterFaderMode() ? valueOn : BTN_VALUE_OFF, force);
+        // masterButton->SetValue(session_type == Master ? valueOn : BTN_VALUE_OFF, force);
         clickButton->SetValue(session_type == Click ? valueOn : BTN_VALUE_OFF, force);
         sectionButton->SetValue(session_type == Section ? valueOn : BTN_VALUE_OFF, force);
         markerButton->SetValue(session_type == Marker ? valueOn : BTN_VALUE_OFF, force);
@@ -193,7 +194,7 @@ public:
         }
 
         // When masterfadermode enabled set master fader mode, otherwise the old way
-        context->SetMasterFaderMode(!context->GetMasterFaderMode());
+        context->ToggleMasterFaderMode();
         // session_type = Master;
         SetButtonValues();
     }
