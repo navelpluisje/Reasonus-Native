@@ -40,7 +40,7 @@ protected:
         color.SetColor(red / 2, green / 2, blue / 2);
     }
 
-    void GetFaderValue(MediaTrack *media_track, int *faderValue, int *valueBarValue)
+    void GetFaderValue(MediaTrack *media_track, int *fader_value, int *value_bar_value)
     {
         int panMode = 0;
         double volume, pan1, pan2 = 0.0;
@@ -48,8 +48,8 @@ protected:
         ::GetTrackUIVolPan(media_track, &volume, &pan1);
         ::GetTrackUIPan(media_track, &pan1, &pan2, &panMode);
 
-        *faderValue = int(volToNormalized(volume) * 16383.0);
-        *valueBarValue = int(panToNormalized(pan1) * 127);
+        *fader_value = int(volToNormalized(volume) * 16383.0);
+        *value_bar_value = int(panToNormalized(pan1) * 127);
     }
 
     std::string GetBypassedText(bool bypassed)
@@ -77,7 +77,16 @@ public:
 
         for (int i = 0; i < context->GetNbChannels(); i++)
         {
-            MediaTrack *media_track = media_tracks.Get(i);
+            MediaTrack *media_track;
+            if (context->GetMasterFaderMode() && i == (context->GetNbChannels() - 1))
+            {
+                media_track = ::GetMasterTrack(0);
+            }
+            else
+            {
+                media_track = media_tracks.Get(i);
+            }
+
             int _nbTrackPlugins = ::TrackFX_GetCount(media_track);
             nbTrackPlugins[i] = _nbTrackPlugins;
 
@@ -92,18 +101,28 @@ public:
 
         for (int i = 0; i < context->GetNbChannels(); i++)
         {
-            int faderValue = 0, valueBarValue = 0;
+            MediaTrack *media_track;
+            int fader_value = 0, value_bar_value = 0;
             int pluginIndex = context->GetChannelManagerItemIndex(nbTrackPlugins[i] - 1);
 
             CSurf_FP_8_Track *track = tracks.at(i);
-            MediaTrack *media_track = media_tracks.Get(i);
+            if (context->GetMasterFaderMode() && i == (context->GetNbChannels() - 1))
+            {
+                media_track = ::GetMasterTrack(0);
+            }
+            else
+            {
+                media_track = media_tracks.Get(i);
+            }
+
             if (!media_track)
             {
                 track->ClearTrack();
                 continue;
             }
+
             SetTrackColors(media_track);
-            GetFaderValue(media_track, &faderValue, &valueBarValue);
+            GetFaderValue(media_track, &fader_value, &value_bar_value);
 
             if (DAW::HasTrackFx(media_track, pluginIndex))
             {
@@ -126,9 +145,9 @@ public:
 
             track->SetTrackColor(color);
             track->SetSelectButtonValue(DAW::IsTrackSelected(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF);
-            track->SetFaderValue(faderValue);
+            track->SetFaderValue(fader_value);
             track->SetValueBarMode(VALUEBAR_MODE_BIPOLAR);
-            track->SetValueBarValue(valueBarValue);
+            track->SetValueBarValue(value_bar_value);
 
             track->SetDisplayMode(DISPLAY_MODE_2);
         }

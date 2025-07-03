@@ -114,7 +114,7 @@ public:
                 media_track = media_tracks.Get(i);
             }
 
-            if (!media_track || ::CountTracks(0) < i)
+            if (!media_track || (::CountTracks(0) < i && !is_master_track))
             {
                 int index = context->GetNbChannels() - (static_cast<int>(time_code.size()) + i);
                 if (index < 1)
@@ -131,6 +131,7 @@ public:
                 }
                 continue;
             }
+
             SetTrackColors(media_track);
 
             bool is_selected = DAW::IsTrackSelected(media_track);

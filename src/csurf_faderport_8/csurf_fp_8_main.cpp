@@ -134,17 +134,37 @@ class CSurf_FaderPort : public IReaperControlSurface
       {
         faderManager->HandleSoloClick(evt->midi_message[1] - BTN_SOLO_1, evt->midi_message[2]);
       }
-      else if (evt->midi_message[1] >= BTN_SOLO_9 && evt->midi_message[1] <= BTN_SOLO_14 && evt->midi_message[1] != BTN_SOLO_12 && evt->midi_message[1] != ENCODER_CLICK_NAV)
+      else if (evt->midi_message[1] == BTN_SOLO_9)
       {
-        faderManager->HandleSoloClick(evt->midi_message[1] - BTN_SOLO_9 + 8, evt->midi_message[2]);
+        faderManager->HandleSoloClick(8, evt->midi_message[2]);
       }
-      else if (evt->midi_message[1] == BTN_SOLO_14 || evt->midi_message[1] == BTN_SOLO_15)
+      else if (evt->midi_message[1] == BTN_SOLO_10)
       {
-        faderManager->HandleSoloClick(evt->midi_message[1] == BTN_SOLO_14 ? 14 : 15, evt->midi_message[2]);
+        faderManager->HandleSoloClick(9, evt->midi_message[2]);
+      }
+      else if (evt->midi_message[1] == BTN_SOLO_11)
+      {
+        faderManager->HandleSoloClick(10, evt->midi_message[2]);
       }
       else if (evt->midi_message[1] == BTN_SOLO_12)
       {
+        faderManager->HandleSoloClick(11, evt->midi_message[2]);
+      }
+      else if (evt->midi_message[1] == BTN_SOLO_13)
+      {
         faderManager->HandleSoloClick(12, evt->midi_message[2]);
+      }
+      else if (evt->midi_message[1] == BTN_SOLO_14)
+      {
+        faderManager->HandleSoloClick(13, evt->midi_message[2]);
+      }
+      else if (evt->midi_message[1] == BTN_SOLO_15)
+      {
+        faderManager->HandleSoloClick(14, evt->midi_message[2]);
+      }
+      else if (evt->midi_message[1] == BTN_SOLO_16)
+      {
+        faderManager->HandleSoloClick(15, evt->midi_message[2]);
       }
 
       /**
