@@ -52,7 +52,7 @@ protected:
         zoomButton->SetValue(session_type == Zoom ? valueOn : BTN_VALUE_OFF, force);
         scrollButton->SetValue(session_type == Scroll ? valueOn : BTN_VALUE_OFF, force);
         bankButton->SetValue(session_type == Bank ? valueOn : BTN_VALUE_OFF, force);
-        masterButton->SetValue(session_type == Master ? valueOn : BTN_VALUE_OFF, force);
+        masterButton->SetValue((context->GetMasterFaderMode() || session_type == Master) ? valueOn : BTN_VALUE_OFF, force);
         clickButton->SetValue(session_type == Click ? valueOn : BTN_VALUE_OFF, force);
         sectionButton->SetValue(session_type == Section ? valueOn : BTN_VALUE_OFF, force);
         markerButton->SetValue(session_type == Marker ? valueOn : BTN_VALUE_OFF, force);
@@ -191,7 +191,16 @@ public:
             handleFunctionKey("5");
             return;
         }
-        session_type = Master;
+
+        if (context->GetMasterFaderModeEnabled())
+        {
+            context->ToggleMasterFaderMode();
+        }
+        else
+        {
+            session_type = Master;
+        }
+
         SetButtonValues();
     }
 
@@ -261,7 +270,7 @@ public:
         switch (session_type)
         {
         case Channel:
-            trackNavigator->DecrementOffset(context->GetShiftLeft() ? context->GetNbChannels() : 1);
+            trackNavigator->DecrementOffset(context->GetShiftLeft() ? context->GetNbBankChannels() : 1);
             TrackList_UpdateAllExternalSurfaces();
             break;
         case Zoom:
@@ -273,11 +282,11 @@ public:
             Main_OnCommandEx(40286, 0, 0); // Track: Go to previous track
             break;
         case Bank:
-            trackNavigator->DecrementOffset(context->GetShiftLeft() ? 1 : context->GetNbChannels());
+            trackNavigator->DecrementOffset(context->GetShiftLeft() ? 1 : context->GetNbBankChannels());
             TrackList_UpdateAllExternalSurfaces();
             break;
         case Master:
-            trackNavigator->DecrementOffset(context->GetShiftLeft() ? context->GetNbChannels() : 1);
+            trackNavigator->DecrementOffset(context->GetShiftLeft() ? context->GetNbBankChannels() : 1);
             TrackList_UpdateAllExternalSurfaces();
             break;
         case Click:
@@ -306,7 +315,7 @@ public:
         switch (session_type)
         {
         case Channel:
-            trackNavigator->IncrementOffset(context->GetShiftLeft() ? context->GetNbChannels() : 1);
+            trackNavigator->IncrementOffset(context->GetShiftLeft() ? context->GetNbBankChannels() : 1);
             TrackList_UpdateAllExternalSurfaces();
             break;
         case Zoom:
@@ -317,11 +326,11 @@ public:
             Main_OnCommandEx(40285, 0, 0); // Track: Go to next track
             break;
         case Bank:
-            trackNavigator->IncrementOffset(context->GetShiftLeft() ? 1 : context->GetNbChannels());
+            trackNavigator->IncrementOffset(context->GetShiftLeft() ? 1 : context->GetNbBankChannels());
             TrackList_UpdateAllExternalSurfaces();
             break;
         case Master:
-            trackNavigator->IncrementOffset(context->GetShiftLeft() ? context->GetNbChannels() : 1);
+            trackNavigator->IncrementOffset(context->GetShiftLeft() ? context->GetNbBankChannels() : 1);
             TrackList_UpdateAllExternalSurfaces();
             break;
         case Click:
@@ -343,7 +352,7 @@ public:
         switch (session_type)
         {
         case Channel:
-            trackNavigator->IncrementOffset(context->GetShiftLeft() ? context->GetNbChannels() : 1);
+            trackNavigator->IncrementOffset(context->GetShiftLeft() ? context->GetNbBankChannels() : 1);
             break;
         case Zoom:
             context->GetShiftLeft() ? Main_OnCommandEx(40111, 0, 0) // View: Zoom in vertical
@@ -354,7 +363,7 @@ public:
                                     : Main_OnCommandEx(40139, 0, 0); // View: Scroll view up
             break;
         case Bank:
-            trackNavigator->IncrementOffset(context->GetShiftLeft() ? 1 : context->GetNbChannels());
+            trackNavigator->IncrementOffset(context->GetShiftLeft() ? 1 : context->GetNbBankChannels());
             break;
         case Master:
             context->GetShiftLeft()    ? IncrementMasterPan(value, true)
@@ -381,7 +390,7 @@ public:
         switch (session_type)
         {
         case Channel:
-            trackNavigator->DecrementOffset(context->GetShiftLeft() ? context->GetNbChannels() : 1);
+            trackNavigator->DecrementOffset(context->GetShiftLeft() ? context->GetNbBankChannels() : 1);
             break;
         case Zoom:
             context->GetShiftLeft() ? Main_OnCommandEx(40112, 0, 0) // View: Zoom out vertical
@@ -392,7 +401,7 @@ public:
                                     : Main_OnCommandEx(40138, 0, 0); // View: Scroll view down
             break;
         case Bank:
-            trackNavigator->DecrementOffset(context->GetShiftLeft() ? 1 : context->GetNbChannels());
+            trackNavigator->DecrementOffset(context->GetShiftLeft() ? 1 : context->GetNbBankChannels());
             break;
         case Master:
             context->GetShiftLeft()    ? DecrementMasterPan(value, true)
