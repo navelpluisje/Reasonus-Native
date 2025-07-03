@@ -280,7 +280,7 @@ public:
      */
     int GetNbBankChannels()
     {
-        return lastTouchedFxMode ? nbChannels - 1 : nbChannels;
+        return (lastTouchedFxMode || masterFaderMode) ? nbChannels - 1 : nbChannels;
     }
 
     void TogglePanPushMode()

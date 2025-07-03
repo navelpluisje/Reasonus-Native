@@ -264,7 +264,7 @@ public:
         switch (session_type)
         {
         case Channel:
-            trackNavigator->DecrementOffset(context->GetShiftLeft() ? context->GetNbChannels() : 1);
+            trackNavigator->DecrementOffset(context->GetShiftLeft() ? context->GetNbBankChannels() : 1);
             TrackList_UpdateAllExternalSurfaces();
             break;
         case Zoom:
@@ -276,11 +276,11 @@ public:
             Main_OnCommandEx(40286, 0, 0); // Track: Go to previous track
             break;
         case Bank:
-            trackNavigator->DecrementOffset(context->GetShiftLeft() ? 1 : context->GetNbChannels());
+            trackNavigator->DecrementOffset(context->GetShiftLeft() ? 1 : context->GetNbBankChannels());
             TrackList_UpdateAllExternalSurfaces();
             break;
         case Master:
-            trackNavigator->DecrementOffset(context->GetShiftLeft() ? context->GetNbChannels() : 1);
+            trackNavigator->DecrementOffset(context->GetShiftLeft() ? context->GetNbBankChannels() : 1);
             TrackList_UpdateAllExternalSurfaces();
             break;
         case Click:
@@ -309,7 +309,7 @@ public:
         switch (session_type)
         {
         case Channel:
-            trackNavigator->IncrementOffset(context->GetShiftLeft() ? context->GetNbChannels() : 1);
+            trackNavigator->IncrementOffset(context->GetShiftLeft() ? context->GetNbBankChannels() : 1);
             TrackList_UpdateAllExternalSurfaces();
             break;
         case Zoom:
@@ -320,11 +320,11 @@ public:
             Main_OnCommandEx(40285, 0, 0); // Track: Go to next track
             break;
         case Bank:
-            trackNavigator->IncrementOffset(context->GetShiftLeft() ? 1 : context->GetNbChannels());
+            trackNavigator->IncrementOffset(context->GetShiftLeft() ? 1 : context->GetNbBankChannels());
             TrackList_UpdateAllExternalSurfaces();
             break;
         case Master:
-            trackNavigator->IncrementOffset(context->GetShiftLeft() ? context->GetNbChannels() : 1);
+            trackNavigator->IncrementOffset(context->GetShiftLeft() ? context->GetNbBankChannels() : 1);
             TrackList_UpdateAllExternalSurfaces();
             break;
         case Click:
@@ -346,7 +346,7 @@ public:
         switch (session_type)
         {
         case Channel:
-            trackNavigator->IncrementOffset(context->GetShiftLeft() ? context->GetNbChannels() : 1);
+            trackNavigator->IncrementOffset(context->GetShiftLeft() ? context->GetNbBankChannels() : 1);
             break;
         case Zoom:
             context->GetShiftLeft() ? Main_OnCommandEx(40111, 0, 0) // View: Zoom in vertical
@@ -357,7 +357,7 @@ public:
                                     : Main_OnCommandEx(40139, 0, 0); // View: Scroll view up
             break;
         case Bank:
-            trackNavigator->IncrementOffset(context->GetShiftLeft() ? 1 : context->GetNbChannels());
+            trackNavigator->IncrementOffset(context->GetShiftLeft() ? 1 : context->GetNbBankChannels());
             break;
         case Master:
             context->GetShiftLeft()    ? IncrementMasterPan(value, true)
@@ -384,7 +384,7 @@ public:
         switch (session_type)
         {
         case Channel:
-            trackNavigator->DecrementOffset(context->GetShiftLeft() ? context->GetNbChannels() : 1);
+            trackNavigator->DecrementOffset(context->GetShiftLeft() ? context->GetNbBankChannels() : 1);
             break;
         case Zoom:
             context->GetShiftLeft() ? Main_OnCommandEx(40112, 0, 0) // View: Zoom out vertical
@@ -395,7 +395,7 @@ public:
                                     : Main_OnCommandEx(40138, 0, 0); // View: Scroll view down
             break;
         case Bank:
-            trackNavigator->DecrementOffset(context->GetShiftLeft() ? 1 : context->GetNbChannels());
+            trackNavigator->DecrementOffset(context->GetShiftLeft() ? 1 : context->GetNbBankChannels());
             break;
         case Master:
             context->GetShiftLeft()    ? DecrementMasterPan(value, true)
