@@ -15,17 +15,19 @@ int csurfRound(double val)
  ************************************************************************/
 void DAW::UnSelectAllTracks()
 {
-    for (int i = 0; i < CountTracks(0); i++)
+    for (int i = 0; i < ::CountTracks(0); i++)
     {
-        MediaTrack *media_track = GetTrack(0, i);
-        SetTrackSelected(media_track, false);
+        MediaTrack *media_track = ::GetTrack(0, i);
+        ::SetTrackSelected(media_track, false);
     }
+    MediaTrack *media_track = ::GetMasterTrack(0);
+    SetTrackSelected(media_track, false);
 };
 
 bool DAW::IsTrackArmed(MediaTrack *media_track)
 {
     int flagsOut;
-    GetTrackState(media_track, &flagsOut);
+    ::GetTrackState(media_track, &flagsOut);
 
     return hasBit(flagsOut, 6);
 };

@@ -555,12 +555,13 @@ public:
   //   ShowConsoleMsg("SetTrackListChange");
   // }
 
-  void
-  OnTrackSelection(MediaTrack *media_track)
+  void OnTrackSelection(MediaTrack *media_track)
   {
     int trackId = (int)::GetMediaTrackInfo_Value(media_track, "IP_TRACKNUMBER");
-
-    trackNavigator->SetOffset(trackId - 1);
+    if (trackId > 0)
+    {
+      trackNavigator->SetOffset(trackId - 1);
+    }
   }
 };
 

@@ -169,7 +169,7 @@ public:
             else
             {
                 track->SetVuMeterValue(DAW::GetTrackSurfacePeakInfo(media_track), true);
-                int index = context->GetNbChannels() - (static_cast<int>(time_code.size()) + i);
+                int index = context->GetNbBankChannels() - (static_cast<int>(time_code.size()) + i);
 
                 if (index < 1)
                 {
@@ -215,10 +215,7 @@ public:
             return;
         }
 
-        /**
-         * Select a single track, so first unselect all the currently selected tracks
-         */
-        Main_OnCommandEx(40297, 0, 0);
+        DAW::UnSelectAllTracks();
         SetTrackSelected(media_track, true);
     }
 
