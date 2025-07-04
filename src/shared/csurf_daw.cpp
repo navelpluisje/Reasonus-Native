@@ -15,17 +15,19 @@ int csurfRound(double val)
  ************************************************************************/
 void DAW::UnSelectAllTracks()
 {
-    for (int i = 0; i < CountTracks(0); i++)
+    for (int i = 0; i < ::CountTracks(0); i++)
     {
-        MediaTrack *media_track = GetTrack(0, i);
-        SetTrackSelected(media_track, false);
+        MediaTrack *media_track = ::GetTrack(0, i);
+        ::SetTrackSelected(media_track, false);
     }
+    MediaTrack *media_track = ::GetMasterTrack(0);
+    SetTrackSelected(media_track, false);
 };
 
 bool DAW::IsTrackArmed(MediaTrack *media_track)
 {
     int flagsOut;
-    GetTrackState(media_track, &flagsOut);
+    ::GetTrackState(media_track, &flagsOut);
 
     return hasBit(flagsOut, 6);
 };
@@ -155,20 +157,40 @@ std::string DAW::GetTrackRecordingMode(MediaTrack *media_track)
     }
 }
 
-bool DAW::GetTrackFxBypassed(MediaTrack *media_track)
+ButtonColor DAW::GetTrackColor(MediaTrack *media_track)
 {
-    return !(bool)GetMediaTrackInfo_Value(media_track, "I_FXEN");
+    ButtonColor color;
+    int red = 0x7f;
+    int green = 0x7f;
+    int blue = 0x7f;
+
+    int track_color = ::GetTrackColor(media_track);
+    if (track_color != 0)
+    {
+        ColorFromNative(track_color, &red, &green, &blue);
+    }
+    color.SetColor(red / 2, green / 2, blue / 2);
+
+    return color;
 }
 
-void DAW::ToggleTrackFxBypass(MediaTrack *media_track)
+void DAW::SetSelectedTracksRange(MediaTrack *media_track)
 {
-    if (DAW::GetTrackFxBypassed(media_track))
+    int index = (int)GetMediaTrackInfo_Value(media_track, "IP_TRACKNUMBER");
+    int selected_track_count = CountSelectedTracks(0);
+    int first_index = (int)GetMediaTrackInfo_Value(GetSelectedTrack(0, 0), "IP_TRACKNUMBER");
+    int last_index = (int)GetMediaTrackInfo_Value(GetSelectedTrack(0, selected_track_count - 1), "IP_TRACKNUMBER");
+    int start_index = index < first_index
+                          ? index
+                      : index < last_index
+                          ? first_index
+                          : last_index;
+    int end_index = index < first_index ? first_index : index;
+
+    for (int i = start_index - 1; i < end_index; i++)
     {
-        SetMediaTrackInfo_Value(media_track, "I_FXEN", 1.0);
-    }
-    else
-    {
-        SetMediaTrackInfo_Value(media_track, "I_FXEN", 0.0);
+        MediaTrack *selectable_track = GetTrack(0, i);
+        SetTrackSelected(selectable_track, true);
     }
 }
 
@@ -273,6 +295,23 @@ bool DAW::GetTrackFxPanelOpen(MediaTrack *media_track, int fx)
     return ::TrackFX_GetOpen(media_track, fx);
 }
 
+bool DAW::GetTrackFxBypassed(MediaTrack *media_track)
+{
+    return !(bool)GetMediaTrackInfo_Value(media_track, "I_FXEN");
+}
+
+void DAW::ToggleTrackFxBypass(MediaTrack *media_track)
+{
+    if (DAW::GetTrackFxBypassed(media_track))
+    {
+        SetMediaTrackInfo_Value(media_track, "I_FXEN", 1.0);
+    }
+    else
+    {
+        SetMediaTrackInfo_Value(media_track, "I_FXEN", 0.0);
+    }
+}
+
 /************************************************************************
  * Track FX Param
  ************************************************************************/
@@ -299,6 +338,11 @@ int DAW::GetTrackFxParamNbSteps(MediaTrack *media_track, int fx, int param)
         }
     }
     return nbSteps;
+}
+
+void DAW::SetTrackFXParamUntouched(MediaTrack *media_track, int fx)
+{
+    TrackFX_SetNamedConfigParm(media_track, fx, "last_touched", "-1");
 }
 
 /************************************************************************
@@ -467,8 +511,8 @@ int DAW::GetProjectTimeMode()
     // Get theh actrual value and not the pointer
     int val = *timeMode2Ptr_;
 
-    // This will get rid of all teh second measure data
-    return val & 255;
+    // This will get rid of all the second measure data
+    return minmax(0, val, 256) & 255;
 }
 
 int DAW::GetProjectMeasureOffset()

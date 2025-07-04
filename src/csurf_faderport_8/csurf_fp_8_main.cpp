@@ -134,17 +134,37 @@ class CSurf_FaderPort : public IReaperControlSurface
       {
         faderManager->HandleSoloClick(evt->midi_message[1] - BTN_SOLO_1, evt->midi_message[2]);
       }
-      else if (evt->midi_message[1] >= BTN_SOLO_9 && evt->midi_message[1] <= BTN_SOLO_14 && evt->midi_message[1] != BTN_SOLO_12 && evt->midi_message[1] != ENCODER_CLICK_NAV)
+      else if (evt->midi_message[1] == BTN_SOLO_9)
       {
-        faderManager->HandleSoloClick(evt->midi_message[1] - BTN_SOLO_9 + 8, evt->midi_message[2]);
+        faderManager->HandleSoloClick(8, evt->midi_message[2]);
       }
-      else if (evt->midi_message[1] == BTN_SOLO_14 || evt->midi_message[1] == BTN_SOLO_15)
+      else if (evt->midi_message[1] == BTN_SOLO_10)
       {
-        faderManager->HandleSoloClick(evt->midi_message[1] == BTN_SOLO_14 ? 14 : 15, evt->midi_message[2]);
+        faderManager->HandleSoloClick(9, evt->midi_message[2]);
+      }
+      else if (evt->midi_message[1] == BTN_SOLO_11)
+      {
+        faderManager->HandleSoloClick(10, evt->midi_message[2]);
       }
       else if (evt->midi_message[1] == BTN_SOLO_12)
       {
+        faderManager->HandleSoloClick(11, evt->midi_message[2]);
+      }
+      else if (evt->midi_message[1] == BTN_SOLO_13)
+      {
         faderManager->HandleSoloClick(12, evt->midi_message[2]);
+      }
+      else if (evt->midi_message[1] == BTN_SOLO_14)
+      {
+        faderManager->HandleSoloClick(13, evt->midi_message[2]);
+      }
+      else if (evt->midi_message[1] == BTN_SOLO_15)
+      {
+        faderManager->HandleSoloClick(14, evt->midi_message[2]);
+      }
+      else if (evt->midi_message[1] == BTN_SOLO_16)
+      {
+        faderManager->HandleSoloClick(15, evt->midi_message[2]);
       }
 
       /**
@@ -368,6 +388,8 @@ public:
 
     context = new CSurf_Context(stoi(ini["surface"]["surface"]));
     context->SetPluginControl(ini["surface"].has("disable-plugins") && ini["surface"]["disable-plugins"] != "1");
+    context->SetUntouchAfterLearn(ini["surface"].has("erase-last-param-after-learn") && ini["surface"]["erase-last-param-after-learn"] == "1");
+    context->SetMasterFaderModeEnabled(ini["surface"].has("master-fader-mode") && ini["surface"]["master-fader-mode"] == "1");
     context->SetSwapShiftButtons(ini["surface"].has("swap-shift-buttons") && ini["surface"]["swap-shift-buttons"] == "1");
     context->SetMuteSoloMomentary(ini["surface"].has("mute-solo-momentary") && ini["surface"]["mute-solo-momentary"] == "1");
     context->SetOverwriteTimeCode(ini["surface"].has("overwrite-time-code") && ini["surface"]["overwrite-time-code"] == "1");
@@ -419,10 +441,25 @@ public:
   {
     if (m_midiout)
     {
-      int x;
-      for (x = 0; x < 0x30; x++) // lights out§
-        m_midiout->Send(0xa0, x, 0x00, -1);
-      Sleep(5);
+      // Reset all displays, faders and track buttons after closing Reaper
+      for (int i = 0; i < (int)tracks.size(); i++)
+      {
+        tracks.at(i)->ClearTrack(true, true);
+      }
+      tracks.at(0)->SetDisplayMode(DISPLAY_MODE_3);
+      tracks.at(1)->SetDisplayMode(DISPLAY_MODE_3);
+      tracks.at(2)->SetDisplayMode(DISPLAY_MODE_3);
+      tracks.at(3)->SetDisplayMode(DISPLAY_MODE_3);
+      tracks.at((int)tracks.size() - 2)->SetDisplayMode(DISPLAY_MODE_3);
+      tracks.at((int)tracks.size() - 1)->SetDisplayMode(DISPLAY_MODE_3);
+      tracks.at(0)->SetDisplayLine(0, ALIGN_CENTER, "Good");
+      tracks.at(1)->SetDisplayLine(0, ALIGN_CENTER, "bye.");
+      tracks.at(0)->SetDisplayLine(1, ALIGN_CENTER, "Have");
+      tracks.at(1)->SetDisplayLine(1, ALIGN_CENTER, "a");
+      tracks.at(2)->SetDisplayLine(1, ALIGN_CENTER, "nice");
+      tracks.at(3)->SetDisplayLine(1, ALIGN_CENTER, "day");
+      tracks.at((int)tracks.size() - 2)->SetDisplayLine(0, ALIGN_RIGHT, "ReaS", INVERT);
+      tracks.at((int)tracks.size() - 1)->SetDisplayLine(0, ALIGN_LEFT, "onus", INVERT);
     }
 
     DELETE_ASYNC(m_midiout);
@@ -495,6 +532,16 @@ public:
 
         surface_update_lastrun = now;
       }
+      if ((now - surface_update_keepalive) >= 1200)
+      {
+        faderManager->Refresh(true);
+        sessionManager->Refresh(true);
+        mixManager->Refresh(true);
+        transportManager->Refresh(true);
+        automationManager->Refresh(true);
+        generalControlManager->Refresh(true);
+      }
+
       if ((now - surface_update_keepalive) >= 990)
       {
         surface_update_keepalive = now;
@@ -512,8 +559,13 @@ public:
   void OnTrackSelection(MediaTrack *media_track)
   {
     int trackId = (int)::GetMediaTrackInfo_Value(media_track, "IP_TRACKNUMBER");
-
-    trackNavigator->SetOffset(trackId - 1);
+    /**
+     * Skip the master track selection
+     */
+    if (trackId > -1)
+    {
+      trackNavigator->SetOffset(trackId - 1);
+    }
   }
 };
 

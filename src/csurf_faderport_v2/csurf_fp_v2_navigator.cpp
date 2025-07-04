@@ -56,8 +56,18 @@ CSurf_FP_V2_Navigator::CSurf_FP_V2_Navigator(CSurf_Context *context) : context(c
 
 MediaTrack *CSurf_FP_V2_Navigator::GetControllerTrack()
 {
+    if (context->GetMasterFaderMode())
+    {
+        return GetMasterTrack(0);
+    }
     GetAllVisibleTracks(tracks, hasSolo, hasMute);
-    return tracks.Get(track_offset);
+
+    if (DAW::IsTrackSelected(tracks.Get(track_offset)))
+    {
+        return tracks.Get(track_offset);
+    }
+
+    return nullptr;
 }
 
 void CSurf_FP_V2_Navigator::SetOffset(int offset)

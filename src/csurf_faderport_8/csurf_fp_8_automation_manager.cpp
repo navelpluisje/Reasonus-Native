@@ -26,58 +26,62 @@ protected:
     bool canUndo = false;
     bool canRedo = false;
 
-    void SetButtonValue()
+    void SetButtonValue(bool force = false)
     {
         if (context->GetShiftRight())
         {
-            latchButton->SetValue(globalAutomationMode == AUTOMATION_LATCH ? BTN_VALUE_ON : BTN_VALUE_OFF);
-            trimButton->SetValue(globalAutomationMode == AUTOMATION_TRIM ? BTN_VALUE_ON : BTN_VALUE_OFF);
-            offButton->SetValue(globalAutomationMode == AUTOMATION_PREVIEW ? BTN_VALUE_ON : BTN_VALUE_OFF);
-            touchButton->SetValue(globalAutomationMode == AUTOMATION_TOUCH ? BTN_VALUE_ON : BTN_VALUE_OFF);
-            writeButton->SetValue(globalAutomationMode == AUTOMATION_WRITE ? BTN_VALUE_ON : BTN_VALUE_OFF);
-            readButton->SetValue(globalAutomationMode == AUTOMATION_READ ? BTN_VALUE_ON : BTN_VALUE_OFF);
+            latchButton->SetValue(globalAutomationMode == AUTOMATION_LATCH ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+            trimButton->SetValue(globalAutomationMode == AUTOMATION_TRIM ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+            offButton->SetValue(globalAutomationMode == AUTOMATION_PREVIEW ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+            touchButton->SetValue(globalAutomationMode == AUTOMATION_TOUCH ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+            writeButton->SetValue(globalAutomationMode == AUTOMATION_WRITE ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+            readButton->SetValue(globalAutomationMode == AUTOMATION_READ ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
             return;
         }
 
         if (context->GetShiftLeft())
         {
-            latchButton->SetValue(canSafe ? BTN_VALUE_ON : BTN_VALUE_OFF);
-            trimButton->SetValue(canRedo ? BTN_VALUE_ON : BTN_VALUE_OFF);
-            offButton->SetValue(canUndo ? BTN_VALUE_ON : BTN_VALUE_OFF);
-            touchButton->SetValue(context->GetChannelMode() == MenuMode ? BTN_VALUE_ON : BTN_VALUE_OFF);
-            writeButton->SetValue(BTN_VALUE_OFF);
-            readButton->SetValue(BTN_VALUE_OFF);
+            latchButton->SetValue(canSafe ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+            trimButton->SetValue(canRedo ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+            offButton->SetValue(canUndo ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+            touchButton->SetValue(context->GetChannelMode() == MenuMode ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+            writeButton->SetValue(BTN_VALUE_OFF, force);
+            readButton->SetValue(BTN_VALUE_OFF, force);
             return;
         }
 
-        latchButton->SetValue(channelAutomationMode == AUTOMATION_LATCH ? BTN_VALUE_ON : BTN_VALUE_OFF);
-        trimButton->SetValue(channelAutomationMode == AUTOMATION_TRIM ? BTN_VALUE_ON : BTN_VALUE_OFF);
-        offButton->SetValue(channelAutomationMode == AUTOMATION_PREVIEW ? BTN_VALUE_ON : BTN_VALUE_OFF);
-        touchButton->SetValue(context->GetChannelMode() == MenuMode ? BTN_VALUE_BLINK : channelAutomationMode == AUTOMATION_TOUCH ? BTN_VALUE_ON
-                                                                                                                                  : BTN_VALUE_OFF);
-        writeButton->SetValue(channelAutomationMode == AUTOMATION_WRITE ? BTN_VALUE_ON : BTN_VALUE_OFF);
-        readButton->SetValue(channelAutomationMode == AUTOMATION_READ ? BTN_VALUE_ON : BTN_VALUE_OFF);
+        latchButton->SetValue(channelAutomationMode == AUTOMATION_LATCH ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+        trimButton->SetValue(channelAutomationMode == AUTOMATION_TRIM ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+        offButton->SetValue(channelAutomationMode == AUTOMATION_PREVIEW ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+        touchButton->SetValue(context->GetChannelMode() == MenuMode
+                                  ? BTN_VALUE_BLINK
+                              : channelAutomationMode == AUTOMATION_TOUCH
+                                  ? BTN_VALUE_ON
+                                  : BTN_VALUE_OFF,
+                              force);
+        writeButton->SetValue(channelAutomationMode == AUTOMATION_WRITE ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+        readButton->SetValue(channelAutomationMode == AUTOMATION_READ ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
     }
 
-    void SetButtonColors()
+    void SetButtonColors(bool force = false)
     {
         if (context->GetShiftLeft())
         {
-            latchButton->SetColor(ButtonColorGreen);
-            trimButton->SetColor(ButtonColorYellow);
-            offButton->SetColor(ButtonColorYellow);
-            touchButton->SetColor(ButtonColorBlack);
-            writeButton->SetColor(ButtonColorBlack);
-            readButton->SetColor(ButtonColorBlack);
+            latchButton->SetColor(ButtonColorGreen, force);
+            trimButton->SetColor(ButtonColorYellow, force);
+            offButton->SetColor(ButtonColorYellow, force);
+            touchButton->SetColor(ButtonColorBlack, force);
+            writeButton->SetColor(ButtonColorBlack, force);
+            readButton->SetColor(ButtonColorBlack, force);
             return;
         }
 
-        latchButton->SetColor(ButtonColorPurple);
-        trimButton->SetColor(ButtonColorWhite);
-        offButton->SetColor(ButtonColorBlue);
-        touchButton->SetColor(ButtonColorYellow);
-        writeButton->SetColor(ButtonColorRed);
-        readButton->SetColor(ButtonColorGreen);
+        latchButton->SetColor(ButtonColorPurple, force);
+        trimButton->SetColor(ButtonColorWhite, force);
+        offButton->SetColor(ButtonColorBlue, force);
+        touchButton->SetColor(ButtonColorYellow, force);
+        writeButton->SetColor(ButtonColorRed, force);
+        readButton->SetColor(ButtonColorGreen, force);
     }
 
 public:
@@ -117,6 +121,12 @@ public:
         SetButtonColors();
         SetButtonValue();
     };
+
+    void Refresh(bool force = false)
+    {
+        SetButtonColors(force);
+        SetButtonValue(force);
+    }
 
     void HandleLatchButton(int value)
     {

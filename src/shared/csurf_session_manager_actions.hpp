@@ -3,6 +3,12 @@
 
 void SetMasterPanToCenter();
 
+void UpdateMasterPanValue(int val, bool left_shift);
+
+void IncrementMasterPan(int val, bool left_shift);
+
+void DecrementMasterPan(int val, bool left_shift);
+
 void IncrementMetronomeVolume();
 
 void DecrementMetronomeVolume();

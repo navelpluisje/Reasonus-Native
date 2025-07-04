@@ -5,6 +5,7 @@
 #include "../shared/csurf_context.cpp"
 #include "../shared/csurf_utils.hpp"
 #include "csurf_fp_v2_navigator.hpp"
+#include "../shared/csurf_daw.hpp"
 
 class CSurf_FP_V2_AutomationManager
 {
@@ -19,19 +20,29 @@ protected:
 
     int channelAutomationMode;
 
-    void SetButtonValue()
+    bool isAutomationMode(int automationMode, bool not_selected)
+    {
+        if (not_selected)
+        {
+            return false;
+        }
+
+        return channelAutomationMode == automationMode;
+    }
+
+    void SetButtonValue(bool not_selected)
     {
         if (context->GetShiftLeft())
         {
-            touchButton->SetValue(channelAutomationMode == AUTOMATION_LATCH ? BTN_VALUE_ON : BTN_VALUE_OFF);
-            writeButton->SetValue(channelAutomationMode == AUTOMATION_TRIM ? BTN_VALUE_ON : BTN_VALUE_OFF);
-            readButton->SetValue(channelAutomationMode == AUTOMATION_PREVIEW ? BTN_VALUE_ON : BTN_VALUE_OFF);
+            touchButton->SetValue(isAutomationMode(AUTOMATION_LATCH, not_selected) ? BTN_VALUE_ON : BTN_VALUE_OFF);
+            writeButton->SetValue(isAutomationMode(AUTOMATION_TRIM, not_selected) ? BTN_VALUE_ON : BTN_VALUE_OFF);
+            readButton->SetValue(isAutomationMode(AUTOMATION_PREVIEW, not_selected) ? BTN_VALUE_ON : BTN_VALUE_OFF);
             return;
         }
 
-        touchButton->SetValue(channelAutomationMode == AUTOMATION_TOUCH ? BTN_VALUE_ON : BTN_VALUE_OFF);
-        writeButton->SetValue(channelAutomationMode == AUTOMATION_WRITE ? BTN_VALUE_ON : BTN_VALUE_OFF);
-        readButton->SetValue(channelAutomationMode == AUTOMATION_READ ? BTN_VALUE_ON : BTN_VALUE_OFF);
+        touchButton->SetValue(isAutomationMode(AUTOMATION_TOUCH, not_selected) ? BTN_VALUE_ON : BTN_VALUE_OFF);
+        writeButton->SetValue(isAutomationMode(AUTOMATION_WRITE, not_selected) ? BTN_VALUE_ON : BTN_VALUE_OFF);
+        readButton->SetValue(isAutomationMode(AUTOMATION_READ, not_selected) ? BTN_VALUE_ON : BTN_VALUE_OFF);
     }
 
     void SetButtonColors()
@@ -67,7 +78,7 @@ public:
         channelAutomationMode = GetTrackAutomationMode(media_track);
 
         SetButtonColors();
-        SetButtonValue();
+        SetButtonValue(media_track == nullptr);
     };
 
     void HandleTouchButton(int value)
@@ -78,6 +89,7 @@ public:
         }
 
         MediaTrack *media_track = navigator->GetControllerTrack();
+
         if (context->GetShiftLeft())
         {
             SetTrackAutomationMode(media_track, AUTOMATION_LATCH);
@@ -94,6 +106,7 @@ public:
         }
 
         MediaTrack *media_track = navigator->GetControllerTrack();
+
         if (context->GetShiftLeft())
         {
             SetTrackAutomationMode(media_track, AUTOMATION_TRIM);
@@ -110,6 +123,7 @@ public:
         }
 
         MediaTrack *media_track = navigator->GetControllerTrack();
+
         if (context->GetShiftLeft())
         {
             SetTrackAutomationMode(media_track, AUTOMATION_PREVIEW);

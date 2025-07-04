@@ -38,51 +38,66 @@ protected:
 
     bool functionsDialogOpen;
 
-    void SetButtonValue()
+    void SetButtonValue(bool force = false)
     {
-        armButton->SetValue(context->GetArm() ? BTN_VALUE_ON : BTN_VALUE_OFF);
+        armButton->SetValue(context->GetArm() ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
         if (context->GetShiftLeft())
         {
-            bypassButton->SetValue(hasGlobalBypass ? BTN_VALUE_ON
-                                                   : BTN_VALUE_OFF);
-            macroButton->SetColor(ButtonColorYellow);
-            macroButton->SetValue(CSURF_FP_UI_FUNCTIONS::IsFunctionsDialogOpen() ? BTN_VALUE_ON : BTN_VALUE_OFF);
+            bypassButton->SetValue(hasGlobalBypass
+                                       ? BTN_VALUE_ON
+                                       : BTN_VALUE_OFF,
+                                   force);
+            macroButton->SetColor(ButtonColorYellow, force);
+            macroButton->SetValue(CSURF_FP_UI_FUNCTIONS::IsFunctionsDialogOpen() ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
         }
         else
         {
-            bypassButton->SetValue(hasSelectedBypass ? BTN_VALUE_ON
-                                                     : BTN_VALUE_OFF);
-            macroButton->SetColor(ButtonColorWhite);
-            macroButton->SetValue(CSURF_FP_8_UI_FILTERS::IsFiltersDialogOpen() ? BTN_VALUE_ON : BTN_VALUE_OFF);
+            bypassButton->SetValue(hasSelectedBypass
+                                       ? BTN_VALUE_ON
+                                       : BTN_VALUE_OFF,
+                                   force);
+            macroButton->SetColor(ButtonColorWhite, force);
+            macroButton->SetValue(CSURF_FP_8_UI_FILTERS::IsFiltersDialogOpen() ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
         }
 
-        soloClearButton->SetValue(hasSolo ? BTN_VALUE_ON : BTN_VALUE_OFF);
-        muteClearButton->SetValue(hasMute ? BTN_VALUE_ON : BTN_VALUE_OFF);
-        linkButton->SetValue(context->GetLastTouchedFxMode() ? BTN_VALUE_ON : context->GetChannelMode() == PluginEditMode ? BTN_VALUE_BLINK
-                                                                                                                          : BTN_VALUE_OFF);
+        soloClearButton->SetValue(hasSolo ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+        muteClearButton->SetValue(hasMute ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+        linkButton->SetValue(context->GetLastTouchedFxMode()
+                                 ? BTN_VALUE_ON
+                             : context->GetChannelMode() == PluginEditMode
+                                 ? BTN_VALUE_BLINK
+                                 : BTN_VALUE_OFF,
+                             force);
         shiftLeftButton->SetValue((context->GetShiftLeft() || (context->GetShiftRight() && context->GetSwapShiftButtons()))
                                       ? BTN_VALUE_ON
-                                      : BTN_VALUE_OFF);
+                                      : BTN_VALUE_OFF,
+                                  force);
     };
 
     void UpdatePanValue(int val)
     {
         double pan1, pan2 = 0.0;
-        int panMode;
+        int pan_mode;
         MediaTrack *media_track = GetSelectedTrack(0, 0);
-        GetTrackUIPan(media_track, &pan1, &pan2, &panMode);
+        GetTrackUIPan(media_track, &pan1, &pan2, &pan_mode);
 
-        if (context->GetPanPushMode())
+        if (pan_mode < 4)
         {
             double newValue = int(panToNormalized(pan1) * 127.0) + val;
             newValue = minmax(0.0, newValue, 127.0);
             SetMediaTrackInfo_Value(media_track, "D_PAN", normalizedToPan(newValue / 127));
         }
+        else if (context->GetPanPushMode())
+        {
+            double newValue = int(panToNormalized(pan1) * 127.0) + val;
+            newValue = minmax(0.0, newValue, 127.0);
+            SetMediaTrackInfo_Value(media_track, pan_mode < 6 ? "D_PAN" : "D_DUALPANL", normalizedToPan(newValue / 127));
+        }
         else
         {
             double newValue = int(panToNormalized(pan2) * 127.0) + val;
             newValue = minmax(0.0, newValue, 127.0);
-            SetMediaTrackInfo_Value(media_track, "D_WIDTH", normalizedToPan(newValue / 127));
+            SetMediaTrackInfo_Value(media_track, pan_mode < 6 ? "D_WIDTH" : "D_DUALPANR", normalizedToPan(newValue / 127));
         }
     }
 
@@ -96,7 +111,45 @@ protected:
         UpdatePanValue(val * -1);
     }
 
-    void SetButtonColors() {};
+    void resetPan()
+    {
+        MediaTrack *media_track = GetSelectedTrack(0, 0);
+
+        int pan_mode = DAW::GetTrackPanMode(media_track);
+        if (pan_mode < 4 && !context->GetPanPushMode())
+        {
+            SetMediaTrackInfo_Value(media_track, "D_PAN", 0);
+        }
+        if (pan_mode == 6)
+        {
+            if (context->GetPanPushMode())
+            {
+                SetMediaTrackInfo_Value(media_track, "D_DUALPANL", -1);
+            }
+            else
+            {
+                SetMediaTrackInfo_Value(media_track, "D_DUALPANR", 1);
+            }
+        }
+        if (pan_mode == 5)
+        {
+            if (context->GetPanPushMode())
+            {
+                SetMediaTrackInfo_Value(media_track, "D_PAN", 0);
+            }
+            else
+            {
+                SetMediaTrackInfo_Value(media_track, "D_WIDTH", 1);
+            }
+        }
+    }
+
+    void SetButtonColors(bool force = false)
+    {
+        bypassButton->SetColor(ButtonColorRed, force);
+        macroButton->SetColor(ButtonColorWhite, force);
+        linkButton->SetColor(ButtonColorGreen, force);
+    };
 
 public:
     CSurf_FP_8_GeneralControlManager(
@@ -127,7 +180,14 @@ public:
         functionsDialogOpen = CSURF_FP_UI_FUNCTIONS::IsFunctionsDialogOpen();
 
         SetButtonValue();
+        SetButtonColors();
     };
+
+    void Refresh(bool force = false)
+    {
+        SetButtonValue(force);
+        SetButtonColors(force);
+    }
 
     void HandleEncoderClick(int value)
     {
@@ -144,9 +204,7 @@ public:
 
         if (context->GetShiftLeft())
         {
-            MediaTrack *media_track = GetSelectedTrack(0, 0);
-            SetMediaTrackInfo_Value(media_track, "D_PAN", 0);
-            SetMediaTrackInfo_Value(media_track, "D_WIDTH", 0);
+            resetPan();
         }
         else
         {
@@ -260,7 +318,17 @@ public:
         }
         else
         {
+            if (::CountTracks(0) == 0)
+            {
+                return;
+            }
+
             if (context->GetPluginControl() &&
+                (context->IsChannelMode(PluginMode) ||
+                 context->IsChannelMode(TrackPluginMode) ||
+                 context->IsChannelMode(PluginControlMode) ||
+                 context->IsChannelMode(PluginEditMode)) &&
+
                 (context->GetPluginEditPluginId() > -1))
             {
                 faderManager->HandleLinkButtonClick();

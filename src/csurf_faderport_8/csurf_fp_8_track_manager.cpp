@@ -98,36 +98,59 @@ public:
 
         for (int i = 0; i < context->GetNbChannels(); i++)
         {
+            MediaTrack *media_track;
+            bool is_master_track = false;
             int fader_value = 0, value_bar_value = 0;
             std::string strPan1, strPan2;
 
             CSurf_FP_8_Track *track = tracks.at(i);
-            MediaTrack *media_track = media_tracks.Get(i);
-
-            if (!media_track || CountTracks(0) < i)
+            if (context->GetMasterFaderMode() && i == (context->GetNbChannels() - 1))
             {
-                track->ClearTrack();
+                media_track = ::GetMasterTrack(0);
+                is_master_track = true;
+            }
+            else
+            {
+                media_track = media_tracks.Get(i);
+            }
+
+            if (!media_track || (::CountTracks(0) < i && !is_master_track))
+            {
+                int index = context->GetNbChannels() - (static_cast<int>(time_code.size()) + i);
+                if (index < 1)
+                {
+                    track->ClearTrack(false);
+                    track->SetDisplayMode(DISPLAY_MODE_0, forceUpdate);
+                    track->SetDisplayLine(0, ALIGN_LEFT, "", NON_INVERT, forceUpdate);
+                    track->SetDisplayLine(1, ALIGN_CENTER, "", NON_INVERT, forceUpdate);
+                    track->SetDisplayLine(2, ALIGN_CENTER, time_code.at(abs(index)).c_str(), INVERT, forceUpdate);
+                }
+                else
+                {
+                    track->ClearTrack(true, forceUpdate);
+                }
                 continue;
             }
+
             SetTrackColors(media_track);
 
-            bool isSelected = DAW::IsTrackSelected(media_track);
-            bool isArmed = DAW::IsTrackArmed(media_track);
+            bool is_selected = DAW::IsTrackSelected(media_track);
+            bool is_armed = DAW::IsTrackArmed(media_track);
 
             GetFaderValue(media_track, &fader_value, &value_bar_value, &strPan1, &strPan2);
-            Btn_Value selectValue = (context->GetArm() && isArmed) || (!context->GetArm() && isSelected) ? BTN_VALUE_ON
-                                                                                                         : BTN_VALUE_OFF;
+            Btn_Value select_value = (context->GetArm() && is_armed) || (!context->GetArm() && is_selected) ? BTN_VALUE_ON
+                                                                                                            : BTN_VALUE_OFF;
 
             track->SetTrackColor(color);
             // If the track is armed always blink as an indication it is armed
-            track->SetSelectButtonValue((!context->GetArm() && isArmed) ? BTN_VALUE_BLINK : selectValue, forceUpdate);
+            track->SetSelectButtonValue((!context->GetArm() && is_armed) ? BTN_VALUE_BLINK : select_value, forceUpdate);
             track->SetMuteButtonValue(DAW::IsTrackMuted(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
             track->SetSoloButtonValue(DAW::IsTrackSoloed(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
             track->SetFaderValue(fader_value, forceUpdate);
             track->SetValueBarMode((context->GetShiftLeft() || context->GetArm()) ? VALUEBAR_MODE_FILL : VALUEBAR_MODE_BIPOLAR);
             track->SetValueBarValue(value_bar_value);
 
-            if (context->GetShiftLeft() || context->GetShiftRight())
+            if (context->GetShiftLeft() || context->GetShiftRight() || is_master_track)
             {
                 track->SetDisplayMode(DISPLAY_MODE_2, forceUpdate);
                 track->SetDisplayLine(0, ALIGN_CENTER, DAW::GetTrackName(media_track).c_str(), NON_INVERT, forceUpdate);
@@ -135,7 +158,7 @@ public:
                 track->SetDisplayLine(2, ALIGN_CENTER, strPan1.c_str(), NON_INVERT, forceUpdate);
                 track->SetDisplayLine(3, ALIGN_CENTER, strPan2.c_str(), NON_INVERT, forceUpdate);
             }
-            else if (context->GetArm() && isArmed)
+            else if (context->GetArm() && is_armed)
             {
                 track->SetDisplayMode(DISPLAY_MODE_2, forceUpdate);
                 track->SetDisplayLine(0, ALIGN_CENTER, DAW::GetTrackName(media_track).c_str(), NON_INVERT, forceUpdate);
@@ -145,8 +168,8 @@ public:
             }
             else
             {
-                track->SetVuMeterValue(DAW::GetTrackSurfacePeakInfo(media_track));
-                int index = context->GetNbChannels() - (static_cast<int>(time_code.size()) + i);
+                track->SetVuMeterValue(DAW::GetTrackSurfacePeakInfo(media_track), true);
+                int index = context->GetNbBankChannels() - (static_cast<int>(time_code.size()) + i);
 
                 if (index < 1)
                 {
@@ -180,16 +203,19 @@ public:
             return;
         }
 
+        if (context->GetShiftRight())
+        {
+            DAW::SetSelectedTracksRange(media_track);
+            return;
+        }
+
         if (context->GetShiftLeft())
         {
             SetTrackSelected(media_track, !IsTrackSelected(media_track));
             return;
         }
 
-        /**
-         * Select a single track, so first unselect all the currently selected tracks
-         */
-        Main_OnCommandEx(40297, 0, 0);
+        DAW::UnSelectAllTracks();
         SetTrackSelected(media_track, true);
     }
 
@@ -197,6 +223,7 @@ public:
     {
         int now = GetTickCount();
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
+
         if (value == 0 && context->GetMuteSoloMomentary())
         {
             if (now - mute_start[index] > MOMENTARY_TIMEOUT)
@@ -216,6 +243,7 @@ public:
     {
         int now = GetTickCount();
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
+
         if (value == 0 && context->GetMuteSoloMomentary())
         {
             if (now - solo_start[index] > MOMENTARY_TIMEOUT)

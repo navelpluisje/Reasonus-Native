@@ -4,6 +4,7 @@
 #include "actions/toggle_play_cursor.hpp"
 #include "actions/show_reaper_resource_path.hpp"
 #include "actions/show_reasonus_function_window.hpp"
+#include "actions/show_reasonus_v2_function_window.hpp"
 #include "actions/show_reasonus_filters_window.hpp"
 #include "actions/show_reasonus_test_window.hpp"
 #include "actions/close_all_floating_fx_windows.hpp"
@@ -38,6 +39,7 @@ extern "C"
       TOGGLE_PLAY_CURSOR::Unregister();
       SHOW_REAPER_RESOURCE_PATH::Unregister();
       SHOW_REASONUS_FUNCTION_WINDOW::Unregister();
+      SHOW_REASONUS_V2_FUNCTION_WINDOW::Unregister();
       SHOW_REASONUS_FILTERS_WINDOW::Unregister();
       SHOW_REASONUS_TEST_WINDOW::Unregister();
       CLOSE_ALL_FLOATING_FX_WINDOWS::Unregister();
@@ -57,6 +59,7 @@ extern "C"
     TOGGLE_PLAY_CURSOR::Register();
     SHOW_REAPER_RESOURCE_PATH::Register();
     SHOW_REASONUS_FUNCTION_WINDOW::Register();
+    SHOW_REASONUS_V2_FUNCTION_WINDOW::Register();
     SHOW_REASONUS_FILTERS_WINDOW::Register();
     SHOW_REASONUS_TEST_WINDOW::Register();
     CLOSE_ALL_FLOATING_FX_WINDOWS::Register();

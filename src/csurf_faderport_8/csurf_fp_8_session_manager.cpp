@@ -43,19 +43,19 @@ protected:
     CSurf_Button *prevButton;
     CSurf_Button *nextButton;
 
-    void SetButtonValues()
+    void SetButtonValues(bool force = false)
     {
         // With shift engaged, blink the selected button
         Btn_Value valueOn = context->GetShiftLeft() ? BTN_VALUE_BLINK : BTN_VALUE_ON;
 
-        channelButton->SetValue(session_type == Channel ? valueOn : BTN_VALUE_OFF);
-        zoomButton->SetValue(session_type == Zoom ? valueOn : BTN_VALUE_OFF);
-        scrollButton->SetValue(session_type == Scroll ? valueOn : BTN_VALUE_OFF);
-        bankButton->SetValue(session_type == Bank ? valueOn : BTN_VALUE_OFF);
-        masterButton->SetValue(session_type == Master ? valueOn : BTN_VALUE_OFF);
-        clickButton->SetValue(session_type == Click ? valueOn : BTN_VALUE_OFF);
-        sectionButton->SetValue(session_type == Section ? valueOn : BTN_VALUE_OFF);
-        markerButton->SetValue(session_type == Marker ? valueOn : BTN_VALUE_OFF);
+        channelButton->SetValue(session_type == Channel ? valueOn : BTN_VALUE_OFF, force);
+        zoomButton->SetValue(session_type == Zoom ? valueOn : BTN_VALUE_OFF, force);
+        scrollButton->SetValue(session_type == Scroll ? valueOn : BTN_VALUE_OFF, force);
+        bankButton->SetValue(session_type == Bank ? valueOn : BTN_VALUE_OFF, force);
+        masterButton->SetValue((context->GetMasterFaderMode() || session_type == Master) ? valueOn : BTN_VALUE_OFF, force);
+        clickButton->SetValue(session_type == Click ? valueOn : BTN_VALUE_OFF, force);
+        sectionButton->SetValue(session_type == Section ? valueOn : BTN_VALUE_OFF, force);
+        markerButton->SetValue(session_type == Marker ? valueOn : BTN_VALUE_OFF, force);
     }
 
     void handleFunctionKey(std::string key)
@@ -104,7 +104,10 @@ public:
     }
     ~CSurf_FP_8_SessionManager();
 
-    void Refresh() { SetButtonValues(); }
+    void Refresh(bool force = false)
+    {
+        SetButtonValues(force);
+    }
 
     void SelectSession(SessionTypes _session_type)
     {
@@ -188,7 +191,16 @@ public:
             handleFunctionKey("5");
             return;
         }
-        session_type = Master;
+
+        if (context->GetMasterFaderModeEnabled())
+        {
+            context->ToggleMasterFaderMode();
+        }
+        else
+        {
+            session_type = Master;
+        }
+
         SetButtonValues();
     }
 
@@ -258,7 +270,7 @@ public:
         switch (session_type)
         {
         case Channel:
-            trackNavigator->DecrementOffset(context->GetShiftLeft() ? context->GetNbChannels() : 1);
+            trackNavigator->DecrementOffset(context->GetShiftLeft() ? context->GetNbBankChannels() : 1);
             TrackList_UpdateAllExternalSurfaces();
             break;
         case Zoom:
@@ -270,11 +282,11 @@ public:
             Main_OnCommandEx(40286, 0, 0); // Track: Go to previous track
             break;
         case Bank:
-            trackNavigator->DecrementOffset(context->GetShiftLeft() ? 1 : context->GetNbChannels());
+            trackNavigator->DecrementOffset(context->GetShiftLeft() ? 1 : context->GetNbBankChannels());
             TrackList_UpdateAllExternalSurfaces();
             break;
         case Master:
-            trackNavigator->DecrementOffset(context->GetShiftLeft() ? context->GetNbChannels() : 1);
+            trackNavigator->DecrementOffset(context->GetShiftLeft() ? context->GetNbBankChannels() : 1);
             TrackList_UpdateAllExternalSurfaces();
             break;
         case Click:
@@ -303,7 +315,7 @@ public:
         switch (session_type)
         {
         case Channel:
-            trackNavigator->IncrementOffset(context->GetShiftLeft() ? context->GetNbChannels() : 1);
+            trackNavigator->IncrementOffset(context->GetShiftLeft() ? context->GetNbBankChannels() : 1);
             TrackList_UpdateAllExternalSurfaces();
             break;
         case Zoom:
@@ -314,11 +326,11 @@ public:
             Main_OnCommandEx(40285, 0, 0); // Track: Go to next track
             break;
         case Bank:
-            trackNavigator->IncrementOffset(context->GetShiftLeft() ? 1 : context->GetNbChannels());
+            trackNavigator->IncrementOffset(context->GetShiftLeft() ? 1 : context->GetNbBankChannels());
             TrackList_UpdateAllExternalSurfaces();
             break;
         case Master:
-            trackNavigator->IncrementOffset(context->GetShiftLeft() ? context->GetNbChannels() : 1);
+            trackNavigator->IncrementOffset(context->GetShiftLeft() ? context->GetNbBankChannels() : 1);
             TrackList_UpdateAllExternalSurfaces();
             break;
         case Click:
@@ -335,12 +347,12 @@ public:
         }
     }
 
-    void HandleEncoderIncrement()
+    void HandleEncoderIncrement(int value)
     {
         switch (session_type)
         {
         case Channel:
-            trackNavigator->IncrementOffset(context->GetShiftLeft() ? context->GetNbChannels() : 1);
+            trackNavigator->IncrementOffset(context->GetShiftLeft() ? context->GetNbBankChannels() : 1);
             break;
         case Zoom:
             context->GetShiftLeft() ? Main_OnCommandEx(40111, 0, 0) // View: Zoom in vertical
@@ -351,11 +363,12 @@ public:
                                     : Main_OnCommandEx(40139, 0, 0); // View: Scroll view up
             break;
         case Bank:
-            trackNavigator->IncrementOffset(context->GetShiftLeft() ? 1 : context->GetNbChannels());
+            trackNavigator->IncrementOffset(context->GetShiftLeft() ? 1 : context->GetNbBankChannels());
             break;
         case Master:
-            Main_OnCommandStringEx("_XENAKIOS_NUDMASVOL1DBU"); // Xenakios/SWS: Nudge master volume 1 dB up
-            // TODO: Add master pan with left shift
+            context->GetShiftLeft()    ? IncrementMasterPan(value, true)
+            : context->GetShiftRight() ? IncrementMasterPan(value, false)
+                                       : Main_OnCommandStringEx("_XENAKIOS_NUDMASVOL1DBU"); // Xenakios/SWS: Nudge master volume 1 dB up;
             break;
         case Click:
             IncrementMetronomeVolume();
@@ -372,12 +385,12 @@ public:
         }
     }
 
-    void HandleEncoderDecrement()
+    void HandleEncoderDecrement(int value)
     {
         switch (session_type)
         {
         case Channel:
-            trackNavigator->DecrementOffset(context->GetShiftLeft() ? context->GetNbChannels() : 1);
+            trackNavigator->DecrementOffset(context->GetShiftLeft() ? context->GetNbBankChannels() : 1);
             break;
         case Zoom:
             context->GetShiftLeft() ? Main_OnCommandEx(40112, 0, 0) // View: Zoom out vertical
@@ -388,10 +401,12 @@ public:
                                     : Main_OnCommandEx(40138, 0, 0); // View: Scroll view down
             break;
         case Bank:
-            trackNavigator->DecrementOffset(context->GetShiftLeft() ? 1 : context->GetNbChannels());
+            trackNavigator->DecrementOffset(context->GetShiftLeft() ? 1 : context->GetNbBankChannels());
             break;
         case Master:
-            Main_OnCommandStringEx("_XENAKIOS_NUDMASVOL1DBD"); // Xenakios/SWS: Nudge master volume 1 dB down
+            context->GetShiftLeft()    ? DecrementMasterPan(value, true)
+            : context->GetShiftRight() ? DecrementMasterPan(value, false)
+                                       : Main_OnCommandStringEx("_XENAKIOS_NUDMASVOL1DBD"); // Xenakios/SWS: Nudge master volume 1 dB down
             break;
         case Click:
             DecrementMetronomeVolume();
@@ -454,11 +469,11 @@ public:
     {
         if (hasBit(value, 6))
         {
-            HandleEncoderDecrement();
+            HandleEncoderDecrement(value - 64);
         }
         else
         {
-            HandleEncoderIncrement();
+            HandleEncoderIncrement(value);
         }
     }
 };

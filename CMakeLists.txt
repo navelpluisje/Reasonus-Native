@@ -336,25 +336,25 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     )
 endif()
 
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
-  execute_process(
-    COMMAND ${CMAKE_COMMAND} -E create_symlink
-            # source
-            "${CMAKE_CURRENT_SOURCE_DIR}/README.md"
-            # target
-            "${CMAKE_CURRENT_BINARY_DIR}/link_readme.txt")
-  set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_BINARY_DIR}/link_readme.txt")
-endif()
+# if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
+#   execute_process(
+#     COMMAND ${CMAKE_COMMAND} -E create_symlink
+#             # source
+#             "${CMAKE_CURRENT_SOURCE_DIR}/README.md"
+#             # target
+#             "${CMAKE_CURRENT_BINARY_DIR}/link_readme.txt")
+#   set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_BINARY_DIR}/link_readme.txt")
+# endif()
 
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
-  execute_process(
-    COMMAND ${CMAKE_COMMAND} -E create_symlink
-            # source
-            "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE"
-            # target
-            "${CMAKE_CURRENT_BINARY_DIR}/link_license.txt")
-  set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_BINARY_DIR}/link_license.txt")
-endif()
+# if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
+#   execute_process(
+#     COMMAND ${CMAKE_COMMAND} -E create_symlink
+#             # source
+#             "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE"
+#             # target
+#             "${CMAKE_CURRENT_BINARY_DIR}/link_license.txt")
+#   set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_BINARY_DIR}/link_license.txt")
+# endif()
 
 set(CPACK_NSIS_PACKAGE_NAME "${PROJECT_NAME}")
 set(CPACK_NSIS_CPUBITS ${CPUBITS})
