@@ -84,6 +84,18 @@ protected:
         readButton->SetColor(ButtonColorGreen, force);
     }
 
+    MediaTrack *GetSelectedAutomationTrack()
+    {
+        if (context->GetMasterFaderMode() && DAW::IsTrackSelected(::GetMasterTrack(0)))
+        {
+            return GetMasterTrack(0);
+        }
+        else
+        {
+            return GetSelectedTrack(0, 0);
+        }
+    }
+
 public:
     CSurf_FP_8_AutomationManager(
         CSurf_Context *context,
@@ -114,7 +126,7 @@ public:
         }
         else
         {
-            MediaTrack *media_track = GetSelectedTrack(0, 0);
+            MediaTrack *media_track = GetSelectedAutomationTrack();
             channelAutomationMode = GetTrackAutomationMode(media_track);
         }
 
@@ -140,12 +152,14 @@ public:
             SetGlobalAutomationOverride(AUTOMATION_LATCH);
             return;
         }
+
         if (context->GetShiftLeft())
         {
             Main_SaveProject(0, false);
             return;
         }
-        MediaTrack *media_track = GetSelectedTrack(0, 0);
+
+        MediaTrack *media_track = GetSelectedAutomationTrack();
         SetTrackAutomationMode(media_track, AUTOMATION_LATCH);
     };
 
@@ -161,12 +175,14 @@ public:
             SetGlobalAutomationOverride(AUTOMATION_TRIM);
             return;
         }
+
         if (context->GetShiftLeft())
         {
             Undo_DoRedo2(0);
             return;
         }
-        MediaTrack *media_track = GetSelectedTrack(0, 0);
+
+        MediaTrack *media_track = GetSelectedAutomationTrack();
         SetTrackAutomationMode(media_track, AUTOMATION_TRIM);
     };
 
@@ -182,12 +198,14 @@ public:
             SetGlobalAutomationOverride(AUTOMATION_PREVIEW);
             return;
         }
+
         if (context->GetShiftLeft())
         {
             Undo_DoUndo2(0);
             return;
         }
-        MediaTrack *media_track = GetSelectedTrack(0, 0);
+
+        MediaTrack *media_track = GetSelectedAutomationTrack();
         SetTrackAutomationMode(media_track, AUTOMATION_PREVIEW);
     };
 
@@ -203,12 +221,14 @@ public:
             SetGlobalAutomationOverride(AUTOMATION_TOUCH);
             return;
         }
+
         if (context->GetShiftLeft())
         {
             faderManager->HandleTouchButtonClick();
             return;
         }
-        MediaTrack *media_track = GetSelectedTrack(0, 0);
+
+        MediaTrack *media_track = GetSelectedAutomationTrack();
         SetTrackAutomationMode(media_track, AUTOMATION_TOUCH);
     };
 
@@ -224,11 +244,13 @@ public:
             SetGlobalAutomationOverride(AUTOMATION_WRITE);
             return;
         }
+
         if (context->GetShiftLeft())
         {
             return;
         }
-        MediaTrack *media_track = GetSelectedTrack(0, 0);
+
+        MediaTrack *media_track = GetSelectedAutomationTrack();
         SetTrackAutomationMode(media_track, AUTOMATION_WRITE);
     };
 
@@ -244,11 +266,13 @@ public:
             SetGlobalAutomationOverride(AUTOMATION_READ);
             return;
         }
+
         if (context->GetShiftLeft())
         {
             return;
         }
-        MediaTrack *media_track = GetSelectedTrack(0, 0);
+
+        MediaTrack *media_track = GetSelectedAutomationTrack();
         SetTrackAutomationMode(media_track, AUTOMATION_READ);
     };
 };
