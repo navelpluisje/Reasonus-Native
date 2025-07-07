@@ -37,6 +37,10 @@ class CSurf_Context
      */
     int surface_time_code_setting;
     /**
+     * @brief When overwrite is true, this is the timecode used
+     */
+    bool control_hidde_tracks;
+    /**
      * @brief Number of channels
      */
     int nbChannels = 8;
@@ -145,6 +149,16 @@ public:
     bool GetSurfaceTimeCode()
     {
         return surface_time_code_setting;
+    }
+
+    void SetControlHiddenTracks(bool value)
+    {
+        control_hidde_tracks = value;
+    }
+
+    bool GetControlHiddenTracks()
+    {
+        return control_hidde_tracks;
     }
 
     void SetShiftLeft(bool val)

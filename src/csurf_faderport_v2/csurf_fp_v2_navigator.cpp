@@ -14,9 +14,9 @@ void CSurf_FP_V2_Navigator::GetAllVisibleTracks(WDL_PtrList<MediaTrack> &tracks,
     {
         MediaTrack *media_track = GetTrack(0, i);
         bool visible = (bool)GetMediaTrackInfo_Value(media_track, "B_SHOWINMIXER");
-        int solo = GetMediaTrackInfo_Value(media_track, "I_SOLO");
-        bool mute = (bool)GetMediaTrackInfo_Value(media_track, "B_MUTE");
-        bool armed = (bool)GetMediaTrackInfo_Value(media_track, "I_RECARM");
+        int solo = DAW::IsTrackSoloed(media_track);
+        bool mute = DAW::IsTrackMuted(media_track);
+        bool armed = DAW::IsTrackArmed(media_track);
 
         if (solo > 0 && !_solo)
         {
@@ -33,7 +33,7 @@ void CSurf_FP_V2_Navigator::GetAllVisibleTracks(WDL_PtrList<MediaTrack> &tracks,
             _arm = true;
         }
 
-        if (visible)
+        if (visible || context->GetControlHiddenTracks())
         {
             tracks.Add(media_track);
         }
@@ -60,6 +60,7 @@ MediaTrack *CSurf_FP_V2_Navigator::GetControllerTrack()
     {
         return GetMasterTrack(0);
     }
+
     GetAllVisibleTracks(tracks, hasSolo, hasMute);
 
     if (DAW::IsTrackSelected(tracks.Get(track_offset)))
