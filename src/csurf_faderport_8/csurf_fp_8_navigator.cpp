@@ -331,6 +331,10 @@ CSurf_FP_8_Navigator::CSurf_FP_8_Navigator(CSurf_Context *context) : context(con
 
 MediaTrack *CSurf_FP_8_Navigator::GetTrackByIndex(int index)
 {
+    if (context->GetMasterFaderMode() && index == context->GetNbChannels() - 1)
+    {
+        return ::GetMasterTrack(0);
+    }
     WDL_PtrList<MediaTrack> bank = GetBankTracks();
     return bank.Get(index);
 }
@@ -339,7 +343,9 @@ WDL_PtrList<MediaTrack> CSurf_FP_8_Navigator::GetBankTracks()
 {
     WDL_PtrList<MediaTrack> bank;
     GetAllVisibleTracks(tracks, hasSolo, hasMute);
-    int channelCount = context->GetNbChannels() > tracks.GetSize() ? context->GetNbChannels() : tracks.GetSize();
+
+    int channelCount = context->GetNbBankChannels() > tracks.GetSize() ? context->GetNbBankChannels() : tracks.GetSize();
+
     for (int i = track_offset; i < track_offset + channelCount; i++)
     {
         if (i > track_offset + channelCount)
@@ -356,13 +362,13 @@ WDL_PtrList<MediaTrack> CSurf_FP_8_Navigator::GetBankTracks()
 
 void CSurf_FP_8_Navigator::SetOffset(int offset)
 {
-    if (tracks.GetSize() < context->GetNbChannels())
+    if (tracks.GetSize() < context->GetNbBankChannels())
     {
         track_offset = 0;
     }
-    else if (offset > (tracks.GetSize() - context->GetNbChannels()))
+    else if (offset > (tracks.GetSize() - context->GetNbBankChannels()))
     {
-        track_offset = tracks.GetSize() - context->GetNbChannels();
+        track_offset = tracks.GetSize() - context->GetNbBankChannels();
     }
     else
     {
@@ -377,17 +383,17 @@ int CSurf_FP_8_Navigator::GetOffset()
 
 void CSurf_FP_8_Navigator::IncrementOffset(int count)
 {
-    if ((track_offset + count) <= (tracks.GetSize() - context->GetNbChannels()))
+    if ((track_offset + count) <= (tracks.GetSize() - context->GetNbBankChannels()))
     {
         track_offset += count;
     }
-    else if (tracks.GetSize() < context->GetNbChannels())
+    else if (tracks.GetSize() < context->GetNbBankChannels())
     {
         track_offset = 0;
     }
     else
     {
-        track_offset = tracks.GetSize() - context->GetNbChannels();
+        track_offset = tracks.GetSize() - context->GetNbBankChannels();
     }
     UpdateMixerPosition();
 }

@@ -1,5 +1,6 @@
 #include "show_reasonus_filters_window.hpp"
 #include "../csurf_faderport_8/csurf_fp_8_ui_filters.hpp"
+#include "../shared/csurf_utils.hpp"
 
 #define STRINGIZE_DEF(x) #x
 #define STRINGIZE(x) STRINGIZE_DEF(x)
@@ -63,9 +64,18 @@ namespace SHOW_REASONUS_FILTERS_WINDOW
             return false;
         }
 
-        // flip state on/off
-        toggle_action_state = !toggle_action_state;
-        MainFunctionOfMyPlugin();
+        bool isFP8 = file_exists(GetReaSonusIniPath(FP_8).c_str());
+
+        if (!isFP8)
+        {
+            ShowMessageBox("The filters dialog is not available for the FaderPort v2", "Dialog not available", 0);
+        }
+        else
+        {
+            // flip state on/off
+            toggle_action_state = !toggle_action_state;
+            MainFunctionOfMyPlugin();
+        }
 
         return true;
     }

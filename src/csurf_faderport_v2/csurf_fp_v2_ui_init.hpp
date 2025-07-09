@@ -82,6 +82,7 @@ namespace CSURF_FP_V2_UI_INIT
             }
 
             SendMessage(GetDlgItem(hwndDlg, IDC_CHECK_INIT_MUTE_MOMENTARY), BM_SETCHECK, ini["surface"]["mute-solo-momentary"] == "1" ? BST_CHECKED : BST_UNCHECKED, 0);
+            SendMessage(GetDlgItem(hwndDlg, IDC_CHECK_CONTROL_HIDDEN_TRACKS), BM_SETCHECK, ini["surface"]["control-hidden-tracks"] == "1" ? BST_CHECKED : BST_UNCHECKED, 0);
 
             SetDlgItemText(hwndDlg, IDC_VERSION, GIT_VERSION);
 
@@ -100,6 +101,12 @@ namespace CSURF_FP_V2_UI_INIT
             case IDC_CHECK_INIT_MUTE_MOMENTARY:
             {
                 SaveCheckBoxValue(hwndDlg, "mute-solo-momentary", IDC_CHECK_INIT_MUTE_MOMENTARY);
+                break;
+            }
+
+            case IDC_CHECK_CONTROL_HIDDEN_TRACKS:
+            {
+                SaveCheckBoxValue(hwndDlg, "control-hidden-tracks", IDC_CHECK_CONTROL_HIDDEN_TRACKS);
                 break;
             }
             break;
