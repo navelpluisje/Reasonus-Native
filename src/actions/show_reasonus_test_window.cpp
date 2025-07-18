@@ -1,3 +1,5 @@
+#define REAIMGUIAPI_IMPLEMENT
+
 #include "show_reasonus_test_window.hpp"
 #include "../csurf_faderport_v2/csurf_fp_v2_ui_test.hpp"
 #include "reaper_plugin_functions.h"

@@ -5,6 +5,7 @@
 #include <reaper_plugin_functions.h>
 #include <reaper_imgui_functions.h>
 #include <memory>
+#include "csurf_fp_v2_ui_settings_page.hpp"
 
 class Example
 {
@@ -20,8 +21,8 @@ private:
     void frame();
 
     ImGui_Context *m_ctx;
-    int m_click_count;
     char m_text[255];
+    CSurf_FP_V2_SettingsPage *settings_page;
 };
 
 #endif

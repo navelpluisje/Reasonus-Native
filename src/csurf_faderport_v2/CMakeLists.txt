@@ -9,4 +9,5 @@ target_sources(${PROJECT_NAME}
         csurf_fp_v2_track.cpp
         csurf_fp_v2_ui_functions.cpp
         csurf_fp_v2_ui_test.cpp
+        csurf_fp_v2_ui_settings_page.cpp
         )

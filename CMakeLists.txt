@@ -153,7 +153,7 @@ target_include_directories(reaper-sdk INTERFACE ${CMAKE_BINARY_DIR})
 
 target_link_libraries(reaper-sdk INTERFACE mINI)
 
-target_link_libraries(reaper-sdk INTERFACE ${PROJECT_LIB_DIR}/reaImgui/reaper_imgui_functions.h)
+# target_link_libraries(reaper-sdk INTERFACE ${PROJECT_LIB_DIR}/reaImgui/reaper_imgui_functions.h)  
 target_include_directories(reaper-sdk INTERFACE ${PROJECT_LIB_DIR}/reaImgui)
 
 # ------------------------------------------------------------------------------
@@ -173,6 +173,39 @@ target_link_libraries(reaper-sdk INTERFACE WDL::WDL)
 if(SWELL_FOUND)
   target_link_libraries(reaper-sdk INTERFACE SWELL::swell)
 endif()
+
+# ------------------------------------------------------------------------------
+# Generate ipp image files
+# ------------------------------------------------------------------------------
+
+# Check if teh destination directory exists
+if(NOT EXISTS ${PROJECT_LIB_DIR}/assets)
+  make_directory(${PROJECT_LIB_DIR}/assets)
+endif()
+
+# Create al ist of files we need to process
+file(GLOB_RECURSE COMPILED_RESOURCES ${PROJECT_SOURCE_DIR}/src/assets/*.png)
+
+# Loop through the files and create an add_custom_command
+foreach(INPUT_FILE ${COMPILED_RESOURCES})
+    # Create the output file name
+    string(REPLACE "png" "ipp" OUTPUT_FILE ${INPUT_FILE})
+    string(REPLACE "src" "lib" OUTPUT_FILE ${OUTPUT_FILE})
+
+    # Custom command to run xxd
+    add_custom_command(
+        OUTPUT ${OUTPUT_FILE}
+        COMMAND xxd -i <${INPUT_FILE} > ${OUTPUT_FILE}
+        DEPENDS ${INPUT_FILE}
+        COMMENT "Generating hex dump of ${INPUT_FILE} to ${OUTPUT_FILE}"
+    )
+    list(APPEND COMPILED_RESOURCES ${OUTPUT_FILE})
+endforeach()
+
+# Custom target that depends on the custom command
+add_custom_target(generate_hex ALL DEPENDS ${COMPILED_RESOURCES})
+# Ensure that the library depends on the hex generation
+add_dependencies(reaper-sdk generate_hex)
 
 # ------------------------------------------------------------------------------
 # Interprocedural Optimization (LTO)
@@ -264,6 +297,8 @@ else()
         -Wall -Wextra -Wpedantic
     )
 endif()
+
+
 
 # ------------------------------------------------------------------------------
 # Installer Defaults and CPack Configuration
