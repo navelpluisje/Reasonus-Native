@@ -1,4 +1,5 @@
 #include <string>
+#include <cmath>
 #include "csurf_fp_8_channel_manager_resources.hpp"
 #include "../shared/csurf_context.cpp"
 #include "csurf_fp_8_navigator.hpp"
@@ -6,41 +7,64 @@
 #include "csurf_fp_8_track.hpp"
 
 /**
- * @brief Get a string representation of the pan value and the panMode. If panMode is 5, it will return the left pan representation
+ * @brief Get a string representation of the pan value and the panMode. If panMode is 6, it will return the left pan representation
  *
- * @param pan The pan value
- * @param panMode The pan mode
+ * @param value The pan value
+ * @param pan_mode The pan mode
  * @return string
  */
-std::string GetPanString(double pan)
+std::string GetPan1String(double value, int pan_mode)
 {
-    int panInt = (int)(pan * 100.0);
-    std::string strVal = std::to_string(abs(panInt));
-    if (panInt < 0)
+    int pan_int;
+    std::string str_val;
+
+    if (pan_mode == 6)
     {
-        return strVal + "%L";
+        pan_int = (int)round((value + 1) * 50.0);
+        str_val = std::to_string(abs(pan_int));
+        return str_val + "%L";
     }
-    if (panInt > 0)
+
+    pan_int = (int)round(value * 100.0);
+    str_val = std::to_string(abs(pan_int));
+    if (pan_int < 0)
     {
-        return strVal + "%R";
+        return str_val + "%L";
+    }
+    if (pan_int > 0)
+    {
+        return str_val + "%R";
     }
     return "Center";
 }
 
 /**
- * @brief Get a string representation of the width value and the panMode. If panMode is 5, it will return the right pan representation
+ * @brief Get a string representation of the width value and the panMode.
+ * If panMode is 6, it will return the right pan representation
+ * If panMode is 5, it will return the width representation
  *
- * @param width The pan value
- * @param panMode The pan mode
+ * @param value The pan value
+ * @param pan_mode The pan mode
  * @return string
  */
-std::string GetWidthString(double width, int panMode)
+std::string GetPan2String(double value, int pan_mode)
 {
-    if (panMode == 6)
+    int pan_int;
+    std::string str_val;
+
+    if (pan_mode == 6)
     {
-        return GetPanString(width);
+        pan_int = (int)round((value + 1) * 50.0);
+        str_val = std::to_string(abs(pan_int));
+        return str_val + "%R";
     }
-    int panInt = (int)(width * 100.0);
-    std::string strVal = std::to_string(panInt);
-    return strVal + "W";
+
+    if (pan_mode == 5)
+    {
+        int pan_int = (int)round(value * 100.0);
+        std::string str_val = std::to_string(pan_int);
+        return str_val + "W";
+    }
+
+    return "";
 }

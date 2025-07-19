@@ -20,15 +20,76 @@ enum DisplayActions
 
 enum DisplayMode
 {
+    /**
+     * Small,
+     * Small,
+     * Large,
+     * Value bar
+     */
     DISPLAY_MODE_0 = 0x00,
+    /**
+     * Large,
+     * Small,
+     * Small,
+     * Value bar
+     */
     DISPLAY_MODE_1 = 0x01,
+    /**
+     * Small,
+     * Small,
+     * Small,
+     * Small,
+     * Value bar
+     */
     DISPLAY_MODE_2 = 0x02,
+    /**
+     * Large,
+     * Large,
+     * Value bar
+     */
     DISPLAY_MODE_3 = 0x03,
+    /**
+     * Large,
+     * Large,
+     * Value bar,
+     * Vu Meter
+     */
     DISPLAY_MODE_4 = 0x04,
+    /**
+     * Small,
+     * Small,
+     * Large,
+     * Value bar,
+     * Vu Meter
+     */
     DISPLAY_MODE_5 = 0x05,
+    /**
+     * Small,
+     * Large,
+     * Small,
+     * Value bar
+     */
     DISPLAY_MODE_6 = 0x06,
+    /**
+     * Large,
+     * Small,
+     * Small,
+     * Value bar,
+     * Vu Meter
+     */
     DISPLAY_MODE_7 = 0x07,
+    /**
+     * Small,
+     * Large,
+     * Small,
+     * Value bar,
+     * Vu Meter
+     */
     DISPLAY_MODE_8 = 0x08,
+    /**
+     * Menu style,
+     * 7 x tiny
+     */
     DISPLAY_MODE_9 = 0x09,
 };
 

@@ -148,14 +148,14 @@ std::string GetSendModeString(int sendMode)
     switch (sendMode)
     {
     case 0:
-        return "Post-fdr";
+        return "Post-Fdr";
     case 1:
         return "Pre-FX";
     case 2:
     case 3:
         return "Post-FX";
     default:
-        return "Post-fdr";
+        return "Post-Fdr";
     };
 }
 

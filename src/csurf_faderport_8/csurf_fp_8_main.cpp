@@ -28,6 +28,8 @@
 extern HWND g_hwnd;
 extern REAPER_PLUGIN_HINSTANCE g_hInst;
 
+const int MOMENTARY_TIMEOUT = 500;
+
 class CSurf_FaderPort : public IReaperControlSurface
 {
   int m_midi_in_dev, m_midi_out_dev;

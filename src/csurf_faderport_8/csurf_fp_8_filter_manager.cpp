@@ -69,8 +69,8 @@ protected:
 
         GetTrackUIVolPan(media_track, &volume, &pan1);
         GetTrackUIPan(media_track, &pan1, &pan2, &panMode);
-        *_pan1 = GetPanString(pan1);
-        *_pan2 = GetWidthString(pan2, panMode);
+        *_pan1 = GetPan1String(pan1);
+        *_pan2 = GetPan2String(pan2, panMode);
 
         if (context->GetShiftLeft())
         {
@@ -196,9 +196,10 @@ public:
         CSurf_SetSurfaceSolo(media_track, CSurf_OnSoloChange(media_track, !DAW::IsTrackSoloed(media_track)), NULL);
     }
 
-    void HandleFaderTouch(int index) override
+    void HandleFaderTouch(int index, int value) override
     {
         (void)index;
+        (void)value;
     }
 
     void HandleFaderMove(int index, int msb, int lsb) override

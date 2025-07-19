@@ -193,9 +193,10 @@ public:
         option[level] = minmax(0, option[level] - 1, max_items - (level == 0 ? 1 : 0));
     }
 
-    void HandleFaderTouch(int index) override
+    void HandleFaderTouch(int index, int value) override
     {
         (void)index;
+        (void)value;
     }
 
     void HandleFaderMove(int index, int msb, int lsb) override

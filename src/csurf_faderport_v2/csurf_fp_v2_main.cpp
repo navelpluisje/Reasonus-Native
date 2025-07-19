@@ -352,14 +352,16 @@ public:
   }
 
   // Probably not needed
-  // void SetTrackListChange()
-  // {
-  //   ShowConsoleMsg("SetTrackListChange");
-  // }
+  void SetTrackListChange()
+  {
+    trackNavigator->UpdateOffset();
+    ShowConsoleMsg("SetTrackListChange");
+  }
 
   void OnTrackSelection(MediaTrack *media_track)
   {
     int trackId = (int)::GetMediaTrackInfo_Value(media_track, "IP_TRACKNUMBER");
+    logInteger("Track Id:", trackId);
     trackNavigator->SetOffset(trackId - 1);
   }
 };

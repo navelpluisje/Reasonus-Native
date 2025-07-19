@@ -60,7 +60,7 @@ class CSurf_Context
     bool masterFaderMode = false;
 
     // Pan encoder modes
-    PanEncoderMode panEncoderMode = PanEncoderPanMode;
+    PanEncoderMode panEncoderMode = PanEncoderTrackPanMode;
     bool panPushModePan = true;
 
     // Channel manager

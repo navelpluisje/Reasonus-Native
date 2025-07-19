@@ -15,9 +15,13 @@ public:
     static void UnSelectAllTracks();
 
     static bool IsTrackArmed(MediaTrack *media_track);
+    static void ToggleTrackArmed(MediaTrack *media_track);
     static bool IsTrackMuted(MediaTrack *media_track);
+    static void ToggleTrackMuted(MediaTrack *media_track);
     static bool IsTrackSoloed(MediaTrack *media_track);
+    static void ToggleTrackSoloed(MediaTrack *media_track);
     static bool IsTrackSelected(MediaTrack *media_track);
+    static bool IsTrackParent(MediaTrack *media_track);
 
     static int GetTrackPanMode(MediaTrack *media_track);
     static std::string GetTrackName(MediaTrack *media_track);
@@ -26,10 +30,18 @@ public:
     static std::string GetTrackMonitorMode(MediaTrack *media_track);
     static std::string GetTrackRecordingMode(MediaTrack *media_track);
     static ButtonColor GetTrackColor(MediaTrack *media_track);
+    static void SetUniqueSelectedTrack(MediaTrack *media_track);
+    static void ToggleSelectedTrack(MediaTrack *media_track);
     static void SetSelectedTracksRange(MediaTrack *media_track);
     static double GetTrackPeakInfo(MediaTrack *media_track);
     static int GetTrackSurfacePeakInfo(MediaTrack *media_track);
+    static void SetTrackPan1(MediaTrack *media_track, double value);
+    static void SetTrackPan2(MediaTrack *media_track, double value);
+    static void SetTrackVolume(MediaTrack *media_track, double value);
 
+    /**
+     * Track plugins
+     */
     static bool TrackHasFx(MediaTrack *media_track);
     static bool HasTrackFx(MediaTrack *media_track, int fx);
     static std::string GetTrackFxName(MediaTrack *media_track, int fx, bool full = false);
@@ -45,33 +57,67 @@ public:
     static int GetTrackFxParamNbSteps(MediaTrack *media_track, int fx, int param);
     static void SetTrackFXParamUntouched(MediaTrack *media_track, int fx);
 
+    /**
+     * Track receives
+     */
     static bool HasTrackReceive(MediaTrack *media_track, int receive);
     static std::string GetTrackReceiveSrcName(MediaTrack *media_track, int receive);
     static int GetTrackReceiveMode(MediaTrack *media_track, int receive);
     static int GetTrackReceiveAutoMode(MediaTrack *media_track, int receive);
     static std::string GetTrackSurfaceReceiveMode(MediaTrack *media_track, int receive);
     static std::string GetTrackSurfaceReceiveAutoMode(MediaTrack *media_track, int receive);
-    static bool GetTrackReceiveMute(MediaTrack *media_track, int receive);
-    static bool GetTrackReceivePhase(MediaTrack *media_track, int receive);
-    static bool GetTrackReceiveMono(MediaTrack *media_track, int receive);
-    static int GetNextTrackReceiveMode(MediaTrack *media_track, int receive);
 
+    static bool GetTrackReceiveMute(MediaTrack *media_track, int receive);
+    static void ToggleTrackReceiveMute(MediaTrack *media_track, int receive);
+
+    static bool GetTrackReceivePhase(MediaTrack *media_track, int receive);
+    static void ToggleTrackReceivePhase(MediaTrack *media_track, int receive);
+
+    static bool GetTrackReceiveMono(MediaTrack *media_track, int receive);
+    static void ToggleTrackReceiveMono(MediaTrack *media_track, int receive);
+
+    static int GetNextTrackReceiveMode(MediaTrack *media_track, int receive);
+    static void SetNextTrackReceiveMode(MediaTrack *media_track, int receive);
+
+    static void SetTrackReceiveVolume(MediaTrack *media_track, int receive, double volume);
+    static void SetTrackReceivePan(MediaTrack *media_track, int receive, double pan);
+
+    /**
+     * Track sends
+     */
     static bool HasTrackSend(MediaTrack *media_track, int send);
     static std::string GetTrackSendDestName(MediaTrack *media_track, int send);
     static int GetTrackSendMode(MediaTrack *media_track, int send);
     static int GetTrackSendAutoMode(MediaTrack *media_track, int send);
     static std::string GetTrackSurfaceSendMode(MediaTrack *media_track, int send);
     static std::string GetTrackSurfaceSendAutoMode(MediaTrack *media_track, int send);
-    static bool GetTrackSendMute(MediaTrack *media_track, int send);
-    static bool GetTrackSendPhase(MediaTrack *media_track, int send);
-    static bool GetTrackSendMono(MediaTrack *media_track, int send);
-    static int GetNextTrackSendMode(MediaTrack *media_track, int receive);
 
+    static bool GetTrackSendMute(MediaTrack *media_track, int send);
+    static void ToggleTrackSendMute(MediaTrack *media_track, int send);
+
+    static bool GetTrackSendPhase(MediaTrack *media_track, int send);
+    static void ToggleTrackSendPhase(MediaTrack *media_track, int send);
+
+    static bool GetTrackSendMono(MediaTrack *media_track, int send);
+    static void ToggleTrackSendMono(MediaTrack *media_track, int send);
+
+    static int GetNextTrackSendMode(MediaTrack *media_track, int send);
+    static void SetNextTrackSendMode(MediaTrack *media_track, int send);
+
+    static void SetTrackSendVolume(MediaTrack *media_track, int send, double volume);
+    static void SetTrackSendPan(MediaTrack *media_track, int send, double pan);
+
+    /**
+     * Project related
+     */
     static int GetProjectTimeMode();
     static int GetProjectMeasureOffset();
     static double GetProjectTimeOffset();
     static std::vector<std::string> GetProjectTime(bool overwrite_time_code, int new_time_code);
 
+    /**
+     * Media item related
+     */
     static bool MediaItemHasMidi(MediaItem *media_item);
     static bool MediaItemHasAudio(MediaItem *media_item);
 

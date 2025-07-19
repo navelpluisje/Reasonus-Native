@@ -11,8 +11,10 @@ enum ChannelMode
     TrackPluginMode,
     SendMode,
     TrackSendMode,
-    PanMode,
-    TrackPanMode,
+    ReceiveMode,
+    TrackReceiveMode,
+    PanMode1,
+    PanMode2,
     MixMode,
     PluginEditMode,
     PluginControlMode,
@@ -27,7 +29,7 @@ enum ChannelManagerType
 
 enum PanEncoderMode
 {
-    PanEncoderPanMode,
+    PanEncoderTrackPanMode,
     PanEncoderPluginMode,
     PanEncoderSendMode,
     PanEncoderReceiveMode,
