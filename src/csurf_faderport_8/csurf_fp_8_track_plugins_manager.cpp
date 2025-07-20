@@ -152,8 +152,7 @@ public:
             return;
         }
 
-        DAW::UnSelectAllTracks();
-        SetTrackSelected(media_track, true);
+        DAW::SetUniqueSelectedTrack(media_track);
     }
 
     void HandleMuteClick(int index, int value) override

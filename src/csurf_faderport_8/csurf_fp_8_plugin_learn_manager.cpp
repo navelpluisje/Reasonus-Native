@@ -196,8 +196,9 @@ public:
         (void)value;
     }
 
-    void HandleFaderTouch(int index) override
+    void HandleFaderTouch(int index, int value) override
     {
+        (void)value;
         int controlIndex = context->GetChannelManagerItemIndex() + index;
         int pluginId = context->GetPluginEditPluginId();
         int trackId, itemNumber, takeId, _pluginId, paramId;

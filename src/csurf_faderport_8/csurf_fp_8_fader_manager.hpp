@@ -8,6 +8,7 @@
 #include "csurf_fp_8_track_sends_manager.cpp"
 #include "csurf_fp_8_receives_manager.cpp"
 #include "csurf_fp_8_track_receives_manager.cpp"
+#include "csurf_fp_8_pan_manager.cpp"
 #include "../shared/csurf_context.cpp"
 #include "../controls/csurf_button.hpp"
 #include "csurf_fp_8_track.hpp"
@@ -71,7 +72,7 @@ public:
     void HandleSoloClick(int index, int value);
     void HandleSelectClick(int index, int value);
     void HandleFaderMove(int index, int msb, int lsb);
-    void HandleFaderTouch(int index, int value);
+    void HandleFaderTouch(int index, int value = 0);
 };
 
 #endif

@@ -31,8 +31,8 @@ protected:
 
         if (!context->GetArm())
         {
-            int trackColor = ::GetTrackColor(media_track);
-            if (trackColor == 0)
+            int track_color = ::GetTrackColor(media_track);
+            if (track_color == 0)
             {
                 red = 0x7f;
                 green = 0x7f;
@@ -40,18 +40,18 @@ protected:
             }
             else
             {
-                ColorFromNative(trackColor, &red, &green, &blue);
+                ColorFromNative(track_color, &red, &green, &blue);
             }
         }
         color.SetColor(red / 2, green / 2, blue / 2);
     }
 
-    void GetFaderValue(MediaTrack *media_track, int send_index, int *fader_value, int *value_bar_value, int *_pan, std::string *panStr)
+    void GetFaderValue(MediaTrack *media_track, int send_index, int *fader_value, int *value_bar_value, int *_pan, std::string *pan_str)
     {
         double volume, pan = 0.0;
 
         GetTrackSendUIVolPan(media_track, send_index, &volume, &pan);
-        *panStr = GetPanString(pan);
+        *pan_str = GetPan1String(pan);
         *_pan = (int)pan;
 
         if (context->GetShiftLeft())
@@ -105,7 +105,7 @@ public:
             int send_index = context->GetChannelManagerItemIndex(nb_track_sends[i] - 1);
 
             int pan, fader_value, value_bar_value = 0;
-            std::string panStr;
+            std::string pan_str;
 
             CSurf_FP_8_Track *track = tracks.at(i);
             MediaTrack *media_track = media_tracks.Get(i);
@@ -118,7 +118,7 @@ public:
 
             SetTrackColors(media_track);
 
-            GetFaderValue(media_track, send_index, &fader_value, &value_bar_value, &pan, &panStr);
+            GetFaderValue(media_track, send_index, &fader_value, &value_bar_value, &pan, &pan_str);
 
             if (DAW::HasTrackSend(media_track, send_index))
             {
@@ -154,12 +154,11 @@ public:
 
         if (context->GetShiftLeft())
         {
-            SetTrackSelected(media_track, !DAW::IsTrackSelected(media_track));
+            DAW::ToggleSelectedTrack(media_track);
             return;
         }
 
-        DAW::UnSelectAllTracks();
-        SetTrackSelected(media_track, true);
+        DAW::SetUniqueSelectedTrack(media_track);
     }
 
     void HandleMuteClick(int index, int value) override
@@ -174,11 +173,11 @@ public:
 
         if (context->GetShiftLeft())
         {
-            SetTrackSendInfo_Value(media_track, 0, send_index, "I_SENDMODE", DAW::GetNextTrackSendMode(media_track, send_index));
+            DAW::SetNextTrackSendMode(media_track, send_index);
         }
         else
         {
-            SetTrackSendInfo_Value(media_track, 0, current_send, "B_MUTE", !DAW::GetTrackSendMute(media_track, send_index));
+            DAW::ToggleTrackSendMute(media_track, send_index);
         }
     }
 
@@ -194,17 +193,18 @@ public:
 
         if (context->GetShiftLeft())
         {
-            SetTrackSendInfo_Value(media_track, 0, send_index, "B_MONO", !DAW::GetTrackSendMono(media_track, send_index));
+            DAW::ToggleTrackSendMono(media_track, send_index);
         }
         else
         {
-            SetTrackSendInfo_Value(media_track, 0, send_index, "B_PHASE", !DAW::GetTrackSendPhase(media_track, send_index));
+            DAW::ToggleTrackSendPhase(media_track, send_index);
         }
     }
 
-    void HandleFaderTouch(int index) override
+    void HandleFaderTouch(int index, int value) override
     {
         (void)index;
+        (void)value;
     }
 
     void HandleFaderMove(int index, int msb, int lsb) override
@@ -214,11 +214,11 @@ public:
 
         if (context->GetShiftLeft())
         {
-            SetTrackSendInfo_Value(media_track, 0, send_index, "D_PAN", CSurf_OnSendPanChange(media_track, send_index, normalizedToPan(int14ToNormalized(msb, lsb)), false));
+            DAW::SetTrackSendPan(media_track, send_index, normalizedToPan(int14ToNormalized(msb, lsb)));
         }
         else
         {
-            SetTrackSendInfo_Value(media_track, 0, send_index, "D_VOL", CSurf_OnSendVolumeChange(media_track, send_index, int14ToVol(msb, lsb), false));
+            DAW::SetTrackSendVolume(media_track, send_index, int14ToVol(msb, lsb));
         }
     }
 };

@@ -28,6 +28,8 @@
 extern HWND g_hwnd;
 extern REAPER_PLUGIN_HINSTANCE g_hInst;
 
+const int MOMENTARY_TIMEOUT = 500;
+
 class CSurf_FaderPort : public IReaperControlSurface
 {
   int m_midi_in_dev, m_midi_out_dev;
@@ -391,6 +393,7 @@ public:
     context->SetUntouchAfterLearn(ini["surface"].has("erase-last-param-after-learn") && ini["surface"]["erase-last-param-after-learn"] == "1");
     context->SetMasterFaderModeEnabled(ini["surface"].has("master-fader-mode") && ini["surface"]["master-fader-mode"] == "1");
     context->SetSwapShiftButtons(ini["surface"].has("swap-shift-buttons") && ini["surface"]["swap-shift-buttons"] == "1");
+    context->SetFaderReset(ini["surface"].has("fader-reset") && ini["surface"]["fader-reset"] == "1");
     context->SetMuteSoloMomentary(ini["surface"].has("mute-solo-momentary") && ini["surface"]["mute-solo-momentary"] == "1");
     context->SetOverwriteTimeCode(ini["surface"].has("overwrite-time-code") && ini["surface"]["overwrite-time-code"] == "1");
     context->SetSurfaceTimeCode(ini["surface"].has("time-code") && std::stoi(ini["surface"]["time-code"]));

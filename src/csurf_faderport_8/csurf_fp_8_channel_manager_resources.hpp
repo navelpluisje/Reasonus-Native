@@ -10,7 +10,7 @@
  * @param panMode The pan mode
  * @return string
  */
-std::string GetPanString(double pan);
+std::string GetPan1String(double pan, int panMode = 0);
 
 /**
  * @brief Get a string representation of the width value and the panMode. If panMode is 5, it will return the right pan representation
@@ -19,7 +19,7 @@ std::string GetPanString(double pan);
  * @param panMode The pan mode
  * @return string
  */
-std::string GetWidthString(double width, int panMode);
+std::string GetPan2String(double width, int panMode);
 
 /**
  * @brief Get a string representation of the automtion mode

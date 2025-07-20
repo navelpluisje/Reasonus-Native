@@ -29,6 +29,7 @@ protected:
 
     ShiftState armState;
     ShiftState shiftState;
+    DoubleClickState dbcState;
     bool hasSolo;
     bool hasMute;
     bool hasSelectedBypass;
@@ -224,7 +225,7 @@ public:
 
         switch (context->GetPanEncoderMode())
         {
-        case PanEncoderPanMode:
+        case PanEncoderTrackPanMode:
             hasBit(value, 6)
                 ? DecrementPan(value - 64)
                 : IncrementPan(value);

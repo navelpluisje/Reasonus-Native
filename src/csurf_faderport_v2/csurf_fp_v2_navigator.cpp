@@ -122,6 +122,12 @@ void CSurf_FP_V2_Navigator::DecrementOffset(int count)
     UpdateMixerPosition();
 }
 
+void CSurf_FP_V2_Navigator::UpdateOffset()
+{
+    MediaTrack *media_track = ::GetSelectedTrack(0, 0);
+    track_offset = (int)::GetMediaTrackInfo_Value(media_track, "IP_TRACKNUMBER") - 1;
+}
+
 bool CSurf_FP_V2_Navigator::HasTracksWithSolo()
 {
     return hasSolo;
