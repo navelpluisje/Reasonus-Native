@@ -180,7 +180,7 @@ namespace CSURF_FP_8_UI_INIT
 
                 LRESULT indev = -1, outdev = -1, surface = -1, time_code = -1;
 
-                int r = SendDlgItemMessage(hwndDlg, IDC_COMBO_MIDI_IN, CB_GETCURSEL, 0, 0);
+                LRESULT r = SendDlgItemMessage(hwndDlg, IDC_COMBO_MIDI_IN, CB_GETCURSEL, 0, 0);
                 if (r != CB_ERR)
                     indev = SendDlgItemMessage(hwndDlg, IDC_COMBO_MIDI_IN, CB_GETITEMDATA, r, 0);
 
