@@ -99,7 +99,7 @@ std::string StripPluginNamePrefixes(char *name)
 {
     std::string s = std::string(name);
     std::string delimiter = ": ";
-    int pos = s.find(delimiter) + size(delimiter);
+    int pos = (int)(s.find(delimiter) + size(delimiter));
     if (pos < 0)
     {
         return s;
@@ -112,7 +112,7 @@ std::string StripPluginChannelPostfix(char *name)
 {
     std::string s = std::string(name);
     std::string delimiter = " (32 out)";
-    int pos = s.find(delimiter);
+    int pos = (int)s.find(delimiter);
     if (pos < 0)
     {
         return s;
@@ -124,7 +124,7 @@ std::string StripPluginChannelPostfix(char *name)
 bool IsPluginFX(std::string name)
 {
     std::string delimiter = ": ";
-    int pos = name.find(delimiter);
+    int pos = (int)name.find(delimiter);
     // If we can not find the delimiter, we can not determine the type of plugin, so asume it's an effect
     if (pos < 0)
     {
@@ -216,7 +216,7 @@ std::vector<std::string> split(std::string str, std::string delimiter)
         do
         {
             // Find the index of occurrence
-            int idx = str.find(delimiter, start);
+            int idx = (int)str.find(delimiter, start);
             if (idx == static_cast<int>(std::string::npos))
             {
                 break;
@@ -226,7 +226,7 @@ std::vector<std::string> split(std::string str, std::string delimiter)
             // occurrence in the vector
             int length = idx - start;
             v.push_back(str.substr(start, length));
-            start += (length + delimiter.size());
+            start += (int)(length + delimiter.size());
         } while (true);
         v.push_back(str.substr(start));
     }

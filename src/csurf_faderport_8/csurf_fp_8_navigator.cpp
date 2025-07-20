@@ -14,7 +14,7 @@ void CSurf_FP_8_Navigator::GetAllVisibleTracks(WDL_PtrList<MediaTrack> &tracks, 
     {
         MediaTrack *media_track = GetTrack(0, i);
         bool visible = (bool)GetMediaTrackInfo_Value(media_track, "B_SHOWINMIXER");
-        int solo = GetMediaTrackInfo_Value(media_track, "I_SOLO");
+        int solo = (int)GetMediaTrackInfo_Value(media_track, "I_SOLO");
         bool mute = (bool)GetMediaTrackInfo_Value(media_track, "B_MUTE");
 
         if (solo > 0 && !_solo)
