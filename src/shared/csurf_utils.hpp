@@ -57,6 +57,11 @@ struct ShiftState
     {
         return invert ? !active : active;
     }
+
+    bool IsLocked()
+    {
+        return invert;
+    }
 };
 
 struct DoubleClickState

@@ -144,13 +144,13 @@ public:
             return;
         }
 
-        if (context->GetShiftRight())
+        if (context->GetShiftChannelRight())
         {
             DAW::SetSelectedTracksRange(media_track);
             return;
         }
 
-        if (context->GetShiftLeft())
+        if (context->GetShiftChannelLeft())
         {
             DAW::ToggleSelectedTrack(media_track);
             return;
@@ -201,12 +201,14 @@ public:
 
     void HandleFaderTouch(int index, int value) override
     {
-        if (!context->GetFaderReset() || value == 0)
+        (void)value;
+
+        if (!context->GetFaderReset())
         {
             return;
         }
 
-        if (context->GetShiftLeft())
+        if (context->GetShiftChannelLeft())
         {
             MediaTrack *media_track = navigator->GetTrackByIndex(index);
             int pan_mode = DAW::GetTrackPanMode(media_track);

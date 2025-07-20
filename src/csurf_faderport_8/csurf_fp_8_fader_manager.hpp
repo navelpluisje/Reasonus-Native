@@ -28,7 +28,7 @@ class CSurf_FP_8_FaderManager
     CSurf_Button *sendButton;
     CSurf_Button *panButton;
 
-    void SetButtonValues(ChannelMode mode, bool force = false);
+    void SetButtonValues(bool force = false);
 
     void SetChannelMode(ChannelMode mode, bool updateButtons);
 
