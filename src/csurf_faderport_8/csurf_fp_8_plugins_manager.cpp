@@ -130,7 +130,7 @@ public:
                 track->SetDisplayLine(1, ALIGN_LEFT, DAW::GetTrackFxName(media_track, plugin_index).c_str(), INVERT);
                 track->SetDisplayLine(2, ALIGN_CENTER, DAW::GetTrackFxSurfceEnabled(media_track, plugin_index).c_str());
                 track->SetDisplayLine(3, ALIGN_CENTER, Progress(plugin_index + 1, nb_track_plugins[i]).c_str());
-                track->SetMuteButtonValue(ButtonBlinkOnOff((context->GetShiftLeft() && !DAW::GetTrackFxEnabled(media_track, plugin_index)), !DAW::GetTrackFxEnabled(media_track, plugin_index)));
+                track->SetMuteButtonValue(ButtonBlinkOnOff((context->GetShiftChannelLeft() && !DAW::GetTrackFxEnabled(media_track, plugin_index)), !DAW::GetTrackFxEnabled(media_track, plugin_index)));
                 track->SetSoloButtonValue(ButtonBlinkOnOff(DAW::GetTrackFxPanelOpen(media_track, plugin_index), hasPluginConfigFile(media_track, plugin_index)));
             }
             else
@@ -176,7 +176,7 @@ public:
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
         int plugin_index = context->GetChannelManagerItemIndex(nb_track_plugins[index] - 1);
 
-        if (context->GetShiftLeft())
+        if (context->GetShiftChannelLeft())
         {
             ::TrackFX_SetOffline(media_track, plugin_index, !DAW::GetTrackFxOffline(media_track, plugin_index));
         }

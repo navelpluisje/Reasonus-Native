@@ -575,12 +575,12 @@ void DAW::SetNextTrackSendMode(MediaTrack *media_track, int send)
 
 void DAW::SetTrackSendVolume(MediaTrack *media_track, int send, double volume)
 {
-    ::SetTrackSendInfo_Value(media_track, 0, send, "D_VOL", CSurf_OnRecvVolumeChange(media_track, send, volume, false));
+    ::SetTrackSendInfo_Value(media_track, 0, send, "D_VOL", CSurf_OnSendVolumeChange(media_track, send, volume, false));
 }
 
 void DAW::SetTrackSendPan(MediaTrack *media_track, int send, double pan)
 {
-    ::SetTrackSendInfo_Value(media_track, 0, send, "D_PAN", CSurf_OnRecvPanChange(media_track, send, pan, false));
+    ::SetTrackSendInfo_Value(media_track, 0, send, "D_PAN", CSurf_OnSendPanChange(media_track, send, pan, false));
 }
 
 /************************************************************************

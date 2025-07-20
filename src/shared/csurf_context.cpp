@@ -51,7 +51,9 @@ class CSurf_Context
 
     // Shift keys
     bool shift_left = false;
+    bool shift_left_locked = false;
     bool shift_right = false;
+    bool shift_right_locked = false;
     bool arm = false;
 
     // track mode show the time code in the displays
@@ -187,6 +189,30 @@ public:
         }
     }
 
+    void SetShiftLeftLocked(bool val)
+    {
+        if (swap_shift_buttons_setting)
+        {
+            shift_right_locked = val;
+        }
+        else
+        {
+            shift_left_locked = val;
+        }
+    }
+
+    bool GetShiftChannelLeft()
+    {
+        if (!shift_left_locked)
+        {
+            return shift_left;
+        }
+        else
+        {
+            return !shift_left;
+        }
+    }
+
     bool GetShiftLeft()
     {
         return shift_left;
@@ -203,6 +229,31 @@ public:
             shift_right = val;
         }
     }
+
+    void SetShiftRightLocked(bool val)
+    {
+        if (swap_shift_buttons_setting)
+        {
+            shift_left_locked = val;
+        }
+        else
+        {
+            shift_right_locked = val;
+        }
+    }
+
+    bool GetShiftChannelRight()
+    {
+        if (!shift_right_locked)
+        {
+            return shift_right;
+        }
+        else
+        {
+            return !shift_right;
+        }
+    }
+
     bool GetShiftRight()
     {
         return shift_right;

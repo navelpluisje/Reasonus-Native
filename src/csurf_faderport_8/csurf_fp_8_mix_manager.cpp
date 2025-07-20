@@ -32,7 +32,7 @@ protected:
         mixBusButton->SetValue((trackFilter == TrackTopFoldersFilter || trackFilter == TrackAllFoldersFilter || trackFilter == TrackHarwareOutputFilter) ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
         mixVcaButton->SetValue((trackFilter == TrackIsVcaFilter || trackFilter == TrackReceivesFilter || trackFilter == TrackEffectsFilter) ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
         mixAllButton->SetValue((trackFilter == TrackAllFilter || trackFilter == TrackCustomFilter || trackFilter == TrackSendsFilter) ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
-        shiftRightButton->SetValue((context->GetShiftRight() || (context->GetShiftLeft() && context->GetSwapShiftButtons()))
+        shiftRightButton->SetValue(((!context->GetSwapShiftButtons() && context->GetShiftRight()) || (context->GetShiftLeft() && context->GetSwapShiftButtons()))
                                        ? BTN_VALUE_ON
                                        : BTN_VALUE_OFF,
                                    force);
@@ -214,6 +214,7 @@ public:
             shiftState.start = 0;
         }
         context->SetShiftRight(shiftState.IsActive());
+        context->SetShiftRightLocked(shiftState.IsLocked());
 
         SetButtonValue();
     }

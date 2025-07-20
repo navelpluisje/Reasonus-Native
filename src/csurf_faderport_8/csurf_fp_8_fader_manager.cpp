@@ -4,7 +4,7 @@
 #include "csurf_fp_8_plugin_control_manager.cpp"
 #include "csurf_fp_8_menu_manager.cpp"
 
-void CSurf_FP_8_FaderManager::SetButtonValues(ChannelMode channelMode, bool force)
+void CSurf_FP_8_FaderManager::SetButtonValues(bool force)
 {
     // Send button has to blink on receive
     trackButton->SetValue(context->IsChannelMode(TrackMode) ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
@@ -21,7 +21,7 @@ void CSurf_FP_8_FaderManager::SetChannelMode(ChannelMode channelMode, bool updat
     context->SetChannelMode(channelMode);
     if (updateButtons)
     {
-        SetButtonValues(channelMode);
+        SetButtonValues();
     }
 
     switch (channelMode)
@@ -120,7 +120,7 @@ CSurf_FP_8_FaderManager::~CSurf_FP_8_FaderManager()
 void CSurf_FP_8_FaderManager::Refresh(bool force)
 {
     SetChannelMode(TrackMode, true);
-    SetButtonValues(TrackMode, force);
+    SetButtonValues(force);
 }
 
 void CSurf_FP_8_FaderManager::HandleTrackButtonClick(int value)
@@ -173,7 +173,7 @@ void CSurf_FP_8_FaderManager::HandleSendButtonClick(int value, bool track)
 
     context->SetPluginEditPluginId(-1);
 
-    if (context->GetShiftLeft())
+    if (context->GetShiftChannelLeft())
     {
         if (!context->IsChannelMode(ReceiveMode) && !track)
         {

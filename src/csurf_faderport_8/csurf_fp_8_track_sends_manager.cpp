@@ -50,7 +50,7 @@ protected:
         *pan_str = GetPan1String(pan);
         *_pan = pan;
 
-        if (context->GetShiftLeft())
+        if (context->GetShiftChannelLeft())
         {
             *fader_value = int(panToNormalized(pan) * 16383.0);
             *value_bar_value = int(volToNormalized(volume) * 127);
@@ -120,12 +120,12 @@ public:
 
             track->SetTrackColor(color);
             track->SetSelectButtonValue(DAW::IsTrackSelected(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF);
-            track->SetMuteButtonValue(ButtonBlinkOnOff((context->GetShiftLeft() && DAW::GetTrackSendMute(sends_track, send_index)), DAW::GetTrackSendMute(sends_track, send_index)));
-            track->SetSoloButtonValue(((context->GetShiftLeft() && DAW::GetTrackSendMono(sends_track, send_index)) || (!context->GetShiftLeft() && DAW::GetTrackSendPhase(sends_track, send_index)))
+            track->SetMuteButtonValue(ButtonBlinkOnOff((context->GetShiftChannelLeft() && DAW::GetTrackSendMute(sends_track, send_index)), DAW::GetTrackSendMute(sends_track, send_index)));
+            track->SetSoloButtonValue(((context->GetShiftChannelLeft() && DAW::GetTrackSendMono(sends_track, send_index)) || (!context->GetShiftChannelLeft() && DAW::GetTrackSendPhase(sends_track, send_index)))
                                           ? BTN_VALUE_ON
                                           : BTN_VALUE_OFF);
             track->SetFaderValue(fader_value);
-            track->SetValueBarMode(context->GetShiftLeft() ? VALUEBAR_MODE_FILL : VALUEBAR_MODE_BIPOLAR);
+            track->SetValueBarMode(context->GetShiftChannelLeft() ? VALUEBAR_MODE_FILL : VALUEBAR_MODE_BIPOLAR);
             track->SetValueBarValue(value_bar_value);
 
             track->SetDisplayMode(DISPLAY_MODE_2);
@@ -136,7 +136,7 @@ public:
     {
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
 
-        if (context->GetShiftLeft())
+        if (context->GetShiftChannelLeft())
         {
             DAW::ToggleSelectedTrack(media_track);
             return;
@@ -155,7 +155,7 @@ public:
         MediaTrack *send_track = GetSelectedTrack(0, 0);
         int send_index = context->GetChannelManagerItemIndex() + index;
 
-        if (context->GetShiftLeft())
+        if (context->GetShiftChannelLeft())
         {
             DAW::SetNextTrackSendMode(send_track, send_index);
         }
@@ -175,7 +175,7 @@ public:
         MediaTrack *send_track = GetSelectedTrack(0, 0);
         int send_index = context->GetChannelManagerItemIndex() + index;
 
-        if (context->GetShiftLeft())
+        if (context->GetShiftChannelLeft())
         {
             DAW::ToggleTrackSendMono(send_track, send_index);
         }
@@ -196,7 +196,7 @@ public:
         MediaTrack *send_track = GetSelectedTrack(0, 0);
         int send_index = context->GetChannelManagerItemIndex() + index;
 
-        if (context->GetShiftLeft())
+        if (context->GetShiftChannelLeft())
         {
             DAW::SetTrackSendPan(send_track, send_index, normalizedToPan(int14ToNormalized(msb, lsb)));
         }

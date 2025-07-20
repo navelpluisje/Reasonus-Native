@@ -27,7 +27,7 @@ protected:
         {{"Disable", "0"}, {"Enable", "1"}},
         {{"Disable", "0"}, {"Enable", "1"}},
         {{"REAPER", "0"}, {"ReaSonus", "1"}},
-        {{"Time", "0"}, {"Beats", "2"}, {"Seconds", "3"}, {"Samples", "4"}, {"H:M:S:Fr", "5"}, {"Abs. Frames", "8"}},
+        {{"Time", "0"}, {"Beats", "2"}, {"Seconds", "3"}, {"Samples", "4"}, {"H:M:S:Fr", "5"}, {"Abs. Frames", "8"}, {"Abs. 1", "8"}, {"Abs. 2", "8"}, {"Abs. 3", "8"}},
     };
 
     std::vector<std::vector<std::string>> menu_descriptions = {
@@ -89,7 +89,18 @@ public:
     {
         int nb_menu_items = static_cast<int>(menu_items.size());
         int nb_options = static_cast<int>(menu_options.at(option[0]).size());
+        int menu_option = option[0];
         int sel_option = option[1];
+
+        int menu_offset = 0;
+        if (nb_menu_items > 7 && menu_option >= (nb_menu_items - 7) + 2)
+        {
+            menu_offset = nb_menu_items - 7;
+        }
+        else if (nb_menu_items > 7 && menu_option > 2)
+        {
+            menu_offset = menu_option - 2;
+        }
 
         int option_offset = 0;
         if (nb_options > 6 && sel_option >= (nb_options - 6) + 2)
@@ -103,16 +114,21 @@ public:
 
         for (int i = 0; i < 7; i++)
         {
-            if (i < nb_menu_items)
+            /**
+             * Handle the menu items
+             */
+            int index = i + menu_offset;
+
+            if (index < nb_menu_items)
             {
-                tracks.at(1)->SetDisplayLine(i, ALIGN_LEFT, menu_items[i].c_str(), option[0] == i ? INVERT : NON_INVERT);
+                tracks.at(1)->SetDisplayLine(i, ALIGN_LEFT, menu_items[index].c_str(), option[0] == index ? INVERT : NON_INVERT);
             }
             else
             {
                 tracks.at(1)->SetDisplayLine(i, ALIGN_LEFT, "", NON_INVERT);
             }
 
-            int index = i + option_offset;
+            index = i + option_offset;
 
             if (index < nb_options)
             {
