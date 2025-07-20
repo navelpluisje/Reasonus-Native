@@ -254,7 +254,11 @@ public:
 
     void HandleFaderTouch(int index, int value) override
     {
-        (void)value;
+        if (!context->GetFaderReset() || value == 0)
+        {
+            return;
+        }
+
         if (context->GetShiftLeft())
         {
             MediaTrack *media_track = navigator->GetTrackByIndex(index);

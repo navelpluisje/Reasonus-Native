@@ -21,9 +21,13 @@ class CSurf_Context
      */
     bool master_fader_mode_setting;
     /**
-     * @brief Sap the left and right shift button behaviuour
+     * @brief Swap the left and right shift button behaviuour
      */
     bool swap_shift_buttons_setting;
+    /**
+     * @brief Use left-shit fader touch to reset the fader value
+     */
+    bool fader_reset_setting;
     /**
      * @brief When engaged the mute and solo button behave as momentary buttons when pressing longer then 500ms
      */
@@ -119,6 +123,16 @@ public:
     bool GetSwapShiftButtons()
     {
         return swap_shift_buttons_setting;
+    }
+
+    void SetFaderReset(bool enabled)
+    {
+        fader_reset_setting = enabled;
+    }
+
+    bool GetFaderReset()
+    {
+        return fader_reset_setting;
     }
 
     void SetMuteSoloMomentary(bool enabled)

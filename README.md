@@ -13,3 +13,18 @@ Feel free to contribute. You can contribute inmultiple ways:
   - Create a pull request
 
 Always respect the code of conduct.
+
+## Notes to self
+
+## Adding Setting
+
+- `shared/csurf_utils.cpp > readAndCreateIni`: add the setting(s)
+- `shared/csurf_utils.cpp > validateReaSonusIni`: add the setting(s)
+- `shared/csurf_context.cpp`: add the setting(s) with the getter(s) and setter(s)
+- `csurf_faderport_x/csurf_fp_X_main.cpp`: set the current value in the context
+- `csurf_faderport_x/csurf_fp_X_ui_init.cpp`: add the control
+- `res.rc`: Add the setting to the init ui
+
+FaderPort 8 & 16 only
+
+- `csurf_faderport_8/csurf_fp_8_menu_manager.cpp`: Add the new setting

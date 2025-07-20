@@ -17,13 +17,14 @@ class CSurf_FP_8_Menu_Manager : public CSurf_FP_8_ChannelManager
 protected:
     mINI::INIStructure ini;
 
-    std::vector<std::string> menu_items = {"Plugin Ctr", "Last Param", "Master Fad", "Swap Shift", "Momentary", "Timecode", "Time type"};
-    std::vector<std::string> ini_keys = {"disable-plugins", "erase-last-param-after-learn", "master-fader-mode", "swap-shift-buttons", "mute-solo-momentary", "overwrite-time-code", "time-code"};
+    std::vector<std::string> menu_items = {"Plugin Ctr", "Last Param", "Master Fad", "Swap Shift", "Fader Reset", "Momentary", "Timecode", "Time type"};
+    std::vector<std::string> ini_keys = {"disable-plugins", "erase-last-param-after-learn", "master-fader-mode", "swap-shift-buttons", "fader-reset", "mute-solo-momentary", "overwrite-time-code", "time-code"};
     std::vector<std::vector<std::vector<std::string>>> menu_options = {
         {{"Disable", "1"}, {"Enable", "0"}},
         {{"Keep", "0"}, {"Untouch", "1"}},
         {{"Disable", "0"}, {"Enable", "1"}},
         {{"Default", "0"}, {"Swap", "1"}},
+        {{"Disable", "0"}, {"Enable", "1"}},
         {{"Disable", "0"}, {"Enable", "1"}},
         {{"REAPER", "0"}, {"ReaSonus", "1"}},
         {{"Time", "0"}, {"Beats", "2"}, {"Seconds", "3"}, {"Samples", "4"}, {"H:M:S:Fr", "5"}, {"Abs. Frames", "8"}},
@@ -34,6 +35,7 @@ protected:
         {"Untouch", "last touched", "parameter", "after learn", "", "", ""},
         {"Control the", "master tr.", "with the", "last fader", "", "", ""},
         {"Swap the", "shift btns", "", "", "", "", ""},
+        {"Use Shift+", "fader touch", "to reset", "fader", "", "", ""},
         {"Momentary", "push mode", "mute/solo", "buttons", "", "", ""},
         {"Which", "time code", "you want", "to use?", "Reaper or", "ReaSonus", ""},
         {"Select the", "time code", "you want to", "use. Works", "only with", "ReaSonus", "selected"},
@@ -160,6 +162,7 @@ public:
                 context->SetUntouchAfterLearn(ini["surface"].has("erase-last-param-after-learn") && ini["surface"]["erase-last-param-after-learn"] == "1");
                 context->SetMasterFaderModeEnabled(ini["surface"].has("master-fader-mode") && ini["surface"]["master-fader-mode"] == "1");
                 context->SetSwapShiftButtons(ini["surface"].has("swap-shift-buttons") && ini["surface"]["swap-shift-buttons"] == "1");
+                context->SetSwapShiftButtons(ini["surface"].has("fader-reset") && ini["surface"]["fader-reset"] == "1");
                 context->SetMuteSoloMomentary(ini["surface"].has("mute-solo-momentary") && ini["surface"]["mute-solo-momentary"] == "1");
                 context->SetOverwriteTimeCode(ini["surface"].has("overwrite-time-code") && ini["surface"]["overwrite-time-code"] == "1");
                 context->SetSurfaceTimeCode(ini["surface"].has("time-code") && std::stoi(ini["surface"]["time-code"]));

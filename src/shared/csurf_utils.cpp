@@ -306,6 +306,7 @@ void readAndCreateIni(mINI::INIStructure &data, std::string device)
             data["surface"]["erase-last-param-after-learn"] = "0";
             data["surface"]["master-fader-mode"] = "0";
             data["surface"]["swap-shift-buttons"] = "0";
+            data["surface"]["fader-reset"] = "0";
             data["surface"]["overwrite-time-code"] = "1";
             data["surface"]["time-code"] = "2";
             data["functions"]["5"] = "0";
@@ -340,6 +341,7 @@ void validateReaSonusIni(mINI::INIFile file, mINI::INIStructure &data, std::stri
         data["surface"]["erase-last-param-after-learn"] = data["surface"].has("erase-last-param-after-learn") ? data["surface"]["erase-last-param-after-learn"] : "0";
         data["surface"]["master-fader-mode"] = data["surface"].has("master-fader-mode") ? data["surface"]["master-fader-mode"] : "0";
         data["surface"]["swap-shift-buttons"] = data["surface"].has("swap-shift-buttons") ? data["surface"]["swap-shift-buttons"] : "0";
+        data["surface"]["fader-reset"] = data["surface"].has("fader-reset") ? data["surface"]["fader-reset"] : "0";
         data["surface"]["overwrite-time-code"] = data["surface"].has("overwrite-time-code") ? data["surface"]["overwrite-time-code"] : "1";
         data["surface"]["time-code"] = data["surface"].has("time-code") ? data["surface"]["time-code"] : "2";
         data["functions"]["5"] = data["functions"].has("5") ? data["functions"]["5"] : "0";
