@@ -72,12 +72,12 @@ protected:
         *_pan1 = GetPan1String(pan1);
         *_pan2 = GetPan2String(pan2, panMode);
 
-        if (context->GetShiftLeft())
+        if (context->GetShiftChannelLeft())
         {
             *faderValue = int(panToNormalized(pan1) * 16383.0);
             *valueBarValue = int(volToNormalized(volume) * 127);
         }
-        else if (context->GetShiftRight() && panMode > 4)
+        else if (context->GetShiftChannelRight() && panMode > 4)
         {
             *faderValue = int(panToNormalized(pan2) * 16383.0);
             *valueBarValue = int(volToNormalized(volume) * 127);
@@ -153,7 +153,7 @@ public:
     void HandleSelectClick(int index) override
     {
         int filterIndex = context->GetChannelManagerItemIndex() + index;
-        if (context->GetShiftLeft())
+        if (context->GetShiftChannelLeft())
         {
             Main_OnCommandStringEx("_REASONUS_SHOW_REASONUS_FILTERS_WINDOW");
         }
@@ -206,11 +206,11 @@ public:
     {
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
 
-        if (context->GetShiftLeft())
+        if (context->GetShiftChannelLeft())
         {
             CSurf_SetSurfacePan(media_track, CSurf_OnPanChange(media_track, normalizedToPan(int14ToNormalized(msb, lsb)), false), NULL);
         }
-        else if (context->GetShiftRight())
+        else if (context->GetShiftChannelRight())
         {
             SetMediaTrackInfo_Value(media_track, "D_WIDTH", CSurf_OnWidthChange(media_track, normalizedToPan(int14ToNormalized(msb, lsb)), false));
         }
