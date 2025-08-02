@@ -29,6 +29,7 @@ protected:
 
     ShiftState armState;
     ShiftState shiftState;
+    DoubleClickState dbcState;
     bool hasSolo;
     bool hasMute;
     bool hasSelectedBypass;
@@ -68,7 +69,7 @@ protected:
                                  ? BTN_VALUE_BLINK
                                  : BTN_VALUE_OFF,
                              force);
-        shiftLeftButton->SetValue((context->GetShiftLeft() || (context->GetShiftRight() && context->GetSwapShiftButtons()))
+        shiftLeftButton->SetValue(((!context->GetSwapShiftButtons() && context->GetShiftLeft()) || (context->GetShiftRight() && context->GetSwapShiftButtons()))
                                       ? BTN_VALUE_ON
                                       : BTN_VALUE_OFF,
                                   force);
@@ -224,7 +225,7 @@ public:
 
         switch (context->GetPanEncoderMode())
         {
-        case PanEncoderPanMode:
+        case PanEncoderTrackPanMode:
             hasBit(value, 6)
                 ? DecrementPan(value - 64)
                 : IncrementPan(value);
@@ -240,11 +241,11 @@ public:
 
     void HandleArmButton(int value)
     {
-        if (context->GetShiftLeft())
+        if (context->GetShiftChannelLeft())
         {
             Main_OnCommandEx(40490, 0, 0); // Track: Arm all tracks for recording
         }
-        else if (context->GetShiftRight())
+        else if (context->GetShiftChannelRight())
         {
             Main_OnCommandEx(40491, 0, 0); // Track: Unarm all tracks for recording
         }
@@ -344,6 +345,7 @@ public:
     {
         shiftState.SetValue(value > 0);
         context->SetShiftLeft(shiftState.IsActive());
+        context->SetShiftLeftLocked(shiftState.IsLocked());
 
         SetButtonValue();
     }

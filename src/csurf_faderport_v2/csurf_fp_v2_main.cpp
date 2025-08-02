@@ -235,6 +235,7 @@ public:
 
     context = new CSurf_Context(1);
     context->SetMuteSoloMomentary(ini["surface"].has("mute-solo-momentary") && ini["surface"]["mute-solo-momentary"] == "1");
+    context->SetControlHiddenTracks(ini["surface"].has("control-hidden-tracks") && ini["surface"]["control-hidden-tracks"] == "1");
 
     trackNavigator = new CSurf_FP_V2_Navigator(context);
     generalControlManager = new CSurf_FP_V2_GeneralControlManager(context, trackNavigator, m_midiout);
@@ -350,11 +351,10 @@ public:
     }
   }
 
-  // Probably not needed
-  // void SetTrackListChange()
-  // {
-  //   ShowConsoleMsg("SetTrackListChange");
-  // }
+  void SetTrackListChange()
+  {
+    trackNavigator->UpdateOffset();
+  }
 
   void OnTrackSelection(MediaTrack *media_track)
   {

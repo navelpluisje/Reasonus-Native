@@ -99,7 +99,7 @@ std::string StripPluginNamePrefixes(char *name)
 {
     std::string s = std::string(name);
     std::string delimiter = ": ";
-    int pos = s.find(delimiter) + size(delimiter);
+    int pos = (int)(s.find(delimiter) + size(delimiter));
     if (pos < 0)
     {
         return s;
@@ -112,7 +112,7 @@ std::string StripPluginChannelPostfix(char *name)
 {
     std::string s = std::string(name);
     std::string delimiter = " (32 out)";
-    int pos = s.find(delimiter);
+    int pos = (int)s.find(delimiter);
     if (pos < 0)
     {
         return s;
@@ -124,7 +124,7 @@ std::string StripPluginChannelPostfix(char *name)
 bool IsPluginFX(std::string name)
 {
     std::string delimiter = ": ";
-    int pos = name.find(delimiter);
+    int pos = (int)name.find(delimiter);
     // If we can not find the delimiter, we can not determine the type of plugin, so asume it's an effect
     if (pos < 0)
     {
@@ -148,14 +148,14 @@ std::string GetSendModeString(int sendMode)
     switch (sendMode)
     {
     case 0:
-        return "Post-fdr";
+        return "Post-Fdr";
     case 1:
         return "Pre-FX";
     case 2:
     case 3:
         return "Post-FX";
     default:
-        return "Post-fdr";
+        return "Post-Fdr";
     };
 }
 
@@ -216,7 +216,7 @@ std::vector<std::string> split(std::string str, std::string delimiter)
         do
         {
             // Find the index of occurrence
-            int idx = str.find(delimiter, start);
+            int idx = (int)str.find(delimiter, start);
             if (idx == static_cast<int>(std::string::npos))
             {
                 break;
@@ -226,7 +226,7 @@ std::vector<std::string> split(std::string str, std::string delimiter)
             // occurrence in the vector
             int length = idx - start;
             v.push_back(str.substr(start, length));
-            start += (length + delimiter.size());
+            start += (int)(length + delimiter.size());
         } while (true);
         v.push_back(str.substr(start));
     }
@@ -306,6 +306,7 @@ void readAndCreateIni(mINI::INIStructure &data, std::string device)
             data["surface"]["erase-last-param-after-learn"] = "0";
             data["surface"]["master-fader-mode"] = "0";
             data["surface"]["swap-shift-buttons"] = "0";
+            data["surface"]["fader-reset"] = "0";
             data["surface"]["overwrite-time-code"] = "1";
             data["surface"]["time-code"] = "2";
             data["functions"]["5"] = "0";
@@ -340,6 +341,7 @@ void validateReaSonusIni(mINI::INIFile file, mINI::INIStructure &data, std::stri
         data["surface"]["erase-last-param-after-learn"] = data["surface"].has("erase-last-param-after-learn") ? data["surface"]["erase-last-param-after-learn"] : "0";
         data["surface"]["master-fader-mode"] = data["surface"].has("master-fader-mode") ? data["surface"]["master-fader-mode"] : "0";
         data["surface"]["swap-shift-buttons"] = data["surface"].has("swap-shift-buttons") ? data["surface"]["swap-shift-buttons"] : "0";
+        data["surface"]["fader-reset"] = data["surface"].has("fader-reset") ? data["surface"]["fader-reset"] : "0";
         data["surface"]["overwrite-time-code"] = data["surface"].has("overwrite-time-code") ? data["surface"]["overwrite-time-code"] : "1";
         data["surface"]["time-code"] = data["surface"].has("time-code") ? data["surface"]["time-code"] : "2";
         data["functions"]["5"] = data["functions"].has("5") ? data["functions"]["5"] : "0";

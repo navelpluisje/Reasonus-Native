@@ -36,10 +36,8 @@ protected:
             touchButton->SetValue(globalAutomationMode == AUTOMATION_TOUCH ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
             writeButton->SetValue(globalAutomationMode == AUTOMATION_WRITE ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
             readButton->SetValue(globalAutomationMode == AUTOMATION_READ ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
-            return;
         }
-
-        if (context->GetShiftLeft())
+        else if (context->GetShiftLeft())
         {
             latchButton->SetValue(canSafe ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
             trimButton->SetValue(canRedo ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
@@ -47,25 +45,35 @@ protected:
             touchButton->SetValue(context->GetChannelMode() == MenuMode ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
             writeButton->SetValue(BTN_VALUE_OFF, force);
             readButton->SetValue(BTN_VALUE_OFF, force);
-            return;
         }
-
-        latchButton->SetValue(channelAutomationMode == AUTOMATION_LATCH ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
-        trimButton->SetValue(channelAutomationMode == AUTOMATION_TRIM ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
-        offButton->SetValue(channelAutomationMode == AUTOMATION_PREVIEW ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
-        touchButton->SetValue(context->GetChannelMode() == MenuMode
-                                  ? BTN_VALUE_BLINK
-                              : channelAutomationMode == AUTOMATION_TOUCH
-                                  ? BTN_VALUE_ON
-                                  : BTN_VALUE_OFF,
-                              force);
-        writeButton->SetValue(channelAutomationMode == AUTOMATION_WRITE ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
-        readButton->SetValue(channelAutomationMode == AUTOMATION_READ ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+        else
+        {
+            latchButton->SetValue(channelAutomationMode == AUTOMATION_LATCH ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+            trimButton->SetValue(channelAutomationMode == AUTOMATION_TRIM ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+            offButton->SetValue(channelAutomationMode == AUTOMATION_PREVIEW ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+            touchButton->SetValue(context->GetChannelMode() == MenuMode
+                                      ? BTN_VALUE_BLINK
+                                  : channelAutomationMode == AUTOMATION_TOUCH
+                                      ? BTN_VALUE_ON
+                                      : BTN_VALUE_OFF,
+                                  force);
+            writeButton->SetValue(channelAutomationMode == AUTOMATION_WRITE ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+            readButton->SetValue(channelAutomationMode == AUTOMATION_READ ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+        }
     }
 
     void SetButtonColors(bool force = false)
     {
-        if (context->GetShiftLeft())
+        if (context->GetShiftRight())
+        {
+            latchButton->SetColor(ButtonColorPurple, force);
+            trimButton->SetColor(ButtonColorWhite, force);
+            offButton->SetColor(ButtonColorBlue, force);
+            touchButton->SetColor(ButtonColorYellow, force);
+            writeButton->SetColor(ButtonColorRed, force);
+            readButton->SetColor(ButtonColorGreen, force);
+        }
+        else if (context->GetShiftLeft())
         {
             latchButton->SetColor(ButtonColorGreen, force);
             trimButton->SetColor(ButtonColorYellow, force);
@@ -73,15 +81,28 @@ protected:
             touchButton->SetColor(ButtonColorBlack, force);
             writeButton->SetColor(ButtonColorBlack, force);
             readButton->SetColor(ButtonColorBlack, force);
-            return;
         }
+        else
+        {
+            latchButton->SetColor(ButtonColorPurple, force);
+            trimButton->SetColor(ButtonColorWhite, force);
+            offButton->SetColor(ButtonColorBlue, force);
+            touchButton->SetColor(ButtonColorYellow, force);
+            writeButton->SetColor(ButtonColorRed, force);
+            readButton->SetColor(ButtonColorGreen, force);
+        }
+    }
 
-        latchButton->SetColor(ButtonColorPurple, force);
-        trimButton->SetColor(ButtonColorWhite, force);
-        offButton->SetColor(ButtonColorBlue, force);
-        touchButton->SetColor(ButtonColorYellow, force);
-        writeButton->SetColor(ButtonColorRed, force);
-        readButton->SetColor(ButtonColorGreen, force);
+    MediaTrack *GetSelectedAutomationTrack()
+    {
+        if (context->GetMasterFaderMode() && DAW::IsTrackSelected(::GetMasterTrack(0)))
+        {
+            return GetMasterTrack(0);
+        }
+        else
+        {
+            return GetSelectedTrack(0, 0);
+        }
     }
 
 public:
@@ -114,7 +135,7 @@ public:
         }
         else
         {
-            MediaTrack *media_track = GetSelectedTrack(0, 0);
+            MediaTrack *media_track = GetSelectedAutomationTrack();
             channelAutomationMode = GetTrackAutomationMode(media_track);
         }
 
@@ -140,12 +161,14 @@ public:
             SetGlobalAutomationOverride(AUTOMATION_LATCH);
             return;
         }
+
         if (context->GetShiftLeft())
         {
             Main_SaveProject(0, false);
             return;
         }
-        MediaTrack *media_track = GetSelectedTrack(0, 0);
+
+        MediaTrack *media_track = GetSelectedAutomationTrack();
         SetTrackAutomationMode(media_track, AUTOMATION_LATCH);
     };
 
@@ -161,12 +184,14 @@ public:
             SetGlobalAutomationOverride(AUTOMATION_TRIM);
             return;
         }
+
         if (context->GetShiftLeft())
         {
             Undo_DoRedo2(0);
             return;
         }
-        MediaTrack *media_track = GetSelectedTrack(0, 0);
+
+        MediaTrack *media_track = GetSelectedAutomationTrack();
         SetTrackAutomationMode(media_track, AUTOMATION_TRIM);
     };
 
@@ -182,12 +207,14 @@ public:
             SetGlobalAutomationOverride(AUTOMATION_PREVIEW);
             return;
         }
+
         if (context->GetShiftLeft())
         {
             Undo_DoUndo2(0);
             return;
         }
-        MediaTrack *media_track = GetSelectedTrack(0, 0);
+
+        MediaTrack *media_track = GetSelectedAutomationTrack();
         SetTrackAutomationMode(media_track, AUTOMATION_PREVIEW);
     };
 
@@ -203,12 +230,14 @@ public:
             SetGlobalAutomationOverride(AUTOMATION_TOUCH);
             return;
         }
+
         if (context->GetShiftLeft())
         {
             faderManager->HandleTouchButtonClick();
             return;
         }
-        MediaTrack *media_track = GetSelectedTrack(0, 0);
+
+        MediaTrack *media_track = GetSelectedAutomationTrack();
         SetTrackAutomationMode(media_track, AUTOMATION_TOUCH);
     };
 
@@ -224,11 +253,13 @@ public:
             SetGlobalAutomationOverride(AUTOMATION_WRITE);
             return;
         }
+
         if (context->GetShiftLeft())
         {
             return;
         }
-        MediaTrack *media_track = GetSelectedTrack(0, 0);
+
+        MediaTrack *media_track = GetSelectedAutomationTrack();
         SetTrackAutomationMode(media_track, AUTOMATION_WRITE);
     };
 
@@ -244,11 +275,13 @@ public:
             SetGlobalAutomationOverride(AUTOMATION_READ);
             return;
         }
+
         if (context->GetShiftLeft())
         {
             return;
         }
-        MediaTrack *media_track = GetSelectedTrack(0, 0);
+
+        MediaTrack *media_track = GetSelectedAutomationTrack();
         SetTrackAutomationMode(media_track, AUTOMATION_READ);
     };
 };

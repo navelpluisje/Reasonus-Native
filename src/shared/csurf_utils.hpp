@@ -7,6 +7,7 @@
 #include <mini/ini.h>
 
 const int TOGGLE_SPEED = 150;
+const int DOUBLE_CLICK_SPEED = 750;
 
 const std::string FP_V2 = "FP_V2";
 const std::string FP_8 = "FP";
@@ -55,6 +56,60 @@ struct ShiftState
     bool IsActive()
     {
         return invert ? !active : active;
+    }
+
+    bool IsLocked()
+    {
+        return invert;
+    }
+};
+
+struct DoubleClickState
+{
+    bool active = false;
+    int start = 0;
+    int clicks = 0;
+
+    void SetValue(bool value)
+    {
+        int time = GetTickCount();
+
+        if (value && start > 0 && clicks == 1)
+        {
+            if (time - start < DOUBLE_CLICK_SPEED)
+            {
+                active = true;
+                start = 0;
+                clicks = 0;
+            }
+            else
+            {
+                active = false;
+                start = time;
+                clicks = 1;
+            }
+            return;
+        }
+
+        if (!value && start > 0 && clicks == 1 && active)
+        {
+            active = false;
+            start = 0;
+            return;
+        }
+
+        if (start == 0 && value && clicks == 0)
+        {
+            clicks += 1;
+            start = time;
+            active = false;
+            return;
+        }
+    }
+
+    bool IsActive()
+    {
+        return active;
     }
 };
 

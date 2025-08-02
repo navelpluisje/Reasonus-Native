@@ -82,6 +82,7 @@ namespace CSURF_FP_V2_UI_INIT
             }
 
             SendMessage(GetDlgItem(hwndDlg, IDC_CHECK_INIT_MUTE_MOMENTARY), BM_SETCHECK, ini["surface"]["mute-solo-momentary"] == "1" ? BST_CHECKED : BST_UNCHECKED, 0);
+            SendMessage(GetDlgItem(hwndDlg, IDC_CHECK_CONTROL_HIDDEN_TRACKS), BM_SETCHECK, ini["surface"]["control-hidden-tracks"] == "1" ? BST_CHECKED : BST_UNCHECKED, 0);
 
             SetDlgItemText(hwndDlg, IDC_VERSION, GIT_VERSION);
 
@@ -102,6 +103,12 @@ namespace CSURF_FP_V2_UI_INIT
                 SaveCheckBoxValue(hwndDlg, "mute-solo-momentary", IDC_CHECK_INIT_MUTE_MOMENTARY);
                 break;
             }
+
+            case IDC_CHECK_CONTROL_HIDDEN_TRACKS:
+            {
+                SaveCheckBoxValue(hwndDlg, "control-hidden-tracks", IDC_CHECK_CONTROL_HIDDEN_TRACKS);
+                break;
+            }
             break;
             }
 
@@ -114,11 +121,11 @@ namespace CSURF_FP_V2_UI_INIT
 
                 LRESULT indev = -1, outdev = -1;
 
-                int r = SendDlgItemMessage(hwndDlg, IDC_COMBO_MIDI_IN, CB_GETCURSEL, 0, 0);
+                int r = (int)SendDlgItemMessage(hwndDlg, IDC_COMBO_MIDI_IN, CB_GETCURSEL, 0, 0);
                 if (r != CB_ERR)
                     indev = SendDlgItemMessage(hwndDlg, IDC_COMBO_MIDI_IN, CB_GETITEMDATA, r, 0);
 
-                r = SendDlgItemMessage(hwndDlg, IDC_COMBO_MIDI_OUT, CB_GETCURSEL, 0, 0);
+                r = (int)SendDlgItemMessage(hwndDlg, IDC_COMBO_MIDI_OUT, CB_GETCURSEL, 0, 0);
                 if (r != CB_ERR)
                     outdev = SendDlgItemMessage(hwndDlg, IDC_COMBO_MIDI_OUT, CB_GETITEMDATA, r, 0);
 

@@ -33,6 +33,8 @@ public:
 
     void DecrementOffset(int count);
 
+    void UpdateOffset();
+
     bool HasTracksWithSolo();
 
     bool HasTracksWithMute();

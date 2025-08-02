@@ -17,16 +17,17 @@ class CSurf_FP_8_Menu_Manager : public CSurf_FP_8_ChannelManager
 protected:
     mINI::INIStructure ini;
 
-    std::vector<std::string> menu_items = {"Plugin Ctr", "Last Param", "Master Fad", "Swap Shift", "Momentary", "Timecode", "Time type"};
-    std::vector<std::string> ini_keys = {"disable-plugins", "erase-last-param-after-learn", "master-fader-mode", "swap-shift-buttons", "mute-solo-momentary", "overwrite-time-code", "time-code"};
+    std::vector<std::string> menu_items = {"Plugin Ctr", "Last Param", "Master Fad", "Swap Shift", "Fader Reset", "Momentary", "Timecode", "Time type"};
+    std::vector<std::string> ini_keys = {"disable-plugins", "erase-last-param-after-learn", "master-fader-mode", "swap-shift-buttons", "fader-reset", "mute-solo-momentary", "overwrite-time-code", "time-code"};
     std::vector<std::vector<std::vector<std::string>>> menu_options = {
         {{"Disable", "1"}, {"Enable", "0"}},
         {{"Keep", "0"}, {"Untouch", "1"}},
         {{"Disable", "0"}, {"Enable", "1"}},
         {{"Default", "0"}, {"Swap", "1"}},
         {{"Disable", "0"}, {"Enable", "1"}},
+        {{"Disable", "0"}, {"Enable", "1"}},
         {{"REAPER", "0"}, {"ReaSonus", "1"}},
-        {{"Time", "0"}, {"Beats", "2"}, {"Seconds", "3"}, {"Samples", "4"}, {"H:M:S:Fr", "5"}, {"Abs. Frames", "8"}},
+        {{"Time", "0"}, {"Beats", "2"}, {"Seconds", "3"}, {"Samples", "4"}, {"H:M:S:Fr", "5"}, {"Abs. Frames", "8"}, {"Abs. 1", "8"}, {"Abs. 2", "8"}, {"Abs. 3", "8"}},
     };
 
     std::vector<std::vector<std::string>> menu_descriptions = {
@@ -34,6 +35,7 @@ protected:
         {"Untouch", "last touched", "parameter", "after learn", "", "", ""},
         {"Control the", "master tr.", "with the", "last fader", "", "", ""},
         {"Swap the", "shift btns", "", "", "", "", ""},
+        {"Use Shift+", "fader touch", "to reset", "fader", "", "", ""},
         {"Momentary", "push mode", "mute/solo", "buttons", "", "", ""},
         {"Which", "time code", "you want", "to use?", "Reaper or", "ReaSonus", ""},
         {"Select the", "time code", "you want to", "use. Works", "only with", "ReaSonus", "selected"},
@@ -87,7 +89,18 @@ public:
     {
         int nb_menu_items = static_cast<int>(menu_items.size());
         int nb_options = static_cast<int>(menu_options.at(option[0]).size());
+        int menu_option = option[0];
         int sel_option = option[1];
+
+        int menu_offset = 0;
+        if (nb_menu_items > 7 && menu_option >= (nb_menu_items - 7) + 2)
+        {
+            menu_offset = nb_menu_items - 7;
+        }
+        else if (nb_menu_items > 7 && menu_option > 2)
+        {
+            menu_offset = menu_option - 2;
+        }
 
         int option_offset = 0;
         if (nb_options > 6 && sel_option >= (nb_options - 6) + 2)
@@ -101,16 +114,21 @@ public:
 
         for (int i = 0; i < 7; i++)
         {
-            if (i < nb_menu_items)
+            /**
+             * Handle the menu items
+             */
+            int index = i + menu_offset;
+
+            if (index < nb_menu_items)
             {
-                tracks.at(1)->SetDisplayLine(i, ALIGN_LEFT, menu_items[i].c_str(), option[0] == i ? INVERT : NON_INVERT);
+                tracks.at(1)->SetDisplayLine(i, ALIGN_LEFT, menu_items[index].c_str(), option[0] == index ? INVERT : NON_INVERT);
             }
             else
             {
                 tracks.at(1)->SetDisplayLine(i, ALIGN_LEFT, "", NON_INVERT);
             }
 
-            int index = i + option_offset;
+            index = i + option_offset;
 
             if (index < nb_options)
             {
@@ -143,7 +161,7 @@ public:
     void HandleSelectClick(int index) override
     {
         (void)index;
-        int max_items = level == 0 ? menu_items.size() : static_cast<int>(menu_options.at(option[0]).size());
+        int max_items = level == 0 ? (int)menu_items.size() : static_cast<int>(menu_options.at(option[0]).size());
         if (level > 0 && option[1] == max_items)
         {
             level = 0;
@@ -160,6 +178,7 @@ public:
                 context->SetUntouchAfterLearn(ini["surface"].has("erase-last-param-after-learn") && ini["surface"]["erase-last-param-after-learn"] == "1");
                 context->SetMasterFaderModeEnabled(ini["surface"].has("master-fader-mode") && ini["surface"]["master-fader-mode"] == "1");
                 context->SetSwapShiftButtons(ini["surface"].has("swap-shift-buttons") && ini["surface"]["swap-shift-buttons"] == "1");
+                context->SetSwapShiftButtons(ini["surface"].has("fader-reset") && ini["surface"]["fader-reset"] == "1");
                 context->SetMuteSoloMomentary(ini["surface"].has("mute-solo-momentary") && ini["surface"]["mute-solo-momentary"] == "1");
                 context->SetOverwriteTimeCode(ini["surface"].has("overwrite-time-code") && ini["surface"]["overwrite-time-code"] == "1");
                 context->SetSurfaceTimeCode(ini["surface"].has("time-code") && std::stoi(ini["surface"]["time-code"]));
@@ -180,7 +199,7 @@ public:
     {
         (void)index;
         (void)value;
-        int max_items = level == 0 ? menu_items.size() : static_cast<int>(menu_options.at(option[0]).size());
+        int max_items = level == 0 ? (int)menu_items.size() : static_cast<int>(menu_options.at(option[0]).size());
         option[level] = minmax(0, option[level] + 1, max_items - (level == 0 ? 1 : 0));
     }
 
@@ -189,13 +208,14 @@ public:
     {
         (void)index;
         (void)value;
-        int max_items = level == 0 ? menu_items.size() : static_cast<int>(menu_options.at(option[0]).size());
+        int max_items = level == 0 ? (int)menu_items.size() : static_cast<int>(menu_options.at(option[0]).size());
         option[level] = minmax(0, option[level] - 1, max_items - (level == 0 ? 1 : 0));
     }
 
-    void HandleFaderTouch(int index) override
+    void HandleFaderTouch(int index, int value) override
     {
         (void)index;
+        (void)value;
     }
 
     void HandleFaderMove(int index, int msb, int lsb) override
