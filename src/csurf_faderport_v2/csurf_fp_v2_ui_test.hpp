@@ -5,7 +5,8 @@
 #include <reaper_plugin_functions.h>
 #include <reaper_imgui_functions.h>
 #include <memory>
-#include "csurf_fp_v2_ui_settings_page.hpp"
+#include <string>
+#include "csurf_fp_v2_ui_page_content.hpp"
 
 class Example
 {
@@ -16,13 +17,27 @@ public:
 private:
     static void loop();
     static std::unique_ptr<Example> s_inst;
+    void initAssets();
+    CSurf_FP_V2_PageContent *page_content = NULL;
 
     Example();
     void frame();
 
     ImGui_Context *m_ctx;
-    char m_text[255];
-    CSurf_FP_V2_SettingsPage *settings_page;
+    ImGui_Font *main_font;
+    ImGui_Font *main_font_bold;
+    ImGui_Font *menu_font;
+    ImGui_Image *logo;
+    ImGui_Image *icon_settings;
+    ImGui_Image *icon_function_actions;
+    ImGui_Image *icon_custom_filters;
+
+    int current_page = 0;
+    int previous_page = -1;
+    bool save_clicked = false;
+    bool cancel_clicked = false;
+    std::string menu_items[3] = {"Function Keys", "Settings", "About ReaSonus"};
+    char string_value[255];
 };
 
 #endif

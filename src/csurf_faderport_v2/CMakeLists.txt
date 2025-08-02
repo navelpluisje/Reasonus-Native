@@ -10,4 +10,6 @@ target_sources(${PROJECT_NAME}
         csurf_fp_v2_ui_functions.cpp
         csurf_fp_v2_ui_test.cpp
         csurf_fp_v2_ui_settings_page.cpp
+        csurf_fp_v2_ui_about_page.cpp
+        csurf_fp_v2_ui_function_keys_page.cpp
         )
