@@ -4,14 +4,20 @@
 #include <WDL/wdltypes.h> // might be unnecessary in future
 #include <reaper_plugin_functions.h>
 #include <reaper_imgui_functions.h>
+#include <mini/ini.h>
+#include "../shared/csurf_utils.hpp"
 
 class CSurf_FP_V2_PageContent
 {
 protected:
     ImGui_Context *m_ctx;
+    mINI::INIStructure ini;
 
 public:
-    CSurf_FP_V2_PageContent(ImGui_Context *m_ctx) : m_ctx(m_ctx) {};
+    CSurf_FP_V2_PageContent(ImGui_Context *m_ctx) : m_ctx(m_ctx)
+    {
+        readAndCreateIni(ini, FP_V2);
+    };
 
     virtual ~CSurf_FP_V2_PageContent() {};
 

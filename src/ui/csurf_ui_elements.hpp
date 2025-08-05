@@ -53,6 +53,18 @@ public:
     static void PushReaSonusPageTitleStyle(ImGui_Context *m_ctx);
 
     static void PopReaSonusPageTitleStyle(ImGui_Context *m_ctx);
+
+    static void PushReaSonusButtonBarContainerStyle(ImGui_Context *m_ctx);
+
+    static void PopReaSonusButtonBarContainerStyle(ImGui_Context *m_ctx);
+
+    static void PushReaSonusFunctionActionStyle(ImGui_Context *m_ctx);
+
+    static void PopReaSonusFunctionActionStyle(ImGui_Context *m_ctx);
+
+    static void PushReaSonusFunctionButtonStyle(ImGui_Context *m_ctx);
+
+    static void PopReaSonusFunctionButtonStyle(ImGui_Context *m_ctx);
 };
 
 #endif

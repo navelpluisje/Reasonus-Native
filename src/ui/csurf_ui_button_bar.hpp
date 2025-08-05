@@ -17,7 +17,7 @@ void ReaSonusButtonBar(
     double x_pos_1, y_pos_1, x_pos_2, y_pos_2;
     int button_padding_x = 16;
 
-    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 0, 0);
+    UiElements::PushReaSonusButtonBarContainerStyle(m_ctx);
     if (ImGui::BeginChild(m_ctx, "button-bar", 0.0, 30.0, ImGui::ChildFlags_FrameStyle))
     {
         ImGui::CalcTextSize(m_ctx, action_label.c_str(), &x_pos_1, &y_pos_1);
@@ -29,6 +29,7 @@ void ReaSonusButtonBar(
         ImGui::GetContentRegionAvail(m_ctx, &x_pos_2, &y_pos_2);
 
         ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + x_pos_2 - widthNeeded - 4);
+        ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 1);
         if (has_cancel)
         {
             UiElements::PushReaSonusButtonOutlineStyle(m_ctx, font);
@@ -47,7 +48,7 @@ void ReaSonusButtonBar(
         UiElements::PopReaSonusButtonStyle(m_ctx);
         ImGui::EndChild(m_ctx);
     }
-    ImGui::PopStyleVar(m_ctx);
+    UiElements::PopReaSonusButtonBarContainerStyle(m_ctx);
 }
 
 #endif

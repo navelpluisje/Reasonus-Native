@@ -37,7 +37,6 @@ private:
     bool save_clicked = false;
     bool cancel_clicked = false;
     std::string menu_items[3] = {"Function Keys", "Settings", "About ReaSonus"};
-    char string_value[255];
 };
 
 #endif

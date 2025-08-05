@@ -23,6 +23,7 @@ void UiElements::PushReaSonusContentStyle(ImGui_Context *m_ctx)
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_ItemSpacing, 8, 8);
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameRounding, 0);
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameBorderSize, 0);
+
     ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBg, 0x272727ff);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBgActive, 0x272727ff);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBgHovered, 0x272727ff);
@@ -76,6 +77,7 @@ void UiElements::PushReaSonusButtonStyle(ImGui_Context *m_ctx, ImGui_Font *butto
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 16, 8);
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameRounding, 4);
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameBorderSize, 2);
+
     ImGui::PushStyleColor(m_ctx, ImGui::Col_Text, 0x272727ff);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_Border, 0xF7CB15FF);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_Button, 0xF7CB15FF);
@@ -97,6 +99,7 @@ void UiElements::PushReaSonusButtonOutlineStyle(ImGui_Context *m_ctx, ImGui_Font
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 16, 8);
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameRounding, 4);
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameBorderSize, 2);
+
     ImGui::PushStyleColor(m_ctx, ImGui::Col_Text, 0xF7CB15FF);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_Border, 0xF7CB15FF);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_Button, 0xF7CB1500);
@@ -240,10 +243,71 @@ void UiElements::PushReaSonusPageTitleStyle(ImGui_Context *m_ctx)
 
     ImGui::PushStyleColor(m_ctx, ImGui::Col_Separator, 0xF7CB15FF);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_Text, 0xF7CB15FF);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBg, 0x00000000);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBgActive, 0x00000000);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBgHovered, 0x00000000);
 }
 
 void UiElements::PopReaSonusPageTitleStyle(ImGui_Context *m_ctx)
 {
     ImGui::PopStyleVar(m_ctx, 4);
-    ImGui::PopStyleColor(m_ctx, 2);
+    ImGui::PopStyleColor(m_ctx, 5);
 }
+
+void UiElements::PushReaSonusButtonBarContainerStyle(ImGui_Context *m_ctx)
+{
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 0, 0);
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameBorderSize, 0);
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_ItemSpacing, 10, 10);
+
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBg, 0x00000000);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBgActive, 0x00000000);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBgHovered, 0x00000000);
+}
+
+void UiElements::PopReaSonusButtonBarContainerStyle(ImGui_Context *m_ctx)
+{
+    ImGui::PopStyleVar(m_ctx, 3);
+    ImGui::PopStyleColor(m_ctx, 3);
+}
+
+void UiElements::PushReaSonusFunctionActionStyle(ImGui_Context *m_ctx)
+{
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 12, 12);
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameRounding, 4);
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameBorderSize, 1);
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_ItemSpacing, 12, 12);
+
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_Border, 0x5C6164ff);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBg, 0x383A3Cff);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBgActive, 0x45474Aff);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBgHovered, 0x45474Aff);
+
+    ImGui::PushItemWidth(m_ctx, -1);
+};
+
+void UiElements::PopReaSonusFunctionActionStyle(ImGui_Context *m_ctx)
+{
+    ImGui::PopStyleVar(m_ctx, 4);
+    ImGui::PopStyleColor(m_ctx, 4);
+};
+
+void UiElements::PushReaSonusFunctionButtonStyle(ImGui_Context *m_ctx)
+{
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 8, 8);
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameRounding, 4);
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameBorderSize, 1);
+
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_Border, 0x5C6164ff);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_Button, 0x383A3Cff);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_ButtonActive, 0x45474Aff);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_ButtonHovered, 0x45474Aff);
+
+    ImGui::PushItemWidth(m_ctx, -1);
+};
+
+void UiElements::PopReaSonusFunctionButtonStyle(ImGui_Context *m_ctx)
+{
+    ImGui::PopStyleVar(m_ctx, 3);
+    ImGui::PopStyleColor(m_ctx, 4);
+};

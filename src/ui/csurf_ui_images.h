@@ -21,4 +21,8 @@ constexpr unsigned char img_icon_settings[] = {
 #include "../../lib/assets/settings.ipp"
 };
 
+constexpr unsigned char img_icon_search[] = {
+#include "../../lib/assets/search.ipp"
+};
+
 #endif

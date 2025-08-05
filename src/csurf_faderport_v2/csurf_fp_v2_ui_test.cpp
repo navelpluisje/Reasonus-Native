@@ -15,6 +15,10 @@
 #include "csurf_fp_v2_ui_settings_page.cpp"
 #include "csurf_fp_v2_ui_about_page.cpp"
 
+bool CSurf_FP_V2_FunctionKeysPage::querying_actions = false;
+int CSurf_FP_V2_FunctionKeysPage::selected_function = -1;
+int CSurf_FP_V2_FunctionKeysPage::selected_action = -1;
+
 constexpr const char *g_name{"ReaSonus Native Control"};
 
 std::unique_ptr<Example> Example::s_inst;
@@ -99,6 +103,10 @@ void Example::frame()
         switch (current_page)
         {
         case 0:
+            CSurf_FP_V2_FunctionKeysPage::querying_actions = false;
+            CSurf_FP_V2_FunctionKeysPage::selected_function = -1;
+            CSurf_FP_V2_FunctionKeysPage::selected_action = -1;
+
             page_content = new CSurf_FP_V2_FunctionKeysPage(m_ctx);
             break;
         case 1:
@@ -145,32 +153,40 @@ void Example::frame()
         UiElements::PushReaSonusContentStyle(m_ctx);
         if (ImGui::BeginChild(m_ctx, "main_content", 0.0, 0.0, ImGui::ChildFlags_FrameStyle))
         {
-            ReaSonusPageTitle(m_ctx, menu_items[current_page], menu_font);
+            UiElements::PopReaSonusContentStyle(m_ctx);
+            if (ImGui::BeginChild(m_ctx, "main_content_area", 0.0, -30.0, ImGui::ChildFlags_None))
+            {
+                ReaSonusPageTitle(m_ctx, menu_items[current_page], menu_font);
 
-            page_content->render();
+                if (ImGui::BeginChild(m_ctx, "main_content_area", 0.0, -12.0, ImGui::ChildFlags_None))
+                {
+                    page_content->render();
 
-            ReaSonusTextInput(m_ctx, "My Label", string_value);
+                    // ReaSonusTextInput(m_ctx, "My Label", string_value);
 
-            ReaSonusComboInput(m_ctx, "Combo component", {"Select an item", "Item 1", "item 2", "item 3"}, &combo_value);
+                    // ReaSonusComboInput(m_ctx, "Combo component", {"Select an item", "Item 1", "item 2", "item 3"}, &combo_value);
 
-            ReaSonusListBox(m_ctx, "List component", {"Select an item", "Item 1", "item 2", "item 3", "Item 4", "item 5", "item 6"}, &list_value);
+                    // ReaSonusListBox(m_ctx, "List component", {"Select an item", "Item 1", "item 2", "item 3", "Item 4", "item 5", "item 6"}, &list_value);
 
-            ReaSonusRadioButtonGroup(m_ctx, "Radio Group List component", {"Check box 1", "Check box 2", "Check box 3"}, &radio_value);
+                    // ReaSonusRadioButtonGroup(m_ctx, "Radio Group List component", {"Check box 1", "Check box 2", "Check box 3"}, &radio_value);
 
-            ReaSonusCheckBox(m_ctx, "Check box Component", &checkbox_value);
+                    // ReaSonusCheckBox(m_ctx, "Check box Component", &checkbox_value);
 
+                    ImGui::EndChild(m_ctx);
+                }
+                ImGui::EndChild(m_ctx);
+            }
             ReaSonusButtonBar(m_ctx, "Save", main_font_bold, &save_clicked, true, &cancel_clicked, "Cancel");
-
             ImGui::EndChild(m_ctx);
         }
 
-        UiElements::PopReaSonusContentStyle(m_ctx);
         ImGui::End(m_ctx);
     }
 
     ImGui::PopFont(m_ctx);
     PopReaSonusColors(m_ctx);
     PopReaSonusStyle(m_ctx);
+    ImGui::ShowMetricsWindow(m_ctx);
 
     if (!open)
         return s_inst.reset();

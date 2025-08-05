@@ -5,7 +5,7 @@
 #include <string>
 #include "csurf_ui_elements.hpp"
 
-void ReaSonusCheckBox(ImGui_Context *m_ctx, std::string label, bool *value)
+static void ReaSonusCheckBox(ImGui_Context *m_ctx, std::string label, bool *value)
 {
     bool _value = *value;
 
