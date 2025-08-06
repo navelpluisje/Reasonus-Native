@@ -65,6 +65,10 @@ public:
     static void PushReaSonusFunctionButtonStyle(ImGui_Context *m_ctx);
 
     static void PopReaSonusFunctionButtonStyle(ImGui_Context *m_ctx);
+
+    static void PushReaSonusTooltipStyle(ImGui_Context *m_ctx);
+
+    static void PopReaSonusTooltipStyle(ImGui_Context *m_ctx);
 };
 
 #endif

@@ -1,30 +1,39 @@
 #define REAIMGUIAPI_IMPLEMENT
 
-#include "show_reasonus_test_window.hpp"
-#include "../csurf_faderport_v2/csurf_fp_v2_ui_test.hpp"
+#include "show_reasonus_v2_control_panel.hpp"
 #include "reaper_plugin_functions.h"
+#include "../csurf_faderport_v2/csurf_fp_v2_ui_control.hpp"
 
 #define STRINGIZE_DEF(x) #x
 #define STRINGIZE(x) STRINGIZE_DEF(x)
 #define min(a, b) ((a) < (b) ? (a) : (b))
 #define max(a, b) ((a) > (b) ? (a) : (b))
 
+bool ReaSonusV2ControlPanel::control_panel_open = false;
+
 // confine my plugin to namespace
-namespace SHOW_REASONUS_TEST_WINDOW
+namespace SHOW_REASONUS_V2_CONTROL_PANEL
 {
     // some global non-const variables
     // the necessary 'evil'
     int command_id{0};
     bool toggle_action_state{false};
-    constexpr auto command_name = "REASONUS_SHOW_REASONUS_TEST_WINDOW";
-    constexpr auto action_name = "Reasonus: Show the ReaSonus Test window";
+    constexpr auto command_name = "REASONUS_SHOW_REASONUS_V2_CONTROL_WINDOW";
+    constexpr auto action_name = "Reasonus: Show the ReaSonus Native V2 Control Panel";
     custom_action_register_t action = {0, command_name, action_name, nullptr};
 
     // the main function of my plugin
     // gets called via callback or timer
     void MainFunctionOfMyPlugin()
     {
-        Example::start();
+        if (!ReaSonusV2ControlPanel::control_panel_open)
+        {
+            ReaSonusV2ControlPanel::start();
+        }
+        else
+        {
+            ReaSonusV2ControlPanel::stop();
+        }
     }
 
     // c++11 trailing return type syntax

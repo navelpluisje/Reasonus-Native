@@ -8,19 +8,21 @@
 #include <string>
 #include "csurf_fp_v2_ui_page_content.hpp"
 
-class Example
+class ReaSonusV2ControlPanel
 {
 public:
+    static bool control_panel_open;
     static void start();
-    ~Example();
+    static void stop();
+    ~ReaSonusV2ControlPanel();
 
 private:
     static void loop();
-    static std::unique_ptr<Example> s_inst;
+    static std::unique_ptr<ReaSonusV2ControlPanel> s_inst;
     void initAssets();
     CSurf_FP_V2_PageContent *page_content = NULL;
 
-    Example();
+    ReaSonusV2ControlPanel();
     void frame();
 
     ImGui_Context *m_ctx;

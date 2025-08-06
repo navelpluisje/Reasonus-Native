@@ -1,19 +1,13 @@
-#include "csurf_fp_v2_ui_test.hpp"
-#include "../ui/csurf_ui_vars.hpp"
-#include "../ui/csurf_ui_colors.hpp"
-#include "../ui/csurf_ui_elements.hpp"
-#include "../ui/csurf_ui_text_input.hpp"
-#include "../ui/csurf_ui_combo_input.hpp"
-#include "../ui/csurf_ui_listbox.hpp"
-#include "../ui/csurf_ui_radio_button_group.hpp"
-#include "../ui/csurf_ui_checkbox.hpp"
-#include "../ui/csurf_ui_button_bar.hpp"
-#include "../ui/csurf_ui_menu_button.hpp"
-#include "../ui/csurf_ui_page_title.hpp"
-#include "../ui/csurf_ui_images.h"
+#include "csurf_fp_v2_ui_control.hpp"
 #include "csurf_fp_v2_ui_function_keys_page.cpp"
 #include "csurf_fp_v2_ui_settings_page.cpp"
 #include "csurf_fp_v2_ui_about_page.cpp"
+#include "../ui/csurf_ui_colors.hpp"
+#include "../ui/csurf_ui_vars.hpp"
+#include "../ui/csurf_ui_menu_button.hpp"
+#include "../ui/csurf_ui_page_title.hpp"
+#include "../ui/csurf_ui_button_bar.hpp"
+#include "../ui/csurf_ui_images.h"
 
 bool CSurf_FP_V2_FunctionKeysPage::querying_actions = false;
 int CSurf_FP_V2_FunctionKeysPage::selected_function = -1;
@@ -21,36 +15,28 @@ int CSurf_FP_V2_FunctionKeysPage::selected_action = -1;
 
 constexpr const char *g_name{"ReaSonus Native Control"};
 
-std::unique_ptr<Example> Example::s_inst;
+std::unique_ptr<ReaSonusV2ControlPanel> ReaSonusV2ControlPanel::s_inst;
 
 static void reportError(const ImGui_Error &e)
 {
     ShowMessageBox(e.what(), g_name, 0);
 }
-static bool checkbox_value = false;
-static int combo_value = 0;
-static int list_value = -1;
-static int radio_value = -1;
-
-Example::Example()
+ReaSonusV2ControlPanel::ReaSonusV2ControlPanel()
     : m_ctx{}
 {
     ImGui::init(plugin_getapi);
     m_ctx = ImGui::CreateContext(g_name);
     initAssets();
-    // settings_page = new CSurf_FP_V2_SettingsPage(m_ctx);
-    // about_page = new CSurf_FP_V2_AboutPage(m_ctx);
-    // function_keys_page = new CSurf_FP_V2_FunctionKeysPage(m_ctx);
 
     plugin_register("timer", reinterpret_cast<void *>(&loop));
 }
 
-Example::~Example()
+ReaSonusV2ControlPanel::~ReaSonusV2ControlPanel()
 {
     plugin_register("-timer", reinterpret_cast<void *>(&loop));
 }
 
-void Example::initAssets()
+void ReaSonusV2ControlPanel::initAssets()
 {
     main_font = ImGui::CreateFont("sans-serif", 13);
     main_font_bold = ImGui::CreateFont("sans-serif", 13, ImGui::FontFlags_Bold);
@@ -69,13 +55,18 @@ void Example::initAssets()
     ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(icon_custom_filters));
 }
 
-void Example::start()
+void ReaSonusV2ControlPanel::start()
 try
 {
+    control_panel_open = true;
     if (s_inst)
+    {
         ImGui::SetNextWindowFocus(s_inst->m_ctx);
+    }
     else
-        s_inst.reset(new Example);
+    {
+        s_inst.reset(new ReaSonusV2ControlPanel);
+    }
 }
 catch (const ImGui_Error &e)
 {
@@ -83,7 +74,22 @@ catch (const ImGui_Error &e)
     s_inst.reset();
 }
 
-void Example::loop()
+void ReaSonusV2ControlPanel::stop()
+try
+{
+    control_panel_open = false;
+    if (s_inst)
+    {
+        s_inst.reset();
+    }
+}
+catch (const ImGui_Error &e)
+{
+    reportError(e);
+    s_inst.reset();
+}
+
+void ReaSonusV2ControlPanel::loop()
 try
 {
     s_inst->frame();
@@ -94,7 +100,7 @@ catch (const ImGui_Error &e)
     s_inst.reset();
 }
 
-void Example::frame()
+void ReaSonusV2ControlPanel::frame()
 {
     if (current_page != previous_page)
     {
@@ -161,17 +167,6 @@ void Example::frame()
                 if (ImGui::BeginChild(m_ctx, "main_content_area", 0.0, -12.0, ImGui::ChildFlags_None))
                 {
                     page_content->render();
-
-                    // ReaSonusTextInput(m_ctx, "My Label", string_value);
-
-                    // ReaSonusComboInput(m_ctx, "Combo component", {"Select an item", "Item 1", "item 2", "item 3"}, &combo_value);
-
-                    // ReaSonusListBox(m_ctx, "List component", {"Select an item", "Item 1", "item 2", "item 3", "Item 4", "item 5", "item 6"}, &list_value);
-
-                    // ReaSonusRadioButtonGroup(m_ctx, "Radio Group List component", {"Check box 1", "Check box 2", "Check box 3"}, &radio_value);
-
-                    // ReaSonusCheckBox(m_ctx, "Check box Component", &checkbox_value);
-
                     ImGui::EndChild(m_ctx);
                 }
                 ImGui::EndChild(m_ctx);
@@ -186,8 +181,10 @@ void Example::frame()
     ImGui::PopFont(m_ctx);
     PopReaSonusColors(m_ctx);
     PopReaSonusStyle(m_ctx);
-    ImGui::ShowMetricsWindow(m_ctx);
 
     if (!open)
+    {
+        SetActionState("_REASONUS_SHOW_REASONUS_V2_CONTROL_WINDOW");
         return s_inst.reset();
+    }
 }

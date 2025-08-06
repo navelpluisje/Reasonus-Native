@@ -6,7 +6,7 @@
 #include "actions/show_reasonus_function_window.hpp"
 #include "actions/show_reasonus_v2_function_window.hpp"
 #include "actions/show_reasonus_filters_window.hpp"
-#include "actions/show_reasonus_test_window.hpp"
+#include "actions/show_reasonus_v2_control_panel.hpp"
 #include "actions/close_all_floating_fx_windows.hpp"
 #include "resource.h"
 
@@ -41,7 +41,7 @@ extern "C"
       SHOW_REASONUS_FUNCTION_WINDOW::Unregister();
       SHOW_REASONUS_V2_FUNCTION_WINDOW::Unregister();
       SHOW_REASONUS_FILTERS_WINDOW::Unregister();
-      SHOW_REASONUS_TEST_WINDOW::Unregister();
+      SHOW_REASONUS_V2_CONTROL_PANEL::Unregister();
       CLOSE_ALL_FLOATING_FX_WINDOWS::Unregister();
       return 0;
     }
@@ -61,7 +61,7 @@ extern "C"
     SHOW_REASONUS_FUNCTION_WINDOW::Register();
     SHOW_REASONUS_V2_FUNCTION_WINDOW::Register();
     SHOW_REASONUS_FILTERS_WINDOW::Register();
-    SHOW_REASONUS_TEST_WINDOW::Register();
+    SHOW_REASONUS_V2_CONTROL_PANEL::Register();
     CLOSE_ALL_FLOATING_FX_WINDOWS::Register();
     reaper_plugin_info->Register("csurf", &csurf_faderport_8_reg);
     reaper_plugin_info->Register("csurf", &csurf_faderport_v2_reg);

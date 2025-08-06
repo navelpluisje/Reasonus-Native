@@ -87,25 +87,51 @@ public:
     {
         std::string idx = "function-key-" + std::to_string(index);
         std::string button_idx = "button-key-" + std::to_string(index);
+        std::string tooltip_idx = "tooltip-key-" + std::to_string(index);
         int actionId = stoi(page.functions[index]);
         const char *fullName = kbd_getTextFromCmd(actionId, 0);
         std::vector<std::string> actionInfo = split(fullName, ": ");
+        std::string action_group = actionInfo.size() > 1 ? actionInfo[0] : "No group";
+        std::string action_description_1 = actionInfo.size() > 1
+                                               ? actionInfo[1]
+                                           : actionInfo.size() > 0
+                                               ? actionInfo[0]
+                                               : " ";
+        std::string action_description_2 = actionInfo.size() > 2
+                                               ? actionInfo[2]
+                                               : " ";
 
         if (ImGui::BeginChild(m_ctx, idx.c_str(), 0.0, 0.0, ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY | ImGui::ChildFlags_ResizeY))
         {
+            ImGui::PushFont(m_ctx, page.function_font_bold);
             ImGui::Text(m_ctx, page.functions[index].c_str());
-            ImGui::Text(m_ctx, actionInfo.size() > 0 ? actionInfo[0].c_str() : "");
-            ImGui::TextWrapped(m_ctx, actionInfo.size() > 1 ? actionInfo[1].c_str() : "");
+            ImGui::PopFont(m_ctx);
+            ImGui::Text(m_ctx, action_group.c_str());
+            ImGui::TextWrapped(m_ctx, (action_description_1 + ". " + action_description_2).c_str());
 
             double x_width, y_width;
             ImGui::GetContentRegionMax(m_ctx, &x_width, &y_width);
             ImGui::SetCursorPosX(m_ctx, x_width - 28.0);
             ImGui::SetCursorPosY(m_ctx, 0);
             UiElements::PushReaSonusFunctionButtonStyle(m_ctx);
+
             if (ImGui::ImageButton(m_ctx, button_idx.c_str(), page.icon_search, 24, 24))
             {
                 PromptForFunctionAction(index);
             }
+
+            if (ImGui::BeginItemTooltip(m_ctx))
+            {
+                UiElements::PushReaSonusTooltipStyle(m_ctx);
+                if (ImGui::BeginChild(m_ctx, tooltip_idx.c_str(), 0.0, 0.0, ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY | ImGui::ChildFlags_AutoResizeX))
+                {
+                    ImGui::Text(m_ctx, "Open the actionlist to select the\naction for this function key");
+                    ImGui::EndChild(m_ctx);
+                    UiElements::PopReaSonusTooltipStyle(m_ctx);
+                }
+                ImGui::EndTooltip(m_ctx);
+            }
+            // ImGui::SetItemTooltip(m_ctx, "Open the action list and select an action");
             UiElements::PopReaSonusFunctionButtonStyle(m_ctx);
             ImGui::EndChild(m_ctx);
         }
@@ -120,7 +146,9 @@ public:
             selected_function = -1;
         }
 
-        if (ImGui::BeginTable(m_ctx, "function_keys", 2))
+        ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 4);
+        ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_CellPadding, 6, 6);
+        if (ImGui::BeginTable(m_ctx, "function_keys_grid", 2))
         {
             for (int i = 0; i < (int)functions.size(); i++)
             {
@@ -132,6 +160,7 @@ public:
                 }
             }
             ImGui::EndTable(m_ctx);
+            ImGui::PopStyleVar(m_ctx);
         }
     }
 };

@@ -311,3 +311,22 @@ void UiElements::PopReaSonusFunctionButtonStyle(ImGui_Context *m_ctx)
     ImGui::PopStyleVar(m_ctx, 3);
     ImGui::PopStyleColor(m_ctx, 4);
 };
+
+void UiElements::PushReaSonusTooltipStyle(ImGui_Context *m_ctx)
+{
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 8, 8);
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameBorderSize, 1);
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameRounding, 4);
+
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_Border, 0x5C6164ff);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_BorderShadow, 0xff0000ff);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBg, 0x272727ff);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBgActive, 0x272727ff);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBgHovered, 0x272727ff);
+}
+
+void UiElements::PopReaSonusTooltipStyle(ImGui_Context *m_ctx)
+{
+    ImGui::PopStyleVar(m_ctx, 3);
+    ImGui::PopStyleColor(m_ctx, 5);
+}
