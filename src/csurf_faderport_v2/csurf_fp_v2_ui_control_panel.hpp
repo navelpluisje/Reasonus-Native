@@ -6,13 +6,15 @@
 #include <reaper_imgui_functions.h>
 #include <memory>
 #include <string>
-#include "csurf_fp_v2_ui_page_content.hpp"
+#include <vector>
+#include "../ui/csurf_ui_page_content.hpp"
 
 class ReaSonusV2ControlPanel
 {
 public:
-    static bool control_panel_open;
-    static void start();
+    inline static bool control_panel_open = false;
+    inline static int current_page = 0;
+    static void start(int page = 0);
     static void stop();
     ~ReaSonusV2ControlPanel();
 
@@ -20,7 +22,7 @@ private:
     static void loop();
     static std::unique_ptr<ReaSonusV2ControlPanel> s_inst;
     void initAssets();
-    CSurf_FP_V2_PageContent *page_content = NULL;
+    CSurf_UI_PageContent *page_content = NULL;
 
     ReaSonusV2ControlPanel();
     void frame();
@@ -34,11 +36,10 @@ private:
     ImGui_Image *icon_function_actions;
     ImGui_Image *icon_custom_filters;
 
-    int current_page = 0;
     int previous_page = -1;
     bool save_clicked = false;
     bool cancel_clicked = false;
-    std::string menu_items[3] = {"Function Keys", "Settings", "About ReaSonus"};
+    std::vector<std::string> menu_items;
 };
 
 #endif

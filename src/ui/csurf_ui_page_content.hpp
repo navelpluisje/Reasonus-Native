@@ -7,33 +7,27 @@
 #include <mini/ini.h>
 #include "../shared/csurf_utils.hpp"
 
-class CSurf_FP_V2_PageContent
+class CSurf_UI_PageContent
 {
 protected:
     ImGui_Context *m_ctx;
     mINI::INIStructure ini;
 
 public:
-    CSurf_FP_V2_PageContent(ImGui_Context *m_ctx) : m_ctx(m_ctx)
+    CSurf_UI_PageContent(ImGui_Context *m_ctx, std::string version) : m_ctx(m_ctx)
     {
-        readAndCreateIni(ini, FP_V2);
+        readAndCreateIni(ini, version);
     };
 
-    virtual ~CSurf_FP_V2_PageContent() {};
+    virtual ~CSurf_UI_PageContent() {};
 
     virtual void start() {};
 
     virtual void render() {};
 
-    virtual void save()
-    {
-        ShowConsoleMsg("Save Pressed");
-    };
+    virtual void save() {};
 
-    virtual void reset()
-    {
-        ShowConsoleMsg("Reset Pressed");
-    };
+    virtual void reset() {};
 };
 
 #endif

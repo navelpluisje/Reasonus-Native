@@ -5,7 +5,7 @@
 #include <string>
 #include "csurf_ui_elements.hpp"
 
-void ReaSonusButtonBar(
+static void ReaSonusButtonBar(
     ImGui_Context *m_ctx,
     std::string action_label,
     ImGui_Font *font,

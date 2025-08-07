@@ -6,7 +6,7 @@
 #include <vector>
 #include "csurf_ui_elements.hpp"
 
-void ReaSonusListBox(ImGui_Context *m_ctx, std::string label, std::vector<std::string> list, int *value, int height = 100)
+static void ReaSonusListBox(ImGui_Context *m_ctx, std::string label, std::vector<std::string> list, int *value, int height = 100)
 {
     std::string id = "##" + label;
 

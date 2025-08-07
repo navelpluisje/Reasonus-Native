@@ -7,13 +7,13 @@
 #include <reaper_plugin_functions.h>
 #include "../shared/csurf_utils.hpp"
 
-double between(int min, int val, int max)
+inline double between(int min, int val, int max)
 {
     double diff = max - min;
     return diff > 0 && diff < val;
 }
 
-void ReaSonusMenuButton(
+static void ReaSonusMenuButton(
     ImGui_Context *m_ctx,
     std::string action_label,
     ImGui_Font *font,

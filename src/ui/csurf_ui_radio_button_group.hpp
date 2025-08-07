@@ -6,7 +6,7 @@
 #include <vector>
 #include "csurf_ui_elements.hpp"
 
-void ReaSonusRadioButtonGroup(ImGui_Context *m_ctx, std::string label, std::vector<std::string> list, int *value)
+static void ReaSonusRadioButtonGroup(ImGui_Context *m_ctx, std::string label, std::vector<std::string> list, int *value)
 {
     std::string id = "##" + label;
 

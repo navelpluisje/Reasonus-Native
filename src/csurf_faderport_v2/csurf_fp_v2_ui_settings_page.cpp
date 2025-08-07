@@ -1,15 +1,15 @@
-#include "./csurf_fp_v2_ui_page_content.hpp"
+#include "../ui/csurf_ui_page_content.hpp"
 #include <reaper_imgui_functions.h>
 #include "../ui/csurf_ui_checkbox.hpp"
 
-class CSurf_FP_V2_SettingsPage : public CSurf_FP_V2_PageContent
+class CSurf_FP_V2_SettingsPage : public CSurf_UI_PageContent
 {
 protected:
     bool momentary_mute_solo;
     bool control_hidden_tracks;
 
 public:
-    CSurf_FP_V2_SettingsPage(ImGui_Context *m_ctx) : CSurf_FP_V2_PageContent(m_ctx)
+    CSurf_FP_V2_SettingsPage(ImGui_Context *m_ctx) : CSurf_UI_PageContent(m_ctx, FP_V2)
     {
         reset();
     };

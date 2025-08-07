@@ -6,7 +6,7 @@
 #include <vector>
 #include "csurf_ui_elements.hpp"
 
-void ReaSonusComboInput(ImGui_Context *m_ctx, std::string label, std::vector<std::string> list, int *value)
+static void ReaSonusComboInput(ImGui_Context *m_ctx, std::string label, std::vector<std::string> list, int *value)
 {
     std::string id = "##" + label;
 
@@ -18,6 +18,7 @@ void ReaSonusComboInput(ImGui_Context *m_ctx, std::string label, std::vector<std
 
         if (ImGui::BeginCombo(m_ctx, id.c_str(), list[*value].c_str()))
         {
+            UiElements::PushReaSonusListBoxStyle(m_ctx);
             for (int i = 0; i < (int)list.size(); i++)
             {
                 bool selected = *value == i;
@@ -26,6 +27,7 @@ void ReaSonusComboInput(ImGui_Context *m_ctx, std::string label, std::vector<std
                     *value = i;
                 }
             }
+            UiElements::PopReaSonusListBoxStyle(m_ctx);
             ImGui::EndCombo(m_ctx);
         }
         UiElements::PopReaSonusComboStyle(m_ctx);

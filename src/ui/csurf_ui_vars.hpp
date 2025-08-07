@@ -3,7 +3,7 @@
 
 #include <reaper_imgui_functions.h>
 
-void PushReaSonusStyle(ImGui_Context *m_ctx)
+static void PushReaSonusStyle(ImGui_Context *m_ctx)
 {
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_Alpha, 1);
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_DisabledAlpha, 0.5);
@@ -39,7 +39,7 @@ void PushReaSonusStyle(ImGui_Context *m_ctx)
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_SeparatorTextPadding, 20, 3);
 }
 
-void PopReaSonusStyle(ImGui_Context *m_ctx)
+static void PopReaSonusStyle(ImGui_Context *m_ctx)
 {
     ImGui::PopStyleVar(m_ctx, 32);
 }

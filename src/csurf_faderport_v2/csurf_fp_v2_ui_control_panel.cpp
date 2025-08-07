@@ -1,7 +1,7 @@
-#include "csurf_fp_v2_ui_control.hpp"
-#include "csurf_fp_v2_ui_function_keys_page.cpp"
+#include "csurf_fp_v2_ui_control_panel.hpp"
 #include "csurf_fp_v2_ui_settings_page.cpp"
-#include "csurf_fp_v2_ui_about_page.cpp"
+#include "../ui/csurf_ui_about_page.cpp"
+#include "../ui/csurf_ui_function_keys_page.cpp"
 #include "../ui/csurf_ui_colors.hpp"
 #include "../ui/csurf_ui_vars.hpp"
 #include "../ui/csurf_ui_menu_button.hpp"
@@ -9,11 +9,7 @@
 #include "../ui/csurf_ui_button_bar.hpp"
 #include "../ui/csurf_ui_images.h"
 
-bool CSurf_FP_V2_FunctionKeysPage::querying_actions = false;
-int CSurf_FP_V2_FunctionKeysPage::selected_function = -1;
-int CSurf_FP_V2_FunctionKeysPage::selected_action = -1;
-
-constexpr const char *g_name{"ReaSonus Native Control"};
+constexpr const char *g_name{"ReaSonus Native V2 Control Panel"};
 
 std::unique_ptr<ReaSonusV2ControlPanel> ReaSonusV2ControlPanel::s_inst;
 
@@ -21,9 +17,13 @@ static void reportError(const ImGui_Error &e)
 {
     ShowMessageBox(e.what(), g_name, 0);
 }
+
 ReaSonusV2ControlPanel::ReaSonusV2ControlPanel()
     : m_ctx{}
 {
+    menu_items.push_back("Function Keys");
+    menu_items.push_back("Settings");
+    menu_items.push_back("About ReaSonus");
     ImGui::init(plugin_getapi);
     m_ctx = ImGui::CreateContext(g_name);
     initAssets();
@@ -55,49 +55,56 @@ void ReaSonusV2ControlPanel::initAssets()
     ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(icon_custom_filters));
 }
 
-void ReaSonusV2ControlPanel::start()
-try
+void ReaSonusV2ControlPanel::start(int page)
 {
-    control_panel_open = true;
-    if (s_inst)
+    current_page = page;
+    try
     {
-        ImGui::SetNextWindowFocus(s_inst->m_ctx);
+        control_panel_open = true;
+        if (s_inst)
+        {
+            ImGui::SetNextWindowFocus(s_inst->m_ctx);
+        }
+        else
+        {
+            s_inst.reset(new ReaSonusV2ControlPanel);
+        }
     }
-    else
+    catch (const ImGui_Error &e)
     {
-        s_inst.reset(new ReaSonusV2ControlPanel);
-    }
-}
-catch (const ImGui_Error &e)
-{
-    reportError(e);
-    s_inst.reset();
-}
-
-void ReaSonusV2ControlPanel::stop()
-try
-{
-    control_panel_open = false;
-    if (s_inst)
-    {
+        reportError(e);
         s_inst.reset();
     }
 }
-catch (const ImGui_Error &e)
+
+void ReaSonusV2ControlPanel::stop()
 {
-    reportError(e);
-    s_inst.reset();
+    try
+    {
+        control_panel_open = false;
+        if (s_inst)
+        {
+            s_inst.reset();
+        }
+    }
+    catch (const ImGui_Error &e)
+    {
+        reportError(e);
+        s_inst.reset();
+    }
 }
 
 void ReaSonusV2ControlPanel::loop()
-try
 {
-    s_inst->frame();
-}
-catch (const ImGui_Error &e)
-{
-    reportError(e);
-    s_inst.reset();
+    try
+    {
+        s_inst->frame();
+    }
+    catch (const ImGui_Error &e)
+    {
+        reportError(e);
+        s_inst.reset();
+    }
 }
 
 void ReaSonusV2ControlPanel::frame()
@@ -109,17 +116,17 @@ void ReaSonusV2ControlPanel::frame()
         switch (current_page)
         {
         case 0:
-            CSurf_FP_V2_FunctionKeysPage::querying_actions = false;
-            CSurf_FP_V2_FunctionKeysPage::selected_function = -1;
-            CSurf_FP_V2_FunctionKeysPage::selected_action = -1;
+            CSurf_UI_FunctionKeysPage::querying_actions = false;
+            CSurf_UI_FunctionKeysPage::selected_function = -1;
+            CSurf_UI_FunctionKeysPage::selected_action = -1;
 
-            page_content = new CSurf_FP_V2_FunctionKeysPage(m_ctx);
+            page_content = new CSurf_UI_FunctionKeysPage(m_ctx, FP_V2);
             break;
         case 1:
             page_content = new CSurf_FP_V2_SettingsPage(m_ctx);
             break;
         case 2:
-            page_content = new CSurf_FP_V2_AboutPage(m_ctx);
+            page_content = new CSurf_UI_AboutPage(m_ctx, FP_V2);
             break;
         }
     }
@@ -148,9 +155,9 @@ void ReaSonusV2ControlPanel::frame()
         {
             ImGui::Image(m_ctx, logo, 200, 52);
 
-            ReaSonusMenuButton(m_ctx, menu_items[0], menu_font, icon_function_actions, 0, &current_page);
-            ReaSonusMenuButton(m_ctx, menu_items[1], menu_font, icon_settings, 1, &current_page);
-            ReaSonusMenuButton(m_ctx, menu_items[2], menu_font, icon_custom_filters, 2, &current_page);
+            ReaSonusMenuButton(m_ctx, menu_items.at(0), menu_font, icon_function_actions, 0, &current_page);
+            ReaSonusMenuButton(m_ctx, menu_items.at(1), menu_font, icon_settings, 1, &current_page);
+            ReaSonusMenuButton(m_ctx, menu_items.at(2), menu_font, icon_custom_filters, 2, &current_page);
 
             ImGui::EndChild(m_ctx);
             UiElements::PopReaSonusSidebarStyle(m_ctx);

@@ -5,7 +5,7 @@
 #include <string>
 #include "csurf_ui_elements.hpp"
 
-void ReaSonusTextInput(ImGui_Context *m_ctx, std::string label, char *value)
+static void ReaSonusTextInput(ImGui_Context *m_ctx, std::string label, char *value)
 {
     static char test[255];
     strcpy(test, value);

@@ -19,4 +19,6 @@ target_sources(${PROJECT_NAME}
         csurf_fp_8_ui_functions.cpp
         csurf_fp_8_ui_filters.cpp
         csurf_fp_8_track.cpp
+        csurf_fp_8_ui_control_panel.cpp
+        csurf_fp_8_ui_settings_page.cpp
         )

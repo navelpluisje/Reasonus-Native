@@ -8,7 +8,7 @@
  *
  * @param m_ctx
  */
-void PushReaSonusColors(ImGui_Context *m_ctx)
+static void PushReaSonusColors(ImGui_Context *m_ctx)
 {
     ImGui::PushStyleColor(m_ctx, ImGui::Col_Text, 0xFFFFFFFF);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_TextDisabled, 0x808080FF);
@@ -69,7 +69,7 @@ void PushReaSonusColors(ImGui_Context *m_ctx)
     ImGui::PushStyleColor(m_ctx, ImGui::Col_ModalWindowDimBg, 0xCCCCCC59);
 }
 
-void PopReaSonusColors(ImGui_Context *m_ctx)
+static void PopReaSonusColors(ImGui_Context *m_ctx)
 {
     ImGui::PopStyleColor(m_ctx, 57);
 }
