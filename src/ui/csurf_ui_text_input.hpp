@@ -5,21 +5,21 @@
 #include <string>
 #include "csurf_ui_elements.hpp"
 
-static void ReaSonusTextInput(ImGui_Context *m_ctx, std::string label, char *value)
+static void ReaSonusTextInput(ImGui_Context *m_ctx, std::string label, std::string *value, double width = 0.0)
 {
     static char test[255];
-    strcpy(test, value);
+    strcpy(test, (*value).c_str());
 
     std::string id = "##" + label;
 
     UiElements::PushReaSonusFieldGroupStyle(m_ctx);
-    if (ImGui::BeginChild(m_ctx, ("container" + label).c_str(), 0.0, 50.0, ImGui::ChildFlags_FrameStyle, ImGui::ChildFlags_AutoResizeY))
+    if (ImGui::BeginChild(m_ctx, ("container" + label).c_str(), width, 50.0, ImGui::ChildFlags_FrameStyle, ImGui::ChildFlags_AutoResizeY))
     {
         ImGui::Text(m_ctx, label.c_str());
         UiElements::PushReaSonusInputStyle(m_ctx);
         if (ImGui::InputText(m_ctx, ("##" + label).c_str(), test, sizeof(test)))
         {
-            strcpy(value, test);
+            *value = std::string(test);
         }
         UiElements::PopReaSonusInputStyle(m_ctx);
         ImGui::EndChild(m_ctx);

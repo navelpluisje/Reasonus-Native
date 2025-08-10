@@ -25,4 +25,12 @@ constexpr unsigned char img_icon_search[] = {
 #include "../../lib/assets/search.ipp"
 };
 
+constexpr unsigned char img_icon_add[] = {
+#include "../../lib/assets/add.ipp"
+};
+
+constexpr unsigned char img_icon_list_remove[] = {
+#include "../../lib/assets/list-action-close.ipp"
+};
+
 #endif

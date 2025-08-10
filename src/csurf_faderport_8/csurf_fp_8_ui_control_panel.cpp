@@ -1,5 +1,6 @@
 #include "csurf_fp_8_ui_control_panel.hpp"
 #include "csurf_fp_8_ui_settings_page.cpp"
+#include "csurf_fp_8_ui_custom_filters_page.cpp"
 #include "../ui/csurf_ui_function_keys_page.cpp"
 #include "../ui/csurf_ui_about_page.cpp"
 #include "../ui/csurf_ui_colors.hpp"
@@ -22,6 +23,7 @@ ReaSonus8ControlPanel::ReaSonus8ControlPanel()
     : m_ctx{}
 {
     menu_items.push_back("Function Keys");
+    menu_items.push_back("Custom Filters");
     menu_items.push_back("Settings");
     menu_items.push_back("About ReaSonus");
 
@@ -117,9 +119,12 @@ void ReaSonus8ControlPanel::frame()
             page_content = new CSurf_UI_FunctionKeysPage(m_ctx, FP_8);
             break;
         case 1:
-            page_content = new CSurf_FP_8_SettingsPage(m_ctx);
+            page_content = new CSurf_FP_8_CustomFilterstPage(m_ctx);
             break;
         case 2:
+            page_content = new CSurf_FP_8_SettingsPage(m_ctx);
+            break;
+        case 3:
             page_content = new CSurf_UI_AboutPage(m_ctx, FP_8);
             break;
         }
@@ -150,8 +155,9 @@ void ReaSonus8ControlPanel::frame()
             ImGui::Image(m_ctx, logo, 200, 52);
 
             ReaSonusMenuButton(m_ctx, menu_items[0], menu_font, icon_function_actions, 0, &current_page);
-            ReaSonusMenuButton(m_ctx, menu_items[1], menu_font, icon_settings, 1, &current_page);
-            ReaSonusMenuButton(m_ctx, menu_items[2], menu_font, icon_custom_filters, 2, &current_page);
+            ReaSonusMenuButton(m_ctx, menu_items[1], menu_font, icon_custom_filters, 1, &current_page);
+            ReaSonusMenuButton(m_ctx, menu_items[2], menu_font, icon_settings, 2, &current_page);
+            ReaSonusMenuButton(m_ctx, menu_items[3], menu_font, icon_custom_filters, 3, &current_page);
 
             ImGui::EndChild(m_ctx);
             UiElements::PopReaSonusSidebarStyle(m_ctx);
@@ -182,6 +188,8 @@ void ReaSonus8ControlPanel::frame()
     ImGui::PopFont(m_ctx);
     PopReaSonusColors(m_ctx);
     PopReaSonusStyle(m_ctx);
+
+    ImGui::ShowMetricsWindow(m_ctx);
 
     if (!open)
     {

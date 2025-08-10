@@ -49,8 +49,8 @@ public:
 
     void save() override
     {
-        mINI::INIFile file(GetReaSonusIniPath(FP_8));
-        readAndCreateIni(ini, FP_8);
+        mINI::INIFile file(GetReaSonusIniPath(device));
+        readAndCreateIni(ini, device);
 
         ini["functions"]["1"] = functions[0];
         ini["functions"]["2"] = functions[1];
@@ -130,8 +130,8 @@ public:
             ImGui::TextWrapped(m_ctx, (action_description_1 + ". " + action_description_2).c_str());
 
             double x_width, y_width;
-            ImGui::GetContentRegionMax(m_ctx, &x_width, &y_width);
-            ImGui::SetCursorPosX(m_ctx, x_width - 28.0);
+            ImGui::GetContentRegionAvail(m_ctx, &x_width, &y_width);
+            ImGui::SetCursorPosX(m_ctx, x_width - 16.0);
             ImGui::SetCursorPosY(m_ctx, 0);
             UiElements::PushReaSonusFunctionButtonStyle(m_ctx);
 

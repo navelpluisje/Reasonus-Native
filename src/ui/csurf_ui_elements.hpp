@@ -14,6 +14,10 @@ public:
 
     static void PopReaSonusContentStyle(ImGui_Context *m_ctx);
 
+    static void PushReaSonusGroupStyle(ImGui_Context *m_ctx);
+
+    static void PopReaSonusGroupStyle(ImGui_Context *m_ctx);
+
     static void PushReaSonusFieldGroupStyle(ImGui_Context *m_ctx);
 
     static void PopReaSonusFieldGroupStyle(ImGui_Context *m_ctx);
@@ -65,6 +69,10 @@ public:
     static void PushReaSonusFunctionButtonStyle(ImGui_Context *m_ctx);
 
     static void PopReaSonusFunctionButtonStyle(ImGui_Context *m_ctx);
+
+    static void PushReaSonusIconButtonStyle(ImGui_Context *m_ctx);
+
+    static void PopReaSonusIconButtonStyle(ImGui_Context *m_ctx);
 
     static void PushReaSonusTooltipStyle(ImGui_Context *m_ctx);
 
