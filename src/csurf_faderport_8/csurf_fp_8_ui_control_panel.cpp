@@ -1,3 +1,4 @@
+#include <config.h>
 #include "csurf_fp_8_ui_control_panel.hpp"
 #include "csurf_fp_8_ui_settings_page.cpp"
 #include "csurf_fp_8_ui_custom_filters_page.cpp"
@@ -159,6 +160,8 @@ void ReaSonus8ControlPanel::frame()
             ReaSonusMenuButton(m_ctx, menu_items[2], menu_font, icon_settings, 2, &current_page);
             ReaSonusMenuButton(m_ctx, menu_items[3], menu_font, icon_custom_filters, 3, &current_page);
 
+            // TODO: Move this to the bottom
+            ImGui::Text(m_ctx, GIT_VERSION);
             ImGui::EndChild(m_ctx);
             UiElements::PopReaSonusSidebarStyle(m_ctx);
         }

@@ -91,8 +91,7 @@ protected:
     {
         std::string filter_key = filter_keys[previous_selected_filter];
         std::string filter_text_string = join(filter_text, ",");
-        // strcpy(filter_name, ini[filter_key]["name"].c_str());
-        // Add text, name chacks as well
+
         filter_dirty =
             filter_name.compare(ini[filter_key]["name"]) != 0 ||
             filter_text_string.compare(ini[filter_key]["text"]) ||
@@ -101,6 +100,19 @@ protected:
             filter_children != (ini[filter_key]["children"] == "1") ||
             filter_top_level != (ini[filter_key]["top-level"] == "1") ||
             filter_match_multiple != (ini[filter_key]["match-multiple"] == "1");
+    }
+
+    void DirtyCheck()
+    {
+        IsFilterDirty();
+        if (filter_dirty)
+        {
+            int res = MB("Do you want to save these first?", "Unsaved changes", 4);
+            if (res == 6)
+            {
+                save();
+            }
+        }
     }
 
 public:
@@ -123,15 +135,16 @@ public:
 
         if (selected_filter != previous_selected_filter)
         {
-            IsFilterDirty();
-            if (filter_dirty)
-            {
-                int res = MB("Do you want to save these first?", "Unsaved changes", 4);
-                if (res == 6)
-                {
-                    save();
-                }
-            }
+            DirtyCheck();
+            // IsFilterDirty();
+            // if (filter_dirty)
+            // {
+            //     int res = MB("Do you want to save these first?", "Unsaved changes", 4);
+            //     if (res == 6)
+            //     {
+            //         save();
+            //     }
+            // }
             selected_filter_text = -1;
             edit_new_filter = false;
             PopulateFilter();
@@ -154,6 +167,7 @@ public:
                     ReaSonusTextInput(m_ctx, "Filter name", &new_filter_name, "Enter a filter name", space_x - 38);
                     if (ImGui::IsKeyPressed(m_ctx, ImGui::Key_Enter) && new_filter_name.compare("") != 0)
                     {
+                        DirtyCheck();
                         CreateFilter();
                         new_filter_name = "";
                     }
@@ -165,6 +179,7 @@ public:
                     {
                         if (new_filter_name.compare("") != 0)
                         {
+                            DirtyCheck();
                             CreateFilter();
                             new_filter_name = "";
                         }
