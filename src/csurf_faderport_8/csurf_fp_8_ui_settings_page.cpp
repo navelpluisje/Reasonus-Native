@@ -24,12 +24,12 @@ protected:
 public:
     CSurf_FP_8_SettingsPage(ImGui_Context *m_ctx) : CSurf_UI_PageContent(m_ctx, FP_8)
     {
-        reset();
+        Reset();
     };
 
     virtual ~CSurf_FP_8_SettingsPage() {};
 
-    void render() override
+    void Render() override
     {
         ReaSonusCheckBox(m_ctx, "Disable Plugin Control", &setting_disable_plugins);
         ReaSonusCheckBox(m_ctx, "Untouch last touched param after learn", &setting_untouch_after_learn);
@@ -45,7 +45,7 @@ public:
         }
     }
 
-    void save() override
+    void Save() override
     {
         mINI::INIFile file(GetReaSonusIniPath(FP_8));
         readAndCreateIni(ini, FP_8);
@@ -65,7 +65,7 @@ public:
         };
     }
 
-    void reset() override
+    void Reset() override
     {
         setting_disable_plugins = ini["surface"]["disable-plugins"] == "1";
         setting_untouch_after_learn = ini["surface"]["erase-last-param-after-learn"] == "1";

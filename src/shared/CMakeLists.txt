@@ -4,6 +4,7 @@ target_sources(${PROJECT_NAME}
         csurf_daw.cpp
         csurf_transport_manager.cpp
         csurf_faderport_ui_utils.cpp
+        csurf_faderport_ui_imgui_utils.cpp
         csurf_utils.cpp
         csurf_session_manager_actions.cpp
         )

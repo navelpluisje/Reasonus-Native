@@ -13,14 +13,16 @@ static void ReaSonusTextInput(ImGui_Context *m_ctx, std::string label, std::stri
     std::string id = "##" + label;
 
     UiElements::PushReaSonusFieldGroupStyle(m_ctx);
-    if (ImGui::BeginChild(m_ctx, ("container" + label).c_str(), width, 50.0, ImGui::ChildFlags_FrameStyle, ImGui::ChildFlags_AutoResizeY))
+    if (ImGui::BeginChild(m_ctx, ("container" + label).c_str(), width, 0.0, ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY))
     {
         ImGui::Text(m_ctx, label.c_str());
+
         UiElements::PushReaSonusInputStyle(m_ctx);
         if (ImGui::InputTextWithHint(m_ctx, ("##" + label).c_str(), hint.c_str(), test, sizeof(test)))
         {
             *value = std::string(test);
         }
+
         UiElements::PopReaSonusInputStyle(m_ctx);
         ImGui::EndChild(m_ctx);
     }

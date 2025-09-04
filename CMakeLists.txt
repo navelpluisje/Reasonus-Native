@@ -87,7 +87,7 @@ FetchContent_MakeAvailable(WDL reaper-sdk GSL mINI)
 # ------------------------------------------------------------------------------
 
 file(DOWNLOAD
-    https://github.com/cfillion/reaimgui/releases/download/v0.9.3.3/reaper_imgui_functions.h
+    https://github.com/cfillion/reaimgui/releases/download/v0.10.0.1/reaper_imgui_functions.h
     ${PROJECT_LIB_DIR}/reaImgui/reaper_imgui_functions.h)
 
 

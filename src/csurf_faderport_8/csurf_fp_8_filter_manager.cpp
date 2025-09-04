@@ -10,6 +10,8 @@
 #include <vector>
 #include "../shared/csurf_daw.hpp"
 #include "../shared/csurf_utils.hpp"
+#include "csurf_fp_8_ui_control_panel.hpp"
+#include "../shared/csurf_faderport_ui_imgui_utils.hpp"
 
 struct Filter
 {
@@ -152,23 +154,39 @@ public:
 
     void HandleSelectClick(int index) override
     {
-        int filterIndex = context->GetChannelManagerItemIndex() + index;
+        int filter_index = context->GetChannelManagerItemIndex() + index;
         if (context->GetShiftChannelLeft())
         {
-            Main_OnCommandStringEx("_REASONUS_SHOW_REASONUS_FILTERS_WINDOW");
+            if (!ReaSonus8ControlPanel::control_panel_open)
+            {
+                ToggleFP8ControlPanel(ReaSonus8ControlPanel::FILTERS_PAGE);
+            }
+            else if (ReaSonus8ControlPanel::current_page != ReaSonus8ControlPanel::FILTERS_PAGE)
+            {
+                ReaSonus8ControlPanel::SetCurrentPage(ReaSonus8ControlPanel::FILTERS_PAGE);
+            }
+            else if (ReaSonus8ControlPanel::GetPageProperty(0) == filter_index)
+            {
+                ToggleFP8ControlPanel(ReaSonus8ControlPanel::FILTERS_PAGE);
+            }
+
+            if (ReaSonus8ControlPanel::control_panel_open)
+            {
+                ReaSonus8ControlPanel::SetPageProperty(0, filter_index);
+            }
         }
         else
         {
-            if (filterIndex < (int)filters.size())
+            if (filter_index < (int)filters.size())
             {
-                navigator->HandleCustomFilter(filters.at(filterIndex).id);
+                navigator->HandleCustomFilter(filters.at(filter_index).id);
             }
             else
             {
                 int result = MB("There is no filter for this button. Do you want to add a new filter?", "No filter", 1);
                 if (result == 1)
                 {
-                    Main_OnCommandStringEx("_REASONUS_SHOW_REASONUS_FILTERS_WINDOW");
+                    ToggleFP8ControlPanel(ReaSonus8ControlPanel::FILTERS_PAGE);
                 }
             }
         }

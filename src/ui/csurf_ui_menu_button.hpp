@@ -24,7 +24,7 @@ static void ReaSonusMenuButton(
     int menu_button_width = 200;
     int menu_button_height = 42;
 
-    int background_color = 0x4f4f4fff;
+    int background_color = value == *active_item ? UI_COLORS::Accent_25 : UI_COLORS::Main_28;
     int border_width = value == *active_item ? 2 : 1;
     double x_pos_1, y_pos_1, x_mouse_pos, y_mouse_pos;
 
@@ -38,15 +38,15 @@ static void ReaSonusMenuButton(
         if (hovered)
         {
             ImGui::SetMouseCursor(m_ctx, ImGui::MouseCursor_Hand);
-            background_color = 0x5a5a5aff;
+            background_color = value == *active_item ? UI_COLORS::Accent_50 : UI_COLORS::Main_38;
         }
 
         /**
-         * Extra chck is needed for 'soft-click' of touch pads. They do not trigger IsItemActive
+         * Extra check is needed for 'soft-click' of touch pads. They do not trigger IsItemActive
          */
         if (ImGui::IsItemActive(m_ctx) || (hovered && ImGui::IsMouseClicked(m_ctx, 0)))
         {
-            background_color = 0x5a5a5aff;
+            background_color = value == *active_item ? UI_COLORS::Accent_50 : UI_COLORS::Main_38;
             border_width = 3;
             *active_item = value;
         }
@@ -54,12 +54,12 @@ static void ReaSonusMenuButton(
         ImGui_DrawList *list = ImGui::GetForegroundDrawList(m_ctx);
 
         ImGui::DrawList_AddRectFilled(list, x_pos_1, y_pos_1, x_pos_1 + menu_button_width, y_pos_1 + menu_button_height, background_color, 4);
-        ImGui::DrawList_AddRect(list, x_pos_1, y_pos_1, x_pos_1 + menu_button_width, y_pos_1 + menu_button_height, 0xF7CB15FF, 4, ImGui::DrawFlags_None, border_width);
+        ImGui::DrawList_AddRect(list, x_pos_1, y_pos_1, x_pos_1 + menu_button_width, y_pos_1 + menu_button_height, UI_COLORS::Accent, 4, ImGui::DrawFlags_None, border_width);
         ImGui::DrawList_AddImage(list, icon, x_pos_1 + 9, y_pos_1 + 9, x_pos_1 + 33, y_pos_1 + 33);
 
-        ImGui::PushFont(m_ctx, font);
+        ImGui::PushFont(m_ctx, font, 15);
         double font_height = ImGui::GetTextLineHeight(m_ctx);
-        ImGui::DrawList_AddText(list, x_pos_1 + 42, y_pos_1 + (menu_button_height - font_height) / 2, 0xffffffff, action_label.c_str());
+        ImGui::DrawList_AddText(list, x_pos_1 + 42, y_pos_1 + (menu_button_height - font_height) / 2, UI_COLORS::White, action_label.c_str());
         ImGui::PopFont(m_ctx);
 
         ImGui::EndChild(m_ctx);

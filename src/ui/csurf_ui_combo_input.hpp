@@ -6,17 +6,25 @@
 #include <vector>
 #include "csurf_ui_elements.hpp"
 
-static void ReaSonusComboInput(ImGui_Context *m_ctx, std::string label, std::vector<std::string> list, int *value)
+static void ReaSonusComboInput(ImGui_Context *m_ctx, std::string label, std::vector<std::string> list, int *value, double width = 0.0)
 {
     std::string id = "##" + label;
+    double space_x, space_y;
 
     UiElements::PushReaSonusFieldGroupStyle(m_ctx);
-    if (ImGui::BeginChild(m_ctx, ("container" + label).c_str(), 0.0, 50.0, ImGui::ChildFlags_FrameStyle, ImGui::ChildFlags_AutoResizeY))
+    if (ImGui::BeginChild(m_ctx, ("container" + label).c_str(), width, 0.0, ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY))
     {
+        ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
+        if (width == 0.0)
+        {
+            width = space_x;
+        }
+
         ImGui::Text(m_ctx, label.c_str());
         UiElements::PushReaSonusComboStyle(m_ctx);
 
-        if (ImGui::BeginCombo(m_ctx, id.c_str(), list[*value].c_str()))
+        ImGui::SetNextItemWidth(m_ctx, width);
+        if (ImGui::BeginCombo(m_ctx, ("##" + label).c_str(), list[*value].c_str()))
         {
             UiElements::PushReaSonusListBoxStyle(m_ctx);
             for (int i = 0; i < (int)list.size(); i++)

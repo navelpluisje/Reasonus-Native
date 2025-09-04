@@ -14,23 +14,22 @@ class ReaSonusV2ControlPanel
 public:
     inline static bool control_panel_open = false;
     inline static int current_page = 0;
-    static void start(int page = 0);
-    static void stop();
+    static void Start(int page = 0);
+    static void Stop();
     ~ReaSonusV2ControlPanel();
 
 private:
-    static void loop();
+    static void Loop();
     static std::unique_ptr<ReaSonusV2ControlPanel> s_inst;
-    void initAssets();
+    void InitAssets();
     CSurf_UI_PageContent *page_content = NULL;
 
     ReaSonusV2ControlPanel();
-    void frame();
+    void Frame();
 
     ImGui_Context *m_ctx;
     ImGui_Font *main_font;
     ImGui_Font *main_font_bold;
-    ImGui_Font *menu_font;
     ImGui_Image *logo;
     ImGui_Image *icon_settings;
     ImGui_Image *icon_function_actions;

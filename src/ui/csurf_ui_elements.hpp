@@ -77,6 +77,14 @@ public:
     static void PushReaSonusTooltipStyle(ImGui_Context *m_ctx);
 
     static void PopReaSonusTooltipStyle(ImGui_Context *m_ctx);
+
+    static void PushReaSonusTreeNodeStyle(ImGui_Context *m_ctx, bool active);
+
+    static void PopReaSonusTreeNodeStyle(ImGui_Context *m_ctx);
+
+    static void PushReaSonusChannelTabStyle(ImGui_Context *m_ctx, bool active);
+
+    static void PopReaSonusChannelTabStyle(ImGui_Context *m_ctx);
 };
 
 #endif

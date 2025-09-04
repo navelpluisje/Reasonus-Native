@@ -5,6 +5,7 @@
 #include <reaper_imgui_functions.h>
 #include <functional>
 #include "csurf_ui_images.h"
+#include "../ui/csurf_ui_colors.hpp"
 
 class CSurf_UI_FunctionKeysPage : public CSurf_UI_PageContent
 {
@@ -22,17 +23,17 @@ public:
     CSurf_UI_FunctionKeysPage(ImGui_Context *m_ctx, std::string _device) : CSurf_UI_PageContent(m_ctx, _device)
     {
         device = _device;
-        function_font_bold = ImGui::CreateFont("sans-serif", 13, ImGui::FontFlags_Bold);
+        function_font_bold = ImGui::CreateFont("sans-serif", ImGui::FontFlags_Bold);
         ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(function_font_bold));
         icon_search = ImGui::CreateImageFromMem(reinterpret_cast<const char *>(img_icon_search), sizeof(img_icon_search));
         ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(icon_search));
 
-        reset();
+        Reset();
     };
 
     virtual ~CSurf_UI_FunctionKeysPage() {};
 
-    void reset() override
+    void Reset() override
     {
         functions.push_back(ini["functions"]["1"]);
         functions.push_back(ini["functions"]["2"]);
@@ -47,7 +48,7 @@ public:
         }
     }
 
-    void save() override
+    void Save() override
     {
         mINI::INIFile file(GetReaSonusIniPath(device));
         readAndCreateIni(ini, device);
@@ -70,7 +71,7 @@ public:
         };
     }
 
-    static void actionListTimer()
+    static void ActionListTimer()
     {
         WDL_ASSERT(querying_actions == true);
         const int actionId = PromptForAction(0, 0, 0);
@@ -78,7 +79,7 @@ public:
         {
             return;
         }
-        plugin_register("-timer", (void *)&actionListTimer);
+        plugin_register("-timer", (void *)&ActionListTimer);
         querying_actions = false;
         if (actionId > 0)
         {
@@ -95,11 +96,11 @@ public:
         if (!querying_actions)
         {
             querying_actions = true;
-            plugin_register("timer", (void *)&actionListTimer);
+            plugin_register("timer", (void *)&ActionListTimer);
         }
     }
 
-    static void renderFunction(ImGui_Context *m_ctx, int index, CSurf_UI_FunctionKeysPage &page)
+    static void RenderFunction(ImGui_Context *m_ctx, int index, CSurf_UI_FunctionKeysPage &page)
     {
         std::string idx = "function-key-" + std::to_string(index);
         std::string button_idx = "button-key-" + std::to_string(index);
@@ -119,8 +120,8 @@ public:
 
         if (ImGui::BeginChild(m_ctx, idx.c_str(), 0.0, 0.0, ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY | ImGui::ChildFlags_ResizeY))
         {
-            ImGui::PushFont(m_ctx, page.function_font_bold);
-            ImGui::PushStyleColor(m_ctx, ImGui::Col_Text, 0xF7CB15FF);
+            ImGui::PushFont(m_ctx, page.function_font_bold, 13);
+            ImGui::PushStyleColor(m_ctx, ImGui::Col_Text, UI_COLORS::Accent);
             ImGui::Text(m_ctx, ("Function " + std::to_string(index + 1) + ":").c_str());
             ImGui::PopStyleColor(m_ctx);
             ImGui::SameLine(m_ctx);
@@ -157,7 +158,7 @@ public:
         }
     }
 
-    void render() override
+    void Render() override
     {
         if (selected_action != -1)
         {
@@ -175,7 +176,7 @@ public:
                 if (ImGui::TableNextColumn(m_ctx))
                 {
                     UiElements::PushReaSonusFunctionActionStyle(m_ctx);
-                    renderFunction(m_ctx, i, *this);
+                    RenderFunction(m_ctx, i, *this);
                     UiElements::PopReaSonusFunctionActionStyle(m_ctx);
                 }
             }

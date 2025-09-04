@@ -28,11 +28,11 @@ namespace SHOW_REASONUS_V2_CONTROL_PANEL
     {
         if (!ReaSonusV2ControlPanel::control_panel_open)
         {
-            ReaSonusV2ControlPanel::start();
+            ReaSonusV2ControlPanel::Start();
         }
         else
         {
-            ReaSonusV2ControlPanel::stop();
+            ReaSonusV2ControlPanel::Stop();
         }
     }
 

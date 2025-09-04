@@ -21,13 +21,37 @@ public:
 
     virtual ~CSurf_UI_PageContent() {};
 
-    virtual void start() {};
+    virtual void Start() {};
 
-    virtual void render() {};
+    virtual void Render() {};
 
-    virtual void save() {};
+    virtual void Save() {};
 
-    virtual void reset() {};
+    virtual void Reset() {};
+
+    virtual void SetPageProperty(int type, int value)
+    {
+        (void)type;
+        (void)value;
+    };
+
+    virtual void SetPageProperty(int type, std::string value)
+    {
+        (void)type;
+        (void)value;
+    };
+
+    virtual int GetPageProperty(int type)
+    {
+        (void)type;
+        return -1;
+    };
+
+    virtual std::string GetPageStringProperty(int type)
+    {
+        (void)type;
+        return "";
+    };
 };
 
 #endif

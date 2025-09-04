@@ -1,10 +1,13 @@
 #include "../ui/csurf_ui_page_content.hpp"
 #include <string.h>
 #include <reaper_imgui_functions.h>
-#include "../ui/csurf_ui_listbox.hpp"
+#include "../ui/csurf_ui_colors.hpp"
 #include "../ui/csurf_ui_text_input.hpp"
 #include "../ui/csurf_ui_checkbox.hpp"
 #include "../ui/csurf_ui_images.h"
+#include "../ui/csurf_ui_action_input_text.hpp"
+#include "../ui/csurf_ui_list_box.hpp"
+#include "../ui/csurf_ui_filter_preview.hpp"
 
 class CSurf_FP_8_CustomFilterstPage : public CSurf_UI_PageContent
 {
@@ -13,16 +16,15 @@ protected:
     ImGui_Image *icon_remove_list_item;
 
     std::string device;
-    int selected_filter = 0;
+    int selected_filter = -1;
     int previous_selected_filter = -1;
-    bool drag_and_drop = false;
 
-    std::vector<std::string> filter_keys;
-    std::vector<std::string> filter_labels;
+    std::vector<std::string> filter_keys = {};
+    std::vector<std::string> filter_labels = {};
 
     bool filter_dirty;
     std::string new_filter_text;
-    std::string new_filter_name;
+    std::string new_filter_name = "";
     bool edit_new_filter = false;
 
     std::string filter_name;
@@ -77,6 +79,17 @@ protected:
 
     void PopulateFilter()
     {
+        if (filter_keys.size() == 0)
+        {
+            filter_name = "";
+            filter_text.clear();
+            filter_siblings = false;
+            filter_parents = false;
+            filter_children = false;
+            filter_top_level = false;
+            filter_match_multiple = false;
+            return;
+        }
         std::string filter_key = filter_keys[selected_filter];
         SetFilterText();
         filter_name = ini[filter_key]["name"];
@@ -89,6 +102,11 @@ protected:
 
     void IsFilterDirty()
     {
+        if (previous_selected_filter < 0)
+        {
+            filter_dirty = false;
+            return;
+        }
         std::string filter_key = filter_keys[previous_selected_filter];
         std::string filter_text_string = join(filter_text, ",");
 
@@ -110,9 +128,70 @@ protected:
             int res = MB("Do you want to save these first?", "Unsaved changes", 4);
             if (res == 6)
             {
-                save();
+                Save();
             }
         }
+    }
+
+    void HandleAddFilter()
+    {
+        DirtyCheck();
+        CreateFilter();
+        new_filter_name = "";
+    }
+
+    void HandleAddFilterText()
+    {
+        filter_text.push_back(new_filter_text);
+        new_filter_text = "";
+    }
+
+    void HandleRemoveFilterTextListItem(int index)
+    {
+        filter_text.erase(filter_text.begin() + index);
+    }
+
+    void HandleRemoveFilterListItem(int index)
+    {
+        ini.remove(filter_keys.at(index));
+        filter_keys.erase(filter_keys.begin() + index);
+        filter_labels.erase(filter_labels.begin() + index);
+        ini["filters"]["nb-filters"] = std::to_string(filter_keys.size());
+        SetFiltersKeys();
+        selected_filter = selected_filter == 0 ? selected_filter : selected_filter - 1;
+        previous_selected_filter = selected_filter;
+        edit_new_filter = false;
+        PopulateFilter();
+    }
+
+    void HandleSortFilterList(int current_item, int next_item)
+    {
+        std::string previous_label = filter_labels[current_item];
+        std::string previous_key = filter_keys[current_item];
+        filter_labels[current_item] = filter_labels[next_item];
+        filter_keys[current_item] = filter_keys[next_item];
+        filter_labels[next_item] = previous_label;
+        filter_keys[next_item] = previous_key;
+        ImGui::ResetMouseDragDelta(m_ctx, ImGui::MouseButton_Left);
+        for (int i = 0; i < (int)filter_keys.size(); i++)
+        {
+            ini["filters"][std::to_string(i)] = filter_keys[i];
+        }
+        selected_filter = next_item;
+        previous_selected_filter = next_item;
+        PopulateFilter();
+    }
+
+    int GetOptionsValue()
+    {
+        int res = 0;
+        res += (filter_siblings ? 1 : 0) << 0;
+        res += (filter_parents ? 1 : 0) << 1;
+        res += (filter_children ? 1 : 0) << 2;
+        res += (filter_top_level ? 1 : 0) << 3;
+        res += (filter_match_multiple ? 1 : 0) << 4;
+
+        return res;
     }
 
 public:
@@ -129,22 +208,19 @@ public:
 
     virtual ~CSurf_FP_8_CustomFilterstPage() {};
 
-    void render() override
+    void Render() override
     {
+        using namespace std::placeholders; // for `_1, _2 etc`
         double space_x, space_y;
+
+        if ((selected_filter == -1) && (filter_labels.size() > 0))
+        {
+            selected_filter = 0;
+        }
 
         if (selected_filter != previous_selected_filter)
         {
             DirtyCheck();
-            // IsFilterDirty();
-            // if (filter_dirty)
-            // {
-            //     int res = MB("Do you want to save these first?", "Unsaved changes", 4);
-            //     if (res == 6)
-            //     {
-            //         save();
-            //     }
-            // }
             selected_filter_text = -1;
             edit_new_filter = false;
             PopulateFilter();
@@ -162,171 +238,55 @@ public:
                 UiElements::PushReaSonusGroupStyle(m_ctx);
                 if (ImGui::BeginChild(m_ctx, "filter_lists_content", 0.0, 0.0, ImGui::ChildFlags_FrameStyle, ImGui::ChildFlags_AutoResizeY))
                 {
+                    ReaSonusActionInputText(m_ctx, "Filter name", &new_filter_name, "Enter a filter name", icon_add, std::bind(&CSurf_FP_8_CustomFilterstPage::HandleAddFilter, this));
+                    ReaSonusExtendedListBox(
+                        m_ctx,
+                        "filters",
+                        filter_labels,
+                        &selected_filter,
+                        false,
+                        icon_remove_list_item,
+                        std::bind(&CSurf_FP_8_CustomFilterstPage::HandleRemoveFilterListItem, this, _1),
+                        true,
+                        std::bind(&CSurf_FP_8_CustomFilterstPage::HandleSortFilterList, this, _1, _2));
 
-                    ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
-                    ReaSonusTextInput(m_ctx, "Filter name", &new_filter_name, "Enter a filter name", space_x - 38);
-                    if (ImGui::IsKeyPressed(m_ctx, ImGui::Key_Enter) && new_filter_name.compare("") != 0)
-                    {
-                        DirtyCheck();
-                        CreateFilter();
-                        new_filter_name = "";
-                    }
-                    ImGui::SameLine(m_ctx);
-
-                    UiElements::PushReaSonusIconButtonStyle(m_ctx);
-                    ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 21);
-                    if (ImGui::ImageButton(m_ctx, "add-filter", icon_add, 20, 20))
-                    {
-                        if (new_filter_name.compare("") != 0)
-                        {
-                            DirtyCheck();
-                            CreateFilter();
-                            new_filter_name = "";
-                        }
-                    }
-                    UiElements::PopReaSonusIconButtonStyle(m_ctx);
-
-                    UiElements::PushReaSonusListBoxStyle(m_ctx);
-                    if (ImGui::BeginListBox(m_ctx, "##filters", 0.0, 0.0))
-                    {
-                        for (int i = 0; i < (int)filter_labels.size(); i++)
-                        {
-                            bool selected = selected_filter == i;
-                            if (ImGui::Selectable(m_ctx, filter_labels[i].c_str(), &selected, ImGui::SelectableFlags_AllowOverlap))
-                            {
-                                selected_filter = i;
-                            }
-
-                            /**
-                             * Implement dragand drop for the list items
-                             */
-                            if (ImGui::IsItemActive(m_ctx) && !ImGui::IsAnyItemHovered(m_ctx))
-                            {
-                                drag_and_drop = true;
-                                ImGui::GetMouseDragDelta(m_ctx, &space_x, &space_y, ImGui::MouseButton_Left);
-                                int next_index = i + (space_y < 0 ? -1 : 1);
-                                if (next_index >= 0 and next_index < (int)filter_labels.size())
-                                {
-                                    std::string previous_label = filter_labels[i];
-                                    std::string previous_key = filter_keys[i];
-                                    filter_labels[i] = filter_labels[next_index];
-                                    filter_keys[i] = filter_keys[next_index];
-                                    filter_labels[next_index] = previous_label;
-                                    filter_keys[next_index] = previous_key;
-                                    ImGui::ResetMouseDragDelta(m_ctx, ImGui::MouseButton_Left);
-                                    for (int i = 0; i < (int)filter_keys.size(); i++)
-                                    {
-                                        ini["filters"][std::to_string(i)] = filter_keys[i];
-                                    }
-                                    selected_filter = next_index;
-                                    previous_selected_filter = next_index;
-                                    PopulateFilter();
-                                }
-                            }
-
-                            if (selected)
-                            {
-                                ImGui::SameLine(m_ctx);
-                                ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
-                                ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + space_x - 18);
-                                ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 3);
-                                ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 4.0, 4.0);
-                                if (ImGui::ImageButton(m_ctx, std::string("Remove-filter##" + std::to_string(i)).c_str(), icon_remove_list_item, 12, 12))
-                                {
-                                    ini.remove(filter_keys.at(i));
-                                    filter_keys.erase(filter_keys.begin() + i);
-                                    filter_labels.erase(filter_labels.begin() + i);
-                                    ini["filters"]["nb-filters"] = std::to_string(filter_keys.size());
-                                    SetFiltersKeys();
-                                    selected_filter = selected_filter == 0 ? selected_filter : selected_filter - 1;
-                                    previous_selected_filter = selected_filter;
-                                    edit_new_filter = false;
-                                    PopulateFilter();
-                                }
-                                ImGui::PopStyleVar(m_ctx);
-                            }
-                        }
-                        ImGui::EndListBox(m_ctx);
-                        UiElements::PopReaSonusListBoxStyle(m_ctx);
-                    }
-                    ImGui::EndChild(m_ctx);
                     UiElements::PopReaSonusGroupStyle(m_ctx);
+                    ImGui::EndChild(m_ctx);
                 }
+
                 ImGui::EndChild(m_ctx);
             }
             ImGui::SameLine(m_ctx);
+
             if (ImGui::BeginChild(m_ctx, "filter_content", 0.0, 0.0))
             {
                 ImGui::Text(m_ctx, edit_new_filter ? "New filter" : "Edit filter");
                 ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 4);
 
                 UiElements::PushReaSonusGroupStyle(m_ctx);
-                if (ImGui::BeginChild(m_ctx, "filter_content", 0.0, 0.0, ImGui::ChildFlags_FrameStyle))
+                if (ImGui::BeginChild(m_ctx, "filter_content_edit", 0.0, 276.0, ImGui::ChildFlags_FrameStyle))
                 {
                     ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
                     double column_width = (space_x - 12) / 2;
 
-                    if (ImGui::BeginChild(m_ctx, "filter_content_left", column_width, 0.0, ImGui::ChildFlags_None))
+                    if (ImGui::BeginChild(m_ctx, "filter_content_left", column_width, 0.0, 0.0, ImGui::ChildFlags_AutoResizeY))
                     {
                         ReaSonusTextInput(m_ctx, "Filter name", &filter_name, "Only 10 characters will be displayed");
+                        ReaSonusActionInputText(m_ctx, "Filter text", &new_filter_text, "Enter a filter text", icon_add, std::bind(&CSurf_FP_8_CustomFilterstPage::HandleAddFilterText, this));
+                        ReaSonusExtendedListBox(
+                            m_ctx,
+                            "filter-text-list",
+                            filter_text,
+                            &selected_filter_text,
+                            true,
+                            icon_remove_list_item,
+                            std::bind(&CSurf_FP_8_CustomFilterstPage::HandleRemoveFilterTextListItem, this, _1));
 
-                        if (ImGui::BeginChild(m_ctx, "filter_text_content", 0.0, 0.0, ImGui::ChildFlags_None | ImGui::ChildFlags_AutoResizeY))
-                        {
-                            ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
-                            ReaSonusTextInput(m_ctx, "Filter text", &new_filter_text, "Enter a filter text", space_x - 38);
-                            if (ImGui::IsKeyPressed(m_ctx, ImGui::Key_Enter) && new_filter_text.compare("") != 0)
-                            {
-                                filter_text.push_back(new_filter_text);
-                                new_filter_text = "";
-                            }
-
-                            ImGui::SameLine(m_ctx);
-
-                            UiElements::PushReaSonusIconButtonStyle(m_ctx);
-                            ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 21);
-                            if (ImGui::ImageButton(m_ctx, "add-filter-text", icon_add, 20, 20))
-                            {
-                                if (new_filter_text.compare("") != 0)
-                                {
-                                    filter_text.push_back(new_filter_text);
-                                    new_filter_text = "";
-                                }
-                            }
-                            UiElements::PopReaSonusIconButtonStyle(m_ctx);
-                            ImGui::EndChild(m_ctx);
-                        }
-
-                        UiElements::PushReaSonusListBoxStyle(m_ctx);
-                        if (ImGui::BeginListBox(m_ctx, "##filter-text-list", 0.0, 124.0))
-                        {
-                            for (int i = 0; i < (int)filter_text.size(); i++)
-                            {
-                                bool selected = selected_filter_text == i;
-                                if (ImGui::Selectable(m_ctx, filter_text[i].c_str(), &selected, ImGui::SelectableFlags_AllowOverlap))
-                                {
-                                    selected_filter_text = selected_filter_text == i ? -1 : i;
-                                }
-                                if (selected)
-                                {
-                                    ImGui::SameLine(m_ctx);
-                                    ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
-                                    ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + space_x - 18);
-                                    ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 3);
-                                    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 4.0, 4.0);
-                                    if (ImGui::ImageButton(m_ctx, std::string("Remove##" + std::to_string(i)).c_str(), icon_remove_list_item, 12, 12))
-                                    {
-                                        filter_text.erase(filter_text.begin() + i);
-                                    }
-                                    ImGui::PopStyleVar(m_ctx);
-                                }
-                            }
-                            ImGui::EndListBox(m_ctx);
-                            UiElements::PopReaSonusListBoxStyle(m_ctx);
-                        }
                         ImGui::EndChild(m_ctx);
                     }
                     ImGui::SameLine(m_ctx);
-                    if (ImGui::BeginChild(m_ctx, "filter_content_right", column_width, 0.0, ImGui::ChildFlags_None))
+
+                    if (ImGui::BeginChild(m_ctx, "filter_content_right", column_width, 0.0, 0.0, ImGui::ChildFlags_AutoResizeY))
                     {
                         ImGui::Text(m_ctx, "Filter options");
                         ReaSonusCheckBox(m_ctx, "Show track Siblings", &filter_siblings);
@@ -335,26 +295,37 @@ public:
                         ReaSonusCheckBox(m_ctx, "Show top level tracks only", &filter_top_level);
                         ReaSonusCheckBox(m_ctx, "Match multiple", &filter_match_multiple);
                         ImGui::EndChild(m_ctx);
-
-                        ImGui::EndChild(m_ctx);
                     }
-                    UiElements::PopReaSonusGroupStyle(m_ctx);
+
                     ImGui::EndChild(m_ctx);
+                    UiElements::PopReaSonusGroupStyle(m_ctx);
                 }
+
+                UiElements::PushReaSonusGroupStyle(m_ctx);
+                if (ImGui::BeginChild(m_ctx, "filter_content_preview", 0.0, 0.0, ImGui::ChildFlags_FrameStyle))
+                {
+                    ReaSonusFilterPreview(m_ctx, GetOptionsValue());
+
+                    ImGui::EndChild(m_ctx);
+                    UiElements::PopReaSonusGroupStyle(m_ctx);
+                }
+
+                ImGui::EndChild(m_ctx);
             }
+
             ImGui::PopStyleVar(m_ctx);
             ImGui::EndChild(m_ctx);
         }
     }
 
-    void reset() override
+    void Reset() override
     {
         readAndCreateIni(ini, FP_8);
         SetFiltersKeys();
         PopulateFilter();
     }
 
-    void save() override
+    void Save() override
     {
         mINI::INIFile file(GetReaSonusIniPath(FP_8));
 
@@ -381,8 +352,30 @@ public:
         if (file.write(ini, true))
         {
             edit_new_filter = false;
-            reset();
+            Reset();
             MB("Changes saved with success", "Woohoo", 0);
         };
+    }
+
+    void SetPageProperty(int type, int value) override
+    {
+        switch (type)
+        {
+        case 0:
+            selected_filter = value;
+            break;
+        }
+    }
+
+    int GetPageProperty(int type) override
+    {
+        switch (type)
+        {
+        case 0:
+            return selected_filter;
+            break;
+        }
+
+        return -1;
     }
 };

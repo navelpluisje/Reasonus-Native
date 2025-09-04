@@ -12,7 +12,7 @@ static void ReaSonusPageTitle(ImGui_Context *m_ctx, std::string label, ImGui_Fon
     UiElements::PushReaSonusPageTitleStyle(m_ctx);
     if (ImGui::BeginChild(m_ctx, ("container" + label).c_str(), 0.0, 32.0, ImGui::ChildFlags_FrameStyle))
     {
-        ImGui::PushFont(m_ctx, font);
+        ImGui::PushFont(m_ctx, font, 15);
         ImGui::Text(m_ctx, label.c_str());
         ImGui::PopFont(m_ctx);
         ImGui::Separator(m_ctx);

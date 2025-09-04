@@ -26,13 +26,13 @@ namespace SHOW_REASONUS_8_CONTROL_PANEL
     // gets called via callback or timer
     void MainFunctionOfMyPlugin()
     {
-        if (!ReaSonus8ControlPanel::control_panel_open)
+        if (toggle_action_state)
         {
-            ReaSonus8ControlPanel::start();
+            ReaSonus8ControlPanel::Start();
         }
         else
         {
-            ReaSonus8ControlPanel::stop();
+            ReaSonus8ControlPanel::Stop();
         }
     }
 

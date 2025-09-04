@@ -18,7 +18,7 @@ static void ReaSonusButtonBar(
     int button_padding_x = 16;
 
     UiElements::PushReaSonusButtonBarContainerStyle(m_ctx);
-    if (ImGui::BeginChild(m_ctx, "button-bar", 0.0, 30.0, ImGui::ChildFlags_FrameStyle))
+    if (ImGui::BeginChild(m_ctx, "button-bar", 0.0, 34.0, ImGui::ChildFlags_FrameStyle))
     {
         ImGui::CalcTextSize(m_ctx, action_label.c_str(), &x_pos_1, &y_pos_1);
         float buttonWidth1 = x_pos_1 + button_padding_x * 2.f;

@@ -15,7 +15,7 @@ public:
 
     virtual ~CSurf_UI_AboutPage() {};
 
-    void render() override
+    void Render() override
     {
         ImGui::Text(m_ctx, "AboutPage");
     }
