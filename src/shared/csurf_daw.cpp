@@ -266,6 +266,14 @@ void DAW::SetTrackVolume(MediaTrack *media_track, double value)
     CSurf_SetSurfaceVolume(media_track, CSurf_OnVolumeChange(media_track, value, false), NULL);
 }
 
+double DAW::GetTrackVolume(MediaTrack *media_track)
+{
+    double volume, pan1 = 0.0;
+    GetTrackUIVolPan(media_track, &volume, &pan1);
+
+    return volume;
+}
+
 /************************************************************************
  * Track FX
  ************************************************************************/

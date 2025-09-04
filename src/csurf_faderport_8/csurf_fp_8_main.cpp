@@ -518,7 +518,7 @@ public:
     if (m_midiout)
     {
       DWORD now = GetTickCount();
-      if ((now - surface_update_lastrun) >= 100)
+      if ((now - surface_update_lastrun) >= 10)
       {
         faderManager->UpdateTracks();
         if (context->GetLastTouchedFxMode())
