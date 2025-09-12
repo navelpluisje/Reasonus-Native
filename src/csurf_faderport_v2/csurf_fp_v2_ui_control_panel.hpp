@@ -12,16 +12,25 @@
 class ReaSonusV2ControlPanel
 {
 public:
-    inline static bool control_panel_open = false;
+    // The page id's
+    static const int FUNCTIONS_PAGE = 0;
+    static const int SETTINGS_PAGE = 1;
+    static const int ABOUT_PAGE = 2;
+
     inline static int current_page = 0;
+    inline static bool control_panel_open = false;
+
     static void Start(int page = 0);
     static void Stop();
+
+    static void SetCurrentPage(int page);
     ~ReaSonusV2ControlPanel();
 
 private:
     static void Loop();
     static std::unique_ptr<ReaSonusV2ControlPanel> s_inst;
     void InitAssets();
+    void SetPageContent();
     CSurf_UI_PageContent *page_content = NULL;
 
     ReaSonusV2ControlPanel();

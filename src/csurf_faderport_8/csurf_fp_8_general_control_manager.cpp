@@ -6,8 +6,6 @@
 #include "../controls/csurf_button.hpp"
 #include "../controls/csurf_color_button.hpp"
 #include "csurf_fp_8_navigator.hpp"
-#include "csurf_fp_8_ui_functions.hpp"
-#include "csurf_fp_8_ui_filters.hpp"
 #include "csurf_fp_8_fader_manager.hpp"
 #include "csurf_fp_8_menu_manager.cpp"
 #include "csurf_fp_8_ui_control_panel.hpp"
@@ -180,7 +178,7 @@ public:
         hasGlobalBypass = (bool)GetToggleCommandState(40344);
         followCursor = GetToggleCommandStringState("_REASONUS_TOGGLE_PLAY_CURSOR_COMMAND");
         lastTouchedFxMode = context->GetLastTouchedFxMode();
-        functionsDialogOpen = CSURF_FP_UI_FUNCTIONS::IsFunctionsDialogOpen();
+        functionsDialogOpen = ReaSonus8ControlPanel::control_panel_open && ReaSonus8ControlPanel::current_page == ReaSonus8ControlPanel::FUNCTIONS_PAGE;
 
         SetButtonValue();
         SetButtonColors();

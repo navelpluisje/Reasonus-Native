@@ -93,6 +93,15 @@ void ReaSonusV2ControlPanel::Stop()
     }
 }
 
+void ReaSonusV2ControlPanel::SetCurrentPage(int page)
+{
+    if (s_inst && current_page != page)
+    {
+        current_page = page;
+        s_inst->SetPageContent();
+    }
+}
+
 void ReaSonusV2ControlPanel::Loop()
 {
     try
@@ -106,7 +115,7 @@ void ReaSonusV2ControlPanel::Loop()
     }
 }
 
-void ReaSonusV2ControlPanel::Frame()
+void ReaSonusV2ControlPanel::SetPageContent()
 {
     if (current_page != previous_page)
     {
@@ -114,21 +123,28 @@ void ReaSonusV2ControlPanel::Frame()
 
         switch (current_page)
         {
-        case 0:
+        case FUNCTIONS_PAGE:
             CSurf_UI_FunctionKeysPage::querying_actions = false;
             CSurf_UI_FunctionKeysPage::selected_function = -1;
             CSurf_UI_FunctionKeysPage::selected_action = -1;
 
             page_content = new CSurf_UI_FunctionKeysPage(m_ctx, FP_V2);
             break;
-        case 1:
+
+        case SETTINGS_PAGE:
             page_content = new CSurf_FP_V2_SettingsPage(m_ctx);
             break;
-        case 2:
+
+        case ABOUT_PAGE:
             page_content = new CSurf_UI_AboutPage(m_ctx, FP_V2);
             break;
         }
     }
+}
+
+void ReaSonusV2ControlPanel::Frame()
+{
+    SetPageContent();
 
     if (save_clicked)
     {

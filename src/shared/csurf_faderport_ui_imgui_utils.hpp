@@ -3,4 +3,6 @@
 
 void ToggleFP8ControlPanel(int page_index);
 
+void ToggleFPV2ControlPanel(int page_index);
+
 #endif

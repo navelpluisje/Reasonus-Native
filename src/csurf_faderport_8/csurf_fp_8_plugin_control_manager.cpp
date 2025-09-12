@@ -5,7 +5,6 @@
 #include <WDL/ptrlist.h>
 #include "csurf_fp_8_track.hpp"
 #include "csurf_fp_8_channel_manager.hpp"
-#include "csurf_fp_8_ui_plugin_edit.hpp"
 #include "csurf_fp_8_navigator.hpp"
 #include <mini/ini.h>
 #include <vector>

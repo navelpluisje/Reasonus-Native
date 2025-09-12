@@ -7,10 +7,11 @@
 #include "../shared/csurf_context.cpp"
 #include "../shared/csurf_session_manager_actions.hpp"
 #include "csurf_fp_v2_navigator.hpp"
-#include "csurf_fp_v2_ui_functions.hpp"
 #include <mini/ini.h>
 #include "../controls/csurf_color_button.hpp"
 #include "../shared/csurf_daw.hpp"
+#include "csurf_fp_v2_ui_control_panel.hpp"
+#include "../shared/csurf_faderport_ui_imgui_utils.hpp"
 
 enum SessionTypes
 {
@@ -54,7 +55,7 @@ protected:
                              : context->GetLastTouchedFxMode()
                                  ? valueOn
                                  : BTN_VALUE_OFF);
-        panButton->SetValue(CSURF_FP_V2_UI_FUNCTIONS::IsFunctionsDialogOpen() && context->GetShiftLeft()
+        panButton->SetValue(ReaSonusV2ControlPanel::control_panel_open && context->GetShiftLeft()
                                 ? BTN_VALUE_ON
                             : session_type == Pan
                                 ? valueOn
@@ -94,7 +95,10 @@ protected:
             int result = MB("There is no action assigned to this function.\nDo you want to assign an action?", "No action assigned", 1);
             if (result == 1)
             {
-                CSURF_FP_V2_UI_FUNCTIONS::ShowFunctionsDialog();
+                if (!ReaSonusV2ControlPanel::control_panel_open)
+                {
+                    ToggleFPV2ControlPanel(ReaSonusV2ControlPanel::FUNCTIONS_PAGE);
+                }
             }
             return;
         }
@@ -225,14 +229,7 @@ public:
 
         if (context->GetShiftLeft())
         {
-            if (CSURF_FP_V2_UI_FUNCTIONS::IsFunctionsDialogOpen())
-            {
-                CSURF_FP_V2_UI_FUNCTIONS::HideFunctionsDialog();
-            }
-            else
-            {
-                CSURF_FP_V2_UI_FUNCTIONS::ShowFunctionsDialog();
-            }
+            ToggleFPV2ControlPanel(ReaSonusV2ControlPanel::FUNCTIONS_PAGE);
             return;
         }
         SetSession(Pan);

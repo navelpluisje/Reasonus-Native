@@ -2,10 +2,7 @@ target_sources(${PROJECT_NAME}
     PRIVATE
         close_all_floating_fx_windows.cpp
         show_reaper_resource_path.cpp
-        show_reasonus_filters_window.cpp
-        show_reasonus_function_window.cpp
         show_reasonus_8_control_panel.cpp
         show_reasonus_v2_control_panel.cpp
-        show_reasonus_v2_function_window.cpp
         toggle_play_cursor.cpp
         )

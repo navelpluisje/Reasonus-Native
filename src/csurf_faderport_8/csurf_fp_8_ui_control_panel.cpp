@@ -1,8 +1,8 @@
 #include <config.h>
 #include "csurf_fp_8_ui_control_panel.hpp"
 #include "csurf_fp_8_ui_settings_page.cpp"
-#include "csurf_fp_8_ui_custom_filters_page.cpp"
 #include "csurf_fp_8_ui_plugin_mapping_page.cpp"
+#include "csurf_fp_8_ui_custom_filters_page.cpp"
 #include "../ui/csurf_ui_function_keys_page.cpp"
 #include "../ui/csurf_ui_about_page.cpp"
 #include "../ui/csurf_ui_colors.hpp"

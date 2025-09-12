@@ -15,9 +15,6 @@ target_sources(${PROJECT_NAME}
         csurf_fp_8_plugins_manager.cpp
         csurf_fp_8_receives_manager.cpp
         csurf_fp_8_sends_manager.cpp
-        csurf_fp_8_ui_plugin_edit.cpp
-        csurf_fp_8_ui_functions.cpp
-        csurf_fp_8_ui_filters.cpp
         csurf_fp_8_track.cpp
         csurf_fp_8_ui_control_panel.cpp
         csurf_fp_8_ui_settings_page.cpp
