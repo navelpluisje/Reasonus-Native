@@ -54,7 +54,7 @@ static void ReaSonusExtendedListBox(
             {
                 ImGui::GetMouseDragDelta(m_ctx, &space_x, &space_y, ImGui::MouseButton_Left);
                 int next_index = i + (space_y < 0 ? -1 : 1);
-                if (next_index >= 0 and next_index < (int)items.size())
+                if (next_index >= 0 && next_index < (int)items.size())
                 {
                     sort_callback(i, next_index);
                 }
