@@ -3,8 +3,10 @@
 **/.DS_Store
 /*build*
 /*out*
-/lib
 /third_party/*
 /WDL
 /.idea
 /.vs
+
+/lib/*
+!/lib/CMakeLists.txt

@@ -6,6 +6,13 @@
 #include <reaper_plugin_functions.h>
 #include <mini/ini.h>
 
+const char pathSeparator =
+#ifdef _WIN32
+    '\\';
+#else
+    '/';
+#endif
+
 const int TOGGLE_SPEED = 150;
 const int DOUBLE_CLICK_SPEED = 750;
 
@@ -118,6 +125,10 @@ void Main_OnCommandStringEx(std::string action_name, int flag = 0, ReaProject *p
 void SetActionState(int actionId);
 
 void SetActionState(std::string action_name);
+
+void SetActionState(int actionId, int state);
+
+void SetActionState(std::string action_name, int state);
 
 bool GetToggleCommandStringState(std::string action_name);
 
@@ -255,6 +266,15 @@ void validateReaSonusIni(mINI::INIFile file, mINI::INIStructure &data, std::stri
  * @param prefix The prefix used for the key
  */
 std::string GenerateUniqueKey(std::string prefix);
+
+/**
+ * @brief Chack if a plugin param name is wanted. therre is a list of values that shoould NOT be in a param name
+ *
+ * @param param_name
+ * @return true
+ * @return false
+ */
+bool IsWantedParam(std::string param_name);
 
 int minmax(int min, int value, int max);
 double minmax(double min, double value, double max);

@@ -110,7 +110,7 @@ std::string DAW::GetTrackInputName(MediaTrack *media_track)
         int midiDeviceId = (inputCode >> 5) & ((1 << 6) - 1);
         ::GetMIDIInputName(midiDeviceId, midiDeviceName, sizeof(midiDeviceName));
 
-        if (!midiDeviceName)
+        if (midiDeviceName[0] == '\0')
         {
             return "";
         }

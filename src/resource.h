@@ -36,69 +36,6 @@
 #define IDC_BUTTON_DOCUMENTTION 1041
 #define IDC_VERSION 1042
 
-//========================================================
-// The functions dialog
-//========================================================
-#define IDC_EDIT_FUNCTION_1 1100
-#define IDC_EDIT_FUNCTION_2 1101
-#define IDC_EDIT_FUNCTION_3 1102
-#define IDC_EDIT_FUNCTION_4 1103
-#define IDC_EDIT_FUNCTION_5 1104
-#define IDC_EDIT_FUNCTION_6 1105
-#define IDC_EDIT_FUNCTION_7 1106
-#define IDC_EDIT_FUNCTION_8 1107
-#define IDC_BUTTON_ACTION_1 1116
-#define IDC_BUTTON_ACTION_2 1117
-#define IDC_BUTTON_ACTION_3 1118
-#define IDC_BUTTON_ACTION_4 1119
-#define IDC_BUTTON_ACTION_5 1120
-#define IDC_BUTTON_ACTION_6 1121
-#define IDC_BUTTON_ACTION_7 1122
-#define IDC_BUTTON_ACTION_8 1123
-#define IDC_BUTTON_INFO_1 1124
-#define IDC_BUTTON_INFO_2 1125
-#define IDC_BUTTON_INFO_3 1126
-#define IDC_BUTTON_INFO_4 1127
-#define IDC_BUTTON_INFO_5 1128
-#define IDC_BUTTON_INFO_6 1129
-#define IDC_BUTTON_INFO_7 1130
-#define IDC_BUTTON_INFO_8 1131
-#define IDC_GROUP_FUNCTION_INFO 1132
-#define IDC_FUNCTION_INFO_ID 1133
-#define IDC_FUNCTION_INFO_TYPE 1134
-#define IDC_FUNCTION_INFO_NAME 1135
-//========================================================
-// The filters window controls
-//========================================================
-#define IDC_LIST_FILTERS 1200
-#define IDC_BUTTON_ADD_FILTER 1201
-#define IDC_BUTTON_REMOVE_FILTER 1202
-#define IDC_BUTTON_FILTER_ITEM_UP 1203
-#define IDC_BUTTON_FILTER_ITEM_DOWN 1204
-#define IDC_EDIT_FILTER_NAME 1205
-#define IDC_EDIT_FilterText 1206
-#define IDC_BUTTON_ADD_TEXT 1207
-#define IDC_LIST_FILTER_TEXT 1208
-#define IDC_CHECK_SHOW_SIBBLINGS 1209
-#define IDC_CHECK_SHOW_PARENTS 1210
-#define IDC_CHECK_SHOW_CHILDREN 1211
-#define IDC_CHECK_SHOW_TOP_LEVEL 1212
-#define IDC_CHECK_MATCH_MULTIPLE 1213
-#define IDC_GROUP_FILTERS 1214
-#define IDC_BUTTON_REMOVE_TEXT 1215
-//========================================================
-// The plugin edit window controls
-//========================================================
-#define IDC_GROUP_PLUGIN_SELECT 1300
-#define IDC_EDIT_PLUGIN_EDIT_SELECT_NAME 1301
-#define IDC_EDIT_PLUGIN_EDIT_ORIG_NAME 1302
-#define IDC_EDIT_PLUGIN_EDIT_SELECT_PARAM_ID 1303
-#define IDC_EDIT_PLUGIN_EDIT_SELECT_NB_STEPS 1304
-#define IDC_GROUP_PLUGIN_FADER 1305
-#define IDC_EDIT_PLUGIN_EDIT_FADER_NAME 1306
-#define IDC_EDIT_PLUGIN_EDIT_FADER_ORIG_NAME 1307
-#define IDC_EDIT_PLUGIN_EDIT_FADER_PARAM_ID 1308
-
 #define ID_QUIT 40000
 
 // Next default values for new objects

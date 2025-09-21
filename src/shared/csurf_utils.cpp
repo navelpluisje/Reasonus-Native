@@ -10,13 +10,6 @@
 #include <ShlObj_core.h>
 #endif
 
-const char pathSeparator =
-#ifdef _WIN32
-    '\\';
-#else
-    '/';
-#endif
-
 void Main_OnCommandStringEx(std::string action_name, int flag, ReaProject *proj)
 {
     int actionId = NamedCommandLookup(action_name.c_str());
@@ -36,6 +29,18 @@ void SetActionState(std::string action_name)
 {
     int actionId = NamedCommandLookup(action_name.c_str());
     SetActionState(actionId);
+}
+
+void SetActionState(int actionId, int new_state)
+{
+    SetToggleCommandState(0, actionId, new_state);
+    RefreshToolbar2(0, actionId);
+}
+
+void SetActionState(std::string action_name, int new_state)
+{
+    int actionId = NamedCommandLookup(action_name.c_str());
+    SetActionState(actionId, new_state);
 }
 
 bool GetToggleCommandStringState(std::string action_name)
@@ -368,6 +373,41 @@ std::string GenerateUniqueKey(std::string prefix)
     prefix += std::to_string(now);
 
     return prefix;
+}
+
+std::vector<std::string> unwanted_param_names = {
+    "MIDI CC",  // Decomposer, Arturia
+    "reserved", // Decomposer, Valhalla
+    // Blue Cat
+    "MIDI Program Change",
+    "MIDI Controller",
+    // Arturia
+    "unassigned",
+    "VST_ProgramChange_",
+    "HardwareDisplayControl",
+    "MPE_",
+    // SPITFIRE
+    "general purpose",
+    // global
+    "undefined",
+};
+
+bool IsWantedParam(std::string param_name)
+{
+    bool result = true;
+
+    for (std::string unwanted_name : unwanted_param_names)
+    {
+        int res = param_name.find(unwanted_name);
+        // We found the string. Set result to false and break;
+        if (res != (int)std::string::npos)
+        {
+            result = false;
+            break;
+        }
+    }
+
+    return result;
 }
 
 int minmax(int min, int value, int max)

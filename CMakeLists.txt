@@ -81,18 +81,28 @@ FetchContent_Declare(mINI
 
 FetchContent_MakeAvailable(WDL reaper-sdk GSL mINI)
 
+
+# ------------------------------------------------------------------------------
+# Single file downloads
+# ------------------------------------------------------------------------------
+
+file(DOWNLOAD
+    https://github.com/cfillion/reaimgui/releases/download/v0.10.0.1/reaper_imgui_functions.h
+    ${PROJECT_LIB_DIR}/reaImgui/reaper_imgui_functions.h)
+
+
 # ------------------------------------------------------------------------------
 # Symlink WDL into reaper-sdk
 # ------------------------------------------------------------------------------
 
 if (UNIX)
-execute_process(
+  execute_process(
     COMMAND ${CMAKE_COMMAND} -E create_symlink
-            # source
-            "${PROJECT_LIB_DIR}/WDL/WDL"
-            # target
-            ${PROJECT_LIB_DIR}/reaper-sdk/WDL
-)
+      # source
+      "${PROJECT_LIB_DIR}/WDL/WDL"
+      # target
+      ${PROJECT_LIB_DIR}/reaper-sdk/WDL
+  )
 else()
     file(TO_NATIVE_PATH "${PROJECT_LIB_DIR}/WDL/WDL" _dstDir)
     file(TO_NATIVE_PATH "${PROJECT_LIB_DIR}/reaper-sdk/WDL" _srcDir)
@@ -135,14 +145,16 @@ endforeach()
 # ------------------------------------------------------------------------------
 
 add_library(reaper-sdk INTERFACE)
-target_include_directories(reaper-sdk   
-    INTERFACE 
-    ${header_paths}
-    )
+
+target_include_directories(reaper-sdk INTERFACE ${header_paths})
+
 target_link_libraries(reaper-sdk INTERFACE GSL)
 target_include_directories(reaper-sdk INTERFACE ${CMAKE_BINARY_DIR})
 
 target_link_libraries(reaper-sdk INTERFACE mINI)
+
+# target_link_libraries(reaper-sdk INTERFACE ${PROJECT_LIB_DIR}/reaImgui/reaper_imgui_functions.h)  
+target_include_directories(reaper-sdk INTERFACE ${PROJECT_LIB_DIR}/reaImgui)
 
 # ------------------------------------------------------------------------------
 # Find and Link WDL + SWELL
@@ -161,6 +173,39 @@ target_link_libraries(reaper-sdk INTERFACE WDL::WDL)
 if(SWELL_FOUND)
   target_link_libraries(reaper-sdk INTERFACE SWELL::swell)
 endif()
+
+# ------------------------------------------------------------------------------
+# Generate ipp image files
+# ------------------------------------------------------------------------------
+
+# Check if teh destination directory exists
+if(NOT EXISTS ${PROJECT_LIB_DIR}/assets)
+  make_directory(${PROJECT_LIB_DIR}/assets)
+endif()
+
+# Create al ist of files we need to process
+file(GLOB_RECURSE COMPILED_RESOURCES ${PROJECT_SOURCE_DIR}/src/assets/*.png)
+
+# Loop through the files and create an add_custom_command
+foreach(INPUT_FILE ${COMPILED_RESOURCES})
+    # Create the output file name
+    string(REPLACE "png" "ipp" OUTPUT_FILE ${INPUT_FILE})
+    string(REPLACE "src" "lib" OUTPUT_FILE ${OUTPUT_FILE})
+
+    # Custom command to run xxd
+    add_custom_command(
+        OUTPUT ${OUTPUT_FILE}
+        COMMAND xxd -i <${INPUT_FILE} > ${OUTPUT_FILE}
+        DEPENDS ${INPUT_FILE}
+        COMMENT "Generating hex dump of ${INPUT_FILE} to ${OUTPUT_FILE}"
+    )
+    list(APPEND COMPILED_RESOURCES ${OUTPUT_FILE})
+endforeach()
+
+# Custom target that depends on the custom command
+add_custom_target(generate_hex ALL DEPENDS ${COMPILED_RESOURCES})
+# Ensure that the library depends on the hex generation
+add_dependencies(reaper-sdk generate_hex)
 
 # ------------------------------------------------------------------------------
 # Interprocedural Optimization (LTO)
@@ -253,6 +298,8 @@ else()
     )
 endif()
 
+
+
 # ------------------------------------------------------------------------------
 # Installer Defaults and CPack Configuration
 # ------------------------------------------------------------------------------
@@ -266,7 +313,7 @@ if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     set(USER_CONFIG_DIR "~/.config")
   endif()
 
-  set(CMAKE_INSTALL_PREFIX "${USER_CONFIG_DIR}/REAPER" CACHE PATH "REAPER resource path where to install ReaPack" FORCE)
+  set(CMAKE_INSTALL_PREFIX "${USER_CONFIG_DIR}/REAPER" CACHE PATH "REAPER resource path where to install ReaSonus" FORCE)
 endif()
 
 if(CMAKE_OSX_ARCHITECTURES)
