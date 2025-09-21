@@ -5,7 +5,7 @@
 #include <map>
 
 std::map<std::string, std::string> enUS = {
-    {"page.functions.title", "Functions"},
+    {"page.functions.title", "Funktionen"},
 };
 
 #endif
