@@ -162,11 +162,6 @@ public:
                 track->SetVuMeterValue(DAW::GetTrackSurfacePeakInfo(media_track), true);
                 int index = context->GetNbBankChannels() - (static_cast<int>(time_code.size()) + i);
 
-                if (touch_start[i])
-                {
-                    DAW::SetTrackVolume(media_track, DAW::GetTrackVolume(media_track));
-                }
-
                 if (index < 1)
                 {
                     track->SetDisplayMode(DISPLAY_MODE_0, forceUpdate);
@@ -270,6 +265,10 @@ public:
         if (::GetTrackAutomationMode(media_track) == AUTOMATION_TOUCH)
         {
             touch_start[index] = value > 0;
+            if (touch_start[index])
+            {
+                DAW::SetTrackVolume(media_track, DAW::GetTrackVolume(media_track));
+            }
         }
     }
 
