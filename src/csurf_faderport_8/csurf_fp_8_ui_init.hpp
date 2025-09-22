@@ -99,23 +99,6 @@ namespace CSURF_FP_8_UI_INIT
                 SendDlgItemMessage(hwndDlg, IDC_COMBO_SURFACE, CB_SETCURSEL, combo, 0);
             }
 
-            for (int i = 0; i < 6; i++)
-            {
-                int dev = AddComboEntry(hwndDlg, time_code_indexes[i], const_cast<char *>(time_code_names[i].c_str()), IDC_COMBO_INIT_TIME_CODE);
-                if (time_code_indexes[i] == stoi(ini["surface"]["time-code"]))
-                {
-                    SendDlgItemMessage(hwndDlg, IDC_COMBO_INIT_TIME_CODE, CB_SETCURSEL, dev, 0);
-                }
-            }
-
-            SendMessage(GetDlgItem(hwndDlg, IDC_CHECK_INIT_DIS_PLUGIN), BM_SETCHECK, ini["surface"]["disable-plugins"] == "1" ? BST_CHECKED : BST_UNCHECKED, 0);
-            SendMessage(GetDlgItem(hwndDlg, IDC_CHECK_UNTOUCH_AFTER_LEARN), BM_SETCHECK, ini["surface"]["erase-last-param-after-learn"] == "1" ? BST_CHECKED : BST_UNCHECKED, 0);
-            SendMessage(GetDlgItem(hwndDlg, IDC_CHECK_MASTER_FADER_MODE), BM_SETCHECK, ini["surface"]["master-fader-mode"] == "1" ? BST_CHECKED : BST_UNCHECKED, 0);
-            SendMessage(GetDlgItem(hwndDlg, IDC_CHECK_INIT_SWAP_SHIFT), BM_SETCHECK, ini["surface"]["swap-shift-buttons"] == "1" ? BST_CHECKED : BST_UNCHECKED, 0);
-            SendMessage(GetDlgItem(hwndDlg, IDC_CHECK_INIT_FADER_RESET), BM_SETCHECK, ini["surface"]["fader-reset"] == "1" ? BST_CHECKED : BST_UNCHECKED, 0);
-            SendMessage(GetDlgItem(hwndDlg, IDC_CHECK_INIT_MUTE_MOMENTARY), BM_SETCHECK, ini["surface"]["mute-solo-momentary"] == "1" ? BST_CHECKED : BST_UNCHECKED, 0);
-            SendMessage(GetDlgItem(hwndDlg, IDC_CHECK_INIT_TIME_CODE), BM_SETCHECK, ini["surface"]["overwrite-time-code"] == "1" ? BST_CHECKED : BST_UNCHECKED, 0);
-
             SetDlgItemText(hwndDlg, IDC_VERSION, GIT_VERSION);
 
             break;
@@ -124,50 +107,20 @@ namespace CSURF_FP_8_UI_INIT
         case WM_COMMAND:
             switch (LOWORD(wParam))
             {
+
+            case IDC_BUTTON_CONTROL_PANEL:
+            {
+                ToggleFP8ControlPanel(ReaSonus8ControlPanel::SETTINGS_PAGE);
+
+                break;
+            }
+
             case IDC_BUTTON_DOCUMENTTION:
             {
                 SystemOpenURL("https://navelpluisje.github.io/reasonus/documentation/faderport8/");
                 break;
             }
 
-            case IDC_CHECK_INIT_DIS_PLUGIN:
-            {
-                SaveCheckBoxValue(hwndDlg, "disable-plugins", IDC_CHECK_INIT_DIS_PLUGIN);
-                break;
-            }
-
-            case IDC_CHECK_UNTOUCH_AFTER_LEARN:
-            {
-                SaveCheckBoxValue(hwndDlg, "erase-last-param-after-learn", IDC_CHECK_UNTOUCH_AFTER_LEARN);
-                break;
-            }
-
-            case IDC_CHECK_MASTER_FADER_MODE:
-            {
-                SaveCheckBoxValue(hwndDlg, "master-fader-mode", IDC_CHECK_MASTER_FADER_MODE);
-                break;
-            }
-
-            case IDC_CHECK_INIT_SWAP_SHIFT:
-            {
-                SaveCheckBoxValue(hwndDlg, "swap-shift-buttons", IDC_CHECK_INIT_SWAP_SHIFT);
-                break;
-            }
-            case IDC_CHECK_INIT_FADER_RESET:
-            {
-                SaveCheckBoxValue(hwndDlg, "fader-reset", IDC_CHECK_INIT_FADER_RESET);
-                break;
-            }
-            case IDC_CHECK_INIT_MUTE_MOMENTARY:
-            {
-                SaveCheckBoxValue(hwndDlg, "mute-solo-momentary", IDC_CHECK_INIT_MUTE_MOMENTARY);
-                break;
-            }
-            case IDC_CHECK_INIT_TIME_CODE:
-            {
-                SaveCheckBoxValue(hwndDlg, "overwrite-time-code", IDC_CHECK_INIT_TIME_CODE);
-                break;
-            }
             break;
             }
 
@@ -192,14 +145,9 @@ namespace CSURF_FP_8_UI_INIT
                 if (r != CB_ERR)
                     surface = SendDlgItemMessage(hwndDlg, IDC_COMBO_SURFACE, CB_GETITEMDATA, r, 0);
 
-                r = SendDlgItemMessage(hwndDlg, IDC_COMBO_INIT_TIME_CODE, CB_GETCURSEL, 0, 0);
-                if (r != CB_ERR)
-                    time_code = SendDlgItemMessage(hwndDlg, IDC_COMBO_INIT_TIME_CODE, CB_GETITEMDATA, r, 0);
-
                 ini["surface"]["midiin"] = std::to_string(indev);
                 ini["surface"]["midiout"] = std::to_string(outdev);
                 ini["surface"]["surface"] = std::to_string(surface);
-                ini["surface"]["time-code"] = std::to_string(time_code);
                 file.write(ini, true);
             }
             break;

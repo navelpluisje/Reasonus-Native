@@ -22,13 +22,13 @@ void ToggleFPV2ControlPanel(int page_index)
 {
     if (ReaSonusV2ControlPanel::control_panel_open && ReaSonusV2ControlPanel::current_page == page_index)
     {
-        Main_OnCommandStringEx("_REASONUS_SHOW_REASONUS_8_CONTROL_WINDOW", 0, 0);
+        Main_OnCommandStringEx("_REASONUS_SHOW_REASONUS_V2_CONTROL_WINDOW", 0, 0);
     }
     else
     {
         if (!ReaSonus8ControlPanel::control_panel_open)
         {
-            Main_OnCommandStringEx("_REASONUS_SHOW_REASONUS_8_CONTROL_WINDOW", 0, 0);
+            Main_OnCommandStringEx("_REASONUS_SHOW_REASONUS_V2_CONTROL_WINDOW", 0, 0);
             ReaSonusV2ControlPanel::SetCurrentPage(page_index);
         }
     }
