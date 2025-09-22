@@ -72,17 +72,20 @@ public:
                     ImGui::EndChild(m_ctx);
                 }
 
-                UiElements::PushReaSonusGroupStyle(m_ctx);
-                if (ImGui::BeginChild(m_ctx, "Thanks", 0.0, 0.0, ImGui::ChildFlags_FrameStyle))
+                if (device != FP_V2)
                 {
-                    ReaSonusPageTitle(m_ctx, "Thanks", main_font_bold);
-                    ImGui::Text(m_ctx, "This project would not have been possible without you, reading this. But also a \nbig thanx goes to the following people:");
-                    ImGui::BulletText(m_ctx, "Geoff Waddington, The man behind the impressive CSI. Without the CSI project, \nthis would probably never been created.");
-                    ImGui::BulletText(m_ctx, "Cfillion, for helping me out with some annoyances I ran into with C++ and CMake.");
-                    ImGui::BulletText(m_ctx, "All volunteers helping with testing, reviewing the documentation and being patient.");
+                    UiElements::PushReaSonusGroupStyle(m_ctx);
+                    if (ImGui::BeginChild(m_ctx, "Thanks", 0.0, 0.0, ImGui::ChildFlags_FrameStyle))
+                    {
+                        ReaSonusPageTitle(m_ctx, "Thanks", main_font_bold);
+                        ImGui::Text(m_ctx, "This project would not have been possible without you, reading this. But also a \nbig thanx goes to the following people:");
+                        ImGui::BulletText(m_ctx, "Geoff Waddington, The man behind the impressive CSI. Without the CSI project, \nthis would probably never been created.");
+                        ImGui::BulletText(m_ctx, "Cfillion, for helping me out with some annoyances I ran into with C++ and CMake.");
+                        ImGui::BulletText(m_ctx, "All volunteers helping with testing, reviewing the documentation and being patient.");
 
-                    ImGui::EndChild(m_ctx);
-                    UiElements::PopReaSonusGroupStyle(m_ctx);
+                        UiElements::PopReaSonusGroupStyle(m_ctx);
+                        ImGui::EndChild(m_ctx);
+                    }
                 }
 
                 ImGui::EndChild(m_ctx);

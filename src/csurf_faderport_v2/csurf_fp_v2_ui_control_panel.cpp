@@ -161,9 +161,9 @@ void ReaSonusV2ControlPanel::Frame()
     PushReaSonusColors(m_ctx);
     PushReaSonusStyle(m_ctx);
     ImGui::PushFont(m_ctx, main_font, 13);
-    ImGui::SetNextWindowSize(m_ctx, 400, 80, ImGui::Cond_FirstUseEver);
+    ImGui::SetNextWindowSize(m_ctx, 1024, 430, ImGui::Cond_Once);
     bool open{true};
-    if (ImGui::Begin(m_ctx, g_name, &open))
+    if (ImGui::Begin(m_ctx, g_name, &open, ImGui::WindowFlags_NoCollapse | ImGui::WindowFlags_NoResize))
     {
         UiElements::PushReaSonusSidebarStyle(m_ctx);
         if (ImGui::BeginChild(m_ctx, "side_bar", 224.0, 0.0, ImGui::ChildFlags_FrameStyle))
