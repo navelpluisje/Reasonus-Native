@@ -110,12 +110,18 @@ public:
                 track->SetDisplayLine(1, ALIGN_LEFT, DAW::GetTrackSendDestName(sends_track, send_index).c_str(), INVERT);
                 track->SetDisplayLine(2, ALIGN_CENTER, DAW::GetTrackSurfaceSendMode(sends_track, send_index).c_str());
                 track->SetDisplayLine(3, ALIGN_CENTER, DAW::GetTrackSurfaceSendAutoMode(sends_track, send_index).c_str());
+                track->SetFaderValue(fader_value);
+                track->SetValueBarMode(context->GetShiftChannelLeft() ? VALUEBAR_MODE_FILL : VALUEBAR_MODE_BIPOLAR);
+                track->SetValueBarValue(value_bar_value);
             }
             else
             {
                 track->SetDisplayLine(1, ALIGN_LEFT, "No Sends", INVERT);
                 track->SetDisplayLine(2, ALIGN_CENTER, "");
                 track->SetDisplayLine(3, ALIGN_CENTER, "");
+                track->SetFaderValue(0);
+                track->SetValueBarMode(VALUEBAR_MODE_FILL);
+                track->SetValueBarValue(0);
             }
 
             track->SetTrackColor(color);
@@ -124,9 +130,6 @@ public:
             track->SetSoloButtonValue(((context->GetShiftChannelLeft() && DAW::GetTrackSendMono(sends_track, send_index)) || (!context->GetShiftChannelLeft() && DAW::GetTrackSendPhase(sends_track, send_index)))
                                           ? BTN_VALUE_ON
                                           : BTN_VALUE_OFF);
-            track->SetFaderValue(fader_value);
-            track->SetValueBarMode(context->GetShiftChannelLeft() ? VALUEBAR_MODE_FILL : VALUEBAR_MODE_BIPOLAR);
-            track->SetValueBarValue(value_bar_value);
 
             track->SetDisplayMode(DISPLAY_MODE_2);
         }
