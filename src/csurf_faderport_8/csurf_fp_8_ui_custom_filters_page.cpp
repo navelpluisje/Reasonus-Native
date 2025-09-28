@@ -71,7 +71,7 @@ protected:
         ini[newKey]["match-multiple"] = "0";
 
         SetFiltersKeys();
-        selected_filter = filter_keys.size() - 1;
+        selected_filter = (int)filter_keys.size() - 1;
         previous_selected_filter = selected_filter;
         edit_new_filter = true;
         PopulateFilter();

@@ -57,7 +57,8 @@ set(PROJECT_LIB_DIR ${PROJECT_SOURCE_DIR}/lib)
 
 FetchContent_Declare(reaper-sdk
     GIT_REPOSITORY https://github.com/justinfrankel/reaper-sdk
-    GIT_TAG        "origin/main" # or specify a tag or branch here
+    # GIT_TAG        "origin/main" # or specify a tag or branch here
+    GIT_TAG        "b6285401c89db5f06d42c5bcb9614fb603c08ba6" # v7.40
     SOURCE_DIR     "${PROJECT_LIB_DIR}/reaper-sdk"
     )
 

@@ -57,7 +57,7 @@ static void ReaSonusFilterPreview(ImGui_Context *m_ctx, int value)
 
         for (int i = 0; i < (int)track_level.size(); i++)
         {
-            int x_pos = x + i * track_width + i * 6;
+            int x_pos = (int)x + i * track_width + i * 6;
             double track_height = height - ((track_level[i] + 1) * 20);
             bool track_selected = fader_options[value][i] == 1;
             bool track_matched = (i == 2 || i == 6);

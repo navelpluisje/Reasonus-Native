@@ -7,6 +7,14 @@
 #include <reaper_plugin_functions.h>
 #include "../shared/csurf_utils.hpp"
 
+/**
+ * Check if the value is betweemn the min and max value
+ * @property min The min value to check againt. The value should be larger the this value
+ * @property val The The value to test against
+ * @property max The max value to check againt. The value should be smaller the this value
+ * 
+ * @return boolean value
+ */
 inline double between(int min, int val, int max)
 {
     double diff = max - min;
@@ -33,7 +41,7 @@ static void ReaSonusMenuButton(
         ImGui::GetMousePos(m_ctx, &x_mouse_pos, &y_mouse_pos);
         ImGui::GetItemRectMin(m_ctx, &x_pos_1, &y_pos_1);
 
-        bool hovered = between(x_pos_1, menu_button_width, x_mouse_pos) && between(y_pos_1, menu_button_height, y_mouse_pos);
+        bool hovered = between((int)x_pos_1, menu_button_width, (int)x_mouse_pos) && between((int)y_pos_1, menu_button_height, (int)y_mouse_pos);
 
         if (hovered)
         {
