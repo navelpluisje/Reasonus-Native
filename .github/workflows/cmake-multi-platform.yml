@@ -81,7 +81,6 @@ jobs:
           elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
             choco install ninja
             choco install nsis -y
-            refreshenv
           elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
             brew install make
             ATH="/opt/homebrew/opt/make/libexec/gnubin:$PATH"
