@@ -185,6 +185,22 @@ double panToNormalized(double val);
 double int14ToVol(unsigned char msb, unsigned char lsb);
 
 /**
+ * @brief Strip the plugin name from its pre and post fixes
+ *
+ * @param name The full plugin name
+ * @return The stripped down name
+ */
+std::string StripPluginName(std::string pluginName);
+
+/**
+ * @brief Strip the plugin developer from its pre and post fixes
+ *
+ * @param name The full plugin name
+ * @return The stripped down name
+ */
+std::string StripPluginDeveloper(std::string pluginName);
+
+/**
  * @brief Strip the type from the plugin name
  *
  * @param name The full plugin name
@@ -227,6 +243,8 @@ std::string GetSendModeString(int sendMode);
 std::string GetAutomationString(int automationMode);
 
 std::string GetReaSonusIniPath(std::string device);
+
+std::string GetReaSonusZonesPath();
 
 std::string GetReaSonusPluginPath(std::string developer, std::string pluginName, bool create = false);
 

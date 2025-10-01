@@ -163,6 +163,7 @@ void ReaSonusV2ControlPanel::Frame()
     ImGui::PushFont(m_ctx, main_font, 13);
     ImGui::SetNextWindowSize(m_ctx, 1024, 430, ImGui::Cond_Once);
     bool open{true};
+
     if (ImGui::Begin(m_ctx, g_name, &open, ImGui::WindowFlags_NoCollapse | ImGui::WindowFlags_NoResize))
     {
         UiElements::PushReaSonusSidebarStyle(m_ctx);
