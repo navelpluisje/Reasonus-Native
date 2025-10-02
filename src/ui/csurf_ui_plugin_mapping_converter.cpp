@@ -113,7 +113,7 @@ void ReaSonusV2PluginMappingConverter::SetBaseFileNames()
             std::filesystem::path path(entry.path());
             if (path.has_extension() && path.extension() == ".zon")
             {
-                file_names.insert(file_names.begin() + index, entry.path());
+                file_names.insert(file_names.begin() + index, entry.path().u8string());
                 index++;
             }
         }
@@ -203,7 +203,7 @@ void ReaSonusV2PluginMappingConverter::ConvertFile(std::string file_path)
     }
     else
     {
-        unconverted_files.insert(unconverted_files.begin() + unconverted_files.size(), path.filename());
+        unconverted_files.insert(unconverted_files.begin() + unconverted_files.size(), path.filename().u8string());
     }
 }
 
