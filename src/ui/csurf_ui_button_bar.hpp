@@ -10,8 +10,8 @@ static void ReaSonusButtonBar(
     std::string action_label,
     ImGui_Font *font,
     bool *action_value,
-    bool has_cancel,
-    bool *cancel_value,
+    bool has_cancel = false,
+    bool *cancel_value = nullptr,
     std::string cancel_label = "")
 {
     double x_pos_1, y_pos_1, x_pos_2, y_pos_2;
@@ -20,6 +20,7 @@ static void ReaSonusButtonBar(
     UiElements::PushReaSonusButtonBarContainerStyle(m_ctx);
     if (ImGui::BeginChild(m_ctx, "button-bar", 0.0, 34.0, ImGui::ChildFlags_FrameStyle))
     {
+        ImGui::PushFont(m_ctx, font, 13);
         ImGui::CalcTextSize(m_ctx, action_label.c_str(), &x_pos_1, &y_pos_1);
         float buttonWidth1 = (int)x_pos_1 + button_padding_x * 2.f;
         ImGui::CalcTextSize(m_ctx, cancel_label.c_str(), &x_pos_1, &y_pos_1);
@@ -27,6 +28,7 @@ static void ReaSonusButtonBar(
         ImGui::GetStyleVar(m_ctx, ImGui::StyleVar_ItemSpacing, &x_pos_2, &y_pos_2);
         float widthNeeded = (int)buttonWidth1 + x_pos_2 + buttonWidth2;
         ImGui::GetContentRegionAvail(m_ctx, &x_pos_2, &y_pos_2);
+        ImGui::PopFont(m_ctx);
 
         ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + x_pos_2 - widthNeeded - 4);
         ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 1);

@@ -100,6 +100,29 @@ double int14ToVol(unsigned char msb, unsigned char lsb)
     return DB2VAL(pos);
 }
 
+std::string StripPluginName(std::string pluginName)
+{
+    std::vector<std::string> pluginNameParts = split(StripPluginNamePrefixes(StripPluginChannelPostfix(pluginName.data()).data()), " (");
+    if (pluginNameParts.size() > 1)
+    {
+        pluginNameParts.pop_back();
+    }
+
+    return join(pluginNameParts, " (");
+}
+
+std::string StripPluginDeveloper(std::string pluginName)
+{
+    std::vector<std::string> pluginNameParts = split(StripPluginNamePrefixes(StripPluginChannelPostfix(pluginName.data()).data()), " (");
+    std::string developer = pluginNameParts.at(pluginNameParts.size() - 1);
+    if (!developer.empty())
+    {
+        developer.pop_back();
+    }
+
+    return developer;
+}
+
 std::string StripPluginNamePrefixes(char *name)
 {
     std::string s = std::string(name);
@@ -188,6 +211,8 @@ std::string GetAutomationString(int automationMode)
 }
 
 std::string GetReaSonusIniPath(std::string device) { return std::string(GetResourcePath()) + pathSeparator + "ReaSonus" + pathSeparator + device + ".ini"; }
+
+std::string GetReaSonusZonesPath() { return std::string(GetResourcePath()) + pathSeparator + "CSI" + pathSeparator + "Zones" + pathSeparator + "ReasonusFaderPort" + pathSeparator + "_ReaSonusEffects"; }
 
 std::string GetReaSonusPluginPath(std::string developer, std::string pluginName, bool create)
 {

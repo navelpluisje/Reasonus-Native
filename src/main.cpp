@@ -6,6 +6,7 @@
 #include "actions/show_reasonus_v2_control_panel.hpp"
 #include "actions/show_reasonus_8_control_panel.hpp"
 #include "actions/close_all_floating_fx_windows.hpp"
+#include "actions/convert_plugin_zon_to_ini.hpp"
 #include "ui/csurf_ui_function_keys_page.cpp"
 #include "resource.h"
 
@@ -47,6 +48,7 @@ extern "C"
       SHOW_REASONUS_V2_CONTROL_PANEL::Unregister();
       SHOW_REASONUS_8_CONTROL_PANEL::Unregister();
       CLOSE_ALL_FLOATING_FX_WINDOWS::Unregister();
+      CONVERT_PLUGIN_ZON_TO_INI::Unregister();
       return 0;
     }
 
@@ -65,8 +67,11 @@ extern "C"
     SHOW_REASONUS_V2_CONTROL_PANEL::Register();
     SHOW_REASONUS_8_CONTROL_PANEL::Register();
     CLOSE_ALL_FLOATING_FX_WINDOWS::Register();
+    CONVERT_PLUGIN_ZON_TO_INI::Register();
+
     reaper_plugin_info->Register("csurf", &csurf_faderport_8_reg);
     reaper_plugin_info->Register("csurf", &csurf_faderport_v2_reg);
+
     return 1;
   }
 };
