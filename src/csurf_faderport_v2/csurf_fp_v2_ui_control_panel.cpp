@@ -38,8 +38,8 @@ ReaSonusV2ControlPanel::~ReaSonusV2ControlPanel()
 
 void ReaSonusV2ControlPanel::InitAssets()
 {
-    main_font = ImGui::CreateFont("sans-serif");
-    main_font_bold = ImGui::CreateFont("sans-serif", ImGui::FontFlags_Bold);
+    main_font = ImGui::CreateFont("Arial");
+    main_font_bold = ImGui::CreateFont("Arial", ImGui::FontFlags_Bold);
     logo = ImGui::CreateImageFromMem(reinterpret_cast<const char *>(reasonus_logo), sizeof(reasonus_logo));
     icon_settings = ImGui::CreateImageFromMem(reinterpret_cast<const char *>(img_icon_settings), sizeof(img_icon_settings));
     icon_function_actions = ImGui::CreateImageFromMem(reinterpret_cast<const char *>(img_icon_function_actions), sizeof(img_icon_function_actions));
