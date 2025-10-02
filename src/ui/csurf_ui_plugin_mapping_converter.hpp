@@ -18,8 +18,8 @@ public:
     static void Start();
     static void Stop();
 
-    static void SetCurrentPage();
     ~ReaSonusV2PluginMappingConverter();
+
     // Regular expressions:
     std::regex select;
     std::regex fader;
@@ -31,7 +31,6 @@ private:
     static void Loop();
     static std::unique_ptr<ReaSonusV2PluginMappingConverter> s_inst;
     void InitAssets();
-    void SetPageContent();
     void SetBaseFileNames();
     void ConvertFile(std::string file_path);
     void ConvertFiles();
