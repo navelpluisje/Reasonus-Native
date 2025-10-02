@@ -14,7 +14,7 @@ public:
     CSurf_UI_AboutPage(ImGui_Context *m_ctx, std::string _device) : CSurf_UI_PageContent(m_ctx, _device)
     {
         device = _device;
-        main_font_bold = ImGui::CreateFont("sans-serif", ImGui::FontFlags_Bold);
+        main_font_bold = ImGui::CreateFont("Arial", ImGui::FontFlags_Bold);
         ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(main_font_bold));
     };
 

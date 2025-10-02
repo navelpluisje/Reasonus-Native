@@ -214,7 +214,7 @@ protected:
 public:
     CSurf_FP_8_PluginMappingPage(ImGui_Context *m_ctx) : CSurf_UI_PageContent(m_ctx, FP_8)
     {
-        main_font_bold = ImGui::CreateFont("sans-serif", ImGui::FontFlags_Bold);
+        main_font_bold = ImGui::CreateFont("Arial", ImGui::FontFlags_Bold);
         ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(main_font_bold));
 
         SetPluginFolders();

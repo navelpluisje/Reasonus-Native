@@ -23,7 +23,7 @@ public:
     CSurf_UI_FunctionKeysPage(ImGui_Context *m_ctx, std::string _device) : CSurf_UI_PageContent(m_ctx, _device)
     {
         device = _device;
-        function_font_bold = ImGui::CreateFont("sans-serif", ImGui::FontFlags_Bold);
+        function_font_bold = ImGui::CreateFont("Arial", ImGui::FontFlags_Bold);
         ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(function_font_bold));
         icon_search = ImGui::CreateImageFromMem(reinterpret_cast<const char *>(img_icon_search), sizeof(img_icon_search));
         ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(icon_search));
