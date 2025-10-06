@@ -16,14 +16,6 @@ namespace CSURF_FP_8_UI_INIT
 {
     mINI::INIStructure ini;
 
-    static void SaveCheckBoxValue(HWND hwndDlg, std::string key, int checkBox)
-    {
-        mINI::INIFile file(GetReaSonusIniPath(FP_8));
-
-        ini["surface"][key] = std::to_string(IsDlgButtonChecked(hwndDlg, checkBox));
-        file.write(ini, true);
-    }
-
     static WDL_DLGRET dlgProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
     {
 
@@ -131,7 +123,7 @@ namespace CSURF_FP_8_UI_INIT
             {
                 static mINI::INIFile file(GetReaSonusIniPath(FP_8));
 
-                LRESULT indev = -1, outdev = -1, surface = -1, time_code = -1;
+                LRESULT indev = -1, outdev = -1, surface = -1;
 
                 LRESULT r = SendDlgItemMessage(hwndDlg, IDC_COMBO_MIDI_IN, CB_GETCURSEL, 0, 0);
                 if (r != CB_ERR)

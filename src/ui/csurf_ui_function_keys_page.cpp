@@ -67,7 +67,7 @@ public:
 
         if (file.write(ini, true))
         {
-            MB("Chages saved with success", "Woohoo", 0);
+            MB("Changes saved with success", "Woohoo", 0);
         };
     }
 

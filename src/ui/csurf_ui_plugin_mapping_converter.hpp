@@ -31,7 +31,7 @@ private:
     static void Loop();
     static std::unique_ptr<ReaSonusV2PluginMappingConverter> s_inst;
     void InitAssets();
-    void SetBaseFileNames();
+    void SetBaseFileNames(std::string folder);
     void ConvertFile(std::string file_path);
     void ConvertFiles();
     void Convert();
