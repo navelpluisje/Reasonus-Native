@@ -101,12 +101,12 @@ void ReaSonusV2PluginMappingConverter::Loop()
     }
 }
 
-void ReaSonusV2PluginMappingConverter::SetBaseFileNames()
+void ReaSonusV2PluginMappingConverter::SetBaseFileNames(std::string folder)
 {
     file_names.clear();
     int index = 0;
 
-    for (const auto &entry : std::filesystem::recursive_directory_iterator(GetReaSonusZonesPath()))
+    for (const auto &entry : std::filesystem::recursive_directory_iterator(folder))
     {
         if (entry.is_regular_file() && !entry.is_symlink())
         {
@@ -122,9 +122,9 @@ void ReaSonusV2PluginMappingConverter::SetBaseFileNames()
 
 void ReaSonusV2PluginMappingConverter::ConvertFile(std::string file_path)
 {
+    bool has_plugin = false;
     std::string plugin_name;
     ini.clear();
-    bool has_plugin = false;
 
     std::smatch matches;
     std::ifstream zon_file(file_path);
@@ -217,9 +217,16 @@ void ReaSonusV2PluginMappingConverter::ConvertFiles()
 
 void ReaSonusV2PluginMappingConverter::Convert()
 {
+    std::string folder;
+    char tmp_folder[512];
+    if (BrowseForDirectory("Select the zon files directory", GetReaSonusZonesPath().c_str(), tmp_folder, 512))
+    {
+        folder = tmp_folder;
+    }
+
     unconverted_files.clear();
     converted_files.clear();
-    SetBaseFileNames();
+    SetBaseFileNames(folder);
     ConvertFiles();
 }
 

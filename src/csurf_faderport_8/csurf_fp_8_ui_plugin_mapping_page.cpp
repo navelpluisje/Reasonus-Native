@@ -18,6 +18,7 @@ protected:
 
     int x = 0;
 
+    bool render_started = false;
     std::string plugin_folder_path = std::string(GetResourcePath()) + pathSeparator + "ReaSonus" + pathSeparator + "Plugins";
     std::vector<std::string> developers;
     int selected_developer = -1;
@@ -26,6 +27,7 @@ protected:
     std::vector<std::vector<std::string>> plugins;
     int selected_plugin = -1;
     int previous_selected_plugin = -1;
+    bool selected_plugin_exists = false;
 
     int nb_channels = 0;
     int selected_channel = 0;
@@ -62,6 +64,7 @@ protected:
             else
             {
                 index++;
+                std::vector<std::string> splitted_name = split(name, ".");
                 developers.push_back(std::string(name));
                 plugins.push_back(SetDeveloperPlugins(name));
             }
@@ -85,7 +88,12 @@ protected:
             else
             {
                 index++;
-                developer_plugins.push_back(std::string(name));
+                std::vector<std::string> splitted_name = split(std::string(name), ".");
+
+                if (splitted_name[splitted_name.size() - 1].compare("ini") == 0)
+                {
+                    developer_plugins.push_back(std::string(name));
+                }
             }
         }
 
@@ -97,10 +105,18 @@ protected:
         return plugin_folder_path + pathSeparator + developers[selected_developer] + pathSeparator + plugins[selected_developer][selected_plugin];
     }
 
-    void SetPluginData()
+    bool SetPluginData()
     {
         mINI::INIFile file(GetPluginPath());
         file.read(ini);
+
+        if (!PluginExists())
+        {
+            selected_plugin_exists = false;
+            return false;
+        }
+
+        selected_plugin_exists = true;
 
         for (int i = 0; i < 99; i++)
         {
@@ -109,8 +125,23 @@ protected:
                 nb_channels = i;
             }
         }
+
+        // AN extra + to set the add button
         nb_channels++;
         GetPluginParams();
+
+        return true;
+    }
+
+    bool PluginExists()
+    {
+        // Create a track, add the plugin and start reading the params
+        InsertTrackAtIndex(0, false);
+        MediaTrack *media_track = GetTrack(0, 0);
+        int exist = TrackFX_AddByName(media_track, ini["global"]["origname"].c_str(), false, -1);
+        DeleteTrack(media_track);
+
+        return exist > -1;
     }
 
     void GetPluginParams()
@@ -124,6 +155,7 @@ protected:
         // Create a track, add the plugin and start reading the params
         InsertTrackAtIndex(0, false);
         MediaTrack *media_track = GetTrack(0, 0);
+
         TrackFX_AddByName(media_track, ini["global"]["origname"].c_str(), false, -1);
 
         for (int i = 0; i < std::min(TrackFX_GetNumParams(media_track, 0), 256); i++)
@@ -222,199 +254,252 @@ public:
 
     virtual ~CSurf_FP_8_PluginMappingPage() {};
 
-    void Render() override
+    void RenderMappingsLlist()
     {
-        double space_x, space_y;
-
-        if (selected_developer != previous_selected_developer)
+        if (ImGui::BeginChild(m_ctx, "mapping_lists", 240.0, 0.0))
         {
-            if (DirtyCheck())
-            {
-                selected_plugin = -1;
-                previous_selected_plugin = -1;
-                selected_channel = 0;
-                previous_selected_channel = 0;
-                previous_selected_developer = selected_developer;
-            }
-            else
-            {
-                selected_developer = previous_selected_developer;
-            }
-        }
+            ImGui::Text(m_ctx, "Plugins");
+            ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 4);
 
-        if (selected_plugin != previous_selected_plugin)
-        {
-            if (DirtyCheck())
+            UiElements::PushReaSonusGroupStyle(m_ctx);
+            if (ImGui::BeginChild(m_ctx, "mapping_lists_content", 0.0, 0.0, ImGui::ChildFlags_FrameStyle, ImGui::ChildFlags_AutoResizeY))
             {
-                selected_channel = 0;
-                SetPluginData();
-                PopulateFields();
-                previous_selected_plugin = selected_plugin;
-            }
-            else
-            {
-                selected_plugin = previous_selected_plugin;
-            }
-        }
-
-        if (selected_channel != previous_selected_channel)
-        {
-            if (DirtyCheck())
-            {
-                PopulateFields();
-                previous_selected_channel = selected_channel;
-            }
-            else
-            {
-                selected_channel = previous_selected_channel;
-            }
-        }
-
-        if (select_param_index != previous_select_param_index)
-        {
-            previous_select_param_index = select_param_index;
-            select_nb_steps = std::get<2>(paramIds[select_param_index]);
-        }
-
-        ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_ItemSpacing, 12.0, 12.0);
-        if (ImGui::BeginChild(m_ctx, "main_mapping_content", 0.0, 0.0, ImGui::ChildFlags_None))
-        {
-            if (ImGui::BeginChild(m_ctx, "mapping_lists", 240.0, 0.0))
-            {
-                ImGui::Text(m_ctx, "Plugins");
-                ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 4);
-
-                UiElements::PushReaSonusGroupStyle(m_ctx);
-                if (ImGui::BeginChild(m_ctx, "filter_lists_content", 0.0, 0.0, ImGui::ChildFlags_FrameStyle, ImGui::ChildFlags_AutoResizeY))
+                for (int i = 0; i < (int)developers.size(); i++)
                 {
-                    for (int i = 0; i < (int)developers.size(); i++)
+                    if (i != selected_developer || selected_developer == -1)
                     {
-                        if (i != selected_developer || selected_developer == -1)
-                        {
-                            ImGui::SetNextItemOpen(m_ctx, false);
-                        }
-                        else
-                        {
-                            ImGui::SetNextItemOpen(m_ctx, true);
-                        }
-
-                        UiElements::PushReaSonusTreeNodeStyle(m_ctx, selected_developer == i);
-                        if (ImGui::TreeNode(m_ctx, developers.at(i).c_str(), ImGui::TreeNodeFlags_CollapsingHeader))
-                        {
-                            selected_developer = i;
-                            std::vector<std::string> developer_plugins = plugins.at(i);
-
-                            for (int j = 0; j < (int)developer_plugins.size(); j++)
-                            {
-                                bool selected = selected_developer == i && selected_plugin == j;
-                                if (ImGui::Selectable(m_ctx, developer_plugins.at(j).c_str(), &selected))
-                                {
-                                    selected_plugin = j;
-                                }
-                            }
-                        }
-                        UiElements::PopReaSonusTreeNodeStyle(m_ctx);
+                        ImGui::SetNextItemOpen(m_ctx, false);
+                    }
+                    else
+                    {
+                        ImGui::SetNextItemOpen(m_ctx, true);
                     }
 
-                    UiElements::PopReaSonusGroupStyle(m_ctx);
-                    ImGui::EndChild(m_ctx);
+                    UiElements::PushReaSonusTreeNodeStyle(m_ctx, selected_developer == i);
+                    if (ImGui::TreeNode(m_ctx, developers.at(i).c_str(), ImGui::TreeNodeFlags_CollapsingHeader))
+                    {
+                        selected_developer = i;
+                        std::vector<std::string> developer_plugins = plugins.at(i);
+
+                        for (int j = 0; j < (int)developer_plugins.size(); j++)
+                        {
+                            bool selected = selected_developer == i && selected_plugin == j;
+                            if (ImGui::Selectable(m_ctx, developer_plugins.at(j).c_str(), &selected))
+                            {
+                                selected_plugin = j;
+                            }
+                        }
+                    }
+                    UiElements::PopReaSonusTreeNodeStyle(m_ctx);
                 }
 
+                UiElements::PopReaSonusGroupStyle(m_ctx);
                 ImGui::EndChild(m_ctx);
             }
+
+            ImGui::EndChild(m_ctx);
+        }
+    }
+
+    void RenderChannelsList()
+    {
+        ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_ItemSpacing, 4, 0);
+        if (ImGui::BeginChild(m_ctx, "##channel-list", 0.0, 30))
+        {
+            for (int i = 0; i < nb_channels; i++)
+            {
+                bool selected = selected_channel == i;
+                if (i > 0)
+                {
+                    ImGui::SameLine(m_ctx);
+                }
+                UiElements::PushReaSonusChannelTabStyle(m_ctx, selected);
+                if (ImGui::Button(m_ctx, std::to_string(i + 1).c_str(), 30, 30))
+                {
+                    selected_channel = i;
+                }
+                UiElements::PopReaSonusChannelTabStyle(m_ctx);
+            }
+
             ImGui::SameLine(m_ctx);
-
-            if (ImGui::BeginChild(m_ctx, "mapping_content", 0.0, 0.0))
+            UiElements::PushReaSonusChannelTabStyle(m_ctx, false);
+            if (ImGui::Button(m_ctx, "+", 30, 30))
             {
-                if (selected_plugin > -1)
-                {
-                    ImGui::Text(m_ctx, selected_plugin < 0 ? "Channels" : std::string(developers[selected_developer] + " :: " + plugins[selected_developer][selected_plugin]).c_str());
-                    ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 4);
-
-                    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_ItemSpacing, 4, 0);
-                    if (ImGui::BeginChild(m_ctx, "##channel-list", 0.0, 30))
-                    {
-                        for (int i = 0; i < nb_channels; i++)
-                        {
-                            bool selected = selected_channel == i;
-                            if (i > 0)
-                            {
-                                ImGui::SameLine(m_ctx);
-                            }
-                            UiElements::PushReaSonusChannelTabStyle(m_ctx, selected);
-                            if (ImGui::Button(m_ctx, std::to_string(i + 1).c_str(), 30, 30))
-                            {
-                                selected_channel = i;
-                            }
-                            UiElements::PopReaSonusChannelTabStyle(m_ctx);
-                        }
-
-                        ImGui::SameLine(m_ctx);
-                        UiElements::PushReaSonusChannelTabStyle(m_ctx, false);
-                        if (ImGui::Button(m_ctx, "+", 30, 30))
-                        {
-                            selected_channel = nb_channels;
-                            nb_channels += 1;
-                        }
-                        UiElements::PopReaSonusChannelTabStyle(m_ctx);
-
-                        ImGui::PopStyleVar(m_ctx);
-                        ImGui::EndChild(m_ctx);
-                    }
-
-                    if (ImGui::BeginChild(m_ctx, "filter_content_fields", 0.0, 0.0))
-                    {
-                        ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
-                        double height = (space_y - 12) / 2;
-
-                        UiElements::PushReaSonusGroupStyle(m_ctx);
-                        if (ImGui::BeginChild(m_ctx, "filter_content_edit", 0.0, height, ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY))
-                        {
-                            ReaSonusPageTitle(m_ctx, "Select Button", main_font_bold);
-                            if (params.size() > 0)
-                            {
-                                ReaSonusComboInput(m_ctx, "Param", params, &select_param_index);
-                            }
-                            if (ImGui::BeginChild(m_ctx, "filter_content_input", 0.0, 0.0, ImGui::ChildFlags_AutoResizeY))
-                            {
-                                ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
-
-                                ReaSonusTextInput(m_ctx, "Param display name", &select_name, "Display name for the param", space_x * 0.7);
-                                ImGui::SameLine(m_ctx);
-
-                                ReaSonusIntInput(m_ctx, "Steps", &select_nb_steps);
-                                ImGui::EndChild(m_ctx);
-                            }
-                            UiElements::PopReaSonusGroupStyle(m_ctx);
-                            ImGui::EndChild(m_ctx);
-                        }
-
-                        UiElements::PushReaSonusGroupStyle(m_ctx);
-                        if (ImGui::BeginChild(m_ctx, "filter_content_right", 0.0, height, ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY))
-                        {
-                            ReaSonusPageTitle(m_ctx, "Fader", main_font_bold);
-                            if (params.size() > 0)
-                            {
-                                ReaSonusComboInput(m_ctx, "Param", params, &fader_param_index);
-                            }
-                            ReaSonusTextInput(m_ctx, "Param display name", &fader_name, "Display name for the param");
-                            ImGui::EndChild(m_ctx);
-                        }
-
-                        UiElements::PopReaSonusGroupStyle(m_ctx);
-                        ImGui::EndChild(m_ctx);
-                    }
-                }
-                else
-                {
-                    ImGui::Text(m_ctx, "Select a developer and plugin");
-                }
-
-                ImGui::EndChild(m_ctx);
+                selected_channel = nb_channels;
+                nb_channels += 1;
             }
+            UiElements::PopReaSonusChannelTabStyle(m_ctx);
 
             ImGui::PopStyleVar(m_ctx);
             ImGui::EndChild(m_ctx);
+        }
+    }
+
+    void RenderMappingSelect(double height)
+    {
+        double space_x, space_y;
+
+        UiElements::PushReaSonusGroupStyle(m_ctx);
+        if (ImGui::BeginChild(m_ctx, "mapping_content_select", 0.0, height, ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY))
+        {
+            ReaSonusPageTitle(m_ctx, "Select Button", main_font_bold);
+            if (params.size() > 0)
+            {
+                ReaSonusComboInput(m_ctx, "Param", params, &select_param_index);
+            }
+            if (ImGui::BeginChild(m_ctx, "filter_content_input", 0.0, 0.0, ImGui::ChildFlags_AutoResizeY))
+            {
+                ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
+
+                ReaSonusTextInput(m_ctx, "Param display name", &select_name, "Display name for the param", space_x * 0.7);
+                ImGui::SameLine(m_ctx);
+
+                ReaSonusIntInput(m_ctx, "Steps", &select_nb_steps);
+                ImGui::EndChild(m_ctx);
+            }
+            UiElements::PopReaSonusGroupStyle(m_ctx);
+            ImGui::EndChild(m_ctx);
+        }
+    }
+
+    void RenderMappingFader(double height)
+    {
+        UiElements::PushReaSonusGroupStyle(m_ctx);
+        if (ImGui::BeginChild(m_ctx, "mapping_content_fader", 0.0, height, ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY))
+        {
+            ReaSonusPageTitle(m_ctx, "Fader", main_font_bold);
+            if (params.size() > 0)
+            {
+                ReaSonusComboInput(m_ctx, "Param", params, &fader_param_index);
+            }
+            ReaSonusTextInput(m_ctx, "Param display name", &fader_name, "Display name for the param");
+            ImGui::EndChild(m_ctx);
+        }
+    }
+
+    void RenderCenteredText(std::string content)
+    {
+        double text_width, text_height, available_width, available_height;
+        ImGui::GetContentRegionAvail(m_ctx, &available_width, &available_height);
+        ImGui::CalcTextSize(m_ctx, content.c_str(), &text_width, &text_height);
+        ImGui::SetCursorPosX(m_ctx, available_width / 2 - text_width / 2);
+        ImGui::SetCursorPosY(m_ctx, available_height / 2 - text_height / 2);
+        ImGui::Text(m_ctx, content.c_str());
+    }
+
+    void Render() override
+    {
+        if (!render_started)
+        {
+
+            render_started = true;
+            double space_x, space_y;
+
+            if (selected_developer != previous_selected_developer)
+            {
+                selected_plugin_exists = false;
+                if (DirtyCheck())
+                {
+                    selected_plugin = -1;
+                    previous_selected_plugin = -1;
+                    selected_channel = 0;
+                    previous_selected_channel = 0;
+                    previous_selected_developer = selected_developer;
+                }
+                else
+                {
+                    selected_developer = previous_selected_developer;
+                }
+            }
+
+            if (selected_plugin != previous_selected_plugin)
+            {
+                if (DirtyCheck())
+                {
+                    selected_channel = 0;
+
+                    if (SetPluginData())
+                    {
+                        PopulateFields();
+                    }
+                    else
+                    {
+                        select_key = "";
+                        fader_key = "";
+                    }
+                    previous_selected_plugin = selected_plugin;
+                }
+                else
+                {
+                    selected_plugin = previous_selected_plugin;
+                }
+            }
+
+            if (selected_channel != previous_selected_channel && selected_plugin_exists)
+            {
+                if (DirtyCheck())
+                {
+                    PopulateFields();
+                    previous_selected_channel = selected_channel;
+                }
+                else
+                {
+                    selected_channel = previous_selected_channel;
+                }
+            }
+
+            if (select_param_index != previous_select_param_index)
+            {
+                previous_select_param_index = select_param_index;
+                select_nb_steps = std::get<2>(paramIds[select_param_index]);
+            }
+
+            ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_ItemSpacing, 12.0, 12.0);
+            if (ImGui::BeginChild(m_ctx, "main_mapping_content", 0.0, 0.0, ImGui::ChildFlags_None))
+            {
+                RenderMappingsLlist();
+                ImGui::SameLine(m_ctx);
+
+                if (ImGui::BeginChild(m_ctx, "mapping_content", 0.0, 0.0))
+                {
+                    if (selected_plugin > -1 && selected_plugin_exists)
+                    {
+                        ImGui::Text(m_ctx, selected_plugin < 0 ? "Channels" : std::string(developers[selected_developer] + " :: " + plugins[selected_developer][selected_plugin]).c_str());
+                        ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 4);
+                        RenderChannelsList();
+
+                        if (ImGui::BeginChild(m_ctx, "mapping_content_area", 0.0, 0.0))
+                        {
+                            ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
+                            double height = (space_y - 12) / 2;
+
+                            RenderMappingSelect(height);
+                            RenderMappingFader(height);
+
+                            UiElements::PopReaSonusGroupStyle(m_ctx);
+                            ImGui::EndChild(m_ctx);
+                        }
+                    }
+                    else if (!selected_plugin_exists && selected_plugin > -1)
+                    {
+                        RenderCenteredText("The selected plugin is not installed (anymore)");
+                    }
+                    else if (selected_developer > -1 && selected_plugin == -1)
+                    {
+                        RenderCenteredText("Select a plugin");
+                    }
+                    else
+                    {
+                        RenderCenteredText("Select a developer and plugin");
+                    }
+
+                    ImGui::EndChild(m_ctx);
+                }
+
+                ImGui::PopStyleVar(m_ctx);
+                ImGui::EndChild(m_ctx);
+            }
+            render_started = false;
         }
     }
 
