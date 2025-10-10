@@ -6,6 +6,10 @@
 class UiElements
 {
 public:
+    static void PushReaSonusWindowStyle(ImGui_Context *m_ctx);
+
+    static void PopReaSonusWindowStyle(ImGui_Context *m_ctx);
+
     static void PushReaSonusSidebarStyle(ImGui_Context *m_ctx);
 
     static void PopReaSonusSidebarStyle(ImGui_Context *m_ctx);

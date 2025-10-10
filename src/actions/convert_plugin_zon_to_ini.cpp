@@ -14,7 +14,7 @@ namespace CONVERT_PLUGIN_ZON_TO_INI
     // the necessary 'evil'
     int command_id{0};
     constexpr auto command_name = "REASONUS_CONVERT_PLUGIN_ZON_TO_INI";
-    constexpr auto action_name = "Reasonus: Convert convert zon to ini";
+    constexpr auto action_name = "Reasonus: Convert the old zon mappings to the new ini mappings";
     custom_action_register_t action = {0, command_name, action_name, nullptr};
 
     // the main function of my plugin
