@@ -1,6 +1,18 @@
 #include "csurf_ui_elements.hpp"
 #include "csurf_ui_colors.hpp"
 
+void UiElements::PushReaSonusWindowStyle(ImGui_Context *m_ctx)
+{
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_WindowPadding, 16, 16);
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_ItemSpacing, 16, 16);
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameRounding, 0);
+}
+
+void UiElements::PopReaSonusWindowStyle(ImGui_Context *m_ctx)
+{
+    ImGui::PopStyleVar(m_ctx, 3);
+}
+
 void UiElements::PushReaSonusSidebarStyle(ImGui_Context *m_ctx)
 {
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 12, 12);

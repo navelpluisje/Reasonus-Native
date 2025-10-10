@@ -25,6 +25,8 @@ ReaSonusV2PluginMappingConverter::ReaSonusV2PluginMappingConverter()
     m_ctx = ImGui::CreateContext(g_name);
     InitAssets();
 
+    path_name = GetReaSonusZonesPath();
+
     select = std::regex("Select([0-9]{1,2})[[:space:]]+FXParam[[:space:]]+([0-9]{1,6})[[:space:]]+\"([a-zA-Z0-9[:space:]]+)\"([[:space:]]+[[][[:space:]]([0-9.[:space:]]+)[[:space:]])?");
     fader = std::regex("Fader([0-9]{1,2})[[:space:]]+FXParam[[:space:]]+([0-9]{1,6})[[:space:]]+\"([a-zA-Z0-9[:space:]]+)\"");
     scribble = std::regex("ScribbleLine([0-9])_([0-9])[[:space:]]+FXParamNameDisplay[[:space:]]+([0-9]{1,6})[[:space:]]+\"([a-zA-Z0-9[:space:]]+)\"");
@@ -219,6 +221,7 @@ void ReaSonusV2PluginMappingConverter::Convert()
 {
     std::string folder;
     char tmp_folder[512];
+
     if (BrowseForDirectory("Select the zon files directory", GetReaSonusZonesPath().c_str(), tmp_folder, 512))
     {
         folder = tmp_folder;
@@ -247,43 +250,50 @@ void ReaSonusV2PluginMappingConverter::Frame()
     PushReaSonusColors(m_ctx);
     PushReaSonusStyle(m_ctx);
     ImGui::PushFont(m_ctx, main_font, 13);
-    ImGui::SetNextWindowSize(m_ctx, 640, 446, ImGui::Cond_Once);
+    ImGui::SetNextWindowSize(m_ctx, 640, 612, ImGui::Cond_Once);
     bool open{true};
 
+    UiElements::PushReaSonusWindowStyle(m_ctx);
     if (ImGui::Begin(m_ctx, g_name, &open, ImGui::WindowFlags_NoCollapse | ImGui::WindowFlags_NoResize))
     {
-        UiElements::PushReaSonusContentStyle(m_ctx);
-        if (ImGui::BeginChild(m_ctx, "actions_info", 300.0, 0.0, ImGui::ChildFlags_FrameStyle))
+        if (ImGui::BeginChild(m_ctx, "logo", 0.0, 52.0, ImGui::ChildFlags_None))
         {
             ImGui::Image(m_ctx, logo, 200, 52);
-            UiElements::PushReaSonusGroupStyle(m_ctx);
-            if (ImGui::BeginChild(m_ctx, "actions_info", 0.0, 0.0, ImGui::ChildFlags_FrameStyle))
-            {
-                ReaSonusPageTitle(m_ctx, "Convert", main_font_bold);
-                ImGui::PushTextWrapPos(m_ctx, 260);
-                ImGui::Text(m_ctx, "This action will convert your old zon plugin files to the new ini files used by ReaSonus Native. If a file already exists for ReaSonus Native, the file will be ignored.");
-                ImGui::Text(m_ctx, "Once the action is finished, it will list the converted files and the skipped files.");
-                ImGui::Text(m_ctx, "The unconverted files have 2 types:");
-                ImGui::BulletText(m_ctx, "With 'zon' extension. These files were invalid");
-                ImGui::BulletText(m_ctx, "Without 'zon' extension. These files already exist and will not be overwritten");
-                ImGui::Text(m_ctx, "Do you want to convert the old files?");
-                ImGui::PopTextWrapPos(m_ctx);
 
-                ImGui::EndChild(m_ctx);
-                UiElements::PopReaSonusGroupStyle(m_ctx);
-            }
-            ImGui::EndChild(m_ctx);
-            UiElements::PopReaSonusContentStyle(m_ctx);
+            ImGui::EndChild(m_ctx); // logo
         }
-        ImGui::SameLine(m_ctx);
-        UiElements::PushReaSonusContentStyle(m_ctx);
-        if (ImGui::BeginChild(m_ctx, "report", 0.0, 0.0, ImGui::ChildFlags_FrameStyle))
-        {
-            UiElements::PushReaSonusGroupStyle(m_ctx);
-            if (ImGui::BeginChild(m_ctx, "main_content_area", 0.0, -44.0, ImGui::ChildFlags_FrameStyle))
-            {
 
-                if (ImGui::BeginChild(m_ctx, "main_content_area", 0.0, 0.0, ImGui::ChildFlags_None))
+        if (ImGui::BeginChild(m_ctx, "actions_container", 0.0, -148.0, ImGui::ChildFlags_None))
+        {
+
+            if (ImGui::BeginChild(m_ctx, "actions_info", 300.0, 0.0, ImGui::ChildFlags_None))
+            {
+                UiElements::PushReaSonusGroupStyle(m_ctx);
+                if (ImGui::BeginChild(m_ctx, "actions_convert_info", 0.0, 0.0, ImGui::ChildFlags_FrameStyle))
+                {
+                    ReaSonusPageTitle(m_ctx, "Convert", main_font_bold);
+                    ImGui::PushTextWrapPos(m_ctx, 260);
+                    ImGui::Text(m_ctx, "This action will convert your old zon plugin files to the new ini files used by ReaSonus Native. If a file already exists for ReaSonus Native, the file will be ignored.");
+                    ImGui::Text(m_ctx, "Once the action is finished, it will list the converted files and the skipped files.");
+                    ImGui::Text(m_ctx, "The unconverted files have 2 types:");
+                    ImGui::BulletText(m_ctx, "With 'zon' extension. These files were invalid");
+                    ImGui::BulletText(m_ctx, "Without 'zon' extension. These files already exist and will not be overwritten");
+                    ImGui::Text(m_ctx, "Do you want to convert the old files?");
+                    ImGui::PopTextWrapPos(m_ctx);
+
+                    UiElements::PopReaSonusGroupStyle(m_ctx);
+                    ImGui::EndChild(m_ctx); // actions_convert_info
+                }
+
+                ImGui::EndChild(m_ctx); // actions_info
+            }
+
+            ImGui::SameLine(m_ctx);
+
+            if (ImGui::BeginChild(m_ctx, "report", 0.0, 0.0, ImGui::ChildFlags_None))
+            {
+                UiElements::PushReaSonusGroupStyle(m_ctx);
+                if (ImGui::BeginChild(m_ctx, "main_content_area", 0.0, 0.0, ImGui::ChildFlags_FrameStyle))
                 {
                     ReaSonusPageTitle(m_ctx, "Converted files", main_font_bold);
 
@@ -296,7 +306,7 @@ void ReaSonusV2PluginMappingConverter::Frame()
                             ImGui::Selectable(m_ctx, converted_files[i].c_str(), &selected, ImGui::SelectableFlags_AllowOverlap);
                         }
                         UiElements::PopReaSonusListBoxStyle(m_ctx);
-                        ImGui::EndListBox(m_ctx);
+                        ImGui::EndListBox(m_ctx); // converted_files
                     }
 
                     ReaSonusPageTitle(m_ctx, "Unconverted files", main_font_bold);
@@ -309,20 +319,35 @@ void ReaSonusV2PluginMappingConverter::Frame()
                         {
                             ImGui::Selectable(m_ctx, unconverted_files[i].c_str(), &selected, ImGui::SelectableFlags_AllowOverlap);
                         }
+
                         UiElements::PopReaSonusListBoxStyle(m_ctx);
-                        ImGui::EndListBox(m_ctx);
+                        ImGui::EndListBox(m_ctx); // unconverted_files
                     }
-                    ImGui::EndChild(m_ctx);
+
+                    UiElements::PopReaSonusGroupStyle(m_ctx);
+                    ImGui::EndChild(m_ctx); // main_content_area
                 }
-                UiElements::PopReaSonusGroupStyle(m_ctx);
-                ImGui::EndChild(m_ctx);
+
+                ImGui::EndChild(m_ctx); // report
             }
-            UiElements::PopReaSonusContentStyle(m_ctx);
-            ReaSonusButtonBar(m_ctx, "Convert", main_font_bold, &convert_clicked, true, &close_clicked, "Close");
-            ImGui::EndChild(m_ctx);
+
+            ImGui::EndChild(m_ctx); // actions_container
         }
 
-        ImGui::End(m_ctx);
+        UiElements::PushReaSonusGroupStyle(m_ctx);
+        if (ImGui::BeginChild(m_ctx, "path_info", 0.0, 80.0, ImGui::ChildFlags_FrameStyle))
+        {
+            ReaSonusTextInput(m_ctx, "Path to the zon mapping files", &path_name, "");
+
+            UiElements::PopReaSonusGroupStyle(m_ctx);
+            ImGui::EndChild(m_ctx); // path_info
+        }
+
+        ReaSonusButtonBar(m_ctx, "Convert", main_font_bold, &convert_clicked, true, &close_clicked, "Close");
+
+        UiElements::PopReaSonusWindowStyle(m_ctx);
+
+        ImGui::End(m_ctx); // window
     }
 
     ImGui::PopFont(m_ctx);

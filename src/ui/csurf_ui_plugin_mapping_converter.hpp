@@ -51,6 +51,7 @@ private:
     std::vector<std::string> unconverted_files;
     std::vector<std::string> file_names;
     mINI::INIStructure ini;
+    std::string path_name;
 };
 
 #endif
