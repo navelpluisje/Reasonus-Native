@@ -219,17 +219,9 @@ void ReaSonusV2PluginMappingConverter::ConvertFiles()
 
 void ReaSonusV2PluginMappingConverter::Convert()
 {
-    std::string folder;
-    char tmp_folder[512];
-
-    if (BrowseForDirectory("Select the zon files directory", GetReaSonusZonesPath().c_str(), tmp_folder, 512))
-    {
-        folder = tmp_folder;
-    }
-
     unconverted_files.clear();
     converted_files.clear();
-    SetBaseFileNames(folder);
+    SetBaseFileNames(path_name);
     ConvertFiles();
 }
 
@@ -348,6 +340,7 @@ void ReaSonusV2PluginMappingConverter::Frame()
         UiElements::PopReaSonusWindowStyle(m_ctx);
 
         ImGui::End(m_ctx); // window
+
     }
 
     ImGui::PopFont(m_ctx);
