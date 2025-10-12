@@ -21,12 +21,20 @@ constexpr unsigned char img_icon_settings[] = {
 #include "../../lib/assets/settings.ipp"
 };
 
+constexpr unsigned char img_icon_about[] = {
+#include "../../lib/assets/about.ipp"
+};
+
 constexpr unsigned char img_icon_search[] = {
 #include "../../lib/assets/search.ipp"
 };
 
 constexpr unsigned char img_icon_add[] = {
 #include "../../lib/assets/add.ipp"
+};
+
+constexpr unsigned char img_icon_info[] = {
+#include "../../lib/assets/info.ipp"
 };
 
 constexpr unsigned char img_icon_list_remove[] = {

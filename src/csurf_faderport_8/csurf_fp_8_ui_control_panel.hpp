@@ -49,6 +49,7 @@ private:
     ImGui_Image *icon_function_actions;
     ImGui_Image *icon_custom_filters;
     ImGui_Image *icon_plugin_mapping;
+    ImGui_Image *icon_about;
 
     int previous_page = -1;
     bool save_clicked = false;

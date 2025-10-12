@@ -49,6 +49,24 @@ void UiElements::PopReaSonusContentStyle(ImGui_Context *m_ctx)
     ImGui::PopStyleColor(m_ctx, 3);
 }
 
+void UiElements::PushReaSonusSettingsContentStyle(ImGui_Context *m_ctx)
+{
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 0, 0);
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_ItemSpacing, 8, 4);
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameRounding, 0);
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameBorderSize, 0);
+
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBg, UI_COLORS::Transparent);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBgActive, UI_COLORS::Transparent);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBgHovered, UI_COLORS::Transparent);
+}
+
+void UiElements::PopReaSonusSettingsContentStyle(ImGui_Context *m_ctx)
+{
+    ImGui::PopStyleVar(m_ctx, 4);
+    ImGui::PopStyleColor(m_ctx, 3);
+}
+
 void UiElements::PushReaSonusGroupStyle(ImGui_Context *m_ctx)
 {
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 12, 12);
@@ -356,12 +374,12 @@ void UiElements::PopReaSonusIconButtonStyle(ImGui_Context *m_ctx)
 
 void UiElements::PushReaSonusTooltipStyle(ImGui_Context *m_ctx)
 {
-    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 8, 8);
-    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameBorderSize, 1);
-    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameRounding, 4);
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 12, 12);
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameBorderSize, 2);
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameRounding, 8);
 
     ImGui::PushStyleColor(m_ctx, ImGui::Col_Border, UI_COLORS::Main_38);
-    ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBg, UI_COLORS::Main_15);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBg, UI_COLORS::Main_23);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBgActive, UI_COLORS::Main_15);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBgHovered, UI_COLORS::Main_15);
 }

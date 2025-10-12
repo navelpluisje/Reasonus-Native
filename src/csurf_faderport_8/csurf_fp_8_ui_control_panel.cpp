@@ -51,6 +51,7 @@ void ReaSonus8ControlPanel::InitAssets()
     icon_function_actions = ImGui::CreateImageFromMem(reinterpret_cast<const char *>(img_icon_function_actions), sizeof(img_icon_function_actions));
     icon_custom_filters = ImGui::CreateImageFromMem(reinterpret_cast<const char *>(img_icon_custom_filters), sizeof(img_icon_custom_filters));
     icon_plugin_mapping = ImGui::CreateImageFromMem(reinterpret_cast<const char *>(img_icon_param_mapping), sizeof(img_icon_param_mapping));
+    icon_about = ImGui::CreateImageFromMem(reinterpret_cast<const char *>(img_icon_about), sizeof(img_icon_about));
 
     ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(main_font));
     ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(main_font_bold));
@@ -59,6 +60,7 @@ void ReaSonus8ControlPanel::InitAssets()
     ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(icon_function_actions));
     ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(icon_custom_filters));
     ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(icon_plugin_mapping));
+    ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(icon_about));
 }
 
 void ReaSonus8ControlPanel::Start()
@@ -233,7 +235,7 @@ void ReaSonus8ControlPanel::Frame()
                 ReaSonusMenuButton(m_ctx, menu_items[1], main_font_bold, icon_custom_filters, FILTERS_PAGE, &current_page);
                 ReaSonusMenuButton(m_ctx, menu_items[2], main_font_bold, icon_plugin_mapping, MAPPING_PAGE, &current_page);
                 ReaSonusMenuButton(m_ctx, menu_items[3], main_font_bold, icon_settings, SETTINGS_PAGE, &current_page);
-                ReaSonusMenuButton(m_ctx, menu_items[4], main_font_bold, icon_custom_filters, ABOUT_PAGE, &current_page);
+                ReaSonusMenuButton(m_ctx, menu_items[4], main_font_bold, icon_about, ABOUT_PAGE, &current_page);
 
                 ImGui::EndChild(m_ctx);
             }

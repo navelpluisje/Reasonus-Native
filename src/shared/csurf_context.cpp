@@ -41,6 +41,10 @@ class CSurf_Context
      */
     int surface_time_code_setting;
     /**
+     * @brief The display type for the default track mode displays
+     */
+    int displays_track_display;
+    /**
      * @brief When overwrite is true, this is the timecode used
      */
     bool control_hidde_tracks;
@@ -165,6 +169,16 @@ public:
     bool GetSurfaceTimeCode()
     {
         return surface_time_code_setting;
+    }
+
+    void SetTrackDisplay(int value)
+    {
+        displays_track_display = value;
+    }
+
+    int GetTrackDisplay()
+    {
+        return displays_track_display;
     }
 
     void SetControlHiddenTracks(bool value)
