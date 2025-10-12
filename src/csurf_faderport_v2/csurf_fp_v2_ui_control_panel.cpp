@@ -44,6 +44,7 @@ void ReaSonusV2ControlPanel::InitAssets()
     icon_settings = ImGui::CreateImageFromMem(reinterpret_cast<const char *>(img_icon_settings), sizeof(img_icon_settings));
     icon_function_actions = ImGui::CreateImageFromMem(reinterpret_cast<const char *>(img_icon_function_actions), sizeof(img_icon_function_actions));
     icon_custom_filters = ImGui::CreateImageFromMem(reinterpret_cast<const char *>(img_icon_custom_filters), sizeof(img_icon_custom_filters));
+    icon_about = ImGui::CreateImageFromMem(reinterpret_cast<const char *>(img_icon_about), sizeof(img_icon_about));
 
     ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(main_font));
     ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(main_font_bold));
@@ -51,6 +52,7 @@ void ReaSonusV2ControlPanel::InitAssets()
     ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(icon_settings));
     ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(icon_function_actions));
     ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(icon_custom_filters));
+    ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(icon_about));
 }
 
 void ReaSonusV2ControlPanel::Start(int page)
@@ -173,7 +175,7 @@ void ReaSonusV2ControlPanel::Frame()
 
             ReaSonusMenuButton(m_ctx, menu_items.at(0), main_font_bold, icon_function_actions, 0, &current_page);
             ReaSonusMenuButton(m_ctx, menu_items.at(1), main_font_bold, icon_settings, 1, &current_page);
-            ReaSonusMenuButton(m_ctx, menu_items.at(2), main_font_bold, icon_custom_filters, 2, &current_page);
+            ReaSonusMenuButton(m_ctx, menu_items.at(2), main_font_bold, icon_about, 2, &current_page);
 
             ImGui::EndChild(m_ctx);
             UiElements::PopReaSonusSidebarStyle(m_ctx);
