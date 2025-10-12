@@ -18,6 +18,10 @@ public:
 
     static void PopReaSonusContentStyle(ImGui_Context *m_ctx);
 
+    static void PushReaSonusSettingsContentStyle(ImGui_Context *m_ctx);
+
+    static void PopReaSonusSettingsContentStyle(ImGui_Context *m_ctx);
+
     static void PushReaSonusGroupStyle(ImGui_Context *m_ctx);
 
     static void PopReaSonusGroupStyle(ImGui_Context *m_ctx);

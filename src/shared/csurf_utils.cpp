@@ -339,6 +339,7 @@ void readAndCreateIni(mINI::INIStructure &data, std::string device)
             data["surface"]["fader-reset"] = "0";
             data["surface"]["overwrite-time-code"] = "1";
             data["surface"]["time-code"] = "2";
+            data["displays"]["track"] = "8";
             data["functions"]["5"] = "0";
             data["functions"]["6"] = "0";
             data["functions"]["7"] = "0";
@@ -374,6 +375,7 @@ void validateReaSonusIni(mINI::INIFile file, mINI::INIStructure &data, std::stri
         data["surface"]["fader-reset"] = data["surface"].has("fader-reset") ? data["surface"]["fader-reset"] : "0";
         data["surface"]["overwrite-time-code"] = data["surface"].has("overwrite-time-code") ? data["surface"]["overwrite-time-code"] : "1";
         data["surface"]["time-code"] = data["surface"].has("time-code") ? data["surface"]["time-code"] : "2";
+        data["displays"]["track"] = data["displays"].has("track") ? data["displays"]["track"] : "8";
         data["functions"]["5"] = data["functions"].has("5") ? data["functions"]["5"] : "0";
         data["functions"]["6"] = data["functions"].has("6") ? data["functions"]["6"] : "0";
         data["functions"]["7"] = data["functions"].has("7") ? data["functions"]["7"] : "0";

@@ -11,14 +11,26 @@
 #include "csurf_fp_8_track.hpp"
 #include "csurf_fp_8_channel_manager.hpp"
 #include "csurf_fp_8_navigator.hpp"
+#include "../shared/csurf.h"
 
 class CSurf_FP_8_Menu_Manager : public CSurf_FP_8_ChannelManager
 {
 protected:
     mINI::INIStructure ini;
 
-    std::vector<std::string> menu_items = {"Plugin Ctr", "Last Param", "Master Fad", "Swap Shift", "Fader Reset", "Momentary", "Timecode", "Time type"};
-    std::vector<std::string> ini_keys = {"disable-plugins", "erase-last-param-after-learn", "master-fader-mode", "swap-shift-buttons", "fader-reset", "mute-solo-momentary", "overwrite-time-code", "time-code"};
+    std::vector<std::string> menu_items = {"Plugin Ctr", "Last Param", "Master Fad", "Swap Shift", "Fader Reset", "Momentary", "Timecode", "Time type", "Trck Disp."};
+    std::vector<std::vector<std::string>> ini_keys = {
+        {"surface", "disable-plugins"},
+        {"surface", "erase-last-param-after-learn"},
+        {"surface", "master-fader-mode"},
+        {"surface", "swap-shift-buttons"},
+        {"surface", "fader-reset"},
+        {"surface", "mute-solo-momentary"},
+        {"surface", "overwrite-time-code"},
+        {"surface", "time-code"},
+        {"displays", "track"},
+    };
+
     std::vector<std::vector<std::vector<std::string>>> menu_options = {
         {{"Disable", "1"}, {"Enable", "0"}},
         {{"Keep", "0"}, {"Untouch", "1"}},
@@ -28,6 +40,7 @@ protected:
         {{"Disable", "0"}, {"Enable", "1"}},
         {{"REAPER", "0"}, {"ReaSonus", "1"}},
         {{"Time", "0"}, {"Beats", "2"}, {"Seconds", "3"}, {"Samples", "4"}, {"H:M:S:Fr", "5"}, {"Abs. Frames", "8"}, {"Abs. 1", "8"}, {"Abs. 2", "8"}, {"Abs. 3", "8"}},
+        {{"Lrg Lrg", "4"}, {"Sm Sm Lrg", "5"}, {"Lrg Sm Sm", "7"}, {"Sm Lrg Sm", "8"}},
     };
 
     std::vector<std::vector<std::string>> menu_descriptions = {
@@ -39,6 +52,7 @@ protected:
         {"Momentary", "push mode", "mute/solo", "buttons", "", "", ""},
         {"Which", "time code", "you want", "to use?", "Reaper or", "ReaSonus", ""},
         {"Select the", "time code", "you want to", "use. Works", "only with", "ReaSonus", "selected"},
+        {"Select the", "display to", "use in", "track mode", "", "", ""},
     };
 
     int level = 0;
@@ -135,7 +149,7 @@ public:
                 std::string option_label = menu_options.at(option[0])[index][0];
                 std::string value = menu_options.at(option[0])[index][1];
 
-                if (value == ini["surface"][ini_keys[option[0]]])
+                if (value == ini[ini_keys[option[0]][0]][ini_keys[option[0]][1]])
                 {
                     option_label = ">" + option_label;
                 }
@@ -169,19 +183,11 @@ public:
         }
         else if (level > 0 && option[1] < max_items)
         {
-            ini["surface"][ini_keys[option[0]]] = menu_options[option[0]][option[1]][1];
+            ini[ini_keys[option[0]][0]][ini_keys[option[0]][1]] = menu_options[option[0]][option[1]][1];
             mINI::INIFile file(GetReaSonusIniPath(FP_8));
             if (file.write(ini, true))
             {
-                // Write all teh values to the context again so they get applied instantly
-                context->SetPluginControl(ini["surface"].has("disable-plugins") && ini["surface"]["disable-plugins"] != "1");
-                context->SetUntouchAfterLearn(ini["surface"].has("erase-last-param-after-learn") && ini["surface"]["erase-last-param-after-learn"] == "1");
-                context->SetMasterFaderModeEnabled(ini["surface"].has("master-fader-mode") && ini["surface"]["master-fader-mode"] == "1");
-                context->SetSwapShiftButtons(ini["surface"].has("swap-shift-buttons") && ini["surface"]["swap-shift-buttons"] == "1");
-                context->SetSwapShiftButtons(ini["surface"].has("fader-reset") && ini["surface"]["fader-reset"] == "1");
-                context->SetMuteSoloMomentary(ini["surface"].has("mute-solo-momentary") && ini["surface"]["mute-solo-momentary"] == "1");
-                context->SetOverwriteTimeCode(ini["surface"].has("overwrite-time-code") && ini["surface"]["overwrite-time-code"] == "1");
-                context->SetSurfaceTimeCode(ini["surface"].has("time-code") && std::stoi(ini["surface"]["time-code"]));
+                ::SetExtState(EXT_STATE_SECTION, EXT_STATE_KEY_SAVED_SETTINGS, EXT_STATE_VALUE_TRUE, false);
 
                 level = 0;
                 option[1] = -1;

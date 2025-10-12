@@ -225,13 +225,13 @@ public:
             return;
         }
 
-        if (context->GetShiftRight())
+        if (context->GetShiftRight() && !context->IsChannelMode(MenuMode))
         {
             SetGlobalAutomationOverride(AUTOMATION_TOUCH);
             return;
         }
 
-        if (context->GetShiftLeft())
+        if (context->GetShiftLeft() || context->IsChannelMode(MenuMode))
         {
             faderManager->HandleTouchButtonClick();
             return;

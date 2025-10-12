@@ -1,6 +1,7 @@
 #include "../ui/csurf_ui_page_content.hpp"
 #include <reaper_imgui_functions.h>
 #include "../ui/csurf_ui_checkbox.hpp"
+#include "../shared/csurf.h"
 
 class CSurf_FP_V2_SettingsPage : public CSurf_UI_PageContent
 {
@@ -32,6 +33,7 @@ public:
 
         if (file.write(ini, true))
         {
+            ::SetExtState(EXT_STATE_SECTION, EXT_STATE_KEY_SAVED_SETTINGS, EXT_STATE_VALUE_TRUE, false);
             MB("Changes saved with success", "Woohoo", 0);
         };
     }
