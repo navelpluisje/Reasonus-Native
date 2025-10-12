@@ -43,6 +43,7 @@ private:
     ImGui_Image *icon_settings;
     ImGui_Image *icon_function_actions;
     ImGui_Image *icon_custom_filters;
+    ImGui_Image *icon_about;
 
     int previous_page = -1;
     bool save_clicked = false;
