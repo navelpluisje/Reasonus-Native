@@ -21,4 +21,19 @@ inline const char *EXT_STATE_VALUE_TRUE = "1";
 inline const char *EXT_STATE_SECTION = "ReaSonus";
 inline const char *EXT_STATE_KEY_SAVED_SETTINGS = "saved_settings";
 
+// void Speak(const char *phrase)
+// {
+//   static void (*osara_outputMessage)(const char *message);
+//   static bool chk;
+
+//   if (!chk)
+//   {
+//     *(void **)&osara_outputMessage = plugin_getapi("osara_outputMessage");
+//     chk = true;
+//   }
+
+//   if (osara_outputMessage)
+//     osara_outputMessage(phrase);
+// }
+
 #endif

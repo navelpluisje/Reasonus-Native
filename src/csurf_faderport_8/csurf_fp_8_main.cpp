@@ -24,6 +24,7 @@
 #include "csurf_fp_8_fader_manager.hpp"
 #include "csurf_fp_8_ui_init.hpp"
 #include "csurf_fp_8_navigator.hpp"
+#include "../shared/csurf_osara.hpp"
 
 extern HWND g_hwnd;
 extern REAPER_PLUGIN_HINSTANCE g_hInst;
@@ -388,6 +389,8 @@ public:
   {
     (void)indev;
     (void)outdev;
+
+    CSurfOsara::GetInstance().Speak("Play motherfucker");
 
     /**
      * First we check if we have the ini file. If not we create it with default values

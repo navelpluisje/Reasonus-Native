@@ -10,3 +10,4 @@
 
 /lib/*
 !/lib/CMakeLists.txt
+!/lib/osara

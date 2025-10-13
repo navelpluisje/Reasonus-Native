@@ -4,6 +4,7 @@
 #include "../controls/csurf_button.hpp"
 #include "../shared/csurf_utils.hpp"
 #include "../shared/csurf_context.cpp"
+#include "./csurf_osara.hpp"
 
 class CSurf_TransportManager
 {
@@ -143,6 +144,7 @@ public:
         {
             return;
         }
+        CSurfOsara::GetInstance().Speak("Play darling");
 
         StopRewindOrForward();
         CSurf_OnPlay();
