@@ -104,6 +104,7 @@ class CSurf_FaderPort : public IReaperControlSurface
       if (evt->midi_message[1] >= FADER_TOUCH_1 && evt->midi_message[1] <= FADER_TOUCH_16)
       {
         faderManager->HandleFaderTouch(evt->midi_message[1] - FADER_TOUCH_1, evt->midi_message[2]);
+        trackNavigator->SetTrackTouched(evt->midi_message[1] - FADER_TOUCH_1, evt->midi_message[2] > 0);
       }
 
       /**
@@ -508,6 +509,13 @@ public:
     DELETE_ASYNC(m_midiin);
     m_midiout = 0;
     m_midiin = 0;
+  }
+
+  bool GetTouchState(MediaTrack *media_track, int is_pan)
+  {
+    (void)is_pan;
+
+    return trackNavigator->IsTrackTouched(media_track);
   }
 
   void Run()
