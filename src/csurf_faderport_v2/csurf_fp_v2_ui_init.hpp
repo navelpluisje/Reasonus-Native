@@ -8,6 +8,7 @@
 #include "../shared/csurf_utils.hpp"
 #include "../shared/csurf_faderport_ui_utils.hpp"
 #include "../resource.h"
+#include "csurf_fp_v2_ui_control_panel.hpp"
 
 extern HWND g_hwnd;
 extern REAPER_PLUGIN_HINSTANCE g_hInst;
@@ -15,14 +16,6 @@ extern REAPER_PLUGIN_HINSTANCE g_hInst;
 namespace CSURF_FP_V2_UI_INIT
 {
     mINI::INIStructure ini;
-
-    static void SaveCheckBoxValue(HWND hwndDlg, std::string key, int checkBox)
-    {
-        mINI::INIFile file(GetReaSonusIniPath(FP_V2));
-
-        ini["surface"][key] = std::to_string(IsDlgButtonChecked(hwndDlg, checkBox));
-        file.write(ini, true);
-    }
 
     static WDL_DLGRET dlgProc(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM lParam)
     {
@@ -81,9 +74,6 @@ namespace CSURF_FP_V2_UI_INIT
                 }
             }
 
-            SendMessage(GetDlgItem(hwndDlg, IDC_CHECK_INIT_MUTE_MOMENTARY), BM_SETCHECK, ini["surface"]["mute-solo-momentary"] == "1" ? BST_CHECKED : BST_UNCHECKED, 0);
-            SendMessage(GetDlgItem(hwndDlg, IDC_CHECK_CONTROL_HIDDEN_TRACKS), BM_SETCHECK, ini["surface"]["control-hidden-tracks"] == "1" ? BST_CHECKED : BST_UNCHECKED, 0);
-
             SetDlgItemText(hwndDlg, IDC_VERSION, GIT_VERSION);
 
             break;
@@ -92,23 +82,20 @@ namespace CSURF_FP_V2_UI_INIT
         case WM_COMMAND:
             switch (LOWORD(wParam))
             {
+
+            case IDC_BUTTON_CONTROL_PANEL:
+            {
+                ToggleFPV2ControlPanel(ReaSonusV2ControlPanel::SETTINGS_PAGE);
+
+                break;
+            }
+
             case IDC_BUTTON_DOCUMENTTION:
             {
                 SystemOpenURL("https://navelpluisje.github.io/reasonus/documentation/faderportv2/");
                 break;
             }
 
-            case IDC_CHECK_INIT_MUTE_MOMENTARY:
-            {
-                SaveCheckBoxValue(hwndDlg, "mute-solo-momentary", IDC_CHECK_INIT_MUTE_MOMENTARY);
-                break;
-            }
-
-            case IDC_CHECK_CONTROL_HIDDEN_TRACKS:
-            {
-                SaveCheckBoxValue(hwndDlg, "control-hidden-tracks", IDC_CHECK_CONTROL_HIDDEN_TRACKS);
-                break;
-            }
             break;
             }
 
@@ -121,11 +108,11 @@ namespace CSURF_FP_V2_UI_INIT
 
                 LRESULT indev = -1, outdev = -1;
 
-                int r = SendDlgItemMessage(hwndDlg, IDC_COMBO_MIDI_IN, CB_GETCURSEL, 0, 0);
+                int r = (int)SendDlgItemMessage(hwndDlg, IDC_COMBO_MIDI_IN, CB_GETCURSEL, 0, 0);
                 if (r != CB_ERR)
                     indev = SendDlgItemMessage(hwndDlg, IDC_COMBO_MIDI_IN, CB_GETITEMDATA, r, 0);
 
-                r = SendDlgItemMessage(hwndDlg, IDC_COMBO_MIDI_OUT, CB_GETCURSEL, 0, 0);
+                r = (int)SendDlgItemMessage(hwndDlg, IDC_COMBO_MIDI_OUT, CB_GETCURSEL, 0, 0);
                 if (r != CB_ERR)
                     outdev = SendDlgItemMessage(hwndDlg, IDC_COMBO_MIDI_OUT, CB_GETITEMDATA, r, 0);
 

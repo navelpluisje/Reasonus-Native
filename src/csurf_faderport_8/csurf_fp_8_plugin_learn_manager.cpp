@@ -5,12 +5,13 @@
 #include <WDL/ptrlist.h>
 #include "csurf_fp_8_track.hpp"
 #include "csurf_fp_8_channel_manager.hpp"
-#include "csurf_fp_8_ui_plugin_edit.hpp"
 #include "csurf_fp_8_navigator.hpp"
 #include <mini/ini.h>
 #include <vector>
 #include "../shared/csurf_daw.hpp"
 #include "../shared/csurf_utils.hpp"
+#include "csurf_fp_8_ui_control_panel.hpp"
+#include "../shared/csurf_faderport_ui_imgui_utils.hpp"
 
 class CSurf_FP_8_PluginLearnManager : public CSurf_FP_8_ChannelManager
 {
@@ -126,6 +127,36 @@ public:
         forceUpdate = false;
     }
 
+    void OpenMappingUi(int plugin_id, int channel)
+    {
+        MediaTrack *media_track = context->GetPluginEditTrack();
+        std::string plugin_name = DAW::GetTrackFxName(media_track, plugin_id);
+        std::string developer_name = DAW::GetTrackFxDeveloper(media_track, plugin_id);
+
+        if (!ReaSonus8ControlPanel::control_panel_open)
+        {
+            ToggleFP8ControlPanel(ReaSonus8ControlPanel::MAPPING_PAGE);
+        }
+        else if (ReaSonus8ControlPanel::current_page != ReaSonus8ControlPanel::MAPPING_PAGE)
+        {
+            ReaSonus8ControlPanel::SetCurrentPage(ReaSonus8ControlPanel::MAPPING_PAGE);
+        }
+        else if (
+            ReaSonus8ControlPanel::GetPageStringProperty(0).compare(developer_name) == 0 &&
+            ReaSonus8ControlPanel::GetPageStringProperty(1).compare(plugin_name + ".ini") == 0 &&
+            ReaSonus8ControlPanel::GetPageProperty(0) == channel)
+        {
+            ToggleFP8ControlPanel(ReaSonus8ControlPanel::MAPPING_PAGE);
+        }
+
+        if (ReaSonus8ControlPanel::control_panel_open)
+        {
+            ReaSonus8ControlPanel::SetPageStringProperty(0, developer_name);
+            ReaSonus8ControlPanel::SetPageStringProperty(1, plugin_name + ".ini");
+            ReaSonus8ControlPanel::SetPageProperty(0, channel);
+        }
+    }
+
     void HandleSelectClick(int index) override
     {
         int controlIndex = context->GetChannelManagerItemIndex() + index;
@@ -136,11 +167,7 @@ public:
 
         if (context->GetShiftLeft())
         {
-            // Show the edit screen
-            if (!CSURF_FP_8_UI_PLUGIN_EDIT::IsPluginEditDialogOpen())
-            {
-                CSURF_FP_8_UI_PLUGIN_EDIT::ShowPluginEditDialog(fileName, controlIndex);
-            }
+            OpenMappingUi(pluginId, controlIndex);
         }
         else if (context->GetShiftRight())
         {
@@ -196,8 +223,9 @@ public:
         (void)value;
     }
 
-    void HandleFaderTouch(int index) override
+    void HandleFaderTouch(int index, int value) override
     {
+        (void)value;
         int controlIndex = context->GetChannelManagerItemIndex() + index;
         int pluginId = context->GetPluginEditPluginId();
         int trackId, itemNumber, takeId, _pluginId, paramId;
@@ -206,11 +234,7 @@ public:
 
         if (context->GetShiftLeft())
         {
-            // Show the edit screen
-            if (!CSURF_FP_8_UI_PLUGIN_EDIT::IsPluginEditDialogOpen())
-            {
-                CSURF_FP_8_UI_PLUGIN_EDIT::ShowPluginEditDialog(fileName, controlIndex);
-            }
+            OpenMappingUi(pluginId, controlIndex);
         }
         else if (context->GetShiftRight())
         {
@@ -236,6 +260,7 @@ public:
             {
                 ini[paramKey];
             }
+
             ini[paramKey]["origName"] = paramName;
             ini[paramKey]["name"] = paramName;
             ini[paramKey]["param"] = std::to_string(paramId);

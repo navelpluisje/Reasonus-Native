@@ -40,15 +40,15 @@ protected:
         color.SetColor(red / 2, green / 2, blue / 2);
     }
 
-    void GetFaderValue(MediaTrack *media_track, int receiveIndex, int *faderValue, int *valueBarValue, double *_pan, std::string *panStr)
+    void GetFaderValue(MediaTrack *media_track, int receive_index, int *faderValue, int *valueBarValue, double *_pan, std::string *panStr)
     {
         double volume, pan = 0.0;
 
-        GetTrackReceiveUIVolPan(media_track, receiveIndex, &volume, &pan);
-        *panStr = GetPanString(pan);
+        GetTrackReceiveUIVolPan(media_track, receive_index, &volume, &pan);
+        *panStr = GetPan1String(pan);
         *_pan = pan;
 
-        if (context->GetShiftLeft())
+        if (context->GetShiftChannelLeft())
         {
             *faderValue = int(panToNormalized(pan) * 16383.0);
             *valueBarValue = int(volToNormalized(volume) * 127);
@@ -95,7 +95,7 @@ public:
 
         for (int i = 0; i < context->GetNbChannels(); i++)
         {
-            int receiveIndex = context->GetChannelManagerItemIndex(nbTrackReceives[i] - 1);
+            int receive_index = context->GetChannelManagerItemIndex(nbTrackReceives[i] - 1);
 
             int faderValue, valueBarValue = 0;
             double pan = 0.0;
@@ -110,30 +110,33 @@ public:
             }
             SetTrackColors(media_track);
 
-            GetFaderValue(media_track, receiveIndex, &faderValue, &valueBarValue, &pan, &panStr);
+            GetFaderValue(media_track, receive_index, &faderValue, &valueBarValue, &pan, &panStr);
 
-            if (DAW::HasTrackReceive(media_track, receiveIndex))
+            if (DAW::HasTrackReceive(media_track, receive_index))
             {
-                track->SetDisplayLine(1, ALIGN_LEFT, DAW::GetTrackReceiveSrcName(media_track, receiveIndex).c_str(), INVERT);
-                track->SetDisplayLine(2, ALIGN_CENTER, DAW::GetTrackSurfaceReceiveMode(media_track, receiveIndex).c_str());
-                track->SetDisplayLine(3, ALIGN_CENTER, Progress(receiveIndex + 1, nbTrackReceives[i]).c_str());
+                track->SetDisplayLine(1, ALIGN_LEFT, DAW::GetTrackReceiveSrcName(media_track, receive_index).c_str(), INVERT);
+                track->SetDisplayLine(2, ALIGN_CENTER, DAW::GetTrackSurfaceReceiveMode(media_track, receive_index).c_str());
+                track->SetDisplayLine(3, ALIGN_CENTER, Progress(receive_index + 1, nbTrackReceives[i]).c_str());
+                track->SetFaderValue(faderValue);
+                track->SetValueBarMode(context->GetShiftChannelLeft() ? VALUEBAR_MODE_FILL : VALUEBAR_MODE_BIPOLAR);
+                track->SetValueBarValue(valueBarValue);
             }
             else
             {
                 track->SetDisplayLine(1, ALIGN_LEFT, "No Rcvs", INVERT);
                 track->SetDisplayLine(2, ALIGN_CENTER, "");
                 track->SetDisplayLine(3, ALIGN_CENTER, "");
+                track->SetFaderValue(0);
+                track->SetValueBarMode(VALUEBAR_MODE_FILL);
+                track->SetValueBarValue(0);
             }
 
             track->SetTrackColor(color);
             track->SetSelectButtonValue(DAW::IsTrackSelected(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF);
-            track->SetMuteButtonValue(ButtonBlinkOnOff((context->GetShiftLeft() && DAW::GetTrackReceiveMute(media_track, receiveIndex)), DAW::GetTrackReceiveMute(media_track, receiveIndex)));
-            track->SetSoloButtonValue(((context->GetShiftLeft() && DAW::GetTrackReceiveMono(media_track, receiveIndex)) || (!context->GetShiftLeft() && DAW::GetTrackReceivePhase(media_track, receiveIndex)))
+            track->SetMuteButtonValue(ButtonBlinkOnOff((context->GetShiftChannelLeft() && DAW::GetTrackReceiveMute(media_track, receive_index)), DAW::GetTrackReceiveMute(media_track, receive_index)));
+            track->SetSoloButtonValue(((context->GetShiftChannelLeft() && DAW::GetTrackReceiveMono(media_track, receive_index)) || (!context->GetShiftChannelLeft() && DAW::GetTrackReceivePhase(media_track, receive_index)))
                                           ? BTN_VALUE_ON
                                           : BTN_VALUE_OFF);
-            track->SetFaderValue(faderValue);
-            track->SetValueBarMode(context->GetShiftLeft() ? VALUEBAR_MODE_FILL : VALUEBAR_MODE_BIPOLAR);
-            track->SetValueBarValue(valueBarValue);
 
             track->SetDisplayMode(DISPLAY_MODE_2);
             track->SetDisplayLine(0, ALIGN_CENTER, DAW::GetTrackName(media_track).c_str());
@@ -142,18 +145,15 @@ public:
 
     void HandleSelectClick(int index) override
     {
-        int flagsOut = 0;
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
-        GetTrackState(media_track, &flagsOut);
 
-        if (context->GetShiftLeft())
+        if (context->GetShiftChannelLeft())
         {
-            SetTrackSelected(media_track, !(hasBit(flagsOut, 1) == 1));
+            DAW::ToggleSelectedTrack(media_track);
             return;
         }
 
-        DAW::UnSelectAllTracks();
-        SetTrackSelected(media_track, true);
+        DAW::SetUniqueSelectedTrack(media_track);
     }
 
     void HandleMuteClick(int index, int value) override
@@ -164,15 +164,15 @@ public:
         }
 
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
-        int receiveIndex = context->GetChannelManagerItemIndex(nbTrackReceives[index] - 1);
+        int receive_index = context->GetChannelManagerItemIndex(nbTrackReceives[index] - 1);
 
-        if (context->GetShiftLeft())
+        if (context->GetShiftChannelLeft())
         {
-            SetTrackSendInfo_Value(media_track, -1, receiveIndex, "I_SENDMODE", DAW::GetNextTrackReceiveMode(media_track, receiveIndex));
+            DAW::SetNextTrackReceiveMode(media_track, receive_index);
         }
         else
         {
-            SetTrackSendInfo_Value(media_track, -1, receiveIndex, "B_MUTE", !DAW::GetTrackReceiveMute(media_track, receiveIndex));
+            DAW::ToggleTrackReceiveMute(media_track, receive_index);
         }
     }
 
@@ -184,35 +184,36 @@ public:
         }
 
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
-        int receiveIndex = context->GetChannelManagerItemIndex(nbTrackReceives[index] - 1);
+        int receive_index = context->GetChannelManagerItemIndex(nbTrackReceives[index] - 1);
 
-        if (context->GetShiftLeft())
+        if (context->GetShiftChannelLeft())
         {
-            SetTrackSendInfo_Value(media_track, -1, receiveIndex, "B_MONO", !DAW::GetTrackReceiveMono(media_track, receiveIndex));
+            DAW::ToggleTrackReceiveMono(media_track, receive_index);
         }
         else
         {
-            SetTrackSendInfo_Value(media_track, -1, receiveIndex, "B_PHASE", !DAW::GetTrackReceivePhase(media_track, receiveIndex));
+            DAW::ToggleTrackReceivePhase(media_track, receive_index);
         }
     }
 
-    void HandleFaderTouch(int index) override
+    void HandleFaderTouch(int index, int value) override
     {
         (void)index;
+        (void)value;
     }
 
     void HandleFaderMove(int index, int msb, int lsb) override
     {
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
-        int receiveIndex = context->GetChannelManagerItemIndex(nbTrackReceives[index] - 1);
+        int receive_index = context->GetChannelManagerItemIndex(nbTrackReceives[index] - 1);
 
-        if (context->GetShiftLeft())
+        if (context->GetShiftChannelLeft())
         {
-            SetTrackSendInfo_Value(media_track, -1, receiveIndex, "D_PAN", CSurf_OnRecvPanChange(media_track, receiveIndex, normalizedToPan(int14ToNormalized(msb, lsb)), false));
+            DAW::SetTrackReceivePan(media_track, receive_index, normalizedToPan(int14ToNormalized(msb, lsb)));
         }
         else
         {
-            SetTrackSendInfo_Value(media_track, -1, receiveIndex, "D_VOL", CSurf_OnRecvVolumeChange(media_track, receiveIndex, int14ToVol(msb, lsb), false));
+            DAW::SetTrackReceiveVolume(media_track, receive_index, int14ToVol(msb, lsb));
         }
     }
 };

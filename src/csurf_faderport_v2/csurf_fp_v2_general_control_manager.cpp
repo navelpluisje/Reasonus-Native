@@ -5,7 +5,6 @@
 #include "../controls/csurf_button.hpp"
 #include "../shared/csurf_utils.hpp"
 #include "csurf_fp_v2_navigator.hpp"
-#include "csurf_fp_v2_ui_functions.hpp"
 #include "../controls/csurf_color_button.hpp"
 
 class CSurf_FP_V2_GeneralControlManager
@@ -21,7 +20,7 @@ protected:
 
     void SetButtonValue()
     {
-        shiftLeftButton->SetValue(context->GetShiftLeft() ? BTN_VALUE_ON: BTN_VALUE_OFF);
+        shiftLeftButton->SetValue(context->GetShiftLeft() ? BTN_VALUE_ON : BTN_VALUE_OFF);
     };
 
     void SetButtonColors() {};

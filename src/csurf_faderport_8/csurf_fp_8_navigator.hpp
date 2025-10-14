@@ -63,6 +63,24 @@ class CSurf_FP_8_Navigator
     WDL_PtrList<MediaTrack> tracks;
     bool hasSolo;
     bool hasMute;
+    bool trackTouched[16] = {
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+    };
 
     void UpdateMixerPosition();
 
@@ -101,6 +119,8 @@ public:
 
     WDL_PtrList<MediaTrack> GetBankTracks();
 
+    bool IsTrackTouched(MediaTrack *media_track);
+
     void SetOffset(int offset);
 
     int GetOffset();
@@ -118,6 +138,8 @@ public:
     void HandleFilter(NavigatorFilter filter);
 
     void HandleCustomFilter(std::string filterName);
+
+    void SetTrackTouched(int index, bool value);
 };
 
 #endif

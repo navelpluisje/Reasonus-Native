@@ -10,14 +10,16 @@
 #include "../shared/csurf_utils.hpp"
 #include "../shared/csurf_context.cpp"
 
-const int MOMENTARY_TIMEOUT = 500;
+extern const int MOMENTARY_TIMEOUT;
+
 class CSurf_FP_8_TrackManager : public CSurf_FP_8_ChannelManager
 {
     int mute_start[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     int solo_start[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    DoubleClickState touch_start[16] = {{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}};
 
 protected:
-    bool has_hast_touched_fx_enabled = false;
+    bool has_last_touched_fx_enabled = false;
 
     void SetTrackColors(MediaTrack *media_track) override
     {
@@ -50,24 +52,11 @@ protected:
 
         GetTrackUIVolPan(media_track, &volume, &pan1);
         GetTrackUIPan(media_track, &pan1, &pan2, &pan_mode);
-        *_pan1 = GetPanString(pan1);
-        *_pan2 = GetWidthString(pan2, pan_mode);
+        *_pan1 = GetPan1String(pan1, pan_mode);
+        *_pan2 = GetPan2String(pan2, pan_mode);
 
-        if (context->GetShiftLeft())
-        {
-            *faderValue = int(panToNormalized(pan1) * 16383.0);
-            *valueBarValue = int(volToNormalized(volume) * 127);
-        }
-        else if (context->GetShiftRight() && pan_mode > 4)
-        {
-            *faderValue = int(panToNormalized(pan2) * 16383.0);
-            *valueBarValue = int(volToNormalized(volume) * 127);
-        }
-        else
-        {
-            *faderValue = int(volToNormalized(volume) * 16383.0);
-            *valueBarValue = int(panToNormalized(pan1) * 127);
-        }
+        *faderValue = int(volToNormalized(volume) * 16383.0);
+        *valueBarValue = int(panToNormalized(pan1) * 127);
     }
 
 public:
@@ -86,7 +75,7 @@ public:
         WDL_PtrList<MediaTrack> media_tracks = navigator->GetBankTracks();
         std::vector<std::string> time_code;
 
-        if (has_hast_touched_fx_enabled != context->GetLastTouchedFxMode())
+        if (has_last_touched_fx_enabled != context->GetLastTouchedFxMode())
         {
             forceUpdate = true;
         }
@@ -147,10 +136,10 @@ public:
             track->SetMuteButtonValue(DAW::IsTrackMuted(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
             track->SetSoloButtonValue(DAW::IsTrackSoloed(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
             track->SetFaderValue(fader_value, forceUpdate);
-            track->SetValueBarMode((context->GetShiftLeft() || context->GetArm()) ? VALUEBAR_MODE_FILL : VALUEBAR_MODE_BIPOLAR);
+            track->SetValueBarMode(context->GetArm() ? VALUEBAR_MODE_FILL : VALUEBAR_MODE_BIPOLAR);
             track->SetValueBarValue(value_bar_value);
 
-            if (context->GetShiftLeft() || context->GetShiftRight() || is_master_track)
+            if (is_master_track)
             {
                 track->SetDisplayMode(DISPLAY_MODE_2, forceUpdate);
                 track->SetDisplayLine(0, ALIGN_CENTER, DAW::GetTrackName(media_track).c_str(), NON_INVERT, forceUpdate);
@@ -163,6 +152,7 @@ public:
                 track->SetDisplayMode(DISPLAY_MODE_2, forceUpdate);
                 track->SetDisplayLine(0, ALIGN_CENTER, DAW::GetTrackName(media_track).c_str(), NON_INVERT, forceUpdate);
                 track->SetDisplayLine(1, ALIGN_CENTER, DAW::GetTrackInputName(media_track).c_str(), NON_INVERT, forceUpdate);
+
                 track->SetDisplayLine(2, ALIGN_CENTER, DAW::GetTrackMonitorMode(media_track).c_str(), NON_INVERT, forceUpdate);
                 track->SetDisplayLine(3, ALIGN_CENTER, DAW::GetTrackRecordingMode(media_track).c_str(), NON_INVERT, forceUpdate);
             }
@@ -180,7 +170,7 @@ public:
                 }
                 else
                 {
-                    track->SetDisplayMode(DISPLAY_MODE_8, forceUpdate);
+                    track->SetDisplayMode((DisplayMode)context->GetTrackDisplay(), forceUpdate);
                     track->SetDisplayLine(0, ALIGN_LEFT, DAW::GetTrackName(media_track).c_str(), NON_INVERT, forceUpdate);
                     track->SetDisplayLine(1, ALIGN_CENTER, DAW::GetTrackIndex(media_track).c_str(), NON_INVERT, forceUpdate);
                     track->SetDisplayLine(2, ALIGN_CENTER, context->GetPanPushMode() ? strPan1.c_str() : strPan2.c_str(), NON_INVERT, forceUpdate);
@@ -189,7 +179,7 @@ public:
             }
         }
 
-        has_hast_touched_fx_enabled = context->GetLastTouchedFxMode();
+        has_last_touched_fx_enabled = context->GetLastTouchedFxMode();
         forceUpdate = false;
     }
 
@@ -199,24 +189,27 @@ public:
 
         if (context->GetArm())
         {
-            CSurf_SetSurfaceRecArm(media_track, CSurf_OnRecArmChange(media_track, !DAW::IsTrackArmed(media_track)), NULL);
+            if (DAW::IsTrackParent(media_track))
+            {
+                return;
+            }
+            DAW::ToggleTrackArmed(media_track);
             return;
         }
 
-        if (context->GetShiftRight())
+        if (context->GetShiftChannelRight())
         {
             DAW::SetSelectedTracksRange(media_track);
             return;
         }
 
-        if (context->GetShiftLeft())
+        if (context->GetShiftChannelLeft())
         {
-            SetTrackSelected(media_track, !IsTrackSelected(media_track));
+            DAW::ToggleSelectedTrack(media_track);
             return;
         }
 
-        DAW::UnSelectAllTracks();
-        SetTrackSelected(media_track, true);
+        DAW::SetUniqueSelectedTrack(media_track);
     }
 
     void HandleMuteClick(int index, int value) override
@@ -228,14 +221,14 @@ public:
         {
             if (now - mute_start[index] > MOMENTARY_TIMEOUT)
             {
-                CSurf_SetSurfaceMute(media_track, CSurf_OnMuteChange(media_track, !DAW::IsTrackMuted(media_track)), NULL);
+                DAW::ToggleTrackMuted(media_track);
             }
             mute_start[index] = 0;
         }
         else if (value > 0)
         {
             mute_start[index] = now;
-            CSurf_SetSurfaceMute(media_track, CSurf_OnMuteChange(media_track, !DAW::IsTrackMuted(media_track)), NULL);
+            DAW::ToggleTrackMuted(media_track);
         }
     }
 
@@ -248,38 +241,37 @@ public:
         {
             if (now - solo_start[index] > MOMENTARY_TIMEOUT)
             {
-                CSurf_SetSurfaceSolo(media_track, CSurf_OnSoloChange(media_track, !DAW::IsTrackSoloed(media_track)), NULL);
+                DAW::ToggleTrackSoloed(media_track);
             }
             solo_start[index] = 0;
         }
         else if (value > 0)
         {
             solo_start[index] = now;
-            CSurf_SetSurfaceSolo(media_track, CSurf_OnSoloChange(media_track, !DAW::IsTrackSoloed(media_track)), NULL);
+            DAW::ToggleTrackSoloed(media_track);
         }
     }
 
-    void HandleFaderTouch(int index) override
+    void HandleFaderTouch(int index, int value) override
     {
-        (void)index;
+        (void)value;
+        if (!context->GetFaderReset())
+        {
+            return;
+        }
+
+        if (context->GetShiftChannelLeft())
+        {
+            MediaTrack *media_track = navigator->GetTrackByIndex(index);
+            DAW::SetTrackVolume(media_track, 1.0);
+        }
     }
 
     void HandleFaderMove(int index, int msb, int lsb) override
     {
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
 
-        if (context->GetShiftLeft())
-        {
-            CSurf_SetSurfacePan(media_track, CSurf_OnPanChange(media_track, normalizedToPan(int14ToNormalized(msb, lsb)), false), NULL);
-        }
-        else if (context->GetShiftRight())
-        {
-            SetMediaTrackInfo_Value(media_track, "D_WIDTH", CSurf_OnWidthChange(media_track, normalizedToPan(int14ToNormalized(msb, lsb)), false));
-        }
-        else
-        {
-            CSurf_SetSurfaceVolume(media_track, CSurf_OnVolumeChange(media_track, int14ToVol(msb, lsb), false), NULL);
-        }
+        DAW::SetTrackVolume(media_track, int14ToVol(msb, lsb));
     }
 };
 

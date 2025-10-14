@@ -10,6 +10,8 @@
 #include <vector>
 #include "../shared/csurf_daw.hpp"
 #include "../shared/csurf_utils.hpp"
+#include "csurf_fp_8_ui_control_panel.hpp"
+#include "../shared/csurf_faderport_ui_imgui_utils.hpp"
 
 struct Filter
 {
@@ -69,15 +71,15 @@ protected:
 
         GetTrackUIVolPan(media_track, &volume, &pan1);
         GetTrackUIPan(media_track, &pan1, &pan2, &panMode);
-        *_pan1 = GetPanString(pan1);
-        *_pan2 = GetWidthString(pan2, panMode);
+        *_pan1 = GetPan1String(pan1);
+        *_pan2 = GetPan2String(pan2, panMode);
 
-        if (context->GetShiftLeft())
+        if (context->GetShiftChannelLeft())
         {
             *faderValue = int(panToNormalized(pan1) * 16383.0);
             *valueBarValue = int(volToNormalized(volume) * 127);
         }
-        else if (context->GetShiftRight() && panMode > 4)
+        else if (context->GetShiftChannelRight() && panMode > 4)
         {
             *faderValue = int(panToNormalized(pan2) * 16383.0);
             *valueBarValue = int(volToNormalized(volume) * 127);
@@ -152,23 +154,39 @@ public:
 
     void HandleSelectClick(int index) override
     {
-        int filterIndex = context->GetChannelManagerItemIndex() + index;
-        if (context->GetShiftLeft())
+        int filter_index = context->GetChannelManagerItemIndex() + index;
+        if (context->GetShiftChannelLeft())
         {
-            Main_OnCommandStringEx("_REASONUS_SHOW_REASONUS_FILTERS_WINDOW");
+            if (!ReaSonus8ControlPanel::control_panel_open)
+            {
+                ToggleFP8ControlPanel(ReaSonus8ControlPanel::FILTERS_PAGE);
+            }
+            else if (ReaSonus8ControlPanel::current_page != ReaSonus8ControlPanel::FILTERS_PAGE)
+            {
+                ReaSonus8ControlPanel::SetCurrentPage(ReaSonus8ControlPanel::FILTERS_PAGE);
+            }
+            else if (ReaSonus8ControlPanel::GetPageProperty(0) == filter_index)
+            {
+                ToggleFP8ControlPanel(ReaSonus8ControlPanel::FILTERS_PAGE);
+            }
+
+            if (ReaSonus8ControlPanel::control_panel_open)
+            {
+                ReaSonus8ControlPanel::SetPageProperty(0, filter_index);
+            }
         }
         else
         {
-            if (filterIndex < (int)filters.size())
+            if (filter_index < (int)filters.size())
             {
-                navigator->HandleCustomFilter(filters.at(filterIndex).id);
+                navigator->HandleCustomFilter(filters.at(filter_index).id);
             }
             else
             {
                 int result = MB("There is no filter for this button. Do you want to add a new filter?", "No filter", 1);
                 if (result == 1)
                 {
-                    Main_OnCommandStringEx("_REASONUS_SHOW_REASONUS_FILTERS_WINDOW");
+                    ToggleFP8ControlPanel(ReaSonus8ControlPanel::FILTERS_PAGE);
                 }
             }
         }
@@ -196,20 +214,21 @@ public:
         CSurf_SetSurfaceSolo(media_track, CSurf_OnSoloChange(media_track, !DAW::IsTrackSoloed(media_track)), NULL);
     }
 
-    void HandleFaderTouch(int index) override
+    void HandleFaderTouch(int index, int value) override
     {
         (void)index;
+        (void)value;
     }
 
     void HandleFaderMove(int index, int msb, int lsb) override
     {
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
 
-        if (context->GetShiftLeft())
+        if (context->GetShiftChannelLeft())
         {
             CSurf_SetSurfacePan(media_track, CSurf_OnPanChange(media_track, normalizedToPan(int14ToNormalized(msb, lsb)), false), NULL);
         }
-        else if (context->GetShiftRight())
+        else if (context->GetShiftChannelRight())
         {
             SetMediaTrackInfo_Value(media_track, "D_WIDTH", CSurf_OnWidthChange(media_track, normalizedToPan(int14ToNormalized(msb, lsb)), false));
         }

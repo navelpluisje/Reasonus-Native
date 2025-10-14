@@ -58,9 +58,10 @@ public:
         (void)value;
     };
 
-    virtual void HandleFaderTouch(int index)
+    virtual void HandleFaderTouch(int index, int value)
     {
         (void)index;
+        (void)value;
     };
 
     virtual void HandleFaderMove(int index, int msb, int lsb)

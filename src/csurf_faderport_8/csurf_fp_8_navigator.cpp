@@ -14,7 +14,7 @@ void CSurf_FP_8_Navigator::GetAllVisibleTracks(WDL_PtrList<MediaTrack> &tracks, 
     {
         MediaTrack *media_track = GetTrack(0, i);
         bool visible = (bool)GetMediaTrackInfo_Value(media_track, "B_SHOWINMIXER");
-        int solo = GetMediaTrackInfo_Value(media_track, "I_SOLO");
+        int solo = (int)GetMediaTrackInfo_Value(media_track, "I_SOLO");
         bool mute = (bool)GetMediaTrackInfo_Value(media_track, "B_MUTE");
 
         if (solo > 0 && !_solo)
@@ -360,6 +360,24 @@ WDL_PtrList<MediaTrack> CSurf_FP_8_Navigator::GetBankTracks()
     return bank;
 }
 
+bool CSurf_FP_8_Navigator::IsTrackTouched(MediaTrack *media_track)
+{
+    int index = -1;
+    WDL_PtrList<MediaTrack> bank = GetBankTracks();
+    std::string searchId = DAW::GetTrackIndex(media_track);
+
+    for (int i = 0; i < context->GetNbChannels(); i++)
+    {
+        std::string id = DAW::GetTrackIndex(bank.Get(i));
+        if (id.compare(searchId) == 0)
+        {
+            index = i;
+        }
+    }
+
+    return trackTouched[index];
+}
+
 void CSurf_FP_8_Navigator::SetOffset(int offset)
 {
     if (tracks.GetSize() < context->GetNbBankChannels())
@@ -475,4 +493,9 @@ void CSurf_FP_8_Navigator::HandleFilter(NavigatorFilter filter)
 void CSurf_FP_8_Navigator::HandleCustomFilter(std::string filterName)
 {
     HandleTracksCustomFilter(filterName);
+}
+
+void CSurf_FP_8_Navigator::SetTrackTouched(int index, bool value)
+{
+    trackTouched[index] = value;
 }

@@ -71,6 +71,19 @@ MediaTrack *CSurf_FP_V2_Navigator::GetControllerTrack()
     return nullptr;
 }
 
+bool CSurf_FP_V2_Navigator::IsTrackTouched(MediaTrack *media_track)
+{
+    std::string searchId = DAW::GetTrackIndex(media_track);
+    std::string id = DAW::GetTrackIndex(GetControllerTrack());
+
+    if (id.compare(searchId) == 0)
+    {
+        return isTouched;
+    }
+
+    return false;
+}
+
 void CSurf_FP_V2_Navigator::SetOffset(int offset)
 {
     if (tracks.GetSize() == 0 || offset < 0)
@@ -122,6 +135,12 @@ void CSurf_FP_V2_Navigator::DecrementOffset(int count)
     UpdateMixerPosition();
 }
 
+void CSurf_FP_V2_Navigator::UpdateOffset()
+{
+    MediaTrack *media_track = ::GetSelectedTrack(0, 0);
+    track_offset = (int)::GetMediaTrackInfo_Value(media_track, "IP_TRACKNUMBER") - 1;
+}
+
 bool CSurf_FP_V2_Navigator::HasTracksWithSolo()
 {
     return hasSolo;
@@ -136,3 +155,8 @@ bool CSurf_FP_V2_Navigator::HasArmedTracks()
 {
     return hasArmed;
 };
+
+void CSurf_FP_V2_Navigator::SetIsTouched(bool value)
+{
+    isTouched = value;
+}

@@ -21,9 +21,13 @@ class CSurf_Context
      */
     bool master_fader_mode_setting;
     /**
-     * @brief Sap the left and right shift button behaviuour
+     * @brief Swap the left and right shift button behaviuour
      */
     bool swap_shift_buttons_setting;
+    /**
+     * @brief Use left-shit fader touch to reset the fader value
+     */
+    bool fader_reset_setting;
     /**
      * @brief When engaged the mute and solo button behave as momentary buttons when pressing longer then 500ms
      */
@@ -37,6 +41,10 @@ class CSurf_Context
      */
     int surface_time_code_setting;
     /**
+     * @brief The display type for the default track mode displays
+     */
+    int displays_track_display;
+    /**
      * @brief When overwrite is true, this is the timecode used
      */
     bool control_hidde_tracks;
@@ -47,7 +55,9 @@ class CSurf_Context
 
     // Shift keys
     bool shift_left = false;
+    bool shift_left_locked = false;
     bool shift_right = false;
+    bool shift_right_locked = false;
     bool arm = false;
 
     // track mode show the time code in the displays
@@ -60,7 +70,7 @@ class CSurf_Context
     bool masterFaderMode = false;
 
     // Pan encoder modes
-    PanEncoderMode panEncoderMode = PanEncoderPanMode;
+    PanEncoderMode panEncoderMode = PanEncoderTrackPanMode;
     bool panPushModePan = true;
 
     // Channel manager
@@ -121,6 +131,16 @@ public:
         return swap_shift_buttons_setting;
     }
 
+    void SetFaderReset(bool enabled)
+    {
+        fader_reset_setting = enabled;
+    }
+
+    bool GetFaderReset()
+    {
+        return fader_reset_setting;
+    }
+
     void SetMuteSoloMomentary(bool enabled)
     {
         mute_solo_momentary_setting = enabled;
@@ -151,6 +171,16 @@ public:
         return surface_time_code_setting;
     }
 
+    void SetTrackDisplay(int value)
+    {
+        displays_track_display = value;
+    }
+
+    int GetTrackDisplay()
+    {
+        return displays_track_display;
+    }
+
     void SetControlHiddenTracks(bool value)
     {
         control_hidde_tracks = value;
@@ -173,6 +203,30 @@ public:
         }
     }
 
+    void SetShiftLeftLocked(bool val)
+    {
+        if (swap_shift_buttons_setting)
+        {
+            shift_right_locked = val;
+        }
+        else
+        {
+            shift_left_locked = val;
+        }
+    }
+
+    bool GetShiftChannelLeft()
+    {
+        if (!shift_left_locked)
+        {
+            return shift_left;
+        }
+        else
+        {
+            return !shift_left;
+        }
+    }
+
     bool GetShiftLeft()
     {
         return shift_left;
@@ -189,6 +243,31 @@ public:
             shift_right = val;
         }
     }
+
+    void SetShiftRightLocked(bool val)
+    {
+        if (swap_shift_buttons_setting)
+        {
+            shift_left_locked = val;
+        }
+        else
+        {
+            shift_right_locked = val;
+        }
+    }
+
+    bool GetShiftChannelRight()
+    {
+        if (!shift_right_locked)
+        {
+            return shift_right;
+        }
+        else
+        {
+            return !shift_right;
+        }
+    }
+
     bool GetShiftRight()
     {
         return shift_right;

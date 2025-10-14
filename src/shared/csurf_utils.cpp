@@ -10,13 +10,6 @@
 #include <ShlObj_core.h>
 #endif
 
-const char pathSeparator =
-#ifdef _WIN32
-    '\\';
-#else
-    '/';
-#endif
-
 void Main_OnCommandStringEx(std::string action_name, int flag, ReaProject *proj)
 {
     int actionId = NamedCommandLookup(action_name.c_str());
@@ -36,6 +29,18 @@ void SetActionState(std::string action_name)
 {
     int actionId = NamedCommandLookup(action_name.c_str());
     SetActionState(actionId);
+}
+
+void SetActionState(int actionId, int new_state)
+{
+    SetToggleCommandState(0, actionId, new_state);
+    RefreshToolbar2(0, actionId);
+}
+
+void SetActionState(std::string action_name, int new_state)
+{
+    int actionId = NamedCommandLookup(action_name.c_str());
+    SetActionState(actionId, new_state);
 }
 
 bool GetToggleCommandStringState(std::string action_name)
@@ -95,11 +100,34 @@ double int14ToVol(unsigned char msb, unsigned char lsb)
     return DB2VAL(pos);
 }
 
+std::string StripPluginName(std::string pluginName)
+{
+    std::vector<std::string> pluginNameParts = split(StripPluginNamePrefixes(StripPluginChannelPostfix(pluginName.data()).data()), " (");
+    if (pluginNameParts.size() > 1)
+    {
+        pluginNameParts.pop_back();
+    }
+
+    return join(pluginNameParts, " (");
+}
+
+std::string StripPluginDeveloper(std::string pluginName)
+{
+    std::vector<std::string> pluginNameParts = split(StripPluginNamePrefixes(StripPluginChannelPostfix(pluginName.data()).data()), " (");
+    std::string developer = pluginNameParts.at(pluginNameParts.size() - 1);
+    if (!developer.empty())
+    {
+        developer.pop_back();
+    }
+
+    return developer;
+}
+
 std::string StripPluginNamePrefixes(char *name)
 {
     std::string s = std::string(name);
     std::string delimiter = ": ";
-    int pos = s.find(delimiter) + size(delimiter);
+    int pos = (int)(s.find(delimiter) + size(delimiter));
     if (pos < 0)
     {
         return s;
@@ -112,7 +140,7 @@ std::string StripPluginChannelPostfix(char *name)
 {
     std::string s = std::string(name);
     std::string delimiter = " (32 out)";
-    int pos = s.find(delimiter);
+    int pos = (int)s.find(delimiter);
     if (pos < 0)
     {
         return s;
@@ -124,7 +152,7 @@ std::string StripPluginChannelPostfix(char *name)
 bool IsPluginFX(std::string name)
 {
     std::string delimiter = ": ";
-    int pos = name.find(delimiter);
+    int pos = (int)name.find(delimiter);
     // If we can not find the delimiter, we can not determine the type of plugin, so asume it's an effect
     if (pos < 0)
     {
@@ -148,14 +176,14 @@ std::string GetSendModeString(int sendMode)
     switch (sendMode)
     {
     case 0:
-        return "Post-fdr";
+        return "Post-Fdr";
     case 1:
         return "Pre-FX";
     case 2:
     case 3:
         return "Post-FX";
     default:
-        return "Post-fdr";
+        return "Post-Fdr";
     };
 }
 
@@ -183,6 +211,8 @@ std::string GetAutomationString(int automationMode)
 }
 
 std::string GetReaSonusIniPath(std::string device) { return std::string(GetResourcePath()) + pathSeparator + "ReaSonus" + pathSeparator + device + ".ini"; }
+
+std::string GetReaSonusZonesPath() { return std::string(GetResourcePath()) + pathSeparator + "CSI" + pathSeparator + "Zones" + pathSeparator + "ReasonusFaderPort" + pathSeparator + "_ReaSonusEffects"; }
 
 std::string GetReaSonusPluginPath(std::string developer, std::string pluginName, bool create)
 {
@@ -216,7 +246,7 @@ std::vector<std::string> split(std::string str, std::string delimiter)
         do
         {
             // Find the index of occurrence
-            int idx = str.find(delimiter, start);
+            int idx = (int)str.find(delimiter, start);
             if (idx == static_cast<int>(std::string::npos))
             {
                 break;
@@ -226,7 +256,7 @@ std::vector<std::string> split(std::string str, std::string delimiter)
             // occurrence in the vector
             int length = idx - start;
             v.push_back(str.substr(start, length));
-            start += (length + delimiter.size());
+            start += (int)(length + delimiter.size());
         } while (true);
         v.push_back(str.substr(start));
     }
@@ -306,8 +336,10 @@ void readAndCreateIni(mINI::INIStructure &data, std::string device)
             data["surface"]["erase-last-param-after-learn"] = "0";
             data["surface"]["master-fader-mode"] = "0";
             data["surface"]["swap-shift-buttons"] = "0";
+            data["surface"]["fader-reset"] = "0";
             data["surface"]["overwrite-time-code"] = "1";
             data["surface"]["time-code"] = "2";
+            data["displays"]["track"] = "8";
             data["functions"]["5"] = "0";
             data["functions"]["6"] = "0";
             data["functions"]["7"] = "0";
@@ -340,8 +372,10 @@ void validateReaSonusIni(mINI::INIFile file, mINI::INIStructure &data, std::stri
         data["surface"]["erase-last-param-after-learn"] = data["surface"].has("erase-last-param-after-learn") ? data["surface"]["erase-last-param-after-learn"] : "0";
         data["surface"]["master-fader-mode"] = data["surface"].has("master-fader-mode") ? data["surface"]["master-fader-mode"] : "0";
         data["surface"]["swap-shift-buttons"] = data["surface"].has("swap-shift-buttons") ? data["surface"]["swap-shift-buttons"] : "0";
+        data["surface"]["fader-reset"] = data["surface"].has("fader-reset") ? data["surface"]["fader-reset"] : "0";
         data["surface"]["overwrite-time-code"] = data["surface"].has("overwrite-time-code") ? data["surface"]["overwrite-time-code"] : "1";
         data["surface"]["time-code"] = data["surface"].has("time-code") ? data["surface"]["time-code"] : "2";
+        data["displays"]["track"] = data["displays"].has("track") ? data["displays"]["track"] : "8";
         data["functions"]["5"] = data["functions"].has("5") ? data["functions"]["5"] : "0";
         data["functions"]["6"] = data["functions"].has("6") ? data["functions"]["6"] : "0";
         data["functions"]["7"] = data["functions"].has("7") ? data["functions"]["7"] : "0";
@@ -366,6 +400,41 @@ std::string GenerateUniqueKey(std::string prefix)
     prefix += std::to_string(now);
 
     return prefix;
+}
+
+std::vector<std::string> unwanted_param_names = {
+    "MIDI CC",  // Decomposer, Arturia
+    "reserved", // Decomposer, Valhalla
+    // Blue Cat
+    "MIDI Program Change",
+    "MIDI Controller",
+    // Arturia
+    "unassigned",
+    "VST_ProgramChange_",
+    "HardwareDisplayControl",
+    "MPE_",
+    // SPITFIRE
+    "general purpose",
+    // global
+    "undefined",
+};
+
+bool IsWantedParam(std::string param_name)
+{
+    bool result = true;
+
+    for (std::string unwanted_name : unwanted_param_names)
+    {
+        int res = param_name.find(unwanted_name);
+        // We found the string. Set result to false and break;
+        if (res != (int)std::string::npos)
+        {
+            result = false;
+            break;
+        }
+    }
+
+    return result;
 }
 
 int minmax(int min, int value, int max)

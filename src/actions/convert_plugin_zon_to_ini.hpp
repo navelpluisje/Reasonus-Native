@@ -5,10 +5,10 @@
 #include <gsl/gsl>
 #include <reaper_plugin_functions.h>
 
-namespace SHOW_REASONUS_V2_FUNCTION_WINDOW
+namespace CONVERT_PLUGIN_ZON_TO_INI
 {
     extern REAPER_PLUGIN_HINSTANCE hInstance; // used for dialogs, if any
     auto Register() -> void;
     auto Unregister() -> void;
 
-} // namespace SHOW_REASONUS_V2_FUNCTION_WINDOW
+} // namespace CONVERT_PLUGIN_ZON_TO_INI

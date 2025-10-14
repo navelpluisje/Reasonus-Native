@@ -6,7 +6,15 @@
 #include <reaper_plugin_functions.h>
 #include <mini/ini.h>
 
+const char pathSeparator =
+#ifdef _WIN32
+    '\\';
+#else
+    '/';
+#endif
+
 const int TOGGLE_SPEED = 150;
+const int DOUBLE_CLICK_SPEED = 750;
 
 const std::string FP_V2 = "FP_V2";
 const std::string FP_8 = "FP";
@@ -56,6 +64,60 @@ struct ShiftState
     {
         return invert ? !active : active;
     }
+
+    bool IsLocked()
+    {
+        return invert;
+    }
+};
+
+struct DoubleClickState
+{
+    bool active = false;
+    int start = 0;
+    int clicks = 0;
+
+    void SetValue(bool value)
+    {
+        int time = GetTickCount();
+
+        if (value && start > 0 && clicks == 1)
+        {
+            if (time - start < DOUBLE_CLICK_SPEED)
+            {
+                active = true;
+                start = 0;
+                clicks = 0;
+            }
+            else
+            {
+                active = false;
+                start = time;
+                clicks = 1;
+            }
+            return;
+        }
+
+        if (!value && start > 0 && clicks == 1 && active)
+        {
+            active = false;
+            start = 0;
+            return;
+        }
+
+        if (start == 0 && value && clicks == 0)
+        {
+            clicks += 1;
+            start = time;
+            active = false;
+            return;
+        }
+    }
+
+    bool IsActive()
+    {
+        return active;
+    }
 };
 
 void Main_OnCommandStringEx(std::string action_name, int flag = 0, ReaProject *proj = 0);
@@ -63,6 +125,10 @@ void Main_OnCommandStringEx(std::string action_name, int flag = 0, ReaProject *p
 void SetActionState(int actionId);
 
 void SetActionState(std::string action_name);
+
+void SetActionState(int actionId, int state);
+
+void SetActionState(std::string action_name, int state);
 
 bool GetToggleCommandStringState(std::string action_name);
 
@@ -119,6 +185,22 @@ double panToNormalized(double val);
 double int14ToVol(unsigned char msb, unsigned char lsb);
 
 /**
+ * @brief Strip the plugin name from its pre and post fixes
+ *
+ * @param name The full plugin name
+ * @return The stripped down name
+ */
+std::string StripPluginName(std::string pluginName);
+
+/**
+ * @brief Strip the plugin developer from its pre and post fixes
+ *
+ * @param name The full plugin name
+ * @return The stripped down name
+ */
+std::string StripPluginDeveloper(std::string pluginName);
+
+/**
  * @brief Strip the type from the plugin name
  *
  * @param name The full plugin name
@@ -162,6 +244,8 @@ std::string GetAutomationString(int automationMode);
 
 std::string GetReaSonusIniPath(std::string device);
 
+std::string GetReaSonusZonesPath();
+
 std::string GetReaSonusPluginPath(std::string developer, std::string pluginName, bool create = false);
 
 bool isInteger(std::string value);
@@ -200,6 +284,15 @@ void validateReaSonusIni(mINI::INIFile file, mINI::INIStructure &data, std::stri
  * @param prefix The prefix used for the key
  */
 std::string GenerateUniqueKey(std::string prefix);
+
+/**
+ * @brief Chack if a plugin param name is wanted. therre is a list of values that shoould NOT be in a param name
+ *
+ * @param param_name
+ * @return true
+ * @return false
+ */
+bool IsWantedParam(std::string param_name);
 
 int minmax(int min, int value, int max);
 double minmax(double min, double value, double max);

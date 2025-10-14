@@ -22,7 +22,7 @@ void DAW::UnSelectAllTracks()
     }
     MediaTrack *media_track = ::GetMasterTrack(0);
     SetTrackSelected(media_track, false);
-};
+}
 
 bool DAW::IsTrackArmed(MediaTrack *media_track)
 {
@@ -30,7 +30,12 @@ bool DAW::IsTrackArmed(MediaTrack *media_track)
     ::GetTrackState(media_track, &flagsOut);
 
     return hasBit(flagsOut, 6);
-};
+}
+
+void DAW::ToggleTrackArmed(MediaTrack *media_track)
+{
+    ::CSurf_SetSurfaceRecArm(media_track, CSurf_OnRecArmChange(media_track, !DAW::IsTrackArmed(media_track)), NULL);
+}
 
 bool DAW::IsTrackMuted(MediaTrack *media_track)
 {
@@ -38,11 +43,11 @@ bool DAW::IsTrackMuted(MediaTrack *media_track)
     GetTrackState(media_track, &flagsOut);
 
     return hasBit(flagsOut, 3);
-};
+}
 
-bool DAW::IsTrackSelected(MediaTrack *media_track)
+void DAW::ToggleTrackMuted(MediaTrack *media_track)
 {
-    return ::IsTrackSelected(media_track);
+    ::CSurf_SetSurfaceMute(media_track, CSurf_OnMuteChange(media_track, !DAW::IsTrackMuted(media_track)), NULL);
 }
 
 bool DAW::IsTrackSoloed(MediaTrack *media_track)
@@ -51,7 +56,22 @@ bool DAW::IsTrackSoloed(MediaTrack *media_track)
     GetTrackState(media_track, &flagsOut);
 
     return hasBit(flagsOut, 4);
-};
+}
+
+void DAW::ToggleTrackSoloed(MediaTrack *media_track)
+{
+    ::CSurf_SetSurfaceSolo(media_track, CSurf_OnSoloChange(media_track, !DAW::IsTrackSoloed(media_track)), NULL);
+}
+
+bool DAW::IsTrackSelected(MediaTrack *media_track)
+{
+    return ::IsTrackSelected(media_track);
+}
+
+bool DAW::IsTrackParent(MediaTrack *media_track)
+{
+    return (int)GetMediaTrackInfo_Value(media_track, "I_FOLDERDEPTH") == 1;
+}
 
 int DAW::GetTrackPanMode(MediaTrack *media_track)
 {
@@ -89,12 +109,24 @@ std::string DAW::GetTrackInputName(MediaTrack *media_track)
         char midiDeviceName[256];
         int midiDeviceId = (inputCode >> 5) & ((1 << 6) - 1);
         ::GetMIDIInputName(midiDeviceId, midiDeviceName, sizeof(midiDeviceName));
+
+        if (midiDeviceName[0] == '\0')
+        {
+            return "";
+        }
+
         return std::string(midiDeviceName);
     }
     else
     {
         int inputChannel = inputCode & ((1 << 5) - 1);
         const char *inputName = ::GetInputChannelName(inputChannel);
+
+        if (!inputName)
+        {
+            return "";
+        }
+
         return std::string(inputName);
     }
 }
@@ -174,6 +206,17 @@ ButtonColor DAW::GetTrackColor(MediaTrack *media_track)
     return color;
 }
 
+void DAW::ToggleSelectedTrack(MediaTrack *media_track)
+{
+    ::SetTrackSelected(media_track, !DAW::IsTrackSelected(media_track));
+}
+
+void DAW::SetUniqueSelectedTrack(MediaTrack *media_track)
+{
+    UnSelectAllTracks();
+    ::SetTrackSelected(media_track, true);
+}
+
 void DAW::SetSelectedTracksRange(MediaTrack *media_track)
 {
     int index = (int)GetMediaTrackInfo_Value(media_track, "IP_TRACKNUMBER");
@@ -206,6 +249,21 @@ double DAW::GetTrackPeakInfo(MediaTrack *media_track)
 int DAW::GetTrackSurfacePeakInfo(MediaTrack *media_track)
 {
     return int(volToNormalized(GetTrackPeakInfo(media_track)) * 127.0);
+}
+
+void DAW::SetTrackPan1(MediaTrack *media_track, double value)
+{
+    CSurf_SetSurfacePan(media_track, CSurf_OnPanChange(media_track, value, false), NULL);
+}
+
+void DAW::SetTrackPan2(MediaTrack *media_track, double value)
+{
+    SetMediaTrackInfo_Value(media_track, "D_WIDTH", CSurf_OnWidthChange(media_track, value, false));
+}
+
+void DAW::SetTrackVolume(MediaTrack *media_track, double value)
+{
+    CSurf_SetSurfaceVolume(media_track, CSurf_OnVolumeChange(media_track, value, false), NULL);
 }
 
 /************************************************************************
@@ -390,9 +448,19 @@ bool DAW::GetTrackReceiveMute(MediaTrack *media_track, int receive)
     return receiveMute;
 }
 
+void DAW::ToggleTrackReceiveMute(MediaTrack *media_track, int receive)
+{
+    SetTrackSendInfo_Value(media_track, -1, receive, "B_MUTE", !DAW::GetTrackReceiveMute(media_track, receive));
+}
+
 bool DAW::GetTrackReceivePhase(MediaTrack *media_track, int receive)
 {
     return (bool)GetTrackSendInfo_Value(media_track, -1, receive, "B_PHASE");
+}
+
+void DAW::ToggleTrackReceivePhase(MediaTrack *media_track, int receive)
+{
+    SetTrackSendInfo_Value(media_track, -1, receive, "B_PHASE", !DAW::GetTrackReceivePhase(media_track, receive));
 }
 
 bool DAW::GetTrackReceiveMono(MediaTrack *media_track, int receive)
@@ -400,9 +468,29 @@ bool DAW::GetTrackReceiveMono(MediaTrack *media_track, int receive)
     return (bool)GetTrackSendInfo_Value(media_track, -1, receive, "B_Mono");
 }
 
-int DAW::GetNextTrackReceiveMode(MediaTrack *media_track, int send)
+void DAW::ToggleTrackReceiveMono(MediaTrack *media_track, int receive)
 {
-    return sendModes[(GetTrackReceiveMode(media_track, send) + 1) % 4];
+    SetTrackSendInfo_Value(media_track, -1, receive, "B_MONO", !DAW::GetTrackReceiveMono(media_track, receive));
+}
+
+int DAW::GetNextTrackReceiveMode(MediaTrack *media_track, int receive)
+{
+    return sendModes[(GetTrackReceiveMode(media_track, receive) + 1) % 4];
+}
+
+void DAW::SetNextTrackReceiveMode(MediaTrack *media_track, int receive)
+{
+    ::SetTrackSendInfo_Value(media_track, -1, receive, "I_SENDMODE", DAW::GetNextTrackReceiveMode(media_track, receive));
+}
+
+void DAW::SetTrackReceiveVolume(MediaTrack *media_track, int receive, double volume)
+{
+    ::SetTrackSendInfo_Value(media_track, -1, receive, "D_VOL", CSurf_OnRecvVolumeChange(media_track, receive, volume, false));
+}
+
+void DAW::SetTrackReceivePan(MediaTrack *media_track, int receive, double pan)
+{
+    ::SetTrackSendInfo_Value(media_track, -1, receive, "D_PAN", CSurf_OnRecvPanChange(media_track, receive, pan, false));
 }
 
 /************************************************************************
@@ -450,9 +538,19 @@ bool DAW::GetTrackSendMute(MediaTrack *media_track, int send)
     return sendMute;
 }
 
+void DAW::ToggleTrackSendMute(MediaTrack *media_track, int send)
+{
+    SetTrackSendInfo_Value(media_track, 0, send, "B_MUTE", !DAW::GetTrackSendMute(media_track, send));
+}
+
 bool DAW::GetTrackSendPhase(MediaTrack *media_track, int send)
 {
     return (bool)GetTrackSendInfo_Value(media_track, 0, send, "B_PHASE");
+}
+
+void DAW::ToggleTrackSendPhase(MediaTrack *media_track, int send)
+{
+    SetTrackSendInfo_Value(media_track, 0, send, "B_PHASE", !DAW::GetTrackSendPhase(media_track, send));
 }
 
 bool DAW::GetTrackSendMono(MediaTrack *media_track, int send)
@@ -460,9 +558,29 @@ bool DAW::GetTrackSendMono(MediaTrack *media_track, int send)
     return (bool)GetTrackSendInfo_Value(media_track, 0, send, "B_MONO");
 }
 
+void DAW::ToggleTrackSendMono(MediaTrack *media_track, int send)
+{
+    SetTrackSendInfo_Value(media_track, 0, send, "B_MONO", !DAW::GetTrackSendMono(media_track, send));
+}
+
 int DAW::GetNextTrackSendMode(MediaTrack *media_track, int send)
 {
     return sendModes[(GetTrackSendMode(media_track, send) + 1) % 4];
+}
+
+void DAW::SetNextTrackSendMode(MediaTrack *media_track, int send)
+{
+    ::SetTrackSendInfo_Value(media_track, 0, send, "I_SENDMODE", DAW::GetNextTrackSendMode(media_track, send));
+}
+
+void DAW::SetTrackSendVolume(MediaTrack *media_track, int send, double volume)
+{
+    ::SetTrackSendInfo_Value(media_track, 0, send, "D_VOL", CSurf_OnSendVolumeChange(media_track, send, volume, false));
+}
+
+void DAW::SetTrackSendPan(MediaTrack *media_track, int send, double pan)
+{
+    ::SetTrackSendInfo_Value(media_track, 0, send, "D_PAN", CSurf_OnSendPanChange(media_track, send, pan, false));
 }
 
 /************************************************************************
