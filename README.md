@@ -1,3 +1,7 @@
+![ReaSonus version](https://img.shields.io/github/v/release/navelpluisje/reasonus-native?style=flat&label=ReaSonus%20version)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/navelpluisje/reasonus-native/cmake-multi-platform.yml?style=flat&label=Last%20ReaSonus%20Build)
+![GitHub License](https://img.shields.io/github/license/navelpluisje/reasonus-native?style=flat)
+
 # ReaSonus Faderport Native
 
 Documentation can be found here: [https://navelpluisje.github.io/reasonus/](https://navelpluisje.github.io/reasonus/)
