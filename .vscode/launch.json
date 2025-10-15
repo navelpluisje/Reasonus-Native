@@ -6,7 +6,7 @@
             "type": "cppdbg",
             "request": "launch",
             // Resolved by CMake Tools:
-            "program": "/Users/erwin/Projects/reaper/REAPER/REAPER.app/Contents/MacOS/REAPER",
+            "program": "/Users/erwin/Projects/reaper/REAPER_OSARA/REAPER.app/Contents/MacOS/REAPER",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

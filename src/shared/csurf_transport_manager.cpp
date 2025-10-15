@@ -5,6 +5,7 @@
 #include "../shared/csurf_utils.hpp"
 #include "../shared/csurf_context.cpp"
 #include "./csurf_osara.hpp"
+#include "./csurf.h"
 
 class CSurf_TransportManager
 {
@@ -144,7 +145,7 @@ public:
         {
             return;
         }
-        CSurfOsara::GetInstance().Speak("Play darling");
+        osara_outputMessage("Play darling");
 
         StopRewindOrForward();
         CSurf_OnPlay();

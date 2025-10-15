@@ -21,6 +21,8 @@ inline const char *EXT_STATE_VALUE_TRUE = "1";
 inline const char *EXT_STATE_SECTION = "ReaSonus";
 inline const char *EXT_STATE_KEY_SAVED_SETTINGS = "saved_settings";
 
+inline void (*osara_outputMessage)(const char *message); // global
+
 // void Speak(const char *phrase)
 // {
 //   static void (*osara_outputMessage)(const char *message);

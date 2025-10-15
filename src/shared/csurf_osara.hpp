@@ -3,9 +3,16 @@
 
 #include <string>
 
+// void (*osara_outputMessage)(const char *);
+
+// static void import_osara_api()
+// {
+//     plugin_register("-timer", (void *)&import_osara_api);
+//     osara_outputMessage = (decltype(osara_outputMessage))plugin_getapi("osara_outputMessage");
+// }
+
 class CSurfOsara
 {
-    void (*osara_outputMessage)(const char *message); // global
     int test;
 
 public:

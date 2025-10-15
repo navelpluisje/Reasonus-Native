@@ -8,7 +8,9 @@
 #include "actions/close_all_floating_fx_windows.hpp"
 #include "actions/convert_plugin_zon_to_ini.hpp"
 #include "ui/csurf_ui_function_keys_page.cpp"
+#include "shared/csurf_osara.hpp"
 #include "resource.h"
+#include "shared/csurf.h"
 
 extern reaper_csurf_reg_t
     csurf_faderport_8_reg,
@@ -25,6 +27,17 @@ REAPER_PLUGIN_HINSTANCE g_hInst; // used for dialogs, if any
 HWND g_hwnd;
 
 reaper_plugin_info_t *g_reaper_plugin_info;
+
+static void import_osara_api()
+{
+  plugin_register("-timer", (void *)&import_osara_api);
+  osara_outputMessage = (decltype(osara_outputMessage))plugin_getapi("osara_outputMessage");
+
+  if (osara_outputMessage)
+  {
+    osara_outputMessage("Go go go girl");
+  }
+}
 
 extern "C"
 {
@@ -71,6 +84,8 @@ extern "C"
 
     reaper_plugin_info->Register("csurf", &csurf_faderport_8_reg);
     reaper_plugin_info->Register("csurf", &csurf_faderport_v2_reg);
+
+    plugin_register("timer", (void *)&import_osara_api);
 
     return 1;
   }
