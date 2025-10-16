@@ -42,6 +42,9 @@ class CSurf_FaderPortV2 : public IReaperControlSurface
 
   DWORD surface_update_lastrun;
   DWORD surface_update_keepalive;
+  DWORD surface_update_settings_check;
+
+  mINI::INIStructure ini;
 
   WDL_String descspace;
   char configtmp[1024];
@@ -79,6 +82,7 @@ class CSurf_FaderPortV2 : public IReaperControlSurface
       if (evt->midi_message[1] == FADER_TOUCH_1)
       {
         trackManager->HandleFaderTouch(evt->midi_message[2]);
+        trackNavigator->SetIsTouched(evt->midi_message[2] > 0);
       }
 
       /**
@@ -211,6 +215,14 @@ class CSurf_FaderPortV2 : public IReaperControlSurface
     }
   }
 
+  void updateSettings()
+  {
+    readAndCreateIni(ini, FP_V2);
+
+    context->SetMuteSoloMomentary(ini["surface"].has("mute-solo-momentary") && ini["surface"]["mute-solo-momentary"] == "1");
+    context->SetControlHiddenTracks(ini["surface"].has("control-hidden-tracks") && ini["surface"]["control-hidden-tracks"] == "1");
+  }
+
 public:
   CSurf_FaderPortV2(int indev, int outdev, int *errStats)
   {
@@ -234,8 +246,7 @@ public:
     m_midiout = m_midi_out_dev >= 0 ? CreateMIDIOutput(m_midi_out_dev, false, NULL) : NULL;
 
     context = new CSurf_Context(1);
-    context->SetMuteSoloMomentary(ini["surface"].has("mute-solo-momentary") && ini["surface"]["mute-solo-momentary"] == "1");
-    context->SetControlHiddenTracks(ini["surface"].has("control-hidden-tracks") && ini["surface"]["control-hidden-tracks"] == "1");
+    updateSettings();
 
     trackNavigator = new CSurf_FP_V2_Navigator(context);
     generalControlManager = new CSurf_FP_V2_GeneralControlManager(context, trackNavigator, m_midiout);
@@ -315,6 +326,14 @@ public:
     m_midiin = 0;
   }
 
+  bool GetTouchState(MediaTrack *media_track, int is_pan)
+  {
+    (void)is_pan;
+
+    return trackNavigator->IsTrackTouched(media_track);
+  }
+
+  ;
   void Run()
   {
     if (m_midiin)
@@ -343,10 +362,29 @@ public:
 
         surface_update_lastrun = now;
       }
+
       if ((now - surface_update_keepalive) >= 990)
       {
         surface_update_keepalive = now;
         m_midiout->Send(0xa0, 0x00, 0x00, -1);
+      }
+
+      /**
+       * every 1500 ms we check if the settings have been saved.
+       * If so, we updet the settings in the context
+       *
+       */
+      if ((now - surface_update_settings_check) >= 1500)
+      {
+        surface_update_settings_check = now;
+        const char *saved = ::GetExtState(EXT_STATE_SECTION, EXT_STATE_KEY_SAVED_SETTINGS);
+        std::string is_saved = saved;
+
+        if (is_saved.compare(EXT_STATE_VALUE_TRUE) == 0)
+        {
+          updateSettings();
+          ::SetExtState(EXT_STATE_SECTION, EXT_STATE_KEY_SAVED_SETTINGS, EXT_STATE_VALUE_FALSE, false);
+        }
       }
     }
   }

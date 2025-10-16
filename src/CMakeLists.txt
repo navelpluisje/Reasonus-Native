@@ -11,4 +11,5 @@ add_subdirectory(csurf_faderport_8)
 add_subdirectory(csurf_faderport_v2)
 add_subdirectory(shared)
 add_subdirectory(i18n)
+add_subdirectory(ui)
 

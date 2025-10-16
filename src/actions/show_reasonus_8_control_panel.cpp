@@ -1,7 +1,10 @@
-#include "show_reasonus_function_window.hpp"
-#include "../csurf_faderport_8/csurf_fp_8_ui_functions.hpp"
-#include <mini/ini.h>
-#include "../shared/csurf_utils.hpp"
+// #ifndef REAIMGUIAPI_IMPLEMENT
+#define REAIMGUIAPI_IMPLEMENT
+// #endif
+
+#include "show_reasonus_8_control_panel.hpp"
+#include "reaper_plugin_functions.h"
+#include "../csurf_faderport_8/csurf_fp_8_ui_control_panel.hpp"
 
 #define STRINGIZE_DEF(x) #x
 #define STRINGIZE(x) STRINGIZE_DEF(x)
@@ -9,16 +12,15 @@
 #define max(a, b) ((a) > (b) ? (a) : (b))
 
 // confine my plugin to namespace
-namespace SHOW_REASONUS_FUNCTION_WINDOW
+namespace SHOW_REASONUS_8_CONTROL_PANEL
 {
     // some global non-const variables
     // the necessary 'evil'
     int command_id{0};
     bool toggle_action_state{false};
-    constexpr auto command_name = "REASONUS_SHOW_REASONUS_FUNCTION_WINDOW";
-    constexpr auto action_name = "Reasonus: Show the ReaSonus Functions window FP 8/16";
+    constexpr auto command_name = "REASONUS_SHOW_REASONUS_8_CONTROL_WINDOW";
+    constexpr auto action_name = "Reasonus: Show the ReaSonus Native 8/16 Control Panel";
     custom_action_register_t action = {0, command_name, action_name, nullptr};
-    mINI::INIStructure ini;
 
     // the main function of my plugin
     // gets called via callback or timer
@@ -26,11 +28,11 @@ namespace SHOW_REASONUS_FUNCTION_WINDOW
     {
         if (toggle_action_state)
         {
-            CSURF_FP_UI_FUNCTIONS::ShowFunctionsDialog();
+            ReaSonus8ControlPanel::Start();
         }
         else
         {
-            CSURF_FP_UI_FUNCTIONS::HideFunctionsDialog();
+            ReaSonus8ControlPanel::Stop();
         }
     }
 
@@ -66,18 +68,10 @@ namespace SHOW_REASONUS_FUNCTION_WINDOW
             return false;
         }
 
-        bool isFP8 = file_exists(GetReaSonusIniPath(FP_8).c_str());
+        // flip state on/off
+        toggle_action_state = !toggle_action_state;
+        MainFunctionOfMyPlugin();
 
-        if (!isFP8)
-        {
-            ShowMessageBox("This Functions dialog is only available for the FaderPort 8/16", "Dialog not available", 0);
-        }
-        else
-        {
-            // flip state on/off
-            toggle_action_state = !toggle_action_state;
-            MainFunctionOfMyPlugin();
-        }
         return true;
     }
 

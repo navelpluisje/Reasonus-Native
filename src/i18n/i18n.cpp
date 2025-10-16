@@ -4,27 +4,27 @@
 
 void I18n::SetLanguage(Languages lang)
 {
-    language = lang;
+    this->language = lang;
     switch (lang)
     {
     case LANG_ENUS:
-        translations = enUS;
+        this->translations = enUS;
         break;
 
     case LANG_DEDE:
-        translations = deDE;
+        this->translations = deDE;
         break;
 
     default:
-        translations = enUS;
+        this->translations = enUS;
     }
 }
 
 std::string I18n::t(std::string key)
 {
-    if (translations.find(key) == translations.end())
+    if (this->translations.find(key) == this->translations.end())
     {
         return key;
     }
-    return translations[key];
+    return this->translations[key];
 }

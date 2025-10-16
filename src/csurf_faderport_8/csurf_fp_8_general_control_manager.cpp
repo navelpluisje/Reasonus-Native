@@ -6,10 +6,10 @@
 #include "../controls/csurf_button.hpp"
 #include "../controls/csurf_color_button.hpp"
 #include "csurf_fp_8_navigator.hpp"
-#include "csurf_fp_8_ui_functions.hpp"
-#include "csurf_fp_8_ui_filters.hpp"
 #include "csurf_fp_8_fader_manager.hpp"
 #include "csurf_fp_8_menu_manager.cpp"
+#include "csurf_fp_8_ui_control_panel.hpp"
+#include "../shared/csurf_faderport_ui_imgui_utils.hpp"
 
 class CSurf_FP_8_GeneralControlManager
 {
@@ -49,7 +49,7 @@ protected:
                                        : BTN_VALUE_OFF,
                                    force);
             macroButton->SetColor(ButtonColorYellow, force);
-            macroButton->SetValue(CSURF_FP_UI_FUNCTIONS::IsFunctionsDialogOpen() ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+            macroButton->SetValue(ReaSonus8ControlPanel::control_panel_open ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
         }
         else
         {
@@ -58,7 +58,7 @@ protected:
                                        : BTN_VALUE_OFF,
                                    force);
             macroButton->SetColor(ButtonColorWhite, force);
-            macroButton->SetValue(CSURF_FP_8_UI_FILTERS::IsFiltersDialogOpen() ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+            macroButton->SetValue(ReaSonus8ControlPanel::control_panel_open ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
         }
 
         soloClearButton->SetValue(hasSolo ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
@@ -178,7 +178,7 @@ public:
         hasGlobalBypass = (bool)GetToggleCommandState(40344);
         followCursor = GetToggleCommandStringState("_REASONUS_TOGGLE_PLAY_CURSOR_COMMAND");
         lastTouchedFxMode = context->GetLastTouchedFxMode();
-        functionsDialogOpen = CSURF_FP_UI_FUNCTIONS::IsFunctionsDialogOpen();
+        functionsDialogOpen = ReaSonus8ControlPanel::control_panel_open && ReaSonus8ControlPanel::current_page == ReaSonus8ControlPanel::FUNCTIONS_PAGE;
 
         SetButtonValue();
         SetButtonColors();
@@ -296,14 +296,9 @@ public:
             return;
         }
 
-        if (context->GetShiftLeft())
-        {
-            Main_OnCommandStringEx("_REASONUS_SHOW_REASONUS_FUNCTION_WINDOW", 0, 0);
-        }
-        else
-        {
-            Main_OnCommandStringEx("_REASONUS_SHOW_REASONUS_FILTERS_WINDOW", 0, 0);
-        }
+        int current_page = context->GetShiftLeft() ? ReaSonus8ControlPanel::FUNCTIONS_PAGE : ReaSonus8ControlPanel::FILTERS_PAGE;
+
+        ToggleFP8ControlPanel(current_page);
     };
 
     void HandleLinkButton(int value)

@@ -7,5 +7,7 @@ target_sources(${PROJECT_NAME}
         csurf_fp_v2_session_manager.cpp
         csurf_fp_v2_track_manager.cpp
         csurf_fp_v2_track.cpp
-        csurf_fp_v2_ui_functions.cpp
+        csurf_fp_v2_ui_control_panel.cpp
+        csurf_fp_v2_ui_settings_page.cpp
         )
+        

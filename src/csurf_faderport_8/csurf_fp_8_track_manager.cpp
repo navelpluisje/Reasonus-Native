@@ -171,7 +171,7 @@ public:
                 }
                 else
                 {
-                    track->SetDisplayMode(DISPLAY_MODE_8, forceUpdate);
+                    track->SetDisplayMode((DisplayMode)context->GetTrackDisplay(), forceUpdate);
                     track->SetDisplayLine(0, ALIGN_LEFT, DAW::GetTrackName(media_track).c_str(), NON_INVERT, forceUpdate);
                     track->SetDisplayLine(1, ALIGN_CENTER, DAW::GetTrackIndex(media_track).c_str(), NON_INVERT, forceUpdate);
                     track->SetDisplayLine(2, ALIGN_CENTER, context->GetPanPushMode() ? strPan1.c_str() : strPan2.c_str(), NON_INVERT, forceUpdate);

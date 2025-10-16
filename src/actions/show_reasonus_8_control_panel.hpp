@@ -5,10 +5,10 @@
 #include <gsl/gsl>
 #include <reaper_plugin_functions.h>
 
-namespace SHOW_REASONUS_FILTERS_WINDOW
+namespace SHOW_REASONUS_8_CONTROL_PANEL
 {
     extern REAPER_PLUGIN_HINSTANCE hInstance; // used for dialogs, if any
     auto Register() -> void;
     auto Unregister() -> void;
 
-} // namespace SHOW_REASONUS_FILTERS_WINDOW
+} // namespace SHOW_REASONUS_8_CONTROL_PANEL

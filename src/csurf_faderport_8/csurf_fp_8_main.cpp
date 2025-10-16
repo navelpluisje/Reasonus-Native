@@ -16,6 +16,7 @@
 #include "../shared/csurf.h"
 #include "../shared/csurf_transport_manager.cpp"
 #include "../shared/csurf_utils.hpp"
+#include "../i18n/i18n.hpp"
 #include "csurf_fp_8_session_manager.cpp"
 #include "csurf_fp_8_mix_manager.cpp"
 #include "csurf_fp_8_automation_manager.cpp"
@@ -27,6 +28,8 @@
 
 extern HWND g_hwnd;
 extern REAPER_PLUGIN_HINSTANCE g_hInst;
+
+I18n *I18n::instancePtr = new I18n();
 
 const int MOMENTARY_TIMEOUT = 500;
 
@@ -51,6 +54,9 @@ class CSurf_FaderPort : public IReaperControlSurface
 
   DWORD surface_update_lastrun;
   DWORD surface_update_keepalive;
+  DWORD surface_update_settings_check;
+
+  mINI::INIStructure ini;
 
   WDL_String descspace;
   char configtmp[1024];
@@ -101,6 +107,7 @@ class CSurf_FaderPort : public IReaperControlSurface
       if (evt->midi_message[1] >= FADER_TOUCH_1 && evt->midi_message[1] <= FADER_TOUCH_16)
       {
         faderManager->HandleFaderTouch(evt->midi_message[1] - FADER_TOUCH_1, evt->midi_message[2]);
+        trackNavigator->SetTrackTouched(evt->midi_message[1] - FADER_TOUCH_1, evt->midi_message[2] > 0);
       }
 
       /**
@@ -365,17 +372,34 @@ class CSurf_FaderPort : public IReaperControlSurface
     }
   }
 
+  void updateSettings()
+  {
+    readAndCreateIni(ini, FP_8);
+
+    context->SetPluginControl(ini["surface"].has("disable-plugins") && ini["surface"]["disable-plugins"] != "1");
+    context->SetUntouchAfterLearn(ini["surface"].has("erase-last-param-after-learn") && ini["surface"]["erase-last-param-after-learn"] == "1");
+    context->SetMasterFaderModeEnabled(ini["surface"].has("master-fader-mode") && ini["surface"]["master-fader-mode"] == "1");
+    context->SetSwapShiftButtons(ini["surface"].has("swap-shift-buttons") && ini["surface"]["swap-shift-buttons"] == "1");
+    context->SetFaderReset(ini["surface"].has("fader-reset") && ini["surface"]["fader-reset"] == "1");
+    context->SetMuteSoloMomentary(ini["surface"].has("mute-solo-momentary") && ini["surface"]["mute-solo-momentary"] == "1");
+    context->SetOverwriteTimeCode(ini["surface"].has("overwrite-time-code") && ini["surface"]["overwrite-time-code"] == "1");
+    context->SetSurfaceTimeCode(ini["surface"].has("time-code") && std::stoi(ini["surface"]["time-code"]));
+    context->SetTrackDisplay(ini["displays"].has("track") ? std::stoi(ini["displays"]["track"]) : 8);
+  }
+
 public:
   CSurf_FaderPort(int indev, int outdev, int *errStats)
   {
     (void)indev;
     (void)outdev;
 
+    I18n *i18n = I18n::GetInstance();
+    i18n->SetLanguage(LANG_ENUS);
+
     /**
      * First we check if we have the ini file. If not we create it with default values
      *
      */
-    mINI::INIStructure ini;
     readAndCreateIni(ini, FP_8);
 
     errStats = 0;
@@ -389,14 +413,7 @@ public:
     m_midiout = m_midi_out_dev >= 0 ? CreateMIDIOutput(m_midi_out_dev, false, NULL) : NULL;
 
     context = new CSurf_Context(stoi(ini["surface"]["surface"]));
-    context->SetPluginControl(ini["surface"].has("disable-plugins") && ini["surface"]["disable-plugins"] != "1");
-    context->SetUntouchAfterLearn(ini["surface"].has("erase-last-param-after-learn") && ini["surface"]["erase-last-param-after-learn"] == "1");
-    context->SetMasterFaderModeEnabled(ini["surface"].has("master-fader-mode") && ini["surface"]["master-fader-mode"] == "1");
-    context->SetSwapShiftButtons(ini["surface"].has("swap-shift-buttons") && ini["surface"]["swap-shift-buttons"] == "1");
-    context->SetFaderReset(ini["surface"].has("fader-reset") && ini["surface"]["fader-reset"] == "1");
-    context->SetMuteSoloMomentary(ini["surface"].has("mute-solo-momentary") && ini["surface"]["mute-solo-momentary"] == "1");
-    context->SetOverwriteTimeCode(ini["surface"].has("overwrite-time-code") && ini["surface"]["overwrite-time-code"] == "1");
-    context->SetSurfaceTimeCode(ini["surface"].has("time-code") && std::stoi(ini["surface"]["time-code"]));
+    updateSettings();
 
     for (int i = 0; i < context->GetNbChannels(); i++)
     {
@@ -500,6 +517,13 @@ public:
     m_midiin = 0;
   }
 
+  bool GetTouchState(MediaTrack *media_track, int is_pan)
+  {
+    (void)is_pan;
+
+    return trackNavigator->IsTrackTouched(media_track);
+  }
+
   void Run()
   {
     if (m_midiin)
@@ -535,20 +559,38 @@ public:
 
         surface_update_lastrun = now;
       }
-      if ((now - surface_update_keepalive) >= 1200)
-      {
-        faderManager->Refresh(true);
-        sessionManager->Refresh(true);
-        mixManager->Refresh(true);
-        transportManager->Refresh(true);
-        automationManager->Refresh(true);
-        generalControlManager->Refresh(true);
-      }
+      // if ((now - surface_update_keepalive) >= 1200)
+      // {
+      //   faderManager->Refresh(true);
+      //   sessionManager->Refresh(true);
+      //   mixManager->Refresh(true);
+      //   transportManager->Refresh(true);
+      //   automationManager->Refresh(true);
+      //   generalControlManager->Refresh(true);
+      // }
 
       if ((now - surface_update_keepalive) >= 990)
       {
         surface_update_keepalive = now;
         m_midiout->Send(0xa0, 0x00, 0x00, -1);
+      }
+
+      /**
+       * every 1500 ms we check if the settings have been saved.
+       * If so, we updet the settings in the context
+       *
+       */
+      if ((now - surface_update_settings_check) >= 1500)
+      {
+        surface_update_settings_check = now;
+        const char *saved = ::GetExtState(EXT_STATE_SECTION, EXT_STATE_KEY_SAVED_SETTINGS);
+        std::string is_saved = saved;
+
+        if (is_saved.compare(EXT_STATE_VALUE_TRUE) == 0)
+        {
+          updateSettings();
+          ::SetExtState(EXT_STATE_SECTION, EXT_STATE_KEY_SAVED_SETTINGS, EXT_STATE_VALUE_FALSE, false);
+        }
       }
     }
   }
