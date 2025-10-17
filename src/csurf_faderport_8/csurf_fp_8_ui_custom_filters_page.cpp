@@ -296,7 +296,7 @@ public:
                             m_ctx,
                             i18n->t("filters.content.text.label").c_str(),
                             &new_filter_text,
-                            i18n->t("filters.content.text.message").c_str(),
+                            i18n->t("filters.content.text.placeholder").c_str(),
                             icon_add,
                             std::bind(&CSurf_FP_8_CustomFilterstPage::HandleAddFilterText, this));
 

@@ -58,6 +58,8 @@ class CSurf_FaderPort : public IReaperControlSurface
 
   mINI::INIStructure ini;
 
+  I18n *i18n = I18n::GetInstance();
+
   WDL_String descspace;
   char configtmp[1024];
 
@@ -384,6 +386,7 @@ class CSurf_FaderPort : public IReaperControlSurface
     context->SetMuteSoloMomentary(ini["surface"].has("mute-solo-momentary") && ini["surface"]["mute-solo-momentary"] == "1");
     context->SetOverwriteTimeCode(ini["surface"].has("overwrite-time-code") && ini["surface"]["overwrite-time-code"] == "1");
     context->SetSurfaceTimeCode(ini["surface"].has("time-code") && std::stoi(ini["surface"]["time-code"]));
+    i18n->SetLanguage(ini["surface"].has("language") ? std::stoi(ini["surface"]["language"]) : 0);
     context->SetTrackDisplay(ini["displays"].has("track") ? std::stoi(ini["displays"]["track"]) : 8);
   }
 
@@ -392,9 +395,6 @@ public:
   {
     (void)indev;
     (void)outdev;
-
-    I18n *i18n = I18n::GetInstance();
-    i18n->SetLanguage(LANG_ENUS);
 
     /**
      * First we check if we have the ini file. If not we create it with default values

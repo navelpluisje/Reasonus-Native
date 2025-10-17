@@ -324,6 +324,7 @@ void readAndCreateIni(mINI::INIStructure &data, std::string device)
         RecursiveCreateDirectory((std::string(GetResourcePath()) + pathSeparator + "ReaSonus" + pathSeparator + "Plugins").c_str(), 0);
         data["surface"]["midiin"] = "0";
         data["surface"]["midiout"] = "0";
+        data["surface"]["language"] = "0";
         data["surface"]["mute-solo-momentary"] = "0";
         data["functions"]["1"] = "0";
         data["functions"]["2"] = "0";
@@ -360,6 +361,8 @@ void validateReaSonusIni(mINI::INIFile file, mINI::INIStructure &data, std::stri
     data["surface"]["midiin"] = data["surface"].has("midiin") ? data["surface"]["midiin"] : "0";
     data["surface"]["midiout"] = data["surface"].has("midiout") ? data["surface"]["midiout"] : "0";
     data["surface"]["mute-solo-momentary"] = data["surface"].has("mute-solo-momentary") ? data["surface"]["mute-solo-momentary"] : "0";
+    data["surface"]["language"] = data["surface"].has("language") ? data["surface"]["language"] : "0";
+
     data["functions"]["1"] = data["functions"].has("1") ? data["functions"]["1"] : "0";
     data["functions"]["2"] = data["functions"].has("2") ? data["functions"]["2"] : "0";
     data["functions"]["3"] = data["functions"].has("3") ? data["functions"]["3"] : "0";

@@ -35,31 +35,14 @@ public:
     }
 
     void SetLanguage(Languages lang);
-    // {
-    //     this->language = lang;
-    //     switch (lang)
-    //     {
-    //     case LANG_ENUS:
-    //         this->translations = enUS;
-    //         break;
-
-    //     case LANG_DEDE:
-    //         this->translations = deDE;
-    //         break;
-
-    //     default:
-    //         this->translations = enUS;
-    //     }
-    // }
+    void SetLanguage(int lang);
 
     std::string t(std::string key);
-    // {
-    //     if (this->translations.find(key) == this->translations.end())
-    //     {
-    //         return key;
-    //     }
-    //     return this->translations[key];
-    // }
+
+    std::string t(std::string key, std::string arg1);
+    std::string t(std::string key, std::string arg1, std::string arg2);
+    std::string t(std::string key, std::string arg1, std::string arg2, std::string arg3);
+    std::string t(std::string key, std::string arg1, std::string arg2, std::string arg3, std::string arg4);
 };
 
 #endif

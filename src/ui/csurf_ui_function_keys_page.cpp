@@ -125,7 +125,7 @@ public:
         {
             ImGui::PushFont(m_ctx, page.function_font_bold, 13);
             ImGui::PushStyleColor(m_ctx, ImGui::Col_Text, UI_COLORS::Accent);
-            ImGui::Text(m_ctx, (page.i18n->t("functions.item.label") + " " + std::to_string(index + 1) + ":").c_str());
+            ImGui::Text(m_ctx, (page.i18n->t("functions.item.label", std::to_string(index + 1)).c_str()));
             ImGui::PopStyleColor(m_ctx);
             ImGui::SameLine(m_ctx);
             ImGui::Text(m_ctx, page.functions[index].c_str());
