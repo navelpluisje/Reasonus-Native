@@ -35,13 +35,13 @@ public:
                 ImGui::GetContentRegionAvail(m_ctx, &available_width, &available_height);
                 ImGui::PushTextWrapPos(m_ctx, available_width);
 
-                ReaSonusPageTitle(m_ctx, i18n->t("about.about.title").c_str(), main_font_bold);
+                ReaSonusPageTitle(m_ctx, i18n->t("about", "about.title").c_str(), main_font_bold);
 
-                ImGui::Text(m_ctx, i18n->t("about.about.top").c_str());
-                ImGui::BulletText(m_ctx, i18n->t("about.about.list.1").c_str());
-                ImGui::BulletText(m_ctx, i18n->t("about.about.list.2").c_str());
-                ImGui::BulletText(m_ctx, i18n->t("about.about.list.3").c_str());
-                ImGui::BulletText(m_ctx, i18n->t("about.about.list.4").c_str());
+                ImGui::Text(m_ctx, i18n->t("about", "about.top").c_str());
+                ImGui::BulletText(m_ctx, i18n->t("about", "about.list.1").c_str());
+                ImGui::BulletText(m_ctx, i18n->t("about", "about.list.2").c_str());
+                ImGui::BulletText(m_ctx, i18n->t("about", "about.list.3").c_str());
+                ImGui::BulletText(m_ctx, i18n->t("about", "about.list.4").c_str());
 
                 UiElements::PopReaSonusGroupStyle(m_ctx);
                 ImGui::PopTextWrapPos(m_ctx);
@@ -57,27 +57,27 @@ public:
                     ImGui::GetContentRegionAvail(m_ctx, &available_width, &available_height);
                     ImGui::PushTextWrapPos(m_ctx, available_width);
 
-                    ReaSonusPageTitle(m_ctx, i18n->t("about.contribute.title").c_str(), main_font_bold);
-                    ImGui::Text(m_ctx, i18n->t("about.contribute.top").c_str());
-                    ImGui::TextLinkOpenURL(m_ctx, i18n->t("about.contribute.link.coffee").c_str(), "https://buymeacoffee.com/navelpluisje");
+                    ReaSonusPageTitle(m_ctx, i18n->t("about", "contribute.title").c_str(), main_font_bold);
+                    ImGui::Text(m_ctx, i18n->t("about", "contribute.top").c_str());
+                    ImGui::TextLinkOpenURL(m_ctx, i18n->t("about", "contribute.link.coffee").c_str(), "https://buymeacoffee.com/navelpluisje");
                     ImGui::SameLine(m_ctx);
                     ImGui::Text(m_ctx, ", or ");
                     ImGui::SameLine(m_ctx);
-                    ImGui::TextLinkOpenURL(m_ctx, i18n->t("about.contribute.link.tipeee").c_str(), "https://en.tipeee.com/navelpluisje");
+                    ImGui::TextLinkOpenURL(m_ctx, i18n->t("about", "contribute.link.tipeee").c_str(), "https://en.tipeee.com/navelpluisje");
 
                     ImGui::Separator(m_ctx);
 
-                    ImGui::Text(m_ctx, i18n->t("about.contribute.center").c_str());
-                    ImGui::TextLinkOpenURL(m_ctx, i18n->t("about.contribute.link.documentation").c_str(), "https://navelpluisje.github.io/reasonus/");
+                    ImGui::Text(m_ctx, i18n->t("about", "contribute.center").c_str());
+                    ImGui::TextLinkOpenURL(m_ctx, i18n->t("about", "contribute.link.documentation").c_str(), "https://navelpluisje.github.io/reasonus/");
 
                     ImGui::Separator(m_ctx);
 
-                    ImGui::Text(m_ctx, i18n->t("about.contribute.bottom").c_str());
-                    ImGui::TextLinkOpenURL(m_ctx, i18n->t("about.contribute.link.bug").c_str(), "https://github.com/navelpluisje/Reasonus-Native/issues");
+                    ImGui::Text(m_ctx, i18n->t("about", "contribute.bottom").c_str());
+                    ImGui::TextLinkOpenURL(m_ctx, i18n->t("about", "contribute.link.bug").c_str(), "https://github.com/navelpluisje/Reasonus-Native/issues");
                     ImGui::SameLine(m_ctx);
                     ImGui::Text(m_ctx, ", or ");
                     ImGui::SameLine(m_ctx);
-                    ImGui::TextLinkOpenURL(m_ctx, i18n->t("about.contribute.link.question").c_str(), "https://forum.cockos.com/showthread.php?t=267116");
+                    ImGui::TextLinkOpenURL(m_ctx, i18n->t("about", "contribute.link.question").c_str(), "https://forum.cockos.com/showthread.php?t=267116");
 
                     UiElements::PopReaSonusGroupStyle(m_ctx);
                     ImGui::PopTextWrapPos(m_ctx);
@@ -92,11 +92,11 @@ public:
                         ImGui::GetContentRegionAvail(m_ctx, &available_width, &available_height);
                         ImGui::PushTextWrapPos(m_ctx, available_width);
 
-                        ReaSonusPageTitle(m_ctx, i18n->t("about.thanks.title").c_str(), main_font_bold);
-                        ImGui::Text(m_ctx, i18n->t("about.thanks.bottom").c_str());
-                        ImGui::BulletText(m_ctx, i18n->t("about.thanks.list.1").c_str());
-                        ImGui::BulletText(m_ctx, i18n->t("about.thanks.list.2").c_str());
-                        ImGui::BulletText(m_ctx, i18n->t("about.thanks.list.3").c_str());
+                        ReaSonusPageTitle(m_ctx, i18n->t("about", "thanks.title").c_str(), main_font_bold);
+                        ImGui::Text(m_ctx, i18n->t("about", "thanks.bottom").c_str());
+                        ImGui::BulletText(m_ctx, i18n->t("about", "thanks.list.1").c_str());
+                        ImGui::BulletText(m_ctx, i18n->t("about", "thanks.list.2").c_str());
+                        ImGui::BulletText(m_ctx, i18n->t("about", "thanks.list.3").c_str());
 
                         UiElements::PopReaSonusGroupStyle(m_ctx);
                         ImGui::PopTextWrapPos(m_ctx);

@@ -151,8 +151,8 @@ protected:
         // Prepare the vectors
         params.clear();
         paramIds.clear();
-        params.push_back(i18n->t("mapping.edit.select.param.first-item"));
-        paramIds.push_back({-1, i18n->t("mapping.edit.select.param.first-item"), 0});
+        params.push_back(i18n->t("mapping", "edit.select.param.first-item"));
+        paramIds.push_back({-1, i18n->t("mapping", "edit.select.param.first-item"), 0});
 
         // Create a track, add the plugin and start reading the params
         InsertTrackAtIndex(0, false);
@@ -235,7 +235,7 @@ protected:
         IsChannelDirty();
         if (channel_dirty)
         {
-            int res = MB(i18n->t("mapping.edit.popup.unsaved.message").c_str(), i18n->t("mapping.edit.popup.unsaved.title").c_str(), 3);
+            int res = MB(i18n->t("mapping", "edit.popup.unsaved.message").c_str(), i18n->t("mapping", "edit.popup.unsaved.title").c_str(), 3);
             if (res == 6)
             {
                 Save();
@@ -260,7 +260,7 @@ public:
     {
         if (ImGui::BeginChild(m_ctx, "mapping_lists", 240.0, 0.0))
         {
-            ImGui::Text(m_ctx, i18n->t("mapping.list.label").c_str());
+            ImGui::Text(m_ctx, i18n->t("mapping", "list.label").c_str());
             ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 4);
 
             UiElements::PushReaSonusGroupStyle(m_ctx);
@@ -344,12 +344,12 @@ public:
         UiElements::PushReaSonusGroupStyle(m_ctx);
         if (ImGui::BeginChild(m_ctx, "mapping_content_select", 0.0, height, ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY))
         {
-            ReaSonusPageTitle(m_ctx, i18n->t("mapping.edit.select.label").c_str(), main_font_bold);
+            ReaSonusPageTitle(m_ctx, i18n->t("mapping", "edit.select.label").c_str(), main_font_bold);
             if (params.size() > 0)
             {
                 ReaSonusComboInput(
                     m_ctx,
-                    i18n->t("mapping.edit.select.param.label"),
+                    i18n->t("mapping", "edit.select.param.label"),
                     params,
                     &select_param_index);
             }
@@ -359,15 +359,15 @@ public:
 
                 ReaSonusTextInput(
                     m_ctx,
-                    i18n->t("mapping.edit.select.param-name.label"),
+                    i18n->t("mapping", "edit.select.param-name.label"),
                     &select_name,
-                    i18n->t("mapping.edit.select.param-name.placeholder"),
+                    i18n->t("mapping", "edit.select.param-name.placeholder"),
                     space_x * 0.7);
                 ImGui::SameLine(m_ctx);
 
                 ReaSonusIntInput(
                     m_ctx,
-                    i18n->t("mapping.edit.select.param.steps"),
+                    i18n->t("mapping", "edit.select.param.steps"),
                     &select_nb_steps);
                 ImGui::EndChild(m_ctx);
             }
@@ -381,12 +381,12 @@ public:
         UiElements::PushReaSonusGroupStyle(m_ctx);
         if (ImGui::BeginChild(m_ctx, "mapping_content_fader", 0.0, height, ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY))
         {
-            ReaSonusPageTitle(m_ctx, i18n->t("mapping.edit.fader.label"), main_font_bold);
+            ReaSonusPageTitle(m_ctx, i18n->t("mapping", "edit.fader.label"), main_font_bold);
             if (params.size() > 0)
             {
-                ReaSonusComboInput(m_ctx, i18n->t("mapping.edit.fader.param.label"), params, &fader_param_index);
+                ReaSonusComboInput(m_ctx, i18n->t("mapping", "edit.fader.param.label"), params, &fader_param_index);
             }
-            ReaSonusTextInput(m_ctx, i18n->t("mapping.edit.fader.param-name.label"), &fader_name, i18n->t("mapping.edit.fader.param-name.placeholder"));
+            ReaSonusTextInput(m_ctx, i18n->t("mapping", "edit.fader.param-name.label"), &fader_name, i18n->t("mapping", "edit.fader.param-name.placeholder"));
             ImGui::EndChild(m_ctx);
         }
     }
@@ -496,15 +496,15 @@ public:
                     }
                     else if (!selected_plugin_exists && selected_plugin > -1)
                     {
-                        RenderCenteredText(i18n->t("mapping.message.not-available"));
+                        RenderCenteredText(i18n->t("mapping", "message.not-available"));
                     }
                     else if (selected_developer > -1 && selected_plugin == -1)
                     {
-                        RenderCenteredText(i18n->t("mapping.message.select-plugin"));
+                        RenderCenteredText(i18n->t("mapping", "message.select-plugin"));
                     }
                     else
                     {
-                        RenderCenteredText(i18n->t("mapping.message.select-developer"));
+                        RenderCenteredText(i18n->t("mapping", "message.select-developer"));
                     }
 
                     ImGui::EndChild(m_ctx);
@@ -565,7 +565,7 @@ public:
         if (file.write(ini, true))
         {
             Reset();
-            MB(i18n->t("mapping.edit.popup.save.message").c_str(), i18n->t("mapping.edit.popup.save.title").c_str(), 0);
+            MB(i18n->t("mapping", "edit.popup.save.message").c_str(), i18n->t("mapping", "edit.popup.save.title").c_str(), 0);
         };
     }
 

@@ -29,7 +29,7 @@
 extern HWND g_hwnd;
 extern REAPER_PLUGIN_HINSTANCE g_hInst;
 
-I18n *I18n::instancePtr = new I18n();
+I18n *I18n::instancePtr = nullptr;
 
 const int MOMENTARY_TIMEOUT = 500;
 
@@ -386,7 +386,7 @@ class CSurf_FaderPort : public IReaperControlSurface
     context->SetMuteSoloMomentary(ini["surface"].has("mute-solo-momentary") && ini["surface"]["mute-solo-momentary"] == "1");
     context->SetOverwriteTimeCode(ini["surface"].has("overwrite-time-code") && ini["surface"]["overwrite-time-code"] == "1");
     context->SetSurfaceTimeCode(ini["surface"].has("time-code") && std::stoi(ini["surface"]["time-code"]));
-    i18n->SetLanguage(ini["surface"].has("language") ? std::stoi(ini["surface"]["language"]) : 0);
+    i18n->SetLanguage(ini["surface"].has("language") ? ini["surface"]["language"] : "en-US");
     context->SetTrackDisplay(ini["displays"].has("track") ? std::stoi(ini["displays"]["track"]) : 8);
   }
 

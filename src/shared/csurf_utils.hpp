@@ -242,11 +242,15 @@ std::string GetSendModeString(int sendMode);
  */
 std::string GetAutomationString(int automationMode);
 
+std::string GetReaSonusFolderPath();
 std::string GetReaSonusIniPath(std::string device);
 
 std::string GetReaSonusZonesPath();
 
 std::string GetReaSonusPluginPath(std::string developer, std::string pluginName, bool create = false);
+
+std::string GetReaSonusLocalesFolderPath();
+std::string GetReaSonusLocalesPath(std::string language);
 
 bool isInteger(std::string value);
 

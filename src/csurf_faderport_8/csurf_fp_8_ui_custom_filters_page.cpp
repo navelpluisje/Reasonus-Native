@@ -129,8 +129,8 @@ protected:
         if (filter_dirty)
         {
             int res = MB(
-                i18n->t("filters.content.popup.unsaved.message").c_str(),
-                i18n->t("filters.content.popup.unsaved.title").c_str(),
+                i18n->t("filters", "content.popup.unsaved.message").c_str(),
+                i18n->t("filters", "content.popup.unsaved.title").c_str(),
                 4);
             if (res == 6)
             {
@@ -238,7 +238,7 @@ public:
         {
             if (ImGui::BeginChild(m_ctx, "filter_lists", 240.0, 0.0))
             {
-                ImGui::Text(m_ctx, i18n->t("filters.list.label").c_str());
+                ImGui::Text(m_ctx, i18n->t("filters", "list.label").c_str());
                 ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 4);
 
                 UiElements::PushReaSonusGroupStyle(m_ctx);
@@ -246,9 +246,9 @@ public:
                 {
                     ReaSonusActionInputText(
                         m_ctx,
-                        i18n->t("filters.list.input.label").c_str(),
+                        i18n->t("filters", "list.input.label").c_str(),
                         &new_filter_name,
-                        i18n->t("filters.list.input.placeholder").c_str(),
+                        i18n->t("filters", "list.input.placeholder").c_str(),
                         icon_add,
                         std::bind(&CSurf_FP_8_CustomFilterstPage::HandleAddFilter, this));
 
@@ -274,8 +274,8 @@ public:
             if (ImGui::BeginChild(m_ctx, "filter_content", 0.0, 0.0))
             {
                 ImGui::Text(m_ctx, edit_new_filter
-                                       ? i18n->t("filters.content.title.new").c_str()
-                                       : i18n->t("filters.content.title.edit").c_str());
+                                       ? i18n->t("filters", "content.title.new").c_str()
+                                       : i18n->t("filters", "content.title.edit").c_str());
                 ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 4);
 
                 UiElements::PushReaSonusGroupStyle(m_ctx);
@@ -288,15 +288,15 @@ public:
                     {
                         ReaSonusTextInput(
                             m_ctx,
-                            i18n->t("filters.content.name.label").c_str(),
+                            i18n->t("filters", "content.name.label").c_str(),
                             &filter_name,
-                            i18n->t("filters.content.name.placeholder").c_str());
+                            i18n->t("filters", "content.name.placeholder").c_str());
 
                         ReaSonusActionInputText(
                             m_ctx,
-                            i18n->t("filters.content.text.label").c_str(),
+                            i18n->t("filters", "content.text.label").c_str(),
                             &new_filter_text,
-                            i18n->t("filters.content.text.placeholder").c_str(),
+                            i18n->t("filters", "content.text.placeholder").c_str(),
                             icon_add,
                             std::bind(&CSurf_FP_8_CustomFilterstPage::HandleAddFilterText, this));
 
@@ -315,12 +315,12 @@ public:
 
                     if (ImGui::BeginChild(m_ctx, "filter_content_right", column_width, 0.0, 0.0, ImGui::ChildFlags_AutoResizeY))
                     {
-                        ImGui::Text(m_ctx, i18n->t("filters.content.option.title").c_str());
-                        ReaSonusCheckBox(m_ctx, i18n->t("filters.content.option.sibling"), &filter_siblings);
-                        ReaSonusCheckBox(m_ctx, i18n->t("filters.content.option.parents"), &filter_parents);
-                        ReaSonusCheckBox(m_ctx, i18n->t("filters.content.option.children"), &filter_children);
-                        ReaSonusCheckBox(m_ctx, i18n->t("filters.content.option.top-level"), &filter_top_level);
-                        ReaSonusCheckBox(m_ctx, i18n->t("filters.content.option.multiple"), &filter_match_multiple);
+                        ImGui::Text(m_ctx, i18n->t("filters", "content.option.title").c_str());
+                        ReaSonusCheckBox(m_ctx, i18n->t("filters", "content.option.sibling"), &filter_siblings);
+                        ReaSonusCheckBox(m_ctx, i18n->t("filters", "content.option.parents"), &filter_parents);
+                        ReaSonusCheckBox(m_ctx, i18n->t("filters", "content.option.children"), &filter_children);
+                        ReaSonusCheckBox(m_ctx, i18n->t("filters", "content.option.top-level"), &filter_top_level);
+                        ReaSonusCheckBox(m_ctx, i18n->t("filters", "content.option.multiple"), &filter_match_multiple);
                         ImGui::EndChild(m_ctx);
                     }
 
@@ -381,8 +381,8 @@ public:
             edit_new_filter = false;
             Reset();
             MB(
-                i18n->t("filters.content.popup.save.message").c_str(),
-                i18n->t("filters.content.popup.save.title").c_str(),
+                i18n->t("filters", "content.popup.save.message").c_str(),
+                i18n->t("filters", "content.popup.save.title").c_str(),
                 0);
         };
     }

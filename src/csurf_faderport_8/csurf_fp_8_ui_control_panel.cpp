@@ -24,11 +24,11 @@ static void reportError_8(const ImGui_Error &e)
 ReaSonus8ControlPanel::ReaSonus8ControlPanel()
     : m_ctx{}
 {
-    menu_items.push_back("control-panel.menu.functions");
-    menu_items.push_back("control-panel.menu.filters");
-    menu_items.push_back("control-panel.menu.plugin");
-    menu_items.push_back("control-panel.menu.settings");
-    menu_items.push_back("control-panel.menu.about");
+    menu_items.push_back("menu.functions");
+    menu_items.push_back("menu.filters");
+    menu_items.push_back("menu.plugin");
+    menu_items.push_back("menu.settings");
+    menu_items.push_back("menu.about");
 
     ImGui::init(plugin_getapi);
     m_ctx = ImGui::CreateContext(g_name);
@@ -231,11 +231,11 @@ void ReaSonus8ControlPanel::Frame()
             {
                 ImGui::Image(m_ctx, logo, 200, 52);
 
-                ReaSonusMenuButton(m_ctx, i18n->t(menu_items[0]), main_font_bold, icon_function_actions, FUNCTIONS_PAGE, &current_page);
-                ReaSonusMenuButton(m_ctx, i18n->t(menu_items[1]), main_font_bold, icon_custom_filters, FILTERS_PAGE, &current_page);
-                ReaSonusMenuButton(m_ctx, i18n->t(menu_items[2]), main_font_bold, icon_plugin_mapping, MAPPING_PAGE, &current_page);
-                ReaSonusMenuButton(m_ctx, i18n->t(menu_items[3]), main_font_bold, icon_settings, SETTINGS_PAGE, &current_page);
-                ReaSonusMenuButton(m_ctx, i18n->t(menu_items[4]), main_font_bold, icon_about, ABOUT_PAGE, &current_page);
+                ReaSonusMenuButton(m_ctx, i18n->t("control-panel", menu_items[0]), main_font_bold, icon_function_actions, FUNCTIONS_PAGE, &current_page);
+                ReaSonusMenuButton(m_ctx, i18n->t("control-panel", menu_items[1]), main_font_bold, icon_custom_filters, FILTERS_PAGE, &current_page);
+                ReaSonusMenuButton(m_ctx, i18n->t("control-panel", menu_items[2]), main_font_bold, icon_plugin_mapping, MAPPING_PAGE, &current_page);
+                ReaSonusMenuButton(m_ctx, i18n->t("control-panel", menu_items[3]), main_font_bold, icon_settings, SETTINGS_PAGE, &current_page);
+                ReaSonusMenuButton(m_ctx, i18n->t("control-panel", menu_items[4]), main_font_bold, icon_about, ABOUT_PAGE, &current_page);
 
                 ImGui::EndChild(m_ctx);
             }
@@ -252,7 +252,7 @@ void ReaSonus8ControlPanel::Frame()
             UiElements::PopReaSonusContentStyle(m_ctx);
             if (ImGui::BeginChild(m_ctx, "main_content_area", 0.0, -34.0, ImGui::ChildFlags_None))
             {
-                ReaSonusPageTitle(m_ctx, i18n->t(menu_items[current_page]), main_font_bold);
+                ReaSonusPageTitle(m_ctx, i18n->t("control-panel", menu_items[current_page]), main_font_bold);
 
                 if (ImGui::BeginChild(m_ctx, "main_content_area", 0.0, -12.0, ImGui::ChildFlags_None))
                 {
@@ -263,12 +263,12 @@ void ReaSonus8ControlPanel::Frame()
             }
             ReaSonusButtonBar(
                 m_ctx,
-                i18n->t("control-panel.button.save"),
+                i18n->t("control-panel", "button.save"),
                 main_font_bold,
                 &save_clicked,
                 true,
                 &cancel_clicked,
-                i18n->t("control-panel.button.cancel"));
+                i18n->t("control-panel", "button.cancel"));
             ImGui::EndChild(m_ctx);
         }
 

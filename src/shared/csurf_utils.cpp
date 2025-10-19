@@ -210,13 +210,15 @@ std::string GetAutomationString(int automationMode)
     };
 }
 
-std::string GetReaSonusIniPath(std::string device) { return std::string(GetResourcePath()) + pathSeparator + "ReaSonus" + pathSeparator + device + ".ini"; }
+std::string GetReaSonusFolderPath() { return std::string(GetResourcePath()) + pathSeparator + "ReaSonus"; }
+
+std::string GetReaSonusIniPath(std::string device) { return GetReaSonusFolderPath() + pathSeparator + device + ".ini"; }
 
 std::string GetReaSonusZonesPath() { return std::string(GetResourcePath()) + pathSeparator + "CSI" + pathSeparator + "Zones" + pathSeparator + "ReasonusFaderPort" + pathSeparator + "_ReaSonusEffects"; }
 
 std::string GetReaSonusPluginPath(std::string developer, std::string pluginName, bool create)
 {
-    std::string path = std::string(GetResourcePath()) + pathSeparator + "ReaSonus" + pathSeparator + "Plugins" + pathSeparator + developer;
+    std::string path = GetReaSonusFolderPath() + pathSeparator + "Plugins" + pathSeparator + developer;
 
     if (create)
     {
@@ -227,6 +229,16 @@ std::string GetReaSonusPluginPath(std::string developer, std::string pluginName,
 #endif
     }
     return path + pathSeparator + pluginName + ".ini";
+}
+
+std::string GetReaSonusLocalesFolderPath()
+{
+    return GetReaSonusFolderPath() + pathSeparator + "Locales";
+}
+
+std::string GetReaSonusLocalesPath(std::string language)
+{
+    return GetReaSonusLocalesFolderPath() + pathSeparator + language + ".ini";
 }
 
 bool isInteger(std::string value)

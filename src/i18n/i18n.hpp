@@ -16,10 +16,11 @@ class I18n
 {
 private:
     // Private Constructor
-    I18n() {};
+    I18n();
 
-    Languages language;
-    std::map<std::string, std::string> translations;
+    mINI::INIStructure ini;
+    std::string language;
+    mINI::INIStructure translations;
     static I18n *instancePtr;
 
 public:
@@ -34,15 +35,14 @@ public:
         return instancePtr;
     }
 
-    void SetLanguage(Languages lang);
+    void SetLanguage(std::string lang);
     void SetLanguage(int lang);
 
-    std::string t(std::string key);
+    std::string t(std::string group, std::string key);
 
-    std::string t(std::string key, std::string arg1);
-    std::string t(std::string key, std::string arg1, std::string arg2);
-    std::string t(std::string key, std::string arg1, std::string arg2, std::string arg3);
-    std::string t(std::string key, std::string arg1, std::string arg2, std::string arg3, std::string arg4);
+    std::string t(std::string group, std::string key, std::string arg1);
+    std::string t(std::string group, std::string key, std::string arg1, std::string arg2);
+    std::string t(std::string group, std::string key, std::string arg1, std::string arg2, std::string arg3);
 };
 
 #endif

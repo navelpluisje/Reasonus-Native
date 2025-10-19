@@ -111,7 +111,7 @@ public:
         int actionId = stoi(page.functions[index]);
         const char *fullName = kbd_getTextFromCmd(actionId, 0);
         std::vector<std::string> actionInfo = split(fullName, ": ");
-        std::string action_group = actionInfo.size() > 1 ? actionInfo[0] : page.i18n->t("functions.item.no-group");
+        std::string action_group = actionInfo.size() > 1 ? actionInfo[0] : page.i18n->t("functions", "item.no-group");
         std::string action_description_1 = actionInfo.size() > 1
                                                ? actionInfo[1]
                                            : actionInfo.size() > 0
@@ -125,7 +125,7 @@ public:
         {
             ImGui::PushFont(m_ctx, page.function_font_bold, 13);
             ImGui::PushStyleColor(m_ctx, ImGui::Col_Text, UI_COLORS::Accent);
-            ImGui::Text(m_ctx, (page.i18n->t("functions.item.label", std::to_string(index + 1)).c_str()));
+            ImGui::Text(m_ctx, (page.i18n->t("functions", "item.label", std::to_string(index + 1)).c_str()));
             ImGui::PopStyleColor(m_ctx);
             ImGui::SameLine(m_ctx);
             ImGui::Text(m_ctx, page.functions[index].c_str());
@@ -150,7 +150,7 @@ public:
                 if (ImGui::BeginChild(m_ctx, tooltip_idx.c_str(), 0.0, 0.0, ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY | ImGui::ChildFlags_AutoResizeX))
                 {
                     ImGui::PushTextWrapPos(m_ctx, 260);
-                    ImGui::Text(m_ctx, page.i18n->t("functions.item.button.tooltip").c_str());
+                    ImGui::Text(m_ctx, page.i18n->t("functions", "item.button.tooltip").c_str());
                     ImGui::PopTextWrapPos(m_ctx);
                     ImGui::EndChild(m_ctx);
                     UiElements::PopReaSonusTooltipStyle(m_ctx);
