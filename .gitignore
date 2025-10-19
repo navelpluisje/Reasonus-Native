@@ -9,5 +9,9 @@
 /.vs
 
 /lib/*
+<<<<<<< HEAD
 !/lib/CMakeLists.txt
 !/lib/osara
+=======
+!/lib/CMakeLists.txt
+>>>>>>> feature/multi-linguality

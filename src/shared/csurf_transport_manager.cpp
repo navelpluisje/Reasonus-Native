@@ -145,7 +145,6 @@ public:
         {
             return;
         }
-        osara_outputMessage("Play darling");
 
         StopRewindOrForward();
         CSurf_OnPlay();

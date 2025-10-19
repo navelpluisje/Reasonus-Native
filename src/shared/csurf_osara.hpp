@@ -1,16 +1,10 @@
-#ifndef I18N_HPP_
-#define I18N_HPP_
+#ifndef CSURF_OSARA_HPP_
+#define CSURF_OSARA_HPP_
 
 #include <string>
 #include <map>
 // #include "../i18n/i18n_locales_enUS.hpp"
 // #include "../i18n/i18n_locales_deDE.hpp"
-
-enum Languages
-{
-    LANG_ENUS,
-    LANG_DEDE,
-};
 
 class CSurfOsara
 {
@@ -18,7 +12,7 @@ private:
     // Private Constructor
     CSurfOsara() {};
 
-    Languages language;
+    // Languages language;
     std::map<std::string, std::string> translations;
     static CSurfOsara *instancePtr;
 
@@ -37,8 +31,8 @@ public:
 
     void Speak(std::string value);
 
-    void SetLanguage(Languages lang);
-    void SetLanguage(int lang);
+    // void SetLanguage(Languages lang);
+    // void SetLanguage(int lang);
 };
 
 #endif

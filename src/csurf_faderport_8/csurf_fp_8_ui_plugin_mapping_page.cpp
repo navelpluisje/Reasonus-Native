@@ -8,13 +8,16 @@
 #include "../ui/csurf_ui_int_input.hpp"
 #include "../ui/csurf_ui_page_title.hpp"
 #include "../shared/csurf_daw.hpp"
+#include "../i18n/i18n.hpp"
 
-typedef std::tuple<int, std::string, int> PluginParam;
+typedef std::tuple<int, std::string, int>
+    PluginParam;
 
 class CSurf_FP_8_PluginMappingPage : public CSurf_UI_PageContent
 {
 protected:
     ImGui_Font *main_font_bold;
+    I18n *i18n = I18n::GetInstance();
 
     int x = 0;
 
@@ -149,8 +152,8 @@ protected:
         // Prepare the vectors
         params.clear();
         paramIds.clear();
-        params.push_back("Select a param");
-        paramIds.push_back({-1, "Select a param", 0});
+        params.push_back(i18n->t("mapping.edit.select.param.first-item"));
+        paramIds.push_back({-1, i18n->t("mapping.edit.select.param.first-item"), 0});
 
         // Create a track, add the plugin and start reading the params
         InsertTrackAtIndex(0, false);
@@ -233,7 +236,7 @@ protected:
         IsChannelDirty();
         if (channel_dirty)
         {
-            int res = MB("Do you want to save these first?", "Unsaved changes", 3);
+            int res = MB(i18n->t("mapping.edit.popup.unsaved.message").c_str(), i18n->t("mapping.edit.popup.unsaved.title").c_str(), 3);
             if (res == 6)
             {
                 Save();
@@ -258,7 +261,7 @@ public:
     {
         if (ImGui::BeginChild(m_ctx, "mapping_lists", 240.0, 0.0))
         {
-            ImGui::Text(m_ctx, "Plugins");
+            ImGui::Text(m_ctx, i18n->t("mapping.list.label").c_str());
             ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 4);
 
             UiElements::PushReaSonusGroupStyle(m_ctx);
@@ -342,19 +345,31 @@ public:
         UiElements::PushReaSonusGroupStyle(m_ctx);
         if (ImGui::BeginChild(m_ctx, "mapping_content_select", 0.0, height, ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY))
         {
-            ReaSonusPageTitle(m_ctx, "Select Button", main_font_bold);
+            ReaSonusPageTitle(m_ctx, i18n->t("mapping.edit.select.label").c_str(), main_font_bold);
             if (params.size() > 0)
             {
-                ReaSonusComboInput(m_ctx, "Param", params, &select_param_index);
+                ReaSonusComboInput(
+                    m_ctx,
+                    i18n->t("mapping.edit.select.param.label"),
+                    params,
+                    &select_param_index);
             }
             if (ImGui::BeginChild(m_ctx, "filter_content_input", 0.0, 0.0, ImGui::ChildFlags_AutoResizeY))
             {
                 ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
 
-                ReaSonusTextInput(m_ctx, "Param display name", &select_name, "Display name for the param", space_x * 0.7);
+                ReaSonusTextInput(
+                    m_ctx,
+                    i18n->t("mapping.edit.select.param-name.label"),
+                    &select_name,
+                    i18n->t("mapping.edit.select.param-name.placeholder"),
+                    space_x * 0.7);
                 ImGui::SameLine(m_ctx);
 
-                ReaSonusIntInput(m_ctx, "Steps", &select_nb_steps);
+                ReaSonusIntInput(
+                    m_ctx,
+                    i18n->t("mapping.edit.select.param.steps"),
+                    &select_nb_steps);
                 ImGui::EndChild(m_ctx);
             }
             UiElements::PopReaSonusGroupStyle(m_ctx);
@@ -367,12 +382,12 @@ public:
         UiElements::PushReaSonusGroupStyle(m_ctx);
         if (ImGui::BeginChild(m_ctx, "mapping_content_fader", 0.0, height, ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY))
         {
-            ReaSonusPageTitle(m_ctx, "Fader", main_font_bold);
+            ReaSonusPageTitle(m_ctx, i18n->t("mapping.edit.fader.label"), main_font_bold);
             if (params.size() > 0)
             {
-                ReaSonusComboInput(m_ctx, "Param", params, &fader_param_index);
+                ReaSonusComboInput(m_ctx, i18n->t("mapping.edit.fader.param.label"), params, &fader_param_index);
             }
-            ReaSonusTextInput(m_ctx, "Param display name", &fader_name, "Display name for the param");
+            ReaSonusTextInput(m_ctx, i18n->t("mapping.edit.fader.param-name.label"), &fader_name, i18n->t("mapping.edit.fader.param-name.placeholder"));
             ImGui::EndChild(m_ctx);
         }
     }
@@ -482,15 +497,15 @@ public:
                     }
                     else if (!selected_plugin_exists && selected_plugin > -1)
                     {
-                        RenderCenteredText("The selected plugin is not installed (anymore)");
+                        RenderCenteredText(i18n->t("mapping.message.not-available"));
                     }
                     else if (selected_developer > -1 && selected_plugin == -1)
                     {
-                        RenderCenteredText("Select a plugin");
+                        RenderCenteredText(i18n->t("mapping.message.select-plugin"));
                     }
                     else
                     {
-                        RenderCenteredText("Select a developer and plugin");
+                        RenderCenteredText(i18n->t("mapping.message.select-developer"));
                     }
 
                     ImGui::EndChild(m_ctx);
@@ -551,7 +566,7 @@ public:
         if (file.write(ini, true))
         {
             Reset();
-            MB("Changes saved with success", "Woohoo", 0);
+            MB(i18n->t("mapping.edit.popup.save.message").c_str(), i18n->t("mapping.edit.popup.save.title").c_str(), 0);
         };
     }
 

@@ -8,12 +8,16 @@
 #include "../ui/csurf_ui_tooltip.hpp"
 #include "../ui/csurf_ui_images.h"
 #include "../shared/csurf.h"
+#include "../i18n/i18n.hpp"
 
 class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent
 {
 protected:
     ImGui_Image *icon_info;
 
+    I18n *i18n = I18n::GetInstance();
+
+    int setting_language;
     bool setting_disable_plugins;
     bool setting_untouch_after_learn;
     bool setting_master_fader_mode;
@@ -25,15 +29,28 @@ protected:
     int setting_track_display;
     int *index;
 
+    int language_indexes[6] = {LANG_ENUS, LANG_DEDE};
+    std::vector<std::string> language_names = {
+        i18n->t("settings.language.option.1"), // English
+        i18n->t("settings.language.option.2"), // German
+    };
+
     int time_code_indexes[6] = {0, 2, 3, 4, 5, 8};
-    std::vector<std::string> time_code_names = {"Time", "Beats", "Seconds", "Samples", "Hr:Min:Sec:Fr", "Abs. Frames"};
+    std::vector<std::string> time_code_names = {
+        i18n->t("settings.timecode-list.option.1"), // Time
+        i18n->t("settings.timecode-list.option.2"), // "Beats",
+        i18n->t("settings.timecode-list.option.3"), // "Seconds",
+        i18n->t("settings.timecode-list.option.4"), // "Samples",
+        i18n->t("settings.timecode-list.option.5"), // "Hr:Min:Sec:Fr",
+        i18n->t("settings.timecode-list.option.6"), // "Abs. Frames"
+    };
 
     int track_display_indexes[4] = {DISPLAY_MODE_4, DISPLAY_MODE_5, DISPLAY_MODE_7, DISPLAY_MODE_8};
     std::vector<std::string> track_display_names = {
-        "Large, Large (No pan info)",
-        "Small, Small, Large",
-        "Large, Small, Small",
-        "Small, Large, Small",
+        i18n->t("settings.display-track.option.1"), // "Large, Large (No pan info)"
+        i18n->t("settings.display-track.option.2"), // "Small, Small, Large"
+        i18n->t("settings.display-track.option.3"), // "Large, Small, Small"
+        i18n->t("settings.display-track.option.4"), // "Small, Large, Small"
     };
 
 public:
@@ -41,7 +58,7 @@ public:
     {
         icon_info = ImGui::CreateImageFromMem(reinterpret_cast<const char *>(img_icon_info), sizeof(img_icon_info));
         ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(icon_info));
-
+        i18n->Speak("Woohoo, it is working again");
         Reset();
     };
 
@@ -87,65 +104,72 @@ public:
         UiElements::PushReaSonusSettingsContentStyle(m_ctx);
         if (ImGui::BeginChild(m_ctx, "mapping_lists_content", 0.0, 0.0, ImGui::ChildFlags_FrameStyle, ImGui::ChildFlags_AutoResizeY))
         {
+            RenderSettingsComboInput(
+                m_ctx,
+                i18n->t("settings.language.label"),
+                language_names,
+                &setting_language,
+                i18n->t("settings.language.tooltip"));
+
             RenderSettingsCheckbox(
                 m_ctx,
-                "Disable Plugin Control",
+                i18n->t("settings.plugin-control.label"),
                 &setting_disable_plugins,
-                "If you use another controller for controlling the plugins, you can select this. The plugins mode is still active and you are still able to open the plugin window. From that point, the ReaSonus FaderPort will not do anything anymore for the plugins.");
+                i18n->t("settings.plugin-control.tooltip"));
 
             RenderSettingsCheckbox(
                 m_ctx,
-                "Untouch last touched param after learn",
+                i18n->t("settings.untouch-after-learn.label"),
                 &setting_untouch_after_learn,
-                "When selected the last touched param will be set to untouched after parameter learn.");
+                i18n->t("settings.untouch-after-learn.tooltip"));
 
             RenderSettingsCheckbox(
                 m_ctx,
-                "Enable master fader mode",
+                i18n->t("settings.master-fader.label"),
                 &setting_master_fader_mode,
-                "When selected en pressing the master button will enable master fader mode. This makes the last track of the FaderPort control the master track.");
+                i18n->t("settings.master-fader.tooltip"));
 
             RenderSettingsCheckbox(
                 m_ctx,
-                "Swap Shift buttons",
+                i18n->t("settings.swap-shift.label"),
                 &setting_swap_shift,
-                "This swaps the left and right Shift button.");
+                i18n->t("settings.swap-shift.tooltip"));
 
             RenderSettingsCheckbox(
                 m_ctx,
-                "Fader Reset: Left shift and fader touch",
+                i18n->t("settings.fader-reset.label"),
                 &setting_fader_reset,
-                "When eneabled, you can use the [Left Shift] button to reset the fader value while touching teh fader.");
+                i18n->t("settings.fader-reset.tooltip"));
 
             RenderSettingsCheckbox(
                 m_ctx,
-                "Mute/Solo Momentary",
+                i18n->t("settings.momentary-mute.label"),
                 &setting_momentary_mute_solo,
-                "When set, it will make the Solo and Mute buttons momentary. The timeout for being momentary is 500 milli seconds. In short: If you press the solo button longer then 500ms and release it, it will instant unsolo again.");
+                i18n->t("settings.momentary-mute.tooltip"));
 
             RenderSettingsCheckbox(
                 m_ctx,
-                "Overwrite Time Code",
+                i18n->t("settings.overwrite-timecode.label"),
                 &setting_overwrite_time_code,
-                "Overwrites the time code selected in REAPER.");
+                i18n->t("settings.overwrite-timecode.tooltip"));
 
             if (setting_overwrite_time_code)
             {
                 ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + 26);
                 RenderSettingsComboInput(
                     m_ctx,
-                    "Time Code",
+                    i18n->t("settings.timecode-list.label"),
                     time_code_names,
                     &setting_time_code,
-                    "Select the time code type you want to overwrite REAPERs time code with.");
+                    i18n->t("settings.timecode-list.tooltip"));
             }
 
             RenderSettingsComboInput(
                 m_ctx,
-                "Track mode display",
+                i18n->t("settings.display-track.label"),
                 track_display_names,
                 &setting_track_display,
-                "Select the display style for the track mode display.");
+                i18n->t("settings.display-track.tooltip"));
 
             UiElements::PopReaSonusSettingsContentStyle(m_ctx);
             ImGui::EndChild(m_ctx);
@@ -157,6 +181,7 @@ public:
         mINI::INIFile file(GetReaSonusIniPath(FP_8));
         readAndCreateIni(ini, FP_8);
 
+        ini["surface"]["language"] = std::to_string(language_indexes[setting_language]);
         ini["surface"]["disable-plugins"] = setting_disable_plugins ? "1" : "0";
         ini["surface"]["erase-last-param-after-learn"] = setting_untouch_after_learn ? "1" : "0";
         ini["surface"]["master-fader-mode"] = setting_master_fader_mode ? "1" : "0";
@@ -176,6 +201,9 @@ public:
 
     void Reset() override
     {
+        index = std::find(language_indexes, language_indexes + 2, stoi(ini["surface"]["language"]));
+        setting_language = index - language_indexes;
+
         setting_disable_plugins = ini["surface"]["disable-plugins"] == "1";
         setting_untouch_after_learn = ini["surface"]["erase-last-param-after-learn"] == "1";
         setting_master_fader_mode = ini["surface"]["master-fader-mode"] == "1";

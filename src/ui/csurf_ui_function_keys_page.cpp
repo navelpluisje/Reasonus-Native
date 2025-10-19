@@ -6,6 +6,7 @@
 #include <functional>
 #include "csurf_ui_images.h"
 #include "../ui/csurf_ui_colors.hpp"
+#include "../i18n/i18n.hpp"
 
 class CSurf_UI_FunctionKeysPage : public CSurf_UI_PageContent
 {
@@ -14,6 +15,7 @@ protected:
     ImGui_Font *function_font_bold;
     ImGui_Image *icon_search;
     std::string device;
+    I18n *i18n;
 
 public:
     static bool querying_actions;
@@ -22,6 +24,7 @@ public:
 
     CSurf_UI_FunctionKeysPage(ImGui_Context *m_ctx, std::string _device) : CSurf_UI_PageContent(m_ctx, _device)
     {
+        i18n = I18n::GetInstance();
         device = _device;
         function_font_bold = ImGui::CreateFont("Arial", ImGui::FontFlags_Bold);
         ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(function_font_bold));
@@ -108,7 +111,7 @@ public:
         int actionId = stoi(page.functions[index]);
         const char *fullName = kbd_getTextFromCmd(actionId, 0);
         std::vector<std::string> actionInfo = split(fullName, ": ");
-        std::string action_group = actionInfo.size() > 1 ? actionInfo[0] : "No group";
+        std::string action_group = actionInfo.size() > 1 ? actionInfo[0] : page.i18n->t("functions.item.no-group");
         std::string action_description_1 = actionInfo.size() > 1
                                                ? actionInfo[1]
                                            : actionInfo.size() > 0
@@ -122,7 +125,7 @@ public:
         {
             ImGui::PushFont(m_ctx, page.function_font_bold, 13);
             ImGui::PushStyleColor(m_ctx, ImGui::Col_Text, UI_COLORS::Accent);
-            ImGui::Text(m_ctx, ("Function " + std::to_string(index + 1) + ":").c_str());
+            ImGui::Text(m_ctx, (page.i18n->t("functions.item.label", std::to_string(index + 1)).c_str()));
             ImGui::PopStyleColor(m_ctx);
             ImGui::SameLine(m_ctx);
             ImGui::Text(m_ctx, page.functions[index].c_str());
@@ -146,7 +149,9 @@ public:
                 UiElements::PushReaSonusTooltipStyle(m_ctx);
                 if (ImGui::BeginChild(m_ctx, tooltip_idx.c_str(), 0.0, 0.0, ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY | ImGui::ChildFlags_AutoResizeX))
                 {
-                    ImGui::Text(m_ctx, "Open the actionlist to select the\naction for this function key");
+                    ImGui::PushTextWrapPos(m_ctx, 260);
+                    ImGui::Text(m_ctx, page.i18n->t("functions.item.button.tooltip").c_str());
+                    ImGui::PopTextWrapPos(m_ctx);
                     ImGui::EndChild(m_ctx);
                     UiElements::PopReaSonusTooltipStyle(m_ctx);
                 }

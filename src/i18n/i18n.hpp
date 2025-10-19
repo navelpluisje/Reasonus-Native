@@ -1,0 +1,51 @@
+#ifndef I18N_HPP_
+#define I18N_HPP_
+
+#include <string>
+#include <map>
+// #include "../i18n/i18n_locales_enUS.hpp"
+// #include "../i18n/i18n_locales_deDE.hpp"
+
+enum Languages
+{
+    LANG_ENUS,
+    LANG_DEDE,
+};
+
+class I18n
+{
+private:
+    // Private Constructor
+    I18n() {};
+
+    Languages language;
+    std::map<std::string, std::string> translations;
+    static I18n *instancePtr;
+
+public:
+    I18n(const I18n &obj) = delete;
+    void (*osara_outputMessage)(const char *);
+
+    static I18n *GetInstance()
+    {
+        if (instancePtr == nullptr)
+        {
+            instancePtr = new I18n();
+        }
+        return instancePtr;
+    }
+
+    void SetLanguage(Languages lang);
+    void SetLanguage(int lang);
+
+    void Speak(std::string message);
+
+    std::string t(std::string key);
+
+    std::string t(std::string key, std::string arg1);
+    std::string t(std::string key, std::string arg1, std::string arg2);
+    std::string t(std::string key, std::string arg1, std::string arg2, std::string arg3);
+    std::string t(std::string key, std::string arg1, std::string arg2, std::string arg3, std::string arg4);
+};
+
+#endif

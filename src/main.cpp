@@ -8,7 +8,6 @@
 #include "actions/close_all_floating_fx_windows.hpp"
 #include "actions/convert_plugin_zon_to_ini.hpp"
 #include "ui/csurf_ui_function_keys_page.cpp"
-#include "shared/csurf_osara.hpp"
 #include "resource.h"
 #include "shared/csurf.h"
 
@@ -31,7 +30,7 @@ reaper_plugin_info_t *g_reaper_plugin_info;
 static void import_osara_api()
 {
   plugin_register("-timer", (void *)&import_osara_api);
-  CSurfOsara::GetInstance()->osara_outputMessage = (decltype(CSurfOsara::osara_outputMessage))plugin_getapi("osara_outputMessage");
+  I18n::GetInstance()->osara_outputMessage = (decltype(I18n::osara_outputMessage))plugin_getapi("osara_outputMessage");
 }
 
 extern "C"
@@ -81,7 +80,6 @@ extern "C"
     reaper_plugin_info->Register("csurf", &csurf_faderport_v2_reg);
 
     plugin_register("timer", (void *)&import_osara_api);
-
     return 1;
   }
 };
