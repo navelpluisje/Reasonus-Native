@@ -31,12 +31,7 @@ reaper_plugin_info_t *g_reaper_plugin_info;
 static void import_osara_api()
 {
   plugin_register("-timer", (void *)&import_osara_api);
-  osara_outputMessage = (decltype(osara_outputMessage))plugin_getapi("osara_outputMessage");
-
-  if (osara_outputMessage)
-  {
-    osara_outputMessage("Go go go girl");
-  }
+  CSurfOsara::GetInstance()->osara_outputMessage = (decltype(CSurfOsara::osara_outputMessage))plugin_getapi("osara_outputMessage");
 }
 
 extern "C"

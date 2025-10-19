@@ -41,6 +41,7 @@ public:
     {
         icon_info = ImGui::CreateImageFromMem(reinterpret_cast<const char *>(img_icon_info), sizeof(img_icon_info));
         ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(icon_info));
+
         Reset();
     };
 

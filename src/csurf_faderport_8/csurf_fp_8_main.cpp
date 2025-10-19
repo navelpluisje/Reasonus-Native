@@ -391,7 +391,7 @@ public:
     (void)indev;
     (void)outdev;
 
-    CSurfOsara::GetInstance().Speak("Play motherfucker");
+    CSurfOsara::GetInstance()->Speak("Play darling");
 
     /**
      * First we check if we have the ini file. If not we create it with default values

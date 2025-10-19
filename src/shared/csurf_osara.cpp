@@ -1,41 +1,30 @@
 #include "./csurf_osara.hpp"
-#include <WDL/wdltypes.h> // might be unnecessary in future
-#include <reaper_plugin_functions.h>
-#include "csurf_utils.hpp"
-#include "csurf.h"
-#include <functional>
+#include "../shared/csurf_utils.hpp"
 
-CSurfOsara &CSurfOsara::GetInstance()
+void CSurfOsara::SetLanguage(Languages lang)
 {
-    static CSurfOsara instance; // Guaranteed to be destroyed
-    return instance;            // Instantiated on first use
-}
-
-void CSurfOsara::Speak(std::string message)
-{
-    // logInteger("Test", 42);
-    // ShowConsoleMsg(("Message: " + message + "\n").c_str());
-
-    if (osara_outputMessage)
-    {
-        ShowConsoleMsg("Speak\n");
-        osara_outputMessage(message.c_str());
-    }
-    // else
+    this->language = lang;
+    // switch (lang)
     // {
+    // case LANG_ENUS:
+    //     this->translations = enUS;
+    //     break;
 
-    //     ShowConsoleMsg("Speachless");
+    // case LANG_DEDE:
+    //     this->translations = deDE;
+    //     break;
+
+    // default:
+    //     this->translations = enUS;
     // }
 }
 
-CSurfOsara::CSurfOsara()
+void CSurfOsara::SetLanguage(int lang)
 {
-    ShowConsoleMsg("Constructor\n");
-    test = 42;
+    SetLanguage((Languages)lang);
+}
 
-    if (osara_outputMessage)
-    {
-        osara_outputMessage("Screeeeeaaaaaammmmmmmmmmm");
-        ShowConsoleMsg("Dis you hear me?\n");
-    }
+void CSurfOsara::Speak(std::string value)
+{
+    this->osara_outputMessage(value.c_str());
 }

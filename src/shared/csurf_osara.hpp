@@ -1,32 +1,44 @@
-#ifndef _SCURF_OSARA_H_
-#define _SCURF_OSARA_H_
+#ifndef I18N_HPP_
+#define I18N_HPP_
 
 #include <string>
+#include <map>
+// #include "../i18n/i18n_locales_enUS.hpp"
+// #include "../i18n/i18n_locales_deDE.hpp"
 
-// void (*osara_outputMessage)(const char *);
-
-// static void import_osara_api()
-// {
-//     plugin_register("-timer", (void *)&import_osara_api);
-//     osara_outputMessage = (decltype(osara_outputMessage))plugin_getapi("osara_outputMessage");
-// }
+enum Languages
+{
+    LANG_ENUS,
+    LANG_DEDE,
+};
 
 class CSurfOsara
 {
-    int test;
+private:
+    // Private Constructor
+    CSurfOsara() {};
+
+    Languages language;
+    std::map<std::string, std::string> translations;
+    static CSurfOsara *instancePtr;
 
 public:
-    // Deleted copy constructor and assignment operator
-    CSurfOsara(const CSurfOsara &) = delete;
-    CSurfOsara &operator=(const CSurfOsara &) = delete;
+    CSurfOsara(const CSurfOsara &obj) = delete;
+    void (*osara_outputMessage)(const char *);
 
-    // Public method to access the instance
-    static CSurfOsara &GetInstance();
+    static CSurfOsara *GetInstance()
+    {
+        if (instancePtr == nullptr)
+        {
+            instancePtr = new CSurfOsara();
+        }
+        return instancePtr;
+    }
 
-    void Speak(std::string message);
+    void Speak(std::string value);
 
-private:
-    CSurfOsara();
+    void SetLanguage(Languages lang);
+    void SetLanguage(int lang);
 };
 
 #endif
