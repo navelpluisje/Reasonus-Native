@@ -256,6 +256,10 @@ public:
 
         if (context->GetShiftLeft())
         {
+            if (context->GetOsaraEnabled())
+            {
+                context->ToggleOsaraTrainingMode();
+            }
             return;
         }
 

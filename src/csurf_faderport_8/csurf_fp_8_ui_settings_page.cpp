@@ -9,6 +9,7 @@
 #include "../ui/csurf_ui_images.h"
 #include "../shared/csurf.h"
 #include "../i18n/i18n.hpp"
+#include "../osara/osara.hpp"
 
 class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent
 {
@@ -16,6 +17,7 @@ protected:
     ImGui_Image *icon_info;
 
     I18n *i18n = I18n::GetInstance();
+    Osara *osara = Osara::GetInstance();
 
     int setting_language;
     bool setting_disable_plugins;
@@ -58,7 +60,8 @@ public:
     {
         icon_info = ImGui::CreateImageFromMem(reinterpret_cast<const char *>(img_icon_info), sizeof(img_icon_info));
         ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(icon_info));
-        i18n->Speak("Woohoo, it is working again");
+
+        osara->Speak("Woohoo, it is working again");
         Reset();
     };
 

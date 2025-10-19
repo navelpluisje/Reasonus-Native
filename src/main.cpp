@@ -10,6 +10,7 @@
 #include "ui/csurf_ui_function_keys_page.cpp"
 #include "resource.h"
 #include "shared/csurf.h"
+#include "osara/osara.hpp"
 
 extern reaper_csurf_reg_t
     csurf_faderport_8_reg,
@@ -27,11 +28,14 @@ HWND g_hwnd;
 
 reaper_plugin_info_t *g_reaper_plugin_info;
 
-static void import_osara_api()
-{
-  plugin_register("-timer", (void *)&import_osara_api);
-  I18n::GetInstance()->osara_outputMessage = (decltype(I18n::osara_outputMessage))plugin_getapi("osara_outputMessage");
-}
+Osara *Osara::instancePtr = nullptr;
+
+// static void import_osara_api()
+// {
+//   plugin_register("-timer", (void *)&import_osara_api);
+//   Osara *osara = Osara::GetInstance();
+//   osara->osara_outputMessage = (decltype(Osara::osara_outputMessage))plugin_getapi("osara_outputMessage");
+// }
 
 extern "C"
 {
@@ -79,7 +83,7 @@ extern "C"
     reaper_plugin_info->Register("csurf", &csurf_faderport_8_reg);
     reaper_plugin_info->Register("csurf", &csurf_faderport_v2_reg);
 
-    plugin_register("timer", (void *)&import_osara_api);
+    plugin_register("timer", (void *)&Osara::ImportOsaraApi);
     return 1;
   }
 };

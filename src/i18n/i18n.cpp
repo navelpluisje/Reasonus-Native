@@ -26,11 +26,6 @@ void I18n::SetLanguage(int lang)
     SetLanguage((Languages)lang);
 }
 
-void I18n::Speak(std::string message)
-{
-    osara_outputMessage(message.c_str());
-}
-
 std::string I18n::t(std::string key)
 {
     if (this->translations.find(key) == this->translations.end())
@@ -45,6 +40,26 @@ std::string I18n::t(std::string key, std::string arg1)
     char buffer[512];
     std::string translation = t(key);
     std::snprintf(buffer, 512, translation.c_str(), arg1.c_str());
+
+    std::string result = buffer;
+    return result;
+}
+
+std::string I18n::t(std::string key, std::string arg1, std::string arg2)
+{
+    char buffer[512];
+    std::string translation = t(key);
+    std::snprintf(buffer, 512, translation.c_str(), arg1.c_str(), arg2.c_str());
+
+    std::string result = buffer;
+    return result;
+}
+
+std::string I18n::t(std::string key, std::string arg1, std::string arg2, std::string arg3)
+{
+    char buffer[512];
+    std::string translation = t(key);
+    std::snprintf(buffer, 512, translation.c_str(), arg1.c_str(), arg2.c_str(), arg3.c_str());
 
     std::string result = buffer;
     return result;

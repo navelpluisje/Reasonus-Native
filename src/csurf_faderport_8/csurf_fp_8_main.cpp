@@ -16,7 +16,7 @@
 #include "../shared/csurf.h"
 #include "../shared/csurf_transport_manager.cpp"
 #include "../shared/csurf_utils.hpp"
-#include "../i18n/i18n.hpp"
+#include "../osara/osara.hpp"
 #include "csurf_fp_8_session_manager.cpp"
 #include "csurf_fp_8_mix_manager.cpp"
 #include "csurf_fp_8_automation_manager.cpp"
@@ -25,7 +25,9 @@
 #include "csurf_fp_8_fader_manager.hpp"
 #include "csurf_fp_8_ui_init.hpp"
 #include "csurf_fp_8_navigator.hpp"
-#include "../shared/csurf_osara.hpp"
+#include "../osara/osara.hpp"
+
+// #include "../shared/csurf_osara.hpp"
 
 extern HWND g_hwnd;
 extern REAPER_PLUGIN_HINSTANCE g_hInst;
@@ -66,6 +68,11 @@ class CSurf_FaderPort : public IReaperControlSurface
 
   void OnMIDIEvent(MIDI_event_t *evt)
   {
+    if (context->GetOsaraTrainingMode())
+    {
+      // OsaraTraining(evt->midi_message[0], evt->midi_message[1], evt->midi_message[2]);
+      return;
+    }
 
     /**
      * Fader values

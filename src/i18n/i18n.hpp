@@ -38,8 +38,6 @@ public:
     void SetLanguage(Languages lang);
     void SetLanguage(int lang);
 
-    void Speak(std::string message);
-
     std::string t(std::string key);
 
     std::string t(std::string key, std::string arg1);

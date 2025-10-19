@@ -52,6 +52,14 @@ class CSurf_Context
      * @brief Number of channels
      */
     int nbChannels = 8;
+    /**
+     * @brief wether or not osara is enabled
+     */
+    bool osara_enabled = true;
+    /**
+     * @brief Is ReaSonus in training mode? In traning mode all buttons only tell what they do, but do not function
+     */
+    bool osara_training_mode = true;
 
     // Shift keys
     bool shift_left = false;
@@ -511,6 +519,31 @@ public:
     int GetPluginEditParamId()
     {
         return pluginEditParamId;
+    };
+
+    void SetOsaraEnabled(bool value)
+    {
+        osara_enabled = value;
+    };
+
+    int GetOsaraEnabled()
+    {
+        return osara_enabled;
+    };
+
+    void SetOsaraTrainingMode(bool value)
+    {
+        osara_training_mode = value;
+    };
+
+    void ToggleOsaraTrainingMode()
+    {
+        osara_training_mode = !osara_training_mode;
+    };
+
+    int GetOsaraTrainingMode()
+    {
+        return osara_training_mode;
     };
 
     void SetChannelManagerType(ChannelManagerType type)

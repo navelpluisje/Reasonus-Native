@@ -1,5 +1,5 @@
-#ifndef CSURF_FP_UI_TEST_8_H_
-#define CSURF_FP_UI_TEST_8_H_
+#ifndef CSURF_FP_UI_CONTROL_PANEL_8_H_
+#define CSURF_FP_UI_CONTROL_PANEL_8_H_
 
 #include <WDL/wdltypes.h> // might be unnecessary in future
 #include <reaper_plugin_functions.h>
