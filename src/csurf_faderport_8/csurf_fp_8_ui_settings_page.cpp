@@ -32,20 +32,20 @@ protected:
 
     int time_code_indexes[6] = {0, 2, 3, 4, 5, 8};
     std::vector<std::string> time_code_names = {
-        i18n->t("settings", "timecode-list.option.1"), // Time
-        i18n->t("settings", "timecode-list.option.2"), // "Beats",
-        i18n->t("settings", "timecode-list.option.3"), // "Seconds",
-        i18n->t("settings", "timecode-list.option.4"), // "Samples",
-        i18n->t("settings", "timecode-list.option.5"), // "Hr:Min:Sec:Fr",
-        i18n->t("settings", "timecode-list.option.6"), // "Abs. Frames"
+        i18n->t("settings", "timecode-list.option.time"),          // Time
+        i18n->t("settings", "timecode-list.option.beats"),         // "Beats",
+        i18n->t("settings", "timecode-list.option.seconds"),       // "Seconds",
+        i18n->t("settings", "timecode-list.option.samples"),       // "Samples",
+        i18n->t("settings", "timecode-list.option.hr-min-sec-fr"), // "Hr:Min:Sec:Fr",
+        i18n->t("settings", "timecode-list.option.frames"),        // "Abs. Frames"
     };
 
     int track_display_indexes[4] = {DISPLAY_MODE_4, DISPLAY_MODE_5, DISPLAY_MODE_7, DISPLAY_MODE_8};
     std::vector<std::string> track_display_names = {
-        i18n->t("settings", "display-track.option.1"), // "Large, Large (No pan info)"
-        i18n->t("settings", "display-track.option.2"), // "Small, Small, Large"
-        i18n->t("settings", "display-track.option.3"), // "Large, Small, Small"
-        i18n->t("settings", "display-track.option.4"), // "Small, Large, Small"
+        i18n->t("settings", "display-track.option.display-mode-4"), // "Large, Large (No pan info)"
+        i18n->t("settings", "display-track.option.display-mode-5"), // "Small, Small, Large"
+        i18n->t("settings", "display-track.option.display-mode-7"), // "Large, Small, Small"
+        i18n->t("settings", "display-track.option.display-mode-8"), // "Small, Large, Small"
     };
 
 public:
@@ -217,7 +217,7 @@ public:
         if (file.write(ini, true))
         {
             ::SetExtState(EXT_STATE_SECTION, EXT_STATE_KEY_SAVED_SETTINGS, EXT_STATE_VALUE_TRUE, false);
-            MB("Changes saved with success", "Woohoo", 0);
+            MB(i18n->t("settings", "popup.save.message").c_str(), i18n->t("settings", "popup.save.title").c_str(), 0);
         };
     }
 

@@ -235,7 +235,7 @@ protected:
         IsChannelDirty();
         if (channel_dirty)
         {
-            int res = MB(i18n->t("mapping", "edit.popup.unsaved.message").c_str(), i18n->t("mapping", "edit.popup.unsaved.title").c_str(), 3);
+            int res = MB(i18n->t("mapping", "popup.unsaved.message").c_str(), i18n->t("mapping", "popup.unsaved.title").c_str(), 3);
             if (res == 6)
             {
                 Save();
@@ -565,7 +565,7 @@ public:
         if (file.write(ini, true))
         {
             Reset();
-            MB(i18n->t("mapping", "edit.popup.save.message").c_str(), i18n->t("mapping", "edit.popup.save.title").c_str(), 0);
+            MB(i18n->t("mapping", "popup.save.message").c_str(), i18n->t("mapping", "popup.save.title").c_str(), 0);
         };
     }
 

@@ -129,8 +129,8 @@ protected:
         if (filter_dirty)
         {
             int res = MB(
-                i18n->t("filters", "content.popup.unsaved.message").c_str(),
-                i18n->t("filters", "content.popup.unsaved.title").c_str(),
+                i18n->t("filters", "popup.unsaved.message").c_str(),
+                i18n->t("filters", "popup.unsaved.title").c_str(),
                 4);
             if (res == 6)
             {
@@ -381,8 +381,8 @@ public:
             edit_new_filter = false;
             Reset();
             MB(
-                i18n->t("filters", "content.popup.save.message").c_str(),
-                i18n->t("filters", "content.popup.save.title").c_str(),
+                i18n->t("filters", "popup.save.message").c_str(),
+                i18n->t("filters", "popup.save.title").c_str(),
                 0);
         };
     }
