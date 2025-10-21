@@ -7,8 +7,8 @@
 
 static void ReaSonusTextInput(ImGui_Context *m_ctx, std::string label, std::string *value, std::string hint, double width = 0.0)
 {
-    static char test[255];
-    strcpy(test, (*value).c_str());
+    static char text[255];
+    strcpy(text, (*value).c_str());
 
     std::string id = "##" + label;
 
@@ -18,9 +18,9 @@ static void ReaSonusTextInput(ImGui_Context *m_ctx, std::string label, std::stri
         ImGui::Text(m_ctx, label.c_str());
 
         UiElements::PushReaSonusInputStyle(m_ctx);
-        if (ImGui::InputTextWithHint(m_ctx, ("##" + label).c_str(), hint.c_str(), test, sizeof(test)))
+        if (ImGui::InputTextWithHint(m_ctx, ("##" + label).c_str(), hint.c_str(), text, sizeof(text)))
         {
-            *value = std::string(test);
+            *value = std::string(text);
         }
 
         UiElements::PopReaSonusInputStyle(m_ctx);

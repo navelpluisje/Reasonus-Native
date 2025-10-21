@@ -250,7 +250,7 @@ bool isInteger(std::string value)
 
 std::vector<std::string> split(std::string str, std::string delimiter)
 {
-    std::vector<std::string> v;
+    std::vector<std::string> value;
 
     if (!str.empty())
     {
@@ -267,13 +267,13 @@ std::vector<std::string> split(std::string str, std::string delimiter)
             // If found add the substring till that
             // occurrence in the vector
             int length = idx - start;
-            v.push_back(str.substr(start, length));
+            value.push_back(str.substr(start, length));
             start += (int)(length + delimiter.size());
         } while (true);
-        v.push_back(str.substr(start));
+        value.push_back(str.substr(start));
     }
 
-    return v;
+    return value;
 }
 
 std::vector<std::string> cutString(std::string str, size_t size)

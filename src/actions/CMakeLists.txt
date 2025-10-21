@@ -6,4 +6,5 @@ target_sources(${PROJECT_NAME}
         show_reasonus_v2_control_panel.cpp
         toggle_play_cursor.cpp
         convert_plugin_zon_to_ini.cpp
+        translations_editor.cpp
     )

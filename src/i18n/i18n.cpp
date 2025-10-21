@@ -1,7 +1,5 @@
 #include <mini/ini.h>
 #include "../i18n/i18n.hpp"
-#include "../i18n/i18n_locales_enUS.hpp"
-#include "../i18n/i18n_locales_deDE.hpp"
 #include "../shared/csurf_utils.hpp"
 
 I18n::I18n() {}
