@@ -22,6 +22,7 @@
 #include "csurf_fp_v2_general_control_manager.cpp"
 #include "csurf_fp_v2_navigator.hpp"
 #include "csurf_fp_v2_ui_init.hpp"
+#include "../i18n/i18n.hpp"
 
 extern HWND g_hwnd;
 extern REAPER_PLUGIN_HINSTANCE g_hInst;
@@ -45,6 +46,8 @@ class CSurf_FaderPortV2 : public IReaperControlSurface
   DWORD surface_update_settings_check;
 
   mINI::INIStructure ini;
+
+  I18n *i18n = I18n::GetInstance();
 
   WDL_String descspace;
   char configtmp[1024];
@@ -221,6 +224,7 @@ class CSurf_FaderPortV2 : public IReaperControlSurface
 
     context->SetMuteSoloMomentary(ini["surface"].has("mute-solo-momentary") && ini["surface"]["mute-solo-momentary"] == "1");
     context->SetControlHiddenTracks(ini["surface"].has("control-hidden-tracks") && ini["surface"]["control-hidden-tracks"] == "1");
+    i18n->SetLanguage(ini["surface"].has("language") ? ini["surface"]["language"] : "en-US");
   }
 
 public:
@@ -232,7 +236,6 @@ public:
     /**
      * First we check if we have the ini file. If not we create it with default values
      */
-    mINI::INIStructure ini;
     readAndCreateIni(ini, FP_V2);
 
     errStats = 0;

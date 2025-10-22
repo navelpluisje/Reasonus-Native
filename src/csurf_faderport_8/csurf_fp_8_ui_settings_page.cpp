@@ -9,14 +9,18 @@
 #include "../ui/csurf_ui_images.h"
 #include "../shared/csurf.h"
 #include "../i18n/i18n.hpp"
+#include "../ui/csurf_ui_button_width.hpp"
 
 class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent
 {
 protected:
     ImGui_Image *icon_info;
     I18n *i18n = I18n::GetInstance();
+    ImGui_Font *main_font_bold;
 
     int setting_language;
+    bool edit_language = false;
+    bool previous_edit_language = false;
     bool setting_disable_plugins;
     bool setting_untouch_after_learn;
     bool setting_master_fader_mode;
@@ -51,7 +55,10 @@ protected:
 public:
     CSurf_FP_8_SettingsPage(ImGui_Context *m_ctx) : CSurf_UI_PageContent(m_ctx, FP_8)
     {
+        main_font_bold = ImGui::CreateFont("Arial", ImGui::FontFlags_Bold);
         icon_info = ImGui::CreateImageFromMem(reinterpret_cast<const char *>(img_icon_info), sizeof(img_icon_info));
+
+        ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(main_font_bold));
         ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(icon_info));
         GetLanguages();
         Reset();
@@ -123,16 +130,41 @@ public:
 
     void Render() override
     {
+        if (edit_language != previous_edit_language)
+        {
+            previous_edit_language = edit_language;
+            Main_OnCommandStringEx("_REASONUS_TRANSLATIONN_EDITOR");
+        }
+
+        int language_button_width = getButtonWidth(m_ctx, i18n->t("settings", "language.button.label"), main_font_bold);
+
         UiElements::PushReaSonusSettingsContentStyle(m_ctx);
         if (ImGui::BeginChild(m_ctx, "mapping_lists_content", 0.0, 0.0, ImGui::ChildFlags_FrameStyle, ImGui::ChildFlags_AutoResizeY))
         {
-            RenderSettingsComboInput(
-                m_ctx,
-                i18n->t("settings", "language.label"),
-                language_names,
-                &setting_language,
-                i18n->t("settings", "language.tooltip"));
+            if (ImGui::BeginChild(m_ctx, "language-select", -1 * language_button_width, 0.0, ImGui::ChildFlags_None | ImGui::ChildFlags_AutoResizeY))
+            {
+                RenderSettingsComboInput(
+                    m_ctx,
+                    i18n->t("settings", "language.label"),
+                    language_names,
+                    &setting_language,
+                    i18n->t("settings", "language.tooltip"));
 
+                ImGui::EndChild(m_ctx);
+            }
+            ImGui::SameLine(m_ctx);
+            if (ImGui::BeginChild(m_ctx, "language-action", 0.0, 0.0, ImGui::ChildFlags_None | ImGui::ChildFlags_AutoResizeY))
+            {
+                ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 22);
+                UiElements::PushReaSonusButtonOutlineStyle(m_ctx, main_font_bold);
+                if (ImGui::Button(m_ctx, i18n->t("settings", "language.button.label").c_str()))
+                {
+                    edit_language = true;
+                }
+                UiElements::PopReaSonusButtonOutlineStyle(m_ctx);
+
+                ImGui::EndChild(m_ctx);
+            }
             RenderSettingsCheckbox(
                 m_ctx,
                 i18n->t("settings", "plugin-control.label"),

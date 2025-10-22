@@ -336,12 +336,16 @@ void readAndCreateIni(mINI::INIStructure &data, std::string device)
         RecursiveCreateDirectory((std::string(GetResourcePath()) + pathSeparator + "ReaSonus" + pathSeparator + "Plugins").c_str(), 0);
         data["surface"]["midiin"] = "0";
         data["surface"]["midiout"] = "0";
-        data["surface"]["language"] = "0";
+        data["surface"]["language"] = "en-US";
         data["surface"]["mute-solo-momentary"] = "0";
         data["functions"]["1"] = "0";
         data["functions"]["2"] = "0";
         data["functions"]["3"] = "0";
         data["functions"]["4"] = "0";
+        if (device == FP_V2)
+        {
+            data["surface"]["control-hidden-tracks"] = "0";
+        }
         if (device == FP_8)
         {
             data["surface"]["surface"] = "0";
@@ -373,12 +377,18 @@ void validateReaSonusIni(mINI::INIFile file, mINI::INIStructure &data, std::stri
     data["surface"]["midiin"] = data["surface"].has("midiin") ? data["surface"]["midiin"] : "0";
     data["surface"]["midiout"] = data["surface"].has("midiout") ? data["surface"]["midiout"] : "0";
     data["surface"]["mute-solo-momentary"] = data["surface"].has("mute-solo-momentary") ? data["surface"]["mute-solo-momentary"] : "0";
-    data["surface"]["language"] = data["surface"].has("language") ? data["surface"]["language"] : "0";
+    data["surface"]["language"] = data["surface"].has("language") ? data["surface"]["language"] : "en-US";
 
     data["functions"]["1"] = data["functions"].has("1") ? data["functions"]["1"] : "0";
     data["functions"]["2"] = data["functions"].has("2") ? data["functions"]["2"] : "0";
     data["functions"]["3"] = data["functions"].has("3") ? data["functions"]["3"] : "0";
     data["functions"]["4"] = data["functions"].has("4") ? data["functions"]["4"] : "0";
+
+    if (device == FP_V2)
+    {
+        data["surface"]["control-hidden-tracks"] = data["surface"].has("control-hidden-tracks") ? data["surface"]["control-hidden-tracks"] : "0";
+        ;
+    }
 
     if (device == FP_8)
     {

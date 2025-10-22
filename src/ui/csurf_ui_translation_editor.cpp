@@ -10,6 +10,7 @@
 #include "csurf_ui_button_bar.hpp"
 #include "csurf_ui_list_box.hpp"
 #include "csurf_ui_action_input_text.hpp"
+#include "csurf_ui_checkbox.hpp"
 
 constexpr const char *g_name{"ReaSonus Native Translaions Editor"};
 
@@ -25,6 +26,7 @@ ReaSonusTranslationEditor::ReaSonusTranslationEditor()
 {
     ImGui::init(plugin_getapi);
     m_ctx = ImGui::CreateContext(g_name);
+
     InitAssets();
     GetBaseLanguage();
     GetLanguageList();
@@ -126,6 +128,11 @@ void ReaSonusTranslationEditor::GetLanguageList()
                 language_list.push_back(std::string(splitted_name[0]));
             }
         }
+    }
+
+    if (language_list.size() > 0)
+    {
+        selected_language = 0;
     }
 }
 
@@ -304,7 +311,10 @@ void ReaSonusTranslationEditor::Frame()
     if (save_clicked)
     {
         save_clicked = false;
-        SaveChanges();
+        if (selected_language > -1)
+        {
+            SaveChanges();
+        }
     }
 
     PushReaSonusColors(m_ctx);
@@ -321,11 +331,11 @@ void ReaSonusTranslationEditor::Frame()
             ImGui::Image(m_ctx, logo, 200, 52);
             ImGui::SameLine(m_ctx);
 
-            if (ImGui::BeginChild(m_ctx, "actions", 0.0, 0.0, ImGui::ChildFlags_FrameStyle))
-            {
-                ImGui::Text(m_ctx, "Hahahahahahaa");
-                ImGui::EndChild(m_ctx); // logo
-            }
+            // if (ImGui::BeginChild(m_ctx, "actions", 0.0, 0.0, ImGui::ChildFlags_FrameStyle))
+            // {
+            //     ImGui::Text(m_ctx, "Hahahahahahaa");
+            //     ImGui::EndChild(m_ctx); // logo
+            // }
             ImGui::EndChild(m_ctx); // logo
         }
 
@@ -338,6 +348,8 @@ void ReaSonusTranslationEditor::Frame()
                 if (ImGui::BeginChild(m_ctx, "actions_convert_info", 0.0, 0.0, ImGui::ChildFlags_FrameStyle))
                 {
                     ReaSonusPageTitle(m_ctx, "Languages", main_font_bold);
+
+                    ReaSonusCheckBox(m_ctx, "Show only empty lines", &show_empty_only);
 
                     ReaSonusActionInputText(
                         m_ctx,
@@ -372,7 +384,7 @@ void ReaSonusTranslationEditor::Frame()
             UiElements::PushReaSonusGroupStyle(m_ctx);
             if (ImGui::BeginChild(m_ctx, "main_content_area", 0.0, 0.0, ImGui::ChildFlags_FrameStyle))
             {
-                for (auto const &sections : translation_file)
+                for (auto const &sections : base_file)
                 {
                     std::string section = sections.first;
                     // auto const &collection = it.second;
@@ -382,6 +394,10 @@ void ReaSonusTranslationEditor::Frame()
                     for (auto const &pair : sections.second)
                     {
                         auto const &key = pair.first;
+                        if (!translation_file[section][key].empty() && show_empty_only)
+                        {
+                            continue;
+                        }
 
                         RenderTranslation(section, key);
                     }
@@ -408,6 +424,7 @@ void ReaSonusTranslationEditor::Frame()
     if (!open)
     {
         window_open = false;
+        SetActionState("_REASONUS_TRANSLATIONN_EDITOR");
         return s_inst.reset();
     }
 }

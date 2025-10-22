@@ -29,7 +29,6 @@ private:
     void GetLanguageList();
     void HandleAddLanguage();
     void getMultilineString(std::string &value, double width, double &height);
-    int HandleInputChange(std::string *data);
     void RenderTranslation(std::string section, std::string key);
     void HandleRemoveLanguageListItem(int index);
     void SaveChanges();
@@ -53,6 +52,7 @@ private:
     int selected_language = -1;
     int previous_selected_language = -1;
 
+    bool show_empty_only = false;
     bool save_clicked = false;
     bool close_clicked = false;
 };
