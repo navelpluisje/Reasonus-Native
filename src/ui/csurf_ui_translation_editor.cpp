@@ -349,7 +349,7 @@ void ReaSonusTranslationEditor::Frame()
                 {
                     ReaSonusPageTitle(m_ctx, "Languages", main_font_bold);
 
-                    ReaSonusCheckBox(m_ctx, "Show only empty lines", &show_empty_only);
+                    ReaSonusCheckBox(m_ctx, "Show only untranslated lines", &show_empty_only);
 
                     ReaSonusActionInputText(
                         m_ctx,

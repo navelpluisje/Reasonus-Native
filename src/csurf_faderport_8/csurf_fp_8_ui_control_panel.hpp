@@ -30,7 +30,6 @@ public:
     static void SetPageStringProperty(int type, std::string value = "");
     static int GetPageProperty(int type);
     static std::string GetPageStringProperty(int type);
-
     ~ReaSonus8ControlPanel();
 
 private:
