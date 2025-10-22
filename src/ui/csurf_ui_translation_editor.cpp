@@ -11,6 +11,7 @@
 #include "csurf_ui_list_box.hpp"
 #include "csurf_ui_action_input_text.hpp"
 #include "csurf_ui_checkbox.hpp"
+#include "../shared/csurf_utils.hpp"
 
 constexpr const char *g_name{"ReaSonus Native Translaions Editor"};
 
@@ -222,7 +223,7 @@ void ReaSonusTranslationEditor::getMultilineString(std::string &value, double wi
 std::string removeNewLines(std::string value)
 {
     std::string new_string = "";
-    for (int i = 0; i < value.size(); i++)
+    for (int i = 0; i < (int)value.size(); i++)
     {
         if (value[i] != '\n' && value[i] != '\r')
         {
