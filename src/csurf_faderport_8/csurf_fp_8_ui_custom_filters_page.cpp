@@ -8,6 +8,7 @@
 #include "../ui/csurf_ui_action_input_text.hpp"
 #include "../ui/csurf_ui_list_box.hpp"
 #include "../ui/csurf_ui_filter_preview.hpp"
+#include "../i18n/i18n.hpp"
 
 class CSurf_FP_8_CustomFilterstPage : public CSurf_UI_PageContent
 {
@@ -35,6 +36,8 @@ protected:
     bool filter_children;
     bool filter_top_level;
     bool filter_match_multiple;
+
+    I18n *i18n = I18n::GetInstance();
 
     void SetFiltersKeys()
     {
@@ -125,7 +128,10 @@ protected:
         IsFilterDirty();
         if (filter_dirty)
         {
-            int res = MB("Do you want to save these first?", "Unsaved changes", 4);
+            int res = MB(
+                i18n->t("filters", "popup.unsaved.message").c_str(),
+                i18n->t("filters", "popup.unsaved.title").c_str(),
+                4);
             if (res == 6)
             {
                 Save();
@@ -232,13 +238,20 @@ public:
         {
             if (ImGui::BeginChild(m_ctx, "filter_lists", 240.0, 0.0))
             {
-                ImGui::Text(m_ctx, "Global filters");
+                ImGui::Text(m_ctx, i18n->t("filters", "list.label").c_str());
                 ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 4);
 
                 UiElements::PushReaSonusGroupStyle(m_ctx);
                 if (ImGui::BeginChild(m_ctx, "filter_lists_content", 0.0, 0.0, ImGui::ChildFlags_FrameStyle, ImGui::ChildFlags_AutoResizeY))
                 {
-                    ReaSonusActionInputText(m_ctx, "Filter name", &new_filter_name, "Enter a filter name", icon_add, std::bind(&CSurf_FP_8_CustomFilterstPage::HandleAddFilter, this));
+                    ReaSonusActionInputText(
+                        m_ctx,
+                        i18n->t("filters", "list.input.label").c_str(),
+                        &new_filter_name,
+                        i18n->t("filters", "list.input.placeholder").c_str(),
+                        icon_add,
+                        std::bind(&CSurf_FP_8_CustomFilterstPage::HandleAddFilter, this));
+
                     ReaSonusExtendedListBox(
                         m_ctx,
                         "filters",
@@ -260,7 +273,9 @@ public:
 
             if (ImGui::BeginChild(m_ctx, "filter_content", 0.0, 0.0))
             {
-                ImGui::Text(m_ctx, edit_new_filter ? "New filter" : "Edit filter");
+                ImGui::Text(m_ctx, edit_new_filter
+                                       ? i18n->t("filters", "content.title.new").c_str()
+                                       : i18n->t("filters", "content.title.edit").c_str());
                 ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 4);
 
                 UiElements::PushReaSonusGroupStyle(m_ctx);
@@ -271,8 +286,20 @@ public:
 
                     if (ImGui::BeginChild(m_ctx, "filter_content_left", column_width, 0.0, 0.0, ImGui::ChildFlags_AutoResizeY))
                     {
-                        ReaSonusTextInput(m_ctx, "Filter name", &filter_name, "Only 10 characters will be displayed");
-                        ReaSonusActionInputText(m_ctx, "Filter text", &new_filter_text, "Enter a filter text", icon_add, std::bind(&CSurf_FP_8_CustomFilterstPage::HandleAddFilterText, this));
+                        ReaSonusTextInput(
+                            m_ctx,
+                            i18n->t("filters", "content.name.label").c_str(),
+                            &filter_name,
+                            i18n->t("filters", "content.name.placeholder").c_str());
+
+                        ReaSonusActionInputText(
+                            m_ctx,
+                            i18n->t("filters", "content.text.label").c_str(),
+                            &new_filter_text,
+                            i18n->t("filters", "content.text.placeholder").c_str(),
+                            icon_add,
+                            std::bind(&CSurf_FP_8_CustomFilterstPage::HandleAddFilterText, this));
+
                         ReaSonusExtendedListBox(
                             m_ctx,
                             "filter-text-list",
@@ -288,12 +315,12 @@ public:
 
                     if (ImGui::BeginChild(m_ctx, "filter_content_right", column_width, 0.0, 0.0, ImGui::ChildFlags_AutoResizeY))
                     {
-                        ImGui::Text(m_ctx, "Filter options");
-                        ReaSonusCheckBox(m_ctx, "Show track Siblings", &filter_siblings);
-                        ReaSonusCheckBox(m_ctx, "Show track parents", &filter_parents);
-                        ReaSonusCheckBox(m_ctx, "Show track children", &filter_children);
-                        ReaSonusCheckBox(m_ctx, "Show top level tracks only", &filter_top_level);
-                        ReaSonusCheckBox(m_ctx, "Match multiple", &filter_match_multiple);
+                        ImGui::Text(m_ctx, i18n->t("filters", "content.option.title").c_str());
+                        ReaSonusCheckBox(m_ctx, i18n->t("filters", "content.option.sibling"), &filter_siblings);
+                        ReaSonusCheckBox(m_ctx, i18n->t("filters", "content.option.parents"), &filter_parents);
+                        ReaSonusCheckBox(m_ctx, i18n->t("filters", "content.option.children"), &filter_children);
+                        ReaSonusCheckBox(m_ctx, i18n->t("filters", "content.option.top-level"), &filter_top_level);
+                        ReaSonusCheckBox(m_ctx, i18n->t("filters", "content.option.multiple"), &filter_match_multiple);
                         ImGui::EndChild(m_ctx);
                     }
 
@@ -353,7 +380,10 @@ public:
         {
             edit_new_filter = false;
             Reset();
-            MB("Changes saved with success", "Woohoo", 0);
+            MB(
+                i18n->t("filters", "popup.save.message").c_str(),
+                i18n->t("filters", "popup.save.title").c_str(),
+                0);
         };
     }
 

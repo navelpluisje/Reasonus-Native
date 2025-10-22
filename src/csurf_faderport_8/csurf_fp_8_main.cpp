@@ -16,6 +16,7 @@
 #include "../shared/csurf.h"
 #include "../shared/csurf_transport_manager.cpp"
 #include "../shared/csurf_utils.hpp"
+#include "../i18n/i18n.hpp"
 #include "csurf_fp_8_session_manager.cpp"
 #include "csurf_fp_8_mix_manager.cpp"
 #include "csurf_fp_8_automation_manager.cpp"
@@ -27,6 +28,8 @@
 
 extern HWND g_hwnd;
 extern REAPER_PLUGIN_HINSTANCE g_hInst;
+
+I18n *I18n::instancePtr = nullptr;
 
 const int MOMENTARY_TIMEOUT = 500;
 
@@ -54,6 +57,8 @@ class CSurf_FaderPort : public IReaperControlSurface
   DWORD surface_update_settings_check;
 
   mINI::INIStructure ini;
+
+  I18n *i18n = I18n::GetInstance();
 
   WDL_String descspace;
   char configtmp[1024];
@@ -381,6 +386,7 @@ class CSurf_FaderPort : public IReaperControlSurface
     context->SetMuteSoloMomentary(ini["surface"].has("mute-solo-momentary") && ini["surface"]["mute-solo-momentary"] == "1");
     context->SetOverwriteTimeCode(ini["surface"].has("overwrite-time-code") && ini["surface"]["overwrite-time-code"] == "1");
     context->SetSurfaceTimeCode(ini["surface"].has("time-code") && std::stoi(ini["surface"]["time-code"]));
+    i18n->SetLanguage(ini["surface"].has("language") ? ini["surface"]["language"] : "en-US");
     context->SetTrackDisplay(ini["displays"].has("track") ? std::stoi(ini["displays"]["track"]) : 8);
   }
 
@@ -536,7 +542,7 @@ public:
     if (m_midiout)
     {
       DWORD now = GetTickCount();
-      if ((now - surface_update_lastrun) >= 100)
+      if ((now - surface_update_lastrun) >= 10)
       {
         faderManager->UpdateTracks();
         if (context->GetLastTouchedFxMode())

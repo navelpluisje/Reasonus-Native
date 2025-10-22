@@ -16,10 +16,11 @@ class CSurf_FP_8_TrackManager : public CSurf_FP_8_ChannelManager
 {
     int mute_start[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     int solo_start[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    DoubleClickState touch_start[16] = {{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}};
+    int touch_start[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 protected:
     bool has_last_touched_fx_enabled = false;
+    bool has_touch_mode = false;
 
     void SetTrackColors(MediaTrack *media_track) override
     {
@@ -135,7 +136,7 @@ public:
             track->SetSelectButtonValue((!context->GetArm() && is_armed) ? BTN_VALUE_BLINK : select_value, forceUpdate);
             track->SetMuteButtonValue(DAW::IsTrackMuted(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
             track->SetSoloButtonValue(DAW::IsTrackSoloed(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
-            track->SetFaderValue(fader_value, forceUpdate);
+            track->SetFaderValue(fader_value, forceUpdate || has_touch_mode);
             track->SetValueBarMode(context->GetArm() ? VALUEBAR_MODE_FILL : VALUEBAR_MODE_BIPOLAR);
             track->SetValueBarValue(value_bar_value);
 
@@ -254,16 +255,20 @@ public:
 
     void HandleFaderTouch(int index, int value) override
     {
-        (void)value;
-        if (!context->GetFaderReset())
+        MediaTrack *media_track = navigator->GetTrackByIndex(index);
+
+        if (context->GetShiftChannelLeft() && context->GetFaderReset())
         {
-            return;
+            DAW::SetTrackVolume(media_track, 1.0);
         }
 
-        if (context->GetShiftChannelLeft())
+        if (::GetTrackAutomationMode(media_track) == AUTOMATION_TOUCH)
         {
-            MediaTrack *media_track = navigator->GetTrackByIndex(index);
-            DAW::SetTrackVolume(media_track, 1.0);
+            touch_start[index] = value > 0;
+            if (touch_start[index])
+            {
+                DAW::SetTrackVolume(media_track, DAW::GetTrackVolume(media_track));
+            }
         }
     }
 

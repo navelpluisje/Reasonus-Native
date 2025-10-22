@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include "../ui/csurf_ui_page_content.hpp"
+#include "../i18n/i18n.hpp"
 
 class ReaSonusV2ControlPanel
 {
@@ -24,11 +25,12 @@ public:
     static void Stop();
 
     static void SetCurrentPage(int page);
+
     ~ReaSonusV2ControlPanel();
 
 private:
-    static void Loop();
     static std::unique_ptr<ReaSonusV2ControlPanel> s_inst;
+    static void Loop();
     void InitAssets();
     void SetPageContent();
     CSurf_UI_PageContent *page_content = NULL;
@@ -49,6 +51,8 @@ private:
     bool save_clicked = false;
     bool cancel_clicked = false;
     std::vector<std::string> menu_items;
+
+    I18n *i18n = I18n::GetInstance();
 };
 
 #endif

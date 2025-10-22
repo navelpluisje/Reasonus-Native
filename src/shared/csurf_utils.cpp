@@ -210,13 +210,15 @@ std::string GetAutomationString(int automationMode)
     };
 }
 
-std::string GetReaSonusIniPath(std::string device) { return std::string(GetResourcePath()) + pathSeparator + "ReaSonus" + pathSeparator + device + ".ini"; }
+std::string GetReaSonusFolderPath() { return std::string(GetResourcePath()) + pathSeparator + "ReaSonus"; }
+
+std::string GetReaSonusIniPath(std::string device) { return GetReaSonusFolderPath() + pathSeparator + device + ".ini"; }
 
 std::string GetReaSonusZonesPath() { return std::string(GetResourcePath()) + pathSeparator + "CSI" + pathSeparator + "Zones" + pathSeparator + "ReasonusFaderPort" + pathSeparator + "_ReaSonusEffects"; }
 
 std::string GetReaSonusPluginPath(std::string developer, std::string pluginName, bool create)
 {
-    std::string path = std::string(GetResourcePath()) + pathSeparator + "ReaSonus" + pathSeparator + "Plugins" + pathSeparator + developer;
+    std::string path = GetReaSonusFolderPath() + pathSeparator + "Plugins" + pathSeparator + developer;
 
     if (create)
     {
@@ -229,6 +231,16 @@ std::string GetReaSonusPluginPath(std::string developer, std::string pluginName,
     return path + pathSeparator + pluginName + ".ini";
 }
 
+std::string GetReaSonusLocalesFolderPath()
+{
+    return GetReaSonusFolderPath() + pathSeparator + "Locales";
+}
+
+std::string GetReaSonusLocalesPath(std::string language)
+{
+    return GetReaSonusLocalesFolderPath() + pathSeparator + language + ".ini";
+}
+
 bool isInteger(std::string value)
 {
     char *p;
@@ -238,7 +250,7 @@ bool isInteger(std::string value)
 
 std::vector<std::string> split(std::string str, std::string delimiter)
 {
-    std::vector<std::string> v;
+    std::vector<std::string> value;
 
     if (!str.empty())
     {
@@ -255,13 +267,13 @@ std::vector<std::string> split(std::string str, std::string delimiter)
             // If found add the substring till that
             // occurrence in the vector
             int length = idx - start;
-            v.push_back(str.substr(start, length));
+            value.push_back(str.substr(start, length));
             start += (int)(length + delimiter.size());
         } while (true);
-        v.push_back(str.substr(start));
+        value.push_back(str.substr(start));
     }
 
-    return v;
+    return value;
 }
 
 std::vector<std::string> cutString(std::string str, size_t size)
@@ -324,11 +336,16 @@ void readAndCreateIni(mINI::INIStructure &data, std::string device)
         RecursiveCreateDirectory((std::string(GetResourcePath()) + pathSeparator + "ReaSonus" + pathSeparator + "Plugins").c_str(), 0);
         data["surface"]["midiin"] = "0";
         data["surface"]["midiout"] = "0";
+        data["surface"]["language"] = "en-US";
         data["surface"]["mute-solo-momentary"] = "0";
         data["functions"]["1"] = "0";
         data["functions"]["2"] = "0";
         data["functions"]["3"] = "0";
         data["functions"]["4"] = "0";
+        if (device == FP_V2)
+        {
+            data["surface"]["control-hidden-tracks"] = "0";
+        }
         if (device == FP_8)
         {
             data["surface"]["surface"] = "0";
@@ -360,10 +377,18 @@ void validateReaSonusIni(mINI::INIFile file, mINI::INIStructure &data, std::stri
     data["surface"]["midiin"] = data["surface"].has("midiin") ? data["surface"]["midiin"] : "0";
     data["surface"]["midiout"] = data["surface"].has("midiout") ? data["surface"]["midiout"] : "0";
     data["surface"]["mute-solo-momentary"] = data["surface"].has("mute-solo-momentary") ? data["surface"]["mute-solo-momentary"] : "0";
+    data["surface"]["language"] = data["surface"].has("language") ? data["surface"]["language"] : "en-US";
+
     data["functions"]["1"] = data["functions"].has("1") ? data["functions"]["1"] : "0";
     data["functions"]["2"] = data["functions"].has("2") ? data["functions"]["2"] : "0";
     data["functions"]["3"] = data["functions"].has("3") ? data["functions"]["3"] : "0";
     data["functions"]["4"] = data["functions"].has("4") ? data["functions"]["4"] : "0";
+
+    if (device == FP_V2)
+    {
+        data["surface"]["control-hidden-tracks"] = data["surface"].has("control-hidden-tracks") ? data["surface"]["control-hidden-tracks"] : "0";
+        ;
+    }
 
     if (device == FP_8)
     {

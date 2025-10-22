@@ -21,9 +21,10 @@ static void reportError(const ImGui_Error &e)
 ReaSonusV2ControlPanel::ReaSonusV2ControlPanel()
     : m_ctx{}
 {
-    menu_items.push_back("Function Keys");
-    menu_items.push_back("Settings");
-    menu_items.push_back("About ReaSonus");
+    menu_items.push_back("menu.functions");
+    menu_items.push_back("menu.settings");
+    menu_items.push_back("menu.about");
+
     ImGui::init(plugin_getapi);
     m_ctx = ImGui::CreateContext(g_name);
     InitAssets();
@@ -173,9 +174,9 @@ void ReaSonusV2ControlPanel::Frame()
         {
             ImGui::Image(m_ctx, logo, 200, 52);
 
-            ReaSonusMenuButton(m_ctx, menu_items.at(0), main_font_bold, icon_function_actions, 0, &current_page);
-            ReaSonusMenuButton(m_ctx, menu_items.at(1), main_font_bold, icon_settings, 1, &current_page);
-            ReaSonusMenuButton(m_ctx, menu_items.at(2), main_font_bold, icon_about, 2, &current_page);
+            ReaSonusMenuButton(m_ctx, i18n->t("control-panel", menu_items[0]), main_font_bold, icon_function_actions, 0, &current_page);
+            ReaSonusMenuButton(m_ctx, i18n->t("control-panel", menu_items[1]), main_font_bold, icon_settings, 1, &current_page);
+            ReaSonusMenuButton(m_ctx, i18n->t("control-panel", menu_items[2]), main_font_bold, icon_about, 2, &current_page);
 
             ImGui::EndChild(m_ctx);
             UiElements::PopReaSonusSidebarStyle(m_ctx);
@@ -187,7 +188,7 @@ void ReaSonusV2ControlPanel::Frame()
             UiElements::PopReaSonusContentStyle(m_ctx);
             if (ImGui::BeginChild(m_ctx, "main_content_area", 0.0, -34.0, ImGui::ChildFlags_None))
             {
-                ReaSonusPageTitle(m_ctx, menu_items[current_page], main_font_bold);
+                ReaSonusPageTitle(m_ctx, i18n->t("control-panel", menu_items[current_page]), main_font_bold);
 
                 if (ImGui::BeginChild(m_ctx, "main_content_area", 0.0, -12.0, ImGui::ChildFlags_None))
                 {
@@ -196,7 +197,14 @@ void ReaSonusV2ControlPanel::Frame()
                 }
                 ImGui::EndChild(m_ctx);
             }
-            ReaSonusButtonBar(m_ctx, "Save", main_font_bold, &save_clicked, true, &cancel_clicked, "Cancel");
+            ReaSonusButtonBar(
+                m_ctx,
+                i18n->t("control-panel", "button.save"),
+                main_font_bold,
+                &save_clicked,
+                true,
+                &cancel_clicked,
+                i18n->t("control-panel", "button.cancel"));
             ImGui::EndChild(m_ctx);
         }
 
@@ -209,6 +217,7 @@ void ReaSonusV2ControlPanel::Frame()
 
     if (!open)
     {
+        control_panel_open = false;
         SetActionState("_REASONUS_SHOW_REASONUS_V2_CONTROL_WINDOW");
         return s_inst.reset();
     }

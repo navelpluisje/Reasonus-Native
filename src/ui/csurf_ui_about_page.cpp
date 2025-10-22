@@ -3,12 +3,14 @@
 #include <reaper_imgui_functions.h>
 #include "csurf_ui_elements.hpp"
 #include "csurf_ui_page_title.hpp"
+#include "../i18n/i18n.hpp"
 
 class CSurf_UI_AboutPage : public CSurf_UI_PageContent
 {
 protected:
     std::string device;
     ImGui_Font *main_font_bold;
+    I18n *i18n = I18n::GetInstance();
 
 public:
     CSurf_UI_AboutPage(ImGui_Context *m_ctx, std::string _device) : CSurf_UI_PageContent(m_ctx, _device)
@@ -33,13 +35,13 @@ public:
                 ImGui::GetContentRegionAvail(m_ctx, &available_width, &available_height);
                 ImGui::PushTextWrapPos(m_ctx, available_width);
 
-                ReaSonusPageTitle(m_ctx, "About", main_font_bold);
+                ReaSonusPageTitle(m_ctx, i18n->t("about", "about.title").c_str(), main_font_bold);
 
-                ImGui::Text(m_ctx, "Thank you for using ReaSonus Native. ReaSonus Native has beside ±95% ofthe Studio One features also:");
-                ImGui::BulletText(m_ctx, "‘Unlimited’ custom editable filters");
-                ImGui::BulletText(m_ctx, "MIDI learn style plugin mapping");
-                ImGui::BulletText(m_ctx, "Swap Shift buttons");
-                ImGui::BulletText(m_ctx, "Controll last touched plugin \nparam");
+                ImGui::Text(m_ctx, i18n->t("about", "about.top").c_str());
+                ImGui::BulletText(m_ctx, i18n->t("about", "about.list.1").c_str());
+                ImGui::BulletText(m_ctx, i18n->t("about", "about.list.2").c_str());
+                ImGui::BulletText(m_ctx, i18n->t("about", "about.list.3").c_str());
+                ImGui::BulletText(m_ctx, i18n->t("about", "about.list.4").c_str());
 
                 UiElements::PopReaSonusGroupStyle(m_ctx);
                 ImGui::PopTextWrapPos(m_ctx);
@@ -55,27 +57,27 @@ public:
                     ImGui::GetContentRegionAvail(m_ctx, &available_width, &available_height);
                     ImGui::PushTextWrapPos(m_ctx, available_width);
 
-                    ReaSonusPageTitle(m_ctx, "Contribute & Links", main_font_bold);
-                    ImGui::Text(m_ctx, "ReaSonus Native is a free and open source project, but takes some time and effort to create and maintain. It is not required of course but a donation for maintaining would be highly appreciated.");
-                    ImGui::TextLinkOpenURL(m_ctx, "Buy me a coffee", "https://buymeacoffee.com/navelpluisje");
+                    ReaSonusPageTitle(m_ctx, i18n->t("about", "contribute.title").c_str(), main_font_bold);
+                    ImGui::Text(m_ctx, i18n->t("about", "contribute.top").c_str());
+                    ImGui::TextLinkOpenURL(m_ctx, i18n->t("about", "contribute.link.coffee").c_str(), "https://buymeacoffee.com/navelpluisje");
                     ImGui::SameLine(m_ctx);
                     ImGui::Text(m_ctx, ", or ");
                     ImGui::SameLine(m_ctx);
-                    ImGui::TextLinkOpenURL(m_ctx, "Tipeee me", "https://en.tipeee.com/navelpluisje");
+                    ImGui::TextLinkOpenURL(m_ctx, i18n->t("about", "contribute.link.tipeee").c_str(), "https://en.tipeee.com/navelpluisje");
 
                     ImGui::Separator(m_ctx);
 
-                    ImGui::Text(m_ctx, "ReaSonus Native has a website for the documentation. Before asking question, please check these first.");
-                    ImGui::TextLinkOpenURL(m_ctx, "ReaSonus Native Documentation", "https://navelpluisje.github.io/reasonus/");
+                    ImGui::Text(m_ctx, i18n->t("about", "contribute.center").c_str());
+                    ImGui::TextLinkOpenURL(m_ctx, i18n->t("about", "contribute.link.documentation").c_str(), "https://navelpluisje.github.io/reasonus/");
 
                     ImGui::Separator(m_ctx);
 
-                    ImGui::Text(m_ctx, "If you encounter a bug or anything ales, please report it, so ReaSonus Native can only get better");
-                    ImGui::TextLinkOpenURL(m_ctx, "Report your bug", "https://github.com/navelpluisje/Reasonus-Native/issues");
+                    ImGui::Text(m_ctx, i18n->t("about", "contribute.bottom").c_str());
+                    ImGui::TextLinkOpenURL(m_ctx, i18n->t("about", "contribute.link.bug").c_str(), "https://github.com/navelpluisje/Reasonus-Native/issues");
                     ImGui::SameLine(m_ctx);
                     ImGui::Text(m_ctx, ", or ");
                     ImGui::SameLine(m_ctx);
-                    ImGui::TextLinkOpenURL(m_ctx, "Ask your question", "https://forum.cockos.com/showthread.php?t=267116");
+                    ImGui::TextLinkOpenURL(m_ctx, i18n->t("about", "contribute.link.question").c_str(), "https://forum.cockos.com/showthread.php?t=267116");
 
                     UiElements::PopReaSonusGroupStyle(m_ctx);
                     ImGui::PopTextWrapPos(m_ctx);
@@ -90,11 +92,11 @@ public:
                         ImGui::GetContentRegionAvail(m_ctx, &available_width, &available_height);
                         ImGui::PushTextWrapPos(m_ctx, available_width);
 
-                        ReaSonusPageTitle(m_ctx, "Thanks", main_font_bold);
-                        ImGui::Text(m_ctx, "This project would not have been possible without you, reading this. But also a big thanx goes to the following people:");
-                        ImGui::BulletText(m_ctx, "Geoff Waddington, The man behind the impressive CSI. Without the CSI project, this would probably never been created.");
-                        ImGui::BulletText(m_ctx, "Cfillion, for helping me out with some annoyances I ran into with C++ and CMake.");
-                        ImGui::BulletText(m_ctx, "All volunteers helping with testing, reviewing the documentation and being patient.");
+                        ReaSonusPageTitle(m_ctx, i18n->t("about", "thanks.title").c_str(), main_font_bold);
+                        ImGui::Text(m_ctx, i18n->t("about", "thanks.bottom").c_str());
+                        ImGui::BulletText(m_ctx, i18n->t("about", "thanks.list.1").c_str());
+                        ImGui::BulletText(m_ctx, i18n->t("about", "thanks.list.2").c_str());
+                        ImGui::BulletText(m_ctx, i18n->t("about", "thanks.list.3").c_str());
 
                         UiElements::PopReaSonusGroupStyle(m_ctx);
                         ImGui::PopTextWrapPos(m_ctx);

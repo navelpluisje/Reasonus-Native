@@ -7,6 +7,7 @@
 #include <memory>
 #include <string>
 #include "../ui/csurf_ui_page_content.hpp"
+#include "../i18n/i18n.hpp"
 
 class ReaSonus8ControlPanel
 {
@@ -55,6 +56,8 @@ private:
     bool save_clicked = false;
     bool cancel_clicked = false;
     std::vector<std::string> menu_items;
+
+    I18n *i18n = I18n::GetInstance();
 };
 
 #endif

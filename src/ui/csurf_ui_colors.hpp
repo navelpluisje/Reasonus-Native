@@ -62,9 +62,9 @@ static void PushReaSonusColors(ImGui_Context *m_ctx)
     ImGui::PushStyleColor(m_ctx, ImGui::Col_Separator, UI_COLORS::Accent);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_SeparatorHovered, UI_COLORS::Accent);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_SeparatorActive, UI_COLORS::Accent);
-    ImGui::PushStyleColor(m_ctx, ImGui::Col_ResizeGrip, 0x4296FA33);
-    ImGui::PushStyleColor(m_ctx, ImGui::Col_ResizeGripHovered, 0x4296FAAB);
-    ImGui::PushStyleColor(m_ctx, ImGui::Col_ResizeGripActive, 0x4296FAF2);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_ResizeGrip, UI_COLORS::Accent_14);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_ResizeGripHovered, UI_COLORS::Accent);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_ResizeGripActive, UI_COLORS::Accent_07);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_TabHovered, 0x4296FACC);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_Tab, 0x2E5994DC);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_TabSelected, 0x3369ADFF);

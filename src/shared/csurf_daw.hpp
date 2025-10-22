@@ -38,6 +38,7 @@ public:
     static void SetTrackPan1(MediaTrack *media_track, double value);
     static void SetTrackPan2(MediaTrack *media_track, double value);
     static void SetTrackVolume(MediaTrack *media_track, double value);
+    static double GetTrackVolume(MediaTrack *media_track);
 
     /**
      * Track plugins
