@@ -336,7 +336,6 @@ void readAndCreateIni(mINI::INIStructure &data, std::string device)
         RecursiveCreateDirectory((std::string(GetResourcePath()) + pathSeparator + "ReaSonus" + pathSeparator + "Plugins").c_str(), 0);
         data["surface"]["midiin"] = "0";
         data["surface"]["midiout"] = "0";
-        data["surface"]["language"] = "en-US";
         data["surface"]["mute-solo-momentary"] = "0";
         data["functions"]["1"] = "0";
         data["functions"]["2"] = "0";
@@ -350,6 +349,7 @@ void readAndCreateIni(mINI::INIStructure &data, std::string device)
         {
             data["surface"]["surface"] = "0";
             data["surface"]["disable-plugins"] = "0";
+            data["surface"]["distraction-free"] = "0";
             data["surface"]["erase-last-param-after-learn"] = "0";
             data["surface"]["master-fader-mode"] = "0";
             data["surface"]["swap-shift-buttons"] = "0";
@@ -377,7 +377,6 @@ void validateReaSonusIni(mINI::INIFile file, mINI::INIStructure &data, std::stri
     data["surface"]["midiin"] = data["surface"].has("midiin") ? data["surface"]["midiin"] : "0";
     data["surface"]["midiout"] = data["surface"].has("midiout") ? data["surface"]["midiout"] : "0";
     data["surface"]["mute-solo-momentary"] = data["surface"].has("mute-solo-momentary") ? data["surface"]["mute-solo-momentary"] : "0";
-    data["surface"]["language"] = data["surface"].has("language") ? data["surface"]["language"] : "en-US";
 
     data["functions"]["1"] = data["functions"].has("1") ? data["functions"]["1"] : "0";
     data["functions"]["2"] = data["functions"].has("2") ? data["functions"]["2"] : "0";
@@ -394,6 +393,7 @@ void validateReaSonusIni(mINI::INIFile file, mINI::INIStructure &data, std::stri
     {
         data["surface"]["surface"] = data["surface"].has("surface") ? data["surface"]["surface"] : "0";
         data["surface"]["disable-plugins"] = data["surface"].has("disable-plugins") ? data["surface"]["disable-plugins"] : "0";
+        data["surface"]["distraction-free"] = data["surface"].has("distraction-free") ? data["surface"]["distraction-free"] : "0";
         data["surface"]["erase-last-param-after-learn"] = data["surface"].has("erase-last-param-after-learn") ? data["surface"]["erase-last-param-after-learn"] : "0";
         data["surface"]["master-fader-mode"] = data["surface"].has("master-fader-mode") ? data["surface"]["master-fader-mode"] : "0";
         data["surface"]["swap-shift-buttons"] = data["surface"].has("swap-shift-buttons") ? data["surface"]["swap-shift-buttons"] : "0";

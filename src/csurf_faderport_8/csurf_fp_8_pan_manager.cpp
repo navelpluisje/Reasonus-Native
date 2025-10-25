@@ -117,7 +117,10 @@ public:
 
             track->SetTrackColor(color);
 
-            track->SetSelectButtonValue((!context->GetArm() && is_armed) ? BTN_VALUE_BLINK : select_value, forceUpdate);
+            track->SetSelectButtonValue((!context->GetArm() && is_armed)
+                                            ? ButtonConditionalBlink(!context->GetDistractionFreeMode(), !context->GetArm() && is_armed)
+                                            : select_value,
+                                        forceUpdate);
             track->SetMuteButtonValue(DAW::IsTrackMuted(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
             track->SetSoloButtonValue(DAW::IsTrackSoloed(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
 

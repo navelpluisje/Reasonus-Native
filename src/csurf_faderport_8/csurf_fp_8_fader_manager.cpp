@@ -8,12 +8,24 @@ void CSurf_FP_8_FaderManager::SetButtonValues(bool force)
 {
     // Send button has to blink on receive
     trackButton->SetValue(context->IsChannelMode(TrackMode) ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
-    pluginsButton->SetValue(ButtonOnBlinkOff(context->IsChannelMode(PluginMode), context->IsChannelMode(TrackPluginMode)), force);
-    sendButton->SetValue(ButtonOnBlinkOff(
-                             context->IsChannelMode(SendMode) || context->IsChannelMode(ReceiveMode),
-                             context->IsChannelMode(TrackSendMode) || context->IsChannelMode(TrackReceiveMode)),
-                         force);
-    panButton->SetValue(ButtonOnBlinkOff(context->IsChannelMode(PanMode1), context->IsChannelMode(PanMode2)), force);
+    pluginsButton->SetValue(
+        ButtonOnBlinkOff(
+            context->IsChannelMode(PluginMode),
+            context->IsChannelMode(TrackPluginMode),
+            context->GetDistractionFreeMode()),
+        force);
+    sendButton->SetValue(
+        ButtonOnBlinkOff(
+            context->IsChannelMode(SendMode) || context->IsChannelMode(ReceiveMode),
+            context->IsChannelMode(TrackSendMode) || context->IsChannelMode(TrackReceiveMode),
+            context->GetDistractionFreeMode()),
+        force);
+    panButton->SetValue(
+        ButtonOnBlinkOff(
+            context->IsChannelMode(PanMode1),
+            context->IsChannelMode(PanMode2),
+            context->GetDistractionFreeMode()),
+        force);
 }
 
 void CSurf_FP_8_FaderManager::SetChannelMode(ChannelMode channelMode, bool updateButtons = false)

@@ -52,7 +52,7 @@ protected:
             trimButton->SetValue(channelAutomationMode == AUTOMATION_TRIM ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
             offButton->SetValue(channelAutomationMode == AUTOMATION_PREVIEW ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
             touchButton->SetValue(context->GetChannelMode() == MenuMode
-                                      ? BTN_VALUE_BLINK
+                                      ? (context->GetDistractionFreeMode() ? BTN_VALUE_ON : BTN_VALUE_BLINK)
                                   : channelAutomationMode == AUTOMATION_TOUCH
                                       ? BTN_VALUE_ON
                                       : BTN_VALUE_OFF,

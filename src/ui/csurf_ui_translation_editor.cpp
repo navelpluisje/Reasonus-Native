@@ -246,31 +246,33 @@ void ReaSonusTranslationEditor::RenderTranslation(std::string section, std::stri
 
     if (ImGui::BeginChild(m_ctx, (section + key + "-container").c_str(), 0.0, 0.0, ImGui::ChildFlags_AlwaysAutoResize | ImGui::ChildFlags_AutoResizeY | ImGui::ChildFlags_None))
     {
-        ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBg, UI_COLORS::Main_18);
-        ImGui::PushStyleColor(m_ctx, ImGui::Col_Border, UI_COLORS::FormFieldBorder);
-        ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameBorderSize, 1);
+        UiElements::PushReaSonusTranslationItemStyle(m_ctx);
         if (ImGui::BeginChild(m_ctx, (section + key + "-label").c_str(), 0.0, 0.0, ImGui::ChildFlags_AlwaysAutoResize | ImGui::ChildFlags_AutoResizeY | ImGui::ChildFlags_FrameStyle))
         {
             ImGui::GetContentRegionAvail(m_ctx, &width, &height);
             ImGui::PushTextWrapPos(m_ctx, width);
-            ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameBorderSize, 2);
+
+            if (show_translation_key)
+            {
+                ImGui::Text(m_ctx, key.c_str());
+            }
             ImGui::PushStyleColor(m_ctx, ImGui::Col_Text, UI_COLORS::Accent);
             ImGui::Text(m_ctx, base_file[section][key].c_str());
             ImGui::PopStyleColor(m_ctx);
+            ImGui::Text(m_ctx, "  ");
 
             ImGui::PopTextWrapPos(m_ctx);
-            ImGui::PopStyleVar(m_ctx);
-            ImGui::PopStyleVar(m_ctx);
-            ImGui::PopStyleColor(m_ctx, 2);
+
+            UiElements::PopReaSonusTranslationItemStyle(m_ctx);
             ImGui::EndChild(m_ctx);
         }
 
         ImGui::GetContentRegionAvail(m_ctx, &width, &height);
-        ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 12);
+        ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 33);
         ImGui::PushTextWrapPos(m_ctx, width - 18);
 
         UiElements::PushReaSonusInputStyle(m_ctx);
-        if (ImGui::InputTextMultiline(m_ctx, ("##" + section + key).c_str(), value, 512, 0.0, text_height + 16, ImGui::InputTextFlags_AlwaysOverwrite))
+        if (ImGui::InputTextMultiline(m_ctx, ("##" + section + key).c_str(), value, 512, width, text_height + 16, ImGui::InputTextFlags_AlwaysOverwrite))
         {
             // ImGui::GetContentRegionAvail(m_ctx, &width, &height);
             std::string new_value = removeNewLines(value);
@@ -332,18 +334,13 @@ void ReaSonusTranslationEditor::Frame()
             ImGui::Image(m_ctx, logo, 200, 52);
             ImGui::SameLine(m_ctx);
 
-            // if (ImGui::BeginChild(m_ctx, "actions", 0.0, 0.0, ImGui::ChildFlags_FrameStyle))
-            // {
-            //     ImGui::Text(m_ctx, "Hahahahahahaa");
-            //     ImGui::EndChild(m_ctx); // logo
-            // }
             ImGui::EndChild(m_ctx); // logo
         }
 
         if (ImGui::BeginChild(m_ctx, "actions_container", 0.0, -52.0, ImGui::ChildFlags_None))
         {
 
-            if (ImGui::BeginChild(m_ctx, "actions_info", 300.0, 0.0, ImGui::ChildFlags_None))
+            if (ImGui::BeginChild(m_ctx, "actions_info", 220.0, 0.0, ImGui::ChildFlags_None))
             {
                 UiElements::PushReaSonusGroupStyle(m_ctx);
                 if (ImGui::BeginChild(m_ctx, "actions_convert_info", 0.0, 0.0, ImGui::ChildFlags_FrameStyle))
@@ -351,6 +348,7 @@ void ReaSonusTranslationEditor::Frame()
                     ReaSonusPageTitle(m_ctx, "Languages", main_font_bold);
 
                     ReaSonusCheckBox(m_ctx, "Show only untranslated lines", &show_empty_only);
+                    ReaSonusCheckBox(m_ctx, "Show the actual key", &show_translation_key);
 
                     ReaSonusActionInputText(
                         m_ctx,
@@ -388,7 +386,6 @@ void ReaSonusTranslationEditor::Frame()
                 for (auto const &sections : base_file)
                 {
                     std::string section = sections.first;
-                    // auto const &collection = it.second;
 
                     ReaSonusPageTitle(m_ctx, section, main_font_bold);
 

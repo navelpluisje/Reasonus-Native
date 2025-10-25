@@ -93,6 +93,18 @@ public:
     static void PushReaSonusChannelTabStyle(ImGui_Context *m_ctx, bool active);
 
     static void PopReaSonusChannelTabStyle(ImGui_Context *m_ctx);
+
+    static void PushReaSonusTabBarStyle(ImGui_Context *m_ctx);
+
+    static void PopReaSonusTabBarStyle(ImGui_Context *m_ctx);
+
+    static void PushReaSonusTabStyle(ImGui_Context *m_ctx, bool selected);
+
+    static void PopReaSonusTabStyle(ImGui_Context *m_ctx);
+
+    static void PushReaSonusTranslationItemStyle(ImGui_Context *m_ctx);
+
+    static void PopReaSonusTranslationItemStyle(ImGui_Context *m_ctx);
 };
 
 #endif

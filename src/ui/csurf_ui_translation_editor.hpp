@@ -51,6 +51,7 @@ private:
     int previous_selected_language = -1;
 
     bool show_empty_only = false;
+    bool show_translation_key = false;
     bool save_clicked = false;
     bool close_clicked = false;
 };

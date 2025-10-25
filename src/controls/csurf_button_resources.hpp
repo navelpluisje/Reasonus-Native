@@ -144,8 +144,10 @@ enum Encoders
 
 };
 
-Btn_Value ButtonOnBlinkOff(bool on, bool blink);
+Btn_Value ButtonOnBlinkOff(bool on, bool blink, bool destraction_free = false);
 
-Btn_Value ButtonBlinkOnOff(bool blink, bool on);
+Btn_Value ButtonBlinkOnOff(bool blink, bool on, bool destraction_free = false);
+
+Btn_Value ButtonConditionalBlink(bool blink, bool on);
 
 #endif
