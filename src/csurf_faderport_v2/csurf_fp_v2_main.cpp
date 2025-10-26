@@ -224,6 +224,7 @@ class CSurf_FaderPortV2 : public IReaperControlSurface
 
     context->SetMuteSoloMomentary(ini["surface"].has("mute-solo-momentary") && ini["surface"]["mute-solo-momentary"] == "1");
     context->SetControlHiddenTracks(ini["surface"].has("control-hidden-tracks") && ini["surface"]["control-hidden-tracks"] == "1");
+    context->SetCanDisableFader(ini["surface"].has("can-disable-fader") && ini["surface"]["can-disable-fader"] == "1");
     i18n->SetLanguage(ini["surface"].has("language") ? ini["surface"]["language"] : "en-US");
   }
 

@@ -20,6 +20,7 @@ protected:
     bool previous_edit_language = false;
     bool momentary_mute_solo;
     bool control_hidden_tracks;
+    bool can_disable_fader;
 
     std::vector<std::string> language_names = {};
 
@@ -149,6 +150,12 @@ public:
                 &control_hidden_tracks,
                 i18n->t("settings", "control_hidden_track.tooltip"));
 
+            RenderSettingsCheckbox(
+                m_ctx,
+                i18n->t("settings", "can_disable_fader.label"),
+                &can_disable_fader,
+                i18n->t("settings", "can_disable_fader.tooltip"));
+
             UiElements::PopReaSonusSettingsContentStyle(m_ctx);
             ImGui::EndChild(m_ctx);
         }
@@ -162,6 +169,7 @@ public:
         ini["surface"]["language"] = language_names[setting_language];
         ini["surface"]["mute-solo-momentary"] = momentary_mute_solo ? "1" : "0";
         ini["surface"]["control-hidden-tracks"] = control_hidden_tracks ? "1" : "0";
+        ini["surface"]["can-disable-fader"] = can_disable_fader ? "1" : "0";
 
         if (file.write(ini, true))
         {
@@ -177,5 +185,6 @@ public:
 
         momentary_mute_solo = ini["surface"]["mute-solo-momentary"] == "1";
         control_hidden_tracks = ini["surface"]["control-hidden-tracks"] == "1";
+        can_disable_fader = ini["surface"]["can-disable-fader"] == "1";
     }
 };

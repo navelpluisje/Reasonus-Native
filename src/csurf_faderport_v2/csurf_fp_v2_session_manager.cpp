@@ -242,8 +242,9 @@ public:
             return;
         }
 
-        if (context->GetShiftLeft())
+        if (context->GetShiftLeft() && context->GetCanDisableFader())
         {
+            context->SetFaderDisabled(!context->GetFaderDisabled());
             return;
         }
 

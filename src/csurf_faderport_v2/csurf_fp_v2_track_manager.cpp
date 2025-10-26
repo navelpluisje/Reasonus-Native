@@ -85,7 +85,10 @@ void CSurf_FP_V2_TrackManager::UpdateTrack()
     }
     else
     {
-        track->SetFaderValue(faderValue, forceUpdate);
+        if (!context->GetFaderDisabled())
+        {
+            track->SetFaderValue(faderValue, forceUpdate);
+        }
     }
 
     hasLastTouchedFxEnabled = context->GetLastTouchedFxMode();
