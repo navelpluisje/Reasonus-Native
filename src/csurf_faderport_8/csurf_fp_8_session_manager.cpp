@@ -343,7 +343,6 @@ public:
         case Section:
             context->GetShiftLeft() ? Main_OnCommandEx(40626, 0, 0)               // Time selection: Set end point
                                     : Main_OnCommandStringEx("_SWS_SELNEXTMORR"); // SWS: Goto/select next marker/region
-
             break;
         case Marker:
             Main_OnCommandStringEx("_SWS_SELNEXTMORR"); // SWS: Goto/select next marker/region

@@ -1,4 +1,5 @@
 #include "../shared/csurf_utils.hpp"
+#include "../shared/csurf.h"
 #include "csurf_daw.hpp"
 #include <WDL/db2val.h>
 #include <WDL/wdltypes.h> // might be unnecessary in future
@@ -478,4 +479,71 @@ double minmax(double min, double value, double max)
            : value > max
                ? max
                : value;
+}
+
+HWND findWindowChildByID(HWND parentHWND, int ID)
+{
+#ifdef _WDL_SWELL
+    if (!ValidatePtr(parentHWND, "HWND"))
+        return nullptr;
+#endif
+    return GetDlgItem(parentHWND, ID);
+}
+
+bool getWindowScrollInfo(void *windowHWND, const char *scrollbar, int *positionOut, int *pageSizeOut, int *minOut, int *maxOut, int *trackPosOut)
+{
+    if (!ValidatePtr(windowHWND, "HWND"))
+    {
+        return false;
+    }
+
+    SCROLLINFO si = {
+        sizeof(SCROLLINFO),
+        SIF_ALL,
+    };
+
+    int nBar = ((strchr(scrollbar, 'v') || strchr(scrollbar, 'V')) ? SB_VERT : SB_HORZ); // Match strings such as "SB_VERT", "VERT" or "v".
+
+    bool isOK = !!CoolSB_GetScrollInfo((HWND)windowHWND, nBar, &si);
+
+    *pageSizeOut = si.nPage;
+    *positionOut = si.nPos;
+    *minOut = si.nMin;
+    *maxOut = si.nMax;
+    *trackPosOut = si.nTrackPos;
+
+    return isOK;
+}
+
+bool setWindowScrollPos(void *windowHWND, const char *scrollbar, int position)
+{
+    bool isOK = false;
+    if (ValidatePtr(windowHWND, "HWND"))
+    {
+        if (strchr(scrollbar, 'v') || strchr(scrollbar, 'V'))
+        {
+            isOK = !!CoolSB_SetScrollPos((HWND)windowHWND, SB_VERT, position, TRUE);
+            if (!isOK)
+            {
+                isOK = !!CoolSB_SetScrollPos((HWND)windowHWND, SB_VERT, position, TRUE);
+            }
+            if (isOK)
+            {
+                SendMessage((HWND)windowHWND, WM_VSCROLL, MAKEWPARAM(SB_THUMBPOSITION, position), 0);
+            }
+        }
+        else
+        {
+            isOK = !!CoolSB_SetScrollPos((HWND)windowHWND, SB_HORZ, position, TRUE);
+            if (!isOK)
+            {
+                isOK = !!CoolSB_SetScrollPos((HWND)windowHWND, SB_HORZ, position, TRUE);
+            }
+            if (isOK)
+            {
+                SendMessage((HWND)windowHWND, WM_HSCROLL, MAKEWPARAM(SB_THUMBPOSITION, position), 0);
+            }
+        }
+    }
+    return isOK;
 }

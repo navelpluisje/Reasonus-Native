@@ -125,6 +125,11 @@ public:
     static void EditSave();
     static void EditUndo();
     static void EditRedo();
+
+    /**
+     * Window related
+     */
+    static void SetTcpScroll(MediaTrack *media_track);
 };
 
 #endif

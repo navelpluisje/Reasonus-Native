@@ -320,8 +320,10 @@ void CSurf_FP_8_Navigator::HandleTracksAllFoldersFilter()
 
 void CSurf_FP_8_Navigator::UpdateMixerPosition()
 {
-    MediaTrack *media_track = GetTrack(0, track_offset);
+    WDL_PtrList<MediaTrack> bank = GetBankTracks();
+    MediaTrack *media_track = bank.Get(0);
     SetMixerScroll(media_track);
+    DAW::SetTcpScroll(media_track);
 };
 
 CSurf_FP_8_Navigator::CSurf_FP_8_Navigator(CSurf_Context *context) : context(context)
