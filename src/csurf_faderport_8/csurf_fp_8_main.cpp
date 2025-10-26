@@ -559,15 +559,6 @@ public:
 
         surface_update_lastrun = now;
       }
-      // if ((now - surface_update_keepalive) >= 1200)
-      // {
-      //   faderManager->Refresh(true);
-      //   sessionManager->Refresh(true);
-      //   mixManager->Refresh(true);
-      //   transportManager->Refresh(true);
-      //   automationManager->Refresh(true);
-      //   generalControlManager->Refresh(true);
-      // }
 
       if ((now - surface_update_keepalive) >= 990)
       {
@@ -603,14 +594,7 @@ public:
 
   void OnTrackSelection(MediaTrack *media_track)
   {
-    int trackId = (int)::GetMediaTrackInfo_Value(media_track, "IP_TRACKNUMBER");
-    /**
-     * Skip the master track selection
-     */
-    if (trackId > -1)
-    {
-      trackNavigator->SetOffset(trackId - 1);
-    }
+    trackNavigator->SetOffsetByTrack(media_track);
   }
 };
 
