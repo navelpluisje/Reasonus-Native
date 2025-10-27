@@ -8,6 +8,7 @@
 #include "csurf_ui_images.h"
 #include "csurf_ui_button_bar.hpp"
 #include "csurf_ui_list_box.hpp"
+#include "../shared/csurf_utils.hpp"
 
 constexpr const char *g_name{"ReaSonus Native V2 Control Panel"};
 
@@ -340,7 +341,6 @@ void ReaSonusV2PluginMappingConverter::Frame()
         UiElements::PopReaSonusWindowStyle(m_ctx);
 
         ImGui::End(m_ctx); // window
-
     }
 
     ImGui::PopFont(m_ctx);

@@ -562,16 +562,11 @@ public:
 
         surface_update_lastrun = now;
       }
-      // if ((now - surface_update_keepalive) >= 1200)
-      // {
-      //   faderManager->Refresh(true);
-      //   sessionManager->Refresh(true);
-      //   mixManager->Refresh(true);
-      //   transportManager->Refresh(true);
-      //   automationManager->Refresh(true);
-      //   generalControlManager->Refresh(true);
-      // }
 
+      /**
+       * @brief Life cycle tick for the FaderPort
+       *
+       */
       if ((now - surface_update_keepalive) >= 990)
       {
         surface_update_keepalive = now;

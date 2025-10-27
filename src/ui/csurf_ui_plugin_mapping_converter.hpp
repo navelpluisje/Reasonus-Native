@@ -2,13 +2,13 @@
 #define CSURF_FP_UI_TEST_V2_H_
 
 #include <WDL/wdltypes.h> // might be unnecessary in future
+#include <mini/ini.h>
 #include <reaper_plugin_functions.h>
 #include <reaper_imgui_functions.h>
 #include <memory>
 #include <string>
 #include <vector>
 #include <regex>
-#include "../ui/csurf_ui_page_content.hpp"
 
 class ReaSonusV2PluginMappingConverter
 {
@@ -35,7 +35,6 @@ private:
     void ConvertFile(std::string file_path);
     void ConvertFiles();
     void Convert();
-    CSurf_UI_PageContent *page_content = NULL;
 
     ReaSonusV2PluginMappingConverter();
     void Frame();

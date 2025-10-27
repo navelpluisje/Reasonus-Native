@@ -108,25 +108,17 @@ void ReaSonusTranslationEditor::Loop()
 
 void ReaSonusTranslationEditor::GetLanguageList()
 {
+    std::string path = GetReaSonusLocalesFolderPath();
     language_list.clear();
-    bool has_next = true;
-    int index = 0;
 
-    while (has_next)
+    for (const auto &entry : std::filesystem::recursive_directory_iterator(path))
     {
-        const char *name = EnumerateFiles(GetReaSonusLocalesFolderPath().c_str(), index);
-        if (!name)
+        if (entry.is_regular_file() && !entry.is_symlink())
         {
-            has_next = false;
-        }
-        else
-        {
-            index++;
-            std::vector<std::string> splitted_name = split(std::string(name), ".");
-
-            if (splitted_name[splitted_name.size() - 1].compare("ini") == 0 && splitted_name[0].compare("en-US") != 0)
+            std::filesystem::path path(entry.path());
+            if (path.has_extension() && path.extension() == ".ini")
             {
-                language_list.push_back(std::string(splitted_name[0]));
+                language_list.push_back((split(path.filename(), ".").at(0)));
             }
         }
     }

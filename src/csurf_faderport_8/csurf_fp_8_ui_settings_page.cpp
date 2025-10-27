@@ -71,26 +71,17 @@ public:
 
     void GetLanguages()
     {
-        language_names.clear();
-        bool has_next = true;
-        int index = 0;
         std::string path = GetReaSonusLocalesFolderPath();
+        language_names.clear();
 
-        while (has_next)
+        for (const auto &entry : std::filesystem::recursive_directory_iterator(path))
         {
-            const char *name = EnumerateFiles(path.c_str(), index);
-            if (!name)
+            if (entry.is_regular_file() && !entry.is_symlink())
             {
-                has_next = false;
-            }
-            else
-            {
-                index++;
-                std::vector<std::string> splitted_name = split(std::string(name), ".");
-
-                if (splitted_name[splitted_name.size() - 1].compare("ini") == 0)
+                std::filesystem::path path(entry.path());
+                if (path.has_extension() && path.extension() == ".ini")
                 {
-                    language_names.push_back(splitted_name[0]);
+                    language_names.push_back((split(path.filename(), ".").at(0)));
                 }
             }
         }
