@@ -118,7 +118,7 @@ void ReaSonusTranslationEditor::GetLanguageList()
             std::filesystem::path path(entry.path());
             if (path.has_extension() && path.extension() == ".ini")
             {
-                language_list.push_back((split(path.filename(), ".").at(0)));
+                language_list.push_back((split(path.filename().u8string(), ".").at(0)));
             }
         }
     }
