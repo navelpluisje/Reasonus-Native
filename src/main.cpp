@@ -10,6 +10,7 @@
 #include "actions/translations_editor.hpp"
 #include "ui/csurf_ui_function_keys_page.cpp"
 #include "resource.h"
+#include "shared/csurf.h"
 
 extern reaper_csurf_reg_t
     csurf_faderport_8_reg,
@@ -56,6 +57,30 @@ extern "C"
 
     g_hwnd = reaper_plugin_info->hwnd_main;
     g_reaper_plugin_info = reaper_plugin_info;
+
+    if (reaper_plugin_info)
+    {
+      // First, import REAPER's C++ API functions for use in this extension.
+      //		Load all listed API functions at once.
+      if (REAPERAPI_LoadAPI(reaper_plugin_info->GetFunc) != 0)
+      {
+        // This is the WIN32 / swell MessageBox, not REAPER's API MB.  This should create a separate window that is listed in the taskbar,
+        //		and more easily visible behind REAPER's splash screen.
+        MessageBox(NULL, "Unable to import default API functions.\n\nNOTE:\nThis extension requires REAPER v7.40 or higher.", "ERROR: ReaSonus Native", 0);
+        return 0;
+      }
+      //		Load each of the undocumented functions.
+      if (!((*(void **)&CoolSB_GetScrollInfo) = (void *)reaper_plugin_info->GetFunc("CoolSB_GetScrollInfo")))
+      {
+        MessageBox(NULL, "Unable to import CoolSB_GetScrollInfo function.", "ERROR: ReaSonus Native", 0);
+        return 0;
+      }
+      if (!((*(void **)&CoolSB_SetScrollPos) = (void *)reaper_plugin_info->GetFunc("CoolSB_SetScrollPos")))
+      {
+        MessageBox(NULL, "Unable to import CoolSB_SetScrollPos function.", "ERROR: ReaSonus Native", 0);
+        return 0;
+      }
+    }
 
     // load Reaper API functions
     // check that our plugin hasn't been already loaded

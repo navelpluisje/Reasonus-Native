@@ -761,3 +761,28 @@ void DAW::EditRedo()
 {
     ::Undo_DoRedo2(0);
 }
+
+/************************************************************************
+ * Window Related
+ ************************************************************************/
+void DAW::SetTcpScroll(MediaTrack *media_track)
+{
+    PreventUIRefresh(1);
+    // Get the y position of the provideed track relative to the top of the Arrange view
+    int track_tcpy = GetMediaTrackInfo_Value(media_track, "I_TCPY");
+    // Get the main window
+    HWND mainHWND = GetMainHwnd();
+    // Get the Arrange view
+    HWND arrangeHWND = findWindowChildByID(mainHWND, 1000);
+    // Get the scroll position and other data of the Arrange view
+    int scroll_position, scroll_pageSize, scroll_min, scroll_max, scroll_track_pos;
+    bool done = getWindowScrollInfo(arrangeHWND, "v", &scroll_position, &scroll_pageSize, &scroll_min, &scroll_max, &scroll_track_pos);
+
+    if (done)
+    {
+        // Set the new Arrange scroll position
+        setWindowScrollPos(arrangeHWND, "v", track_tcpy + scroll_position);
+    }
+
+    PreventUIRefresh(-1);
+}
