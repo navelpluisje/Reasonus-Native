@@ -196,7 +196,7 @@ void ReaSonusTranslationEditor::getMultilineString(std::string &value, double wi
         if (text_width > width)
         {
             int lastSpace = tmp_str.size() - 1;
-            while (tmp_str[lastSpace] != ' ' and lastSpace > 0)
+            while (tmp_str[lastSpace] != ' ' && lastSpace > 0)
                 lastSpace--;
             if (lastSpace == 0)
                 lastSpace = tmp_str.size() - 2;
