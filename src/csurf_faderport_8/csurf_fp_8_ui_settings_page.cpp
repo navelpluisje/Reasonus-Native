@@ -1,4 +1,3 @@
-#include <reaper_imgui_functions.h>
 #include <algorithm>
 #include <vector>
 #include "../controls/csurf_display_resources.hpp"
