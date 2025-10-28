@@ -142,6 +142,7 @@ jobs:
             ./reaper_*.so
             ./*.exe
             ./*.pkg
+            ./src/i18n/locales/en-US.ini
 
   release:
     needs: build
@@ -164,3 +165,4 @@ jobs:
           files: |
             ./**/*.dll
             ./**/*.dylib
+            ./**/*.ini
