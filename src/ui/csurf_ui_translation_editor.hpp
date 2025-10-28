@@ -7,8 +7,7 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include <regex>
-#include "../ui/csurf_ui_page_content.hpp"
+#include <mini/ini.h>
 
 class ReaSonusTranslationEditor
 {
@@ -32,7 +31,6 @@ private:
     void RenderTranslation(std::string section, std::string key);
     void HandleRemoveLanguageListItem(int index);
     void SaveChanges();
-    CSurf_UI_PageContent *page_content = NULL;
 
     ReaSonusTranslationEditor();
     void Frame();
@@ -53,6 +51,7 @@ private:
     int previous_selected_language = -1;
 
     bool show_empty_only = false;
+    bool show_translation_key = false;
     bool save_clicked = false;
     bool close_clicked = false;
 };

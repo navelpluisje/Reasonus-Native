@@ -11,6 +11,7 @@
 #include "csurf_ui_list_box.hpp"
 #include "csurf_ui_action_input_text.hpp"
 #include "csurf_ui_checkbox.hpp"
+#include "../shared/csurf_utils.hpp"
 
 constexpr const char *g_name{"ReaSonus Native Translaions Editor"};
 
@@ -107,25 +108,17 @@ void ReaSonusTranslationEditor::Loop()
 
 void ReaSonusTranslationEditor::GetLanguageList()
 {
+    std::string path = GetReaSonusLocalesFolderPath();
     language_list.clear();
-    bool has_next = true;
-    int index = 0;
 
-    while (has_next)
+    for (const auto &entry : std::filesystem::recursive_directory_iterator(path))
     {
-        const char *name = EnumerateFiles(GetReaSonusLocalesFolderPath().c_str(), index);
-        if (!name)
+        if (entry.is_regular_file() && !entry.is_symlink())
         {
-            has_next = false;
-        }
-        else
-        {
-            index++;
-            std::vector<std::string> splitted_name = split(std::string(name), ".");
-
-            if (splitted_name[splitted_name.size() - 1].compare("ini") == 0 && splitted_name[0].compare("en-US") != 0)
+            std::filesystem::path path(entry.path());
+            if (path.has_extension() && path.extension() == ".ini")
             {
-                language_list.push_back(std::string(splitted_name[0]));
+                language_list.push_back((split(path.filename().u8string(), ".").at(0)));
             }
         }
     }
@@ -196,7 +189,7 @@ void ReaSonusTranslationEditor::getMultilineString(std::string &value, double wi
         if (text_width > width)
         {
             int lastSpace = tmp_str.size() - 1;
-            while (tmp_str[lastSpace] != ' ' and lastSpace > 0)
+            while (tmp_str[lastSpace] != ' ' && lastSpace > 0)
                 lastSpace--;
             if (lastSpace == 0)
                 lastSpace = tmp_str.size() - 2;
@@ -222,7 +215,7 @@ void ReaSonusTranslationEditor::getMultilineString(std::string &value, double wi
 std::string removeNewLines(std::string value)
 {
     std::string new_string = "";
-    for (int i = 0; i < value.size(); i++)
+    for (int i = 0; i < (int)value.size(); i++)
     {
         if (value[i] != '\n' && value[i] != '\r')
         {
@@ -245,31 +238,33 @@ void ReaSonusTranslationEditor::RenderTranslation(std::string section, std::stri
 
     if (ImGui::BeginChild(m_ctx, (section + key + "-container").c_str(), 0.0, 0.0, ImGui::ChildFlags_AlwaysAutoResize | ImGui::ChildFlags_AutoResizeY | ImGui::ChildFlags_None))
     {
-        ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBg, UI_COLORS::Main_18);
-        ImGui::PushStyleColor(m_ctx, ImGui::Col_Border, UI_COLORS::FormFieldBorder);
-        ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameBorderSize, 1);
+        UiElements::PushReaSonusTranslationItemStyle(m_ctx);
         if (ImGui::BeginChild(m_ctx, (section + key + "-label").c_str(), 0.0, 0.0, ImGui::ChildFlags_AlwaysAutoResize | ImGui::ChildFlags_AutoResizeY | ImGui::ChildFlags_FrameStyle))
         {
             ImGui::GetContentRegionAvail(m_ctx, &width, &height);
             ImGui::PushTextWrapPos(m_ctx, width);
-            ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameBorderSize, 2);
+
+            if (show_translation_key)
+            {
+                ImGui::Text(m_ctx, key.c_str());
+            }
             ImGui::PushStyleColor(m_ctx, ImGui::Col_Text, UI_COLORS::Accent);
             ImGui::Text(m_ctx, base_file[section][key].c_str());
             ImGui::PopStyleColor(m_ctx);
+            ImGui::Text(m_ctx, "  ");
 
             ImGui::PopTextWrapPos(m_ctx);
-            ImGui::PopStyleVar(m_ctx);
-            ImGui::PopStyleVar(m_ctx);
-            ImGui::PopStyleColor(m_ctx, 2);
+
+            UiElements::PopReaSonusTranslationItemStyle(m_ctx);
             ImGui::EndChild(m_ctx);
         }
 
         ImGui::GetContentRegionAvail(m_ctx, &width, &height);
-        ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 12);
+        ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 33);
         ImGui::PushTextWrapPos(m_ctx, width - 18);
 
         UiElements::PushReaSonusInputStyle(m_ctx);
-        if (ImGui::InputTextMultiline(m_ctx, ("##" + section + key).c_str(), value, 512, 0.0, text_height + 16, ImGui::InputTextFlags_AlwaysOverwrite))
+        if (ImGui::InputTextMultiline(m_ctx, ("##" + section + key).c_str(), value, 512, width, text_height + 16, ImGui::InputTextFlags_AlwaysOverwrite))
         {
             // ImGui::GetContentRegionAvail(m_ctx, &width, &height);
             std::string new_value = removeNewLines(value);
@@ -331,18 +326,13 @@ void ReaSonusTranslationEditor::Frame()
             ImGui::Image(m_ctx, logo, 200, 52);
             ImGui::SameLine(m_ctx);
 
-            // if (ImGui::BeginChild(m_ctx, "actions", 0.0, 0.0, ImGui::ChildFlags_FrameStyle))
-            // {
-            //     ImGui::Text(m_ctx, "Hahahahahahaa");
-            //     ImGui::EndChild(m_ctx); // logo
-            // }
             ImGui::EndChild(m_ctx); // logo
         }
 
         if (ImGui::BeginChild(m_ctx, "actions_container", 0.0, -52.0, ImGui::ChildFlags_None))
         {
 
-            if (ImGui::BeginChild(m_ctx, "actions_info", 300.0, 0.0, ImGui::ChildFlags_None))
+            if (ImGui::BeginChild(m_ctx, "actions_info", 220.0, 0.0, ImGui::ChildFlags_None))
             {
                 UiElements::PushReaSonusGroupStyle(m_ctx);
                 if (ImGui::BeginChild(m_ctx, "actions_convert_info", 0.0, 0.0, ImGui::ChildFlags_FrameStyle))
@@ -350,6 +340,7 @@ void ReaSonusTranslationEditor::Frame()
                     ReaSonusPageTitle(m_ctx, "Languages", main_font_bold);
 
                     ReaSonusCheckBox(m_ctx, "Show only untranslated lines", &show_empty_only);
+                    ReaSonusCheckBox(m_ctx, "Show the actual key", &show_translation_key);
 
                     ReaSonusActionInputText(
                         m_ctx,
@@ -387,7 +378,6 @@ void ReaSonusTranslationEditor::Frame()
                 for (auto const &sections : base_file)
                 {
                     std::string section = sections.first;
-                    // auto const &collection = it.second;
 
                     ReaSonusPageTitle(m_ctx, section, main_font_bold);
 

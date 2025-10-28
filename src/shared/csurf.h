@@ -20,5 +20,6 @@ inline const char *EXT_STATE_VALUE_FALSE = "0";
 inline const char *EXT_STATE_VALUE_TRUE = "1";
 inline const char *EXT_STATE_SECTION = "ReaSonus";
 inline const char *EXT_STATE_KEY_SAVED_SETTINGS = "saved_settings";
+inline const char *EXT_STATE_KEY_UI_LANGUAGE = "language";
 
 #endif

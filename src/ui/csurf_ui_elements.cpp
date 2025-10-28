@@ -444,3 +444,53 @@ void UiElements::PopReaSonusChannelTabStyle(ImGui_Context *m_ctx)
     ImGui::PopStyleVar(m_ctx, 3);
     ImGui::PopStyleColor(m_ctx, 4);
 }
+
+void UiElements::PushReaSonusTabBarStyle(ImGui_Context *m_ctx)
+{
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_TabRounding, 4);
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 16, 8);
+}
+
+void UiElements::PopReaSonusTabBarStyle(ImGui_Context *m_ctx)
+{
+    ImGui::PopStyleVar(m_ctx, 2);
+}
+
+void UiElements::PushReaSonusTabStyle(ImGui_Context *m_ctx, bool selected)
+{
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_TabBorderSize, selected ? 2 : 1);
+
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_Border, UI_COLORS::Accent);
+    if (selected)
+    {
+        ImGui::PushStyleColor(m_ctx, ImGui::Col_Tab, UI_COLORS::Accent_25);
+        ImGui::PushStyleColor(m_ctx, ImGui::Col_TabSelected, UI_COLORS::Accent_50);
+        ImGui::PushStyleColor(m_ctx, ImGui::Col_TabHovered, UI_COLORS::Accent_50);
+    }
+    else
+    {
+        ImGui::PushStyleColor(m_ctx, ImGui::Col_Tab, UI_COLORS::Main_28);
+        ImGui::PushStyleColor(m_ctx, ImGui::Col_TabSelected, UI_COLORS::Main_38);
+        ImGui::PushStyleColor(m_ctx, ImGui::Col_TabHovered, UI_COLORS::Main_38);
+    }
+}
+
+void UiElements::PopReaSonusTabStyle(ImGui_Context *m_ctx)
+{
+    ImGui::PopStyleVar(m_ctx, 1);
+    ImGui::PopStyleColor(m_ctx, 4);
+}
+
+void UiElements::PushReaSonusTranslationItemStyle(ImGui_Context *m_ctx)
+{
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameBorderSize, 1);
+
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBg, UI_COLORS::Main_18);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_Border, UI_COLORS::FormFieldBorder);
+}
+
+void UiElements::PopReaSonusTranslationItemStyle(ImGui_Context *m_ctx)
+{
+    ImGui::PopStyleVar(m_ctx, 1);
+    ImGui::PopStyleColor(m_ctx, 2);
+}

@@ -1,4 +1,3 @@
-#include <reaper_imgui_functions.h>
 #include <algorithm>
 #include <vector>
 #include "../controls/csurf_display_resources.hpp"
@@ -18,9 +17,12 @@ protected:
     I18n *i18n = I18n::GetInstance();
     ImGui_Font *main_font_bold;
 
+    int selected_tab = -1;
+
     int setting_language;
     bool edit_language = false;
     bool previous_edit_language = false;
+    bool setting_distraction_free_mode = false;
     bool setting_disable_plugins;
     bool setting_untouch_after_learn;
     bool setting_master_fader_mode;
@@ -68,26 +70,17 @@ public:
 
     void GetLanguages()
     {
+        std::string locale_path = GetReaSonusLocalesFolderPath();
         language_names.clear();
-        bool has_next = true;
-        int index = 0;
-        std::string path = GetReaSonusLocalesFolderPath();
 
-        while (has_next)
+        for (const auto &entry : std::filesystem::recursive_directory_iterator(locale_path))
         {
-            const char *name = EnumerateFiles(path.c_str(), index);
-            if (!name)
+            if (entry.is_regular_file() && !entry.is_symlink())
             {
-                has_next = false;
-            }
-            else
-            {
-                index++;
-                std::vector<std::string> splitted_name = split(std::string(name), ".");
-
-                if (splitted_name[splitted_name.size() - 1].compare("ini") == 0)
+                std::filesystem::path path(entry.path());
+                if (path.has_extension() && path.extension() == ".ini")
                 {
-                    language_names.push_back(splitted_name[0]);
+                    language_names.push_back((split(path.filename().u8string(), ".").at(0)));
                 }
             }
         }
@@ -139,93 +132,137 @@ public:
         int language_button_width = getButtonWidth(m_ctx, i18n->t("settings", "language.button.label"), main_font_bold);
 
         UiElements::PushReaSonusSettingsContentStyle(m_ctx);
-        if (ImGui::BeginChild(m_ctx, "mapping_lists_content", 0.0, 0.0, ImGui::ChildFlags_FrameStyle, ImGui::ChildFlags_AutoResizeY))
+        if (ImGui::BeginChild(m_ctx, "settings_lists_content", 0.0, 0.0, ImGui::ChildFlags_FrameStyle, ImGui::ChildFlags_AutoResizeY))
         {
-            if (ImGui::BeginChild(m_ctx, "language-select", -1 * language_button_width, 0.0, ImGui::ChildFlags_None | ImGui::ChildFlags_AutoResizeY))
+            UiElements::PushReaSonusTabBarStyle(m_ctx);
+            if (ImGui::BeginTabBar(m_ctx, "SettingsTabs", ImGui::TabBarFlags_None))
             {
-                RenderSettingsComboInput(
-                    m_ctx,
-                    i18n->t("settings", "language.label"),
-                    language_names,
-                    &setting_language,
-                    i18n->t("settings", "language.tooltip"));
-
-                ImGui::EndChild(m_ctx);
-            }
-            ImGui::SameLine(m_ctx);
-            if (ImGui::BeginChild(m_ctx, "language-action", 0.0, 0.0, ImGui::ChildFlags_None | ImGui::ChildFlags_AutoResizeY))
-            {
-                ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 22);
-                UiElements::PushReaSonusButtonOutlineStyle(m_ctx, main_font_bold);
-                if (ImGui::Button(m_ctx, i18n->t("settings", "language.button.label").c_str()))
+                UiElements::PushReaSonusTabStyle(m_ctx, selected_tab == 0);
+                if (ImGui::BeginTabItem(m_ctx, i18n->t("settings", "tab.global").c_str()))
                 {
-                    edit_language = true;
+                    selected_tab = 0;
+                    ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 16);
+
+                    if (ImGui::BeginChild(m_ctx, "language-select", -1 * language_button_width, 0.0, ImGui::ChildFlags_None | ImGui::ChildFlags_AutoResizeY))
+                    {
+                        RenderSettingsComboInput(
+                            m_ctx,
+                            i18n->t("settings", "language.label"),
+                            language_names,
+                            &setting_language,
+                            i18n->t("settings", "language.tooltip"));
+
+                        ImGui::EndChild(m_ctx);
+                    }
+                    ImGui::SameLine(m_ctx);
+                    if (ImGui::BeginChild(m_ctx, "language-action", 0.0, 0.0, ImGui::ChildFlags_None | ImGui::ChildFlags_AutoResizeY))
+                    {
+                        ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 22);
+                        UiElements::PushReaSonusButtonOutlineStyle(m_ctx, main_font_bold);
+                        if (ImGui::Button(m_ctx, i18n->t("settings", "language.button.label").c_str()))
+                        {
+                            edit_language = true;
+                        }
+                        UiElements::PopReaSonusButtonOutlineStyle(m_ctx);
+
+                        ImGui::EndChild(m_ctx);
+                    }
+
+                    RenderSettingsCheckbox(
+                        m_ctx,
+                        i18n->t("settings", "plugin-control.label"),
+                        &setting_disable_plugins,
+                        i18n->t("settings", "plugin-control.tooltip"));
+
+                    RenderSettingsCheckbox(
+                        m_ctx,
+                        i18n->t("settings", "distraction-free-mode.label"),
+                        &setting_distraction_free_mode,
+                        i18n->t("settings", "distraction-free-mode.tooltip"));
+
+                    ImGui::EndTabItem(m_ctx);
                 }
-                UiElements::PopReaSonusButtonOutlineStyle(m_ctx);
+                UiElements::PopReaSonusTabStyle(m_ctx);
 
-                ImGui::EndChild(m_ctx);
+                UiElements::PushReaSonusTabStyle(m_ctx, selected_tab == 1);
+                if (ImGui::BeginTabItem(m_ctx, i18n->t("settings", "tab.functional").c_str()))
+                {
+                    selected_tab = 1;
+                    ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 16);
+
+                    RenderSettingsCheckbox(
+                        m_ctx,
+                        i18n->t("settings", "untouch-after-learn.label"),
+                        &setting_untouch_after_learn,
+                        i18n->t("settings", "untouch-after-learn.tooltip"));
+
+                    RenderSettingsCheckbox(
+                        m_ctx,
+                        i18n->t("settings", "master-fader.label"),
+                        &setting_master_fader_mode,
+                        i18n->t("settings", "master-fader.tooltip"));
+
+                    RenderSettingsCheckbox(
+                        m_ctx,
+                        i18n->t("settings", "swap-shift.label"),
+                        &setting_swap_shift,
+                        i18n->t("settings", "swap-shift.tooltip"));
+
+                    RenderSettingsCheckbox(
+                        m_ctx,
+                        i18n->t("settings", "fader-reset.label"),
+                        &setting_fader_reset,
+                        i18n->t("settings", "fader-reset.tooltip"));
+
+                    RenderSettingsCheckbox(
+                        m_ctx,
+                        i18n->t("settings", "momentary-mute.label"),
+                        &setting_momentary_mute_solo,
+                        i18n->t("settings", "momentary-mute.tooltip"));
+
+                    ImGui::EndTabItem(m_ctx);
+                }
+                UiElements::PopReaSonusTabStyle(m_ctx);
+
+                UiElements::PushReaSonusTabStyle(m_ctx, selected_tab == 2);
+                if (ImGui::BeginTabItem(m_ctx, i18n->t("settings", "tab.display").c_str()))
+                {
+                    selected_tab = 2;
+                    ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 16);
+
+                    RenderSettingsCheckbox(
+                        m_ctx,
+                        i18n->t("settings", "overwrite-timecode.label"),
+                        &setting_overwrite_time_code,
+                        i18n->t("settings", "overwrite-timecode.tooltip"));
+
+                    if (setting_overwrite_time_code)
+                    {
+                        ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + 26);
+                        RenderSettingsComboInput(
+                            m_ctx,
+                            i18n->t("settings", "timecode-list.label"),
+                            time_code_names,
+                            &setting_time_code,
+                            i18n->t("settings", "timecode-list.tooltip"));
+                    }
+
+                    RenderSettingsComboInput(
+                        m_ctx,
+                        i18n->t("settings", "display-track.label"),
+                        track_display_names,
+                        &setting_track_display,
+                        i18n->t("settings", "display-track.tooltip"));
+
+                    ImGui::EndTabItem(m_ctx);
+                }
+                UiElements::PopReaSonusTabStyle(m_ctx);
+
+                ImGui::EndTabBar(m_ctx);
             }
-            RenderSettingsCheckbox(
-                m_ctx,
-                i18n->t("settings", "plugin-control.label"),
-                &setting_disable_plugins,
-                i18n->t("settings", "plugin-control.tooltip"));
-
-            RenderSettingsCheckbox(
-                m_ctx,
-                i18n->t("settings", "untouch-after-learn.label"),
-                &setting_untouch_after_learn,
-                i18n->t("settings", "untouch-after-learn.tooltip"));
-
-            RenderSettingsCheckbox(
-                m_ctx,
-                i18n->t("settings", "master-fader.label"),
-                &setting_master_fader_mode,
-                i18n->t("settings", "master-fader.tooltip"));
-
-            RenderSettingsCheckbox(
-                m_ctx,
-                i18n->t("settings", "swap-shift.label"),
-                &setting_swap_shift,
-                i18n->t("settings", "swap-shift.tooltip"));
-
-            RenderSettingsCheckbox(
-                m_ctx,
-                i18n->t("settings", "fader-reset.label"),
-                &setting_fader_reset,
-                i18n->t("settings", "fader-reset.tooltip"));
-
-            RenderSettingsCheckbox(
-                m_ctx,
-                i18n->t("settings", "momentary-mute.label"),
-                &setting_momentary_mute_solo,
-                i18n->t("settings", "momentary-mute.tooltip"));
-
-            RenderSettingsCheckbox(
-                m_ctx,
-                i18n->t("settings", "overwrite-timecode.label"),
-                &setting_overwrite_time_code,
-                i18n->t("settings", "overwrite-timecode.tooltip"));
-
-            if (setting_overwrite_time_code)
-            {
-                ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + 26);
-                RenderSettingsComboInput(
-                    m_ctx,
-                    i18n->t("settings", "timecode-list.label"),
-                    time_code_names,
-                    &setting_time_code,
-                    i18n->t("settings", "timecode-list.tooltip"));
-            }
-
-            RenderSettingsComboInput(
-                m_ctx,
-                i18n->t("settings", "display-track.label"),
-                track_display_names,
-                &setting_track_display,
-                i18n->t("settings", "display-track.tooltip"));
 
             UiElements::PopReaSonusSettingsContentStyle(m_ctx);
+            UiElements::PopReaSonusTabBarStyle(m_ctx);
             ImGui::EndChild(m_ctx);
         }
     }
@@ -235,14 +272,17 @@ public:
         mINI::INIFile file(GetReaSonusIniPath(FP_8));
         readAndCreateIni(ini, FP_8);
 
-        ini["surface"]["language"] = language_names[setting_language];
+        ::SetExtState(EXT_STATE_SECTION, EXT_STATE_KEY_UI_LANGUAGE, language_names[setting_language].c_str(), true);
         ini["surface"]["disable-plugins"] = setting_disable_plugins ? "1" : "0";
+        ini["surface"]["distraction-free"] = setting_distraction_free_mode ? "1" : "0";
+
         ini["surface"]["erase-last-param-after-learn"] = setting_untouch_after_learn ? "1" : "0";
         ini["surface"]["master-fader-mode"] = setting_master_fader_mode ? "1" : "0";
         ini["surface"]["swap-shift-buttons"] = setting_swap_shift ? "1" : "0";
         ini["surface"]["fader-reset"] = setting_fader_reset ? "1" : "0";
         ini["surface"]["mute-solo-momentary"] = setting_momentary_mute_solo ? "1" : "0";
         ini["surface"]["overwrite-time-code"] = setting_overwrite_time_code ? "1" : "0";
+
         ini["surface"]["time-code"] = std::to_string(time_code_indexes[setting_time_code]);
         ini["displays"]["track"] = std::to_string(track_display_indexes[setting_track_display]);
 
@@ -255,10 +295,20 @@ public:
 
     void Reset() override
     {
-        auto language_index = std::find(language_names.begin(), language_names.end(), ini["surface"]["language"]);
-        setting_language = language_index - language_names.begin();
+        setting_language = 0;
+
+        for (int i = 0; i < (int)language_names.size(); i++)
+        {
+            if (language_names[i].compare(::GetExtState(EXT_STATE_SECTION, EXT_STATE_KEY_UI_LANGUAGE)) == 0)
+            {
+                setting_language = i;
+            }
+        }
+        //     auto language_index = std::find(language_names, language_names + 3, ::GetExtState(EXT_STATE_SECTION, EXT_STATE_KEY_UI_LANGUAGE));
+        // setting_language = language_index - language_names.begin();
 
         setting_disable_plugins = ini["surface"]["disable-plugins"] == "1";
+        setting_distraction_free_mode = ini["surface"]["distraction-free"] == "1";
         setting_untouch_after_learn = ini["surface"]["erase-last-param-after-learn"] == "1";
         setting_master_fader_mode = ini["surface"]["master-fader-mode"] == "1";
         setting_swap_shift = ini["surface"]["swap-shift-buttons"] == "1";

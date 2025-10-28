@@ -159,7 +159,7 @@ public:
         mINI::INIFile file(GetReaSonusIniPath(FP_V2));
         readAndCreateIni(ini, FP_V2);
 
-        ini["surface"]["language"] = language_names[setting_language];
+        ::SetExtState(EXT_STATE_SECTION, EXT_STATE_KEY_UI_LANGUAGE, language_names[setting_language].c_str(), true);
         ini["surface"]["mute-solo-momentary"] = momentary_mute_solo ? "1" : "0";
         ini["surface"]["control-hidden-tracks"] = control_hidden_tracks ? "1" : "0";
 
@@ -172,7 +172,7 @@ public:
 
     void Reset() override
     {
-        auto language_index = std::find(language_names.begin(), language_names.end(), ini["surface"]["language"]);
+        auto language_index = std::find(language_names.begin(), language_names.end(), ::GetExtState(EXT_STATE_SECTION, EXT_STATE_KEY_UI_LANGUAGE));
         setting_language = language_index - language_names.begin();
 
         momentary_mute_solo = ini["surface"]["mute-solo-momentary"] == "1";

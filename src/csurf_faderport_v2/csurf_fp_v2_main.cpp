@@ -222,9 +222,9 @@ class CSurf_FaderPortV2 : public IReaperControlSurface
   {
     readAndCreateIni(ini, FP_V2);
 
+    i18n->SetLanguage(::HasExtState(EXT_STATE_SECTION, EXT_STATE_KEY_UI_LANGUAGE) ? ::GetExtState(EXT_STATE_SECTION, EXT_STATE_KEY_UI_LANGUAGE) : "en-US");
     context->SetMuteSoloMomentary(ini["surface"].has("mute-solo-momentary") && ini["surface"]["mute-solo-momentary"] == "1");
     context->SetControlHiddenTracks(ini["surface"].has("control-hidden-tracks") && ini["surface"]["control-hidden-tracks"] == "1");
-    i18n->SetLanguage(ini["surface"].has("language") ? ini["surface"]["language"] : "en-US");
   }
 
 public:

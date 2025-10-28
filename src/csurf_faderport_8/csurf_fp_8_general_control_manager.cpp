@@ -61,14 +61,14 @@ protected:
             macroButton->SetValue(ReaSonus8ControlPanel::control_panel_open ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
         }
 
-        soloClearButton->SetValue(hasSolo ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
-        muteClearButton->SetValue(hasMute ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
-        linkButton->SetValue(context->GetLastTouchedFxMode()
-                                 ? BTN_VALUE_ON
-                             : context->GetChannelMode() == PluginEditMode
-                                 ? BTN_VALUE_BLINK
-                                 : BTN_VALUE_OFF,
-                             force);
+        soloClearButton->SetValue(hasSolo && !context->GetDistractionFreeMode() ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+        muteClearButton->SetValue(hasMute && !context->GetDistractionFreeMode() ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+        linkButton->SetValue(
+            ButtonOnBlinkOff(
+                context->GetLastTouchedFxMode(),
+                context->GetChannelMode() == PluginEditMode,
+                context->GetDistractionFreeMode()),
+            force);
         shiftLeftButton->SetValue(((!context->GetSwapShiftButtons() && context->GetShiftLeft()) || (context->GetShiftRight() && context->GetSwapShiftButtons()))
                                       ? BTN_VALUE_ON
                                       : BTN_VALUE_OFF,

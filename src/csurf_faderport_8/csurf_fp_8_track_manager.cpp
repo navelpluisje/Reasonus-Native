@@ -24,11 +24,11 @@ protected:
 
     void SetTrackColors(MediaTrack *media_track) override
     {
-        int red = 0xff;
+        int red = 0x7f;
         int green = 0x00;
         int blue = 0x00;
 
-        if (!context->GetArm())
+        if (!context->GetArm() && !(DAW::IsTrackArmed(media_track) && context->GetDistractionFreeMode()))
         {
 
             int track_color = ::GetTrackColor(media_track);
@@ -128,14 +128,19 @@ public:
             bool is_armed = DAW::IsTrackArmed(media_track);
 
             GetFaderValue(media_track, &fader_value, &value_bar_value, &strPan1, &strPan2);
-            Btn_Value select_value = (context->GetArm() && is_armed) || (!context->GetArm() && is_selected) ? BTN_VALUE_ON
-                                                                                                            : BTN_VALUE_OFF;
+            Btn_Value select_value = (context->GetArm() && is_armed) || (!context->GetArm() && is_selected)
+                                         ? BTN_VALUE_ON
+                                         : BTN_VALUE_OFF;
 
             track->SetTrackColor(color);
             // If the track is armed always blink as an indication it is armed
-            track->SetSelectButtonValue((!context->GetArm() && is_armed) ? BTN_VALUE_BLINK : select_value, forceUpdate);
+            track->SetSelectButtonValue(!context->GetArm() && is_armed
+                                            ? ButtonConditionalBlink(!context->GetDistractionFreeMode(), !context->GetArm() && is_armed)
+                                            : select_value,
+                                        forceUpdate);
             track->SetMuteButtonValue(DAW::IsTrackMuted(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
             track->SetSoloButtonValue(DAW::IsTrackSoloed(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
+
             track->SetFaderValue(fader_value, forceUpdate || has_touch_mode);
             track->SetValueBarMode(context->GetArm() ? VALUEBAR_MODE_FILL : VALUEBAR_MODE_BIPOLAR);
             track->SetValueBarValue(value_bar_value);

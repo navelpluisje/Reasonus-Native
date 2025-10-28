@@ -53,36 +53,53 @@ static void PushReaSonusColors(ImGui_Context *m_ctx)
     ImGui::PushStyleColor(m_ctx, ImGui::Col_CheckMark, UI_COLORS::Accent);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_SliderGrab, UI_COLORS::Accent);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_SliderGrabActive, UI_COLORS::Accent_50);
+
+    // Button
     ImGui::PushStyleColor(m_ctx, ImGui::Col_Button, 0x4296FA66);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_ButtonHovered, 0xF55D3EFF);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_ButtonActive, 0x0F87FAFF);
+
+    // Header
     ImGui::PushStyleColor(m_ctx, ImGui::Col_Header, UI_COLORS::Accent_50);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_HeaderHovered, UI_COLORS::Accent_25);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_HeaderActive, UI_COLORS::Accent);
+
+    // Separator
     ImGui::PushStyleColor(m_ctx, ImGui::Col_Separator, UI_COLORS::Accent);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_SeparatorHovered, UI_COLORS::Accent);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_SeparatorActive, UI_COLORS::Accent);
+
+    // resize Grip
     ImGui::PushStyleColor(m_ctx, ImGui::Col_ResizeGrip, UI_COLORS::Accent_14);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_ResizeGripHovered, UI_COLORS::Accent);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_ResizeGripActive, UI_COLORS::Accent_07);
-    ImGui::PushStyleColor(m_ctx, ImGui::Col_TabHovered, 0x4296FACC);
-    ImGui::PushStyleColor(m_ctx, ImGui::Col_Tab, 0x2E5994DC);
-    ImGui::PushStyleColor(m_ctx, ImGui::Col_TabSelected, 0x3369ADFF);
-    ImGui::PushStyleColor(m_ctx, ImGui::Col_TabSelectedOverline, 0x4296FAFF);
+
+    // Tabs
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_TabHovered, UI_COLORS::Accent_50);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_Tab, UI_COLORS::Accent_25);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_TabSelected, UI_COLORS::Accent);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_TabSelectedOverline, UI_COLORS::Accent);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_TabDimmed, 0x111A26F8);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_TabDimmedSelected, 0x23436CFF);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_TabDimmedSelectedOverline, 0x808080FF);
+
+    // Docking
     ImGui::PushStyleColor(m_ctx, ImGui::Col_DockingPreview, UI_COLORS::Accent_50);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_DockingEmptyBg, 0x333333FF);
+
+    // Plots
     ImGui::PushStyleColor(m_ctx, ImGui::Col_PlotLines, 0x9C9C9CFF);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_PlotLinesHovered, 0xFF6E59FF);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_PlotHistogram, 0xE6B300FF);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_PlotHistogramHovered, 0xFF9900FF);
+
+    // Table
     ImGui::PushStyleColor(m_ctx, ImGui::Col_TableHeaderBg, 0x303033FF);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_TableBorderStrong, 0x4F4F59FF);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_TableBorderLight, 0x3B3B40FF);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_TableRowBg, UI_COLORS::Transparent);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_TableRowBgAlt, 0xFFFFFF0F);
+
     ImGui::PushStyleColor(m_ctx, ImGui::Col_TextSelectedBg, 0x4296FA59);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_DragDropTarget, 0xFFFF00E6);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_NavCursor, 0x4296FAFF);
