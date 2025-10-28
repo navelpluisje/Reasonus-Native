@@ -296,8 +296,17 @@ public:
 
     void Reset() override
     {
-        auto language_index = std::find(language_names.begin(), language_names.end(), ::GetExtState(EXT_STATE_SECTION, EXT_STATE_KEY_UI_LANGUAGE));
-        setting_language = language_index - language_names.begin();
+        setting_language = 0;
+
+        for (int i = 0; i < (int)language_names.size(); i++)
+        {
+            if (language_names[i].compare(::GetExtState(EXT_STATE_SECTION, EXT_STATE_KEY_UI_LANGUAGE)) == 0)
+            {
+                setting_language = i;
+            }
+        }
+        //     auto language_index = std::find(language_names, language_names + 3, ::GetExtState(EXT_STATE_SECTION, EXT_STATE_KEY_UI_LANGUAGE));
+        // setting_language = language_index - language_names.begin();
 
         setting_disable_plugins = ini["surface"]["disable-plugins"] == "1";
         setting_distraction_free_mode = ini["surface"]["distraction-free"] == "1";
