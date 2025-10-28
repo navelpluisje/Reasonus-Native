@@ -399,6 +399,22 @@ int CSurf_FP_8_Navigator::GetOffset()
     return track_offset;
 }
 
+void CSurf_FP_8_Navigator::SetOffsetByTrack(MediaTrack *media_track)
+{
+    int trackId = (int)::GetMediaTrackInfo_Value(media_track, "IP_TRACKNUMBER");
+
+    for (int i = 0; tracks.GetSize(); i++)
+    {
+        int id = (int)::GetMediaTrackInfo_Value(tracks.Get(i), "IP_TRACKNUMBER");
+
+        if (trackId == id)
+        {
+            SetOffset(i);
+            break;
+        }
+    }
+}
+
 void CSurf_FP_8_Navigator::IncrementOffset(int count)
 {
     if ((track_offset + count) <= (tracks.GetSize() - context->GetNbBankChannels()))

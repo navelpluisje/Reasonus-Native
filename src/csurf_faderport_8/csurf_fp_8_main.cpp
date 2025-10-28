@@ -601,14 +601,7 @@ public:
 
   void OnTrackSelection(MediaTrack *media_track)
   {
-    int trackId = (int)::GetMediaTrackInfo_Value(media_track, "IP_TRACKNUMBER");
-    /**
-     * Skip the master track selection
-     */
-    if (trackId > -1)
-    {
-      trackNavigator->SetOffset(trackId - 1);
-    }
+    trackNavigator->SetOffsetByTrack(media_track);
   }
 };
 
