@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include "../shared/csurf_utils.hpp"
+#include "csurf.h"
 
 int DAW::sendModes[3] = {0, 1, 3};
 
@@ -785,4 +786,14 @@ void DAW::SetTcpScroll(MediaTrack *media_track)
     }
 
     PreventUIRefresh(-1);
+}
+
+std::string DAW::GetExtState(std::string key, std::string default_value)
+{
+    return ::HasExtState(EXT_STATE_SECTION, key.c_str()) ? ::GetExtState(EXT_STATE_SECTION, key.c_str()) : default_value;
+}
+
+void DAW::SetExtState(std::string key, std::string value, bool persist)
+{
+    ::SetExtState(EXT_STATE_SECTION, key.c_str(), value.c_str(), persist);
 }

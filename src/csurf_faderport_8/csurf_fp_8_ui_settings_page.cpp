@@ -9,6 +9,7 @@
 #include "../shared/csurf.h"
 #include "../i18n/i18n.hpp"
 #include "../ui/csurf_ui_button_width.hpp"
+#include "../shared/csurf_daw.hpp"
 
 class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent
 {
@@ -62,29 +63,11 @@ public:
 
         ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(main_font_bold));
         ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(icon_info));
-        GetLanguages();
+        GetLanguages(language_names);
         Reset();
     };
 
     virtual ~CSurf_FP_8_SettingsPage() {};
-
-    void GetLanguages()
-    {
-        std::string locale_path = GetReaSonusLocalesFolderPath();
-        language_names.clear();
-
-        for (const auto &entry : std::filesystem::recursive_directory_iterator(locale_path))
-        {
-            if (entry.is_regular_file() && !entry.is_symlink())
-            {
-                std::filesystem::path path(entry.path());
-                if (path.has_extension() && path.extension() == ".ini")
-                {
-                    language_names.push_back((split(path.filename().u8string(), ".").at(0)));
-                }
-            }
-        }
-    }
 
     void RenderSettingsCheckbox(
         ImGui_Context *m_ctx,
@@ -272,7 +255,7 @@ public:
         mINI::INIFile file(GetReaSonusIniPath(FP_8));
         readAndCreateIni(ini, FP_8);
 
-        ::SetExtState(EXT_STATE_SECTION, EXT_STATE_KEY_UI_LANGUAGE, language_names[setting_language].c_str(), true);
+        DAW::SetExtState(EXT_STATE_KEY_UI_LANGUAGE, language_names[setting_language].c_str(), true);
         ini["surface"]["disable-plugins"] = setting_disable_plugins ? "1" : "0";
         ini["surface"]["distraction-free"] = setting_distraction_free_mode ? "1" : "0";
 
@@ -288,7 +271,7 @@ public:
 
         if (file.write(ini, true))
         {
-            ::SetExtState(EXT_STATE_SECTION, EXT_STATE_KEY_SAVED_SETTINGS, EXT_STATE_VALUE_TRUE, false);
+            DAW::SetExtState(EXT_STATE_KEY_SAVED_SETTINGS, EXT_STATE_VALUE_TRUE, false);
             MB(i18n->t("settings", "popup.save.message").c_str(), i18n->t("settings", "popup.save.title").c_str(), 0);
         };
     }
@@ -299,13 +282,11 @@ public:
 
         for (int i = 0; i < (int)language_names.size(); i++)
         {
-            if (language_names[i].compare(::GetExtState(EXT_STATE_SECTION, EXT_STATE_KEY_UI_LANGUAGE)) == 0)
+            if (language_names[i].compare(DAW::GetExtState(EXT_STATE_KEY_UI_LANGUAGE, "en-US")) == 0)
             {
                 setting_language = i;
             }
         }
-        //     auto language_index = std::find(language_names, language_names + 3, ::GetExtState(EXT_STATE_SECTION, EXT_STATE_KEY_UI_LANGUAGE));
-        // setting_language = language_index - language_names.begin();
 
         setting_disable_plugins = ini["surface"]["disable-plugins"] == "1";
         setting_distraction_free_mode = ini["surface"]["distraction-free"] == "1";

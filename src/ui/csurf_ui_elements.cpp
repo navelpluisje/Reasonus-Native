@@ -104,25 +104,6 @@ void UiElements::PopReaSonusFieldGroupStyle(ImGui_Context *m_ctx)
     ImGui::PopStyleColor(m_ctx, 3);
 }
 
-void UiElements::PushReaSonusMenuButtonStyle(ImGui_Context *m_ctx)
-{
-    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_ButtonTextAlign, 0.0, 0.5);
-    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 12, 12);
-    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameRounding, 4);
-    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameBorderSize, 2);
-
-    ImGui::PushStyleColor(m_ctx, ImGui::Col_Button, UI_COLORS::Main_28);
-    ImGui::PushStyleColor(m_ctx, ImGui::Col_ButtonActive, UI_COLORS::Main_38);
-    ImGui::PushStyleColor(m_ctx, ImGui::Col_ButtonHovered, UI_COLORS::Main_38);
-    ImGui::PushStyleColor(m_ctx, ImGui::Col_Border, UI_COLORS::Accent);
-}
-
-void UiElements::PopReaSonusMenuButtonStyle(ImGui_Context *m_ctx)
-{
-    ImGui::PopStyleVar(m_ctx, 4);
-    ImGui::PopStyleColor(m_ctx, 4);
-}
-
 void UiElements::PushReaSonusButtonStyle(ImGui_Context *m_ctx, ImGui_Font *button_font)
 {
     ImGui::PushFont(m_ctx, button_font, 13);
@@ -464,7 +445,7 @@ void UiElements::PushReaSonusTabStyle(ImGui_Context *m_ctx, bool selected)
     if (selected)
     {
         ImGui::PushStyleColor(m_ctx, ImGui::Col_Tab, UI_COLORS::Accent_25);
-        ImGui::PushStyleColor(m_ctx, ImGui::Col_TabSelected, UI_COLORS::Accent_50);
+        ImGui::PushStyleColor(m_ctx, ImGui::Col_TabSelected, UI_COLORS::Accent_25);
         ImGui::PushStyleColor(m_ctx, ImGui::Col_TabHovered, UI_COLORS::Accent_50);
     }
     else

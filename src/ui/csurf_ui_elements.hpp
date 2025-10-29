@@ -30,10 +30,6 @@ public:
 
     static void PopReaSonusFieldGroupStyle(ImGui_Context *m_ctx);
 
-    static void PushReaSonusMenuButtonStyle(ImGui_Context *m_ctx);
-
-    static void PopReaSonusMenuButtonStyle(ImGui_Context *m_ctx);
-
     static void PushReaSonusButtonStyle(ImGui_Context *m_ctx, ImGui_Font *button_font);
 
     static void PopReaSonusButtonStyle(ImGui_Context *m_ctx);

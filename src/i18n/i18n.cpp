@@ -1,3 +1,5 @@
+#include <filesystem>
+#include <config.h>
 #include <mini/ini.h>
 #include "../i18n/i18n.hpp"
 #include "../shared/csurf_utils.hpp"
@@ -20,11 +22,6 @@ void I18n::SetLanguage(std::string lang)
         mINI::INIFile file(GetReaSonusLocalesPath("en-US"));
         file.read(translations);
     }
-}
-
-void I18n::SetLanguage(int lang)
-{
-    SetLanguage((Languages)lang);
 }
 
 std::string I18n::t(std::string group, std::string key)
@@ -64,4 +61,53 @@ std::string I18n::t(std::string group, std::string key, std::string arg1, std::s
 
     std::string result = buffer;
     return result;
+}
+
+void I18n::checkLocalesFiles()
+{
+    mINI::INIStructure root_translations;
+    mINI::INIStructure translations;
+
+    // copy enUS to ReaSonus/Locales
+    std::string locales_root = GetReaSonusLocalesRootFile();
+    std::string locales_path = GetReaSonusLocalesPath("en-US");
+    try
+    {
+        const std::filesystem::path dirPath = GetReaSonusLocalesFolderPath();
+
+        if (!std::filesystem::exists(dirPath))
+        {
+            std::filesystem::create_directory(dirPath);
+        }
+
+        std::filesystem::copy(locales_root, locales_path, std::filesystem::copy_options::overwrite_existing | std::filesystem::copy_options::recursive);
+    }
+    catch (std::filesystem::filesystem_error &e)
+    {
+        ShowConsoleMsg(e.what());
+        return;
+    }
+
+    std::vector<std::string> languages;
+    GetLanguages(languages);
+
+    for (auto language : languages)
+    {
+        mINI::INIFile file(GetReaSonusLocalesPath(language));
+        file.read(translations);
+        mINI::INIFile root(GetReaSonusLocalesPath("en-US"));
+        root.read(root_translations);
+
+        for (auto const &sections : translations)
+        {
+            std::string section = sections.first;
+            for (auto const &pair : sections.second)
+            {
+                auto const &key = pair.first;
+                root_translations[section][key] = translations[section][key];
+            }
+        }
+
+        file.write(root_translations);
+    }
 }
