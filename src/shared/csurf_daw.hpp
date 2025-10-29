@@ -130,6 +130,12 @@ public:
      * Window related
      */
     static void SetTcpScroll(MediaTrack *media_track);
+
+    /**
+     * Ext State
+     */
+    static std::string GetExtState(std::string key, std::string default_value);
+    static void SetExtState(std::string key, std::string value, bool persist);
 };
 
 #endif

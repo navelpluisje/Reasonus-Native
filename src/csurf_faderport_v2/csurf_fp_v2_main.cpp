@@ -222,7 +222,7 @@ class CSurf_FaderPortV2 : public IReaperControlSurface
   {
     readAndCreateIni(ini, FP_V2);
 
-    i18n->SetLanguage(::HasExtState(EXT_STATE_SECTION, EXT_STATE_KEY_UI_LANGUAGE) ? ::GetExtState(EXT_STATE_SECTION, EXT_STATE_KEY_UI_LANGUAGE) : "en-US");
+    i18n->SetLanguage(DAW::GetExtState(EXT_STATE_KEY_UI_LANGUAGE, "en-US"));
     context->SetMuteSoloMomentary(ini["surface"].has("mute-solo-momentary") && ini["surface"]["mute-solo-momentary"] == "1");
     context->SetControlHiddenTracks(ini["surface"].has("control-hidden-tracks") && ini["surface"]["control-hidden-tracks"] == "1");
   }
@@ -237,6 +237,11 @@ public:
      * First we check if we have the ini file. If not we create it with default values
      */
     readAndCreateIni(ini, FP_V2);
+    if (std::string(GIT_VERSION).compare(DAW::GetExtState(EXT_STATE_KEY_VERSION, "")) != 0)
+    {
+      DAW::SetExtState(EXT_STATE_KEY_VERSION, GIT_VERSION, true);
+      I18n::checkLocalesFiles();
+    }
 
     errStats = 0;
     m_midi_in_dev = stoi(ini["surface"]["midiin"]);
@@ -380,13 +385,12 @@ public:
       if ((now - surface_update_settings_check) >= 1500)
       {
         surface_update_settings_check = now;
-        const char *saved = ::GetExtState(EXT_STATE_SECTION, EXT_STATE_KEY_SAVED_SETTINGS);
-        std::string is_saved = saved;
+        std::string is_saved = DAW::GetExtState(EXT_STATE_KEY_SAVED_SETTINGS, "");
 
         if (is_saved.compare(EXT_STATE_VALUE_TRUE) == 0)
         {
           updateSettings();
-          ::SetExtState(EXT_STATE_SECTION, EXT_STATE_KEY_SAVED_SETTINGS, EXT_STATE_VALUE_FALSE, false);
+          DAW::SetExtState(EXT_STATE_KEY_SAVED_SETTINGS, EXT_STATE_VALUE_FALSE, false);
         }
       }
     }

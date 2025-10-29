@@ -187,7 +187,7 @@ public:
             mINI::INIFile file(GetReaSonusIniPath(FP_8));
             if (file.write(ini, true))
             {
-                ::SetExtState(EXT_STATE_SECTION, EXT_STATE_KEY_SAVED_SETTINGS, EXT_STATE_VALUE_TRUE, false);
+                DAW::SetExtState(EXT_STATE_KEY_SAVED_SETTINGS, EXT_STATE_VALUE_TRUE, false);
 
                 level = 0;
                 option[1] = -1;

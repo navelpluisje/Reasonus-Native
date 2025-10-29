@@ -7,6 +7,7 @@
 #include "../ui/csurf_ui_tooltip.hpp"
 #include "../ui/csurf_ui_combo_input.hpp"
 #include "../ui/csurf_ui_button_width.hpp"
+#include "../shared/csurf_daw.hpp"
 
 class CSurf_FP_V2_SettingsPage : public CSurf_UI_PageContent
 {
@@ -31,38 +32,11 @@ public:
 
         ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(main_font_bold));
         ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(icon_info));
-        GetLanguages();
+        GetLanguages(language_names);
         Reset();
     };
 
     virtual ~CSurf_FP_V2_SettingsPage() {};
-
-    void GetLanguages()
-    {
-        language_names.clear();
-        bool has_next = true;
-        int index = 0;
-        std::string path = GetReaSonusLocalesFolderPath();
-
-        while (has_next)
-        {
-            const char *name = EnumerateFiles(path.c_str(), index);
-            if (!name)
-            {
-                has_next = false;
-            }
-            else
-            {
-                index++;
-                std::vector<std::string> splitted_name = split(std::string(name), ".");
-
-                if (splitted_name[splitted_name.size() - 1].compare("ini") == 0)
-                {
-                    language_names.push_back(splitted_name[0]);
-                }
-            }
-        }
-    }
 
     void RenderSettingsCheckbox(
         ImGui_Context *m_ctx,
@@ -159,20 +133,20 @@ public:
         mINI::INIFile file(GetReaSonusIniPath(FP_V2));
         readAndCreateIni(ini, FP_V2);
 
-        ::SetExtState(EXT_STATE_SECTION, EXT_STATE_KEY_UI_LANGUAGE, language_names[setting_language].c_str(), true);
+        DAW::SetExtState(EXT_STATE_KEY_UI_LANGUAGE, language_names[setting_language].c_str(), true);
         ini["surface"]["mute-solo-momentary"] = momentary_mute_solo ? "1" : "0";
         ini["surface"]["control-hidden-tracks"] = control_hidden_tracks ? "1" : "0";
 
         if (file.write(ini, true))
         {
-            ::SetExtState(EXT_STATE_SECTION, EXT_STATE_KEY_SAVED_SETTINGS, EXT_STATE_VALUE_TRUE, false);
+            DAW::SetExtState(EXT_STATE_KEY_SAVED_SETTINGS, EXT_STATE_VALUE_TRUE, false);
             MB("Changes saved with success", "Woohoo", 0);
         };
     }
 
     void Reset() override
     {
-        auto language_index = std::find(language_names.begin(), language_names.end(), ::GetExtState(EXT_STATE_SECTION, EXT_STATE_KEY_UI_LANGUAGE));
+        auto language_index = std::find(language_names.begin(), language_names.end(), DAW::GetExtState(EXT_STATE_KEY_UI_LANGUAGE, "en-US"));
         setting_language = language_index - language_names.begin();
 
         momentary_mute_solo = ini["surface"]["mute-solo-momentary"] == "1";

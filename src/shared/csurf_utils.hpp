@@ -252,6 +252,8 @@ std::string GetReaSonusPluginPath(std::string developer, std::string pluginName,
 std::string GetReaSonusLocalesFolderPath();
 std::string GetReaSonusLocalesPath(std::string language);
 
+std::string GetReaSonusLocalesRootFile();
+
 bool isInteger(std::string value);
 
 std::vector<std::string> split(std::string str, std::string delimiter);
@@ -339,5 +341,10 @@ bool getWindowScrollInfo(void *windowHWND, const char *scrollbar, int *positionO
  * @return false
  */
 bool setWindowScrollPos(void *windowHWND, const char *scrollbar, int position);
+
+/**
+ * @brief Get a list with all the avaiulable ini translation files
+ */
+void GetLanguages(std::vector<std::string> &language_names);
 
 #endif // CSURF_UTILS_H_

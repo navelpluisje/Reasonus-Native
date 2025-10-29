@@ -242,6 +242,11 @@ std::string GetReaSonusLocalesPath(std::string language)
     return GetReaSonusLocalesFolderPath() + pathSeparator + language + ".ini";
 }
 
+std::string GetReaSonusLocalesRootFile()
+{
+    return std::string(GetResourcePath()) + pathSeparator + "UserPlugins" + pathSeparator + "ReaSonus" + pathSeparator + "en-US.ini";
+}
+
 bool isInteger(std::string value)
 {
     char *p;
@@ -546,4 +551,22 @@ bool setWindowScrollPos(void *windowHWND, const char *scrollbar, int position)
         }
     }
     return isOK;
+}
+
+void GetLanguages(std::vector<std::string> &language_names)
+{
+    std::string locale_path = GetReaSonusLocalesFolderPath();
+    language_names.clear();
+
+    for (const auto &entry : std::filesystem::recursive_directory_iterator(locale_path))
+    {
+        if (entry.is_regular_file() && !entry.is_symlink())
+        {
+            std::filesystem::path path(entry.path());
+            if (path.has_extension() && path.extension() == ".ini")
+            {
+                language_names.push_back((split(path.filename().u8string(), ".").at(0)));
+            }
+        }
+    }
 }
