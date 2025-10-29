@@ -134,7 +134,6 @@ jobs:
             ./reaper_*.so
             ./*.exe
             ./*.pkg
-            ./src/i18n/locales/en-US.ini
 
   locales:
     runs-on: ubuntu-latest
