@@ -74,6 +74,11 @@ bool DAW::IsTrackParent(MediaTrack *media_track)
     return (int)GetMediaTrackInfo_Value(media_track, "I_FOLDERDEPTH") == 1;
 }
 
+bool DAW::IsTrackPinned(MediaTrack *media_track)
+{
+    return (int)GetMediaTrackInfo_Value(media_track, "B_TCPPIN") == 1;
+}
+
 int DAW::GetTrackPanMode(MediaTrack *media_track)
 {
     int panMode = 0;
@@ -777,15 +782,41 @@ void DAW::SetTcpScroll(MediaTrack *media_track)
     HWND arrangeHWND = findWindowChildByID(mainHWND, 1000);
     // Get the scroll position and other data of the Arrange view
     int scroll_position, scroll_pageSize, scroll_min, scroll_max, scroll_track_pos;
+
+    int pinned_tracks_height = VersionHasFeature(FEATURE_PINNED_TRACKS) ? GetPinnedTracksHeight() : 0;
     bool done = getWindowScrollInfo(arrangeHWND, "v", &scroll_position, &scroll_pageSize, &scroll_min, &scroll_max, &scroll_track_pos);
 
     if (done)
     {
         // Set the new Arrange scroll position
-        setWindowScrollPos(arrangeHWND, "v", track_tcpy + scroll_position);
+        setWindowScrollPos(arrangeHWND, "v", track_tcpy + scroll_position - pinned_tracks_height);
     }
 
     PreventUIRefresh(-1);
+}
+
+int DAW::GetPinnedTracksHeight()
+{
+    MediaTrack *media_track;
+    int pinned_height = 0;
+
+    for (int i = 0; i < ::GetNumTracks(); i++)
+    {
+        media_track = ::GetTrack(0, i);
+        if (IsTrackPinned(media_track))
+        {
+            pinned_height += GetMediaTrackInfo_Value(media_track, "I_TCPH");
+        }
+    }
+
+    // Return the actual height plus the gap
+    return pinned_height + 10;
+}
+
+bool DAW::VersionHasFeature(Features feature)
+{
+    double current_version = std::stod(::GetAppVersion());
+    return current_version >= feature_versions[feature];
 }
 
 std::string DAW::GetExtState(std::string key, std::string default_value)

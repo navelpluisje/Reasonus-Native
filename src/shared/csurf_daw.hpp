@@ -3,8 +3,18 @@
 
 #include <reaper_plugin.h>
 #include <string>
+#include <map>
 #include <vector>
 #include "../controls/csurf_color_button_colors.hpp"
+
+enum Features
+{
+    FEATURE_PINNED_TRACKS
+};
+
+static std::map<Features, double> feature_versions = {
+    {FEATURE_PINNED_TRACKS, 7.46},
+};
 
 class DAW
 {
@@ -22,6 +32,7 @@ public:
     static void ToggleTrackSoloed(MediaTrack *media_track);
     static bool IsTrackSelected(MediaTrack *media_track);
     static bool IsTrackParent(MediaTrack *media_track);
+    static bool IsTrackPinned(MediaTrack *media_track);
 
     static int GetTrackPanMode(MediaTrack *media_track);
     static std::string GetTrackName(MediaTrack *media_track);
@@ -130,6 +141,10 @@ public:
      * Window related
      */
     static void SetTcpScroll(MediaTrack *media_track);
+
+    static int GetPinnedTracksHeight();
+
+    static bool VersionHasFeature(Features feature);
 
     /**
      * Ext State
