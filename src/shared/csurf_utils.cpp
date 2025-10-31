@@ -367,6 +367,14 @@ void readAndCreateIni(mINI::INIStructure &data, std::string device)
             data["functions"]["6"] = "0";
             data["functions"]["7"] = "0";
             data["functions"]["8"] = "0";
+            data["functions"]["9"] = "0";
+            data["functions"]["10"] = "0";
+            data["functions"]["11"] = "0";
+            data["functions"]["12"] = "0";
+            data["functions"]["13"] = "0";
+            data["functions"]["14"] = "0";
+            data["functions"]["15"] = "0";
+            data["functions"]["16"] = "0";
             data["filters"]["nb-filters"] = "0";
         }
         file.generate(data, true);
@@ -411,6 +419,14 @@ void validateReaSonusIni(mINI::INIFile file, mINI::INIStructure &data, std::stri
         data["functions"]["6"] = data["functions"].has("6") ? data["functions"]["6"] : "0";
         data["functions"]["7"] = data["functions"].has("7") ? data["functions"]["7"] : "0";
         data["functions"]["8"] = data["functions"].has("8") ? data["functions"]["8"] : "0";
+        data["functions"]["9"] = data["functions"].has("9") ? data["functions"]["9"] : "0";
+        data["functions"]["10"] = data["functions"].has("10") ? data["functions"]["10"] : "0";
+        data["functions"]["11"] = data["functions"].has("11") ? data["functions"]["11"] : "0";
+        data["functions"]["12"] = data["functions"].has("12") ? data["functions"]["12"] : "0";
+        data["functions"]["13"] = data["functions"].has("13") ? data["functions"]["13"] : "0";
+        data["functions"]["14"] = data["functions"].has("14") ? data["functions"]["14"] : "0";
+        data["functions"]["15"] = data["functions"].has("15") ? data["functions"]["15"] : "0";
+        data["functions"]["16"] = data["functions"].has("16") ? data["functions"]["16"] : "0";
         data["filters"]["nb-filters"] = data["filters"].has("nb-filters") ? data["filters"]["nb-filters"] : "0";
     }
 

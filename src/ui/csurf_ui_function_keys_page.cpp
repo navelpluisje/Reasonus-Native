@@ -16,6 +16,7 @@ protected:
     ImGui_Image *icon_search;
     std::string device;
     I18n *i18n;
+    bool selected_tab = 0;
 
 public:
     static bool querying_actions;
@@ -48,6 +49,14 @@ public:
             functions.push_back(ini["functions"]["6"]);
             functions.push_back(ini["functions"]["7"]);
             functions.push_back(ini["functions"]["8"]);
+            functions.push_back(ini["functions"]["9"]);
+            functions.push_back(ini["functions"]["10"]);
+            functions.push_back(ini["functions"]["11"]);
+            functions.push_back(ini["functions"]["12"]);
+            functions.push_back(ini["functions"]["13"]);
+            functions.push_back(ini["functions"]["14"]);
+            functions.push_back(ini["functions"]["15"]);
+            functions.push_back(ini["functions"]["16"]);
         }
     }
 
@@ -66,6 +75,14 @@ public:
             ini["functions"]["6"] = functions[5];
             ini["functions"]["7"] = functions[6];
             ini["functions"]["8"] = functions[7];
+            ini["functions"]["9"] = functions[8];
+            ini["functions"]["10"] = functions[9];
+            ini["functions"]["11"] = functions[10];
+            ini["functions"]["12"] = functions[11];
+            ini["functions"]["13"] = functions[12];
+            ini["functions"]["14"] = functions[13];
+            ini["functions"]["15"] = functions[14];
+            ini["functions"]["16"] = functions[15];
         }
 
         if (file.write(ini, true))
@@ -163,20 +180,13 @@ public:
         }
     }
 
-    void Render() override
+    void RenderFPV2FunctionGroup()
     {
-        if (selected_action != -1)
-        {
-            functions[selected_function] = std::to_string(selected_action);
-            selected_action = -1;
-            selected_function = -1;
-        }
-
         ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 4);
         ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_CellPadding, 6, 6);
         if (ImGui::BeginTable(m_ctx, "function_keys_grid", 2))
         {
-            for (int i = 0; i < (device == FP_8 ? 8 : 4); i++)
+            for (int i = 0; i < 4; i++)
             {
                 if (ImGui::TableNextColumn(m_ctx))
                 {
@@ -187,6 +197,95 @@ public:
             }
             ImGui::EndTable(m_ctx);
             ImGui::PopStyleVar(m_ctx);
+        }
+    }
+
+    void RenderFP8FunctionGroup()
+    {
+        if (ImGui::BeginChild(m_ctx, "settings-group", 0, 0, ImGui::ChildFlags_None))
+        {
+            UiElements::PushReaSonusTabBarStyle(m_ctx);
+            if (ImGui::BeginTabBar(m_ctx, "FunctionsTabs", ImGui::TabBarFlags_None))
+            {
+                UiElements::PushReaSonusTabStyle(m_ctx, selected_tab == 0);
+                if (ImGui::BeginTabItem(m_ctx, i18n->t("functions", "tab.left-shift").c_str()))
+                {
+                    selected_tab = 0;
+                    ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 8);
+                    if (ImGui::BeginChild(m_ctx, "left-shift-group", 0, 0, ImGui::ChildFlags_None))
+                    {
+                        ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_CellPadding, 6, 6);
+                        if (ImGui::BeginTable(m_ctx, "function_keys_grid", 2))
+                        {
+                            for (int i = 0; i < 8; i++)
+                            {
+                                if (ImGui::TableNextColumn(m_ctx))
+                                {
+                                    UiElements::PushReaSonusFunctionActionStyle(m_ctx);
+                                    RenderFunction(m_ctx, i, *this);
+                                    UiElements::PopReaSonusFunctionActionStyle(m_ctx);
+                                }
+                            }
+                            ImGui::PopStyleVar(m_ctx);
+                            ImGui::EndTable(m_ctx);
+                        }
+                        ImGui::EndChild(m_ctx);
+                    }
+                    ImGui::EndTabItem(m_ctx);
+                }
+                UiElements::PopReaSonusTabStyle(m_ctx);
+
+                UiElements::PushReaSonusTabStyle(m_ctx, selected_tab == 1);
+                if (ImGui::BeginTabItem(m_ctx, i18n->t("functions", "tab.right-shift").c_str()))
+                {
+                    selected_tab = 1;
+                    ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 8);
+                    if (ImGui::BeginChild(m_ctx, "right-shift-group", 0, 0, ImGui::ChildFlags_None))
+                    {
+                        ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_CellPadding, 6, 6);
+                        if (ImGui::BeginTable(m_ctx, "function_keys_grid", 2))
+                        {
+                            for (int i = 8; i < 16; i++)
+                            {
+                                if (ImGui::TableNextColumn(m_ctx))
+                                {
+                                    UiElements::PushReaSonusFunctionActionStyle(m_ctx);
+                                    RenderFunction(m_ctx, i, *this);
+                                    UiElements::PopReaSonusFunctionActionStyle(m_ctx);
+                                }
+                            }
+                            ImGui::PopStyleVar(m_ctx);
+                            ImGui::EndTable(m_ctx);
+                        }
+                        ImGui::EndChild(m_ctx);
+                    }
+                    ImGui::EndTabItem(m_ctx);
+                }
+                UiElements::PopReaSonusTabStyle(m_ctx);
+
+                UiElements::PopReaSonusTabBarStyle(m_ctx);
+                ImGui::EndTabBar(m_ctx);
+            }
+            ImGui::EndChild(m_ctx);
+        }
+    }
+
+    void Render() override
+    {
+        if (selected_action != -1)
+        {
+            functions[selected_function] = std::to_string(selected_action);
+            selected_action = -1;
+            selected_function = -1;
+        }
+
+        if (device == FP_8)
+        {
+            RenderFP8FunctionGroup();
+        }
+        else
+        {
+            RenderFPV2FunctionGroup();
         }
     }
 };

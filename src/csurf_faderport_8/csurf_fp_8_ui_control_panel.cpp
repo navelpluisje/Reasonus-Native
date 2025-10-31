@@ -199,6 +199,13 @@ void ReaSonus8ControlPanel::Frame()
 {
     double space_x, space_y, width, height;
 
+    if (ImGui::IsKeyDown(m_ctx, ImGui::Key_Escape))
+    {
+        control_panel_open = false;
+        SetActionState("_REASONUS_SHOW_REASONUS_8_CONTROL_WINDOW");
+        return fp8_inst.reset();
+    }
+
     SetPageContent();
 
     if (save_clicked)
