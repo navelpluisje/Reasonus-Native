@@ -106,7 +106,7 @@ public:
         prevButton = new CSurf_Button(BTN_PREV, BTN_VALUE_OFF, m_midiout);
         nextButton = new CSurf_Button(BTN_NEXT, BTN_VALUE_OFF, m_midiout);
     }
-    ~CSurf_FP_8_SessionManager();
+    ~CSurf_FP_8_SessionManager() {};
 
     void Refresh(bool force = false)
     {
@@ -126,6 +126,11 @@ public:
             return;
         }
 
+        if (context->GetShiftRight())
+        {
+            handleFunctionKey("9");
+            return;
+        }
         if (context->GetShiftLeft())
         {
             handleFunctionKey("1");
@@ -142,6 +147,11 @@ public:
             return;
         }
 
+        if (context->GetShiftRight())
+        {
+            handleFunctionKey("10");
+            return;
+        }
         if (context->GetShiftLeft())
         {
             handleFunctionKey("2");
@@ -158,6 +168,11 @@ public:
             return;
         }
 
+        if (context->GetShiftRight())
+        {
+            handleFunctionKey("11");
+            return;
+        }
         if (context->GetShiftLeft())
         {
             handleFunctionKey("3");
@@ -174,6 +189,11 @@ public:
             return;
         }
 
+        if (context->GetShiftRight())
+        {
+            handleFunctionKey("12");
+            return;
+        }
         if (context->GetShiftLeft())
         {
             handleFunctionKey("4");
@@ -190,6 +210,11 @@ public:
             return;
         }
 
+        if (context->GetShiftRight())
+        {
+            handleFunctionKey("13");
+            return;
+        }
         if (context->GetShiftLeft())
         {
             handleFunctionKey("5");
@@ -215,6 +240,11 @@ public:
             return;
         }
 
+        if (context->GetShiftRight())
+        {
+            handleFunctionKey("14");
+            return;
+        }
         if (context->GetShiftLeft())
         {
             handleFunctionKey("6");
@@ -231,6 +261,11 @@ public:
             return;
         }
 
+        if (context->GetShiftRight())
+        {
+            handleFunctionKey("15");
+            return;
+        }
         if (context->GetShiftLeft())
         {
             handleFunctionKey("7");
@@ -252,6 +287,11 @@ public:
             return;
         }
 
+        if (context->GetShiftRight())
+        {
+            handleFunctionKey("16");
+            return;
+        }
         if (context->GetShiftLeft())
         {
             handleFunctionKey("8");
