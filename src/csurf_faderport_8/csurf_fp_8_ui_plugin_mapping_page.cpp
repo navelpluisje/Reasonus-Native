@@ -9,6 +9,7 @@
 #include "../ui/csurf_ui_page_title.hpp"
 #include "../shared/csurf_daw.hpp"
 #include "../i18n/i18n.hpp"
+#include "csurf_fp_8_ui_control_panel.hpp"
 
 typedef std::tuple<int, std::string, int> PluginParam;
 
@@ -527,6 +528,11 @@ public:
 
     void Save() override
     {
+        if (selected_plugin < 0)
+        {
+            return;
+        }
+
         mINI::INIFile file(GetPluginPath());
 
         select_key = "select_" + std::to_string(selected_channel);
@@ -565,7 +571,7 @@ public:
         if (file.write(ini, true))
         {
             Reset();
-            MB(i18n->t("mapping", "popup.save.message").c_str(), i18n->t("mapping", "popup.save.title").c_str(), 0);
+            ReaSonus8ControlPanel::SetMessage(i18n->t("mapping", "action.save.message"));
         };
     }
 

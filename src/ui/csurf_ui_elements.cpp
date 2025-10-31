@@ -170,6 +170,26 @@ void UiElements::PopReaSonusInputStyle(ImGui_Context *m_ctx)
     ImGui::PopStyleColor(m_ctx, 4);
 }
 
+void UiElements::PushReaSonusButtonBarMessageStyle(ImGui_Context *m_ctx)
+{
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 16, 8);
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameRounding, 4);
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameBorderSize, 1);
+
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_Border, UI_COLORS::Success);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBg, UI_COLORS::Success_50);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBgActive, UI_COLORS::Success_50);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBgHovered, UI_COLORS::Success_50);
+
+    ImGui::PushItemWidth(m_ctx, -1);
+}
+
+void UiElements::PopReaSonusButtonBarMessageStyle(ImGui_Context *m_ctx)
+{
+    ImGui::PopStyleVar(m_ctx, 3);
+    ImGui::PopStyleColor(m_ctx, 4);
+}
+
 void UiElements::PushReaSonusComboStyle(ImGui_Context *m_ctx)
 {
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 8, 8);

@@ -29,6 +29,8 @@ public:
     static void SetPageProperty(int type, int value = 0);
     static void SetPageStringProperty(int type, std::string value = "");
     static int GetPageProperty(int type);
+    static void SetMessage(std::string message);
+    void SetLocalMessage(std::string message);
     static std::string GetPageStringProperty(int type);
     ~ReaSonus8ControlPanel();
 
@@ -56,6 +58,9 @@ private:
     bool save_clicked = false;
     bool cancel_clicked = false;
     std::vector<std::string> menu_items;
+
+    std::string message = "";
+    int message_timer = 0;
 
     I18n *i18n = I18n::GetInstance();
 };

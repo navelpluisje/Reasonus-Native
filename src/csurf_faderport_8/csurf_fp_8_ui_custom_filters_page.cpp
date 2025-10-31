@@ -9,6 +9,7 @@
 #include "../ui/csurf_ui_list_box.hpp"
 #include "../ui/csurf_ui_filter_preview.hpp"
 #include "../i18n/i18n.hpp"
+#include "csurf_fp_8_ui_control_panel.hpp"
 
 class CSurf_FP_8_CustomFilterstPage : public CSurf_UI_PageContent
 {
@@ -354,6 +355,10 @@ public:
 
     void Save() override
     {
+        if (selected_filter < 0)
+        {
+            return;
+        }
         mINI::INIFile file(GetReaSonusIniPath(FP_8));
 
         int selected = selected_filter;
@@ -379,11 +384,8 @@ public:
         if (file.write(ini, true))
         {
             edit_new_filter = false;
+            ReaSonus8ControlPanel::SetMessage(i18n->t("filters", "action.save.message"));
             Reset();
-            MB(
-                i18n->t("filters", "popup.save.message").c_str(),
-                i18n->t("filters", "popup.save.title").c_str(),
-                0);
         };
     }
 
