@@ -7,6 +7,8 @@
 #include "csurf_ui_images.h"
 #include "../ui/csurf_ui_colors.hpp"
 #include "../i18n/i18n.hpp"
+#include "../csurf_faderport_8/csurf_fp_8_ui_control_panel.hpp"
+#include "../csurf_faderport_v2/csurf_fp_v2_ui_control_panel.hpp"
 
 class CSurf_UI_FunctionKeysPage : public CSurf_UI_PageContent
 {
@@ -87,7 +89,14 @@ public:
 
         if (file.write(ini, true))
         {
-            MB("Changes saved with success", "Woohoo", 0);
+            if (device == FP_8)
+            {
+                ReaSonus8ControlPanel::SetMessage(i18n->t("functions", "action.save.message"));
+            }
+            else
+            {
+                ReaSonusV2ControlPanel::SetMessage(i18n->t("functions", "action.save.message"));
+            }
         };
     }
 

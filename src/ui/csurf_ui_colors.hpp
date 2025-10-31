@@ -5,7 +5,6 @@
 
 namespace UI_COLORS
 {
-
     const int White = 0xffffffff;
     const int Main_15 = 0x272727ff;
     const int Main_18 = 0x2e2e2eff;
@@ -17,6 +16,8 @@ namespace UI_COLORS
     const int Accent_14 = 0xF7CB1523;
     const int Accent_25 = 0xF7CB153f;
     const int Accent_50 = 0xF7CB157F;
+    const int Success = 0x58D23AFF;
+    const int Success_50 = 0x58D23A7F;
     const int Transparent = 0x00000000;
 
     const int FormFieldBorder = UI_COLORS::Main_38;

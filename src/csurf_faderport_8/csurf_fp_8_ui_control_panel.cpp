@@ -147,6 +147,19 @@ std::string ReaSonus8ControlPanel::GetPageStringProperty(int type)
     return "";
 }
 
+void ReaSonus8ControlPanel::SetMessage(std::string message)
+{
+    if (fp8_inst)
+    {
+        return fp8_inst->SetLocalMessage(message);
+    }
+}
+
+void ReaSonus8ControlPanel::SetLocalMessage(std::string _message)
+{
+    message = _message;
+}
+
 void ReaSonus8ControlPanel::Loop()
 {
     try
@@ -199,6 +212,20 @@ void ReaSonus8ControlPanel::Frame()
 {
     double space_x, space_y, width, height;
 
+    if (!message.empty())
+    {
+        int now = (int)GetTickCount();
+        if (message_timer == 0)
+        {
+            message_timer = now;
+        }
+        else if ((message_timer + 3000) < now)
+        {
+            message = "";
+            message_timer = 0;
+        }
+    }
+
     if (ImGui::IsKeyDown(m_ctx, ImGui::Key_Escape))
     {
         control_panel_open = false;
@@ -246,7 +273,7 @@ void ReaSonus8ControlPanel::Frame()
 
                 ImGui::EndChild(m_ctx);
             }
-            // TODO: Move this to the bottom
+
             ImGui::Text(m_ctx, GIT_VERSION);
 
             ImGui::EndChild(m_ctx);
@@ -257,7 +284,7 @@ void ReaSonus8ControlPanel::Frame()
         if (ImGui::BeginChild(m_ctx, "main_content", 0.0, 0.0, ImGui::ChildFlags_FrameStyle))
         {
             UiElements::PopReaSonusContentStyle(m_ctx);
-            if (ImGui::BeginChild(m_ctx, "main_content_area", 0.0, -34.0, ImGui::ChildFlags_None))
+            if (ImGui::BeginChild(m_ctx, "main_content_area", 0.0, current_page != 4 ? -34.0 : 0, ImGui::ChildFlags_None))
             {
                 ReaSonusPageTitle(m_ctx, i18n->t("control-panel", menu_items[current_page]), main_font_bold);
 
@@ -268,14 +295,18 @@ void ReaSonus8ControlPanel::Frame()
                 }
                 ImGui::EndChild(m_ctx);
             }
-            ReaSonusButtonBar(
-                m_ctx,
-                i18n->t("control-panel", "button.save"),
-                main_font_bold,
-                &save_clicked,
-                true,
-                &cancel_clicked,
-                i18n->t("control-panel", "button.cancel"));
+            if (current_page != 4)
+            {
+                ReaSonusButtonBar(
+                    m_ctx,
+                    i18n->t("control-panel", "button.save"),
+                    main_font_bold,
+                    &save_clicked,
+                    true,
+                    &cancel_clicked,
+                    i18n->t("control-panel", "button.cancel"),
+                    &message);
+            }
             ImGui::EndChild(m_ctx);
         }
 

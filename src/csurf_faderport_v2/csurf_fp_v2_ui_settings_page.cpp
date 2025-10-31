@@ -8,6 +8,7 @@
 #include "../ui/csurf_ui_combo_input.hpp"
 #include "../ui/csurf_ui_button_width.hpp"
 #include "../shared/csurf_daw.hpp"
+#include "csurf_fp_v2_ui_control_panel.hpp"
 
 class CSurf_FP_V2_SettingsPage : public CSurf_UI_PageContent
 {
@@ -140,7 +141,7 @@ public:
         if (file.write(ini, true))
         {
             DAW::SetExtState(EXT_STATE_KEY_SAVED_SETTINGS, EXT_STATE_VALUE_TRUE, false);
-            MB("Changes saved with success", "Woohoo", 0);
+            ReaSonusV2ControlPanel::SetMessage(i18n->t("settings", "action.save.message"));
         };
     }
 

@@ -42,6 +42,10 @@ public:
 
     static void PopReaSonusInputStyle(ImGui_Context *m_ctx);
 
+    static void PushReaSonusButtonBarMessageStyle(ImGui_Context *m_ctx);
+
+    static void PopReaSonusButtonBarMessageStyle(ImGui_Context *m_ctx);
+
     static void PushReaSonusComboStyle(ImGui_Context *m_ctx);
 
     static void PopReaSonusComboStyle(ImGui_Context *m_ctx);

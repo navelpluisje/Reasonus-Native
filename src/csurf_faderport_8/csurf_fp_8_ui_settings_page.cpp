@@ -10,6 +10,7 @@
 #include "../i18n/i18n.hpp"
 #include "../ui/csurf_ui_button_width.hpp"
 #include "../shared/csurf_daw.hpp"
+#include "csurf_fp_8_ui_control_panel.hpp"
 
 class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent
 {
@@ -272,7 +273,7 @@ public:
         if (file.write(ini, true))
         {
             DAW::SetExtState(EXT_STATE_KEY_SAVED_SETTINGS, EXT_STATE_VALUE_TRUE, false);
-            MB(i18n->t("settings", "popup.save.message").c_str(), i18n->t("settings", "popup.save.title").c_str(), 0);
+            ReaSonus8ControlPanel::SetMessage(i18n->t("settings", "action.save.message"));
         };
     }
 
