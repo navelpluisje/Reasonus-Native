@@ -81,8 +81,12 @@ protected:
         int pan_mode;
         MediaTrack *media_track = GetSelectedTrack(0, 0);
         GetTrackUIPan(media_track, &pan1, &pan2, &pan_mode);
+        if (pan_mode < PAN_MODE_STEREO_PAN)
+        {
+            pan_mode = PAN_MODE_BALANCE_PAN;
+        }
 
-        if (pan_mode < 4)
+        if (pan_mode == PAN_MODE_BALANCE_PAN)
         {
             double newValue = int(panToNormalized(pan1) * 127.0) + val;
             newValue = minmax(0.0, newValue, 127.0);
@@ -116,12 +120,20 @@ protected:
     {
         MediaTrack *media_track = GetSelectedTrack(0, 0);
 
-        int pan_mode = DAW::GetTrackPanMode(media_track);
-        if (pan_mode < 4 && !context->GetPanPushMode())
+        switch (DAW::GetTrackPanMode(media_track))
         {
-            SetMediaTrackInfo_Value(media_track, "D_PAN", 0);
+        case PAN_MODE_STEREO_PAN:
+        {
+            if (context->GetPanPushMode())
+            {
+                SetMediaTrackInfo_Value(media_track, "D_PAN", 0);
+            }
+            else
+            {
+                SetMediaTrackInfo_Value(media_track, "D_WIDTH", 1);
+            }
         }
-        if (pan_mode == 6)
+        case PAN_MODE_DUAL_PAN:
         {
             if (context->GetPanPushMode())
             {
@@ -132,16 +144,10 @@ protected:
                 SetMediaTrackInfo_Value(media_track, "D_DUALPANR", 1);
             }
         }
-        if (pan_mode == 5)
+        default:
         {
-            if (context->GetPanPushMode())
-            {
-                SetMediaTrackInfo_Value(media_track, "D_PAN", 0);
-            }
-            else
-            {
-                SetMediaTrackInfo_Value(media_track, "D_WIDTH", 1);
-            }
+            SetMediaTrackInfo_Value(media_track, "D_PAN", 0);
+        }
         }
     }
 

@@ -53,8 +53,20 @@ protected:
 
         GetTrackUIVolPan(media_track, &volume, &pan1);
         GetTrackUIPan(media_track, &pan1, &pan2, &pan_mode);
+        if (pan_mode < PAN_MODE_STEREO_PAN)
+        {
+            pan_mode = PAN_MODE_BALANCE_PAN;
+        }
+
         *_pan1 = GetPan1String(pan1, pan_mode);
-        *_pan2 = GetPan2String(pan2, pan_mode);
+        if (pan_mode != PAN_MODE_BALANCE_PAN)
+        {
+            *_pan2 = GetPan2String(pan2, pan_mode);
+        }
+        else
+        {
+            *_pan2 = *_pan1;
+        }
 
         *faderValue = int(volToNormalized(volume) * 16383.0);
         *valueBarValue = int(panToNormalized(pan1) * 127);
@@ -158,7 +170,6 @@ public:
                 track->SetDisplayMode(DISPLAY_MODE_2, forceUpdate);
                 track->SetDisplayLine(0, ALIGN_CENTER, DAW::GetTrackName(media_track).c_str(), NON_INVERT, forceUpdate);
                 track->SetDisplayLine(1, ALIGN_CENTER, DAW::GetTrackInputName(media_track).c_str(), NON_INVERT, forceUpdate);
-
                 track->SetDisplayLine(2, ALIGN_CENTER, DAW::GetTrackMonitorMode(media_track).c_str(), NON_INVERT, forceUpdate);
                 track->SetDisplayLine(3, ALIGN_CENTER, DAW::GetTrackRecordingMode(media_track).c_str(), NON_INVERT, forceUpdate);
             }

@@ -12,8 +12,25 @@ enum Features
     FEATURE_PINNED_TRACKS
 };
 
-static std::map<Features, double> feature_versions = {
-    {FEATURE_PINNED_TRACKS, 7.46},
+enum PAN_MODES
+{
+    /**
+     * @brief Default single encoder pan
+     */
+    PAN_MODE_BALANCE_PAN = 3,
+    /**
+     * @brief Width and pan control
+     */
+    PAN_MODE_STEREO_PAN = 5,
+    /**
+     * @brief Left and right pan
+     */
+    PAN_MODE_DUAL_PAN = 6,
+};
+
+static std::map<Features, double>
+    feature_versions = {
+        {FEATURE_PINNED_TRACKS, 7.46},
 };
 
 class DAW

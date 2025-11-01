@@ -86,6 +86,10 @@ int DAW::GetTrackPanMode(MediaTrack *media_track)
 
     GetTrackUIPan(media_track, &pan1, &pan2, &panMode);
 
+    if (panMode < PAN_MODE_STEREO_PAN)
+    {
+        return PAN_MODE_BALANCE_PAN;
+    }
     return panMode;
 }
 
@@ -144,13 +148,13 @@ std::string DAW::GetTrackMonitorMode(MediaTrack *media_track)
     switch (monitorMode)
     {
     case 0:
-        return "Mon OFF";
+        return "Mon: OFF";
 
     case 1:
-        return "Mon ON";
+        return "Mon: ON";
 
     case 2:
-        return "Mon !Play";
+        return "Mon: AUTO";
 
     default:
         return "";
