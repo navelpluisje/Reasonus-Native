@@ -25,6 +25,8 @@ public:
     static void Stop();
 
     static void SetCurrentPage(int page);
+    static void SetMessage(std::string message);
+    void SetLocalMessage(std::string message);
 
     ~ReaSonusV2ControlPanel();
 
@@ -51,6 +53,9 @@ private:
     bool save_clicked = false;
     bool cancel_clicked = false;
     std::vector<std::string> menu_items;
+
+    std::string message = "";
+    int message_timer = 0;
 
     I18n *i18n = I18n::GetInstance();
 };

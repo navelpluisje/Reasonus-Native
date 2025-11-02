@@ -378,15 +378,18 @@ class CSurf_FaderPort : public IReaperControlSurface
   {
     readAndCreateIni(ini, FP_8);
 
+    i18n->SetLanguage(DAW::GetExtState(EXT_STATE_KEY_UI_LANGUAGE, "en-US"));
     context->SetPluginControl(ini["surface"].has("disable-plugins") && ini["surface"]["disable-plugins"] != "1");
+    context->SetDistractionFreeMode(ini["surface"].has("distraction-free") && ini["surface"]["distraction-free"] == "1");
+
     context->SetUntouchAfterLearn(ini["surface"].has("erase-last-param-after-learn") && ini["surface"]["erase-last-param-after-learn"] == "1");
     context->SetMasterFaderModeEnabled(ini["surface"].has("master-fader-mode") && ini["surface"]["master-fader-mode"] == "1");
     context->SetSwapShiftButtons(ini["surface"].has("swap-shift-buttons") && ini["surface"]["swap-shift-buttons"] == "1");
     context->SetFaderReset(ini["surface"].has("fader-reset") && ini["surface"]["fader-reset"] == "1");
     context->SetMuteSoloMomentary(ini["surface"].has("mute-solo-momentary") && ini["surface"]["mute-solo-momentary"] == "1");
+
     context->SetOverwriteTimeCode(ini["surface"].has("overwrite-time-code") && ini["surface"]["overwrite-time-code"] == "1");
     context->SetSurfaceTimeCode(ini["surface"].has("time-code") && std::stoi(ini["surface"]["time-code"]));
-    i18n->SetLanguage(ini["surface"].has("language") ? ini["surface"]["language"] : "en-US");
     context->SetTrackDisplay(ini["displays"].has("track") ? std::stoi(ini["displays"]["track"]) : 8);
   }
 
@@ -398,9 +401,13 @@ public:
 
     /**
      * First we check if we have the ini file. If not we create it with default values
-     *
      */
     readAndCreateIni(ini, FP_8);
+    if (std::string(GIT_VERSION).compare(DAW::GetExtState(EXT_STATE_KEY_VERSION, "")) != 0)
+    {
+      DAW::SetExtState(EXT_STATE_KEY_VERSION, GIT_VERSION, true);
+      I18n::checkLocalesFiles();
+    }
 
     errStats = 0;
     m_midi_in_dev = stoi(ini["surface"]["midiin"]);
@@ -559,16 +566,11 @@ public:
 
         surface_update_lastrun = now;
       }
-      // if ((now - surface_update_keepalive) >= 1200)
-      // {
-      //   faderManager->Refresh(true);
-      //   sessionManager->Refresh(true);
-      //   mixManager->Refresh(true);
-      //   transportManager->Refresh(true);
-      //   automationManager->Refresh(true);
-      //   generalControlManager->Refresh(true);
-      // }
 
+      /**
+       * @brief Life cycle tick for the FaderPort
+       *
+       */
       if ((now - surface_update_keepalive) >= 990)
       {
         surface_update_keepalive = now;
@@ -583,13 +585,12 @@ public:
       if ((now - surface_update_settings_check) >= 1500)
       {
         surface_update_settings_check = now;
-        const char *saved = ::GetExtState(EXT_STATE_SECTION, EXT_STATE_KEY_SAVED_SETTINGS);
-        std::string is_saved = saved;
+        std::string is_saved = DAW::GetExtState(EXT_STATE_KEY_SAVED_SETTINGS, "");
 
         if (is_saved.compare(EXT_STATE_VALUE_TRUE) == 0)
         {
           updateSettings();
-          ::SetExtState(EXT_STATE_SECTION, EXT_STATE_KEY_SAVED_SETTINGS, EXT_STATE_VALUE_FALSE, false);
+          DAW::SetExtState(EXT_STATE_KEY_SAVED_SETTINGS, EXT_STATE_VALUE_FALSE, false);
         }
       }
     }
@@ -603,14 +604,7 @@ public:
 
   void OnTrackSelection(MediaTrack *media_track)
   {
-    int trackId = (int)::GetMediaTrackInfo_Value(media_track, "IP_TRACKNUMBER");
-    /**
-     * Skip the master track selection
-     */
-    if (trackId > -1)
-    {
-      trackNavigator->SetOffset(trackId - 1);
-    }
+    trackNavigator->SetOffsetByTrack(media_track);
   }
 };
 

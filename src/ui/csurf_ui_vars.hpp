@@ -28,7 +28,7 @@ static void PushReaSonusStyle(ImGui_Context *m_ctx)
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_GrabMinSize, 8);
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_GrabRounding, 5);
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_TabRounding, 4);
-    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_TabBorderSize, 0);
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_TabBorderSize, 1);
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_TabBarBorderSize, 1);
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_TableAngledHeadersAngle, 0.610865);
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_TableAngledHeadersTextAlign, 0.5, 0);

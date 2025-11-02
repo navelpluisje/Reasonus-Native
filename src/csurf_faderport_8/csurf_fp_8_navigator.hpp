@@ -125,6 +125,8 @@ public:
 
     int GetOffset();
 
+    void SetOffsetByTrack(MediaTrack *media_track);
+
     void IncrementOffset(int count);
 
     void DecrementOffset(int count);

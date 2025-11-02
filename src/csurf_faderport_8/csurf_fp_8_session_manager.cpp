@@ -47,7 +47,7 @@ protected:
     void SetButtonValues(bool force = false)
     {
         // With shift engaged, blink the selected button
-        Btn_Value valueOn = context->GetShiftLeft() ? BTN_VALUE_BLINK : BTN_VALUE_ON;
+        Btn_Value valueOn = context->GetShiftLeft() && !context->GetDistractionFreeMode() ? BTN_VALUE_BLINK : BTN_VALUE_ON;
 
         channelButton->SetValue(session_type == Channel ? valueOn : BTN_VALUE_OFF, force);
         zoomButton->SetValue(session_type == Zoom ? valueOn : BTN_VALUE_OFF, force);
@@ -106,7 +106,7 @@ public:
         prevButton = new CSurf_Button(BTN_PREV, BTN_VALUE_OFF, m_midiout);
         nextButton = new CSurf_Button(BTN_NEXT, BTN_VALUE_OFF, m_midiout);
     }
-    ~CSurf_FP_8_SessionManager();
+    ~CSurf_FP_8_SessionManager() {};
 
     void Refresh(bool force = false)
     {
@@ -126,6 +126,11 @@ public:
             return;
         }
 
+        if (context->GetShiftRight())
+        {
+            handleFunctionKey("9");
+            return;
+        }
         if (context->GetShiftLeft())
         {
             handleFunctionKey("1");
@@ -142,6 +147,11 @@ public:
             return;
         }
 
+        if (context->GetShiftRight())
+        {
+            handleFunctionKey("10");
+            return;
+        }
         if (context->GetShiftLeft())
         {
             handleFunctionKey("2");
@@ -158,6 +168,11 @@ public:
             return;
         }
 
+        if (context->GetShiftRight())
+        {
+            handleFunctionKey("11");
+            return;
+        }
         if (context->GetShiftLeft())
         {
             handleFunctionKey("3");
@@ -174,6 +189,11 @@ public:
             return;
         }
 
+        if (context->GetShiftRight())
+        {
+            handleFunctionKey("12");
+            return;
+        }
         if (context->GetShiftLeft())
         {
             handleFunctionKey("4");
@@ -190,6 +210,11 @@ public:
             return;
         }
 
+        if (context->GetShiftRight())
+        {
+            handleFunctionKey("13");
+            return;
+        }
         if (context->GetShiftLeft())
         {
             handleFunctionKey("5");
@@ -215,6 +240,11 @@ public:
             return;
         }
 
+        if (context->GetShiftRight())
+        {
+            handleFunctionKey("14");
+            return;
+        }
         if (context->GetShiftLeft())
         {
             handleFunctionKey("6");
@@ -231,6 +261,11 @@ public:
             return;
         }
 
+        if (context->GetShiftRight())
+        {
+            handleFunctionKey("15");
+            return;
+        }
         if (context->GetShiftLeft())
         {
             handleFunctionKey("7");
@@ -252,6 +287,11 @@ public:
             return;
         }
 
+        if (context->GetShiftRight())
+        {
+            handleFunctionKey("16");
+            return;
+        }
         if (context->GetShiftLeft())
         {
             handleFunctionKey("8");
@@ -343,7 +383,6 @@ public:
         case Section:
             context->GetShiftLeft() ? Main_OnCommandEx(40626, 0, 0)               // Time selection: Set end point
                                     : Main_OnCommandStringEx("_SWS_SELNEXTMORR"); // SWS: Goto/select next marker/region
-
             break;
         case Marker:
             Main_OnCommandStringEx("_SWS_SELNEXTMORR"); // SWS: Goto/select next marker/region

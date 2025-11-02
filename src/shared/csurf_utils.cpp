@@ -1,4 +1,5 @@
 #include "../shared/csurf_utils.hpp"
+#include "../shared/csurf.h"
 #include "csurf_daw.hpp"
 #include <WDL/db2val.h>
 #include <WDL/wdltypes.h> // might be unnecessary in future
@@ -241,6 +242,11 @@ std::string GetReaSonusLocalesPath(std::string language)
     return GetReaSonusLocalesFolderPath() + pathSeparator + language + ".ini";
 }
 
+std::string GetReaSonusLocalesRootFile()
+{
+    return std::string(GetResourcePath()) + pathSeparator + "UserPlugins" + pathSeparator + "ReaSonus" + pathSeparator + "en-US.ini";
+}
+
 bool isInteger(std::string value)
 {
     char *p;
@@ -336,7 +342,6 @@ void readAndCreateIni(mINI::INIStructure &data, std::string device)
         RecursiveCreateDirectory((std::string(GetResourcePath()) + pathSeparator + "ReaSonus" + pathSeparator + "Plugins").c_str(), 0);
         data["surface"]["midiin"] = "0";
         data["surface"]["midiout"] = "0";
-        data["surface"]["language"] = "en-US";
         data["surface"]["mute-solo-momentary"] = "0";
         data["functions"]["1"] = "0";
         data["functions"]["2"] = "0";
@@ -351,6 +356,7 @@ void readAndCreateIni(mINI::INIStructure &data, std::string device)
         {
             data["surface"]["surface"] = "0";
             data["surface"]["disable-plugins"] = "0";
+            data["surface"]["distraction-free"] = "0";
             data["surface"]["erase-last-param-after-learn"] = "0";
             data["surface"]["master-fader-mode"] = "0";
             data["surface"]["swap-shift-buttons"] = "0";
@@ -362,6 +368,14 @@ void readAndCreateIni(mINI::INIStructure &data, std::string device)
             data["functions"]["6"] = "0";
             data["functions"]["7"] = "0";
             data["functions"]["8"] = "0";
+            data["functions"]["9"] = "0";
+            data["functions"]["10"] = "0";
+            data["functions"]["11"] = "0";
+            data["functions"]["12"] = "0";
+            data["functions"]["13"] = "0";
+            data["functions"]["14"] = "0";
+            data["functions"]["15"] = "0";
+            data["functions"]["16"] = "0";
             data["filters"]["nb-filters"] = "0";
         }
         file.generate(data, true);
@@ -378,7 +392,6 @@ void validateReaSonusIni(mINI::INIFile file, mINI::INIStructure &data, std::stri
     data["surface"]["midiin"] = data["surface"].has("midiin") ? data["surface"]["midiin"] : "0";
     data["surface"]["midiout"] = data["surface"].has("midiout") ? data["surface"]["midiout"] : "0";
     data["surface"]["mute-solo-momentary"] = data["surface"].has("mute-solo-momentary") ? data["surface"]["mute-solo-momentary"] : "0";
-    data["surface"]["language"] = data["surface"].has("language") ? data["surface"]["language"] : "en-US";
 
     data["functions"]["1"] = data["functions"].has("1") ? data["functions"]["1"] : "0";
     data["functions"]["2"] = data["functions"].has("2") ? data["functions"]["2"] : "0";
@@ -396,6 +409,7 @@ void validateReaSonusIni(mINI::INIFile file, mINI::INIStructure &data, std::stri
     {
         data["surface"]["surface"] = data["surface"].has("surface") ? data["surface"]["surface"] : "0";
         data["surface"]["disable-plugins"] = data["surface"].has("disable-plugins") ? data["surface"]["disable-plugins"] : "0";
+        data["surface"]["distraction-free"] = data["surface"].has("distraction-free") ? data["surface"]["distraction-free"] : "0";
         data["surface"]["erase-last-param-after-learn"] = data["surface"].has("erase-last-param-after-learn") ? data["surface"]["erase-last-param-after-learn"] : "0";
         data["surface"]["master-fader-mode"] = data["surface"].has("master-fader-mode") ? data["surface"]["master-fader-mode"] : "0";
         data["surface"]["swap-shift-buttons"] = data["surface"].has("swap-shift-buttons") ? data["surface"]["swap-shift-buttons"] : "0";
@@ -407,6 +421,14 @@ void validateReaSonusIni(mINI::INIFile file, mINI::INIStructure &data, std::stri
         data["functions"]["6"] = data["functions"].has("6") ? data["functions"]["6"] : "0";
         data["functions"]["7"] = data["functions"].has("7") ? data["functions"]["7"] : "0";
         data["functions"]["8"] = data["functions"].has("8") ? data["functions"]["8"] : "0";
+        data["functions"]["9"] = data["functions"].has("9") ? data["functions"]["9"] : "0";
+        data["functions"]["10"] = data["functions"].has("10") ? data["functions"]["10"] : "0";
+        data["functions"]["11"] = data["functions"].has("11") ? data["functions"]["11"] : "0";
+        data["functions"]["12"] = data["functions"].has("12") ? data["functions"]["12"] : "0";
+        data["functions"]["13"] = data["functions"].has("13") ? data["functions"]["13"] : "0";
+        data["functions"]["14"] = data["functions"].has("14") ? data["functions"]["14"] : "0";
+        data["functions"]["15"] = data["functions"].has("15") ? data["functions"]["15"] : "0";
+        data["functions"]["16"] = data["functions"].has("16") ? data["functions"]["16"] : "0";
         data["filters"]["nb-filters"] = data["filters"].has("nb-filters") ? data["filters"]["nb-filters"] : "0";
     }
 
@@ -480,4 +502,89 @@ double minmax(double min, double value, double max)
            : value > max
                ? max
                : value;
+}
+
+HWND findWindowChildByID(HWND parentHWND, int ID)
+{
+#ifdef _WDL_SWELL
+    if (!ValidatePtr(parentHWND, "HWND"))
+        return nullptr;
+#endif
+    return GetDlgItem(parentHWND, ID);
+}
+
+bool getWindowScrollInfo(void *windowHWND, const char *scrollbar, int *positionOut, int *pageSizeOut, int *minOut, int *maxOut, int *trackPosOut)
+{
+    if (!ValidatePtr(windowHWND, "HWND"))
+    {
+        return false;
+    }
+
+    SCROLLINFO si = {
+        sizeof(SCROLLINFO),
+        SIF_ALL,
+    };
+
+    int nBar = ((strchr(scrollbar, 'v') || strchr(scrollbar, 'V')) ? SB_VERT : SB_HORZ); // Match strings such as "SB_VERT", "VERT" or "v".
+
+    bool isOK = !!CoolSB_GetScrollInfo((HWND)windowHWND, nBar, &si);
+
+    *pageSizeOut = si.nPage;
+    *positionOut = si.nPos;
+    *minOut = si.nMin;
+    *maxOut = si.nMax;
+    *trackPosOut = si.nTrackPos;
+
+    return isOK;
+}
+
+bool setWindowScrollPos(void *windowHWND, const char *scrollbar, int position)
+{
+    bool isOK = false;
+    if (ValidatePtr(windowHWND, "HWND"))
+    {
+        if (strchr(scrollbar, 'v') || strchr(scrollbar, 'V'))
+        {
+            isOK = !!CoolSB_SetScrollPos((HWND)windowHWND, SB_VERT, position, TRUE);
+            if (!isOK)
+            {
+                isOK = !!CoolSB_SetScrollPos((HWND)windowHWND, SB_VERT, position, TRUE);
+            }
+            if (isOK)
+            {
+                SendMessage((HWND)windowHWND, WM_VSCROLL, MAKEWPARAM(SB_THUMBPOSITION, position), 0);
+            }
+        }
+        else
+        {
+            isOK = !!CoolSB_SetScrollPos((HWND)windowHWND, SB_HORZ, position, TRUE);
+            if (!isOK)
+            {
+                isOK = !!CoolSB_SetScrollPos((HWND)windowHWND, SB_HORZ, position, TRUE);
+            }
+            if (isOK)
+            {
+                SendMessage((HWND)windowHWND, WM_HSCROLL, MAKEWPARAM(SB_THUMBPOSITION, position), 0);
+            }
+        }
+    }
+    return isOK;
+}
+
+void GetLanguages(std::vector<std::string> &language_names)
+{
+    std::string locale_path = GetReaSonusLocalesFolderPath();
+    language_names.clear();
+
+    for (const auto &entry : std::filesystem::recursive_directory_iterator(locale_path))
+    {
+        if (entry.is_regular_file() && !entry.is_symlink())
+        {
+            std::filesystem::path path(entry.path());
+            if (path.has_extension() && path.extension() == ".ini")
+            {
+                language_names.push_back((split(path.filename().u8string(), ".").at(0)));
+            }
+        }
+    }
 }

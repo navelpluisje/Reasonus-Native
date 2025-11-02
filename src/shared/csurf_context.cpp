@@ -45,6 +45,10 @@ class CSurf_Context
      */
     int displays_track_display;
     /**
+     * @brief Wether or not to be in distraction free mode
+     */
+    int distraction_free_mode_setting;
+    /**
      * @brief When overwrite is true, this is the timecode used
      */
     bool control_hidde_tracks;
@@ -539,6 +543,16 @@ public:
     int GetFaderDisabled()
     {
         return fader_disabled;
+    }
+
+    void SetDistractionFreeMode(bool value)
+    {
+        distraction_free_mode_setting = value;
+    };
+
+    bool GetDistractionFreeMode()
+    {
+        return distraction_free_mode_setting;
     };
 
     void SetChannelManagerType(ChannelManagerType type)
