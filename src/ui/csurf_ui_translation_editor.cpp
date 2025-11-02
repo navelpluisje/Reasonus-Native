@@ -154,7 +154,10 @@ void ReaSonusTranslationEditor::HandleAddLanguage()
 void ReaSonusTranslationEditor::SaveChanges()
 {
     mINI::INIFile file(GetReaSonusLocalesPath(language_list.at(selected_language)));
-    file.write(translation_file);
+    if (file.write(translation_file))
+    {
+        save_message = "Woohoo! Changes were successfully saved";
+    }
 }
 
 void ReaSonusTranslationEditor::HandleRemoveLanguageListItem(int index)
@@ -190,14 +193,24 @@ void ReaSonusTranslationEditor::getMultilineString(std::string &value, double wi
         {
             int lastSpace = tmp_str.size() - 1;
             while (tmp_str[lastSpace] != ' ' && lastSpace > 0)
+            {
                 lastSpace--;
+            }
+
             if (lastSpace == 0)
+            {
                 lastSpace = tmp_str.size() - 2;
+            }
+
             final_str += tmp_str.substr(0, lastSpace + 1) + "\r\n";
             if (lastSpace + 1 > (int)tmp_str.size())
+            {
                 tmp_str = "";
+            }
             else
+            {
                 tmp_str = tmp_str.substr(lastSpace + 1);
+            }
         }
         curChr++;
     }
@@ -266,19 +279,12 @@ void ReaSonusTranslationEditor::RenderTranslation(std::string section, std::stri
         UiElements::PushReaSonusInputStyle(m_ctx);
         if (ImGui::InputTextMultiline(m_ctx, ("##" + section + key).c_str(), value, 512, width, text_height + 16, ImGui::InputTextFlags_AlwaysOverwrite))
         {
-            // ImGui::GetContentRegionAvail(m_ctx, &width, &height);
             std::string new_value = removeNewLines(value);
 
             if (new_value.compare(translation_file[section][key]) != 0)
             {
                 translation_file[section][key] = new_value;
             }
-
-            // getMultilineString(new_value, width - 16, text_height);
-            // ShowConsoleMsg("\n");
-            // ShowConsoleMsg(new_value.c_str());
-            // ShowConsoleMsg("\n");
-            // strcpy(value, new_value.c_str());
         }
         ImGui::PopTextWrapPos(m_ctx);
         UiElements::PopReaSonusInputStyle(m_ctx);
@@ -290,6 +296,20 @@ void ReaSonusTranslationEditor::RenderTranslation(std::string section, std::stri
 void ReaSonusTranslationEditor::Frame()
 {
     using namespace std::placeholders; // for `_1, _2 etc`
+
+    if (!save_message.empty())
+    {
+        int now = (int)GetTickCount();
+        if (save_message_timer == 0)
+        {
+            save_message_timer = now;
+        }
+        else if ((save_message_timer + 3000) < now)
+        {
+            save_message = "";
+            save_message_timer = 0;
+        }
+    }
 
     if (previous_selected_language != selected_language)
     {
@@ -400,7 +420,7 @@ void ReaSonusTranslationEditor::Frame()
             ImGui::EndChild(m_ctx); // actions_container
         }
 
-        ReaSonusButtonBar(m_ctx, "Save", main_font_bold, &save_clicked, true, &close_clicked, "Close");
+        ReaSonusButtonBar(m_ctx, "Save", main_font_bold, &save_clicked, true, &close_clicked, "Close", &save_message);
 
         UiElements::PopReaSonusWindowStyle(m_ctx);
 
