@@ -156,20 +156,25 @@ public:
     {
         MediaTrack *media_track = trackNavigator->GetControllerTrack();
 
-        int pan_mode = DAW::GetTrackPanMode(media_track);
-        if (pan_mode < 4)
+        switch (DAW::GetTrackPanMode(media_track))
         {
-            SetMediaTrackInfo_Value(media_track, "D_PAN", 0);
-        }
-        if (pan_mode == 6)
-        {
-            SetMediaTrackInfo_Value(media_track, "D_DUALPANL", -1);
-            SetMediaTrackInfo_Value(media_track, "D_DUALPANR", 1);
-        }
-        if (pan_mode == 5)
+        case PAN_MODE_STEREO_PAN:
         {
             SetMediaTrackInfo_Value(media_track, "D_PAN", 0);
             SetMediaTrackInfo_Value(media_track, "D_WIDTH", 1);
+            break;
+        }
+        case PAN_MODE_DUAL_PAN:
+        {
+            SetMediaTrackInfo_Value(media_track, "D_DUALPANL", -1);
+            SetMediaTrackInfo_Value(media_track, "D_DUALPANR", 1);
+            break;
+        }
+        default:
+        {
+
+            SetMediaTrackInfo_Value(media_track, "D_PAN", 0);
+        }
         }
     }
 
@@ -184,13 +189,13 @@ public:
         {
             double newValue = int(panToNormalized(pan2) * 127.0) + val;
             newValue = minmax(0.0, newValue, 127.0);
-            SetMediaTrackInfo_Value(media_track, pan_mode < 6 ? "D_WIDTH" : "D_DUALPANR", normalizedToPan(newValue / 127));
+            SetMediaTrackInfo_Value(media_track, pan_mode != PAN_MODE_DUAL_PAN ? "D_WIDTH" : "D_DUALPANR", normalizedToPan(newValue / 127));
         }
         else
         {
             double newValue = int(panToNormalized(pan1) * 127.0) + val;
             newValue = minmax(0.0, newValue, 127.0);
-            SetMediaTrackInfo_Value(media_track, pan_mode < 6 ? "D_PAN" : "D_DUALPANL", normalizedToPan(newValue / 127));
+            SetMediaTrackInfo_Value(media_track, pan_mode != PAN_MODE_DUAL_PAN ? "D_PAN" : "D_DUALPANL", normalizedToPan(newValue / 127));
         }
     }
 
