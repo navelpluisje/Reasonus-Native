@@ -3,7 +3,7 @@
 #include "../shared/csurf_daw.hpp"
 #include <mini/ini.h>
 
-void CSurf_FP_V2_Navigator::GetAllVisibleTracks(WDL_PtrList<MediaTrack> &tracks, bool &hasSolo, bool &hasMute)
+void CSurf_FP_V2_Navigator::GetAllControllableTracks(WDL_PtrList<MediaTrack> &tracks, bool &hasSolo, bool &hasMute)
 {
     tracks.Empty();
     bool _solo = false;
@@ -61,7 +61,7 @@ MediaTrack *CSurf_FP_V2_Navigator::GetControllerTrack()
         return GetMasterTrack(0);
     }
 
-    GetAllVisibleTracks(tracks, hasSolo, hasMute);
+    GetAllControllableTracks(tracks, hasSolo, hasMute);
 
     if (DAW::IsTrackSelected(tracks.Get(track_offset)))
     {
@@ -97,6 +97,22 @@ void CSurf_FP_V2_Navigator::SetOffset(int offset)
     else
     {
         track_offset = offset;
+    }
+}
+
+void CSurf_FP_V2_Navigator::SetOffsetByTrack(MediaTrack *media_track)
+{
+    int trackId = (int)::GetMediaTrackInfo_Value(media_track, "IP_TRACKNUMBER");
+
+    for (int i = 0; tracks.GetSize(); i++)
+    {
+        int id = (int)::GetMediaTrackInfo_Value(tracks.Get(i), "IP_TRACKNUMBER");
+
+        if (trackId == id)
+        {
+            SetOffset(i);
+            break;
+        }
     }
 }
 
@@ -137,8 +153,30 @@ void CSurf_FP_V2_Navigator::DecrementOffset(int count)
 
 void CSurf_FP_V2_Navigator::UpdateOffset()
 {
+    GetAllControllableTracks(tracks, hasSolo, hasMute);
+
     MediaTrack *media_track = ::GetSelectedTrack(0, 0);
     track_offset = (int)::GetMediaTrackInfo_Value(media_track, "IP_TRACKNUMBER") - 1;
+}
+
+MediaTrack *CSurf_FP_V2_Navigator::GetNextTrack()
+{
+    if (track_offset + 1 > tracks.GetSize())
+    {
+        return tracks.Get(track_offset);
+    }
+    track_offset += 1;
+    return tracks.Get(track_offset);
+}
+
+MediaTrack *CSurf_FP_V2_Navigator::GetPreviousTrack()
+{
+    if (track_offset - 1 < 0)
+    {
+        return tracks.Get(track_offset);
+    }
+    track_offset -= 1;
+    return tracks.Get(track_offset - 1);
 }
 
 bool CSurf_FP_V2_Navigator::HasTracksWithSolo()

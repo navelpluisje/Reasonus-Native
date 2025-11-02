@@ -404,8 +404,15 @@ public:
 
   void OnTrackSelection(MediaTrack *media_track)
   {
-    int trackId = (int)::GetMediaTrackInfo_Value(media_track, "IP_TRACKNUMBER");
-    trackNavigator->SetOffset(trackId - 1);
+    if (!context->GetControlHiddenTracks())
+    {
+      trackNavigator->SetOffsetByTrack(media_track);
+    }
+    else
+    {
+      int trackId = (int)::GetMediaTrackInfo_Value(media_track, "IP_TRACKNUMBER");
+      trackNavigator->SetOffset(trackId - 1);
+    }
   }
 };
 

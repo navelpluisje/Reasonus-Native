@@ -85,7 +85,8 @@ void CSurf_FP_V2_TrackManager::UpdateTrack()
     }
     else
     {
-        if (!context->GetFaderDisabled())
+        logInteger("GetFaderDisabled", context->GetFaderDisabled());
+        if (context->GetFaderDisabled())
         {
             track->SetFaderValue(faderValue, forceUpdate);
         }
