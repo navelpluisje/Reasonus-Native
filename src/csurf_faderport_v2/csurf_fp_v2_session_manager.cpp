@@ -358,7 +358,7 @@ public:
         {
         case Pan:
             context->GetShiftLeft() ? DAW::EditUndo()
-                                    : Main_OnCommandEx(40286, 0, 0); // Track: Go to previous track
+                                    : DAW::SetUniqueSelectedTrack(trackNavigator->GetPreviousTrack());
             break;
         case Channel:
             context->GetShiftLeft() ? DAW::EditUndo()
@@ -370,11 +370,11 @@ public:
             break;
         case Scroll:
             context->GetShiftLeft() ? DAW::EditUndo()
-                                    : Main_OnCommandEx(40286, 0, 0); // Track: Go to previous track
+                                    : DAW::SetUniqueSelectedTrack(trackNavigator->GetPreviousTrack());
             break;
         case Master:
             context->GetShiftLeft() ? DAW::EditUndo()
-                                    : Main_OnCommandEx(40286, 0, 0); // Track: Go to previous track
+                                    : DAW::SetUniqueSelectedTrack(trackNavigator->GetPreviousTrack());
             break;
         case Click:
             context->GetShiftLeft() ? DAW::EditUndo()
@@ -405,7 +405,7 @@ public:
         {
         case Pan:
             context->GetShiftLeft() ? DAW::EditRedo()
-                                    : Main_OnCommandEx(40285, 0, 0); // Track: Go to next track
+                                    : DAW::SetUniqueSelectedTrack(trackNavigator->GetNextTrack());
             break;
         case Channel:
             context->GetShiftLeft() ? DAW::EditRedo()
@@ -417,11 +417,11 @@ public:
             break;
         case Scroll:
             context->GetShiftLeft() ? DAW::EditRedo()
-                                    : Main_OnCommandEx(40285, 0, 0); // Track: Go to next track
+                                    : DAW::SetUniqueSelectedTrack(trackNavigator->GetNextTrack());
             break;
         case Master:
             context->GetShiftLeft() ? DAW::EditRedo()
-                                    : Main_OnCommandEx(40285, 0, 0); // Track: Go to next track
+                                    : DAW::SetUniqueSelectedTrack(trackNavigator->GetNextTrack());
             break;
         case Click:
             context->GetShiftLeft() ? DAW::EditRedo()
