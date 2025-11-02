@@ -60,7 +60,8 @@ protected:
                             : session_type == Pan
                                 ? valueOn
                                 : BTN_VALUE_OFF);
-        channelButton->SetValue(session_type == Channel ? valueOn : BTN_VALUE_OFF);
+        channelButton->SetValue(session_type == Channel ? valueOn
+                                                        : BTN_VALUE_OFF);
         scrollButton->SetValue(session_type == Scroll
                                    ? valueOn
                                : session_type == Zoom
@@ -77,7 +78,7 @@ protected:
         MediaTrack *media_track = trackNavigator->GetControllerTrack();
         ButtonColor color = DAW::GetTrackColor(media_track);
 
-        channelButton->SetColor(color);
+        channelButton->SetColor(context->GetShiftLeft() && context->GetFaderDisabled() ? ButtonColorYellow : color);
         linkButton->SetColor(context->GetShiftLeft() ? ButtonColorYellow : ButtonColorGreen);
         panButton->SetColor(context->GetShiftLeft() ? ButtonColorYellow : ButtonColorWhite);
         scrollButton->SetColor(session_type == Zoom ? ButtonColorYellow : ButtonColorWhite);
