@@ -132,6 +132,7 @@ protected:
             {
                 SetMediaTrackInfo_Value(media_track, "D_WIDTH", 1);
             }
+            break;
         }
         case PAN_MODE_DUAL_PAN:
         {
@@ -143,6 +144,7 @@ protected:
             {
                 SetMediaTrackInfo_Value(media_track, "D_DUALPANR", 1);
             }
+            break;
         }
         default:
         {
