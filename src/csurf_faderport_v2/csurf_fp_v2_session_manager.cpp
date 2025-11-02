@@ -60,7 +60,8 @@ protected:
                             : session_type == Pan
                                 ? valueOn
                                 : BTN_VALUE_OFF);
-        channelButton->SetValue(session_type == Channel ? valueOn : BTN_VALUE_OFF);
+        channelButton->SetValue(session_type == Channel ? valueOn
+                                                        : BTN_VALUE_OFF);
         scrollButton->SetValue(session_type == Scroll
                                    ? valueOn
                                : session_type == Zoom
@@ -77,7 +78,7 @@ protected:
         MediaTrack *media_track = trackNavigator->GetControllerTrack();
         ButtonColor color = DAW::GetTrackColor(media_track);
 
-        channelButton->SetColor(color);
+        channelButton->SetColor(context->GetShiftLeft() && context->GetFaderDisabled() ? ButtonColorYellow : color);
         linkButton->SetColor(context->GetShiftLeft() ? ButtonColorYellow : ButtonColorGreen);
         panButton->SetColor(context->GetShiftLeft() ? ButtonColorYellow : ButtonColorWhite);
         scrollButton->SetColor(session_type == Zoom ? ButtonColorYellow : ButtonColorWhite);
@@ -131,7 +132,7 @@ public:
         prevButton = new CSurf_Button(BTN_PREV, BTN_VALUE_OFF, m_midiout);
         nextButton = new CSurf_Button(BTN_NEXT, BTN_VALUE_OFF, m_midiout);
     }
-    ~CSurf_FP_V2_SessionManager();
+    ~CSurf_FP_V2_SessionManager() {};
 
     void Refresh()
     {
@@ -242,8 +243,9 @@ public:
             return;
         }
 
-        if (context->GetShiftLeft())
+        if (context->GetShiftLeft() && context->GetCanDisableFader())
         {
+            context->SetFaderDisabled(!context->GetFaderDisabled());
             return;
         }
 
@@ -355,7 +357,7 @@ public:
             break;
         case Channel:
             context->GetShiftLeft() ? DAW::EditUndo()
-                                    : Main_OnCommandEx(40286, 0, 0); // Track: Go to previous track
+                                    : DAW::SetUniqueSelectedTrack(trackNavigator->GetPreviousTrack());
             break;
         case Zoom:
             context->GetShiftLeft() ? Main_OnCommandEx(40112, 0, 0) // View: Zoom out vertical
@@ -402,7 +404,7 @@ public:
             break;
         case Channel:
             context->GetShiftLeft() ? DAW::EditRedo()
-                                    : Main_OnCommandEx(40285, 0, 0); // Track: Go to next track
+                                    : DAW::SetUniqueSelectedTrack(trackNavigator->GetNextTrack());
             break;
         case Zoom:
             context->GetShiftLeft() ? Main_OnCommandEx(40111, 0, 0) // View: Zoom in vertical

@@ -225,6 +225,7 @@ class CSurf_FaderPortV2 : public IReaperControlSurface
     i18n->SetLanguage(DAW::GetExtState(EXT_STATE_KEY_UI_LANGUAGE, "en-US"));
     context->SetMuteSoloMomentary(ini["surface"].has("mute-solo-momentary") && ini["surface"]["mute-solo-momentary"] == "1");
     context->SetControlHiddenTracks(ini["surface"].has("control-hidden-tracks") && ini["surface"]["control-hidden-tracks"] == "1");
+    context->SetCanDisableFader(ini["surface"].has("can-disable-fader") && ini["surface"]["can-disable-fader"] == "1");
   }
 
 public:
@@ -360,7 +361,7 @@ public:
     if (m_midiout)
     {
       DWORD now = GetTickCount();
-      if ((now - surface_update_lastrun) >= 100)
+      if ((now - surface_update_lastrun) >= 10)
       {
         trackManager->UpdateTrack();
         generalControlManager->Update();
@@ -403,8 +404,15 @@ public:
 
   void OnTrackSelection(MediaTrack *media_track)
   {
-    int trackId = (int)::GetMediaTrackInfo_Value(media_track, "IP_TRACKNUMBER");
-    trackNavigator->SetOffset(trackId - 1);
+    if (!context->GetControlHiddenTracks())
+    {
+      trackNavigator->SetOffsetByTrack(media_track);
+    }
+    else
+    {
+      int trackId = (int)::GetMediaTrackInfo_Value(media_track, "IP_TRACKNUMBER");
+      trackNavigator->SetOffset(trackId - 1);
+    }
   }
 };
 

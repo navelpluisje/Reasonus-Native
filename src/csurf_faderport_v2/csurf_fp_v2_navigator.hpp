@@ -19,7 +19,7 @@ class CSurf_FP_V2_Navigator
 
     void UpdateMixerPosition();
 
-    void GetAllVisibleTracks(WDL_PtrList<MediaTrack> &tracks, bool &hasSolo, bool &hasMute);
+    void GetAllControllableTracks(WDL_PtrList<MediaTrack> &tracks, bool &hasSolo, bool &hasMute);
 
 public:
     CSurf_FP_V2_Navigator(CSurf_Context *context);
@@ -30,6 +30,8 @@ public:
 
     void SetOffset(int offset);
 
+    void SetOffsetByTrack(MediaTrack *media_track);
+
     int GetOffset();
 
     void IncrementOffset(int count);
@@ -37,6 +39,10 @@ public:
     void DecrementOffset(int count);
 
     void UpdateOffset();
+
+    MediaTrack *GetNextTrack();
+
+    MediaTrack *GetPreviousTrack();
 
     bool HasTracksWithSolo();
 

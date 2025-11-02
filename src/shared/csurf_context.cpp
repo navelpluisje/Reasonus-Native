@@ -53,6 +53,14 @@ class CSurf_Context
      */
     bool control_hidde_tracks;
     /**
+     * @brief Wether or not the fader can be disabled
+     */
+    bool can_disable_fader;
+    /**
+     * @brief Wether or not the fader on the V2 is disabled
+     */
+    bool fader_disabled;
+    /**
      * @brief Number of channels
      */
     int nbChannels = 8;
@@ -193,6 +201,16 @@ public:
     bool GetControlHiddenTracks()
     {
         return control_hidde_tracks;
+    }
+
+    void SetCanDisableFader(bool value)
+    {
+        can_disable_fader = value;
+    }
+
+    bool GetCanDisableFader()
+    {
+        return can_disable_fader;
     }
 
     void SetShiftLeft(bool val)
@@ -516,6 +534,16 @@ public:
     {
         return pluginEditParamId;
     };
+
+    void SetFaderDisabled(bool value)
+    {
+        fader_disabled = value;
+    };
+
+    int GetFaderDisabled()
+    {
+        return fader_disabled;
+    }
 
     void SetDistractionFreeMode(bool value)
     {

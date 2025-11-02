@@ -350,6 +350,7 @@ void readAndCreateIni(mINI::INIStructure &data, std::string device)
         if (device == FP_V2)
         {
             data["surface"]["control-hidden-tracks"] = "0";
+            data["surface"]["can-disable-fader"] = "0";
         }
         if (device == FP_8)
         {
@@ -400,6 +401,7 @@ void validateReaSonusIni(mINI::INIFile file, mINI::INIStructure &data, std::stri
     if (device == FP_V2)
     {
         data["surface"]["control-hidden-tracks"] = data["surface"].has("control-hidden-tracks") ? data["surface"]["control-hidden-tracks"] : "0";
+        data["surface"]["can-disable-fader"] = data["surface"].has("can-disable-fader") ? data["surface"]["can-disable-fader"] : "0";
         ;
     }
 
