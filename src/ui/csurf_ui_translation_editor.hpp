@@ -54,6 +54,8 @@ private:
     bool show_translation_key = false;
     bool save_clicked = false;
     bool close_clicked = false;
+    std::string save_message = "";
+    int save_message_timer = 0;
 };
 
 #endif
