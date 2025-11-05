@@ -3,8 +3,35 @@
 
 #include <reaper_plugin.h>
 #include <string>
+#include <map>
 #include <vector>
 #include "../controls/csurf_color_button_colors.hpp"
+
+enum Features
+{
+    FEATURE_PINNED_TRACKS
+};
+
+enum PAN_MODES
+{
+    /**
+     * @brief Default single encoder pan
+     */
+    PAN_MODE_BALANCE_PAN = 3,
+    /**
+     * @brief Width and pan control
+     */
+    PAN_MODE_STEREO_PAN = 5,
+    /**
+     * @brief Left and right pan
+     */
+    PAN_MODE_DUAL_PAN = 6,
+};
+
+static std::map<Features, double>
+    feature_versions = {
+        {FEATURE_PINNED_TRACKS, 7.46},
+};
 
 class DAW
 {
@@ -22,6 +49,7 @@ public:
     static void ToggleTrackSoloed(MediaTrack *media_track);
     static bool IsTrackSelected(MediaTrack *media_track);
     static bool IsTrackParent(MediaTrack *media_track);
+    static bool IsTrackPinned(MediaTrack *media_track);
 
     static int GetTrackPanMode(MediaTrack *media_track);
     static std::string GetTrackName(MediaTrack *media_track);
@@ -38,6 +66,7 @@ public:
     static void SetTrackPan1(MediaTrack *media_track, double value);
     static void SetTrackPan2(MediaTrack *media_track, double value);
     static void SetTrackVolume(MediaTrack *media_track, double value);
+    static double GetTrackVolume(MediaTrack *media_track);
 
     /**
      * Track plugins
@@ -124,6 +153,21 @@ public:
     static void EditSave();
     static void EditUndo();
     static void EditRedo();
+
+    /**
+     * Window related
+     */
+    static void SetTcpScroll(MediaTrack *media_track);
+
+    static int GetPinnedTracksHeight();
+
+    static bool VersionHasFeature(Features feature);
+
+    /**
+     * Ext State
+     */
+    static std::string GetExtState(std::string key, std::string default_value);
+    static void SetExtState(std::string key, std::string value, bool persist);
 };
 
 #endif

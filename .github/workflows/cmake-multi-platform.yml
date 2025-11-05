@@ -17,14 +17,6 @@ jobs:
         include:
           - os: macos-latest
             arch: arm64;x86_64
-          # - os: ubuntu-latest
-          #   arch: x86_64
-          # - os: ubuntu-latest
-          #   arch: aarch64
-          # - os: ubuntu-latest
-          #   arch: i686
-          # - os: ubuntu-latest
-          #   arch: armv7l
           - os: windows-latest
             arch: x64
             win_build_type: RelWithDebInfo
@@ -143,8 +135,22 @@ jobs:
             ./*.exe
             ./*.pkg
 
+  locales:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: reasonus-native-ini
+          path: |
+            ./src/i18n/locales/en-US.ini
+
   release:
-    needs: build
+    needs: [build, locales]
     runs-on: ubuntu-latest
     steps:
       - name: Download artifact
@@ -164,3 +170,4 @@ jobs:
           files: |
             ./**/*.dll
             ./**/*.dylib
+            ./**/*.ini

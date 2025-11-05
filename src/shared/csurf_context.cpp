@@ -45,9 +45,21 @@ class CSurf_Context
      */
     int displays_track_display;
     /**
+     * @brief Wether or not to be in distraction free mode
+     */
+    int distraction_free_mode_setting;
+    /**
      * @brief When overwrite is true, this is the timecode used
      */
     bool control_hidde_tracks;
+    /**
+     * @brief Wether or not the fader can be disabled
+     */
+    bool can_disable_fader;
+    /**
+     * @brief Wether or not the fader on the V2 is disabled
+     */
+    bool fader_disabled;
     /**
      * @brief Number of channels
      */
@@ -189,6 +201,16 @@ public:
     bool GetControlHiddenTracks()
     {
         return control_hidde_tracks;
+    }
+
+    void SetCanDisableFader(bool value)
+    {
+        can_disable_fader = value;
+    }
+
+    bool GetCanDisableFader()
+    {
+        return can_disable_fader;
     }
 
     void SetShiftLeft(bool val)
@@ -511,6 +533,26 @@ public:
     int GetPluginEditParamId()
     {
         return pluginEditParamId;
+    };
+
+    void SetFaderDisabled(bool value)
+    {
+        fader_disabled = value;
+    };
+
+    int GetFaderDisabled()
+    {
+        return fader_disabled;
+    }
+
+    void SetDistractionFreeMode(bool value)
+    {
+        distraction_free_mode_setting = value;
+    };
+
+    bool GetDistractionFreeMode()
+    {
+        return distraction_free_mode_setting;
     };
 
     void SetChannelManagerType(ChannelManagerType type)

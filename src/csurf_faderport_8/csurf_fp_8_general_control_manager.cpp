@@ -61,14 +61,14 @@ protected:
             macroButton->SetValue(ReaSonus8ControlPanel::control_panel_open ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
         }
 
-        soloClearButton->SetValue(hasSolo ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
-        muteClearButton->SetValue(hasMute ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
-        linkButton->SetValue(context->GetLastTouchedFxMode()
-                                 ? BTN_VALUE_ON
-                             : context->GetChannelMode() == PluginEditMode
-                                 ? BTN_VALUE_BLINK
-                                 : BTN_VALUE_OFF,
-                             force);
+        soloClearButton->SetValue(hasSolo && !context->GetDistractionFreeMode() ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+        muteClearButton->SetValue(hasMute && !context->GetDistractionFreeMode() ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+        linkButton->SetValue(
+            ButtonOnBlinkOff(
+                context->GetLastTouchedFxMode(),
+                context->GetChannelMode() == PluginEditMode,
+                context->GetDistractionFreeMode()),
+            force);
         shiftLeftButton->SetValue(((!context->GetSwapShiftButtons() && context->GetShiftLeft()) || (context->GetShiftRight() && context->GetSwapShiftButtons()))
                                       ? BTN_VALUE_ON
                                       : BTN_VALUE_OFF,
@@ -81,8 +81,12 @@ protected:
         int pan_mode;
         MediaTrack *media_track = GetSelectedTrack(0, 0);
         GetTrackUIPan(media_track, &pan1, &pan2, &pan_mode);
+        if (pan_mode < PAN_MODE_STEREO_PAN)
+        {
+            pan_mode = PAN_MODE_BALANCE_PAN;
+        }
 
-        if (pan_mode < 4)
+        if (pan_mode == PAN_MODE_BALANCE_PAN)
         {
             double newValue = int(panToNormalized(pan1) * 127.0) + val;
             newValue = minmax(0.0, newValue, 127.0);
@@ -116,23 +120,9 @@ protected:
     {
         MediaTrack *media_track = GetSelectedTrack(0, 0);
 
-        int pan_mode = DAW::GetTrackPanMode(media_track);
-        if (pan_mode < 4 && !context->GetPanPushMode())
+        switch (DAW::GetTrackPanMode(media_track))
         {
-            SetMediaTrackInfo_Value(media_track, "D_PAN", 0);
-        }
-        if (pan_mode == 6)
-        {
-            if (context->GetPanPushMode())
-            {
-                SetMediaTrackInfo_Value(media_track, "D_DUALPANL", -1);
-            }
-            else
-            {
-                SetMediaTrackInfo_Value(media_track, "D_DUALPANR", 1);
-            }
-        }
-        if (pan_mode == 5)
+        case PAN_MODE_STEREO_PAN:
         {
             if (context->GetPanPushMode())
             {
@@ -142,6 +132,24 @@ protected:
             {
                 SetMediaTrackInfo_Value(media_track, "D_WIDTH", 1);
             }
+            break;
+        }
+        case PAN_MODE_DUAL_PAN:
+        {
+            if (context->GetPanPushMode())
+            {
+                SetMediaTrackInfo_Value(media_track, "D_DUALPANL", -1);
+            }
+            else
+            {
+                SetMediaTrackInfo_Value(media_track, "D_DUALPANR", 1);
+            }
+            break;
+        }
+        default:
+        {
+            SetMediaTrackInfo_Value(media_track, "D_PAN", 0);
+        }
         }
     }
 

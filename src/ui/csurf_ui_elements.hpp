@@ -30,10 +30,6 @@ public:
 
     static void PopReaSonusFieldGroupStyle(ImGui_Context *m_ctx);
 
-    static void PushReaSonusMenuButtonStyle(ImGui_Context *m_ctx);
-
-    static void PopReaSonusMenuButtonStyle(ImGui_Context *m_ctx);
-
     static void PushReaSonusButtonStyle(ImGui_Context *m_ctx, ImGui_Font *button_font);
 
     static void PopReaSonusButtonStyle(ImGui_Context *m_ctx);
@@ -45,6 +41,10 @@ public:
     static void PushReaSonusInputStyle(ImGui_Context *m_ctx);
 
     static void PopReaSonusInputStyle(ImGui_Context *m_ctx);
+
+    static void PushReaSonusButtonBarMessageStyle(ImGui_Context *m_ctx);
+
+    static void PopReaSonusButtonBarMessageStyle(ImGui_Context *m_ctx);
 
     static void PushReaSonusComboStyle(ImGui_Context *m_ctx);
 
@@ -93,6 +93,18 @@ public:
     static void PushReaSonusChannelTabStyle(ImGui_Context *m_ctx, bool active);
 
     static void PopReaSonusChannelTabStyle(ImGui_Context *m_ctx);
+
+    static void PushReaSonusTabBarStyle(ImGui_Context *m_ctx);
+
+    static void PopReaSonusTabBarStyle(ImGui_Context *m_ctx);
+
+    static void PushReaSonusTabStyle(ImGui_Context *m_ctx, bool selected);
+
+    static void PopReaSonusTabStyle(ImGui_Context *m_ctx);
+
+    static void PushReaSonusTranslationItemStyle(ImGui_Context *m_ctx);
+
+    static void PopReaSonusTranslationItemStyle(ImGui_Context *m_ctx);
 };
 
 #endif

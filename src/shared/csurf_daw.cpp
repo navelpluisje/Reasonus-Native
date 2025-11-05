@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include "../shared/csurf_utils.hpp"
+#include "csurf.h"
 
 int DAW::sendModes[3] = {0, 1, 3};
 
@@ -73,6 +74,11 @@ bool DAW::IsTrackParent(MediaTrack *media_track)
     return (int)GetMediaTrackInfo_Value(media_track, "I_FOLDERDEPTH") == 1;
 }
 
+bool DAW::IsTrackPinned(MediaTrack *media_track)
+{
+    return (int)GetMediaTrackInfo_Value(media_track, "B_TCPPIN") == 1;
+}
+
 int DAW::GetTrackPanMode(MediaTrack *media_track)
 {
     int panMode = 0;
@@ -80,6 +86,10 @@ int DAW::GetTrackPanMode(MediaTrack *media_track)
 
     GetTrackUIPan(media_track, &pan1, &pan2, &panMode);
 
+    if (panMode < PAN_MODE_STEREO_PAN)
+    {
+        return PAN_MODE_BALANCE_PAN;
+    }
     return panMode;
 }
 
@@ -138,13 +148,13 @@ std::string DAW::GetTrackMonitorMode(MediaTrack *media_track)
     switch (monitorMode)
     {
     case 0:
-        return "Mon OFF";
+        return "Mon: OFF";
 
     case 1:
-        return "Mon ON";
+        return "Mon: ON";
 
     case 2:
-        return "Mon !Play";
+        return "Mon: AUTO";
 
     default:
         return "";
@@ -264,6 +274,14 @@ void DAW::SetTrackPan2(MediaTrack *media_track, double value)
 void DAW::SetTrackVolume(MediaTrack *media_track, double value)
 {
     CSurf_SetSurfaceVolume(media_track, CSurf_OnVolumeChange(media_track, value, false), NULL);
+}
+
+double DAW::GetTrackVolume(MediaTrack *media_track)
+{
+    double volume, pan1 = 0.0;
+    GetTrackUIVolPan(media_track, &volume, &pan1);
+
+    return volume;
 }
 
 /************************************************************************
@@ -752,4 +770,65 @@ void DAW::EditUndo()
 void DAW::EditRedo()
 {
     ::Undo_DoRedo2(0);
+}
+
+/************************************************************************
+ * Window Related
+ ************************************************************************/
+void DAW::SetTcpScroll(MediaTrack *media_track)
+{
+    PreventUIRefresh(1);
+    // Get the y position of the provideed track relative to the top of the Arrange view
+    int track_tcpy = GetMediaTrackInfo_Value(media_track, "I_TCPY");
+    // Get the main window
+    HWND mainHWND = GetMainHwnd();
+    // Get the Arrange view
+    HWND arrangeHWND = findWindowChildByID(mainHWND, 1000);
+    // Get the scroll position and other data of the Arrange view
+    int scroll_position, scroll_pageSize, scroll_min, scroll_max, scroll_track_pos;
+
+    int pinned_tracks_height = VersionHasFeature(FEATURE_PINNED_TRACKS) ? GetPinnedTracksHeight() : 0;
+    bool done = getWindowScrollInfo(arrangeHWND, "v", &scroll_position, &scroll_pageSize, &scroll_min, &scroll_max, &scroll_track_pos);
+
+    if (done)
+    {
+        // Set the new Arrange scroll position
+        setWindowScrollPos(arrangeHWND, "v", track_tcpy + scroll_position - pinned_tracks_height);
+    }
+
+    PreventUIRefresh(-1);
+}
+
+int DAW::GetPinnedTracksHeight()
+{
+    MediaTrack *media_track;
+    int pinned_height = 0;
+
+    for (int i = 0; i < ::GetNumTracks(); i++)
+    {
+        media_track = ::GetTrack(0, i);
+        if (IsTrackPinned(media_track))
+        {
+            pinned_height += GetMediaTrackInfo_Value(media_track, "I_TCPH");
+        }
+    }
+
+    // Return the actual height plus the gap
+    return pinned_height + 10;
+}
+
+bool DAW::VersionHasFeature(Features feature)
+{
+    double current_version = std::stod(::GetAppVersion());
+    return current_version >= feature_versions[feature];
+}
+
+std::string DAW::GetExtState(std::string key, std::string default_value)
+{
+    return ::HasExtState(EXT_STATE_SECTION, key.c_str()) ? ::GetExtState(EXT_STATE_SECTION, key.c_str()) : default_value;
+}
+
+void DAW::SetExtState(std::string key, std::string value, bool persist)
+{
+    ::SetExtState(EXT_STATE_SECTION, key.c_str(), value.c_str(), persist);
 }

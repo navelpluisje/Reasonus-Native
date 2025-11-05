@@ -22,6 +22,7 @@
 #include "csurf_fp_v2_general_control_manager.cpp"
 #include "csurf_fp_v2_navigator.hpp"
 #include "csurf_fp_v2_ui_init.hpp"
+#include "../i18n/i18n.hpp"
 
 extern HWND g_hwnd;
 extern REAPER_PLUGIN_HINSTANCE g_hInst;
@@ -45,6 +46,8 @@ class CSurf_FaderPortV2 : public IReaperControlSurface
   DWORD surface_update_settings_check;
 
   mINI::INIStructure ini;
+
+  I18n *i18n = I18n::GetInstance();
 
   WDL_String descspace;
   char configtmp[1024];
@@ -219,8 +222,10 @@ class CSurf_FaderPortV2 : public IReaperControlSurface
   {
     readAndCreateIni(ini, FP_V2);
 
+    i18n->SetLanguage(DAW::GetExtState(EXT_STATE_KEY_UI_LANGUAGE, "en-US"));
     context->SetMuteSoloMomentary(ini["surface"].has("mute-solo-momentary") && ini["surface"]["mute-solo-momentary"] == "1");
     context->SetControlHiddenTracks(ini["surface"].has("control-hidden-tracks") && ini["surface"]["control-hidden-tracks"] == "1");
+    context->SetCanDisableFader(ini["surface"].has("can-disable-fader") && ini["surface"]["can-disable-fader"] == "1");
   }
 
 public:
@@ -232,8 +237,12 @@ public:
     /**
      * First we check if we have the ini file. If not we create it with default values
      */
-    mINI::INIStructure ini;
     readAndCreateIni(ini, FP_V2);
+    if (std::string(GIT_VERSION).compare(DAW::GetExtState(EXT_STATE_KEY_VERSION, "")) != 0)
+    {
+      DAW::SetExtState(EXT_STATE_KEY_VERSION, GIT_VERSION, true);
+      I18n::checkLocalesFiles();
+    }
 
     errStats = 0;
     m_midi_in_dev = stoi(ini["surface"]["midiin"]);
@@ -352,7 +361,7 @@ public:
     if (m_midiout)
     {
       DWORD now = GetTickCount();
-      if ((now - surface_update_lastrun) >= 100)
+      if ((now - surface_update_lastrun) >= 10)
       {
         trackManager->UpdateTrack();
         generalControlManager->Update();
@@ -377,13 +386,12 @@ public:
       if ((now - surface_update_settings_check) >= 1500)
       {
         surface_update_settings_check = now;
-        const char *saved = ::GetExtState(EXT_STATE_SECTION, EXT_STATE_KEY_SAVED_SETTINGS);
-        std::string is_saved = saved;
+        std::string is_saved = DAW::GetExtState(EXT_STATE_KEY_SAVED_SETTINGS, "");
 
         if (is_saved.compare(EXT_STATE_VALUE_TRUE) == 0)
         {
           updateSettings();
-          ::SetExtState(EXT_STATE_SECTION, EXT_STATE_KEY_SAVED_SETTINGS, EXT_STATE_VALUE_FALSE, false);
+          DAW::SetExtState(EXT_STATE_KEY_SAVED_SETTINGS, EXT_STATE_VALUE_FALSE, false);
         }
       }
     }
@@ -396,8 +404,15 @@ public:
 
   void OnTrackSelection(MediaTrack *media_track)
   {
-    int trackId = (int)::GetMediaTrackInfo_Value(media_track, "IP_TRACKNUMBER");
-    trackNavigator->SetOffset(trackId - 1);
+    if (!context->GetControlHiddenTracks())
+    {
+      trackNavigator->SetOffsetByTrack(media_track);
+    }
+    else
+    {
+      int trackId = (int)::GetMediaTrackInfo_Value(media_track, "IP_TRACKNUMBER");
+      trackNavigator->SetOffset(trackId - 1);
+    }
   }
 };
 

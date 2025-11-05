@@ -242,11 +242,17 @@ std::string GetSendModeString(int sendMode);
  */
 std::string GetAutomationString(int automationMode);
 
+std::string GetReaSonusFolderPath();
 std::string GetReaSonusIniPath(std::string device);
 
 std::string GetReaSonusZonesPath();
 
 std::string GetReaSonusPluginPath(std::string developer, std::string pluginName, bool create = false);
+
+std::string GetReaSonusLocalesFolderPath();
+std::string GetReaSonusLocalesPath(std::string language);
+
+std::string GetReaSonusLocalesRootFile();
 
 bool isInteger(std::string value);
 
@@ -296,5 +302,49 @@ bool IsWantedParam(std::string param_name);
 
 int minmax(int min, int value, int max);
 double minmax(double min, double value, double max);
+
+/**
+ * @brief borrowed from https://github.com/juliansader/ReaExtensions
+ *
+ * @param parentHWND
+ * @param ID
+ * @return HWND
+ */
+HWND findWindowChildByID(HWND parentHWND, int ID);
+
+/**
+ * @brief Get the Window Scroll Info object
+ *
+ * borrowed from https://github.com/juliansader/ReaExtensions
+ *
+ * @param windowHWND
+ * @param scrollbar
+ * @param positionOut
+ * @param pageSizeOut
+ * @param minOut
+ * @param maxOut
+ * @param trackPosOut
+ * @return true
+ * @return false
+ */
+bool getWindowScrollInfo(void *windowHWND, const char *scrollbar, int *positionOut, int *pageSizeOut, int *minOut, int *maxOut, int *trackPosOut);
+
+/**
+ * @brief Set the window scroll position
+ *
+ * borrowed from https://github.com/juliansader/ReaExtensions
+ *
+ * @param windowHWND
+ * @param scrollbar
+ * @param position
+ * @return true
+ * @return false
+ */
+bool setWindowScrollPos(void *windowHWND, const char *scrollbar, int position);
+
+/**
+ * @brief Get a list with all the avaiulable ini translation files
+ */
+void GetLanguages(std::vector<std::string> &language_names);
 
 #endif // CSURF_UTILS_H_

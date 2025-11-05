@@ -48,7 +48,7 @@ protected:
     void SetButtonValues()
     {
         // With shift engaged, blink the selected button
-        Btn_Value valueOn = context->GetShiftLeft() ? BTN_VALUE_BLINK : BTN_VALUE_ON;
+        Btn_Value valueOn = context->GetShiftLeft() && !context->GetDistractionFreeMode() ? BTN_VALUE_BLINK : BTN_VALUE_ON;
 
         linkButton->SetValue(GetToggleCommandStringState("_REASONUS_TOGGLE_PLAY_CURSOR_COMMAND") && context->GetShiftLeft()
                                  ? BTN_VALUE_ON
@@ -60,7 +60,8 @@ protected:
                             : session_type == Pan
                                 ? valueOn
                                 : BTN_VALUE_OFF);
-        channelButton->SetValue(session_type == Channel ? valueOn : BTN_VALUE_OFF);
+        channelButton->SetValue(session_type == Channel ? valueOn
+                                                        : BTN_VALUE_OFF);
         scrollButton->SetValue(session_type == Scroll
                                    ? valueOn
                                : session_type == Zoom
@@ -77,7 +78,7 @@ protected:
         MediaTrack *media_track = trackNavigator->GetControllerTrack();
         ButtonColor color = DAW::GetTrackColor(media_track);
 
-        channelButton->SetColor(color);
+        channelButton->SetColor(context->GetShiftLeft() && context->GetFaderDisabled() ? ButtonColorYellow : color);
         linkButton->SetColor(context->GetShiftLeft() ? ButtonColorYellow : ButtonColorGreen);
         panButton->SetColor(context->GetShiftLeft() ? ButtonColorYellow : ButtonColorWhite);
         scrollButton->SetColor(session_type == Zoom ? ButtonColorYellow : ButtonColorWhite);
@@ -131,7 +132,7 @@ public:
         prevButton = new CSurf_Button(BTN_PREV, BTN_VALUE_OFF, m_midiout);
         nextButton = new CSurf_Button(BTN_NEXT, BTN_VALUE_OFF, m_midiout);
     }
-    ~CSurf_FP_V2_SessionManager();
+    ~CSurf_FP_V2_SessionManager() {};
 
     void Refresh()
     {
@@ -155,20 +156,25 @@ public:
     {
         MediaTrack *media_track = trackNavigator->GetControllerTrack();
 
-        int pan_mode = DAW::GetTrackPanMode(media_track);
-        if (pan_mode < 4)
+        switch (DAW::GetTrackPanMode(media_track))
         {
-            SetMediaTrackInfo_Value(media_track, "D_PAN", 0);
-        }
-        if (pan_mode == 6)
-        {
-            SetMediaTrackInfo_Value(media_track, "D_DUALPANL", -1);
-            SetMediaTrackInfo_Value(media_track, "D_DUALPANR", 1);
-        }
-        if (pan_mode == 5)
+        case PAN_MODE_STEREO_PAN:
         {
             SetMediaTrackInfo_Value(media_track, "D_PAN", 0);
             SetMediaTrackInfo_Value(media_track, "D_WIDTH", 1);
+            break;
+        }
+        case PAN_MODE_DUAL_PAN:
+        {
+            SetMediaTrackInfo_Value(media_track, "D_DUALPANL", -1);
+            SetMediaTrackInfo_Value(media_track, "D_DUALPANR", 1);
+            break;
+        }
+        default:
+        {
+
+            SetMediaTrackInfo_Value(media_track, "D_PAN", 0);
+        }
         }
     }
 
@@ -183,13 +189,13 @@ public:
         {
             double newValue = int(panToNormalized(pan2) * 127.0) + val;
             newValue = minmax(0.0, newValue, 127.0);
-            SetMediaTrackInfo_Value(media_track, pan_mode < 6 ? "D_WIDTH" : "D_DUALPANR", normalizedToPan(newValue / 127));
+            SetMediaTrackInfo_Value(media_track, pan_mode != PAN_MODE_DUAL_PAN ? "D_WIDTH" : "D_DUALPANR", normalizedToPan(newValue / 127));
         }
         else
         {
             double newValue = int(panToNormalized(pan1) * 127.0) + val;
             newValue = minmax(0.0, newValue, 127.0);
-            SetMediaTrackInfo_Value(media_track, pan_mode < 6 ? "D_PAN" : "D_DUALPANL", normalizedToPan(newValue / 127));
+            SetMediaTrackInfo_Value(media_track, pan_mode != PAN_MODE_DUAL_PAN ? "D_PAN" : "D_DUALPANL", normalizedToPan(newValue / 127));
         }
     }
 
@@ -242,8 +248,9 @@ public:
             return;
         }
 
-        if (context->GetShiftLeft())
+        if (context->GetShiftLeft() && context->GetCanDisableFader())
         {
+            context->SetFaderDisabled(!context->GetFaderDisabled());
             return;
         }
 
@@ -351,11 +358,11 @@ public:
         {
         case Pan:
             context->GetShiftLeft() ? DAW::EditUndo()
-                                    : Main_OnCommandEx(40286, 0, 0); // Track: Go to previous track
+                                    : DAW::SetUniqueSelectedTrack(trackNavigator->GetPreviousTrack());
             break;
         case Channel:
             context->GetShiftLeft() ? DAW::EditUndo()
-                                    : Main_OnCommandEx(40286, 0, 0); // Track: Go to previous track
+                                    : DAW::SetUniqueSelectedTrack(trackNavigator->GetPreviousTrack());
             break;
         case Zoom:
             context->GetShiftLeft() ? Main_OnCommandEx(40112, 0, 0) // View: Zoom out vertical
@@ -363,11 +370,11 @@ public:
             break;
         case Scroll:
             context->GetShiftLeft() ? DAW::EditUndo()
-                                    : Main_OnCommandEx(40286, 0, 0); // Track: Go to previous track
+                                    : DAW::SetUniqueSelectedTrack(trackNavigator->GetPreviousTrack());
             break;
         case Master:
             context->GetShiftLeft() ? DAW::EditUndo()
-                                    : Main_OnCommandEx(40286, 0, 0); // Track: Go to previous track
+                                    : DAW::SetUniqueSelectedTrack(trackNavigator->GetPreviousTrack());
             break;
         case Click:
             context->GetShiftLeft() ? DAW::EditUndo()
@@ -398,11 +405,11 @@ public:
         {
         case Pan:
             context->GetShiftLeft() ? DAW::EditRedo()
-                                    : Main_OnCommandEx(40285, 0, 0); // Track: Go to next track
+                                    : DAW::SetUniqueSelectedTrack(trackNavigator->GetNextTrack());
             break;
         case Channel:
             context->GetShiftLeft() ? DAW::EditRedo()
-                                    : Main_OnCommandEx(40285, 0, 0); // Track: Go to next track
+                                    : DAW::SetUniqueSelectedTrack(trackNavigator->GetNextTrack());
             break;
         case Zoom:
             context->GetShiftLeft() ? Main_OnCommandEx(40111, 0, 0) // View: Zoom in vertical
@@ -410,11 +417,11 @@ public:
             break;
         case Scroll:
             context->GetShiftLeft() ? DAW::EditRedo()
-                                    : Main_OnCommandEx(40285, 0, 0); // Track: Go to next track
+                                    : DAW::SetUniqueSelectedTrack(trackNavigator->GetNextTrack());
             break;
         case Master:
             context->GetShiftLeft() ? DAW::EditRedo()
-                                    : Main_OnCommandEx(40285, 0, 0); // Track: Go to next track
+                                    : DAW::SetUniqueSelectedTrack(trackNavigator->GetNextTrack());
             break;
         case Click:
             context->GetShiftLeft() ? DAW::EditRedo()

@@ -16,18 +16,19 @@ class CSurf_FP_8_TrackManager : public CSurf_FP_8_ChannelManager
 {
     int mute_start[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     int solo_start[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    DoubleClickState touch_start[16] = {{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}};
+    int touch_start[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 protected:
     bool has_last_touched_fx_enabled = false;
+    bool has_touch_mode = false;
 
     void SetTrackColors(MediaTrack *media_track) override
     {
-        int red = 0xff;
+        int red = 0x7f;
         int green = 0x00;
         int blue = 0x00;
 
-        if (!context->GetArm())
+        if (!context->GetArm() && !(DAW::IsTrackArmed(media_track) && context->GetDistractionFreeMode()))
         {
 
             int track_color = ::GetTrackColor(media_track);
@@ -52,8 +53,20 @@ protected:
 
         GetTrackUIVolPan(media_track, &volume, &pan1);
         GetTrackUIPan(media_track, &pan1, &pan2, &pan_mode);
+        if (pan_mode < PAN_MODE_STEREO_PAN)
+        {
+            pan_mode = PAN_MODE_BALANCE_PAN;
+        }
+
         *_pan1 = GetPan1String(pan1, pan_mode);
-        *_pan2 = GetPan2String(pan2, pan_mode);
+        if (pan_mode != PAN_MODE_BALANCE_PAN)
+        {
+            *_pan2 = GetPan2String(pan2, pan_mode);
+        }
+        else
+        {
+            *_pan2 = *_pan1;
+        }
 
         *faderValue = int(volToNormalized(volume) * 16383.0);
         *valueBarValue = int(panToNormalized(pan1) * 127);
@@ -127,15 +140,20 @@ public:
             bool is_armed = DAW::IsTrackArmed(media_track);
 
             GetFaderValue(media_track, &fader_value, &value_bar_value, &strPan1, &strPan2);
-            Btn_Value select_value = (context->GetArm() && is_armed) || (!context->GetArm() && is_selected) ? BTN_VALUE_ON
-                                                                                                            : BTN_VALUE_OFF;
+            Btn_Value select_value = (context->GetArm() && is_armed) || (!context->GetArm() && is_selected)
+                                         ? BTN_VALUE_ON
+                                         : BTN_VALUE_OFF;
 
             track->SetTrackColor(color);
             // If the track is armed always blink as an indication it is armed
-            track->SetSelectButtonValue((!context->GetArm() && is_armed) ? BTN_VALUE_BLINK : select_value, forceUpdate);
+            track->SetSelectButtonValue(!context->GetArm() && is_armed
+                                            ? ButtonConditionalBlink(!context->GetDistractionFreeMode(), !context->GetArm() && is_armed)
+                                            : select_value,
+                                        forceUpdate);
             track->SetMuteButtonValue(DAW::IsTrackMuted(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
             track->SetSoloButtonValue(DAW::IsTrackSoloed(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
-            track->SetFaderValue(fader_value, forceUpdate);
+
+            track->SetFaderValue(fader_value, forceUpdate || has_touch_mode);
             track->SetValueBarMode(context->GetArm() ? VALUEBAR_MODE_FILL : VALUEBAR_MODE_BIPOLAR);
             track->SetValueBarValue(value_bar_value);
 
@@ -152,7 +170,6 @@ public:
                 track->SetDisplayMode(DISPLAY_MODE_2, forceUpdate);
                 track->SetDisplayLine(0, ALIGN_CENTER, DAW::GetTrackName(media_track).c_str(), NON_INVERT, forceUpdate);
                 track->SetDisplayLine(1, ALIGN_CENTER, DAW::GetTrackInputName(media_track).c_str(), NON_INVERT, forceUpdate);
-
                 track->SetDisplayLine(2, ALIGN_CENTER, DAW::GetTrackMonitorMode(media_track).c_str(), NON_INVERT, forceUpdate);
                 track->SetDisplayLine(3, ALIGN_CENTER, DAW::GetTrackRecordingMode(media_track).c_str(), NON_INVERT, forceUpdate);
             }
@@ -254,16 +271,20 @@ public:
 
     void HandleFaderTouch(int index, int value) override
     {
-        (void)value;
-        if (!context->GetFaderReset())
+        MediaTrack *media_track = navigator->GetTrackByIndex(index);
+
+        if (context->GetShiftChannelLeft() && context->GetFaderReset())
         {
-            return;
+            DAW::SetTrackVolume(media_track, 1.0);
         }
 
-        if (context->GetShiftChannelLeft())
+        if (::GetTrackAutomationMode(media_track) == AUTOMATION_TOUCH)
         {
-            MediaTrack *media_track = navigator->GetTrackByIndex(index);
-            DAW::SetTrackVolume(media_track, 1.0);
+            touch_start[index] = value > 0;
+            if (touch_start[index])
+            {
+                DAW::SetTrackVolume(media_track, DAW::GetTrackVolume(media_track));
+            }
         }
     }
 

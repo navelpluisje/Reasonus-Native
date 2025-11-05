@@ -24,11 +24,11 @@ static void reportError_8(const ImGui_Error &e)
 ReaSonus8ControlPanel::ReaSonus8ControlPanel()
     : m_ctx{}
 {
-    menu_items.push_back("Function Keys");
-    menu_items.push_back("Custom Filters");
-    menu_items.push_back("Plugin Mapping");
-    menu_items.push_back("Settings");
-    menu_items.push_back("About ReaSonus");
+    menu_items.push_back("menu.functions");
+    menu_items.push_back("menu.filters");
+    menu_items.push_back("menu.plugin");
+    menu_items.push_back("menu.settings");
+    menu_items.push_back("menu.about");
 
     ImGui::init(plugin_getapi);
     m_ctx = ImGui::CreateContext(g_name);
@@ -147,6 +147,19 @@ std::string ReaSonus8ControlPanel::GetPageStringProperty(int type)
     return "";
 }
 
+void ReaSonus8ControlPanel::SetMessage(std::string message)
+{
+    if (fp8_inst)
+    {
+        return fp8_inst->SetLocalMessage(message);
+    }
+}
+
+void ReaSonus8ControlPanel::SetLocalMessage(std::string _message)
+{
+    message = _message;
+}
+
 void ReaSonus8ControlPanel::Loop()
 {
     try
@@ -199,6 +212,27 @@ void ReaSonus8ControlPanel::Frame()
 {
     double space_x, space_y, width, height;
 
+    if (!message.empty())
+    {
+        int now = (int)GetTickCount();
+        if (message_timer == 0)
+        {
+            message_timer = now;
+        }
+        else if ((message_timer + 3000) < now)
+        {
+            message = "";
+            message_timer = 0;
+        }
+    }
+
+    if (ImGui::IsKeyDown(m_ctx, ImGui::Key_Escape))
+    {
+        control_panel_open = false;
+        SetActionState("_REASONUS_SHOW_REASONUS_8_CONTROL_WINDOW");
+        return fp8_inst.reset();
+    }
+
     SetPageContent();
 
     if (save_clicked)
@@ -231,15 +265,15 @@ void ReaSonus8ControlPanel::Frame()
             {
                 ImGui::Image(m_ctx, logo, 200, 52);
 
-                ReaSonusMenuButton(m_ctx, menu_items[0], main_font_bold, icon_function_actions, FUNCTIONS_PAGE, &current_page);
-                ReaSonusMenuButton(m_ctx, menu_items[1], main_font_bold, icon_custom_filters, FILTERS_PAGE, &current_page);
-                ReaSonusMenuButton(m_ctx, menu_items[2], main_font_bold, icon_plugin_mapping, MAPPING_PAGE, &current_page);
-                ReaSonusMenuButton(m_ctx, menu_items[3], main_font_bold, icon_settings, SETTINGS_PAGE, &current_page);
-                ReaSonusMenuButton(m_ctx, menu_items[4], main_font_bold, icon_about, ABOUT_PAGE, &current_page);
+                ReaSonusMenuButton(m_ctx, i18n->t("control-panel", menu_items[0]), main_font_bold, icon_function_actions, FUNCTIONS_PAGE, &current_page);
+                ReaSonusMenuButton(m_ctx, i18n->t("control-panel", menu_items[1]), main_font_bold, icon_custom_filters, FILTERS_PAGE, &current_page);
+                ReaSonusMenuButton(m_ctx, i18n->t("control-panel", menu_items[2]), main_font_bold, icon_plugin_mapping, MAPPING_PAGE, &current_page);
+                ReaSonusMenuButton(m_ctx, i18n->t("control-panel", menu_items[3]), main_font_bold, icon_settings, SETTINGS_PAGE, &current_page);
+                ReaSonusMenuButton(m_ctx, i18n->t("control-panel", menu_items[4]), main_font_bold, icon_about, ABOUT_PAGE, &current_page);
 
                 ImGui::EndChild(m_ctx);
             }
-            // TODO: Move this to the bottom
+
             ImGui::Text(m_ctx, GIT_VERSION);
 
             ImGui::EndChild(m_ctx);
@@ -250,9 +284,9 @@ void ReaSonus8ControlPanel::Frame()
         if (ImGui::BeginChild(m_ctx, "main_content", 0.0, 0.0, ImGui::ChildFlags_FrameStyle))
         {
             UiElements::PopReaSonusContentStyle(m_ctx);
-            if (ImGui::BeginChild(m_ctx, "main_content_area", 0.0, -34.0, ImGui::ChildFlags_None))
+            if (ImGui::BeginChild(m_ctx, "main_content_area", 0.0, current_page != 4 ? -34.0 : 0, ImGui::ChildFlags_None))
             {
-                ReaSonusPageTitle(m_ctx, menu_items[current_page], main_font_bold);
+                ReaSonusPageTitle(m_ctx, i18n->t("control-panel", menu_items[current_page]), main_font_bold);
 
                 if (ImGui::BeginChild(m_ctx, "main_content_area", 0.0, -12.0, ImGui::ChildFlags_None))
                 {
@@ -261,7 +295,18 @@ void ReaSonus8ControlPanel::Frame()
                 }
                 ImGui::EndChild(m_ctx);
             }
-            ReaSonusButtonBar(m_ctx, "Save", main_font_bold, &save_clicked, true, &cancel_clicked, "Cancel");
+            if (current_page != 4)
+            {
+                ReaSonusButtonBar(
+                    m_ctx,
+                    i18n->t("control-panel", "button.save"),
+                    main_font_bold,
+                    &save_clicked,
+                    true,
+                    &cancel_clicked,
+                    i18n->t("control-panel", "button.cancel"),
+                    &message);
+            }
             ImGui::EndChild(m_ctx);
         }
 

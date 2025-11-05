@@ -320,8 +320,10 @@ void CSurf_FP_8_Navigator::HandleTracksAllFoldersFilter()
 
 void CSurf_FP_8_Navigator::UpdateMixerPosition()
 {
-    MediaTrack *media_track = GetTrack(0, track_offset);
+    WDL_PtrList<MediaTrack> bank = GetBankTracks();
+    MediaTrack *media_track = bank.Get(0);
     SetMixerScroll(media_track);
+    DAW::SetTcpScroll(media_track);
 };
 
 CSurf_FP_8_Navigator::CSurf_FP_8_Navigator(CSurf_Context *context) : context(context)
@@ -397,6 +399,22 @@ void CSurf_FP_8_Navigator::SetOffset(int offset)
 int CSurf_FP_8_Navigator::GetOffset()
 {
     return track_offset;
+}
+
+void CSurf_FP_8_Navigator::SetOffsetByTrack(MediaTrack *media_track)
+{
+    int trackId = (int)::GetMediaTrackInfo_Value(media_track, "IP_TRACKNUMBER");
+
+    for (int i = 0; tracks.GetSize(); i++)
+    {
+        int id = (int)::GetMediaTrackInfo_Value(tracks.Get(i), "IP_TRACKNUMBER");
+
+        if (trackId == id)
+        {
+            SetOffset(i);
+            break;
+        }
+    }
 }
 
 void CSurf_FP_8_Navigator::IncrementOffset(int count)
