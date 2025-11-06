@@ -2,13 +2,13 @@
 #define CSURF_FP_8_FADER_MANAGER_H_
 
 #include "csurf_fp_8_track_manager.cpp"
-#include "csurf_fp_8_plugins_manager.cpp"
+#include "csurf_fp_8_hui_plugins_manager.cpp"
 #include "csurf_fp_8_track_plugins_manager.cpp"
-#include "csurf_fp_8_sends_manager.cpp"
+#include "csurf_fp_8_hui_sends_manager.cpp"
 #include "csurf_fp_8_track_sends_manager.cpp"
-#include "csurf_fp_8_receives_manager.cpp"
+#include "csurf_fp_8_hui_receives_manager.cpp"
 #include "csurf_fp_8_track_receives_manager.cpp"
-#include "csurf_fp_8_pan_manager.cpp"
+#include "csurf_fp_8_track_pan_manager.cpp"
 #include "../shared/csurf_context.cpp"
 #include "../controls/csurf_button.hpp"
 #include "csurf_fp_8_track.hpp"

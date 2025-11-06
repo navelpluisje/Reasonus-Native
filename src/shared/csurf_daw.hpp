@@ -28,6 +28,13 @@ enum PAN_MODES
     PAN_MODE_DUAL_PAN = 6,
 };
 
+enum SEND_MODES
+{
+    SEND_MODE_RECEIVE = -1,
+    SEND_MODE_SEND = 0,
+    SEND_MODE_HARDWARE = 1,
+};
+
 static std::map<Features, double>
     feature_versions = {
         {FEATURE_PINNED_TRACKS, 7.46},
