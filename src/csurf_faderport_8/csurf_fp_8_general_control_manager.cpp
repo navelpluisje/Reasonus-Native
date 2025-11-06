@@ -35,7 +35,7 @@ protected:
     bool hasSelectedBypass;
     bool hasGlobalBypass;
     bool followCursor;
-    bool lastTouchedFxMode;
+    bool last_touched_fx_mode;
 
     bool functionsDialogOpen;
 
@@ -185,7 +185,7 @@ public:
         hasSelectedBypass = (bool)GetToggleCommandState(8);
         hasGlobalBypass = (bool)GetToggleCommandState(40344);
         followCursor = GetToggleCommandStringState("_REASONUS_TOGGLE_PLAY_CURSOR_COMMAND");
-        lastTouchedFxMode = context->GetLastTouchedFxMode();
+        last_touched_fx_mode = context->GetLastTouchedFxMode();
         functionsDialogOpen = ReaSonus8ControlPanel::control_panel_open && ReaSonus8ControlPanel::current_page == ReaSonus8ControlPanel::FUNCTIONS_PAGE;
 
         SetButtonValue();
@@ -205,6 +205,19 @@ public:
             return;
         }
 
+        if (context->GetAddSendReceiveMode() > -1)
+        {
+            bool is_receive_mode = context->GetChannelMode() == ReceiveMode || context->GetChannelMode() == TrackReceiveMode;
+            MediaTrack *src_track = is_receive_mode ? GetTrack(0, context->GetCurrentSelectedSendReceive()) : trackNavigator->GetTrackByIndex(context->GetAddSendReceiveMode());
+            MediaTrack *dest_track = is_receive_mode ? trackNavigator->GetTrackByIndex(context->GetAddSendReceiveMode()) : GetTrack(0, context->GetCurrentSelectedSendReceive());
+
+            if (CreateTrackSend(src_track, dest_track) > -1)
+            {
+                context->SetAddSendReceiveMode(-1);
+            }
+            return;
+                }
+
         if (context->GetChannelMode() == MenuMode)
         {
             faderManager->HandleEncoderPush();
@@ -223,6 +236,14 @@ public:
 
     void HandleEncoderChange(int value)
     {
+        if (context->GetAddSendReceiveMode() > -1)
+        {
+            hasBit(value, 6)
+                ? context->DecrementCurrentSelectedSendReceive()
+                : context->IncrementCurrentSelectedSendReceive();
+            return;
+        }
+
         if (context->GetChannelMode() == MenuMode)
         {
             hasBit(value, 6)
