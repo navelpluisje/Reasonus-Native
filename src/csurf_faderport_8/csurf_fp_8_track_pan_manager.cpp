@@ -1,7 +1,6 @@
 #ifndef CSURF_FP_8_PAN_MANAGER_C_
 #define CSURF_FP_8_PAN_MANAGER_C_
 
-#include <WDL/ptrlist.h>
 #include "csurf_fp_8_track.hpp"
 #include "csurf_fp_8_channel_manager.hpp"
 #include "csurf_fp_8_navigator.hpp"
