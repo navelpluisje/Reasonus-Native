@@ -27,11 +27,11 @@ protected:
 
     void SetButtonValue(bool force = false)
     {
-        mixAudioButton->SetValue(trackFilter == TrackWithAudioFilter ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+        mixAudioButton->SetValue((trackFilter == TrackWithAudioFilter || trackFilter == TrackSendsFilter || trackFilter == TrackReceivesFilter) ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
         mixViButton->SetValue((trackFilter == TrackInstrumentsFilter || trackFilter == TrackWithMidiFilter) ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
         mixBusButton->SetValue((trackFilter == TrackTopFoldersFilter || trackFilter == TrackAllFoldersFilter || trackFilter == TrackHarwareOutputFilter) ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
-        mixVcaButton->SetValue((trackFilter == TrackIsVcaFilter || trackFilter == TrackReceivesFilter || trackFilter == TrackEffectsFilter) ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
-        mixAllButton->SetValue((trackFilter == TrackAllFilter || trackFilter == TrackCustomFilter || trackFilter == TrackSendsFilter) ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+        mixVcaButton->SetValue((trackFilter == TrackIsVcaFilter || trackFilter == TrackEffectsFilter) ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+        mixAllButton->SetValue((trackFilter == TrackAllFilter || trackFilter == TrackCustomFilter) ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
         shiftRightButton->SetValue(((!context->GetSwapShiftButtons() && context->GetShiftRight()) || (context->GetShiftLeft() && context->GetSwapShiftButtons()))
                                        ? BTN_VALUE_ON
                                        : BTN_VALUE_OFF,
@@ -77,10 +77,26 @@ public:
         {
             return;
         }
+        if (context->GetShiftRight())
+        {
+            mixAudioButton->SetColor(ButtonColorGreen);
+            trackFilter = TrackReceivesFilter;
+            trackNavigator->HandleFilter(TrackReceivesFilter);
+        }
+        else if (context->GetShiftLeft())
+        {
+            mixAllButton->SetColor(ButtonColorYellow);
+            trackFilter = TrackSendsFilter;
+            trackNavigator->HandleFilter(TrackSendsFilter);
+            faderManager->ResetMixButtonClick();
+        }
+        else
+        {
+            mixAudioButton->SetColor(ButtonColorWhite);
+            trackFilter = TrackWithAudioFilter;
+            trackNavigator->HandleFilter(TrackWithAudioFilter);
+        }
 
-        mixAudioButton->SetColor(ButtonColorWhite);
-        trackFilter = TrackWithAudioFilter;
-        trackNavigator->HandleFilter(TrackWithAudioFilter);
         faderManager->ResetMixButtonClick();
         SetButtonValue();
     }
@@ -104,6 +120,7 @@ public:
             trackFilter = TrackInstrumentsFilter;
             trackNavigator->HandleFilter(TrackInstrumentsFilter);
         }
+
         faderManager->ResetMixButtonClick();
         SetButtonValue();
     }
@@ -133,6 +150,7 @@ public:
             trackFilter = TrackTopFoldersFilter;
             trackNavigator->HandleFilter(TrackTopFoldersFilter);
         }
+
         faderManager->ResetMixButtonClick();
         SetButtonValue();
     }
@@ -144,13 +162,7 @@ public:
             return;
         }
 
-        if (context->GetShiftRight())
-        {
-            mixVcaButton->SetColor(ButtonColorGreen);
-            trackFilter = TrackReceivesFilter;
-            trackNavigator->HandleFilter(TrackReceivesFilter);
-        }
-        else if (context->GetShiftLeft())
+        if (context->GetShiftLeft())
         {
             mixVcaButton->SetColor(ButtonColorYellow);
             trackFilter = TrackEffectsFilter;
@@ -176,9 +188,8 @@ public:
         if (context->GetShiftRight())
         {
             mixAllButton->SetColor(ButtonColorGreen);
-            trackFilter = TrackSendsFilter;
-            trackNavigator->HandleFilter(TrackSendsFilter);
-            faderManager->ResetMixButtonClick();
+            trackFilter = TrackCustomFilter;
+            faderManager->HandleMixAllButtonClick();
         }
         else if (context->GetShiftLeft())
         {
@@ -191,8 +202,9 @@ public:
             mixAllButton->SetColor(ButtonColorWhite);
             trackFilter = TrackAllFilter;
             trackNavigator->HandleFilter(TrackAllFilter);
-            faderManager->ResetMixButtonClick();
         }
+
+        faderManager->ResetMixButtonClick();
         SetButtonValue();
     }
 
