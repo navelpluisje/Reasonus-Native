@@ -178,4 +178,5 @@ jobs:
           files: |
             ./**/*.dll
             ./**/*.dylib
+            ./**/*.so
             ./**/*.ini
