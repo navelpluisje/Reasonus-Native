@@ -41,9 +41,10 @@ public:
 
     virtual void UpdateTracks() {};
 
-    virtual void HandleSelectClick(int index)
+    virtual void HandleSelectClick(int index, int value)
     {
         (void)index;
+        (void)value;
     };
 
     virtual void HandleMuteClick(int index, int value)

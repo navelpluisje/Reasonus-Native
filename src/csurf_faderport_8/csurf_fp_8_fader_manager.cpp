@@ -311,7 +311,7 @@ void CSurf_FP_8_FaderManager::HandleEncoderPush()
 {
     if (context->IsChannelMode(MenuMode))
     {
-        channelManager->HandleSelectClick(0);
+        channelManager->HandleSelectClick(0, 1);
     }
 }
 
@@ -339,13 +339,11 @@ void CSurf_FP_8_FaderManager::HandleSoloClick(int index, int value)
 
 void CSurf_FP_8_FaderManager::HandleSelectClick(int index, int value)
 {
-    if (value == 0)
+    channelManager->HandleSelectClick(index, value);
+    if (!navigator->GetMultiSelectFilter())
     {
-        return;
+        ResetMixButtonClick();
     }
-
-    channelManager->HandleSelectClick(index);
-    ResetMixButtonClick();
 }
 
 void CSurf_FP_8_FaderManager::HandleFaderMove(int index, int msb, int lsb)

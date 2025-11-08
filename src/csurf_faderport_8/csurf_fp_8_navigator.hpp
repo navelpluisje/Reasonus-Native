@@ -2,9 +2,11 @@
 #define CSURF_FP_8_NAVIGATOR_H_
 
 #include <WDL/ptrlist.h>
-#include "../shared/csurf_context.cpp"
+#include <mini/ini.h>
 #include <map>
 #include <reaper_plugin.h>
+#include "../shared/csurf_utils.hpp"
+#include "../shared/csurf_context.cpp"
 
 enum NavigatorFilter
 {
@@ -53,12 +55,14 @@ enum NavigatorFilter
      */
     TrackIsVcaFilter,
     TrackCustomFilter,
+    TrackCustomMultiSelectFilter,
 };
 
 class CSurf_FP_8_Navigator
 {
     int track_offset = 0;
     CSurf_Context *context;
+    mINI::INIStructure ini;
 
     WDL_PtrList<MediaTrack> tracks;
     bool hasSolo;
@@ -81,6 +85,8 @@ class CSurf_FP_8_Navigator
         false,
         false,
     };
+    bool multi_select_filter = false;
+    std::vector<int> selected_filters = {};
 
     void UpdateMixerPosition();
 
@@ -112,6 +118,8 @@ class CSurf_FP_8_Navigator
 
     void HandleTracksCustomFilter(std::string filter);
 
+    void HandleTrackCustomMultiSelectFilter();
+
 public:
     CSurf_FP_8_Navigator(CSurf_Context *context);
 
@@ -142,6 +150,20 @@ public:
     void HandleCustomFilter(std::string filterName);
 
     void SetTrackTouched(int index, bool value);
+
+    void SetMultiSelectFilter(bool value);
+
+    bool GetMultiSelectFilter();
+
+    void AddFilter(int filter_index);
+
+    void ToggleFilter(int filter_index);
+
+    void RemoveFilter(int filter_index);
+
+    bool HasFilter(int filter_index);
+
+    void HandleMultiSelectFilter();
 };
 
 #endif
