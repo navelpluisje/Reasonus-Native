@@ -190,7 +190,6 @@ public:
         {
             return;
         }
-        // navigator->HandleMultiSelectFilter();
 
         if (context->GetShiftRight())
         {
