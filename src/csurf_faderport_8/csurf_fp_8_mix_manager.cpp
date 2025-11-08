@@ -47,6 +47,12 @@ protected:
         mixAllButton->SetColor(ButtonColorWhite, force);
     }
 
+    void SetTrackFilter(NavigatorFilter filter)
+    {
+        trackFilter = filter;
+        trackNavigator->SetMultiSelectFilter(filter == TrackCustomMultiSelectFilter);
+    }
+
 public:
     CSurf_FP_8_MixManager(
         CSurf_Context *context,
@@ -80,20 +86,20 @@ public:
         if (context->GetShiftRight())
         {
             mixAudioButton->SetColor(ButtonColorGreen);
-            trackFilter = TrackReceivesFilter;
+            SetTrackFilter(TrackReceivesFilter);
             trackNavigator->HandleFilter(TrackReceivesFilter);
         }
         else if (context->GetShiftLeft())
         {
             mixAllButton->SetColor(ButtonColorYellow);
-            trackFilter = TrackSendsFilter;
+            SetTrackFilter(TrackSendsFilter);
             trackNavigator->HandleFilter(TrackSendsFilter);
             faderManager->ResetMixButtonClick();
         }
         else
         {
             mixAudioButton->SetColor(ButtonColorWhite);
-            trackFilter = TrackWithAudioFilter;
+            SetTrackFilter(TrackWithAudioFilter);
             trackNavigator->HandleFilter(TrackWithAudioFilter);
         }
 
@@ -111,13 +117,13 @@ public:
         if (context->GetShiftLeft())
         {
             mixViButton->SetColor(ButtonColorYellow);
-            trackFilter = TrackWithMidiFilter;
+            SetTrackFilter(TrackWithMidiFilter);
             trackNavigator->HandleFilter(TrackWithMidiFilter);
         }
         else
         {
             mixViButton->SetColor(ButtonColorWhite);
-            trackFilter = TrackInstrumentsFilter;
+            SetTrackFilter(TrackInstrumentsFilter);
             trackNavigator->HandleFilter(TrackInstrumentsFilter);
         }
 
@@ -135,19 +141,19 @@ public:
         if (context->GetShiftRight())
         {
             mixBusButton->SetColor(ButtonColorGreen);
-            trackFilter = TrackAllFoldersFilter;
+            SetTrackFilter(TrackAllFoldersFilter);
             trackNavigator->HandleFilter(TrackAllFoldersFilter);
         }
         else if (context->GetShiftLeft())
         {
             mixBusButton->SetColor(ButtonColorYellow);
-            trackFilter = TrackHarwareOutputFilter;
+            SetTrackFilter(TrackHarwareOutputFilter);
             trackNavigator->HandleFilter(TrackHarwareOutputFilter);
         }
         else
         {
             mixBusButton->SetColor(ButtonColorWhite);
-            trackFilter = TrackTopFoldersFilter;
+            SetTrackFilter(TrackTopFoldersFilter);
             trackNavigator->HandleFilter(TrackTopFoldersFilter);
         }
 
@@ -165,13 +171,13 @@ public:
         if (context->GetShiftLeft())
         {
             mixVcaButton->SetColor(ButtonColorYellow);
-            trackFilter = TrackEffectsFilter;
+            SetTrackFilter(TrackEffectsFilter);
             trackNavigator->HandleFilter(TrackEffectsFilter);
         }
         else
         {
             mixVcaButton->SetColor(ButtonColorWhite);
-            trackFilter = TrackIsVcaFilter;
+            SetTrackFilter(TrackIsVcaFilter);
             trackNavigator->HandleFilter(TrackIsVcaFilter);
         }
         faderManager->ResetMixButtonClick();
@@ -187,24 +193,33 @@ public:
 
         if (context->GetShiftRight())
         {
-            mixAllButton->SetColor(ButtonColorGreen);
-            trackFilter = TrackCustomFilter;
-            faderManager->HandleMixAllButtonClick();
+            // We do not have multi select enabled yet, so lets go
+            if (trackFilter != TrackCustomMultiSelectFilter || context->GetChannelMode() != MixMode)
+            {
+                mixAllButton->SetColor(ButtonColorGreen);
+                SetTrackFilter(TrackCustomMultiSelectFilter);
+                faderManager->HandleMixAllButtonClick();
+            }
+            else
+            {
+                trackNavigator->HandleFilter(TrackCustomMultiSelectFilter);
+                faderManager->ResetMixButtonClick();
+            }
         }
         else if (context->GetShiftLeft())
         {
             mixAllButton->SetColor(ButtonColorYellow);
-            trackFilter = TrackCustomFilter;
+            SetTrackFilter(TrackCustomFilter);
             faderManager->HandleMixAllButtonClick();
         }
         else
         {
             mixAllButton->SetColor(ButtonColorWhite);
-            trackFilter = TrackAllFilter;
+            SetTrackFilter(TrackAllFilter);
             trackNavigator->HandleFilter(TrackAllFilter);
+            faderManager->ResetMixButtonClick();
         }
 
-        faderManager->ResetMixButtonClick();
         SetButtonValue();
     }
 

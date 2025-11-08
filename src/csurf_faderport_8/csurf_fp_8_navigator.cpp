@@ -517,3 +517,50 @@ void CSurf_FP_8_Navigator::SetTrackTouched(int index, bool value)
 {
     trackTouched[index] = value;
 }
+
+void CSurf_FP_8_Navigator::SetMultiSelectFilter(bool value)
+{
+    multi_select_filter = value;
+
+    if (!value)
+    {
+        selected_filters.clear();
+    }
+}
+
+bool CSurf_FP_8_Navigator::GetMultiSelectFilter()
+{
+    return multi_select_filter;
+}
+
+void CSurf_FP_8_Navigator::AddFilter(int filter_index)
+{
+    selected_filters.push_back(filter_index);
+}
+
+void CSurf_FP_8_Navigator::ToggleFilter(int filter_index)
+{
+    if (HasFilter(filter_index))
+    {
+        RemoveFilter(filter_index);
+    }
+    else
+    {
+        AddFilter(filter_index);
+    }
+}
+
+bool CSurf_FP_8_Navigator::HasFilter(int filter_index)
+{
+    return (distance(selected_filters.end(), find(selected_filters.begin(), selected_filters.end(), filter_index)) != 0);
+}
+
+void CSurf_FP_8_Navigator::RemoveFilter(int filter_index)
+{
+    selected_filters.erase(find(selected_filters.begin(), selected_filters.end(), filter_index));
+}
+
+void CSurf_FP_8_Navigator::HandleMultiSelectFilter()
+{
+    // Now do the filter magic
+}

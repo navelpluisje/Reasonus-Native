@@ -53,6 +53,7 @@ enum NavigatorFilter
      */
     TrackIsVcaFilter,
     TrackCustomFilter,
+    TrackCustomMultiSelectFilter,
 };
 
 class CSurf_FP_8_Navigator
@@ -81,6 +82,8 @@ class CSurf_FP_8_Navigator
         false,
         false,
     };
+    bool multi_select_filter = false;
+    std::vector<int> selected_filters = {};
 
     void UpdateMixerPosition();
 
@@ -142,6 +145,20 @@ public:
     void HandleCustomFilter(std::string filterName);
 
     void SetTrackTouched(int index, bool value);
+
+    void SetMultiSelectFilter(bool value);
+
+    bool GetMultiSelectFilter();
+
+    void AddFilter(int filter_index);
+
+    void ToggleFilter(int filter_index);
+
+    void RemoveFilter(int filter_index);
+
+    bool HasFilter(int filter_index);
+
+    void HandleMultiSelectFilter();
 };
 
 #endif

@@ -112,33 +112,31 @@ public:
 
         for (int i = 0; i < context->GetNbChannels(); i++)
         {
-            int filterIndex = context->GetChannelManagerItemIndex() + i;
-            int faderValue = 0, valueBarValue = 0;
+            int filter_index = context->GetChannelManagerItemIndex() + i;
+            int fader_value = 0, value_bar_value = 0;
             std::string strPan1, strPan2;
 
             CSurf_FP_8_Track *track = tracks.at(i);
             MediaTrack *media_track = media_tracks.Get(i);
             SetTrackColors(media_track);
 
-            GetFaderValue(media_track, &faderValue, &valueBarValue, &strPan1, &strPan2);
+            GetFaderValue(media_track, &fader_value, &value_bar_value, &strPan1, &strPan2);
 
             track->SetTrackColor(color);
-            // If the track is armed always blink as an indication it is armed
-            track->SetSelectButtonValue(BTN_VALUE_OFF, forceUpdate);
+            track->SetSelectButtonValue(navigator->HasFilter(filter_index) ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
             track->SetMuteButtonValue(DAW::IsTrackMuted(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
             track->SetSoloButtonValue(DAW::IsTrackSoloed(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
-            track->SetFaderValue(faderValue, forceUpdate);
+            track->SetFaderValue(fader_value, forceUpdate);
             track->SetValueBarMode(VALUEBAR_MODE_NORMAL);
             track->SetValueBarValue(0);
 
             track->SetDisplayMode(DISPLAY_MODE_2, forceUpdate);
             track->SetDisplayLine(0, ALIGN_CENTER, DAW::GetTrackName(media_track).c_str(), NON_INVERT, forceUpdate);
 
-            if (filterIndex < (int)filters.size())
+            if (filter_index < (int)filters.size())
             {
-                Filter f = filters.at(filterIndex);
                 track->SetDisplayLine(1, ALIGN_CENTER, "Filter", INVERT, forceUpdate);
-                track->SetDisplayLine(2, ALIGN_CENTER, filters.at(filterIndex).name.c_str(), NON_INVERT, forceUpdate);
+                track->SetDisplayLine(2, ALIGN_CENTER, filters.at(filter_index).name.c_str(), NON_INVERT, forceUpdate);
                 track->SetDisplayLine(3, ALIGN_CENTER, "", NON_INVERT, forceUpdate);
             }
             else
@@ -152,8 +150,13 @@ public:
         forceUpdate = false;
     }
 
-    void HandleSelectClick(int index) override
+    void HandleSelectClick(int index, int value) override
     {
+        if (value == 0)
+        {
+            return;
+        }
+
         int filter_index = context->GetChannelManagerItemIndex() + index;
         if (context->GetShiftChannelLeft())
         {
@@ -179,7 +182,18 @@ public:
         {
             if (filter_index < (int)filters.size())
             {
-                navigator->HandleCustomFilter(filters.at(filter_index).id);
+                logInteger("has multi select filter", navigator->GetMultiSelectFilter());
+                if (navigator->GetMultiSelectFilter())
+                {
+                    logInteger("filter_index", filter_index);
+                    navigator->ToggleFilter(filter_index);
+                    // navigator->HandleMultiSelectFilter();
+                }
+                else
+                {
+                    logInteger("filter_index 2", filter_index);
+                    navigator->HandleCustomFilter(filters.at(filter_index).id);
+                }
             }
             else
             {
