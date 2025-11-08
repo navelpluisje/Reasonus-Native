@@ -74,21 +74,8 @@ protected:
         *_pan1 = GetPan1String(pan1);
         *_pan2 = GetPan2String(pan2, panMode);
 
-        if (context->GetShiftChannelLeft())
-        {
-            *faderValue = int(panToNormalized(pan1) * 16383.0);
-            *valueBarValue = int(volToNormalized(volume) * 127);
-        }
-        else if (context->GetShiftChannelRight() && panMode > 4)
-        {
-            *faderValue = int(panToNormalized(pan2) * 16383.0);
-            *valueBarValue = int(volToNormalized(volume) * 127);
-        }
-        else
-        {
-            *faderValue = int(volToNormalized(volume) * 16383.0);
-            *valueBarValue = int(panToNormalized(pan1) * 127);
-        }
+        *faderValue = int(volToNormalized(volume) * 16383.0);
+        *valueBarValue = int(panToNormalized(pan1) * 127);
     }
 
 public:
