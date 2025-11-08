@@ -182,16 +182,12 @@ public:
         {
             if (filter_index < (int)filters.size())
             {
-                logInteger("has multi select filter", navigator->GetMultiSelectFilter());
                 if (navigator->GetMultiSelectFilter())
                 {
-                    logInteger("filter_index", filter_index);
                     navigator->ToggleFilter(filter_index);
-                    // navigator->HandleMultiSelectFilter();
                 }
                 else
                 {
-                    logInteger("filter_index 2", filter_index);
                     navigator->HandleCustomFilter(filters.at(filter_index).id);
                 }
             }
