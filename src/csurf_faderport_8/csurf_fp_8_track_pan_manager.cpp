@@ -137,8 +137,12 @@ public:
         forceUpdate = false;
     }
 
-    void HandleSelectClick(int index) override
+    void HandleSelectClick(int index, int value) override
     {
+        if (value == 0)
+        {
+            return;
+        }
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
 
         if (context->GetArm())

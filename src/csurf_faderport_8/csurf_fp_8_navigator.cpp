@@ -1,7 +1,5 @@
 #include "csurf_fp_8_navigator.hpp"
-#include "../shared/csurf_utils.hpp"
 #include "../shared/csurf_daw.hpp"
-#include <mini/ini.h>
 #include "csurf_fp_8_navigator_filters.hpp"
 
 void CSurf_FP_8_Navigator::GetAllVisibleTracks(WDL_PtrList<MediaTrack> &tracks, bool &hasSolo, bool &hasMute)
@@ -81,57 +79,11 @@ void CSurf_FP_8_Navigator::HandleAllTracksFilter()
 void CSurf_FP_8_Navigator::HandleTracksCustomFilter(std::string filterName)
 {
     mINI::INIFile file(GetReaSonusIniPath(FP_8));
-    mINI::INIStructure ini;
     file.read(ini);
     mINI::INIMap<std::string> filter = ini[filterName];
 
-    std::map<int, bool> tracks;
-    std::map<int, bool> filterTracks;
-    std::map<int, bool> allTracks;
-    std::map<int, bool> childTracks;
-    std::map<int, bool> parentTracks;
-    std::map<int, bool> sibblingTracks;
-
-    bool stop = false;
-    for (int i = 0; i < CountTracks(0); i++)
-    {
-        allTracks[i] = false;
-        if (!stop)
-        {
-            MediaTrack *media_track = GetTrack(0, i);
-            std::string trackName = DAW::GetTrackName(media_track);
-            bool isChild = GetTrackDepth(media_track) > 0;
-
-            if (FuzzyMatch(trackName, filter["text"]) && !(isChild && filter["top-level"] == "1"))
-            {
-                filterTracks[i] = true;
-                if (filter["match-multiple"] == "0")
-                {
-                    stop = true;
-                }
-            }
-        }
-    }
-
-    tracks.insert(filterTracks.begin(), filterTracks.end());
-
-    if (filter["children"] == "1")
-    {
-        childTracks = GetChildTracks(filterTracks);
-        tracks.insert(childTracks.begin(), childTracks.end());
-    }
-
-    if (filter["parents"] == "1")
-    {
-        parentTracks = GetParentTracks(filterTracks);
-        tracks.insert(parentTracks.begin(), parentTracks.end());
-    }
-
-    if (filter["sibblings"] == "1")
-    {
-        sibblingTracks = GetSibblingTracks(filterTracks);
-        tracks.insert(sibblingTracks.begin(), sibblingTracks.end());
-    }
+    std::map<int, bool> tracks = GetCustomFilterTracks(filter);
+    std::map<int, bool> allTracks = GetAllTracksBase();
 
     tracks.insert(allTracks.begin(), allTracks.end());
 
@@ -313,6 +265,29 @@ void CSurf_FP_8_Navigator::HandleTracksAllFoldersFilter()
         int folderDepth = (int)GetMediaTrackInfo_Value(media_track, "I_FOLDERDEPTH");
         tracks[i] = folderDepth == 1;
     }
+
+    SetTrackUIVisibility(tracks);
+    SetOffset(0);
+}
+
+void CSurf_FP_8_Navigator::HandleTrackCustomMultiSelectFilter()
+{
+    mINI::INIFile file(GetReaSonusIniPath(FP_8));
+    file.read(ini);
+    std::map<int, bool> allTracks = GetAllTracksBase();
+    std::map<int, bool> tracks;
+    std::map<int, bool> tmp_tracks;
+
+    for (const int filter_index : selected_filters)
+    {
+        tmp_tracks.clear();
+        mINI::INIMap<std::string>
+            filter = ini[ini["filters"][std::to_string(filter_index)]];
+        tmp_tracks = GetCustomFilterTracks(filter);
+        tracks.insert(tmp_tracks.begin(), tmp_tracks.end());
+    }
+
+    tracks.insert(allTracks.begin(), allTracks.end());
 
     SetTrackUIVisibility(tracks);
     SetOffset(0);
@@ -503,6 +478,9 @@ void CSurf_FP_8_Navigator::HandleFilter(NavigatorFilter filter)
     case TrackIsVcaFilter:
         HandleTracksAreVcaFilter();
         break;
+    case TrackCustomMultiSelectFilter:
+        HandleTrackCustomMultiSelectFilter();
+        break;
     default:
         HandleAllTracksFilter();
     }
@@ -516,4 +494,51 @@ void CSurf_FP_8_Navigator::HandleCustomFilter(std::string filterName)
 void CSurf_FP_8_Navigator::SetTrackTouched(int index, bool value)
 {
     trackTouched[index] = value;
+}
+
+void CSurf_FP_8_Navigator::SetMultiSelectFilter(bool value)
+{
+    multi_select_filter = value;
+
+    if (!value)
+    {
+        selected_filters.clear();
+    }
+}
+
+bool CSurf_FP_8_Navigator::GetMultiSelectFilter()
+{
+    return multi_select_filter;
+}
+
+void CSurf_FP_8_Navigator::AddFilter(int filter_index)
+{
+    selected_filters.push_back(filter_index);
+}
+
+void CSurf_FP_8_Navigator::ToggleFilter(int filter_index)
+{
+    if (HasFilter(filter_index))
+    {
+        RemoveFilter(filter_index);
+    }
+    else
+    {
+        AddFilter(filter_index);
+    }
+}
+
+bool CSurf_FP_8_Navigator::HasFilter(int filter_index)
+{
+    return (distance(selected_filters.end(), find(selected_filters.begin(), selected_filters.end(), filter_index)) != 0);
+}
+
+void CSurf_FP_8_Navigator::RemoveFilter(int filter_index)
+{
+    selected_filters.erase(find(selected_filters.begin(), selected_filters.end(), filter_index));
+}
+
+void CSurf_FP_8_Navigator::HandleMultiSelectFilter()
+{
+    // Now do the filter magic
 }
