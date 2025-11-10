@@ -378,7 +378,14 @@ public:
 
     bool GetMasterFaderMode()
     {
-        return masterFaderMode && master_fader_mode_setting;
+        if (nbChannels > 1)
+        {
+            return masterFaderMode && master_fader_mode_setting;
+        }
+        else
+        {
+            return masterFaderMode;
+        }
     }
 
     /**
