@@ -604,6 +604,14 @@ public:
 
   void OnTrackSelection(MediaTrack *media_track)
   {
+    int track_index = stoi(DAW::GetTrackIndex(media_track));
+
+    // Master track returns -1. Do not a=do anyting right now
+    if (track_index < 0)
+    {
+      return;
+    }
+
     trackNavigator->SetOffsetByTrack(media_track);
   }
 };
