@@ -172,7 +172,6 @@ public:
         }
         default:
         {
-
             SetMediaTrackInfo_Value(media_track, "D_PAN", 0);
         }
         }

@@ -16,6 +16,7 @@
 #include "../shared/csurf.h"
 #include "../shared/csurf_transport_manager.hpp"
 #include "../shared/csurf_utils.hpp"
+#include "../shared/csurf_daw.hpp"
 #include "csurf_fp_v2_session_manager.cpp"
 #include "csurf_fp_v2_track_manager.hpp"
 #include "csurf_fp_v2_automation_manager.cpp"
@@ -342,7 +343,6 @@ public:
     return trackNavigator->IsTrackTouched(media_track);
   }
 
-  ;
   void Run()
   {
     if (m_midiin)
@@ -404,14 +404,21 @@ public:
 
   void OnTrackSelection(MediaTrack *media_track)
   {
+    int track_index = stoi(DAW::GetTrackIndex(media_track));
+
+    // Master track returns -1. Do not a=do anyting right now
+    if (track_index < 0)
+    {
+      return;
+    }
+
     if (!context->GetControlHiddenTracks())
     {
       trackNavigator->SetOffsetByTrack(media_track);
     }
     else
     {
-      int trackId = (int)::GetMediaTrackInfo_Value(media_track, "IP_TRACKNUMBER");
-      trackNavigator->SetOffset(trackId - 1);
+      trackNavigator->SetOffset(track_index - 1);
     }
   }
 };
