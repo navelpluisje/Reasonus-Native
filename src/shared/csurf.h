@@ -4,7 +4,7 @@
 #include <reaper_plugin.h>
 
 #include <WDL/wdlstring.h>
-#include <WDL/win32_utf8.h>
+// #include <WDL/win32_utf8.h>
 
 // WARNING: REAPER has a handful of UNDOCUMENTED API functions that are not declared in reaper_plugin_functions.h, so must declare here:
 inline bool (*CoolSB_GetScrollInfo)(HWND hwnd, int nBar, LPSCROLLINFO lpsi);

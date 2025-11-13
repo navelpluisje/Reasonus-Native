@@ -5,7 +5,6 @@
 #include "../shared/csurf_utils.hpp"
 #include "../shared/csurf_daw.hpp"
 #include <mini/ini.h>
-#include <WDL/ptrlist.h>
 #include <config.h>
 #include <vector>
 #include "csurf_fp_8_track.hpp"
