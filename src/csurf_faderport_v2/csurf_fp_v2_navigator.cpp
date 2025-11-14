@@ -102,11 +102,11 @@ void CSurf_FP_V2_Navigator::SetOffset(int offset)
 
 void CSurf_FP_V2_Navigator::SetOffsetByTrack(MediaTrack *media_track)
 {
-    int trackId = (int)::GetMediaTrackInfo_Value(media_track, "IP_TRACKNUMBER");
+    int trackId = stoi(DAW::GetTrackIndex(media_track));
 
     for (int i = 0; tracks.GetSize(); i++)
     {
-        int id = (int)::GetMediaTrackInfo_Value(tracks.Get(i), "IP_TRACKNUMBER");
+        int id = stoi(DAW::GetTrackIndex(tracks.Get(i)));
 
         if (trackId == id)
         {

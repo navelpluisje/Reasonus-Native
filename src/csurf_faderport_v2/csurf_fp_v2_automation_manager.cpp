@@ -75,7 +75,7 @@ public:
     void Update()
     {
         MediaTrack *media_track = navigator->GetControllerTrack();
-        channelAutomationMode = GetTrackAutomationMode(media_track);
+        channelAutomationMode = ::GetTrackAutomationMode(media_track);
 
         SetButtonColors();
         SetButtonValue(media_track == nullptr);
