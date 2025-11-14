@@ -165,7 +165,7 @@ MediaTrack *CSurf_FP_V2_Navigator::GetNextTrack()
     {
         return tracks.Get(track_offset);
     }
-    track_offset += 1;
+    track_offset++;
     return tracks.Get(track_offset);
 }
 
@@ -175,8 +175,8 @@ MediaTrack *CSurf_FP_V2_Navigator::GetPreviousTrack()
     {
         return tracks.Get(track_offset);
     }
-    track_offset -= 1;
-    return tracks.Get(track_offset - 1);
+    track_offset--;
+    return tracks.Get(track_offset);
 }
 
 bool CSurf_FP_V2_Navigator::HasTracksWithSolo()
