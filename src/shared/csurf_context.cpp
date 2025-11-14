@@ -61,6 +61,10 @@ class CSurf_Context
      */
     bool fader_disabled;
     /**
+     * @brief On the V2 go to the first track when pressing next on the last track en the other way around
+     */
+    bool endless_track_scroll;
+    /**
      * @brief Number of channels
      */
     int nbChannels = 8;
@@ -333,6 +337,16 @@ public:
     bool GetDistractionFreeMode()
     {
         return distraction_free_mode_setting;
+    };
+
+    void SetEndlessTrackScroll(bool value)
+    {
+        endless_track_scroll = value;
+    };
+
+    bool GetEndlessTrackScroll()
+    {
+        return endless_track_scroll;
     };
 
     /**************************************************************************
