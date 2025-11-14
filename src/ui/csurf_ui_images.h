@@ -41,4 +41,8 @@ constexpr unsigned char img_icon_list_remove[] = {
 #include "../../lib/assets/list-action-close.ipp"
 };
 
+constexpr unsigned char img_icon_restore[] = {
+#include "../../lib/assets/restore.ipp"
+};
+
 #endif
