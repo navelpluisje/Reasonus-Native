@@ -66,6 +66,7 @@ public:
     static std::string GetTrackRecordingMode(MediaTrack *media_track);
     static ButtonColor GetTrackColor(MediaTrack *media_track);
     static void SetUniqueSelectedTrack(MediaTrack *media_track);
+    static void SetTrackSoloUnique(MediaTrack *media_track);
     static void ToggleSelectedTrack(MediaTrack *media_track);
     static void SetSelectedTracksRange(MediaTrack *media_track);
     static double GetTrackPeakInfo(MediaTrack *media_track);
