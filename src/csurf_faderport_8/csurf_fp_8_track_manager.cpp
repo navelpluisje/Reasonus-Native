@@ -257,7 +257,7 @@ public:
     {
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
 
-        if (context->GetShiftLeft())
+        if (context->GetShiftChannelLeft())
         {
             if (value != 0)
             {
