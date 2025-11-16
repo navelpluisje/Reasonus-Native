@@ -407,7 +407,7 @@ void CSurf_FP_8_Navigator::SetOffsetByTrack(MediaTrack *media_track)
 
     for (int i = 0; tracks.GetSize(); i++)
     {
-        int id = stoi(DAW::GetTrackIndex(media_track));
+        int id = stoi(DAW::GetTrackIndex(tracks.Get(i)));
 
         if (trackId == id)
         {
