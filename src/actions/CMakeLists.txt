@@ -7,4 +7,6 @@ target_sources(${PROJECT_NAME}
         toggle_play_cursor.cpp
         convert_plugin_zon_to_ini.cpp
         translations_editor.cpp
+        toggle_distraction_free_mode.cpp
+        toggle_disable_plugins_setting.cpp
     )
