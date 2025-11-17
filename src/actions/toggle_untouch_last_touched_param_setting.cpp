@@ -1,4 +1,4 @@
-#include "toggle_distraction_free_mode.hpp"
+#include "toggle_untouch_last_touched_param_setting.hpp"
 #include <mini/ini.h>
 #include "../shared/csurf_utils.hpp"
 
@@ -8,14 +8,14 @@
 #define max(a, b) ((a) > (b) ? (a) : (b))
 
 // confine my plugin to namespace
-namespace TOGGLE_DISTRACTION_FREE_MODE
+namespace TOGGLE_UNTOUCH_LAST_TOUCHED_PARAM_SETTING
 {
     // some global non-const variables
     // the necessary 'evil'
     int command_id{0};
     bool toggle_action_state{false};
-    constexpr auto command_name = "REASONUS_TOGGLE_DISTRACTION_FREE_MODE";
-    constexpr auto action_name = "Reasonus: Toggle distraction free";
+    constexpr auto command_name = "REASONUS_TOGGLE_UNTOUCH_LAST_TOUCHED_PARAM_SETTING";
+    constexpr auto action_name = "Reasonus: Toggle untouch last touched param after learn setting";
     custom_action_register_t action = {0, command_name, action_name, nullptr};
 
     std::string ReadIniValue(std::string group, std::string item)
@@ -41,11 +41,11 @@ namespace TOGGLE_DISTRACTION_FREE_MODE
 
         if (toggle_action_state)
         {
-            WriteIniValue("surface", "distraction-free", "0");
+            WriteIniValue("surface", "erase-last-param-after-learn", "0");
         }
         else
         {
-            WriteIniValue("surface", "distraction-free", "1");
+            WriteIniValue("surface", "erase-last-param-after-learn", "1");
         }
     }
 
@@ -58,7 +58,7 @@ namespace TOGGLE_DISTRACTION_FREE_MODE
             // not quite our command_id
             return -1;
         }
-        if (stoi(ReadIniValue("surface", "distraction-free")) == 1) // if toggle_action_state == true
+        if (stoi(ReadIniValue("surface", "erase-last-param-after-learn")) == 1) // if toggle_action_state == true
         {
             return 1;
         }
@@ -120,4 +120,4 @@ namespace TOGGLE_DISTRACTION_FREE_MODE
         plugin_register("-hookcommand2", (void *)OnAction);
     }
 
-} // namespace TOGGLE_DISTRACTION_FREE_MODE
+} // namespace TOGGLE_DISTRACTION_FREE_MODE_SETTING

@@ -7,6 +7,11 @@ target_sources(${PROJECT_NAME}
         toggle_play_cursor.cpp
         convert_plugin_zon_to_ini.cpp
         translations_editor.cpp
-        toggle_distraction_free_mode.cpp
+        toggle_distraction_free_mode_setting.cpp
         toggle_disable_plugins_setting.cpp
+        toggle_untouch_last_touched_param_setting.cpp
+        toggle_master_fader_mode_setting.cpp
+        toggle_swap_shift_buttons_setting.cpp
+        toggle_fader_reset_setting.cpp
+        toggle_momentary_mute_solo_setting.cpp
     )

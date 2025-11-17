@@ -1,4 +1,4 @@
-#include "toggle_distraction_free_mode_setting.hpp"
+#include "toggle_swap_shift_buttons_setting.hpp"
 #include <mini/ini.h>
 #include "../shared/csurf_utils.hpp"
 
@@ -8,14 +8,14 @@
 #define max(a, b) ((a) > (b) ? (a) : (b))
 
 // confine my plugin to namespace
-namespace TOGGLE_DISABLE_PLUGINS_SETTING
+namespace TOGGLE_MOMENTARY_MUTE_SOLO_SETTING
 {
     // some global non-const variables
     // the necessary 'evil'
     int command_id{0};
     bool toggle_action_state{false};
-    constexpr auto command_name = "REASONUS_TOGGLE_DISABLE_PLUGINS_SETTING";
-    constexpr auto action_name = "Reasonus: Toggle disable plugins setting";
+    constexpr auto command_name = "REASONUS_TOGGLE_MOMENTARY_MUTE_SOLO_SETTING";
+    constexpr auto action_name = "Reasonus: Toggle momentary mute/solo setting";
     custom_action_register_t action = {0, command_name, action_name, nullptr};
 
     std::string ReadIniValue(std::string group, std::string item)
@@ -41,11 +41,11 @@ namespace TOGGLE_DISABLE_PLUGINS_SETTING
 
         if (toggle_action_state)
         {
-            WriteIniValue("surface", "disable-plugins", "0");
+            WriteIniValue("surface", "mute-solo-momentary", "0");
         }
         else
         {
-            WriteIniValue("surface", "disable-plugins", "1");
+            WriteIniValue("surface", "mute-solo-momentary", "1");
         }
     }
 
@@ -58,7 +58,7 @@ namespace TOGGLE_DISABLE_PLUGINS_SETTING
             // not quite our command_id
             return -1;
         }
-        if (stoi(ReadIniValue("surface", "disable-plugins")) == 1) // if toggle_action_state == true
+        if (stoi(ReadIniValue("surface", "mute-solo-momentary")) == 1) // if toggle_action_state == true
         {
             return 1;
         }
@@ -120,4 +120,4 @@ namespace TOGGLE_DISABLE_PLUGINS_SETTING
         plugin_register("-hookcommand2", (void *)OnAction);
     }
 
-} // namespace TOGGLE_DISABLE_PLUGINS_SETTING
+} // namespace TOGGLE_MASTER_FADER_MODE_SETTING
