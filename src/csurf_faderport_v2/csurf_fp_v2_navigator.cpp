@@ -49,6 +49,7 @@ void CSurf_FP_V2_Navigator::UpdateMixerPosition()
     if (media_track)
     {
         SetMixerScroll(media_track);
+        DAW::SetTcpScroll(media_track);
     }
 };
 
@@ -161,22 +162,42 @@ void CSurf_FP_V2_Navigator::UpdateOffset()
 
 MediaTrack *CSurf_FP_V2_Navigator::GetNextTrack()
 {
-    if (track_offset + 1 > tracks.GetSize())
+    if (track_offset + 1 > tracks.GetSize() - 1)
     {
-        return tracks.Get(track_offset);
+        if (context->GetEndlessTrackScroll())
+        {
+            track_offset = 0;
+        }
     }
-    track_offset += 1;
-    return tracks.Get(track_offset);
+    else
+    {
+        track_offset++;
+    }
+
+    MediaTrack *media_track = tracks.Get(track_offset);
+    SetMixerScroll(media_track);
+    DAW::SetTcpScroll(media_track);
+    return media_track;
 }
 
 MediaTrack *CSurf_FP_V2_Navigator::GetPreviousTrack()
 {
     if (track_offset - 1 < 0)
     {
-        return tracks.Get(track_offset);
+        if (context->GetEndlessTrackScroll())
+        {
+            track_offset = tracks.GetSize() - 1;
+        }
     }
-    track_offset -= 1;
-    return tracks.Get(track_offset - 1);
+    else
+    {
+        track_offset--;
+    }
+
+    MediaTrack *media_track = tracks.Get(track_offset);
+    SetMixerScroll(media_track);
+    DAW::SetTcpScroll(media_track);
+    return media_track;
 }
 
 bool CSurf_FP_V2_Navigator::HasTracksWithSolo()

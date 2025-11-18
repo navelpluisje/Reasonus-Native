@@ -23,6 +23,7 @@ protected:
     bool momentary_mute_solo;
     bool control_hidden_tracks;
     bool can_disable_fader;
+    bool endless_track_scroll;
 
     std::vector<std::string> language_names = {};
 
@@ -131,6 +132,12 @@ public:
                 &can_disable_fader,
                 i18n->t("settings", "can_disable_fader.tooltip"));
 
+            RenderSettingsCheckbox(
+                m_ctx,
+                i18n->t("settings", "endless_track_scroll.label"),
+                &endless_track_scroll,
+                i18n->t("settings", "endless_track_scroll.tooltip"));
+
             UiElements::PopReaSonusSettingsContentStyle(m_ctx);
             ImGui::EndChild(m_ctx);
         }
@@ -145,6 +152,7 @@ public:
         ini["surface"]["mute-solo-momentary"] = momentary_mute_solo ? "1" : "0";
         ini["surface"]["control-hidden-tracks"] = control_hidden_tracks ? "1" : "0";
         ini["surface"]["can-disable-fader"] = can_disable_fader ? "1" : "0";
+        ini["surface"]["endless-track-scroll"] = endless_track_scroll ? "1" : "0";
 
         if (file.write(ini, true))
         {
@@ -161,5 +169,6 @@ public:
         momentary_mute_solo = ini["surface"]["mute-solo-momentary"] == "1";
         control_hidden_tracks = ini["surface"]["control-hidden-tracks"] == "1";
         can_disable_fader = ini["surface"]["can-disable-fader"] == "1";
+        endless_track_scroll = ini["surface"]["endless-track-scrollr"] == "1";
     }
 };
