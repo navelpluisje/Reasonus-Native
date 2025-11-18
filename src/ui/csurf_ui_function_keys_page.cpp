@@ -16,6 +16,7 @@ protected:
     std::vector<std::string> functions;
     ImGui_Font *function_font_bold;
     ImGui_Image *icon_search;
+    ImGui_Image *icon_reset;
     std::string device;
     I18n *i18n;
     bool selected_tab = 0;
@@ -33,6 +34,8 @@ public:
         ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(function_font_bold));
         icon_search = ImGui::CreateImageFromMem(reinterpret_cast<const char *>(img_icon_search), sizeof(img_icon_search));
         ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(icon_search));
+        icon_reset = ImGui::CreateImageFromMem(reinterpret_cast<const char *>(img_icon_restore), sizeof(img_icon_restore));
+        ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(icon_reset));
 
         Reset();
     };
@@ -129,6 +132,12 @@ public:
         }
     }
 
+    static void HandleResetButtonClick(int index)
+    {
+        selected_function = index;
+        selected_action = 0;
+    }
+
     static void RenderFunction(ImGui_Context *m_ctx, int index, CSurf_UI_FunctionKeysPage &page)
     {
         std::string idx = "function-key-" + std::to_string(index);
@@ -161,9 +170,16 @@ public:
 
             double x_width, y_width;
             ImGui::GetContentRegionAvail(m_ctx, &x_width, &y_width);
-            ImGui::SetCursorPosX(m_ctx, x_width - 16.0);
+            ImGui::SetCursorPosX(m_ctx, x_width - 55.0);
             ImGui::SetCursorPosY(m_ctx, 0);
             UiElements::PushReaSonusFunctionButtonStyle(m_ctx);
+
+            if (ImGui::ImageButton(m_ctx, (button_idx + "reset").c_str(), page.icon_reset, 24, 24))
+            {
+                HandleResetButtonClick(index);
+            }
+            ImGui::SetCursorPosX(m_ctx, x_width - 16.0);
+            ImGui::SetCursorPosY(m_ctx, 0);
 
             if (ImGui::ImageButton(m_ctx, button_idx.c_str(), page.icon_search, 24, 24))
             {
