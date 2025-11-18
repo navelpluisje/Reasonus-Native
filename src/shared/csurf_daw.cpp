@@ -79,6 +79,11 @@ bool DAW::IsTrackPinned(MediaTrack *media_track)
     return (int)GetMediaTrackInfo_Value(media_track, "B_TCPPIN") == 1;
 }
 
+bool DAW::IsTrackVisible(MediaTrack *media_track)
+{
+    return (int)GetMediaTrackInfo_Value(media_track, "B_SHOWINMIXER") == 1;
+}
+
 int DAW::GetTrackPanMode(MediaTrack *media_track)
 {
     int panMode = 0;

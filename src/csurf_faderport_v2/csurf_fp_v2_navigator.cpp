@@ -13,7 +13,7 @@ void CSurf_FP_V2_Navigator::GetAllControllableTracks(WDL_PtrList<MediaTrack> &tr
     for (int i = 0; i < CountTracks(0); i++)
     {
         MediaTrack *media_track = GetTrack(0, i);
-        bool visible = (bool)GetMediaTrackInfo_Value(media_track, "B_SHOWINMIXER");
+        bool visible = DAW::IsTrackVisible(media_track);
         int solo = DAW::IsTrackSoloed(media_track);
         bool mute = DAW::IsTrackMuted(media_track);
         bool armed = DAW::IsTrackArmed(media_track);
