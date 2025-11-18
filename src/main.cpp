@@ -8,9 +8,16 @@
 #include "actions/close_all_floating_fx_windows.hpp"
 #include "actions/convert_plugin_zon_to_ini.hpp"
 #include "actions/translations_editor.hpp"
+#include "actions/toggle_distraction_free_mode_setting.hpp"
 #include "ui/csurf_ui_function_keys_page.cpp"
 #include "resource.h"
 #include "shared/csurf.h"
+#include "actions/toggle_disable_plugins_setting.hpp"
+#include "actions/toggle_untouch_last_touched_param_setting.hpp"
+#include "actions/toggle_master_fader_mode_setting.hpp"
+#include "actions/toggle_swap_shift_buttons_setting.hpp"
+#include "actions/toggle_fader_reset_setting.hpp"
+#include "actions/toggle_momentary_mute_solo_setting.hpp"
 
 extern reaper_csurf_reg_t
     csurf_faderport_8_reg,
@@ -52,6 +59,14 @@ extern "C"
       CLOSE_ALL_FLOATING_FX_WINDOWS::Unregister();
       CONVERT_PLUGIN_ZON_TO_INI::Unregister();
       TRANSLATION_EDITOR::Unregister();
+      TOGGLE_DISTRACTION_FREE_MODE_SETTING::Unregister();
+      TOGGLE_DISABLE_PLUGINS_SETTING::Unregister();
+      TOGGLE_UNTOUCH_LAST_TOUCHED_PARAM_SETTING::Unregister();
+      TOGGLE_MASTER_FADER_MODE_SETTING::Unregister();
+      TOGGLE_SWAP_SHIFT_BUTTONS_SETTING::Unregister();
+      TOGGLE_FADER_RESET_SETTING::Unregister();
+      TOGGLE_MOMENTARY_MUTE_SOLO_SETTING::Unregister();
+
       return 0;
     }
 
@@ -96,6 +111,13 @@ extern "C"
     CLOSE_ALL_FLOATING_FX_WINDOWS::Register();
     CONVERT_PLUGIN_ZON_TO_INI::Register();
     TRANSLATION_EDITOR::Register();
+    TOGGLE_DISTRACTION_FREE_MODE_SETTING::Register();
+    TOGGLE_DISABLE_PLUGINS_SETTING::Register();
+    TOGGLE_UNTOUCH_LAST_TOUCHED_PARAM_SETTING::Register();
+    TOGGLE_MASTER_FADER_MODE_SETTING::Register();
+    TOGGLE_SWAP_SHIFT_BUTTONS_SETTING::Register();
+    TOGGLE_FADER_RESET_SETTING::Register();
+    TOGGLE_MOMENTARY_MUTE_SOLO_SETTING::Register();
 
     reaper_plugin_info->Register("csurf", &csurf_faderport_8_reg);
     reaper_plugin_info->Register("csurf", &csurf_faderport_v2_reg);

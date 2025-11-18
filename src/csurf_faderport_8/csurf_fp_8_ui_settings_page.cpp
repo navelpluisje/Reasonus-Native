@@ -275,6 +275,10 @@ public:
             DAW::SetExtState(EXT_STATE_KEY_SAVED_SETTINGS, EXT_STATE_VALUE_TRUE, false);
             ReaSonus8ControlPanel::SetMessage(i18n->t("settings", "action.save.message"));
         };
+        int actionId = NamedCommandLookup("_REASONUS_TOGGLE_DISABLE_PLUGINS_SETTING");
+        RefreshToolbar2(0, actionId);
+        actionId = NamedCommandLookup("_REASONUS_TOGGLE_DISTRACTION_FREE_MODE");
+        RefreshToolbar2(0, actionId);
     }
 
     void Reset() override
