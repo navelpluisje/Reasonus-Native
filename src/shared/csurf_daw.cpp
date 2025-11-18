@@ -232,6 +232,12 @@ void DAW::SetUniqueSelectedTrack(MediaTrack *media_track)
     ::SetTrackSelected(media_track, true);
 }
 
+void DAW::SetTrackSoloUnique(MediaTrack *media_track)
+{
+    Main_OnCommandEx(40340, 0, 0); // Track: Unsolo all tracks
+    ToggleTrackSoloed(media_track);
+}
+
 void DAW::SetSelectedTracksRange(MediaTrack *media_track)
 {
     int index = (int)GetMediaTrackInfo_Value(media_track, "IP_TRACKNUMBER");

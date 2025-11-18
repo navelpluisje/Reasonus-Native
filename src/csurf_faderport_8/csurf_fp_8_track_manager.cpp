@@ -255,8 +255,18 @@ public:
 
     void HandleSoloClick(int index, int value) override
     {
-        int now = GetTickCount();
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
+
+        if (context->GetShiftChannelLeft())
+        {
+            if (value != 0)
+            {
+                DAW::SetTrackSoloUnique(media_track);
+            }
+            return;
+        }
+
+        int now = GetTickCount();
 
         if (value == 0 && context->GetMuteSoloMomentary())
         {
