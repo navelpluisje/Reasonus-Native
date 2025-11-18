@@ -13,7 +13,7 @@ void CSurf_FP_8_Navigator::GetAllVisibleTracks(WDL_PtrList<MediaTrack> &tracks, 
     for (int i = 0; i < CountTracks(0); i++)
     {
         MediaTrack *media_track = GetTrack(0, i);
-        bool visible = (bool)GetMediaTrackInfo_Value(media_track, "B_SHOWINMIXER");
+        bool visible = DAW::IsTrackVisible(media_track);
         int solo = (int)GetMediaTrackInfo_Value(media_track, "I_SOLO");
         bool mute = (bool)GetMediaTrackInfo_Value(media_track, "B_MUTE");
 
@@ -407,7 +407,7 @@ void CSurf_FP_8_Navigator::SetOffsetByTrack(MediaTrack *media_track)
 
     for (int i = 0; tracks.GetSize(); i++)
     {
-        int id = stoi(DAW::GetTrackIndex(media_track));
+        int id = stoi(DAW::GetTrackIndex(tracks.Get(i)));
 
         if (trackId == id)
         {

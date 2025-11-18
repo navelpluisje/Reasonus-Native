@@ -50,6 +50,7 @@ public:
     static bool IsTrackSelected(MediaTrack *media_track);
     static bool IsTrackParent(MediaTrack *media_track);
     static bool IsTrackPinned(MediaTrack *media_track);
+    static bool IsTrackVisible(MediaTrack *media_track);
 
     static int GetTrackPanMode(MediaTrack *media_track);
     static std::string GetTrackName(MediaTrack *media_track);

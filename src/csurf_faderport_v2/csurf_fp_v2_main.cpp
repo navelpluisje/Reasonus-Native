@@ -406,17 +406,17 @@ public:
   {
     int track_index = stoi(DAW::GetTrackIndex(media_track));
 
-    // Master track returns -1. Do not a=do anyting right now
+    // Master track returns -1. Do not do anyting right now
     if (track_index < 0)
     {
       return;
     }
 
-    if (!context->GetControlHiddenTracks())
+    if (!context->GetControlHiddenTracks() && DAW::IsTrackVisible(media_track))
     {
       trackNavigator->SetOffsetByTrack(media_track);
     }
-    else
+    else if (context->GetControlHiddenTracks())
     {
       trackNavigator->SetOffset(track_index - 1);
     }
