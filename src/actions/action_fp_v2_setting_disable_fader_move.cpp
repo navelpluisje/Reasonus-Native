@@ -15,7 +15,7 @@ namespace ACTION_FP_V2_SETTING_DISABLE_FADER_MOVE
     int command_id{0};
     bool toggle_action_state{false};
     constexpr auto command_name = "REASONUS_FPV2_TOGGLE_DISABLE_FADER_MOVE";
-    constexpr auto action_name = "Reasonus: v2 Toggle momentarydisable fader move";
+    constexpr auto action_name = "Reasonus: v2 Toggle disable fader move";
     custom_action_register_t action = {0, command_name, action_name, nullptr};
 
     std::string ReadIniValue(std::string group, std::string item)
