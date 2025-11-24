@@ -526,9 +526,7 @@ public:
 
   bool GetTouchState(MediaTrack *media_track, int is_pan)
   {
-    (void)is_pan;
-
-    return trackNavigator->IsTrackTouched(media_track);
+    return trackNavigator->IsTrackTouched(media_track, is_pan);
   }
 
   void Run()

@@ -72,12 +72,14 @@ MediaTrack *CSurf_FP_V2_Navigator::GetControllerTrack()
     return nullptr;
 }
 
-bool CSurf_FP_V2_Navigator::IsTrackTouched(MediaTrack *media_track)
+bool CSurf_FP_V2_Navigator::IsTrackTouched(MediaTrack *media_track, int is_pan)
 {
-    std::string searchId = DAW::GetTrackIndex(media_track);
-    std::string id = DAW::GetTrackIndex(GetControllerTrack());
+    if (media_track != GetControllerTrack() || context->GetLastTouchedFxMode())
+    {
+        return false;
+    }
 
-    if (id.compare(searchId) == 0)
+    if (!context->GetShiftLeft() && is_pan == 0 || context->GetShiftLeft() && is_pan == 1)
     {
         return isTouched;
     }

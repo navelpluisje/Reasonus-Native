@@ -337,22 +337,35 @@ WDL_PtrList<MediaTrack> CSurf_FP_8_Navigator::GetBankTracks()
     return bank;
 }
 
-bool CSurf_FP_8_Navigator::IsTrackTouched(MediaTrack *media_track)
+bool CSurf_FP_8_Navigator::IsTrackTouched(MediaTrack *media_track, int is_pan)
 {
     int index = -1;
     WDL_PtrList<MediaTrack> bank = GetBankTracks();
-    std::string searchId = DAW::GetTrackIndex(media_track);
 
     for (int i = 0; i < context->GetNbChannels(); i++)
     {
-        std::string id = DAW::GetTrackIndex(bank.Get(i));
-        if (id.compare(searchId) == 0)
+        if (bank.Get(i) == media_track)
         {
             index = i;
         }
     }
 
-    return trackTouched[index];
+    if (context->GetChannelMode() == TrackMode && is_pan == 0)
+    {
+        return trackTouched[index];
+    }
+
+    if (context->GetChannelMode() == PanMode1 && is_pan == 1)
+    {
+        return trackTouched[index];
+    }
+
+    if (context->GetChannelMode() == PanMode2 && is_pan == 2)
+    {
+        return trackTouched[index];
+    }
+
+    return false;
 }
 
 void CSurf_FP_8_Navigator::SetOffset(int offset)
