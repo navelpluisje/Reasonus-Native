@@ -119,7 +119,7 @@ public:
 
     WDL_PtrList<MediaTrack> GetBankTracks();
 
-    bool IsTrackTouched(MediaTrack *media_track);
+    bool IsTrackTouched(MediaTrack *media_track, int is_pan);
 
     void SetOffset(int offset);
 
