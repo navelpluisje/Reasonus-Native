@@ -227,6 +227,14 @@ class CSurf_FaderPort : public IReaperControlSurface
       }
 
       /**
+       * Footswitch
+       */
+      else if (evt->midi_message[1] == BTN_FOOTSWITCH)
+      {
+        transportManager->HandleFootSwitchClick(evt->midi_message[2]);
+      }
+
+      /**
        * Mix Management
        */
       else if (evt->midi_message[1] == BTN_AUDIO)
@@ -368,6 +376,14 @@ class CSurf_FaderPort : public IReaperControlSurface
         sessionManager->HandlePrevButton(evt->midi_message[2]);
       }
       else if (evt->midi_message[1] == ENCODER_CLICK_NAV)
+      {
+        sessionManager->HandleEncoderClick(evt->midi_message[2]);
+      }
+
+      /**
+       * Footswitch
+       */
+      else if (evt->midi_message[1] == BTN_FOOTSWITCH)
       {
         sessionManager->HandleEncoderClick(evt->midi_message[2]);
       }

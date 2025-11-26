@@ -219,6 +219,23 @@ public:
         SetPause();
         SetForwardingState();
     };
+
+    void HandleFootSwitchClick(int value)
+    {
+        if (value == 0)
+        {
+            return;
+        }
+
+        if (context->GetShiftLeft())
+        {
+            CSurf_GoEnd();
+            return;
+        }
+
+        SetPause();
+        SetForwardingState();
+    };
 };
 
 #endif
