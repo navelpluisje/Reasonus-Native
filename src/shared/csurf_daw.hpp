@@ -28,6 +28,13 @@ enum PAN_MODES
     PAN_MODE_DUAL_PAN = 6,
 };
 
+enum SEND_MODES
+{
+    SEND_MODE_RECEIVE = -1,
+    SEND_MODE_SEND = 0,
+    SEND_MODE_HARDWARE = 1,
+};
+
 static std::map<Features, double>
     feature_versions = {
         {FEATURE_PINNED_TRACKS, 7.46},
@@ -60,6 +67,7 @@ public:
     static std::string GetTrackRecordingMode(MediaTrack *media_track);
     static ButtonColor GetTrackColor(MediaTrack *media_track);
     static void SetUniqueSelectedTrack(MediaTrack *media_track);
+    static void SetTrackSoloUnique(MediaTrack *media_track);
     static void ToggleSelectedTrack(MediaTrack *media_track);
     static void SetSelectedTracksRange(MediaTrack *media_track);
     static double GetTrackPeakInfo(MediaTrack *media_track);

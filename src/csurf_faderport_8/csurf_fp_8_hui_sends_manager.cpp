@@ -75,20 +75,22 @@ public:
     {
         context->ResetChannelManagerItemIndex();
         context->SetChannelManagerType(Hui);
+        context->SetAddSendReceiveMode(-1);
         UpdateTracks();
     }
-    ~CSurf_FP_8_SendsManager() {};
+    ~CSurf_FP_8_SendsManager() {
+    };
 
     void UpdateTracks() override
     {
         nb_sends = 0;
         WDL_PtrList<MediaTrack> media_tracks = navigator->GetBankTracks();
+        MediaTrack *add_send_track;
 
         for (int i = 0; i < context->GetNbChannels(); i++)
         {
             MediaTrack *media_track = media_tracks.Get(i);
-
-            int _nb_track_sends = GetTrackNumSends(media_track, 0);
+            int _nb_track_sends = ::GetTrackNumSends(media_track, 0);
             nb_track_sends[i] = _nb_track_sends;
 
             if (_nb_track_sends > nb_sends)
@@ -103,6 +105,12 @@ public:
         for (int i = 0; i < context->GetNbChannels(); i++)
         {
             int send_index = context->GetChannelManagerItemIndex(nb_track_sends[i] - 1);
+            bool add_send_enabled = context->GetAddSendReceiveMode() == i;
+
+            if (add_send_enabled)
+            {
+                add_send_track = ::GetTrack(0, context->GetCurrentSelectedSendReceive());
+            }
 
             int pan, fader_value, value_bar_value = 0;
             std::string pan_str;
@@ -122,8 +130,16 @@ public:
 
             if (DAW::HasTrackSend(media_track, send_index))
             {
-                track->SetDisplayLine(1, ALIGN_LEFT, DAW::GetTrackSendDestName(media_track, send_index).c_str(), INVERT);
-                track->SetDisplayLine(2, ALIGN_CENTER, DAW::GetTrackSurfaceSendMode(media_track, send_index).c_str());
+                if (add_send_enabled)
+                {
+                    track->SetDisplayLine(1, ALIGN_LEFT, ("Trk: " + DAW::GetTrackIndex(add_send_track)).c_str(), INVERT);
+                    track->SetDisplayLine(2, ALIGN_CENTER, DAW::GetTrackName(add_send_track).c_str(), INVERT);
+                }
+                else
+                {
+                    track->SetDisplayLine(1, ALIGN_LEFT, DAW::GetTrackSendDestName(media_track, send_index).c_str(), INVERT);
+                    track->SetDisplayLine(2, ALIGN_CENTER, DAW::GetTrackSurfaceSendMode(media_track, send_index).c_str(), NON_INVERT);
+                }
                 track->SetDisplayLine(3, ALIGN_CENTER, Progress(send_index + 1, nb_track_sends[i]).c_str());
                 track->SetFaderValue(fader_value);
                 track->SetValueBarMode(context->GetShiftChannelLeft() ? VALUEBAR_MODE_FILL : VALUEBAR_MODE_BIPOLAR);
@@ -131,8 +147,16 @@ public:
             }
             else
             {
-                track->SetDisplayLine(1, ALIGN_LEFT, "No Sends", INVERT);
-                track->SetDisplayLine(2, ALIGN_CENTER, "");
+                if (add_send_enabled)
+                {
+                    track->SetDisplayLine(1, ALIGN_LEFT, ("Trk: " + DAW::GetTrackIndex(add_send_track)).c_str(), INVERT);
+                    track->SetDisplayLine(2, ALIGN_CENTER, DAW::GetTrackName(add_send_track).c_str(), INVERT);
+                }
+                else
+                {
+                    track->SetDisplayLine(1, ALIGN_LEFT, "No Sends", INVERT);
+                    track->SetDisplayLine(2, ALIGN_CENTER, "", NON_INVERT);
+                }
                 track->SetDisplayLine(3, ALIGN_CENTER, "");
                 track->SetFaderValue(0);
                 track->SetValueBarMode(VALUEBAR_MODE_FILL);
@@ -155,13 +179,42 @@ public:
         }
     }
 
-    void HandleSelectClick(int index) override
+    void HandleSelectClick(int index, int value) override
     {
+        if (value == 0)
+        {
+            return;
+        }
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
 
+        /**
+         * Set add_send_mode when right shift and select are engaged.
+         * If add_send_mode is set, regardless the shift keys, we will reset the add_send_mode
+         *
+         */
         if (context->GetShiftChannelLeft())
         {
-            DAW::ToggleSelectedTrack(media_track);
+            if (context->GetAddSendReceiveMode() == -1)
+            {
+                context->SetCurrentSelectedSendReceive(0);
+                context->SetAddSendReceiveMode(index);
+            }
+            else
+            {
+                context->SetAddSendReceiveMode(-1);
+            }
+            return;
+        }
+
+        if (context->GetAddSendReceiveMode() == index)
+        {
+            context->SetAddSendReceiveMode(-1);
+        }
+
+        if (context->GetShiftChannelRight())
+        {
+            int send_index = context->GetChannelManagerItemIndex(::GetTrackNumSends(media_track, SEND_MODE_SEND) - 1);
+            ::RemoveTrackSend(media_track, SEND_MODE_SEND, send_index);
             return;
         }
 

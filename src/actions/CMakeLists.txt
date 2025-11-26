@@ -1,10 +1,21 @@
 target_sources(${PROJECT_NAME}
     PRIVATE
-        close_all_floating_fx_windows.cpp
-        show_reaper_resource_path.cpp
-        show_reasonus_8_control_panel.cpp
-        show_reasonus_v2_control_panel.cpp
-        toggle_play_cursor.cpp
-        convert_plugin_zon_to_ini.cpp
-        translations_editor.cpp
+        action_close_all_floating_fx_windows.cpp
+        action_fp_8_setting_disable_plugins.cpp
+        action_fp_8_setting_distraction_free_mode.cpp
+        action_fp_8_setting_fader_reset.cpp
+        action_fp_8_setting_master_fader_mode.cpp
+        action_fp_8_setting_momentary_mute_solo.cpp
+        action_fp_8_setting_swap_shift_buttons.cpp
+        action_fp_8_setting_untouch_last_touched_param.cpp
+        action_fp_v2_setting_control_hidden_tracks.cpp
+        action_fp_v2_setting_disable_fader_move.cpp
+        action_fp_v2_setting_endless_track_scroll.cpp
+        action_fp_v2_setting_momentary_mute_solo.cpp
+        action_show_reaper_resource_path.cpp
+        action_toggle_play_cursor.cpp
+        action_ui_convert_plugin_zon_to_ini.cpp
+        action_ui_fp_8_control_panel.cpp
+        action_ui_fp_v2_control_panel.cpp
+        action_ui_translations_editor.cpp
     )

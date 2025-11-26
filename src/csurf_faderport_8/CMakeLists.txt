@@ -12,9 +12,9 @@ target_sources(${PROJECT_NAME}
         csurf_fp_8_navigator_filters.cpp
         csurf_fp_8_navigator.cpp
         csurf_fp_8_plugin_control_manager.cpp
-        csurf_fp_8_plugins_manager.cpp
-        csurf_fp_8_receives_manager.cpp
-        csurf_fp_8_sends_manager.cpp
+        csurf_fp_8_hui_plugins_manager.cpp
+        csurf_fp_8_hui_receives_manager.cpp
+        csurf_fp_8_hui_sends_manager.cpp
         csurf_fp_8_track.cpp
         csurf_fp_8_ui_control_panel.cpp
         csurf_fp_8_ui_settings_page.cpp

@@ -1,10 +1,6 @@
-// #ifndef REAIMGUIAPI_IMPLEMENT
-#define REAIMGUIAPI_IMPLEMENT
-// #endif
-
-#include "show_reasonus_8_control_panel.hpp"
-#include "reaper_plugin_functions.h"
-#include "../csurf_faderport_8/csurf_fp_8_ui_control_panel.hpp"
+#include "action_fp_8_setting_momentary_mute_solo.hpp"
+#include <mini/ini.h>
+#include "../shared/csurf_utils.hpp"
 
 #define STRINGIZE_DEF(x) #x
 #define STRINGIZE(x) STRINGIZE_DEF(x)
@@ -12,27 +8,44 @@
 #define max(a, b) ((a) > (b) ? (a) : (b))
 
 // confine my plugin to namespace
-namespace SHOW_REASONUS_8_CONTROL_PANEL
+namespace ACTION_FP_8_SETTING_MOMENTARY_MUTE_SOLO
 {
     // some global non-const variables
     // the necessary 'evil'
     int command_id{0};
     bool toggle_action_state{false};
-    constexpr auto command_name = "REASONUS_SHOW_REASONUS_8_CONTROL_WINDOW";
-    constexpr auto action_name = "Reasonus: Show the ReaSonus Native 8/16 Control Panel";
+    constexpr auto command_name = "REASONUS_FP8_TOGGLE_MOMENTARY_MUTE_SOLO";
+    constexpr auto action_name = "Reasonus: Toggle momentary mute/solo setting";
     custom_action_register_t action = {0, command_name, action_name, nullptr};
 
+    std::string ReadIniValue(std::string group, std::string item)
+    {
+        mINI::INIStructure ini;
+        mINI::INIFile file(GetReaSonusIniPath(FP_8));
+        readAndCreateIni(ini, FP_8);
+        return ini[group][item];
+    }
+
+    void WriteIniValue(std::string group, std::string item, std::string value)
+    {
+        mINI::INIStructure ini;
+        mINI::INIFile file(GetReaSonusIniPath(FP_8));
+        readAndCreateIni(ini, FP_8);
+        ini[group][item] = value;
+        file.write(ini);
+    }
     // the main function of my plugin
     // gets called via callback or timer
     void MainFunctionOfMyPlugin()
     {
+
         if (toggle_action_state)
         {
-            ReaSonus8ControlPanel::Start();
+            WriteIniValue("surface", "mute-solo-momentary", "0");
         }
         else
         {
-            ReaSonus8ControlPanel::Stop();
+            WriteIniValue("surface", "mute-solo-momentary", "1");
         }
     }
 
@@ -45,7 +58,7 @@ namespace SHOW_REASONUS_8_CONTROL_PANEL
             // not quite our command_id
             return -1;
         }
-        if (toggle_action_state) // if toggle_action_state == true
+        if (stoi(ReadIniValue("surface", "mute-solo-momentary")) == 1) // if toggle_action_state == true
         {
             return 1;
         }
@@ -86,13 +99,20 @@ namespace SHOW_REASONUS_8_CONTROL_PANEL
         commitOut[min(commitOut_sz - 1, (int)strlen(commit))] = '\0'; // Ensure null termination
     }
 
+    // when my plugin gets loaded
+    // function to register my plugins 'stuff' with REAPER
     void Register()
     {
+        // register action name and get command_id
         command_id = plugin_register("custom_action", &action);
         plugin_register("toggleaction", (void *)ToggleActionCallback);
+
+        // register run action/command
         plugin_register("hookcommand2", (void *)OnAction);
     }
 
+    // shutdown, time to exit
+    // modern C++11 syntax
     auto Unregister() -> void
     {
         plugin_register("-custom_action", &action);
@@ -100,4 +120,4 @@ namespace SHOW_REASONUS_8_CONTROL_PANEL
         plugin_register("-hookcommand2", (void *)OnAction);
     }
 
-} // namespace SHOW_REASONUS_FUNCTION_WINDOW
+} // namespace ACTION_FP_8_SETTING_MOMENTARY_MUTE_SOLO

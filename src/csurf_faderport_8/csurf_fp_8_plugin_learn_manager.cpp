@@ -157,8 +157,12 @@ public:
         }
     }
 
-    void HandleSelectClick(int index) override
+    void HandleSelectClick(int index, int value) override
     {
+        if (value == 0)
+        {
+            return;
+        }
         int controlIndex = context->GetChannelManagerItemIndex() + index;
         int pluginId = context->GetPluginEditPluginId();
         int trackId, itemNumber, takeId, _pluginId, paramId;

@@ -1,4 +1,10 @@
-#include "show_reaper_resource_path.hpp"
+// #ifndef REAIMGUIAPI_IMPLEMENT
+// #define REAIMGUIAPI_IMPLEMENT
+// #endif
+
+#include "action_ui_fp_v2_control_panel.hpp"
+#include "reaper_plugin_functions.h"
+#include "../csurf_faderport_v2/csurf_fp_v2_ui_control_panel.hpp"
 
 #define STRINGIZE_DEF(x) #x
 #define STRINGIZE(x) STRINGIZE_DEF(x)
@@ -6,22 +12,44 @@
 #define max(a, b) ((a) > (b) ? (a) : (b))
 
 // confine my plugin to namespace
-namespace SHOW_REAPER_RESOURCE_PATH
+namespace ACTION_UI_FP_V2_CONTROL_PANEL
 {
     // some global non-const variables
     // the necessary 'evil'
     int command_id{0};
-    constexpr auto command_name = "REASONUS_SHOW_REAPER_RESOURCE_PATH_COMMAND";
-    constexpr auto action_name = "Reasonus: Show Reaper resource path";
+    bool toggle_action_state{false};
+    constexpr auto command_name = "REASONUS_SHOW_REASONUS_V2_CONTROL_WINDOW";
+    constexpr auto action_name = "Reasonus: Show the ReaSonus Native V2 Control Panel";
     custom_action_register_t action = {0, command_name, action_name, nullptr};
 
     // the main function of my plugin
     // gets called via callback or timer
     void MainFunctionOfMyPlugin()
     {
-        const char *path = GetResourcePath();
-        ShowConsoleMsg("Path: ");
-        ShowConsoleMsg(path);
+        if (!ReaSonusV2ControlPanel::control_panel_open)
+        {
+            ReaSonusV2ControlPanel::Start();
+        }
+        else
+        {
+            ReaSonusV2ControlPanel::Stop();
+        }
+    }
+
+    // c++11 trailing return type syntax
+    // REAPER calls this to check this action it's toggle state
+    auto ToggleActionCallback(int command) -> int
+    {
+        if (command != command_id)
+        {
+            // not quite our command_id
+            return -1;
+        }
+        if (toggle_action_state) // if toggle_action_state == true
+        {
+            return 1;
+        }
+        return 0;
     }
 
     // this gets called when my plugin action is run (e.g. from action list)
@@ -39,6 +67,9 @@ namespace SHOW_REAPER_RESOURCE_PATH
         {
             return false;
         }
+
+        // flip state on/off
+        toggle_action_state = !toggle_action_state;
         MainFunctionOfMyPlugin();
 
         return true;
@@ -55,23 +86,18 @@ namespace SHOW_REAPER_RESOURCE_PATH
         commitOut[min(commitOut_sz - 1, (int)strlen(commit))] = '\0'; // Ensure null termination
     }
 
-    // when my plugin gets loaded
-    // function to register my plugins 'stuff' with REAPER
     void Register()
     {
-        // register action name and get command_id
         command_id = plugin_register("custom_action", &action);
-
-        // register run action/command
+        plugin_register("toggleaction", (void *)ToggleActionCallback);
         plugin_register("hookcommand2", (void *)OnAction);
     }
 
-    // shutdown, time to exit
-    // modern C++11 syntax
     auto Unregister() -> void
     {
         plugin_register("-custom_action", &action);
+        plugin_register("-toggleaction", (void *)ToggleActionCallback);
         plugin_register("-hookcommand2", (void *)OnAction);
     }
 
-} // namespace SHOW_REAPER_RESOURCE_PATH
+} // namespace ACTION_UI_FP_V2_CONTROL_PANEL

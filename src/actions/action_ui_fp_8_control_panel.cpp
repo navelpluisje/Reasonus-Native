@@ -1,4 +1,10 @@
-#include "toggle_play_cursor.hpp"
+// #ifndef REAIMGUIAPI_IMPLEMENT
+#define REAIMGUIAPI_IMPLEMENT
+// #endif
+
+#include "action_ui_fp_8_control_panel.hpp"
+#include "reaper_plugin_functions.h"
+#include "../csurf_faderport_8/csurf_fp_8_ui_control_panel.hpp"
 
 #define STRINGIZE_DEF(x) #x
 #define STRINGIZE(x) STRINGIZE_DEF(x)
@@ -6,14 +12,14 @@
 #define max(a, b) ((a) > (b) ? (a) : (b))
 
 // confine my plugin to namespace
-namespace TOGGLE_PLAY_CURSOR
+namespace ACTION_UI_FP_8_CONTROL_PANEL
 {
     // some global non-const variables
     // the necessary 'evil'
     int command_id{0};
     bool toggle_action_state{false};
-    constexpr auto command_name = "REASONUS_TOGGLE_PLAY_CURSOR_COMMAND";
-    constexpr auto action_name = "Reasonus: Toggle follow the play cursor";
+    constexpr auto command_name = "REASONUS_SHOW_REASONUS_8_CONTROL_WINDOW";
+    constexpr auto action_name = "Reasonus: Show the ReaSonus Native 8/16 Control Panel";
     custom_action_register_t action = {0, command_name, action_name, nullptr};
 
     // the main function of my plugin
@@ -22,9 +28,12 @@ namespace TOGGLE_PLAY_CURSOR
     {
         if (toggle_action_state)
         {
-            Main_OnCommandEx(40150, 0, 0);
+            ReaSonus8ControlPanel::Start();
         }
-        Main_OnCommandEx(40036, 0, 0);
+        else
+        {
+            ReaSonus8ControlPanel::Stop();
+        }
     }
 
     // c++11 trailing return type syntax
@@ -77,20 +86,13 @@ namespace TOGGLE_PLAY_CURSOR
         commitOut[min(commitOut_sz - 1, (int)strlen(commit))] = '\0'; // Ensure null termination
     }
 
-    // when my plugin gets loaded
-    // function to register my plugins 'stuff' with REAPER
     void Register()
     {
-        // register action name and get command_id
         command_id = plugin_register("custom_action", &action);
         plugin_register("toggleaction", (void *)ToggleActionCallback);
-
-        // register run action/command
         plugin_register("hookcommand2", (void *)OnAction);
     }
 
-    // shutdown, time to exit
-    // modern C++11 syntax
     auto Unregister() -> void
     {
         plugin_register("-custom_action", &action);
@@ -98,4 +100,4 @@ namespace TOGGLE_PLAY_CURSOR
         plugin_register("-hookcommand2", (void *)OnAction);
     }
 
-} // namespace TOGGLE_PLAY_CURSOR
+} // namespace ACTION_UI_FP_8_CONTROL_PANEL

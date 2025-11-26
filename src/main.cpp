@@ -1,13 +1,24 @@
 #define REAPERAPI_IMPLEMENT
 // #define REAIMGUIAPI_IMPLEMENT
 
-#include "actions/toggle_play_cursor.hpp"
-#include "actions/show_reaper_resource_path.hpp"
-#include "actions/show_reasonus_v2_control_panel.hpp"
-#include "actions/show_reasonus_8_control_panel.hpp"
-#include "actions/close_all_floating_fx_windows.hpp"
-#include "actions/convert_plugin_zon_to_ini.hpp"
-#include "actions/translations_editor.hpp"
+#include "actions/action_toggle_play_cursor.hpp"
+#include "actions/action_show_reaper_resource_path.hpp"
+#include "actions/action_ui_fp_v2_control_panel.hpp"
+#include "actions/action_ui_fp_8_control_panel.hpp"
+#include "actions/action_close_all_floating_fx_windows.hpp"
+#include "actions/action_ui_convert_plugin_zon_to_ini.hpp"
+#include "actions/action_ui_translations_editor.hpp"
+#include "actions/action_fp_8_setting_distraction_free_mode.hpp"
+#include "actions/action_fp_8_setting_disable_plugins.hpp"
+#include "actions/action_fp_8_setting_fader_reset.hpp"
+#include "actions/action_fp_8_setting_master_fader_mode.hpp"
+#include "actions/action_fp_8_setting_momentary_mute_solo.hpp"
+#include "actions/action_fp_8_setting_swap_shift_buttons.hpp"
+#include "actions/action_fp_8_setting_untouch_last_touched_param.hpp"
+#include "actions/action_fp_v2_setting_control_hidden_tracks.hpp"
+#include "actions/action_fp_v2_setting_disable_fader_move.hpp"
+#include "actions/action_fp_v2_setting_endless_track_scroll.hpp"
+#include "actions/action_fp_v2_setting_momentary_mute_solo.hpp"
 #include "ui/csurf_ui_function_keys_page.cpp"
 #include "resource.h"
 #include "shared/csurf.h"
@@ -45,13 +56,25 @@ extern "C"
      */
     if (reaper_plugin_info == nullptr)
     {
-      TOGGLE_PLAY_CURSOR::Unregister();
-      SHOW_REAPER_RESOURCE_PATH::Unregister();
-      SHOW_REASONUS_V2_CONTROL_PANEL::Unregister();
-      SHOW_REASONUS_8_CONTROL_PANEL::Unregister();
-      CLOSE_ALL_FLOATING_FX_WINDOWS::Unregister();
-      CONVERT_PLUGIN_ZON_TO_INI::Unregister();
-      TRANSLATION_EDITOR::Unregister();
+      ACTION_CLOSE_ALL_FLOATING_FX_WINDOWS::Unregister();
+      ACTION_FP_8_SETTING_DISABLE_PLUGINS::Unregister();
+      ACTION_FP_8_SETTING_DISTRACTION_FREE_MODE::Unregister();
+      ACTION_FP_8_SETTING_FADER_RESET_SETTING::Unregister();
+      ACTION_FP_8_SETTING_MASTER_FADER_MODE::Unregister();
+      ACTION_FP_8_SETTING_MOMENTARY_MUTE_SOLO::Unregister();
+      ACTION_FP_8_SETTING_SWAP_SHIFT_BUTTONS::Unregister();
+      ACTION_FP_8_SETTING_UNTOUCH_LAST_TOUCHED_PARAM::Unregister();
+      ACTION_FP_V2_SETTING_CONTROL_HIDDEN_TRACKS::Unregister();
+      ACTION_FP_V2_SETTING_DISABLE_FADER_MOVE::Unregister();
+      ACTION_FP_V2_SETTING_ENDLESS_TRACK_SCROLL::Unregister();
+      ACTION_FP_V2_SETTING_MOMENTARY_MUTE_SOLO::Unregister();
+      ACTION_SHOW_REAPER_RESOURCE_PATH::Unregister();
+      ACTION_TOGGLE_PLAY_CURSOR::Unregister();
+      ACTION_UI_CONVERT_PLUGIN_ZON_TO_INI::Unregister();
+      ACTION_UI_FP_8_CONTROL_PANEL::Unregister();
+      ACTION_UI_FP_V2_CONTROL_PANEL::Unregister();
+      ACTION_UI_TRANSLATIONS_EDITOR::Unregister();
+
       return 0;
     }
 
@@ -89,13 +112,24 @@ extern "C"
       return 0;
     }
 
-    TOGGLE_PLAY_CURSOR::Register();
-    SHOW_REAPER_RESOURCE_PATH::Register();
-    SHOW_REASONUS_V2_CONTROL_PANEL::Register();
-    SHOW_REASONUS_8_CONTROL_PANEL::Register();
-    CLOSE_ALL_FLOATING_FX_WINDOWS::Register();
-    CONVERT_PLUGIN_ZON_TO_INI::Register();
-    TRANSLATION_EDITOR::Register();
+    ACTION_CLOSE_ALL_FLOATING_FX_WINDOWS::Register();
+    ACTION_FP_8_SETTING_DISABLE_PLUGINS::Register();
+    ACTION_FP_8_SETTING_DISTRACTION_FREE_MODE::Register();
+    ACTION_FP_8_SETTING_FADER_RESET_SETTING::Register();
+    ACTION_FP_8_SETTING_MASTER_FADER_MODE::Register();
+    ACTION_FP_8_SETTING_MOMENTARY_MUTE_SOLO::Register();
+    ACTION_FP_8_SETTING_SWAP_SHIFT_BUTTONS::Register();
+    ACTION_FP_8_SETTING_UNTOUCH_LAST_TOUCHED_PARAM::Register();
+    ACTION_FP_V2_SETTING_CONTROL_HIDDEN_TRACKS::Register();
+    ACTION_FP_V2_SETTING_DISABLE_FADER_MOVE::Register();
+    ACTION_FP_V2_SETTING_ENDLESS_TRACK_SCROLL::Register();
+    ACTION_FP_V2_SETTING_MOMENTARY_MUTE_SOLO::Register();
+    ACTION_SHOW_REAPER_RESOURCE_PATH::Register();
+    ACTION_TOGGLE_PLAY_CURSOR::Register();
+    ACTION_UI_CONVERT_PLUGIN_ZON_TO_INI::Register();
+    ACTION_UI_FP_8_CONTROL_PANEL::Register();
+    ACTION_UI_FP_V2_CONTROL_PANEL::Register();
+    ACTION_UI_TRANSLATIONS_EDITOR::Register();
 
     reaper_plugin_info->Register("csurf", &csurf_faderport_8_reg);
     reaper_plugin_info->Register("csurf", &csurf_faderport_v2_reg);

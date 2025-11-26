@@ -5,10 +5,10 @@
 #include <gsl/gsl>
 #include <reaper_plugin_functions.h>
 
-namespace TRANSLATION_EDITOR
+namespace ACTION_TOGGLE_PLAY_CURSOR
 {
     extern REAPER_PLUGIN_HINSTANCE hInstance; // used for dialogs, if any
     auto Register() -> void;
     auto Unregister() -> void;
 
-} // namespace TRANSLATION_EDITOR
+} // namespace ACTION_TOGGLE_PLAY_CURSOR

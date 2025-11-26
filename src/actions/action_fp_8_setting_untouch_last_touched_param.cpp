@@ -1,4 +1,6 @@
-#include "close_all_floating_fx_windows.hpp"
+#include "action_fp_8_setting_untouch_last_touched_param.hpp"
+#include <mini/ini.h>
+#include "../shared/csurf_utils.hpp"
 
 #define STRINGIZE_DEF(x) #x
 #define STRINGIZE(x) STRINGIZE_DEF(x)
@@ -6,32 +8,61 @@
 #define max(a, b) ((a) > (b) ? (a) : (b))
 
 // confine my plugin to namespace
-namespace CLOSE_ALL_FLOATING_FX_WINDOWS
+namespace ACTION_FP_8_SETTING_UNTOUCH_LAST_TOUCHED_PARAM
 {
     // some global non-const variables
     // the necessary 'evil'
     int command_id{0};
-    constexpr auto command_name = "REASONUS_CLOSE_ALL_FLOATING_FX_WINDOWS_COMMAND";
-    constexpr auto action_name = "Reasonus: Close all floating fx windows";
+    bool toggle_action_state{false};
+    constexpr auto command_name = "REASONUS_FP8_TOGGLE_UNTOUCH_LAST_TOUCHED_PARAM";
+    constexpr auto action_name = "Reasonus: Toggle untouch last touched param after learn setting";
     custom_action_register_t action = {0, command_name, action_name, nullptr};
 
+    std::string ReadIniValue(std::string group, std::string item)
+    {
+        mINI::INIStructure ini;
+        mINI::INIFile file(GetReaSonusIniPath(FP_8));
+        readAndCreateIni(ini, FP_8);
+        return ini[group][item];
+    }
+
+    void WriteIniValue(std::string group, std::string item, std::string value)
+    {
+        mINI::INIStructure ini;
+        mINI::INIFile file(GetReaSonusIniPath(FP_8));
+        readAndCreateIni(ini, FP_8);
+        ini[group][item] = value;
+        file.write(ini);
+    }
     // the main function of my plugin
     // gets called via callback or timer
     void MainFunctionOfMyPlugin()
     {
-        int nb_tracks = ::GetNumTracks();
 
-        for (int i = 0; i < nb_tracks; i++)
+        if (toggle_action_state)
         {
-            MediaTrack *media_track = ::GetTrack(0, i);
-            int nb_plugins = ::TrackFX_GetCount(media_track);
-
-            for (int j = 0; j < nb_plugins; j++)
-            {
-                ::TrackFX_Show(media_track, j, 0);
-                ::TrackFX_Show(media_track, j, 2);
-            }
+            WriteIniValue("surface", "erase-last-param-after-learn", "0");
         }
+        else
+        {
+            WriteIniValue("surface", "erase-last-param-after-learn", "1");
+        }
+    }
+
+    // c++11 trailing return type syntax
+    // REAPER calls this to check this action it's toggle state
+    auto ToggleActionCallback(int command) -> int
+    {
+        if (command != command_id)
+        {
+            // not quite our command_id
+            return -1;
+        }
+        if (stoi(ReadIniValue("surface", "erase-last-param-after-learn")) == 1) // if toggle_action_state == true
+        {
+            return 1;
+        }
+        return 0;
     }
 
     // this gets called when my plugin action is run (e.g. from action list)
@@ -49,6 +80,9 @@ namespace CLOSE_ALL_FLOATING_FX_WINDOWS
         {
             return false;
         }
+
+        // flip state on/off
+        toggle_action_state = !toggle_action_state;
         MainFunctionOfMyPlugin();
 
         return true;
@@ -71,6 +105,7 @@ namespace CLOSE_ALL_FLOATING_FX_WINDOWS
     {
         // register action name and get command_id
         command_id = plugin_register("custom_action", &action);
+        plugin_register("toggleaction", (void *)ToggleActionCallback);
 
         // register run action/command
         plugin_register("hookcommand2", (void *)OnAction);
@@ -81,7 +116,8 @@ namespace CLOSE_ALL_FLOATING_FX_WINDOWS
     auto Unregister() -> void
     {
         plugin_register("-custom_action", &action);
+        plugin_register("-toggleaction", (void *)ToggleActionCallback);
         plugin_register("-hookcommand2", (void *)OnAction);
     }
 
-} // namespace CLOSE_ALL_FLOATING_FX_WINDOWS
+} // namespace ACTION_FP_8_SETTING_UNTOUCH_LAST_TOUCHED_PARAM

@@ -232,6 +232,12 @@ void DAW::SetUniqueSelectedTrack(MediaTrack *media_track)
     ::SetTrackSelected(media_track, true);
 }
 
+void DAW::SetTrackSoloUnique(MediaTrack *media_track)
+{
+    Main_OnCommandEx(40340, 0, 0); // Track: Unsolo all tracks
+    ToggleTrackSoloed(media_track);
+}
+
 void DAW::SetSelectedTracksRange(MediaTrack *media_track)
 {
     int index = (int)GetMediaTrackInfo_Value(media_track, "IP_TRACKNUMBER");
@@ -431,12 +437,12 @@ void DAW::SetTrackFXParamUntouched(MediaTrack *media_track, int fx)
  ************************************************************************/
 bool DAW::HasTrackReceive(MediaTrack *media_track, int receive)
 {
-    return GetSetTrackSendInfo(media_track, -1, receive, "P_SRCTRACK", 0) ? true : false;
+    return GetSetTrackSendInfo(media_track, SEND_MODE_RECEIVE, receive, "P_SRCTRACK", 0) ? true : false;
 }
 
 std::string DAW::GetTrackReceiveSrcName(MediaTrack *media_track, int receive)
 {
-    MediaTrack *srcTrack = (MediaTrack *)GetSetTrackSendInfo(media_track, -1, receive, "P_SRCTRACK", 0);
+    MediaTrack *srcTrack = (MediaTrack *)GetSetTrackSendInfo(media_track, SEND_MODE_RECEIVE, receive, "P_SRCTRACK", 0);
     if (srcTrack)
     {
         return GetTrackName(srcTrack);
@@ -446,12 +452,12 @@ std::string DAW::GetTrackReceiveSrcName(MediaTrack *media_track, int receive)
 
 int DAW::GetTrackReceiveMode(MediaTrack *media_track, int receive)
 {
-    return (int)GetTrackSendInfo_Value(media_track, -1, receive, "I_SENDMODE");
+    return (int)GetTrackSendInfo_Value(media_track, SEND_MODE_RECEIVE, receive, "I_SENDMODE");
 }
 
 int DAW::GetTrackReceiveAutoMode(MediaTrack *media_track, int receive)
 {
-    return (int)GetTrackSendInfo_Value(media_track, -1, receive, "I_AUTOMODE");
+    return (int)GetTrackSendInfo_Value(media_track, SEND_MODE_RECEIVE, receive, "I_AUTOMODE");
 }
 
 std::string DAW::GetTrackSurfaceReceiveMode(MediaTrack *media_track, int receive)
@@ -473,27 +479,27 @@ bool DAW::GetTrackReceiveMute(MediaTrack *media_track, int receive)
 
 void DAW::ToggleTrackReceiveMute(MediaTrack *media_track, int receive)
 {
-    SetTrackSendInfo_Value(media_track, -1, receive, "B_MUTE", !DAW::GetTrackReceiveMute(media_track, receive));
+    SetTrackSendInfo_Value(media_track, SEND_MODE_RECEIVE, receive, "B_MUTE", !DAW::GetTrackReceiveMute(media_track, receive));
 }
 
 bool DAW::GetTrackReceivePhase(MediaTrack *media_track, int receive)
 {
-    return (bool)GetTrackSendInfo_Value(media_track, -1, receive, "B_PHASE");
+    return (bool)GetTrackSendInfo_Value(media_track, SEND_MODE_RECEIVE, receive, "B_PHASE");
 }
 
 void DAW::ToggleTrackReceivePhase(MediaTrack *media_track, int receive)
 {
-    SetTrackSendInfo_Value(media_track, -1, receive, "B_PHASE", !DAW::GetTrackReceivePhase(media_track, receive));
+    SetTrackSendInfo_Value(media_track, SEND_MODE_RECEIVE, receive, "B_PHASE", !DAW::GetTrackReceivePhase(media_track, receive));
 }
 
 bool DAW::GetTrackReceiveMono(MediaTrack *media_track, int receive)
 {
-    return (bool)GetTrackSendInfo_Value(media_track, -1, receive, "B_Mono");
+    return (bool)GetTrackSendInfo_Value(media_track, SEND_MODE_RECEIVE, receive, "B_Mono");
 }
 
 void DAW::ToggleTrackReceiveMono(MediaTrack *media_track, int receive)
 {
-    SetTrackSendInfo_Value(media_track, -1, receive, "B_MONO", !DAW::GetTrackReceiveMono(media_track, receive));
+    SetTrackSendInfo_Value(media_track, SEND_MODE_RECEIVE, receive, "B_MONO", !DAW::GetTrackReceiveMono(media_track, receive));
 }
 
 int DAW::GetNextTrackReceiveMode(MediaTrack *media_track, int receive)
@@ -503,17 +509,17 @@ int DAW::GetNextTrackReceiveMode(MediaTrack *media_track, int receive)
 
 void DAW::SetNextTrackReceiveMode(MediaTrack *media_track, int receive)
 {
-    ::SetTrackSendInfo_Value(media_track, -1, receive, "I_SENDMODE", DAW::GetNextTrackReceiveMode(media_track, receive));
+    ::SetTrackSendInfo_Value(media_track, SEND_MODE_RECEIVE, receive, "I_SENDMODE", DAW::GetNextTrackReceiveMode(media_track, receive));
 }
 
 void DAW::SetTrackReceiveVolume(MediaTrack *media_track, int receive, double volume)
 {
-    ::SetTrackSendInfo_Value(media_track, -1, receive, "D_VOL", CSurf_OnRecvVolumeChange(media_track, receive, volume, false));
+    ::SetTrackSendInfo_Value(media_track, SEND_MODE_RECEIVE, receive, "D_VOL", CSurf_OnRecvVolumeChange(media_track, receive, volume, false));
 }
 
 void DAW::SetTrackReceivePan(MediaTrack *media_track, int receive, double pan)
 {
-    ::SetTrackSendInfo_Value(media_track, -1, receive, "D_PAN", CSurf_OnRecvPanChange(media_track, receive, pan, false));
+    ::SetTrackSendInfo_Value(media_track, SEND_MODE_RECEIVE, receive, "D_PAN", CSurf_OnRecvPanChange(media_track, receive, pan, false));
 }
 
 /************************************************************************
@@ -521,7 +527,7 @@ void DAW::SetTrackReceivePan(MediaTrack *media_track, int receive, double pan)
  ************************************************************************/
 bool DAW::HasTrackSend(MediaTrack *media_track, int send)
 {
-    return GetSetTrackSendInfo(media_track, 0, send, "P_DESTTRACK", 0) ? true : false;
+    return GetSetTrackSendInfo(media_track, SEND_MODE_SEND, send, "P_DESTTRACK", 0) ? true : false;
 }
 
 std::string DAW::GetTrackSendDestName(MediaTrack *media_track, int send)
@@ -536,12 +542,12 @@ std::string DAW::GetTrackSendDestName(MediaTrack *media_track, int send)
 
 int DAW::GetTrackSendMode(MediaTrack *media_track, int send)
 {
-    return (int)GetTrackSendInfo_Value(media_track, 0, send, "I_SENDMODE");
+    return (int)GetTrackSendInfo_Value(media_track, SEND_MODE_SEND, send, "I_SENDMODE");
 }
 
 int DAW::GetTrackSendAutoMode(MediaTrack *media_track, int send)
 {
-    return (int)GetTrackSendInfo_Value(media_track, 0, send, "I_AUTOMODE");
+    return (int)GetTrackSendInfo_Value(media_track, SEND_MODE_SEND, send, "I_AUTOMODE");
 }
 
 std::string DAW::GetTrackSurfaceSendMode(MediaTrack *media_track, int send)
@@ -563,7 +569,7 @@ bool DAW::GetTrackSendMute(MediaTrack *media_track, int send)
 
 void DAW::ToggleTrackSendMute(MediaTrack *media_track, int send)
 {
-    SetTrackSendInfo_Value(media_track, 0, send, "B_MUTE", !DAW::GetTrackSendMute(media_track, send));
+    SetTrackSendInfo_Value(media_track, SEND_MODE_SEND, send, "B_MUTE", !DAW::GetTrackSendMute(media_track, send));
 }
 
 bool DAW::GetTrackSendPhase(MediaTrack *media_track, int send)
@@ -573,17 +579,17 @@ bool DAW::GetTrackSendPhase(MediaTrack *media_track, int send)
 
 void DAW::ToggleTrackSendPhase(MediaTrack *media_track, int send)
 {
-    SetTrackSendInfo_Value(media_track, 0, send, "B_PHASE", !DAW::GetTrackSendPhase(media_track, send));
+    SetTrackSendInfo_Value(media_track, SEND_MODE_SEND, send, "B_PHASE", !DAW::GetTrackSendPhase(media_track, send));
 }
 
 bool DAW::GetTrackSendMono(MediaTrack *media_track, int send)
 {
-    return (bool)GetTrackSendInfo_Value(media_track, 0, send, "B_MONO");
+    return (bool)GetTrackSendInfo_Value(media_track, SEND_MODE_SEND, send, "B_MONO");
 }
 
 void DAW::ToggleTrackSendMono(MediaTrack *media_track, int send)
 {
-    SetTrackSendInfo_Value(media_track, 0, send, "B_MONO", !DAW::GetTrackSendMono(media_track, send));
+    SetTrackSendInfo_Value(media_track, SEND_MODE_SEND, send, "B_MONO", !DAW::GetTrackSendMono(media_track, send));
 }
 
 int DAW::GetNextTrackSendMode(MediaTrack *media_track, int send)
@@ -593,17 +599,17 @@ int DAW::GetNextTrackSendMode(MediaTrack *media_track, int send)
 
 void DAW::SetNextTrackSendMode(MediaTrack *media_track, int send)
 {
-    ::SetTrackSendInfo_Value(media_track, 0, send, "I_SENDMODE", DAW::GetNextTrackSendMode(media_track, send));
+    ::SetTrackSendInfo_Value(media_track, SEND_MODE_SEND, send, "I_SENDMODE", DAW::GetNextTrackSendMode(media_track, send));
 }
 
 void DAW::SetTrackSendVolume(MediaTrack *media_track, int send, double volume)
 {
-    ::SetTrackSendInfo_Value(media_track, 0, send, "D_VOL", CSurf_OnSendVolumeChange(media_track, send, volume, false));
+    ::SetTrackSendInfo_Value(media_track, SEND_MODE_SEND, send, "D_VOL", CSurf_OnSendVolumeChange(media_track, send, volume, false));
 }
 
 void DAW::SetTrackSendPan(MediaTrack *media_track, int send, double pan)
 {
-    ::SetTrackSendInfo_Value(media_track, 0, send, "D_PAN", CSurf_OnSendPanChange(media_track, send, pan, false));
+    ::SetTrackSendInfo_Value(media_track, SEND_MODE_SEND, send, "D_PAN", CSurf_OnSendPanChange(media_track, send, pan, false));
 }
 
 /************************************************************************

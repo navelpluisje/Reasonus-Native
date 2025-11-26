@@ -1,6 +1,6 @@
-#include "convert_plugin_zon_to_ini.hpp"
+#include "action_fp_8_setting_fader_reset.hpp"
+#include <mini/ini.h>
 #include "../shared/csurf_utils.hpp"
-#include "../ui/csurf_ui_plugin_mapping_converter.hpp"
 
 #define STRINGIZE_DEF(x) #x
 #define STRINGIZE(x) STRINGIZE_DEF(x)
@@ -8,27 +8,61 @@
 #define max(a, b) ((a) > (b) ? (a) : (b))
 
 // confine my plugin to namespace
-namespace CONVERT_PLUGIN_ZON_TO_INI
+namespace ACTION_FP_8_SETTING_FADER_RESET_SETTING
 {
     // some global non-const variables
     // the necessary 'evil'
     int command_id{0};
-    constexpr auto command_name = "REASONUS_CONVERT_PLUGIN_ZON_TO_INI";
-    constexpr auto action_name = "Reasonus: Convert the old zon mappings to the new ini mappings";
+    bool toggle_action_state{false};
+    constexpr auto command_name = "REASONUS_FP8_TOGGLE_FADER_RESET";
+    constexpr auto action_name = "Reasonus: Toggle fader reset: Left shift and fader touch setting";
     custom_action_register_t action = {0, command_name, action_name, nullptr};
 
+    std::string ReadIniValue(std::string group, std::string item)
+    {
+        mINI::INIStructure ini;
+        mINI::INIFile file(GetReaSonusIniPath(FP_8));
+        readAndCreateIni(ini, FP_8);
+        return ini[group][item];
+    }
+
+    void WriteIniValue(std::string group, std::string item, std::string value)
+    {
+        mINI::INIStructure ini;
+        mINI::INIFile file(GetReaSonusIniPath(FP_8));
+        readAndCreateIni(ini, FP_8);
+        ini[group][item] = value;
+        file.write(ini);
+    }
     // the main function of my plugin
     // gets called via callback or timer
     void MainFunctionOfMyPlugin()
     {
-        if (ReaSonusV2PluginMappingConverter::converter_open)
+
+        if (toggle_action_state)
         {
-            ReaSonusV2PluginMappingConverter::Stop();
+            WriteIniValue("surface", "fader-reset", "0");
         }
         else
         {
-            ReaSonusV2PluginMappingConverter::Start();
+            WriteIniValue("surface", "fader-reset", "1");
         }
+    }
+
+    // c++11 trailing return type syntax
+    // REAPER calls this to check this action it's toggle state
+    auto ToggleActionCallback(int command) -> int
+    {
+        if (command != command_id)
+        {
+            // not quite our command_id
+            return -1;
+        }
+        if (stoi(ReadIniValue("surface", "fader-reset")) == 1) // if toggle_action_state == true
+        {
+            return 1;
+        }
+        return 0;
     }
 
     // this gets called when my plugin action is run (e.g. from action list)
@@ -47,6 +81,8 @@ namespace CONVERT_PLUGIN_ZON_TO_INI
             return false;
         }
 
+        // flip state on/off
+        toggle_action_state = !toggle_action_state;
         MainFunctionOfMyPlugin();
 
         return true;
@@ -69,6 +105,7 @@ namespace CONVERT_PLUGIN_ZON_TO_INI
     {
         // register action name and get command_id
         command_id = plugin_register("custom_action", &action);
+        plugin_register("toggleaction", (void *)ToggleActionCallback);
 
         // register run action/command
         plugin_register("hookcommand2", (void *)OnAction);
@@ -79,7 +116,8 @@ namespace CONVERT_PLUGIN_ZON_TO_INI
     auto Unregister() -> void
     {
         plugin_register("-custom_action", &action);
+        plugin_register("-toggleaction", (void *)ToggleActionCallback);
         plugin_register("-hookcommand2", (void *)OnAction);
     }
 
-} // namespace CONVERT_PLUGIN_ZON_TO_INI
+} // namespace ACTION_FP_8_SETTING_FADER_RESET_SETTING

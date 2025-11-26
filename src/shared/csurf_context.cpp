@@ -61,6 +61,10 @@ class CSurf_Context
      */
     bool fader_disabled;
     /**
+     * @brief On the V2 go to the first track when pressing next on the last track en the other way around
+     */
+    bool endless_track_scroll;
+    /**
      * @brief Number of channels
      */
     int nbChannels = 8;
@@ -73,13 +77,17 @@ class CSurf_Context
     bool arm = false;
 
     // track mode show the time code in the displays
-    bool showTimeCode = false;
+    bool show_time_code = false;
 
     // Last touched fx
-    bool lastTouchedFxMode = false;
+    bool last_touched_fx_mode = false;
 
     // Make the fader control the master track for the FaderPort V2
-    bool masterFaderMode = false;
+    bool master_fader_mode = false;
+
+    // Set the track id that has the add send mode. -1 is unselected
+    int add_send_receive_mode = -1;
+    int current_selected_send_receive = 0;
 
     // Pan encoder modes
     PanEncoderMode panEncoderMode = PanEncoderTrackPanMode;
@@ -103,6 +111,9 @@ public:
     CSurf_Context(int nbChannels) : nbChannels(nbChannels) {}
     ~CSurf_Context() {}
 
+    /**************************************************************************
+     * Settings
+     **************************************************************************/
     void SetPluginControl(bool enabled)
     {
         plugin_control_setting = enabled;
@@ -213,6 +224,9 @@ public:
         return can_disable_fader;
     }
 
+    /**************************************************************************
+     * Modifiers
+     **************************************************************************/
     void SetShiftLeft(bool val)
     {
         if (swap_shift_buttons_setting)
@@ -305,6 +319,39 @@ public:
         return arm;
     }
 
+    void SetFaderDisabled(bool value)
+    {
+        fader_disabled = value;
+    };
+
+    int GetFaderDisabled()
+    {
+        return fader_disabled;
+    }
+
+    void SetDistractionFreeMode(bool value)
+    {
+        distraction_free_mode_setting = value;
+    };
+
+    bool GetDistractionFreeMode()
+    {
+        return distraction_free_mode_setting;
+    };
+
+    void SetEndlessTrackScroll(bool value)
+    {
+        endless_track_scroll = value;
+    };
+
+    bool GetEndlessTrackScroll()
+    {
+        return endless_track_scroll;
+    };
+
+    /**************************************************************************
+     * Pan mode
+     **************************************************************************/
     void SetPanEncoderMode(PanEncoderMode val)
     {
         panEncoderMode = val;
@@ -315,24 +362,30 @@ public:
         return panEncoderMode;
     }
 
+    /**************************************************************************
+     * Display the timecode
+     **************************************************************************/
     void SetShowTimeCode(bool value)
     {
-        showTimeCode = value;
+        show_time_code = value;
     }
 
     void ToggleShowTimeCode()
     {
-        showTimeCode = !showTimeCode;
+        show_time_code = !show_time_code;
     }
 
     bool GetShowTimeCode()
     {
-        return showTimeCode;
+        return show_time_code;
     }
 
+    /**************************************************************************
+     * Last touched Fx param control
+     **************************************************************************/
     void ToggleLastTouchedFxMode()
     {
-        SetLastTouchedFxMode(!lastTouchedFxMode);
+        SetLastTouchedFxMode(!last_touched_fx_mode);
     }
 
     /**
@@ -344,22 +397,25 @@ public:
     {
         if (value)
         {
-            masterFaderMode = false;
+            master_fader_mode = false;
         }
-        lastTouchedFxMode = value;
+        last_touched_fx_mode = value;
     }
 
     bool GetLastTouchedFxMode()
     {
-        return lastTouchedFxMode;
+        return last_touched_fx_mode;
     }
 
+    /**************************************************************************
+     * Master Fader mode
+     **************************************************************************/
     /**
      * @brief Toggle the master fader mode
      */
     void ToggleMasterFaderMode()
     {
-        SetMasterFaderMode(!masterFaderMode);
+        SetMasterFaderMode(!master_fader_mode);
     }
 
     /**
@@ -371,23 +427,26 @@ public:
     {
         if (value)
         {
-            lastTouchedFxMode = false;
+            last_touched_fx_mode = false;
         }
-        masterFaderMode = value;
+        master_fader_mode = value;
     }
 
     bool GetMasterFaderMode()
     {
         if (nbChannels > 1)
         {
-            return masterFaderMode && master_fader_mode_setting;
+            return master_fader_mode && master_fader_mode_setting;
         }
         else
         {
-            return masterFaderMode;
+            return master_fader_mode;
         }
     }
 
+    /**************************************************************************
+     * Number of device channels
+     **************************************************************************/
     /**
      * @brief Set the Nb Channels. These are the nb of faders on the FaderPort
      *
@@ -406,7 +465,7 @@ public:
     int GetNbChannels()
     {
         // TODO: Should be only nbChannels
-        return lastTouchedFxMode ? nbChannels - 1 : nbChannels;
+        return last_touched_fx_mode ? nbChannels - 1 : nbChannels;
     }
 
     /**
@@ -416,7 +475,7 @@ public:
      */
     int GetNbBankChannels()
     {
-        return (lastTouchedFxMode || masterFaderMode) ? nbChannels - 1 : nbChannels;
+        return (last_touched_fx_mode || master_fader_mode) ? nbChannels - 1 : nbChannels;
     }
 
     void TogglePanPushMode()
@@ -434,6 +493,9 @@ public:
         return panPushModePan;
     }
 
+    /**************************************************************************
+     * Channel manager Item
+     **************************************************************************/
     void UpdateChannelManagerItemIndex(int val)
     {
         val < 0 ? DecrementChannelManagerItemIndex(abs(val))
@@ -481,6 +543,9 @@ public:
         channelManagerItemsCount = 0;
     }
 
+    /**************************************************************************
+     * Channel modes
+     **************************************************************************/
     bool IsChannelMode(ChannelMode _channelMode)
     {
         return channelMode == _channelMode;
@@ -542,26 +607,42 @@ public:
         return pluginEditParamId;
     };
 
-    void SetFaderDisabled(bool value)
+    /**************************************************************************
+     * Add Send mode
+     **************************************************************************/
+    void SetAddSendReceiveMode(int value)
     {
-        fader_disabled = value;
+        add_send_receive_mode = value;
     };
 
-    int GetFaderDisabled()
+    int GetAddSendReceiveMode()
     {
-        return fader_disabled;
+        return add_send_receive_mode;
+    };
+
+    void SetCurrentSelectedSendReceive(int value)
+    {
+        current_selected_send_receive = minmax(0, value, ::CountTracks(0) - 1);
     }
 
-    void SetDistractionFreeMode(bool value)
+    void IncrementCurrentSelectedSendReceive()
     {
-        distraction_free_mode_setting = value;
-    };
+        SetCurrentSelectedSendReceive(current_selected_send_receive + 1);
+    }
 
-    bool GetDistractionFreeMode()
+    void DecrementCurrentSelectedSendReceive()
     {
-        return distraction_free_mode_setting;
-    };
+        SetCurrentSelectedSendReceive(current_selected_send_receive - 1);
+    }
 
+    int GetCurrentSelectedSendReceive()
+    {
+        return current_selected_send_receive;
+    }
+
+    /**************************************************************************
+     * Channel manager type
+     **************************************************************************/
     void SetChannelManagerType(ChannelManagerType type)
     {
         channelManagerType = type;
