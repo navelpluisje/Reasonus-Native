@@ -159,10 +159,6 @@ bool FuzzyMatch(std::string trackName, std::string matches, bool case_insensitiv
         std::transform(trackName.begin(), trackName.end(), trackName.begin(), ::tolower);
         std::transform(matches.begin(), matches.end(), matches.begin(), ::tolower);
     }
-    ShowConsoleMsg(trackName.c_str());
-    ShowConsoleMsg("\n");
-    ShowConsoleMsg(matches.c_str());
-    ShowConsoleMsg("\n");
 
     for (const std::string &val : split(matches, ","))
     {
