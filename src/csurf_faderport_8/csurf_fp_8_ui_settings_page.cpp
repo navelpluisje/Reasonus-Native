@@ -31,12 +31,26 @@ protected:
     bool setting_swap_shift;
     bool setting_fader_reset;
     bool setting_momentary_mute_solo;
+    bool setting_latch_preview_action_enable;
     bool setting_overwrite_time_code;
+    int setting_latch_preview_action;
     int setting_time_code;
     int setting_track_display;
     int *index;
 
     std::vector<std::string> language_names = {};
+
+    int latch_preview_action_indexes[8] = {42013, 42014, 42015, 42016, 42017, 41160, 41161, 41162};
+    std::vector<std::string> latch_preview_action_names = {
+        "Write current values for actively-writing envelopes to time selection",
+        "Write current values for actively-writing envelopes from cursor to start of project",
+        "Write current values for actively-writing envelopes from cursor to end of project",
+        "Write current values for actively-writing envelopes from cursor to first touch position",
+        "Write current values for actively-writing envelopes to entire envelope",
+        "Write current values for all writing envelopes to time selection",
+        "Write current values for all writing envelopes from cursor to start of project",
+        "Write current values for all writing envelopes from cursor to end of project",
+    };
 
     int time_code_indexes[6] = {0, 2, 3, 4, 5, 8};
     std::vector<std::string> time_code_names = {
@@ -204,6 +218,23 @@ public:
                         &setting_momentary_mute_solo,
                         i18n->t("settings", "momentary-mute.tooltip"));
 
+                    RenderSettingsCheckbox(
+                        m_ctx,
+                        i18n->t("settings", "latch-preview-action-enable.label"),
+                        &setting_latch_preview_action_enable,
+                        i18n->t("settings", "latch-preview-action-enable.tooltip"));
+
+                    if (setting_latch_preview_action_enable)
+                    {
+                        ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + 26);
+                        RenderSettingsComboInput(
+                            m_ctx,
+                            i18n->t("settings", "latch-preview-action-list.label"),
+                            latch_preview_action_names,
+                            &setting_latch_preview_action,
+                            i18n->t("settings", "latch-preview-action.tooltip"));
+                    }
+
                     ImGui::EndTabItem(m_ctx);
                 }
                 UiElements::PopReaSonusTabStyle(m_ctx);
@@ -266,7 +297,9 @@ public:
         ini["surface"]["fader-reset"] = setting_fader_reset ? "1" : "0";
         ini["surface"]["mute-solo-momentary"] = setting_momentary_mute_solo ? "1" : "0";
         ini["surface"]["overwrite-time-code"] = setting_overwrite_time_code ? "1" : "0";
+        ini["surface"]["latch-preview-action"] = setting_latch_preview_action_enable ? "1" : "0";
 
+        ini["surface"]["latch-preview-action-code"] = std::to_string(latch_preview_action_indexes[setting_latch_preview_action]);
         ini["surface"]["time-code"] = std::to_string(time_code_indexes[setting_time_code]);
         ini["displays"]["track"] = std::to_string(track_display_indexes[setting_track_display]);
 
@@ -301,6 +334,10 @@ public:
         setting_fader_reset = ini["surface"]["fader-reset"] == "1";
         setting_momentary_mute_solo = ini["surface"]["mute-solo-momentary"] == "1";
         setting_overwrite_time_code = ini["surface"]["overwrite-time-code"] == "1";
+        setting_latch_preview_action_enable = ini["surface"]["latch-preview-action"] == "1";
+
+        index = std::find(latch_preview_action_indexes, latch_preview_action_indexes + 8, stoi(ini["surface"]["latch-preview-action-code"]));
+        setting_latch_preview_action = index - latch_preview_action_indexes;
 
         index = std::find(time_code_indexes, time_code_indexes + 6, stoi(ini["surface"]["time-code"]));
         setting_time_code = index - time_code_indexes;

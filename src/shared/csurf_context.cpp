@@ -65,6 +65,14 @@ class CSurf_Context
      */
     bool endless_track_scroll;
     /**
+     * @brief When enabled pressing the latch preview when latch preview active trigger the action
+     */
+    bool latch_preview_action_enabled;
+    /**
+     * @brief action to perform for latch preview
+     */
+    int latch_preview_action_code;
+    /**
      * @brief Number of channels
      */
     int nbChannels = 8;
@@ -405,6 +413,29 @@ public:
     bool GetLastTouchedFxMode()
     {
         return last_touched_fx_mode;
+    }
+
+    /**************************************************************************
+     * Latch Preview settings
+     **************************************************************************/
+    void SetLatchPreviewActionEnabled(bool value)
+    {
+        latch_preview_action_enabled = value;
+    }
+
+    bool GetLatchPreviewActionEnabled()
+    {
+        return latch_preview_action_enabled;
+    }
+
+    void SetLatchPreviewActionCode(int value)
+    {
+        latch_preview_action_code = value;
+    }
+
+    int GetLatchPreviewActionCode()
+    {
+        return latch_preview_action_code;
     }
 
     /**************************************************************************

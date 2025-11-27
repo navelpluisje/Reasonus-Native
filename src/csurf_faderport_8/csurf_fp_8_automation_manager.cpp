@@ -215,7 +215,14 @@ public:
         }
 
         MediaTrack *media_track = GetSelectedAutomationTrack();
-        SetTrackAutomationMode(media_track, AUTOMATION_PREVIEW);
+        if (::GetTrackAutomationMode(media_track) == AUTOMATION_PREVIEW && context->GetLatchPreviewActionEnabled())
+        {
+            ::Main_OnCommandEx(context->GetLatchPreviewActionCode(), 0, 0);
+        }
+        else
+        {
+            SetTrackAutomationMode(media_track, AUTOMATION_PREVIEW);
+        }
     };
 
     void HandleTouchButton(int value)
