@@ -9,6 +9,7 @@
 #include "../i18n/i18n.hpp"
 #include "../csurf_faderport_8/csurf_fp_8_ui_control_panel.hpp"
 #include "../csurf_faderport_v2/csurf_fp_v2_ui_control_panel.hpp"
+#include "csurf_ui_tooltip.hpp"
 
 class CSurf_UI_FunctionKeysPage : public CSurf_UI_PageContent
 {
@@ -19,7 +20,7 @@ protected:
     ImGui_Image *icon_reset;
     std::string device;
     I18n *i18n;
-    bool selected_tab = 0;
+    int selected_tab = 0;
 
 public:
     static bool querying_actions;
@@ -138,15 +139,18 @@ public:
         selected_action = 0;
     }
 
-    static void RenderFunction(ImGui_Context *m_ctx, int index, CSurf_UI_FunctionKeysPage &page)
+    static void RenderFunction(ImGui_Context *m_ctx, int index, CSurf_UI_FunctionKeysPage &page, std::string type = "item")
     {
+        int actionId = stoi(page.functions[index]);
+        double x_width, y_width;
+        const char *fullName = kbd_getTextFromCmd(actionId, 0);
+
+        std::vector<std::string> actionInfo = split(fullName, ": ");
+
         std::string idx = "function-key-" + std::to_string(index);
         std::string button_idx = "button-key-" + std::to_string(index);
         std::string tooltip_idx = "tooltip-key-" + std::to_string(index);
-        int actionId = stoi(page.functions[index]);
-        const char *fullName = kbd_getTextFromCmd(actionId, 0);
-        std::vector<std::string> actionInfo = split(fullName, ": ");
-        std::string action_group = actionInfo.size() > 1 ? actionInfo[0] : page.i18n->t("functions", "item.no-group");
+        std::string action_group = actionInfo.size() > 1 ? actionInfo[0] : page.i18n->t("functions", type + ".no-group");
         std::string action_description_1 = actionInfo.size() > 1
                                                ? actionInfo[1]
                                            : actionInfo.size() > 0
@@ -160,7 +164,14 @@ public:
         {
             ImGui::PushFont(m_ctx, page.function_font_bold, 13);
             ImGui::PushStyleColor(m_ctx, ImGui::Col_Text, UI_COLORS::Accent);
-            ImGui::Text(m_ctx, (page.i18n->t("functions", "item.label", std::to_string(index + 1)).c_str()));
+            if (type.compare("item") == 0)
+            {
+                ImGui::Text(m_ctx, page.i18n->t("functions", type + ".label", std::to_string(index + 1)).c_str());
+            }
+            else
+            {
+                ImGui::Text(m_ctx, page.i18n->t("functions", type + ".label." + std::to_string(index)).c_str());
+            }
             ImGui::PopStyleColor(m_ctx);
             ImGui::SameLine(m_ctx);
             ImGui::Text(m_ctx, page.functions[index].c_str());
@@ -168,7 +179,6 @@ public:
             ImGui::Text(m_ctx, action_group.c_str());
             ImGui::TextWrapped(m_ctx, (action_description_1 + ". " + action_description_2).c_str());
 
-            double x_width, y_width;
             ImGui::GetContentRegionAvail(m_ctx, &x_width, &y_width);
             ImGui::SetCursorPosX(m_ctx, x_width - 55.0);
             ImGui::SetCursorPosY(m_ctx, 0);
@@ -178,6 +188,8 @@ public:
             {
                 HandleResetButtonClick(index);
             }
+            ReaSonusSimpleTooltip(m_ctx, page.i18n->t("functions", type + ".button.clear.tooltip"), "clear-function-tooltip" + std::to_string(index));
+
             ImGui::SetCursorPosX(m_ctx, x_width - 16.0);
             ImGui::SetCursorPosY(m_ctx, 0);
 
@@ -185,21 +197,8 @@ public:
             {
                 PromptForFunctionAction(index);
             }
+            ReaSonusSimpleTooltip(m_ctx, page.i18n->t("functions", type + ".button.tooltip"), "add-function-tooltip" + std::to_string(index));
 
-            if (ImGui::BeginItemTooltip(m_ctx))
-            {
-                UiElements::PushReaSonusTooltipStyle(m_ctx);
-                if (ImGui::BeginChild(m_ctx, tooltip_idx.c_str(), 0.0, 0.0, ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY | ImGui::ChildFlags_AutoResizeX))
-                {
-                    ImGui::PushTextWrapPos(m_ctx, 260);
-                    ImGui::Text(m_ctx, page.i18n->t("functions", "item.button.tooltip").c_str());
-                    ImGui::PopTextWrapPos(m_ctx);
-                    ImGui::EndChild(m_ctx);
-                    UiElements::PopReaSonusTooltipStyle(m_ctx);
-                }
-                ImGui::EndTooltip(m_ctx);
-            }
-            // ImGui::SetItemTooltip(m_ctx, "Open the action list and select an action");
             UiElements::PopReaSonusFunctionButtonStyle(m_ctx);
             ImGui::EndChild(m_ctx);
         }
@@ -276,6 +275,34 @@ public:
                                 {
                                     UiElements::PushReaSonusFunctionActionStyle(m_ctx);
                                     RenderFunction(m_ctx, i, *this);
+                                    UiElements::PopReaSonusFunctionActionStyle(m_ctx);
+                                }
+                            }
+                            ImGui::PopStyleVar(m_ctx);
+                            ImGui::EndTable(m_ctx);
+                        }
+                        ImGui::EndChild(m_ctx);
+                    }
+                    ImGui::EndTabItem(m_ctx);
+                }
+                UiElements::PopReaSonusTabStyle(m_ctx);
+
+                UiElements::PushReaSonusTabStyle(m_ctx, selected_tab == 2);
+                if (ImGui::BeginTabItem(m_ctx, i18n->t("functions", "tab.footswitch").c_str()))
+                {
+                    selected_tab = 2;
+                    ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 8);
+                    if (ImGui::BeginChild(m_ctx, "right-shift-group", 0, 0, ImGui::ChildFlags_None))
+                    {
+                        ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_CellPadding, 6, 6);
+                        if (ImGui::BeginTable(m_ctx, "function_keys_grid", 2))
+                        {
+                            for (int i = 0; i < 3; i++)
+                            {
+                                if (ImGui::TableNextColumn(m_ctx))
+                                {
+                                    UiElements::PushReaSonusFunctionActionStyle(m_ctx);
+                                    RenderFunction(m_ctx, i, *this, "footswitch");
                                     UiElements::PopReaSonusFunctionActionStyle(m_ctx);
                                 }
                             }

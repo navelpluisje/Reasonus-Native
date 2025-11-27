@@ -14,7 +14,7 @@
 #include "../controls/csurf_button.hpp"
 #include "../resource.h"
 #include "../shared/csurf.h"
-#include "../shared/csurf_transport_manager.cpp"
+#include "../shared/csurf_transport_manager.hpp"
 #include "../shared/csurf_utils.hpp"
 #include "../i18n/i18n.hpp"
 #include "csurf_fp_8_session_manager.cpp"
