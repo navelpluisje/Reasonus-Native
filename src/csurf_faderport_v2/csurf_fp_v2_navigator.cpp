@@ -9,6 +9,7 @@ void CSurf_FP_V2_Navigator::GetAllControllableTracks(WDL_PtrList<MediaTrack> &tr
     bool _solo = false;
     bool _mute = false;
     bool _arm = false;
+    bool _all_armed = true;
 
     for (int i = 0; i < CountTracks(0); i++)
     {
@@ -33,6 +34,11 @@ void CSurf_FP_V2_Navigator::GetAllControllableTracks(WDL_PtrList<MediaTrack> &tr
             _arm = true;
         }
 
+        if (!armed && _all_armed)
+        {
+            _all_armed = false;
+        }
+
         if (visible || context->GetControlHiddenTracks())
         {
             tracks.Add(media_track);
@@ -41,6 +47,7 @@ void CSurf_FP_V2_Navigator::GetAllControllableTracks(WDL_PtrList<MediaTrack> &tr
     hasSolo = _solo;
     hasMute = _mute;
     hasArmed = _arm;
+    hasAllArmed = _all_armed;
 }
 
 void CSurf_FP_V2_Navigator::UpdateMixerPosition()
@@ -215,6 +222,11 @@ bool CSurf_FP_V2_Navigator::HasTracksWithMute()
 bool CSurf_FP_V2_Navigator::HasArmedTracks()
 {
     return hasArmed;
+};
+
+bool CSurf_FP_V2_Navigator::HasAllArmedTracks()
+{
+    return hasAllArmed;
 };
 
 void CSurf_FP_V2_Navigator::SetIsTouched(bool value)

@@ -15,6 +15,7 @@ class CSurf_FP_V2_Navigator
     bool hasSolo;
     bool hasMute;
     bool hasArmed;
+    bool hasAllArmed;
     bool isTouched;
 
     void UpdateMixerPosition();
@@ -49,6 +50,8 @@ public:
     bool HasTracksWithMute();
 
     bool HasArmedTracks();
+
+    bool HasAllArmedTracks();
 
     void SetIsTouched(bool value);
 };
