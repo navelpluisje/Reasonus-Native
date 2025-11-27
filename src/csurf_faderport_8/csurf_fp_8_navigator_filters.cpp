@@ -116,7 +116,7 @@ std::map<int, bool> GetCustomFilterTracks(mINI::INIMap<std::string> filter)
             std::string trackName = DAW::GetTrackName(media_track);
             bool isChild = GetTrackDepth(media_track) > 0;
 
-            if (FuzzyMatch(trackName, filter["text"]) && !(isChild && filter["top-level"] == "1"))
+            if (FuzzyMatch(trackName, filter["text"], filter["case-insensitive"] == "1") && !(isChild && filter["top-level"] == "1"))
             {
                 filterTracks[i] = true;
                 if (filter["match-multiple"] == "0")
@@ -150,9 +150,15 @@ std::map<int, bool> GetCustomFilterTracks(mINI::INIMap<std::string> filter)
     return tracks;
 }
 
-bool FuzzyMatch(std::string trackName, std::string matches)
+bool FuzzyMatch(std::string trackName, std::string matches, bool case_insensitive)
 {
     bool match = false;
+
+    if (case_insensitive)
+    {
+        std::transform(trackName.begin(), trackName.end(), trackName.begin(), ::tolower);
+        std::transform(matches.begin(), matches.end(), matches.begin(), ::tolower);
+    }
 
     for (const std::string &val : split(matches, ","))
     {

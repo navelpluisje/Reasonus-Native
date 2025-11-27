@@ -13,7 +13,7 @@ std::map<int, bool> GetChildTracks(std::map<int, bool> tracks);
 
 std::map<int, bool> GetCustomFilterTracks(mINI::INIMap<std::string> filter);
 
-bool FuzzyMatch(std::string trackName, std::string matches);
+bool FuzzyMatch(std::string trackName, std::string matches, bool case_insensitive);
 
 std::map<int, bool> GetAllTracksBase();
 

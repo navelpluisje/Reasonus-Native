@@ -141,6 +141,14 @@ class CSurf_FaderPortV2 : public IReaperControlSurface
       }
 
       /**
+       * Footswitch
+       */
+      else if (evt->midi_message[1] == BTN_FOOTSWITCH)
+      {
+        transportManager->HandleFootSwitchClick(evt->midi_message[2]);
+      }
+
+      /**
        * General Control Management
        */
       else if (evt->midi_message[1] == BTN_SHIFT_LEFT)

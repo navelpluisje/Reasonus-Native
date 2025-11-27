@@ -32,6 +32,7 @@ protected:
     std::string filter_name;
     std::vector<std::string> filter_text;
     int selected_filter_text = -1;
+    bool filter_case_insensitive;
     bool filter_siblings;
     bool filter_parents;
     bool filter_children;
@@ -68,6 +69,7 @@ protected:
         ini[newKey];
         ini[newKey]["name"] = new_filter_name;
         ini[newKey]["text"] = "";
+        ini[newKey]["case-insensitive"] = "0";
         ini[newKey]["sibblings"] = "0";
         ini[newKey]["parents"] = "0";
         ini[newKey]["children"] = "0";
@@ -87,6 +89,7 @@ protected:
         {
             filter_name = "";
             filter_text.clear();
+            filter_case_insensitive = false;
             filter_siblings = false;
             filter_parents = false;
             filter_children = false;
@@ -97,6 +100,7 @@ protected:
         std::string filter_key = filter_keys[selected_filter];
         SetFilterText();
         filter_name = ini[filter_key]["name"];
+        filter_case_insensitive = ini[filter_key]["case-insensitive"] == "1";
         filter_siblings = ini[filter_key]["sibblings"] == "1";
         filter_parents = ini[filter_key]["parents"] == "1";
         filter_children = ini[filter_key]["children"] == "1";
@@ -117,6 +121,7 @@ protected:
         filter_dirty =
             filter_name.compare(ini[filter_key]["name"]) != 0 ||
             filter_text_string.compare(ini[filter_key]["text"]) ||
+            filter_case_insensitive != (ini[filter_key]["case-insensitive"] == "1") ||
             filter_siblings != (ini[filter_key]["sibblings"] == "1") ||
             filter_parents != (ini[filter_key]["parents"] == "1") ||
             filter_children != (ini[filter_key]["children"] == "1") ||
@@ -317,6 +322,7 @@ public:
                     if (ImGui::BeginChild(m_ctx, "filter_content_right", column_width, 0.0, 0.0, ImGui::ChildFlags_AutoResizeY))
                     {
                         ImGui::Text(m_ctx, i18n->t("filters", "content.option.title").c_str());
+                        ReaSonusCheckBox(m_ctx, i18n->t("filters", "content.option.case-insensitive"), &filter_case_insensitive);
                         ReaSonusCheckBox(m_ctx, i18n->t("filters", "content.option.sibling"), &filter_siblings);
                         ReaSonusCheckBox(m_ctx, i18n->t("filters", "content.option.parents"), &filter_parents);
                         ReaSonusCheckBox(m_ctx, i18n->t("filters", "content.option.children"), &filter_children);
@@ -370,6 +376,7 @@ public:
 
         ini[filter_key]["name"] = filter_name;
         ini[filter_key]["text"] = join(filter_text, ",");
+        ini[filter_key]["case-insensitive"] = filter_case_insensitive ? "1" : "0";
         ini[filter_key]["sibblings"] = filter_siblings ? "1" : "0";
         ini[filter_key]["parents"] = filter_parents ? "1" : "0";
         ini[filter_key]["children"] = filter_children ? "1" : "0";

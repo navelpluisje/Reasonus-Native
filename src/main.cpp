@@ -19,7 +19,7 @@
 #include "actions/action_fp_v2_setting_disable_fader_move.hpp"
 #include "actions/action_fp_v2_setting_endless_track_scroll.hpp"
 #include "actions/action_fp_v2_setting_momentary_mute_solo.hpp"
-#include "ui/csurf_ui_function_keys_page.cpp"
+#include "ui/csurf_ui_function_keys_page.hpp"
 #include "resource.h"
 #include "shared/csurf.h"
 
@@ -31,6 +31,7 @@ extern reaper_csurf_reg_t
  * Set some initial values
  */
 bool CSurf_UI_FunctionKeysPage::querying_actions = false;
+FunctionTypes CSurf_UI_FunctionKeysPage::selected_type = TypeFunction;
 int CSurf_UI_FunctionKeysPage::selected_function = -1;
 int CSurf_UI_FunctionKeysPage::selected_action = -1;
 
