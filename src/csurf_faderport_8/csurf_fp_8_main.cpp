@@ -387,6 +387,8 @@ class CSurf_FaderPort : public IReaperControlSurface
     context->SetSwapShiftButtons(ini["surface"].has("swap-shift-buttons") && ini["surface"]["swap-shift-buttons"] == "1");
     context->SetFaderReset(ini["surface"].has("fader-reset") && ini["surface"]["fader-reset"] == "1");
     context->SetMuteSoloMomentary(ini["surface"].has("mute-solo-momentary") && ini["surface"]["mute-solo-momentary"] == "1");
+    context->SetLatchPreviewActionEnabled(ini["surface"].has("latch-preview-action") && ini["surface"]["latch-preview-action"] == "1");
+    context->SetLatchPreviewActionCode(ini["surface"].has("latch-preview-action-code") ? std::stoi(ini["surface"]["latch-preview-action-code"]) : 42013);
 
     context->SetOverwriteTimeCode(ini["surface"].has("overwrite-time-code") && ini["surface"]["overwrite-time-code"] == "1");
     context->SetSurfaceTimeCode(ini["surface"].has("time-code") && std::stoi(ini["surface"]["time-code"]));

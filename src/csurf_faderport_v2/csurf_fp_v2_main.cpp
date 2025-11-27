@@ -228,6 +228,8 @@ class CSurf_FaderPortV2 : public IReaperControlSurface
     context->SetControlHiddenTracks(ini["surface"].has("control-hidden-tracks") && ini["surface"]["control-hidden-tracks"] == "1");
     context->SetCanDisableFader(ini["surface"].has("can-disable-fader") && ini["surface"]["can-disable-fader"] == "1");
     context->SetEndlessTrackScroll(ini["surface"].has("endless-track-scroll") && ini["surface"]["endless-track-scroll"] == "1");
+    context->SetLatchPreviewActionEnabled(ini["surface"].has("latch-preview-action") && ini["surface"]["latch-preview-action"] == "1");
+    context->SetLatchPreviewActionCode(ini["surface"].has("latch-preview-action-code") && std::stoi(ini["surface"]["latch-preview-action-code"]));
   }
 
 public:
