@@ -39,6 +39,8 @@ class CSurf_TransportManager
 
     void SetForwardingState();
 
+    void handleFootSwitchKey(std::string key);
+
 public:
     CSurf_TransportManager(CSurf_Context *context, midi_Output *m_midiout);
 

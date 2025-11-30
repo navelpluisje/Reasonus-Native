@@ -2,6 +2,9 @@
 #include "../controls/csurf_button.hpp"
 #include "../shared/csurf_utils.hpp"
 #include "../shared/csurf_context.cpp"
+#include "../csurf_faderport_8/csurf_fp_8_ui_control_panel.hpp"
+#include "csurf_faderport_ui_imgui_utils.hpp"
+#include "../csurf_faderport_v2/csurf_fp_v2_ui_control_panel.hpp"
 
 void CSurf_TransportManager::SetButtonValues(bool force)
 {
@@ -75,6 +78,47 @@ void CSurf_TransportManager::SetForwardingState()
     isRewinding = false;
     isForwarding = true;
 };
+
+void CSurf_TransportManager::handleFootSwitchKey(std::string key)
+{
+    std::string device = context->GetNbChannels() > 1 ? FP_8 : FP_V2;
+    mINI::INIFile file(GetReaSonusIniPath(device));
+    mINI::INIStructure ini;
+    file.read(ini);
+
+    std::string actionId = ini["footswitch"][key];
+    if (actionId == "0")
+    {
+        int result = MB("There is no action assigned to this function.\nDo you want to assign an action?", "No action assigned", 1);
+        if (result == 1)
+        {
+            if (device == FP_8)
+            {
+                if (!ReaSonus8ControlPanel::control_panel_open)
+                {
+                    ToggleFP8ControlPanel(ReaSonus8ControlPanel::FUNCTIONS_PAGE);
+                }
+            }
+            else if (device == FP_V2)
+            {
+                if (!ReaSonusV2ControlPanel::control_panel_open)
+                {
+                    ToggleFPV2ControlPanel(ReaSonusV2ControlPanel::FUNCTIONS_PAGE);
+                }
+            }
+        }
+        return;
+    }
+
+    if (isInteger(actionId))
+    {
+        Main_OnCommandEx(stoi(actionId), 0, 0);
+    }
+    else
+    {
+        Main_OnCommandStringEx(actionId);
+    }
+}
 
 CSurf_TransportManager::CSurf_TransportManager(CSurf_Context *context, midi_Output *m_midiout) : context(context)
 {
@@ -204,12 +248,16 @@ void CSurf_TransportManager::HandleFootSwitchClick(int value)
         return;
     }
 
-    if (context->GetShiftLeft())
+    if (context->GetShiftChannelRight())
     {
-        CSurf_GoEnd();
-        return;
+        handleFootSwitchKey("3");
     }
-
-    SetPause();
-    SetForwardingState();
+    else if (context->GetShiftChannelLeft())
+    {
+        handleFootSwitchKey("2");
+    }
+    else
+    {
+        handleFootSwitchKey("1");
+    }
 };

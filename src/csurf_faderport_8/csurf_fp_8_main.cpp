@@ -379,14 +379,6 @@ class CSurf_FaderPort : public IReaperControlSurface
       {
         sessionManager->HandleEncoderClick(evt->midi_message[2]);
       }
-
-      /**
-       * Footswitch
-       */
-      else if (evt->midi_message[1] == BTN_FOOTSWITCH)
-      {
-        sessionManager->HandleEncoderClick(evt->midi_message[2]);
-      }
     }
   }
 
