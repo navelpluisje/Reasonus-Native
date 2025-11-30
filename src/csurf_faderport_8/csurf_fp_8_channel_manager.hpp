@@ -22,7 +22,31 @@ protected:
 
     virtual void SetTrackColors(MediaTrack *media_track)
     {
-        (void)media_track;
+        if (!media_track)
+        {
+            color.SetColor(ButtonColorWhite);
+            return;
+        }
+
+        int red = 0xff;
+        int green = 0x00;
+        int blue = 0x00;
+
+        if (!context->GetArm())
+        {
+            int trackColor = ::GetTrackColor(media_track);
+            if (trackColor == 0)
+            {
+                red = 0x7f;
+                green = 0x7f;
+                blue = 0x7f;
+            }
+            else
+            {
+                ColorFromNative(trackColor, &red, &green, &blue);
+            }
+        }
+        color.SetColor(red / 2, green / 2, blue / 2);
     };
 
 public:

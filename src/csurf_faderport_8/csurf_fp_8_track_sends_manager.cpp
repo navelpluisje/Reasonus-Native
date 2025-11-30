@@ -13,35 +13,6 @@
 class CSurf_FP_8_TrackSendsManager : public CSurf_FP_8_ChannelManager
 {
 protected:
-    void SetTrackColors(MediaTrack *media_track) override
-    {
-        if (!media_track)
-        {
-            color.SetColor(ButtonColorWhite);
-            return;
-        }
-
-        int red = 0xff;
-        int green = 0x00;
-        int blue = 0x00;
-
-        if (!context->GetArm())
-        {
-            int track_color = ::GetTrackColor(media_track);
-            if (track_color == 0)
-            {
-                red = 0x7f;
-                green = 0x7f;
-                blue = 0x7f;
-            }
-            else
-            {
-                ColorFromNative(track_color, &red, &green, &blue);
-            }
-        }
-        color.SetColor(red / 2, green / 2, blue / 2);
-    }
-
     void GetFaderValue(MediaTrack *media_track, int send_index, int *fader_value, int *value_bar_value, double *_pan, std::string *pan_str)
     {
         double volume, pan = 0.0;

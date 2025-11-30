@@ -17,29 +17,6 @@ protected:
     int nb_track_plugins[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     int current_plugin = 0;
 
-    void SetTrackColors(MediaTrack *media_track) override
-    {
-        int red = 0xff;
-        int green = 0x00;
-        int blue = 0x00;
-
-        if (!context->GetArm())
-        {
-            int trackColor = ::GetTrackColor(media_track);
-            if (trackColor == 0)
-            {
-                red = 0x7f;
-                green = 0x7f;
-                blue = 0x7f;
-            }
-            else
-            {
-                ::ColorFromNative(trackColor, &red, &green, &blue);
-            }
-        }
-        color.SetColor(red / 2, green / 2, blue / 2);
-    }
-
     void GetFaderValue(MediaTrack *media_track, int *fader_value, int *value_bar_value)
     {
         int panMode = 0;

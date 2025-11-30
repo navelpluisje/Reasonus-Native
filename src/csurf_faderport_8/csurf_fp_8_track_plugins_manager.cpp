@@ -16,35 +16,6 @@ class CSurf_FP_8_TrackPluginsManager : public CSurf_FP_8_ChannelManager
 protected:
     int current_plugin = 0;
 
-    void SetTrackColors(MediaTrack *media_track) override
-    {
-        if (!media_track)
-        {
-            color.SetColor(ButtonColorWhite);
-            return;
-        }
-
-        int red = 0xff;
-        int green = 0x00;
-        int blue = 0x00;
-
-        if (!context->GetArm())
-        {
-            int trackColor = ::GetTrackColor(media_track);
-            if (trackColor == 0)
-            {
-                red = 0x7f;
-                green = 0x7f;
-                blue = 0x7f;
-            }
-            else
-            {
-                ColorFromNative(trackColor, &red, &green, &blue);
-            }
-        }
-        color.SetColor(red / 2, green / 2, blue / 2);
-    }
-
     void GetFaderValue(MediaTrack *media_track, int *fader_value, int *value_bar_value)
     {
         int panMode = 0;

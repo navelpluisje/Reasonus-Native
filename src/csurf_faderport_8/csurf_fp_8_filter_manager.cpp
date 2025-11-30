@@ -26,30 +26,6 @@ protected:
     mINI::INIStructure ini;
     std::vector<Filter> filters;
 
-    void SetTrackColors(MediaTrack *media_track) override
-    {
-        int red = 0xff;
-        int green = 0x00;
-        int blue = 0x00;
-
-        if (!context->GetArm())
-        {
-
-            int trackColor = ::GetTrackColor(media_track);
-            if (trackColor == 0)
-            {
-                red = 0x7f;
-                green = 0x7f;
-                blue = 0x7f;
-            }
-            else
-            {
-                ColorFromNative(trackColor, &red, &green, &blue);
-            }
-        }
-        color.SetColor(red / 2, green / 2, blue / 2);
-    }
-
     void GetFilters()
     {
         mINI::INIFile file(GetReaSonusIniPath(FP_8));
