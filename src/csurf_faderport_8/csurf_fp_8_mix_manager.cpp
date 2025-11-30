@@ -32,7 +32,8 @@ protected:
         mixBusButton->SetValue((trackFilter == TrackTopFoldersFilter || trackFilter == TrackAllFoldersFilter || trackFilter == TrackHarwareOutputFilter) ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
         mixVcaButton->SetValue((trackFilter == TrackIsVcaFilter || trackFilter == TrackEffectsFilter) ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
         mixAllButton->SetValue((trackFilter == TrackAllFilter || trackFilter == TrackCustomFilter || trackFilter == TrackCustomMultiSelectFilter) ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
-        shiftRightButton->SetValue(((!context->GetSwapShiftButtons() && context->GetShiftRight()) || (context->GetShiftLeft() && context->GetSwapShiftButtons()))
+        shiftRightButton->SetValue(((!context->GetSettings()->GetSwapShiftButtons() && context->GetShiftRight()) ||
+                                    (context->GetShiftLeft() && context->GetSettings()->GetSwapShiftButtons()))
                                        ? BTN_VALUE_ON
                                        : BTN_VALUE_OFF,
                                    force);

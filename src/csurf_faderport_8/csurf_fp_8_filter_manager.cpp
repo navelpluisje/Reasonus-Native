@@ -81,12 +81,12 @@ public:
 
             CSurf_FP_8_Track *track = tracks.at(i);
             MediaTrack *media_track = media_tracks.Get(i);
-            SetTrackColors(media_track);
+            SetTrackColors(media_track, navigator->HasFilter(filter_index));
 
             GetFaderValue(media_track, &fader_value, &value_bar_value, &strPan1, &strPan2);
 
             track->SetTrackColor(color);
-            track->SetSelectButtonValue(navigator->HasFilter(filter_index) ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
+            track->SetSelectButtonValue(BTN_VALUE_ON, forceUpdate);
             track->SetMuteButtonValue(DAW::IsTrackMuted(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
             track->SetSoloButtonValue(DAW::IsTrackSoloed(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
             track->SetFaderValue(fader_value, forceUpdate);

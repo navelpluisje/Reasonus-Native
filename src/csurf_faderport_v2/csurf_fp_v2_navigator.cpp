@@ -33,7 +33,7 @@ void CSurf_FP_V2_Navigator::GetAllControllableTracks(WDL_PtrList<MediaTrack> &tr
             _arm = true;
         }
 
-        if (visible || context->GetControlHiddenTracks())
+        if (visible || context->GetSettings()->GetControlHiddenTracks())
         {
             tracks.Add(media_track);
         }
@@ -166,7 +166,7 @@ MediaTrack *CSurf_FP_V2_Navigator::GetNextTrack()
 {
     if (track_offset + 1 > tracks.GetSize() - 1)
     {
-        if (context->GetEndlessTrackScroll())
+        if (context->GetSettings()->GetEndlessTrackScroll())
         {
             track_offset = 0;
         }
@@ -186,7 +186,7 @@ MediaTrack *CSurf_FP_V2_Navigator::GetPreviousTrack()
 {
     if (track_offset - 1 < 0)
     {
-        if (context->GetEndlessTrackScroll())
+        if (context->GetSettings()->GetEndlessTrackScroll())
         {
             track_offset = tracks.GetSize() - 1;
         }

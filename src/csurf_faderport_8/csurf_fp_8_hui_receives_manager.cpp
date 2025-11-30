@@ -1,14 +1,7 @@
 #ifndef CSURF_FP_8_RECEIVES_MANAGER_C_
 #define CSURF_FP_8_RECEIVES_MANAGER_C_
 
-#include "../shared/csurf_context.cpp"
-#include <WDL/ptrlist.h>
-#include "csurf_fp_8_track.hpp"
-#include "../shared/csurf_utils.hpp"
 #include "csurf_fp_8_channel_manager.hpp"
-#include "csurf_fp_8_navigator.hpp"
-#include <vector>
-#include "../shared/csurf_daw.hpp"
 
 class CSurf_FP_8_ReceivesManager : public CSurf_FP_8_ChannelManager
 {
@@ -94,7 +87,7 @@ public:
                 continue;
             }
 
-            SetTrackColors(media_track);
+            SetTrackColors(media_track, DAW::IsTrackSelected(media_track));
 
             GetFaderValue(media_track, receive_index, &faderValue, &valueBarValue, &pan, &panStr);
 
@@ -134,12 +127,12 @@ public:
             }
 
             track->SetTrackColor(color);
-            track->SetSelectButtonValue(DAW::IsTrackSelected(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF);
+            track->SetSelectButtonValue(BTN_VALUE_ON);
             track->SetMuteButtonValue(
                 ButtonBlinkOnOff(
                     (context->GetShiftChannelLeft() && DAW::GetTrackReceiveMute(media_track, receive_index)),
                     DAW::GetTrackReceiveMute(media_track, receive_index),
-                    context->GetDistractionFreeMode()));
+                    context->GetSettings()->GetDistractionFreeMode()));
             track->SetSoloButtonValue(((context->GetShiftChannelLeft() && DAW::GetTrackReceiveMono(media_track, receive_index)) || (!context->GetShiftChannelLeft() && DAW::GetTrackReceivePhase(media_track, receive_index)))
                                           ? BTN_VALUE_ON
                                           : BTN_VALUE_OFF);
