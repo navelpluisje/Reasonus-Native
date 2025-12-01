@@ -23,6 +23,10 @@ jobs:
           - os: windows-latest
             arch: x86
             win_build_type: Release
+          - os: ubuntu-latest
+            arch: x86_64
+          - os: ubuntu-latest
+            arch: i686
 
     steps:
       - uses: actions/checkout@v2
@@ -116,11 +120,13 @@ jobs:
         working-directory: ${{ github.workspace }}
         shell: bash
         run: |
-          if [[ "${{ matrix.os }}" == "windows-latest" && 
+          if [[ "${{ matrix.os }}" == "windows-latest" &&
                 "${{ matrix.arch }}" == "x64" ]]; then
             cpack
           elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
             sudo cpack
+          elif [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+            cpack
           fi
 
       - name: Upload artifact
@@ -170,4 +176,7 @@ jobs:
           files: |
             ./**/*.dll
             ./**/*.dylib
+            ./**/*.so
+            ./**/*.tar.xz
+            ./**/*.txz
             ./**/*.ini
