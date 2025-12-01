@@ -64,6 +64,14 @@ class CSurf_Settings
      * @brief The the brightness of the button offstate for the track color
      */
     int track_color_brightness;
+    /**
+     * @brief When enabled pressing the latch preview when latch preview active trigger the action
+     */
+    bool latch_preview_action_enabled;
+    /**
+     * @brief action to perform for latch preview
+     */
+    int latch_preview_action_code;
 
 public:
     CSurf_Settings() {}
@@ -216,6 +224,26 @@ public:
     {
         return track_color_brightness / 100.0;
     };
+
+    void SetLatchPreviewActionEnabled(bool value)
+    {
+        latch_preview_action_enabled = value;
+    }
+
+    bool GetLatchPreviewActionEnabled()
+    {
+        return latch_preview_action_enabled;
+    }
+
+    void SetLatchPreviewActionCode(int value)
+    {
+        latch_preview_action_code = value;
+    }
+
+    int GetLatchPreviewActionCode()
+    {
+        return latch_preview_action_code;
+    }
 };
 
 #endif

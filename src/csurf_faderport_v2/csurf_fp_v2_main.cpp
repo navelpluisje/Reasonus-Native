@@ -232,6 +232,8 @@ class CSurf_FaderPortV2 : public IReaperControlSurface
     readAndCreateIni(ini, FP_V2);
 
     i18n->SetLanguage(DAW::GetExtState(EXT_STATE_KEY_UI_LANGUAGE, "en-US"));
+    context->GetSettings()->SetLatchPreviewActionEnabled(ini["surface"].has("latch-preview-action") && ini["surface"]["latch-preview-action"] == "1");
+    context->GetSettings()->SetLatchPreviewActionCode(ini["surface"].has("latch-preview-action-code") && std::stoi(ini["surface"]["latch-preview-action-code"]));
     context->GetSettings()->SetMuteSoloMomentary(ini["surface"].has("mute-solo-momentary") && ini["surface"]["mute-solo-momentary"] == "1");
     context->GetSettings()->SetControlHiddenTracks(ini["surface"].has("control-hidden-tracks") && ini["surface"]["control-hidden-tracks"] == "1");
     context->GetSettings()->SetCanDisableFader(ini["surface"].has("can-disable-fader") && ini["surface"]["can-disable-fader"] == "1");
