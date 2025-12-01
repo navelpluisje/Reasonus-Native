@@ -127,7 +127,7 @@ void CSurf_FP_V2_TrackManager::HandleMuteClick(int index, int value)
     int now = GetTickCount();
     MediaTrack *media_track = navigator->GetControllerTrack();
 
-    if (value == 0 && context->GetMuteSoloMomentary())
+    if (value == 0 && context->GetSettings()->GetMuteSoloMomentary())
     {
         if (now - mute_start > MOMENTARY_TIMEOUT)
         {
@@ -158,7 +158,7 @@ void CSurf_FP_V2_TrackManager::HandleSoloClick(int index, int value)
     int now = GetTickCount();
     MediaTrack *media_track = navigator->GetControllerTrack();
 
-    if (value == 0 && context->GetMuteSoloMomentary())
+    if (value == 0 && context->GetSettings()->GetMuteSoloMomentary())
     {
         if (now - solo_start > MOMENTARY_TIMEOUT)
         {

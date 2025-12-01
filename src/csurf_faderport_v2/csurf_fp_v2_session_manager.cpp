@@ -48,7 +48,7 @@ protected:
     void SetButtonValues()
     {
         // With shift engaged, blink the selected button
-        Btn_Value valueOn = context->GetShiftLeft() && !context->GetDistractionFreeMode() ? BTN_VALUE_BLINK : BTN_VALUE_ON;
+        Btn_Value valueOn = context->GetShiftLeft() && !context->GetSettings()->GetDistractionFreeMode() ? BTN_VALUE_BLINK : BTN_VALUE_ON;
 
         linkButton->SetValue(GetToggleCommandStringState("_REASONUS_TOGGLE_PLAY_CURSOR_COMMAND") && context->GetShiftLeft()
                                  ? BTN_VALUE_ON
@@ -247,7 +247,7 @@ public:
             return;
         }
 
-        if (context->GetShiftLeft() && context->GetCanDisableFader())
+        if (context->GetShiftLeft() && context->GetSettings()->GetCanDisableFader())
         {
             context->SetFaderDisabled(!context->GetFaderDisabled());
             return;
