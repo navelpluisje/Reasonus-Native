@@ -126,9 +126,9 @@ public:
 
         if (context->GetShiftLeft())
         {
-            if (::GetTrackAutomationMode(media_track) == AUTOMATION_PREVIEW && context->GetLatchPreviewActionEnabled())
+            if (::GetTrackAutomationMode(media_track) == AUTOMATION_PREVIEW && context->GetSettings()->GetLatchPreviewActionEnabled())
             {
-                ::Main_OnCommandEx(context->GetLatchPreviewActionCode(), 0, 0);
+                ::Main_OnCommandEx(context->GetSettings()->GetLatchPreviewActionCode(), 0, 0);
             }
             else
             {

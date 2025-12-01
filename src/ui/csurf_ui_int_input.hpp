@@ -5,7 +5,7 @@
 #include <string>
 #include "csurf_ui_elements.hpp"
 
-static void ReaSonusIntInput(ImGui_Context *m_ctx, std::string label, int *value, double width = 0.0)
+static void ReaSonusIntInput(ImGui_Context *m_ctx, std::string label, int *value, int v_min, int v_max, double width = 0.0, std::string format = "%d")
 {
     int local_value = *value;
 
@@ -19,7 +19,7 @@ static void ReaSonusIntInput(ImGui_Context *m_ctx, std::string label, int *value
         if (ImGui::BeginChild(m_ctx, ("input-container" + label).c_str(), width, 0.0, ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY))
         {
             UiElements::PushReaSonusInputStyle(m_ctx);
-            if (ImGui::SliderInt(m_ctx, ("##" + label).c_str(), &local_value, 0, 20))
+            if (ImGui::SliderInt(m_ctx, ("##" + label).c_str(), &local_value, v_min, v_max, format.c_str()))
             {
                 *value = local_value;
             }

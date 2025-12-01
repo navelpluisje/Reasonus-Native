@@ -3,6 +3,7 @@
 #include "../controls/csurf_display_resources.hpp"
 #include "../ui/csurf_ui_page_content.hpp"
 #include "../ui/csurf_ui_checkbox.hpp"
+#include "../ui/csurf_ui_int_input.hpp"
 #include "../ui/csurf_ui_combo_input.hpp"
 #include "../ui/csurf_ui_tooltip.hpp"
 #include "../ui/csurf_ui_images.h"
@@ -34,6 +35,7 @@ protected:
     bool setting_latch_preview_action_enable;
     bool setting_overwrite_time_code;
     int setting_latch_preview_action;
+    int setting_track_color_brightness = 25;
     int setting_time_code;
     int setting_track_display;
     int *index;
@@ -84,6 +86,26 @@ public:
 
     virtual ~CSurf_FP_8_SettingsPage() {};
 
+    void RenderSettingsIntInput(
+        ImGui_Context *m_ctx,
+        std::string label,
+        int *value,
+        int min,
+        int max,
+        std::string tooltip,
+        std::string format)
+    {
+        double x_pos = ImGui::GetCursorPosX(m_ctx);
+        double y_pos = ImGui::GetCursorPosY(m_ctx);
+        std::string id = std::to_string(x_pos) + "-" + std::to_string(y_pos);
+
+        ReaSonusIntInput(m_ctx, label.c_str(), value, min, max, -20.0, format);
+        ImGui::SameLine(m_ctx);
+        ReaSonusTooltip(m_ctx, tooltip.c_str(), id.c_str(), icon_info, -20, 26);
+        ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 4);
+        ImGui::Dummy(m_ctx, 0, 0);
+    }
+
     void RenderSettingsCheckbox(
         ImGui_Context *m_ctx,
         std::string label,
@@ -121,6 +143,8 @@ public:
 
     void Render() override
     {
+        double width, height = 0.0;
+
         if (edit_language != previous_edit_language)
         {
             previous_edit_language = edit_language;
@@ -244,30 +268,52 @@ public:
                 {
                     selected_tab = 2;
                     ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 16);
+                    ImGui::GetContentRegionAvail(m_ctx, &width, &height);
 
-                    RenderSettingsCheckbox(
-                        m_ctx,
-                        i18n->t("settings", "overwrite-timecode.label"),
-                        &setting_overwrite_time_code,
-                        i18n->t("settings", "overwrite-timecode.tooltip"));
-
-                    if (setting_overwrite_time_code)
+                    if (ImGui::BeginChild(m_ctx, "settings-display", width / 2 - 8, 0.0, ImGui::ChildFlags_None))
                     {
-                        ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + 26);
+
+                        RenderSettingsCheckbox(
+                            m_ctx,
+                            i18n->t("settings", "overwrite-timecode.label"),
+                            &setting_overwrite_time_code,
+                            i18n->t("settings", "overwrite-timecode.tooltip"));
+
+                        if (setting_overwrite_time_code)
+                        {
+                            ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + 26);
+                            RenderSettingsComboInput(
+                                m_ctx,
+                                i18n->t("settings", "timecode-list.label"),
+                                time_code_names,
+                                &setting_time_code,
+                                i18n->t("settings", "timecode-list.tooltip"));
+                        }
+
                         RenderSettingsComboInput(
                             m_ctx,
-                            i18n->t("settings", "timecode-list.label"),
-                            time_code_names,
-                            &setting_time_code,
-                            i18n->t("settings", "timecode-list.tooltip"));
-                    }
+                            i18n->t("settings", "display-track.label"),
+                            track_display_names,
+                            &setting_track_display,
+                            i18n->t("settings", "display-track.tooltip"));
 
-                    RenderSettingsComboInput(
-                        m_ctx,
-                        i18n->t("settings", "display-track.label"),
-                        track_display_names,
-                        &setting_track_display,
-                        i18n->t("settings", "display-track.tooltip"));
+                        ImGui::EndChild(m_ctx);
+                    }
+                    ImGui::SameLine(m_ctx);
+                    ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + 16);
+                    if (ImGui::BeginChild(m_ctx, "settings-colors", width / 2 - 8, 0.0, ImGui::ChildFlags_None))
+                    {
+                        RenderSettingsIntInput(
+                            m_ctx,
+                            i18n->t("settings", "track-color-brightness.label"),
+                            &setting_track_color_brightness,
+                            5,
+                            100,
+                            i18n->t("settings", "track-color-brightness.tooltip"),
+                            "%d%%");
+
+                        ImGui::EndChild(m_ctx);
+                    }
 
                     ImGui::EndTabItem(m_ctx);
                 }
@@ -298,7 +344,7 @@ public:
         ini["surface"]["mute-solo-momentary"] = setting_momentary_mute_solo ? "1" : "0";
         ini["surface"]["overwrite-time-code"] = setting_overwrite_time_code ? "1" : "0";
         ini["surface"]["latch-preview-action"] = setting_latch_preview_action_enable ? "1" : "0";
-
+        ini["surface"]["track-color-brightness"] = std::to_string(setting_track_color_brightness);
         ini["surface"]["latch-preview-action-code"] = std::to_string(latch_preview_action_indexes[setting_latch_preview_action]);
         ini["surface"]["time-code"] = std::to_string(time_code_indexes[setting_time_code]);
         ini["displays"]["track"] = std::to_string(track_display_indexes[setting_track_display]);
@@ -338,6 +384,7 @@ public:
 
         index = std::find(latch_preview_action_indexes, latch_preview_action_indexes + 8, stoi(ini["surface"]["latch-preview-action-code"]));
         setting_latch_preview_action = index - latch_preview_action_indexes;
+        setting_track_color_brightness = stoi(ini["surface"]["track-color-brightness"]);
 
         index = std::find(time_code_indexes, time_code_indexes + 6, stoi(ini["surface"]["time-code"]));
         setting_time_code = index - time_code_indexes;

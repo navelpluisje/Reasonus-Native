@@ -26,30 +26,6 @@ protected:
     mINI::INIStructure ini;
     std::vector<Filter> filters;
 
-    void SetTrackColors(MediaTrack *media_track) override
-    {
-        int red = 0xff;
-        int green = 0x00;
-        int blue = 0x00;
-
-        if (!context->GetArm())
-        {
-
-            int trackColor = ::GetTrackColor(media_track);
-            if (trackColor == 0)
-            {
-                red = 0x7f;
-                green = 0x7f;
-                blue = 0x7f;
-            }
-            else
-            {
-                ColorFromNative(trackColor, &red, &green, &blue);
-            }
-        }
-        color.SetColor(red / 2, green / 2, blue / 2);
-    }
-
     void GetFilters()
     {
         mINI::INIFile file(GetReaSonusIniPath(FP_8));
@@ -105,12 +81,12 @@ public:
 
             CSurf_FP_8_Track *track = tracks.at(i);
             MediaTrack *media_track = media_tracks.Get(i);
-            SetTrackColors(media_track);
+            SetTrackColors(media_track, navigator->HasFilter(filter_index));
 
             GetFaderValue(media_track, &fader_value, &value_bar_value, &strPan1, &strPan2);
 
             track->SetTrackColor(color);
-            track->SetSelectButtonValue(navigator->HasFilter(filter_index) ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
+            track->SetSelectButtonValue(BTN_VALUE_ON, forceUpdate);
             track->SetMuteButtonValue(DAW::IsTrackMuted(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
             track->SetSoloButtonValue(DAW::IsTrackSoloed(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
             track->SetFaderValue(fader_value, forceUpdate);

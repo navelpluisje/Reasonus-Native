@@ -25,195 +25,42 @@ class CSurf_TransportManager
 
     CSurf_Context *context;
 
-    void SetButtonValues()
-    {
-        playButton->SetValue(ButtonBlinkOnOff(isPaused, isPlaying));
-        stopButton->SetValue(isStopped ? BTN_VALUE_ON : BTN_VALUE_OFF);
-        recordButton->SetValue(isRecording ? BTN_VALUE_ON : BTN_VALUE_OFF);
-        repeatButton->SetValue(isRepeat ? BTN_VALUE_ON : BTN_VALUE_OFF);
-        rewindButton->SetValue(ButtonBlinkOnOff(isRewinding && isFastFwdRwd, isRewinding));
-        forwardButton->SetValue(ButtonBlinkOnOff(isForwarding && isFastFwdRwd, isForwarding));
-    };
+    void SetButtonValues(bool force);
 
-    void StopRewindOrForward()
-    {
-        isFastFwdRwd = false;
-        isForwarding = false;
-        isRewinding = false;
-    }
+    void StopRewindOrForward();
 
-    void HandleRewind()
-    {
-        CSurf_OnRew(0);
+    void HandleRewind();
 
-        if (isFastFwdRwd)
-        {
-            CSurf_OnRew(0);
-            CSurf_OnRew(0);
-            CSurf_OnRew(0);
-        }
-    }
+    void HandleForward();
 
-    void HandleForward()
-    {
-        CSurf_OnFwd(0);
+    void SetPause();
 
-        if (isFastFwdRwd)
-        {
-            CSurf_OnFwd(0);
-            CSurf_OnFwd(0);
-            CSurf_OnFwd(0);
-        }
-    }
+    void SetRewindingState();
 
-    void SetPause()
-    {
-        if (isPlaying)
-        {
-            CSurf_OnPlay();
-        }
-    }
+    void SetForwardingState();
 
-    void SetRewindingState()
-    {
-        if (isRewinding)
-        {
-            isFastFwdRwd = !isFastFwdRwd;
-            return;
-        }
-        isFastFwdRwd = false;
-        isForwarding = false;
-        isRewinding = true;
-    };
-
-    void SetForwardingState()
-    {
-        if (isForwarding)
-        {
-            isFastFwdRwd = !isFastFwdRwd;
-            return;
-        }
-        isFastFwdRwd = false;
-        isRewinding = false;
-        isForwarding = true;
-    };
+    void handleFootSwitchKey(std::string key);
 
 public:
-    CSurf_TransportManager(CSurf_Context *context, midi_Output *m_midiout) : context(context)
-    {
-        playButton = new CSurf_Button(BTN_PLAY, BTN_VALUE_OFF, m_midiout);
-        stopButton = new CSurf_Button(BTN_STOP, BTN_VALUE_OFF, m_midiout);
-        recordButton = new CSurf_Button(BTN_RECORD, BTN_VALUE_OFF, m_midiout);
-        repeatButton = new CSurf_Button(BTN_LOOP, BTN_VALUE_OFF, m_midiout);
-        rewindButton = new CSurf_Button(BTN_REWIND, BTN_VALUE_OFF, m_midiout);
-        forwardButton = new CSurf_Button(BTN_FORWARD, BTN_VALUE_OFF, m_midiout);
-        Update();
-    };
+    CSurf_TransportManager(CSurf_Context *context, midi_Output *m_midiout);
 
-    void Update()
-    {
-        int playState = GetPlayStateEx(0);
-        isPlaying = hasBit(playState, 0);
-        isPaused = hasBit(playState, 1);
-        isRecording = hasBit(playState, 2);
-        isStopped = !isPlaying && !isPaused;
-        isRepeat = GetSetRepeatEx(0, -1) > 0;
+    void Update();
 
-        if (isRewinding)
-        {
-            HandleRewind();
-        }
+    void Refresh(bool force);
 
-        if (isForwarding)
-        {
-            HandleForward();
-        }
+    void HandlePlayButton(int value);
 
-        SetButtonValues();
-    }
+    void HandleStopButton(int value);
 
-    void HandlePlayButton(int value)
-    {
-        if (value == 0)
-        {
-            return;
-        }
+    void HandleRepeatButton(int value);
 
-        StopRewindOrForward();
-        CSurf_OnPlay();
-    };
+    void HandleRecordButton(int value);
 
-    void HandleStopButton(int value)
-    {
-        if (value == 0)
-        {
-            return;
-        }
+    void HandleRewindButton(int value);
 
-        StopRewindOrForward();
-        CSurf_OnStop();
-    };
+    void HandleForwardButton(int value);
 
-    void HandleRepeatButton(int value)
-    {
-        if (value == 0)
-        {
-            return;
-        }
-
-        if (context->GetShiftLeft())
-        {
-            GetSetRepeatEx(0, 0);
-        }
-        else
-        {
-            // SendMessage(g_hwnd, WM_COMMAND, IDC_REPEAT, 0);
-            GetSetRepeatEx(0, 2);
-        }
-    };
-
-    void HandleRecordButton(int value)
-    {
-        if (value == 0)
-        {
-            return;
-        }
-
-        CSurf_OnRecord();
-    };
-
-    void HandleRewindButton(int value)
-    {
-        if (value == 0)
-        {
-            return;
-        }
-
-        if (context->GetShiftLeft())
-        {
-            CSurf_GoStart();
-            return;
-        }
-        SetPause();
-        SetRewindingState();
-    };
-
-    void HandleForwardButton(int value)
-    {
-        if (value == 0)
-        {
-            return;
-        }
-
-        if (context->GetShiftLeft())
-        {
-            CSurf_GoEnd();
-            return;
-        }
-
-        SetPause();
-        SetForwardingState();
-    };
+    void HandleFootSwitchClick(int value);
 };
 
 #endif

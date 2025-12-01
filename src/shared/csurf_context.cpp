@@ -4,74 +4,10 @@
 #include "csurf_context_resources.hpp"
 #include <cstdlib>
 #include "csurf_utils.hpp"
+#include "csurf_settings.cpp"
 
 class CSurf_Context
 {
-    // Global settings
-    /**
-     * @brief Wether or not you want to control plugins with ReaSonus
-     */
-    bool plugin_control_setting;
-    /**
-     * @brief Should the last touched parameter get 'untouched' after connectring it to a control
-     */
-    bool untouch_after_learn_setting;
-    /**
-     * @brief Enable the last fader for master affter clicking themaster button
-     */
-    bool master_fader_mode_setting;
-    /**
-     * @brief Swap the left and right shift button behaviuour
-     */
-    bool swap_shift_buttons_setting;
-    /**
-     * @brief Use left-shit fader touch to reset the fader value
-     */
-    bool fader_reset_setting;
-    /**
-     * @brief When engaged the mute and solo button behave as momentary buttons when pressing longer then 500ms
-     */
-    bool mute_solo_momentary_setting;
-    /**
-     * @brief When engaged you use your own selected timeocode. Otherwise the selected time code in Reaper will be used
-     */
-    bool overwrite_time_code_setting;
-    /**
-     * @brief When overwrite is true, this is the timecode used
-     */
-    int surface_time_code_setting;
-    /**
-     * @brief The display type for the default track mode displays
-     */
-    int displays_track_display;
-    /**
-     * @brief Wether or not to be in distraction free mode
-     */
-    int distraction_free_mode_setting;
-    /**
-     * @brief When overwrite is true, this is the timecode used
-     */
-    bool control_hidde_tracks;
-    /**
-     * @brief Wether or not the fader can be disabled
-     */
-    bool can_disable_fader;
-    /**
-     * @brief Wether or not the fader on the V2 is disabled
-     */
-    bool fader_disabled;
-    /**
-     * @brief On the V2 go to the first track when pressing next on the last track en the other way around
-     */
-    bool endless_track_scroll;
-    /**
-     * @brief When enabled pressing the latch preview when latch preview active trigger the action
-     */
-    bool latch_preview_action_enabled;
-    /**
-     * @brief action to perform for latch preview
-     */
-    int latch_preview_action_code;
     /**
      * @brief Number of channels
      */
@@ -110,134 +46,33 @@ class CSurf_Context
     int pluginEditPluginId;
     int pluginEditParamId;
 
+    // disable fader on v2
+    bool fader_disabled;
+
     ChannelMode channelMode = TrackMode;
     ChannelMode previousChannelMode = TrackMode;
     ChannelMode previousPluginChannelMode = TrackMode;
     ChannelManagerType channelManagerType;
+    CSurf_Settings *settings;
 
 public:
-    CSurf_Context(int nbChannels) : nbChannels(nbChannels) {}
+    CSurf_Context(int nbChannels) : nbChannels(nbChannels)
+    {
+        settings = new CSurf_Settings();
+    }
     ~CSurf_Context() {}
 
-    /**************************************************************************
-     * Settings
-     **************************************************************************/
-    void SetPluginControl(bool enabled)
+    CSurf_Settings *GetSettings()
     {
-        plugin_control_setting = enabled;
+        return settings;
     }
-
-    bool GetPluginControl()
-    {
-        return plugin_control_setting;
-    }
-
-    void SetUntouchAfterLearn(bool enabled)
-    {
-        untouch_after_learn_setting = enabled;
-    }
-
-    bool GetUntouchAfterLearn()
-    {
-        return untouch_after_learn_setting;
-    }
-
-    void SetMasterFaderModeEnabled(bool enabled)
-    {
-        master_fader_mode_setting = enabled;
-    }
-
-    bool GetMasterFaderModeEnabled()
-    {
-        return master_fader_mode_setting;
-    }
-
-    void SetSwapShiftButtons(bool enabled)
-    {
-        swap_shift_buttons_setting = enabled;
-    }
-
-    bool GetSwapShiftButtons()
-    {
-        return swap_shift_buttons_setting;
-    }
-
-    void SetFaderReset(bool enabled)
-    {
-        fader_reset_setting = enabled;
-    }
-
-    bool GetFaderReset()
-    {
-        return fader_reset_setting;
-    }
-
-    void SetMuteSoloMomentary(bool enabled)
-    {
-        mute_solo_momentary_setting = enabled;
-    }
-
-    bool GetMuteSoloMomentary()
-    {
-        return mute_solo_momentary_setting;
-    }
-
-    void SetOverwriteTimeCode(bool enabled)
-    {
-        overwrite_time_code_setting = enabled;
-    }
-
-    bool GetOverwriteTimeCode()
-    {
-        return overwrite_time_code_setting;
-    }
-
-    void SetSurfaceTimeCode(int value)
-    {
-        surface_time_code_setting = value;
-    }
-
-    bool GetSurfaceTimeCode()
-    {
-        return surface_time_code_setting;
-    }
-
-    void SetTrackDisplay(int value)
-    {
-        displays_track_display = value;
-    }
-
-    int GetTrackDisplay()
-    {
-        return displays_track_display;
-    }
-
-    void SetControlHiddenTracks(bool value)
-    {
-        control_hidde_tracks = value;
-    }
-
-    bool GetControlHiddenTracks()
-    {
-        return control_hidde_tracks;
-    }
-
-    void SetCanDisableFader(bool value)
-    {
-        can_disable_fader = value;
-    }
-
-    bool GetCanDisableFader()
-    {
-        return can_disable_fader;
-    }
-
     /**************************************************************************
      * Modifiers
      **************************************************************************/
-    void SetShiftLeft(bool val)
+    void
+    SetShiftLeft(bool val)
     {
-        if (swap_shift_buttons_setting)
+        if (settings->GetSwapShiftButtons())
         {
             shift_right = val;
         }
@@ -249,7 +84,7 @@ public:
 
     void SetShiftLeftLocked(bool val)
     {
-        if (swap_shift_buttons_setting)
+        if (settings->GetSwapShiftButtons())
         {
             shift_right_locked = val;
         }
@@ -278,7 +113,7 @@ public:
 
     void SetShiftRight(bool val)
     {
-        if (swap_shift_buttons_setting)
+        if (settings->GetSwapShiftButtons())
         {
             shift_left = val;
         }
@@ -290,7 +125,7 @@ public:
 
     void SetShiftRightLocked(bool val)
     {
-        if (swap_shift_buttons_setting)
+        if (settings->GetSwapShiftButtons())
         {
             shift_left_locked = val;
         }
@@ -326,36 +161,6 @@ public:
     {
         return arm;
     }
-
-    void SetFaderDisabled(bool value)
-    {
-        fader_disabled = value;
-    };
-
-    int GetFaderDisabled()
-    {
-        return fader_disabled;
-    }
-
-    void SetDistractionFreeMode(bool value)
-    {
-        distraction_free_mode_setting = value;
-    };
-
-    bool GetDistractionFreeMode()
-    {
-        return distraction_free_mode_setting;
-    };
-
-    void SetEndlessTrackScroll(bool value)
-    {
-        endless_track_scroll = value;
-    };
-
-    bool GetEndlessTrackScroll()
-    {
-        return endless_track_scroll;
-    };
 
     /**************************************************************************
      * Pan mode
@@ -416,29 +221,6 @@ public:
     }
 
     /**************************************************************************
-     * Latch Preview settings
-     **************************************************************************/
-    void SetLatchPreviewActionEnabled(bool value)
-    {
-        latch_preview_action_enabled = value;
-    }
-
-    bool GetLatchPreviewActionEnabled()
-    {
-        return latch_preview_action_enabled;
-    }
-
-    void SetLatchPreviewActionCode(int value)
-    {
-        latch_preview_action_code = value;
-    }
-
-    int GetLatchPreviewActionCode()
-    {
-        return latch_preview_action_code;
-    }
-
-    /**************************************************************************
      * Master Fader mode
      **************************************************************************/
     /**
@@ -467,7 +249,7 @@ public:
     {
         if (nbChannels > 1)
         {
-            return master_fader_mode && master_fader_mode_setting;
+            return master_fader_mode && settings->GetMasterFaderModeEnabled();
         }
         else
         {
@@ -677,6 +459,16 @@ public:
     void SetChannelManagerType(ChannelManagerType type)
     {
         channelManagerType = type;
+    }
+
+    void SetFaderDisabled(bool value)
+    {
+        fader_disabled = value;
+    };
+
+    int GetFaderDisabled()
+    {
+        return fader_disabled;
     }
 };
 
