@@ -118,7 +118,7 @@ enum Btn_Types
     BTN_STOP = 0x5d,
     BTN_PLAY = 0x5e,
     BTN_RECORD = 0x5f,
-    BTN_FOOTSWITCH = 0x4f,
+    BTN_FOOTSWITCH = 0x66,
 };
 
 // Button Values

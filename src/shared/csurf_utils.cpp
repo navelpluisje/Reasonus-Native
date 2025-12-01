@@ -347,6 +347,9 @@ void readAndCreateIni(mINI::INIStructure &data, std::string device)
         data["functions"]["2"] = "0";
         data["functions"]["3"] = "0";
         data["functions"]["4"] = "0";
+        data["footswitch"]["1"] = "0";
+        data["footswitch"]["2"] = "0";
+        data["footswitch"]["3"] = "0";
         if (device == FP_V2)
         {
             data["surface"]["control-hidden-tracks"] = "0";
@@ -379,7 +382,10 @@ void readAndCreateIni(mINI::INIStructure &data, std::string device)
             data["functions"]["16"] = "0";
             data["filters"]["nb-filters"] = "0";
         }
-        file.generate(data, true);
+        if (!file.generate(data, true))
+        {
+            MB("Error while creating the ini file. Please contact via the forum", "ReaSonus Error", 0);
+        }
     }
     else
     {
@@ -398,6 +404,10 @@ void validateReaSonusIni(mINI::INIFile file, mINI::INIStructure &data, std::stri
     data["functions"]["2"] = data["functions"].has("2") ? data["functions"]["2"] : "0";
     data["functions"]["3"] = data["functions"].has("3") ? data["functions"]["3"] : "0";
     data["functions"]["4"] = data["functions"].has("4") ? data["functions"]["4"] : "0";
+
+    data["footswitch"]["1"] = data["footswitch"].has("1") ? data["footswitch"]["1"] : "0";
+    data["footswitch"]["2"] = data["footswitch"].has("2") ? data["footswitch"]["2"] : "0";
+    data["footswitch"]["3"] = data["footswitch"].has("3") ? data["footswitch"]["3"] : "0";
 
     if (device == FP_V2)
     {
