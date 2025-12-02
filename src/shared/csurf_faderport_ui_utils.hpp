@@ -15,7 +15,7 @@
 #elif __APPLE__
 #define SystemOpenURL(url) std::system("open " url);
 #elif __linux__
-#define SystemOpenURL(url) std::system("xdg-open" url);
+#define SystemOpenURL(url) std::system("xdg-open " url);
 #else
 #error "Unknown compiler"
 #endif

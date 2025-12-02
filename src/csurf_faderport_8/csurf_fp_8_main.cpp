@@ -9,7 +9,6 @@
 #include <vector>
 #include <reaper_plugin.h>
 #include <WDL/wdltypes.h> // might be unnecessary in future
-#include <WDL/ptrlist.h>
 #include <reaper_plugin_functions.h>
 #include "../controls/csurf_button.hpp"
 #include "../resource.h"
