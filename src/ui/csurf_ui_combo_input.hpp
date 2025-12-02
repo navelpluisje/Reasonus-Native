@@ -23,8 +23,14 @@ static void ReaSonusComboInput(ImGui_Context *m_ctx, std::string label, std::vec
         ImGui::Text(m_ctx, label.c_str());
         UiElements::PushReaSonusComboStyle(m_ctx);
 
+        // Ensure value is within bounds to prevent crash
+        if (*value < 0 || *value >= (int)list.size())
+        {
+            *value = 0;
+        }
+
         ImGui::SetNextItemWidth(m_ctx, width);
-        if (ImGui::BeginCombo(m_ctx, ("##" + label).c_str(), list[*value].c_str()))
+        if (list.size() > 0 && ImGui::BeginCombo(m_ctx, ("##" + label).c_str(), list[*value].c_str()))
         {
             UiElements::PushReaSonusListBoxStyle(m_ctx);
             for (int i = 0; i < (int)list.size(); i++)
