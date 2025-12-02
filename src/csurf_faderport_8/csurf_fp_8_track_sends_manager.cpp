@@ -1,46 +1,11 @@
 #ifndef CSURF_FP_8_TRACK_SENDS_MANAGER_C_
 #define CSURF_FP_8_TRACK_SENDS_MANAGER_C_
 
-#include "../shared/csurf_context.cpp"
-#include "csurf_fp_8_track.hpp"
 #include "csurf_fp_8_channel_manager.hpp"
-#include "csurf_fp_8_navigator.hpp"
-#include <vector>
-#include "../shared/csurf_utils.hpp"
-#include "../shared/csurf_daw.hpp"
 
 class CSurf_FP_8_TrackSendsManager : public CSurf_FP_8_ChannelManager
 {
 protected:
-    void SetTrackColors(MediaTrack *media_track) override
-    {
-        if (!media_track)
-        {
-            color.SetColor(ButtonColorWhite);
-            return;
-        }
-
-        int red = 0xff;
-        int green = 0x00;
-        int blue = 0x00;
-
-        if (!context->GetArm())
-        {
-            int track_color = ::GetTrackColor(media_track);
-            if (track_color == 0)
-            {
-                red = 0x7f;
-                green = 0x7f;
-                blue = 0x7f;
-            }
-            else
-            {
-                ColorFromNative(track_color, &red, &green, &blue);
-            }
-        }
-        color.SetColor(red / 2, green / 2, blue / 2);
-    }
-
     void GetFaderValue(MediaTrack *media_track, int send_index, int *fader_value, int *value_bar_value, double *_pan, std::string *pan_str)
     {
         double volume, pan = 0.0;
@@ -98,7 +63,7 @@ public:
 
             CSurf_FP_8_Track *track = tracks.at(i);
             MediaTrack *media_track = media_tracks.Get(i);
-            SetTrackColors(media_track);
+            SetTrackColors(media_track, DAW::IsTrackSelected(media_track));
 
             std::string pan_str;
             GetFaderValue(sends_track, send_index, &fader_value, &value_bar_value, &pan, &pan_str);
@@ -148,12 +113,12 @@ public:
             }
 
             track->SetTrackColor(color);
-            track->SetSelectButtonValue(DAW::IsTrackSelected(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF);
+            track->SetSelectButtonValue(BTN_VALUE_ON);
             track->SetMuteButtonValue(
                 ButtonBlinkOnOff(
                     (context->GetShiftChannelLeft() && DAW::GetTrackSendMute(sends_track, send_index)),
                     DAW::GetTrackSendMute(sends_track, send_index),
-                    context->GetDistractionFreeMode()));
+                    context->GetSettings()->GetDistractionFreeMode()));
             track->SetSoloButtonValue(((context->GetShiftChannelLeft() && DAW::GetTrackSendMono(sends_track, send_index)) || (!context->GetShiftChannelLeft() && DAW::GetTrackSendPhase(sends_track, send_index)))
                                           ? BTN_VALUE_ON
                                           : BTN_VALUE_OFF);
@@ -162,8 +127,12 @@ public:
         }
     }
 
-    void HandleSelectClick(int index) override
+    void HandleSelectClick(int index, int value) override
     {
+        if (value == 0)
+        {
+            return;
+        }
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
 
         /**

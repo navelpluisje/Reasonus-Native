@@ -1,13 +1,7 @@
 #ifndef CSURF_FP_8_PAN_MANAGER_C_
 #define CSURF_FP_8_PAN_MANAGER_C_
 
-#include "csurf_fp_8_track.hpp"
 #include "csurf_fp_8_channel_manager.hpp"
-#include "csurf_fp_8_navigator.hpp"
-#include <vector>
-#include "../shared/csurf_daw.hpp"
-#include "../shared/csurf_utils.hpp"
-#include "../shared/csurf_context.cpp"
 
 extern const int MOMENTARY_TIMEOUT;
 
@@ -18,30 +12,6 @@ class CSurf_FP_8_PanManager : public CSurf_FP_8_ChannelManager
 
 protected:
     bool has_last_touched_fx_enabled = false;
-
-    void SetTrackColors(MediaTrack *media_track) override
-    {
-        int red = 0xff;
-        int green = 0x00;
-        int blue = 0x00;
-
-        if (!context->GetArm())
-        {
-
-            int track_color = ::GetTrackColor(media_track);
-            if (track_color == 0)
-            {
-                red = 0x7f;
-                green = 0x7f;
-                blue = 0x7f;
-            }
-            else
-            {
-                ColorFromNative(track_color, &red, &green, &blue);
-            }
-        }
-        color.SetColor(red / 2, green / 2, blue / 2);
-    }
 
     void GetFaderValue(MediaTrack *media_track, int *fader_value, int *value_bar_value, std::string *_pan1, std::string *_pan2)
     {
@@ -105,20 +75,18 @@ public:
                 continue;
             }
 
-            SetTrackColors(media_track);
-
-            bool is_selected = DAW::IsTrackSelected(media_track);
+            bool track_selected = DAW::IsTrackSelected(media_track);
             bool is_armed = DAW::IsTrackArmed(media_track);
 
             GetFaderValue(media_track, &fader_value, &value_bar_value, &str_pan_1, &str_pan_2);
-            Btn_Value select_value = (context->GetArm() && is_armed) || (!context->GetArm() && is_selected) ? BTN_VALUE_ON
-                                                                                                            : BTN_VALUE_OFF;
+            bool is_selected = (context->GetArm() && is_armed) || (!context->GetArm() && track_selected);
 
+            SetTrackColors(media_track, is_selected, true);
             track->SetTrackColor(color);
 
-            track->SetSelectButtonValue((!context->GetArm() && is_armed)
-                                            ? ButtonConditionalBlink(!context->GetDistractionFreeMode(), !context->GetArm() && is_armed)
-                                            : select_value,
+            track->SetSelectButtonValue((!context->GetArm() && is_armed && !context->GetSettings()->GetDistractionFreeMode())
+                                            ? BTN_VALUE_BLINK
+                                            : BTN_VALUE_ON,
                                         forceUpdate);
             track->SetMuteButtonValue(DAW::IsTrackMuted(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
             track->SetSoloButtonValue(DAW::IsTrackSoloed(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
@@ -136,8 +104,12 @@ public:
         forceUpdate = false;
     }
 
-    void HandleSelectClick(int index) override
+    void HandleSelectClick(int index, int value) override
     {
+        if (value == 0)
+        {
+            return;
+        }
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
 
         if (context->GetArm())
@@ -166,7 +138,7 @@ public:
         int now = GetTickCount();
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
 
-        if (value == 0 && context->GetMuteSoloMomentary())
+        if (value == 0 && context->GetSettings()->GetMuteSoloMomentary())
         {
             if (now - mute_start[index] > MOMENTARY_TIMEOUT)
             {
@@ -186,7 +158,7 @@ public:
         int now = GetTickCount();
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
 
-        if (value == 0 && context->GetMuteSoloMomentary())
+        if (value == 0 && context->GetSettings()->GetMuteSoloMomentary())
         {
             if (now - solo_start[index] > MOMENTARY_TIMEOUT)
             {
@@ -205,7 +177,7 @@ public:
     {
         (void)value;
 
-        if (!context->GetFaderReset())
+        if (!context->GetSettings()->GetFaderReset())
         {
             return;
         }

@@ -369,7 +369,9 @@ public:
                 ReaSonusIntInput(
                     m_ctx,
                     i18n->t("mapping", "edit.select.param.steps"),
-                    &select_nb_steps);
+                    &select_nb_steps,
+                    0,
+                    20);
                 ImGui::EndChild(m_ctx);
             }
             UiElements::PopReaSonusGroupStyle(m_ctx);

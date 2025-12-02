@@ -47,7 +47,7 @@ protected:
     void SetButtonValues(bool force = false)
     {
         // With shift engaged, blink the selected button
-        Btn_Value valueOn = context->GetShiftLeft() && !context->GetDistractionFreeMode() ? BTN_VALUE_BLINK : BTN_VALUE_ON;
+        Btn_Value valueOn = context->GetShiftLeft() && !context->GetSettings()->GetControlHiddenTracks() ? BTN_VALUE_BLINK : BTN_VALUE_ON;
 
         channelButton->SetValue(session_type == Channel ? valueOn : BTN_VALUE_OFF, force);
         zoomButton->SetValue(session_type == Zoom ? valueOn : BTN_VALUE_OFF, force);
@@ -221,7 +221,7 @@ public:
             return;
         }
 
-        if (context->GetMasterFaderModeEnabled())
+        if (context->GetSettings()->GetMasterFaderModeEnabled())
         {
             context->ToggleMasterFaderMode();
         }

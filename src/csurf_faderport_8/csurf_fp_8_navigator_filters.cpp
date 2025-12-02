@@ -79,7 +79,8 @@ std::map<int, bool> GetChildTracks(std::map<int, bool> tracks)
     for (auto const &track : tracks)
     {
         MediaTrack *media_track = GetTrack(0, track.first);
-        // The track is a parent, so has children. Now add all teh children to the result
+
+        // The track is a parent, so has children. Now add all the children to the result
         if ((int)GetMediaTrackInfo_Value(media_track, "I_FOLDERDEPTH") == 1)
         {
             int folderDepth = 1;
@@ -98,9 +99,66 @@ std::map<int, bool> GetChildTracks(std::map<int, bool> tracks)
     return response;
 }
 
-bool FuzzyMatch(std::string trackName, std::string matches)
+std::map<int, bool> GetCustomFilterTracks(mINI::INIMap<std::string> filter)
+{
+    std::map<int, bool> tracks;
+    std::map<int, bool> filterTracks;
+    std::map<int, bool> childTracks;
+    std::map<int, bool> parentTracks;
+    std::map<int, bool> sibblingTracks;
+
+    bool stop = false;
+    for (int i = 0; i < CountTracks(0); i++)
+    {
+        if (!stop)
+        {
+            MediaTrack *media_track = GetTrack(0, i);
+            std::string trackName = DAW::GetTrackName(media_track);
+            bool isChild = GetTrackDepth(media_track) > 0;
+
+            if (FuzzyMatch(trackName, filter["text"], filter["case-insensitive"] == "1") && !(isChild && filter["top-level"] == "1"))
+            {
+                filterTracks[i] = true;
+                if (filter["match-multiple"] == "0")
+                {
+                    stop = true;
+                }
+            }
+        }
+    }
+
+    tracks.insert(filterTracks.begin(), filterTracks.end());
+
+    if (filter["children"] == "1")
+    {
+        childTracks = GetChildTracks(filterTracks);
+        tracks.insert(childTracks.begin(), childTracks.end());
+    }
+
+    if (filter["parents"] == "1")
+    {
+        parentTracks = GetParentTracks(filterTracks);
+        tracks.insert(parentTracks.begin(), parentTracks.end());
+    }
+
+    if (filter["sibblings"] == "1")
+    {
+        sibblingTracks = GetSibblingTracks(filterTracks);
+        tracks.insert(sibblingTracks.begin(), sibblingTracks.end());
+    }
+
+    return tracks;
+}
+
+bool FuzzyMatch(std::string trackName, std::string matches, bool case_insensitive)
 {
     bool match = false;
+
+    if (case_insensitive)
+    {
+        std::transform(trackName.begin(), trackName.end(), trackName.begin(), ::tolower);
+        std::transform(matches.begin(), matches.end(), matches.begin(), ::tolower);
+    }
 
     for (const std::string &val : split(matches, ","))
     {
@@ -109,4 +167,16 @@ bool FuzzyMatch(std::string trackName, std::string matches)
     }
 
     return match;
+}
+
+std::map<int, bool> GetAllTracksBase()
+{
+    std::map<int, bool> result;
+
+    for (int i = 0; i < CountTracks(0); i++)
+    {
+        result[i] = false;
+    }
+
+    return result;
 }

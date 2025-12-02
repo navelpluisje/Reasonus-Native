@@ -25,30 +25,6 @@ protected:
     mINI::INIStructure ini;
     std::vector<Filter> filters;
 
-    void SetTrackColors(MediaTrack *media_track) override
-    {
-        int red = 0xff;
-        int green = 0x00;
-        int blue = 0x00;
-
-        if (!context->GetArm())
-        {
-
-            int trackColor = ::GetTrackColor(media_track);
-            if (trackColor == 0)
-            {
-                red = 0x7f;
-                green = 0x7f;
-                blue = 0x7f;
-            }
-            else
-            {
-                ColorFromNative(trackColor, &red, &green, &blue);
-            }
-        }
-        color.SetColor(red / 2, green / 2, blue / 2);
-    }
-
     void GetFilters()
     {
         mINI::INIFile file(GetReaSonusIniPath(FP_8));
@@ -73,21 +49,8 @@ protected:
         *_pan1 = GetPan1String(pan1);
         *_pan2 = GetPan2String(pan2, panMode);
 
-        if (context->GetShiftChannelLeft())
-        {
-            *faderValue = int(panToNormalized(pan1) * 16383.0);
-            *valueBarValue = int(volToNormalized(volume) * 127);
-        }
-        else if (context->GetShiftChannelRight() && panMode > 4)
-        {
-            *faderValue = int(panToNormalized(pan2) * 16383.0);
-            *valueBarValue = int(volToNormalized(volume) * 127);
-        }
-        else
-        {
-            *faderValue = int(volToNormalized(volume) * 16383.0);
-            *valueBarValue = int(panToNormalized(pan1) * 127);
-        }
+        *faderValue = int(volToNormalized(volume) * 16383.0);
+        *valueBarValue = int(panToNormalized(pan1) * 127);
     }
 
 public:
@@ -111,33 +74,31 @@ public:
 
         for (int i = 0; i < context->GetNbChannels(); i++)
         {
-            int filterIndex = context->GetChannelManagerItemIndex() + i;
-            int faderValue = 0, valueBarValue = 0;
+            int filter_index = context->GetChannelManagerItemIndex() + i;
+            int fader_value = 0, value_bar_value = 0;
             std::string strPan1, strPan2;
 
             CSurf_FP_8_Track *track = tracks.at(i);
             MediaTrack *media_track = media_tracks.Get(i);
-            SetTrackColors(media_track);
+            SetTrackColors(media_track, navigator->HasFilter(filter_index));
 
-            GetFaderValue(media_track, &faderValue, &valueBarValue, &strPan1, &strPan2);
+            GetFaderValue(media_track, &fader_value, &value_bar_value, &strPan1, &strPan2);
 
             track->SetTrackColor(color);
-            // If the track is armed always blink as an indication it is armed
-            track->SetSelectButtonValue(BTN_VALUE_OFF, forceUpdate);
+            track->SetSelectButtonValue(BTN_VALUE_ON, forceUpdate);
             track->SetMuteButtonValue(DAW::IsTrackMuted(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
             track->SetSoloButtonValue(DAW::IsTrackSoloed(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
-            track->SetFaderValue(faderValue, forceUpdate);
+            track->SetFaderValue(fader_value, forceUpdate);
             track->SetValueBarMode(VALUEBAR_MODE_NORMAL);
             track->SetValueBarValue(0);
 
             track->SetDisplayMode(DISPLAY_MODE_2, forceUpdate);
             track->SetDisplayLine(0, ALIGN_CENTER, DAW::GetTrackName(media_track).c_str(), NON_INVERT, forceUpdate);
 
-            if (filterIndex < (int)filters.size())
+            if (filter_index < (int)filters.size())
             {
-                Filter f = filters.at(filterIndex);
                 track->SetDisplayLine(1, ALIGN_CENTER, "Filter", INVERT, forceUpdate);
-                track->SetDisplayLine(2, ALIGN_CENTER, filters.at(filterIndex).name.c_str(), NON_INVERT, forceUpdate);
+                track->SetDisplayLine(2, ALIGN_CENTER, filters.at(filter_index).name.c_str(), NON_INVERT, forceUpdate);
                 track->SetDisplayLine(3, ALIGN_CENTER, "", NON_INVERT, forceUpdate);
             }
             else
@@ -151,8 +112,13 @@ public:
         forceUpdate = false;
     }
 
-    void HandleSelectClick(int index) override
+    void HandleSelectClick(int index, int value) override
     {
+        if (value == 0)
+        {
+            return;
+        }
+
         int filter_index = context->GetChannelManagerItemIndex() + index;
         if (context->GetShiftChannelLeft())
         {
@@ -178,7 +144,14 @@ public:
         {
             if (filter_index < (int)filters.size())
             {
-                navigator->HandleCustomFilter(filters.at(filter_index).id);
+                if (navigator->GetMultiSelectFilter())
+                {
+                    navigator->ToggleFilter(filter_index);
+                }
+                else
+                {
+                    navigator->HandleCustomFilter(filters.at(filter_index).id);
+                }
             }
             else
             {

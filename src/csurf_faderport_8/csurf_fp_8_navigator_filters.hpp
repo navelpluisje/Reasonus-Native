@@ -3,6 +3,7 @@
 
 #include <map>
 #include <string>
+#include <mini/ini.h>
 
 std::map<int, bool> GetSibblingTracks(std::map<int, bool> tracks);
 
@@ -10,6 +11,10 @@ std::map<int, bool> GetParentTracks(std::map<int, bool> tracks);
 
 std::map<int, bool> GetChildTracks(std::map<int, bool> tracks);
 
-bool FuzzyMatch(std::string trackName, std::string matches);
+std::map<int, bool> GetCustomFilterTracks(mINI::INIMap<std::string> filter);
+
+bool FuzzyMatch(std::string trackName, std::string matches, bool case_insensitive);
+
+std::map<int, bool> GetAllTracksBase();
 
 #endif

@@ -1,6 +1,6 @@
-#include "translations_editor.hpp"
+#include "action_fp_8_setting_swap_shift_buttons.hpp"
+#include <mini/ini.h>
 #include "../shared/csurf_utils.hpp"
-#include "../ui/csurf_ui_translation_editor.hpp"
 
 #define STRINGIZE_DEF(x) #x
 #define STRINGIZE(x) STRINGIZE_DEF(x)
@@ -8,27 +8,61 @@
 #define max(a, b) ((a) > (b) ? (a) : (b))
 
 // confine my plugin to namespace
-namespace TRANSLATION_EDITOR
+namespace ACTION_FP_8_SETTING_SWAP_SHIFT_BUTTONS
 {
     // some global non-const variables
     // the necessary 'evil'
     int command_id{0};
-    constexpr auto command_name = "REASONUS_TRANSLATIONN_EDITOR";
-    constexpr auto action_name = "Reasonus: Manage the translations";
+    bool toggle_action_state{false};
+    constexpr auto command_name = "REASONUS_FP8_TOGGLE_SWAP_SHIFT_BUTTONS";
+    constexpr auto action_name = "Reasonus: Toggle swap shift buttons setting";
     custom_action_register_t action = {0, command_name, action_name, nullptr};
 
+    std::string ReadIniValue(std::string group, std::string item)
+    {
+        mINI::INIStructure ini;
+        mINI::INIFile file(GetReaSonusIniPath(FP_8));
+        readAndCreateIni(ini, FP_8);
+        return ini[group][item];
+    }
+
+    void WriteIniValue(std::string group, std::string item, std::string value)
+    {
+        mINI::INIStructure ini;
+        mINI::INIFile file(GetReaSonusIniPath(FP_8));
+        readAndCreateIni(ini, FP_8);
+        ini[group][item] = value;
+        file.write(ini);
+    }
     // the main function of my plugin
     // gets called via callback or timer
     void MainFunctionOfMyPlugin()
     {
-        if (ReaSonusTranslationEditor::window_open)
+
+        if (toggle_action_state)
         {
-            ReaSonusTranslationEditor::Stop();
+            WriteIniValue("surface", "swap-shift-buttons", "0");
         }
         else
         {
-            ReaSonusTranslationEditor::Start();
+            WriteIniValue("surface", "swap-shift-buttons", "1");
         }
+    }
+
+    // c++11 trailing return type syntax
+    // REAPER calls this to check this action it's toggle state
+    auto ToggleActionCallback(int command) -> int
+    {
+        if (command != command_id)
+        {
+            // not quite our command_id
+            return -1;
+        }
+        if (stoi(ReadIniValue("surface", "swap-shift-buttons")) == 1) // if toggle_action_state == true
+        {
+            return 1;
+        }
+        return 0;
     }
 
     // this gets called when my plugin action is run (e.g. from action list)
@@ -47,6 +81,8 @@ namespace TRANSLATION_EDITOR
             return false;
         }
 
+        // flip state on/off
+        toggle_action_state = !toggle_action_state;
         MainFunctionOfMyPlugin();
 
         return true;
@@ -69,6 +105,7 @@ namespace TRANSLATION_EDITOR
     {
         // register action name and get command_id
         command_id = plugin_register("custom_action", &action);
+        plugin_register("toggleaction", (void *)ToggleActionCallback);
 
         // register run action/command
         plugin_register("hookcommand2", (void *)OnAction);
@@ -79,7 +116,8 @@ namespace TRANSLATION_EDITOR
     auto Unregister() -> void
     {
         plugin_register("-custom_action", &action);
+        plugin_register("-toggleaction", (void *)ToggleActionCallback);
         plugin_register("-hookcommand2", (void *)OnAction);
     }
 
-} // namespace CONVERT_PLUGIN_ZON_TO_INI
+} // namespace ACTION_FP_8_SETTING_SWAP_SHIFT_BUTTONS

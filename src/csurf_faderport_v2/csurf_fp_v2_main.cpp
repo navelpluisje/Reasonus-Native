@@ -15,6 +15,7 @@
 #include "../shared/csurf.h"
 #include "../shared/csurf_transport_manager.hpp"
 #include "../shared/csurf_utils.hpp"
+#include "../shared/csurf_daw.hpp"
 #include "csurf_fp_v2_session_manager.cpp"
 #include "csurf_fp_v2_track_manager.hpp"
 #include "csurf_fp_v2_automation_manager.cpp"
@@ -139,6 +140,14 @@ class CSurf_FaderPortV2 : public IReaperControlSurface
       }
 
       /**
+       * Footswitch
+       */
+      else if (evt->midi_message[1] == BTN_FOOTSWITCH)
+      {
+        transportManager->HandleFootSwitchClick(evt->midi_message[2]);
+      }
+
+      /**
        * General Control Management
        */
       else if (evt->midi_message[1] == BTN_SHIFT_LEFT)
@@ -222,9 +231,12 @@ class CSurf_FaderPortV2 : public IReaperControlSurface
     readAndCreateIni(ini, FP_V2);
 
     i18n->SetLanguage(DAW::GetExtState(EXT_STATE_KEY_UI_LANGUAGE, "en-US"));
-    context->SetMuteSoloMomentary(ini["surface"].has("mute-solo-momentary") && ini["surface"]["mute-solo-momentary"] == "1");
-    context->SetControlHiddenTracks(ini["surface"].has("control-hidden-tracks") && ini["surface"]["control-hidden-tracks"] == "1");
-    context->SetCanDisableFader(ini["surface"].has("can-disable-fader") && ini["surface"]["can-disable-fader"] == "1");
+    context->GetSettings()->SetLatchPreviewActionEnabled(ini["surface"].has("latch-preview-action") && ini["surface"]["latch-preview-action"] == "1");
+    context->GetSettings()->SetLatchPreviewActionCode(ini["surface"].has("latch-preview-action-code") && std::stoi(ini["surface"]["latch-preview-action-code"]));
+    context->GetSettings()->SetMuteSoloMomentary(ini["surface"].has("mute-solo-momentary") && ini["surface"]["mute-solo-momentary"] == "1");
+    context->GetSettings()->SetControlHiddenTracks(ini["surface"].has("control-hidden-tracks") && ini["surface"]["control-hidden-tracks"] == "1");
+    context->GetSettings()->SetCanDisableFader(ini["surface"].has("can-disable-fader") && ini["surface"]["can-disable-fader"] == "1");
+    context->GetSettings()->SetEndlessTrackScroll(ini["surface"].has("endless-track-scroll") && ini["surface"]["endless-track-scroll"] == "1");
   }
 
 public:
@@ -336,12 +348,9 @@ public:
 
   bool GetTouchState(MediaTrack *media_track, int is_pan)
   {
-    (void)is_pan;
-
-    return trackNavigator->IsTrackTouched(media_track);
+    return trackNavigator->IsTrackTouched(media_track, is_pan);
   }
 
-  ;
   void Run()
   {
     if (m_midiin)
@@ -403,14 +412,21 @@ public:
 
   void OnTrackSelection(MediaTrack *media_track)
   {
-    if (!context->GetControlHiddenTracks())
+    int track_index = stoi(DAW::GetTrackIndex(media_track));
+
+    // Master track returns -1. Do not do anyting right now
+    if (track_index < 0)
+    {
+      return;
+    }
+
+    if (!context->GetSettings()->GetControlHiddenTracks() && DAW::IsTrackVisible(media_track))
     {
       trackNavigator->SetOffsetByTrack(media_track);
     }
-    else
+    else if (context->GetSettings()->GetControlHiddenTracks())
     {
-      int trackId = (int)::GetMediaTrackInfo_Value(media_track, "IP_TRACKNUMBER");
-      trackNavigator->SetOffset(trackId - 1);
+      trackNavigator->SetOffset(track_index - 1);
     }
   }
 };

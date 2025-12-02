@@ -75,7 +75,7 @@ public:
     void Update()
     {
         MediaTrack *media_track = navigator->GetControllerTrack();
-        channelAutomationMode = GetTrackAutomationMode(media_track);
+        channelAutomationMode = ::GetTrackAutomationMode(media_track);
 
         SetButtonColors();
         SetButtonValue(media_track == nullptr);
@@ -126,7 +126,14 @@ public:
 
         if (context->GetShiftLeft())
         {
-            SetTrackAutomationMode(media_track, AUTOMATION_PREVIEW);
+            if (::GetTrackAutomationMode(media_track) == AUTOMATION_PREVIEW && context->GetSettings()->GetLatchPreviewActionEnabled())
+            {
+                ::Main_OnCommandEx(context->GetSettings()->GetLatchPreviewActionCode(), 0, 0);
+            }
+            else
+            {
+                SetTrackAutomationMode(media_track, AUTOMATION_PREVIEW);
+            }
             return;
         }
         SetTrackAutomationMode(media_track, AUTOMATION_READ);

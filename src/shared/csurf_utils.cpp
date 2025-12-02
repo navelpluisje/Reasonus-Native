@@ -347,10 +347,14 @@ void readAndCreateIni(mINI::INIStructure &data, std::string device)
         data["functions"]["2"] = "0";
         data["functions"]["3"] = "0";
         data["functions"]["4"] = "0";
+        data["footswitch"]["1"] = "0";
+        data["footswitch"]["2"] = "0";
+        data["footswitch"]["3"] = "0";
         if (device == FP_V2)
         {
             data["surface"]["control-hidden-tracks"] = "0";
             data["surface"]["can-disable-fader"] = "0";
+            data["surface"]["endless-track-scroll"] = "0";
         }
         if (device == FP_8)
         {
@@ -363,6 +367,7 @@ void readAndCreateIni(mINI::INIStructure &data, std::string device)
             data["surface"]["fader-reset"] = "0";
             data["surface"]["overwrite-time-code"] = "1";
             data["surface"]["time-code"] = "2";
+            data["surface"]["track-color-brightness"] = "25";
             data["displays"]["track"] = "8";
             data["functions"]["5"] = "0";
             data["functions"]["6"] = "0";
@@ -378,7 +383,10 @@ void readAndCreateIni(mINI::INIStructure &data, std::string device)
             data["functions"]["16"] = "0";
             data["filters"]["nb-filters"] = "0";
         }
-        file.generate(data, true);
+        if (!file.generate(data, true))
+        {
+            MB("Error while creating the ini file. Please contact via the forum", "ReaSonus Error", 0);
+        }
     }
     else
     {
@@ -392,17 +400,23 @@ void validateReaSonusIni(mINI::INIFile file, mINI::INIStructure &data, std::stri
     data["surface"]["midiin"] = data["surface"].has("midiin") ? data["surface"]["midiin"] : "0";
     data["surface"]["midiout"] = data["surface"].has("midiout") ? data["surface"]["midiout"] : "0";
     data["surface"]["mute-solo-momentary"] = data["surface"].has("mute-solo-momentary") ? data["surface"]["mute-solo-momentary"] : "0";
+    data["surface"]["latch-preview-action"] = data["surface"].has("latch-preview-action") ? data["surface"]["latch-preview-action"] : "0";
+    data["surface"]["latch-preview-action-code"] = data["surface"].has("latch-preview-action-code") ? data["surface"]["latch-preview-action-code"] : "42013";
 
     data["functions"]["1"] = data["functions"].has("1") ? data["functions"]["1"] : "0";
     data["functions"]["2"] = data["functions"].has("2") ? data["functions"]["2"] : "0";
     data["functions"]["3"] = data["functions"].has("3") ? data["functions"]["3"] : "0";
     data["functions"]["4"] = data["functions"].has("4") ? data["functions"]["4"] : "0";
 
+    data["footswitch"]["1"] = data["footswitch"].has("1") ? data["footswitch"]["1"] : "0";
+    data["footswitch"]["2"] = data["footswitch"].has("2") ? data["footswitch"]["2"] : "0";
+    data["footswitch"]["3"] = data["footswitch"].has("3") ? data["footswitch"]["3"] : "0";
+
     if (device == FP_V2)
     {
         data["surface"]["control-hidden-tracks"] = data["surface"].has("control-hidden-tracks") ? data["surface"]["control-hidden-tracks"] : "0";
         data["surface"]["can-disable-fader"] = data["surface"].has("can-disable-fader") ? data["surface"]["can-disable-fader"] : "0";
-        ;
+        data["surface"]["endless-track-scroll"] = data["surface"].has("endless-track-scroll") ? data["surface"]["endless-track-scroll"] : "0";
     }
 
     if (device == FP_8)
@@ -416,6 +430,7 @@ void validateReaSonusIni(mINI::INIFile file, mINI::INIStructure &data, std::stri
         data["surface"]["fader-reset"] = data["surface"].has("fader-reset") ? data["surface"]["fader-reset"] : "0";
         data["surface"]["overwrite-time-code"] = data["surface"].has("overwrite-time-code") ? data["surface"]["overwrite-time-code"] : "1";
         data["surface"]["time-code"] = data["surface"].has("time-code") ? data["surface"]["time-code"] : "2";
+        data["surface"]["track-color-brightness"] = data["surface"].has("track-color-brightness") ? data["surface"]["track-color-brightness"] : "25";
         data["displays"]["track"] = data["displays"].has("track") ? data["displays"]["track"] : "8";
         data["functions"]["5"] = data["functions"].has("5") ? data["functions"]["5"] : "0";
         data["functions"]["6"] = data["functions"].has("6") ? data["functions"]["6"] : "0";

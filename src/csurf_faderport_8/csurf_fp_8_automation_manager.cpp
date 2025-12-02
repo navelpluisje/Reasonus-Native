@@ -52,7 +52,7 @@ protected:
             trimButton->SetValue(channelAutomationMode == AUTOMATION_TRIM ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
             offButton->SetValue(channelAutomationMode == AUTOMATION_PREVIEW ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
             touchButton->SetValue(context->GetChannelMode() == MenuMode
-                                      ? (context->GetDistractionFreeMode() ? BTN_VALUE_ON : BTN_VALUE_BLINK)
+                                      ? (context->GetSettings()->GetDistractionFreeMode() ? BTN_VALUE_ON : BTN_VALUE_BLINK)
                                   : channelAutomationMode == AUTOMATION_TOUCH
                                       ? BTN_VALUE_ON
                                       : BTN_VALUE_OFF,
@@ -215,7 +215,14 @@ public:
         }
 
         MediaTrack *media_track = GetSelectedAutomationTrack();
-        SetTrackAutomationMode(media_track, AUTOMATION_PREVIEW);
+        if (::GetTrackAutomationMode(media_track) == AUTOMATION_PREVIEW && context->GetSettings()->GetLatchPreviewActionEnabled())
+        {
+            ::Main_OnCommandEx(context->GetSettings()->GetLatchPreviewActionCode(), 0, 0);
+        }
+        else
+        {
+            SetTrackAutomationMode(media_track, AUTOMATION_PREVIEW);
+        }
     };
 
     void HandleTouchButton(int value)

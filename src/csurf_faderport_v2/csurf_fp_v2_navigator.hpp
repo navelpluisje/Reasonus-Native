@@ -16,6 +16,7 @@ class CSurf_FP_V2_Navigator
     bool hasSolo;
     bool hasMute;
     bool hasArmed;
+    bool hasAllArmed;
     bool isTouched;
 
     void UpdateMixerPosition();
@@ -27,7 +28,7 @@ public:
 
     MediaTrack *GetControllerTrack();
 
-    bool IsTrackTouched(MediaTrack *media_track);
+    bool IsTrackTouched(MediaTrack *media_track, int is_pan);
 
     void SetOffset(int offset);
 
@@ -50,6 +51,8 @@ public:
     bool HasTracksWithMute();
 
     bool HasArmedTracks();
+
+    bool HasAllArmedTracks();
 
     void SetIsTouched(bool value);
 };

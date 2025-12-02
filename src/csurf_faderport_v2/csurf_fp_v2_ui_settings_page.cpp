@@ -23,8 +23,24 @@ protected:
     bool momentary_mute_solo;
     bool control_hidden_tracks;
     bool can_disable_fader;
+    bool endless_track_scroll;
+    bool setting_latch_preview_action_enable;
+    int setting_latch_preview_action;
+    int *index;
 
     std::vector<std::string> language_names = {};
+
+    int latch_preview_action_indexes[8] = {42013, 42014, 42015, 42016, 42017, 41160, 41161, 41162};
+    std::vector<std::string> latch_preview_action_names = {
+        "Write current values for actively-writing envelopes to time selection",
+        "Write current values for actively-writing envelopes from cursor to start of project",
+        "Write current values for actively-writing envelopes from cursor to end of project",
+        "Write current values for actively-writing envelopes from cursor to first touch position",
+        "Write current values for actively-writing envelopes to entire envelope",
+        "Write current values for all writing envelopes to time selection",
+        "Write current values for all writing envelopes from cursor to start of project",
+        "Write current values for all writing envelopes from cursor to end of project",
+    };
 
 public:
     CSurf_FP_V2_SettingsPage(ImGui_Context *m_ctx) : CSurf_UI_PageContent(m_ctx, FP_V2)
@@ -131,6 +147,29 @@ public:
                 &can_disable_fader,
                 i18n->t("settings", "can_disable_fader.tooltip"));
 
+            RenderSettingsCheckbox(
+                m_ctx,
+                i18n->t("settings", "endless_track_scroll.label"),
+                &endless_track_scroll,
+                i18n->t("settings", "endless_track_scroll.tooltip"));
+
+            RenderSettingsCheckbox(
+                m_ctx,
+                i18n->t("settings", "latch-preview-action-enable.label"),
+                &setting_latch_preview_action_enable,
+                i18n->t("settings", "latch-preview-action-enable.tooltip"));
+
+            if (setting_latch_preview_action_enable)
+            {
+                ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + 26);
+                RenderSettingsComboInput(
+                    m_ctx,
+                    i18n->t("settings", "latch-preview-action-list.label"),
+                    latch_preview_action_names,
+                    &setting_latch_preview_action,
+                    i18n->t("settings", "latch-preview-action.tooltip"));
+            }
+
             UiElements::PopReaSonusSettingsContentStyle(m_ctx);
             ImGui::EndChild(m_ctx);
         }
@@ -145,6 +184,10 @@ public:
         ini["surface"]["mute-solo-momentary"] = momentary_mute_solo ? "1" : "0";
         ini["surface"]["control-hidden-tracks"] = control_hidden_tracks ? "1" : "0";
         ini["surface"]["can-disable-fader"] = can_disable_fader ? "1" : "0";
+        ini["surface"]["endless-track-scroll"] = endless_track_scroll ? "1" : "0";
+        ini["surface"]["latch-preview-action"] = setting_latch_preview_action_enable ? "1" : "0";
+
+        ini["surface"]["latch-preview-action-code"] = std::to_string(latch_preview_action_indexes[setting_latch_preview_action]);
 
         if (file.write(ini, true))
         {
@@ -161,5 +204,10 @@ public:
         momentary_mute_solo = ini["surface"]["mute-solo-momentary"] == "1";
         control_hidden_tracks = ini["surface"]["control-hidden-tracks"] == "1";
         can_disable_fader = ini["surface"]["can-disable-fader"] == "1";
+        endless_track_scroll = ini["surface"]["endless-track-scrollr"] == "1";
+        setting_latch_preview_action_enable = ini["surface"]["latch-preview-action"] == "1";
+
+        index = std::find(latch_preview_action_indexes, latch_preview_action_indexes + 8, stoi(ini["surface"]["latch-preview-action-code"]));
+        setting_latch_preview_action = index - latch_preview_action_indexes;
     }
 };

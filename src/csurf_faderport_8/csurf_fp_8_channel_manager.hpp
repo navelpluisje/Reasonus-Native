@@ -1,12 +1,13 @@
 #ifndef CSURF_FP_8_CHANNEL_MANAGER_H_
 #define CSURF_FP_8_CHANNEL_MANAGER_H_
 
-#include "../shared/csurf_context.cpp"
-#include "../controls/csurf_button.hpp"
+#include <vector>
 #include "csurf_fp_8_navigator.hpp"
 #include "csurf_fp_8_channel_manager_resources.hpp"
 #include "csurf_fp_8_track.hpp"
-#include <vector>
+#include "../shared/csurf_context.cpp"
+#include "../controls/csurf_button.hpp"
+#include "../shared/csurf_daw.hpp"
 
 class CSurf_FP_8_ChannelManager
 {
@@ -20,9 +21,35 @@ protected:
 
     bool forceUpdate = false;
 
-    virtual void SetTrackColors(MediaTrack *media_track)
+    virtual void SetTrackColors(MediaTrack *media_track, bool is_selected, bool has_arm = false)
     {
-        (void)media_track;
+        double brightness = is_selected ? 1 : context->GetSettings()->GetTrackColorBrightnessPercentage();
+
+        if (!media_track)
+        {
+            color.SetColor(ButtonColorWhite);
+            return;
+        }
+
+        int red = 0xff;
+        int green = 0x00;
+        int blue = 0x00;
+
+        if (!(context->GetArm() && has_arm) && !(DAW::IsTrackArmed(media_track) && context->GetSettings()->GetDistractionFreeMode()))
+        {
+            int trackColor = ::GetTrackColor(media_track);
+            if (trackColor == 0)
+            {
+                red = 0x7f;
+                green = 0x7f;
+                blue = 0x7f;
+            }
+            else
+            {
+                ColorFromNative(trackColor, &red, &green, &blue);
+            }
+        }
+        color.SetColor((red * brightness) / 2, (green * brightness) / 2, (blue * brightness) / 2);
     };
 
 public:
@@ -41,9 +68,10 @@ public:
 
     virtual void UpdateTracks() {};
 
-    virtual void HandleSelectClick(int index)
+    virtual void HandleSelectClick(int index, int value)
     {
         (void)index;
+        (void)value;
     };
 
     virtual void HandleMuteClick(int index, int value)

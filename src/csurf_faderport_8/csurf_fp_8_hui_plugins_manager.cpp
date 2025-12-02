@@ -1,13 +1,7 @@
 #ifndef CSURF_FP_8_PLUGINS_MANAGER_C_
 #define CSURF_FP_8_PLUGINS_MANAGER_C_
 
-#include "../shared/csurf_context.cpp"
-#include "csurf_fp_8_track.hpp"
 #include "csurf_fp_8_channel_manager.hpp"
-#include "csurf_fp_8_navigator.hpp"
-#include <vector>
-#include "../shared/csurf_utils.hpp"
-#include "../shared/csurf_daw.hpp"
 
 class CSurf_FP_8_PluginsManager : public CSurf_FP_8_ChannelManager
 {
@@ -15,29 +9,6 @@ protected:
     int nb_plugins = 0;
     int nb_track_plugins[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     int current_plugin = 0;
-
-    void SetTrackColors(MediaTrack *media_track) override
-    {
-        int red = 0xff;
-        int green = 0x00;
-        int blue = 0x00;
-
-        if (!context->GetArm())
-        {
-            int trackColor = ::GetTrackColor(media_track);
-            if (trackColor == 0)
-            {
-                red = 0x7f;
-                green = 0x7f;
-                blue = 0x7f;
-            }
-            else
-            {
-                ::ColorFromNative(trackColor, &red, &green, &blue);
-            }
-        }
-        color.SetColor(red / 2, green / 2, blue / 2);
-    }
 
     void GetFaderValue(MediaTrack *media_track, int *fader_value, int *value_bar_value)
     {
@@ -120,7 +91,7 @@ public:
                 continue;
             }
 
-            SetTrackColors(media_track);
+            SetTrackColors(media_track, DAW::IsTrackSelected(media_track));
             GetFaderValue(media_track, &fader_value, &value_bar_value);
 
             if (DAW::HasTrackFx(media_track, plugin_index))
@@ -133,12 +104,12 @@ public:
                     ButtonBlinkOnOff(
                         (context->GetShiftChannelLeft() && !DAW::GetTrackFxEnabled(media_track, plugin_index)),
                         !DAW::GetTrackFxEnabled(media_track, plugin_index),
-                        context->GetDistractionFreeMode()));
+                        context->GetSettings()->GetDistractionFreeMode()));
                 track->SetSoloButtonValue(
                     ButtonBlinkOnOff(
                         DAW::GetTrackFxPanelOpen(media_track, plugin_index),
                         hasPluginConfigFile(media_track, plugin_index),
-                        context->GetDistractionFreeMode()));
+                        context->GetSettings()->GetDistractionFreeMode()));
             }
             else
             {
@@ -151,7 +122,7 @@ public:
             }
 
             track->SetTrackColor(color);
-            track->SetSelectButtonValue(DAW::IsTrackSelected(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF);
+            track->SetSelectButtonValue(BTN_VALUE_ON);
             track->SetFaderValue(fader_value);
             track->SetValueBarMode(VALUEBAR_MODE_BIPOLAR);
             track->SetValueBarValue(value_bar_value);
@@ -160,8 +131,12 @@ public:
         }
     }
 
-    void HandleSelectClick(int index) override
+    void HandleSelectClick(int index, int value) override
     {
+        if (value == 0)
+        {
+            return;
+        }
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
 
         if (context->GetArm())

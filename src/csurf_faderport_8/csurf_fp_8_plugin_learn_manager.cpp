@@ -1,14 +1,7 @@
 #ifndef CSURF_FP_8_PLUGIN_LEARN_MANAGER_C_
 #define CSURF_FP_8_PLUGIN_LEARN_MANAGER_C_
 
-#include "../shared/csurf_context.cpp"
-#include "csurf_fp_8_track.hpp"
 #include "csurf_fp_8_channel_manager.hpp"
-#include "csurf_fp_8_navigator.hpp"
-#include <mini/ini.h>
-#include <vector>
-#include "../shared/csurf_daw.hpp"
-#include "../shared/csurf_utils.hpp"
 #include "csurf_fp_8_ui_control_panel.hpp"
 #include "../shared/csurf_faderport_ui_imgui_utils.hpp"
 
@@ -156,8 +149,12 @@ public:
         }
     }
 
-    void HandleSelectClick(int index) override
+    void HandleSelectClick(int index, int value) override
     {
+        if (value == 0)
+        {
+            return;
+        }
         int controlIndex = context->GetChannelManagerItemIndex() + index;
         int pluginId = context->GetPluginEditPluginId();
         int trackId, itemNumber, takeId, _pluginId, paramId;
@@ -199,7 +196,7 @@ public:
             ini[paramKey]["steps"] = std::to_string(nbSteps);
 
             SaveIniFile();
-            if (context->GetUntouchAfterLearn())
+            if (context->GetSettings()->GetUntouchAfterLearn())
             {
                 DAW::SetTrackFXParamUntouched(media_track, pluginId);
             }
@@ -265,7 +262,7 @@ public:
             ini[paramKey]["param"] = std::to_string(paramId);
 
             SaveIniFile();
-            if (context->GetUntouchAfterLearn())
+            if (context->GetSettings()->GetUntouchAfterLearn())
             {
                 DAW::SetTrackFXParamUntouched(media_track, pluginId);
             }

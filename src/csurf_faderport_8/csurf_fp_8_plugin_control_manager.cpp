@@ -123,8 +123,13 @@ public:
         forceUpdate = false;
     }
 
-    void HandleSelectClick(int index) override
+    void HandleSelectClick(int index, int value) override
     {
+        if (value == 0)
+        {
+            return;
+        }
+
         double min, max = 0.0;
         int controlIndex = context->GetChannelManagerItemIndex() + index;
         MediaTrack *media_track = context->GetPluginEditTrack();

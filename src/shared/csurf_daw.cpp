@@ -79,6 +79,11 @@ bool DAW::IsTrackPinned(MediaTrack *media_track)
     return (int)GetMediaTrackInfo_Value(media_track, "B_TCPPIN") == 1;
 }
 
+bool DAW::IsTrackVisible(MediaTrack *media_track)
+{
+    return (int)GetMediaTrackInfo_Value(media_track, "B_SHOWINMIXER") == 1;
+}
+
 int DAW::GetTrackPanMode(MediaTrack *media_track)
 {
     int panMode = 0;
@@ -225,6 +230,12 @@ void DAW::SetUniqueSelectedTrack(MediaTrack *media_track)
 {
     UnSelectAllTracks();
     ::SetTrackSelected(media_track, true);
+}
+
+void DAW::SetTrackSoloUnique(MediaTrack *media_track)
+{
+    Main_OnCommandEx(40340, 0, 0); // Track: Unsolo all tracks
+    ToggleTrackSoloed(media_track);
 }
 
 void DAW::SetSelectedTracksRange(MediaTrack *media_track)

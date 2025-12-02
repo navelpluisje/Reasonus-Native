@@ -12,19 +12,19 @@ void CSurf_FP_8_FaderManager::SetButtonValues(bool force)
         ButtonOnBlinkOff(
             context->IsChannelMode(PluginMode),
             context->IsChannelMode(TrackPluginMode),
-            context->GetDistractionFreeMode()),
+            context->GetSettings()->GetDistractionFreeMode()),
         force);
     sendButton->SetValue(
         ButtonOnBlinkOff(
             context->IsChannelMode(SendMode) || context->IsChannelMode(ReceiveMode),
             context->IsChannelMode(TrackSendMode) || context->IsChannelMode(TrackReceiveMode),
-            context->GetDistractionFreeMode()),
+            context->GetSettings()->GetDistractionFreeMode()),
         force);
     panButton->SetValue(
         ButtonOnBlinkOff(
             context->IsChannelMode(PanMode1),
             context->IsChannelMode(PanMode2),
-            context->GetDistractionFreeMode()),
+            context->GetSettings()->GetDistractionFreeMode()),
         force);
 }
 
@@ -311,7 +311,7 @@ void CSurf_FP_8_FaderManager::HandleEncoderPush()
 {
     if (context->IsChannelMode(MenuMode))
     {
-        channelManager->HandleSelectClick(0);
+        channelManager->HandleSelectClick(0, 1);
     }
 }
 
@@ -326,7 +326,7 @@ void CSurf_FP_8_FaderManager::HandleSoloClick(int index, int value)
 
     prevChannelMode = context->GetChannelMode();
 
-    if (context->GetPluginControl() &&
+    if (context->GetSettings()->GetPluginControl() &&
         (context->IsChannelMode(TrackPluginMode) || context->IsChannelMode(PluginMode)) &&
         (context->GetPluginEditPluginId() > -1))
     {
@@ -339,13 +339,11 @@ void CSurf_FP_8_FaderManager::HandleSoloClick(int index, int value)
 
 void CSurf_FP_8_FaderManager::HandleSelectClick(int index, int value)
 {
-    if (value == 0)
+    channelManager->HandleSelectClick(index, value);
+    if (!navigator->GetMultiSelectFilter())
     {
-        return;
+        ResetMixButtonClick();
     }
-
-    channelManager->HandleSelectClick(index);
-    ResetMixButtonClick();
 }
 
 void CSurf_FP_8_FaderManager::HandleFaderMove(int index, int msb, int lsb)
