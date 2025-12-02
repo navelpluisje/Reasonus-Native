@@ -1,6 +1,7 @@
 #ifndef CSURF_NAVIGATOR_V2_H_
 #define CSURF_NAVIGATOR_V2_H_
 
+#include <stdlib.h>
 #include <WDL/ptrlist.h>
 #include "../shared/csurf_context.cpp"
 #include <map>
