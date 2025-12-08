@@ -625,6 +625,10 @@ public:
 
   int Extended(int call, void *param1, void *param2, void *param3)
   {
+    (void)param1;
+    (void)param2;
+    (void)param3;
+
     if (call == CSURF_EXT_SUPPORTS_EXTENDED_TOUCH)
     {
       return 1;
