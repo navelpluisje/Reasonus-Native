@@ -622,6 +622,16 @@ public:
 
     trackNavigator->SetOffsetByTrack(media_track);
   }
+
+  int Extended(int call, void *param1, void *param2, void *param3)
+  {
+    if (call == CSURF_EXT_SUPPORTS_EXTENDED_TOUCH)
+    {
+      return 1;
+    }
+
+    return 1;
+  }
 };
 
 static IReaperControlSurface *createFunc(const char *type_string, const char *configString, int *errStats)
