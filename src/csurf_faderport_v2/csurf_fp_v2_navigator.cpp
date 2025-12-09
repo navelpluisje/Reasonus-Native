@@ -86,7 +86,7 @@ bool CSurf_FP_V2_Navigator::IsTrackTouched(MediaTrack *media_track, int is_pan)
         return false;
     }
 
-    if (!context->GetShiftLeft() && is_pan == 0 || context->GetShiftLeft() && is_pan == 1)
+    if ((!context->GetShiftLeft() && is_pan == 0) || (context->GetShiftLeft() && is_pan == 1))
     {
         return isTouched;
     }
