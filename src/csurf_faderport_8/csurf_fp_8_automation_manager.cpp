@@ -105,6 +105,18 @@ protected:
         }
     }
 
+    void SetGlobalAutomationMode(int automation_mode)
+    {
+        if (::GetGlobalAutomationOverride() == automation_mode)
+        {
+            ::SetGlobalAutomationOverride(AUTOMATION_OFF);
+        }
+        else
+        {
+            ::SetGlobalAutomationOverride(automation_mode);
+        }
+    }
+
 public:
     CSurf_FP_8_AutomationManager(
         CSurf_Context *context,
@@ -158,7 +170,7 @@ public:
 
         if (context->GetShiftRight())
         {
-            SetGlobalAutomationOverride(AUTOMATION_LATCH);
+            SetGlobalAutomationMode(AUTOMATION_LATCH);
             return;
         }
 
@@ -181,7 +193,7 @@ public:
 
         if (context->GetShiftRight())
         {
-            SetGlobalAutomationOverride(AUTOMATION_TRIM);
+            SetGlobalAutomationMode(AUTOMATION_TRIM);
             return;
         }
 
@@ -204,7 +216,7 @@ public:
 
         if (context->GetShiftRight())
         {
-            SetGlobalAutomationOverride(AUTOMATION_PREVIEW);
+            SetGlobalAutomationMode(AUTOMATION_PREVIEW);
             return;
         }
 
@@ -215,7 +227,8 @@ public:
         }
 
         MediaTrack *media_track = GetSelectedAutomationTrack();
-        if (::GetTrackAutomationMode(media_track) == AUTOMATION_PREVIEW && context->GetSettings()->GetLatchPreviewActionEnabled())
+        if (
+            (::GetTrackAutomationMode(media_track) == AUTOMATION_PREVIEW || ::GetGlobalAutomationOverride() == AUTOMATION_PREVIEW) && context->GetSettings()->GetLatchPreviewActionEnabled())
         {
             ::Main_OnCommandEx(context->GetSettings()->GetLatchPreviewActionCode(), 0, 0);
         }
@@ -234,7 +247,7 @@ public:
 
         if (context->GetShiftRight() && !context->IsChannelMode(MenuMode))
         {
-            SetGlobalAutomationOverride(AUTOMATION_TOUCH);
+            SetGlobalAutomationMode(AUTOMATION_TOUCH);
             return;
         }
 
@@ -257,7 +270,7 @@ public:
 
         if (context->GetShiftRight())
         {
-            SetGlobalAutomationOverride(AUTOMATION_WRITE);
+            SetGlobalAutomationMode(AUTOMATION_WRITE);
             return;
         }
 
@@ -279,7 +292,7 @@ public:
 
         if (context->GetShiftRight())
         {
-            SetGlobalAutomationOverride(AUTOMATION_READ);
+            SetGlobalAutomationMode(AUTOMATION_READ);
             return;
         }
 
