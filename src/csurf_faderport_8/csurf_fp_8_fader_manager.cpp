@@ -12,19 +12,19 @@ void CSurf_FP_8_FaderManager::SetButtonValues(bool force)
         ButtonOnBlinkOff(
             context->IsChannelMode(PluginMode),
             context->IsChannelMode(TrackPluginMode),
-            context->GetDistractionFreeMode()),
+            context->GetSettings()->GetDistractionFreeMode()),
         force);
     sendButton->SetValue(
         ButtonOnBlinkOff(
             context->IsChannelMode(SendMode) || context->IsChannelMode(ReceiveMode),
             context->IsChannelMode(TrackSendMode) || context->IsChannelMode(TrackReceiveMode),
-            context->GetDistractionFreeMode()),
+            context->GetSettings()->GetDistractionFreeMode()),
         force);
     panButton->SetValue(
         ButtonOnBlinkOff(
             context->IsChannelMode(PanMode1),
             context->IsChannelMode(PanMode2),
-            context->GetDistractionFreeMode()),
+            context->GetSettings()->GetDistractionFreeMode()),
         force);
 }
 
@@ -326,7 +326,7 @@ void CSurf_FP_8_FaderManager::HandleSoloClick(int index, int value)
 
     prevChannelMode = context->GetChannelMode();
 
-    if (context->GetPluginControl() &&
+    if (context->GetSettings()->GetPluginControl() &&
         (context->IsChannelMode(TrackPluginMode) || context->IsChannelMode(PluginMode)) &&
         (context->GetPluginEditPluginId() > -1))
     {

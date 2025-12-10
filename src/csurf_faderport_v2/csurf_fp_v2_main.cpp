@@ -141,6 +141,14 @@ class CSurf_FaderPortV2 : public IReaperControlSurface
       }
 
       /**
+       * Footswitch
+       */
+      else if (evt->midi_message[1] == BTN_FOOTSWITCH)
+      {
+        transportManager->HandleFootSwitchClick(evt->midi_message[2]);
+      }
+
+      /**
        * General Control Management
        */
       else if (evt->midi_message[1] == BTN_SHIFT_LEFT)
@@ -224,10 +232,12 @@ class CSurf_FaderPortV2 : public IReaperControlSurface
     readAndCreateIni(ini, FP_V2);
 
     i18n->SetLanguage(DAW::GetExtState(EXT_STATE_KEY_UI_LANGUAGE, "en-US"));
-    context->SetMuteSoloMomentary(ini["surface"].has("mute-solo-momentary") && ini["surface"]["mute-solo-momentary"] == "1");
-    context->SetControlHiddenTracks(ini["surface"].has("control-hidden-tracks") && ini["surface"]["control-hidden-tracks"] == "1");
-    context->SetCanDisableFader(ini["surface"].has("can-disable-fader") && ini["surface"]["can-disable-fader"] == "1");
-    context->SetEndlessTrackScroll(ini["surface"].has("endless-track-scroll") && ini["surface"]["endless-track-scroll"] == "1");
+    context->GetSettings()->SetLatchPreviewActionEnabled(ini["surface"].has("latch-preview-action") && ini["surface"]["latch-preview-action"] == "1");
+    context->GetSettings()->SetLatchPreviewActionCode(ini["surface"].has("latch-preview-action-code") && std::stoi(ini["surface"]["latch-preview-action-code"]));
+    context->GetSettings()->SetMuteSoloMomentary(ini["surface"].has("mute-solo-momentary") && ini["surface"]["mute-solo-momentary"] == "1");
+    context->GetSettings()->SetControlHiddenTracks(ini["surface"].has("control-hidden-tracks") && ini["surface"]["control-hidden-tracks"] == "1");
+    context->GetSettings()->SetCanDisableFader(ini["surface"].has("can-disable-fader") && ini["surface"]["can-disable-fader"] == "1");
+    context->GetSettings()->SetEndlessTrackScroll(ini["surface"].has("endless-track-scroll") && ini["surface"]["endless-track-scroll"] == "1");
   }
 
 public:
@@ -411,11 +421,11 @@ public:
       return;
     }
 
-    if (!context->GetControlHiddenTracks() && DAW::IsTrackVisible(media_track))
+    if (!context->GetSettings()->GetControlHiddenTracks() && DAW::IsTrackVisible(media_track))
     {
       trackNavigator->SetOffsetByTrack(media_track);
     }
-    else if (context->GetControlHiddenTracks())
+    else if (context->GetSettings()->GetControlHiddenTracks())
     {
       trackNavigator->SetOffset(track_index - 1);
     }

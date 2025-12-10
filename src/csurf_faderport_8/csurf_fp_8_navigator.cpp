@@ -350,6 +350,11 @@ bool CSurf_FP_8_Navigator::IsTrackTouched(MediaTrack *media_track, int is_pan)
         }
     }
 
+    if (index == -1)
+    {
+        return false;
+    }
+
     if (context->GetChannelMode() == TrackMode && is_pan == 0)
     {
         return trackTouched[index];

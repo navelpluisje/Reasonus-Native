@@ -61,15 +61,16 @@ protected:
             macroButton->SetValue(ReaSonus8ControlPanel::control_panel_open ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
         }
 
-        soloClearButton->SetValue(hasSolo && !context->GetDistractionFreeMode() ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
-        muteClearButton->SetValue(hasMute && !context->GetDistractionFreeMode() ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+        soloClearButton->SetValue(hasSolo && !context->GetSettings()->GetDistractionFreeMode() ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+        muteClearButton->SetValue(hasMute && !context->GetSettings()->GetDistractionFreeMode() ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
         linkButton->SetValue(
             ButtonOnBlinkOff(
                 context->GetLastTouchedFxMode(),
                 context->GetChannelMode() == PluginEditMode,
-                context->GetDistractionFreeMode()),
+                context->GetSettings()->GetDistractionFreeMode()),
             force);
-        shiftLeftButton->SetValue(((!context->GetSwapShiftButtons() && context->GetShiftLeft()) || (context->GetShiftRight() && context->GetSwapShiftButtons()))
+        shiftLeftButton->SetValue(((!context->GetSettings()->GetSwapShiftButtons() && context->GetShiftLeft()) ||
+                                   (context->GetShiftRight() && context->GetSettings()->GetSwapShiftButtons()))
                                       ? BTN_VALUE_ON
                                       : BTN_VALUE_OFF,
                                   force);
@@ -216,7 +217,7 @@ public:
                 context->SetAddSendReceiveMode(-1);
             }
             return;
-                }
+        }
 
         if (context->GetChannelMode() == MenuMode)
         {
@@ -348,7 +349,7 @@ public:
                 return;
             }
 
-            if (context->GetPluginControl() &&
+            if (context->GetSettings()->GetPluginControl() &&
                 (context->IsChannelMode(PluginMode) ||
                  context->IsChannelMode(TrackPluginMode) ||
                  context->IsChannelMode(PluginControlMode) ||

@@ -173,6 +173,25 @@ public:
         (void)value;
     }
 
+    void HandleFaderTouch(int index, int value) override
+    {
+        int controlIndex = context->GetChannelManagerItemIndex() + index;
+        int pluginId = context->GetPluginEditPluginId();
+
+        std::string paramKey = getParamKey("Fader_", controlIndex);
+
+        if (ini.has(paramKey))
+        {
+            MediaTrack *media_track = context->GetPluginEditTrack();
+            if (!media_track || value > 0)
+            {
+                return;
+            }
+
+            TrackFX_EndParamEdit(media_track, pluginId, stoi(ini[paramKey]["param"]));
+        }
+    }
+
     void HandleFaderMove(int index, int msb, int lsb) override
     {
         int controlIndex = context->GetChannelManagerItemIndex() + index;

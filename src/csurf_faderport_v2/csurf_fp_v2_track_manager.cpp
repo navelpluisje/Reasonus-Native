@@ -66,7 +66,12 @@ void CSurf_FP_V2_TrackManager::UpdateTrack()
         track->SetSoloButtonValue(DAW::IsTrackSoloed(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
     }
 
-    track->SetArmButtonValue(isArmed ? BTN_VALUE_ON : BTN_VALUE_OFF);
+    track->SetArmButtonValue(navigator->HasAllArmedTracks()
+                                 ? BTN_VALUE_BLINK
+                             : isArmed
+                                 ? BTN_VALUE_ON
+                                 : BTN_VALUE_OFF,
+                             forceUpdate);
     track->SetBypassButtonValue(DAW::GetTrackFxBypassed(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF);
 
     if (context->GetLastTouchedFxMode())
@@ -122,7 +127,7 @@ void CSurf_FP_V2_TrackManager::HandleMuteClick(int index, int value)
     int now = GetTickCount();
     MediaTrack *media_track = navigator->GetControllerTrack();
 
-    if (value == 0 && context->GetMuteSoloMomentary())
+    if (value == 0 && context->GetSettings()->GetMuteSoloMomentary())
     {
         if (now - mute_start > MOMENTARY_TIMEOUT)
         {
@@ -153,7 +158,7 @@ void CSurf_FP_V2_TrackManager::HandleSoloClick(int index, int value)
     int now = GetTickCount();
     MediaTrack *media_track = navigator->GetControllerTrack();
 
-    if (value == 0 && context->GetMuteSoloMomentary())
+    if (value == 0 && context->GetSettings()->GetMuteSoloMomentary())
     {
         if (now - solo_start > MOMENTARY_TIMEOUT)
         {
@@ -180,7 +185,14 @@ void CSurf_FP_V2_TrackManager::HandleArmClick(int index, int value)
 
     if (context->GetShiftLeft())
     {
-        Main_OnCommandEx(40490, 0, 0); // Track: Arm all tracks for recording
+        if (navigator->HasAllArmedTracks())
+        {
+            Main_OnCommandEx(40491, 0, 0); // Track: Unarm all tracks for recording
+        }
+        else
+        {
+            Main_OnCommandEx(40490, 0, 0); // Track: Arm all tracks for recording
+        }
         return;
     }
 

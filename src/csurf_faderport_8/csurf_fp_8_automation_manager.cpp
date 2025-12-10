@@ -26,6 +26,19 @@ protected:
     bool canUndo = false;
     bool canRedo = false;
 
+    bool IsAutomationSelected(int automation_mode)
+    {
+        if (globalAutomationMode == automation_mode)
+        {
+            return true;
+        }
+        if (globalAutomationMode == AUTOMATION_OFF && channelAutomationMode == automation_mode)
+        {
+            return true;
+        }
+        return false;
+    }
+
     void SetButtonValue(bool force = false)
     {
         if (context->GetShiftRight())
@@ -48,17 +61,17 @@ protected:
         }
         else
         {
-            latchButton->SetValue(channelAutomationMode == AUTOMATION_LATCH ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
-            trimButton->SetValue(channelAutomationMode == AUTOMATION_TRIM ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
-            offButton->SetValue(channelAutomationMode == AUTOMATION_PREVIEW ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+            latchButton->SetValue(IsAutomationSelected(AUTOMATION_LATCH) ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+            trimButton->SetValue(IsAutomationSelected(AUTOMATION_TRIM) ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+            offButton->SetValue(IsAutomationSelected(AUTOMATION_PREVIEW) ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
             touchButton->SetValue(context->GetChannelMode() == MenuMode
-                                      ? (context->GetDistractionFreeMode() ? BTN_VALUE_ON : BTN_VALUE_BLINK)
-                                  : channelAutomationMode == AUTOMATION_TOUCH
+                                      ? (context->GetSettings()->GetDistractionFreeMode() ? BTN_VALUE_ON : BTN_VALUE_BLINK)
+                                  : IsAutomationSelected(AUTOMATION_TOUCH)
                                       ? BTN_VALUE_ON
                                       : BTN_VALUE_OFF,
                                   force);
-            writeButton->SetValue(channelAutomationMode == AUTOMATION_WRITE ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
-            readButton->SetValue(channelAutomationMode == AUTOMATION_READ ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+            writeButton->SetValue(IsAutomationSelected(AUTOMATION_WRITE) ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+            readButton->SetValue(IsAutomationSelected(AUTOMATION_READ) ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
         }
     }
 
@@ -102,6 +115,18 @@ protected:
         else
         {
             return GetSelectedTrack(0, 0);
+        }
+    }
+
+    void SetGlobalAutomationMode(int automation_mode)
+    {
+        if (::GetGlobalAutomationOverride() == automation_mode)
+        {
+            ::SetGlobalAutomationOverride(AUTOMATION_OFF);
+        }
+        else
+        {
+            ::SetGlobalAutomationOverride(automation_mode);
         }
     }
 
@@ -158,7 +183,7 @@ public:
 
         if (context->GetShiftRight())
         {
-            SetGlobalAutomationOverride(AUTOMATION_LATCH);
+            SetGlobalAutomationMode(AUTOMATION_LATCH);
             return;
         }
 
@@ -181,7 +206,7 @@ public:
 
         if (context->GetShiftRight())
         {
-            SetGlobalAutomationOverride(AUTOMATION_TRIM);
+            SetGlobalAutomationMode(AUTOMATION_TRIM);
             return;
         }
 
@@ -204,7 +229,7 @@ public:
 
         if (context->GetShiftRight())
         {
-            SetGlobalAutomationOverride(AUTOMATION_PREVIEW);
+            SetGlobalAutomationMode(AUTOMATION_PREVIEW);
             return;
         }
 
@@ -215,7 +240,15 @@ public:
         }
 
         MediaTrack *media_track = GetSelectedAutomationTrack();
-        SetTrackAutomationMode(media_track, AUTOMATION_PREVIEW);
+        if (
+            (::GetTrackAutomationMode(media_track) == AUTOMATION_PREVIEW || ::GetGlobalAutomationOverride() == AUTOMATION_PREVIEW) && context->GetSettings()->GetLatchPreviewActionEnabled())
+        {
+            ::Main_OnCommandEx(context->GetSettings()->GetLatchPreviewActionCode(), 0, 0);
+        }
+        else
+        {
+            SetTrackAutomationMode(media_track, AUTOMATION_PREVIEW);
+        }
     };
 
     void HandleTouchButton(int value)
@@ -227,7 +260,7 @@ public:
 
         if (context->GetShiftRight() && !context->IsChannelMode(MenuMode))
         {
-            SetGlobalAutomationOverride(AUTOMATION_TOUCH);
+            SetGlobalAutomationMode(AUTOMATION_TOUCH);
             return;
         }
 
@@ -250,7 +283,7 @@ public:
 
         if (context->GetShiftRight())
         {
-            SetGlobalAutomationOverride(AUTOMATION_WRITE);
+            SetGlobalAutomationMode(AUTOMATION_WRITE);
             return;
         }
 
@@ -272,7 +305,7 @@ public:
 
         if (context->GetShiftRight())
         {
-            SetGlobalAutomationOverride(AUTOMATION_READ);
+            SetGlobalAutomationMode(AUTOMATION_READ);
             return;
         }
 
