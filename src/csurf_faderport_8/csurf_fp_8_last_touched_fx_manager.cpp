@@ -20,7 +20,7 @@ void CSurf_FP_8_LastTouchedFXManager::UpdateTrack()
     char fxName[256];
     char paramName[256];
     char paramValueString[256];
-    double paramValue = 0.0, min, max;
+    double paramValue = 0.0;
 
     if (hasLastTouchedFxEnabled != context->GetLastTouchedFxMode() && context->GetLastTouchedFxMode())
     {
@@ -40,7 +40,7 @@ void CSurf_FP_8_LastTouchedFXManager::UpdateTrack()
             TrackFX_GetFXName(media_track, fxNumber, fxName, sizeof(fxName));
             TrackFX_GetParamName(media_track, fxNumber, paramNumber, paramName, std::size(paramName));
             TrackFX_GetFormattedParamValue(media_track, fxNumber, paramNumber, paramValueString, std::size(paramValueString));
-            paramValue = TrackFX_GetParam(media_track, fxNumber, paramNumber, &min, &max);
+            paramValue = TrackFX_GetParamNormalized(media_track, fxNumber, paramNumber);
         }
     }
     else
@@ -90,7 +90,7 @@ void CSurf_FP_8_LastTouchedFXManager::HandleFaderMove(int msb, int lsb)
     {
         if (MediaTrack *media_track = GetTrack(0, trackNumber - 1))
         {
-            TrackFX_SetParam(media_track, fxNumber, paramNumber, int14ToNormalized(msb, lsb));
+            TrackFX_SetParamNormalized(media_track, fxNumber, paramNumber, int14ToNormalized(msb, lsb));
         }
     }
 };

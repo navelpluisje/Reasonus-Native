@@ -68,7 +68,6 @@ public:
     void UpdateTracks() override
     {
         std::string paramKey;
-        double min, max = 0.0;
 
         MediaTrack *media_track = context->GetPluginEditTrack();
         int pluginId = context->GetPluginEditPluginId();
@@ -107,7 +106,7 @@ public:
                 track->SetDisplayLine(2, ALIGN_CENTER, ini[paramKey]["name"].c_str(), INVERT, forceUpdate);
                 TrackFX_GetFormattedParamValue(media_track, pluginId, stoi(ini[paramKey]["param"]), buffer, sizeof(buffer));
                 track->SetDisplayLine(3, ALIGN_CENTER, buffer, NON_INVERT, forceUpdate);
-                double value = TrackFX_GetParam(media_track, pluginId, stoi(ini[paramKey]["param"]), &min, &max);
+                double value = TrackFX_GetParamNormalized(media_track, pluginId, stoi(ini[paramKey]["param"]));
                 track->SetFaderValue((int)(value * 16383.0), forceUpdate);
                 track->SetValueBarValue((int)(value * 127.0));
             }
@@ -131,7 +130,6 @@ public:
             return;
         }
 
-        double min, max = 0.0;
         int controlIndex = context->GetChannelManagerItemIndex() + index;
         MediaTrack *media_track = context->GetPluginEditTrack();
         int pluginId = context->GetPluginEditPluginId();
@@ -146,15 +144,15 @@ public:
             {
                 nbSteps = 2;
             }
-            double value = TrackFX_GetParam(media_track, pluginId, paramId, &min, &max);
-            double stepSize = max / (nbSteps - 1);
+            double value = TrackFX_GetParamNormalized(media_track, pluginId, paramId);
+            double stepSize = 1.0 / (nbSteps - 1);
             double newValue = int((value + stepSize) * 100);
             if (newValue > 100)
             {
                 newValue = 0;
             }
 
-            TrackFX_SetParam(media_track, pluginId, paramId, newValue / 100);
+            TrackFX_SetParamNormalized(media_track, pluginId, paramId, newValue / 100);
         }
     }
 
@@ -204,7 +202,7 @@ public:
             MediaTrack *media_track = context->GetPluginEditTrack();
             double value = int14ToNormalized(msb, lsb);
 
-            TrackFX_SetParam(media_track, pluginId, stoi(ini[paramKey]["param"]), value);
+            TrackFX_SetParamNormalized(media_track, pluginId, stoi(ini[paramKey]["param"]), value);
         }
     }
 };
