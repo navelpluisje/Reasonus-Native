@@ -1,6 +1,7 @@
 #ifndef CSURF_FP_8_NAVIGATOR_H_
 #define CSURF_FP_8_NAVIGATOR_H_
 
+#include <stdlib.h>
 #include <WDL/ptrlist.h>
 #include <mini/ini.h>
 #include <map>

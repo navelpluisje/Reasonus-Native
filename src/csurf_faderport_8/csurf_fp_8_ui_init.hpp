@@ -3,7 +3,6 @@
 
 #include <string>
 #include <mini/ini.h>
-#include <WDL/win32_utf8.h>
 #include <config.h>
 #include "../shared/csurf_utils.hpp"
 #include "../shared/csurf_faderport_ui_utils.hpp"
