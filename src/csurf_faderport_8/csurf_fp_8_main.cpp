@@ -17,6 +17,7 @@
 #include "../shared/csurf_transport_manager.hpp"
 #include "../shared/csurf_utils.hpp"
 #include "../i18n/i18n.hpp"
+#include "../shared/csurf_reasonus_settings.hpp"
 #include "csurf_fp_8_session_manager.cpp"
 #include "csurf_fp_8_mix_manager.cpp"
 #include "csurf_fp_8_automation_manager.cpp"
@@ -30,6 +31,7 @@ extern HWND g_hwnd;
 extern REAPER_PLUGIN_HINSTANCE g_hInst;
 
 I18n *I18n::instancePtr = nullptr;
+ReaSonusSettings *ReaSonusSettings::instance8Ptr = nullptr;
 
 const int MOMENTARY_TIMEOUT = 500;
 
@@ -56,9 +58,8 @@ class CSurf_FaderPort : public IReaperControlSurface
   DWORD surface_update_keepalive;
   DWORD surface_update_settings_check;
 
-  mINI::INIStructure ini;
-
   I18n *i18n = I18n::GetInstance();
+  ReaSonusSettings *settings = ReaSonusSettings::GetInstance(FP_8);
 
   WDL_String descspace;
   char configtmp[1024];
@@ -384,23 +385,8 @@ class CSurf_FaderPort : public IReaperControlSurface
 
   void updateSettings()
   {
-    readAndCreateIni(ini, FP_8);
-
     i18n->SetLanguage(DAW::GetExtState(EXT_STATE_KEY_UI_LANGUAGE, "en-US"));
-    context->GetSettings()->SetPluginControl(ini["surface"].has("disable-plugins") && ini["surface"]["disable-plugins"] != "1");
-    context->GetSettings()->SetDistractionFreeMode(ini["surface"].has("distraction-free") && ini["surface"]["distraction-free"] == "1");
-
-    context->GetSettings()->SetLatchPreviewActionEnabled(ini["surface"].has("latch-preview-action") && ini["surface"]["latch-preview-action"] == "1");
-    context->GetSettings()->SetLatchPreviewActionCode(ini["surface"].has("latch-preview-action-code") ? std::stoi(ini["surface"]["latch-preview-action-code"]) : 42013);
-    context->GetSettings()->SetUntouchAfterLearn(ini["surface"].has("erase-last-param-after-learn") && ini["surface"]["erase-last-param-after-learn"] == "1");
-    context->GetSettings()->SetMasterFaderModeEnabled(ini["surface"].has("master-fader-mode") && ini["surface"]["master-fader-mode"] == "1");
-    context->GetSettings()->SetSwapShiftButtons(ini["surface"].has("swap-shift-buttons") && ini["surface"]["swap-shift-buttons"] == "1");
-    context->GetSettings()->SetFaderReset(ini["surface"].has("fader-reset") && ini["surface"]["fader-reset"] == "1");
-    context->GetSettings()->SetMuteSoloMomentary(ini["surface"].has("mute-solo-momentary") && ini["surface"]["mute-solo-momentary"] == "1");
-    context->GetSettings()->SetOverwriteTimeCode(ini["surface"].has("overwrite-time-code") && ini["surface"]["overwrite-time-code"] == "1");
-    context->GetSettings()->SetSurfaceTimeCode(ini["surface"].has("time-code") && std::stoi(ini["surface"]["time-code"]));
-    context->GetSettings()->SetTrackDisplay(ini["displays"].has("track") ? std::stoi(ini["displays"]["track"]) : 8);
-    context->GetSettings()->SetTrackColorBrightness(ini["surface"].has("track-color-brightness") ? std::stoi(ini["surface"]["track-color-brightness"]) : 25);
+    settings->UpdateSettings();
   }
 
 public:
@@ -409,10 +395,6 @@ public:
     (void)indev;
     (void)outdev;
 
-    /**
-     * First we check if we have the ini file. If not we create it with default values
-     */
-    readAndCreateIni(ini, FP_8);
     if (std::string(GIT_VERSION).compare(DAW::GetExtState(EXT_STATE_KEY_VERSION, "")) != 0)
     {
       DAW::SetExtState(EXT_STATE_KEY_VERSION, GIT_VERSION, true);
@@ -420,8 +402,8 @@ public:
     }
 
     errStats = 0;
-    m_midi_in_dev = stoi(ini["surface"]["midiin"]);
-    m_midi_out_dev = stoi(ini["surface"]["midiout"]);
+    m_midi_in_dev = settings->GetMidiInput();
+    m_midi_out_dev = settings->GetMidiOutput();
 
     surface_update_lastrun = 0;
 
@@ -429,7 +411,7 @@ public:
     m_midiin = m_midi_in_dev >= 0 ? CreateMIDIInput(m_midi_in_dev) : NULL;
     m_midiout = m_midi_out_dev >= 0 ? CreateMIDIOutput(m_midi_out_dev, false, NULL) : NULL;
 
-    context = new CSurf_Context(stoi(ini["surface"]["surface"]));
+    context = new CSurf_Context(settings->GetSurface());
     updateSettings();
 
     for (int i = 0; i < context->GetNbChannels(); i++)

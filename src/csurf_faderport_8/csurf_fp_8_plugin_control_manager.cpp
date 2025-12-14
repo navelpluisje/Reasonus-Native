@@ -1,15 +1,7 @@
 #ifndef CSURF_FP_8_PLUGIN_CONTROL_MANAGER_C_
 #define CSURF_FP_8_PLUGIN_CONTROL_MANAGER_C_
 
-#include "../shared/csurf_context.cpp"
-#include <WDL/ptrlist.h>
-#include "csurf_fp_8_track.hpp"
 #include "csurf_fp_8_channel_manager.hpp"
-#include "csurf_fp_8_navigator.hpp"
-#include <mini/ini.h>
-#include <vector>
-#include "../shared/csurf_daw.hpp"
-#include "../shared/csurf_utils.hpp"
 
 class CSurf_FP_8_PluginControlManager : public CSurf_FP_8_ChannelManager
 {

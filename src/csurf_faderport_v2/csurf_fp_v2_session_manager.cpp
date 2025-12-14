@@ -3,12 +3,9 @@
 #define CSURF_SESSION_MANAGER_V2_C_
 
 #include "../controls/csurf_button.hpp"
-#include "../shared/csurf_utils.hpp"
-#include "../shared/csurf_context.cpp"
+#include "../controls/csurf_color_button.hpp"
 #include "../shared/csurf_session_manager_actions.hpp"
 #include "csurf_fp_v2_navigator.hpp"
-#include <mini/ini.h>
-#include "../controls/csurf_color_button.hpp"
 #include "../shared/csurf_daw.hpp"
 #include "csurf_fp_v2_ui_control_panel.hpp"
 #include "../shared/csurf_faderport_ui_imgui_utils.hpp"
@@ -33,6 +30,7 @@ protected:
     CSurf_FP_V2_Navigator *trackNavigator;
     SessionTypes session_type = Channel;
     bool handleFunctionKeys = false;
+    ReaSonusSettings *settings = ReaSonusSettings::GetInstance(FP_V2);
 
     CSurf_ColorButton *linkButton;
     CSurf_ColorButton *panButton;
@@ -48,7 +46,7 @@ protected:
     void SetButtonValues()
     {
         // With shift engaged, blink the selected button
-        Btn_Value valueOn = context->GetShiftLeft() && !context->GetSettings()->GetDistractionFreeMode() ? BTN_VALUE_BLINK : BTN_VALUE_ON;
+        Btn_Value valueOn = context->GetShiftLeft() && !settings->GetDistractionFreeMode() ? BTN_VALUE_BLINK : BTN_VALUE_ON;
 
         linkButton->SetValue(GetToggleCommandStringState("_REASONUS_TOGGLE_PLAY_CURSOR_COMMAND") && context->GetShiftLeft()
                                  ? BTN_VALUE_ON
@@ -247,7 +245,7 @@ public:
             return;
         }
 
-        if (context->GetShiftLeft() && context->GetSettings()->GetCanDisableFader())
+        if (context->GetShiftLeft() && settings->GetCanDisableFader())
         {
             context->SetFaderDisabled(!context->GetFaderDisabled());
             return;

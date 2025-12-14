@@ -211,7 +211,11 @@ std::string GetAutomationString(int automationMode)
     };
 }
 
-std::string GetReaSonusFolderPath() { return std::string(GetResourcePath()) + pathSeparator + "ReaSonus"; }
+std::string GetReaSonusFolderPath()
+{
+    std::string recource_path = std::string(GetResourcePath());
+    return recource_path + pathSeparator + "ReaSonus";
+}
 
 std::string GetReaSonusIniPath(std::string device) { return GetReaSonusFolderPath() + pathSeparator + device + ".ini"; }
 

@@ -2,7 +2,6 @@
 #define CSURF_SHIFT_MANAGER_C_
 
 #include "csurf_fp_8_track.hpp"
-#include "../shared/csurf_utils.hpp"
 
 CSurf_FP_8_Track::CSurf_FP_8_Track(int index, CSurf_Context *context, midi_Output *m_midiout) : context(context)
 {

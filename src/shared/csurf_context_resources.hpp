@@ -33,6 +33,11 @@ enum PanEncoderMode
     PanEncoderPluginMode,
     PanEncoderSendMode,
     PanEncoderReceiveMode,
+    PanEncoderPanMode,
+    PanEncoderMixMode,
+    PanEncoderPluginEditMode,
+    PanEncoderPluginControlMode,
+    PanEncoderMenuMode,
 };
 
 #endif // CSURF_CONTEXT_RESOURCES_H_

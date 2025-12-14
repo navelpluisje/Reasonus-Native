@@ -1,7 +1,5 @@
-#include <algorithm>
-#include <vector>
-#include "../controls/csurf_display_resources.hpp"
 #include "../ui/csurf_ui_page_content.hpp"
+#include "../controls/csurf_display_resources.hpp"
 #include "../ui/csurf_ui_checkbox.hpp"
 #include "../ui/csurf_ui_int_input.hpp"
 #include "../ui/csurf_ui_combo_input.hpp"
@@ -12,12 +10,14 @@
 #include "../ui/csurf_ui_button_width.hpp"
 #include "../shared/csurf_daw.hpp"
 #include "csurf_fp_8_ui_control_panel.hpp"
+#include "../shared/csurf_reasonus_settings.hpp"
 
 class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent
 {
 protected:
     ImGui_Image *icon_info;
     I18n *i18n = I18n::GetInstance();
+    ReaSonusSettings *settings = ReaSonusSettings::GetInstance(FP_8);
     ImGui_Font *main_font_bold;
 
     int selected_tab = -1;
@@ -330,30 +330,29 @@ public:
 
     void Save() override
     {
-        mINI::INIFile file(GetReaSonusIniPath(FP_8));
-        readAndCreateIni(ini, FP_8);
-
         DAW::SetExtState(EXT_STATE_KEY_UI_LANGUAGE, language_names[setting_language].c_str(), true);
-        ini["surface"]["disable-plugins"] = setting_disable_plugins ? "1" : "0";
-        ini["surface"]["distraction-free"] = setting_distraction_free_mode ? "1" : "0";
 
-        ini["surface"]["erase-last-param-after-learn"] = setting_untouch_after_learn ? "1" : "0";
-        ini["surface"]["master-fader-mode"] = setting_master_fader_mode ? "1" : "0";
-        ini["surface"]["swap-shift-buttons"] = setting_swap_shift ? "1" : "0";
-        ini["surface"]["fader-reset"] = setting_fader_reset ? "1" : "0";
-        ini["surface"]["mute-solo-momentary"] = setting_momentary_mute_solo ? "1" : "0";
-        ini["surface"]["overwrite-time-code"] = setting_overwrite_time_code ? "1" : "0";
-        ini["surface"]["latch-preview-action"] = setting_latch_preview_action_enable ? "1" : "0";
-        ini["surface"]["track-color-brightness"] = std::to_string(setting_track_color_brightness);
-        ini["surface"]["latch-preview-action-code"] = std::to_string(latch_preview_action_indexes[setting_latch_preview_action]);
-        ini["surface"]["time-code"] = std::to_string(time_code_indexes[setting_time_code]);
-        ini["displays"]["track"] = std::to_string(track_display_indexes[setting_track_display]);
+        settings->SetSetting("surface", "disable-plugins", setting_disable_plugins);
+        settings->SetSetting("surface", "distraction-free", setting_distraction_free_mode);
 
-        if (file.write(ini, true))
+        settings->SetSetting("surface", "erase-last-param-after-learn", setting_untouch_after_learn);
+        settings->SetSetting("surface", "master-fader-mode", setting_master_fader_mode);
+        settings->SetSetting("surface", "swap-shift-buttons", setting_swap_shift);
+        settings->SetSetting("surface", "fader-reset", setting_fader_reset);
+        settings->SetSetting("surface", "mute-solo-momentary", setting_momentary_mute_solo);
+        settings->SetSetting("surface", "overwrite-time-code", setting_overwrite_time_code);
+        settings->SetSetting("surface", "latch-preview-action", setting_latch_preview_action_enable);
+        settings->SetSetting("surface", "track-color-brightness", setting_track_color_brightness);
+        settings->SetSetting("surface", "latch-preview-action-code", latch_preview_action_indexes[setting_latch_preview_action]);
+        settings->SetSetting("surface", "time-code", time_code_indexes[setting_time_code]);
+        settings->SetSetting("displays", "track", track_display_indexes[setting_track_display]);
+
+        if (settings->StoreSettings())
         {
             DAW::SetExtState(EXT_STATE_KEY_SAVED_SETTINGS, EXT_STATE_VALUE_TRUE, false);
             ReaSonus8ControlPanel::SetMessage(i18n->t("settings", "action.save.message"));
         };
+
         int actionId = NamedCommandLookup("_REASONUS_TOGGLE_DISABLE_PLUGINS_SETTING");
         RefreshToolbar2(0, actionId);
         actionId = NamedCommandLookup("_REASONUS_TOGGLE_DISTRACTION_FREE_MODE");
@@ -372,24 +371,25 @@ public:
             }
         }
 
-        setting_disable_plugins = ini["surface"]["disable-plugins"] == "1";
-        setting_distraction_free_mode = ini["surface"]["distraction-free"] == "1";
-        setting_untouch_after_learn = ini["surface"]["erase-last-param-after-learn"] == "1";
-        setting_master_fader_mode = ini["surface"]["master-fader-mode"] == "1";
-        setting_swap_shift = ini["surface"]["swap-shift-buttons"] == "1";
-        setting_fader_reset = ini["surface"]["fader-reset"] == "1";
-        setting_momentary_mute_solo = ini["surface"]["mute-solo-momentary"] == "1";
-        setting_overwrite_time_code = ini["surface"]["overwrite-time-code"] == "1";
-        setting_latch_preview_action_enable = ini["surface"]["latch-preview-action"] == "1";
+        setting_disable_plugins = settings->GetDisablePluginControl();
+        setting_distraction_free_mode = settings->GetDistractionFreeMode();
+        setting_untouch_after_learn = settings->GetUntouchAfterLearn();
+        setting_master_fader_mode = settings->GetMasterFaderModeEnabled();
+        setting_swap_shift = settings->GetSwapShiftButtons();
+        setting_fader_reset = settings->GetFaderReset();
+        setting_momentary_mute_solo = settings->GetMuteSoloMomentary();
+        setting_overwrite_time_code = settings->GetOverwriteTimeCode();
+        setting_latch_preview_action_enable = settings->GetLatchPreviewActionEnabled();
 
-        index = std::find(latch_preview_action_indexes, latch_preview_action_indexes + 8, stoi(ini["surface"]["latch-preview-action-code"]));
+        setting_track_color_brightness = settings->GetTrackColorBrightness();
+
+        index = std::find(latch_preview_action_indexes, latch_preview_action_indexes + 8, settings->GetLatchPreviewActionCode());
         setting_latch_preview_action = index - latch_preview_action_indexes;
-        setting_track_color_brightness = stoi(ini["surface"]["track-color-brightness"]);
 
-        index = std::find(time_code_indexes, time_code_indexes + 6, stoi(ini["surface"]["time-code"]));
+        index = std::find(time_code_indexes, time_code_indexes + 6, settings->GetSurfaceTimeCode());
         setting_time_code = index - time_code_indexes;
 
-        index = std::find(track_display_indexes, track_display_indexes + 4, stoi(ini["displays"]["track"]));
+        index = std::find(track_display_indexes, track_display_indexes + 4, settings->GetTrackDisplay());
         setting_track_display = index - track_display_indexes;
     }
 };

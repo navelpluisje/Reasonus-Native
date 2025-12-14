@@ -10,6 +10,8 @@ CSurf_UI_FunctionKeysPage::CSurf_UI_FunctionKeysPage(ImGui_Context *m_ctx, std::
 {
     i18n = I18n::GetInstance();
     device = _device;
+    settings = ReaSonusSettings::GetInstance(device);
+
     function_font_bold = ImGui::CreateFont("Arial", ImGui::FontFlags_Bold);
     ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(function_font_bold));
     icon_search = ImGui::CreateImageFromMem(reinterpret_cast<const char *>(img_icon_search), sizeof(img_icon_search));
@@ -22,61 +24,58 @@ CSurf_UI_FunctionKeysPage::CSurf_UI_FunctionKeysPage(ImGui_Context *m_ctx, std::
 
 void CSurf_UI_FunctionKeysPage::Reset()
 {
-    footswitch.push_back(ini["footswitch"]["1"]);
-    footswitch.push_back(ini["footswitch"]["2"]);
-    footswitch.push_back(ini["footswitch"]["3"]);
+    footswitch.push_back(settings->GetFunction("1", true));
+    footswitch.push_back(settings->GetFunction("2", true));
+    footswitch.push_back(settings->GetFunction("3", true));
 
-    functions.push_back(ini["functions"]["1"]);
-    functions.push_back(ini["functions"]["2"]);
-    functions.push_back(ini["functions"]["3"]);
-    functions.push_back(ini["functions"]["4"]);
+    functions.push_back(settings->GetFunction("1"));
+    functions.push_back(settings->GetFunction("2"));
+    functions.push_back(settings->GetFunction("3"));
+    functions.push_back(settings->GetFunction("4"));
     if (device == FP_8)
     {
-        functions.push_back(ini["functions"]["5"]);
-        functions.push_back(ini["functions"]["6"]);
-        functions.push_back(ini["functions"]["7"]);
-        functions.push_back(ini["functions"]["8"]);
-        functions.push_back(ini["functions"]["9"]);
-        functions.push_back(ini["functions"]["10"]);
-        functions.push_back(ini["functions"]["11"]);
-        functions.push_back(ini["functions"]["12"]);
-        functions.push_back(ini["functions"]["13"]);
-        functions.push_back(ini["functions"]["14"]);
-        functions.push_back(ini["functions"]["15"]);
-        functions.push_back(ini["functions"]["16"]);
+        functions.push_back(settings->GetFunction("5"));
+        functions.push_back(settings->GetFunction("6"));
+        functions.push_back(settings->GetFunction("7"));
+        functions.push_back(settings->GetFunction("8"));
+        functions.push_back(settings->GetFunction("9"));
+        functions.push_back(settings->GetFunction("10"));
+        functions.push_back(settings->GetFunction("11"));
+        functions.push_back(settings->GetFunction("12"));
+        functions.push_back(settings->GetFunction("13"));
+        functions.push_back(settings->GetFunction("14"));
+        functions.push_back(settings->GetFunction("15"));
+        functions.push_back(settings->GetFunction("16"));
     }
 }
 
 void CSurf_UI_FunctionKeysPage::Save()
 {
-    mINI::INIFile file(GetReaSonusIniPath(device));
-    readAndCreateIni(ini, device);
+    settings->SetFunction("1", footswitch[0], true);
+    settings->SetFunction("2", footswitch[1], true);
+    settings->SetFunction("3", footswitch[2], true);
 
-    ini["footswitch"]["1"] = footswitch[0];
-    ini["footswitch"]["2"] = footswitch[1];
-    ini["footswitch"]["3"] = footswitch[2];
-
-    ini["functions"]["1"] = functions[0];
-    ini["functions"]["2"] = functions[1];
-    ini["functions"]["3"] = functions[2];
-    ini["functions"]["4"] = functions[3];
+    settings->SetFunction("1", functions[0]);
+    settings->SetFunction("2", functions[1]);
+    settings->SetFunction("3", functions[2]);
+    settings->SetFunction("4", functions[3]);
     if (device == FP_8)
     {
-        ini["functions"]["5"] = functions[4];
-        ini["functions"]["6"] = functions[5];
-        ini["functions"]["7"] = functions[6];
-        ini["functions"]["8"] = functions[7];
-        ini["functions"]["9"] = functions[8];
-        ini["functions"]["10"] = functions[9];
-        ini["functions"]["11"] = functions[10];
-        ini["functions"]["12"] = functions[11];
-        ini["functions"]["13"] = functions[12];
-        ini["functions"]["14"] = functions[13];
-        ini["functions"]["15"] = functions[14];
-        ini["functions"]["16"] = functions[15];
+        settings->SetFunction("5", functions[4]);
+        settings->SetFunction("6", functions[5]);
+        settings->SetFunction("7", functions[6]);
+        settings->SetFunction("8", functions[7]);
+        settings->SetFunction("9", functions[8]);
+        settings->SetFunction("10", functions[9]);
+        settings->SetFunction("11", functions[10]);
+        settings->SetFunction("12", functions[11]);
+        settings->SetFunction("13", functions[12]);
+        settings->SetFunction("14", functions[13]);
+        settings->SetFunction("15", functions[14]);
+        settings->SetFunction("16", functions[15]);
     }
 
-    if (file.write(ini, true))
+    if (settings->StoreSettings())
     {
         if (device == FP_8)
         {
@@ -142,7 +141,7 @@ void CSurf_UI_FunctionKeysPage::RenderFunction(ImGui_Context *m_ctx, int index, 
     std::string idx = "function-key-" + std::to_string(index);
     std::string button_idx = "button-key-" + std::to_string(index);
     std::string tooltip_idx = "tooltip-key-" + std::to_string(index);
-    std::string action_group = actionInfo.size() > 1 ? actionInfo[0] : page.i18n->t("functions", type + ".no-group");
+    std::string action_group = actionInfo.size() > 1 ? actionInfo[0] : page.i18n->t("functions", type_name + ".no-group");
     std::string action_description_1 = actionInfo.size() > 1
                                            ? actionInfo[1]
                                        : actionInfo.size() > 0

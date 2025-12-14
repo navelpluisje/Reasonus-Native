@@ -4,6 +4,7 @@
 #include "../controls/csurf_button.hpp"
 #include "../shared/csurf_utils.hpp"
 #include "../shared/csurf_context.cpp"
+#include "../shared/csurf_reasonus_settings.hpp"
 
 class CSurf_TransportManager
 {
@@ -24,6 +25,8 @@ class CSurf_TransportManager
     CSurf_Button *forwardButton;
 
     CSurf_Context *context;
+
+    ReaSonusSettings *settings;
 
     void SetButtonValues(bool force);
 

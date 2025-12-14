@@ -1,10 +1,6 @@
 #ifndef CSURF_FP_UI_TEST_8_H_
 #define CSURF_FP_UI_TEST_8_H_
 
-#include <WDL/wdltypes.h> // might be unnecessary in future
-#include <reaper_plugin_functions.h>
-#include <reaper_imgui_functions.h>
-#include <memory>
 #include <string>
 #include "../ui/csurf_ui_page_content.hpp"
 #include "../i18n/i18n.hpp"

@@ -1,15 +1,7 @@
 #ifndef CSURF_FP_8_FILTER_MANAGER_C_
 #define CSURF_FP_8_FILTER_MANAGER_C_
 
-#include "../shared/csurf_context.cpp"
-#include <WDL/ptrlist.h>
-#include "csurf_fp_8_track.hpp"
 #include "csurf_fp_8_channel_manager.hpp"
-#include "csurf_fp_8_navigator.hpp"
-#include <mini/ini.h>
-#include <vector>
-#include "../shared/csurf_daw.hpp"
-#include "../shared/csurf_utils.hpp"
 #include "csurf_fp_8_ui_control_panel.hpp"
 #include "../shared/csurf_faderport_ui_imgui_utils.hpp"
 

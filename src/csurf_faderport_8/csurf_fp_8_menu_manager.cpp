@@ -1,16 +1,8 @@
 #ifndef CSURF_FP_8_MENU_MANAGER_C_
 #define CSURF_FP_8_MENU_MANAGER_C_
 
-#include "../shared/csurf_context.cpp"
-#include "../shared/csurf_utils.hpp"
-#include "../shared/csurf_daw.hpp"
-#include <mini/ini.h>
-#include <WDL/ptrlist.h>
-#include <config.h>
-#include <vector>
-#include "csurf_fp_8_track.hpp"
 #include "csurf_fp_8_channel_manager.hpp"
-#include "csurf_fp_8_navigator.hpp"
+#include <config.h>
 #include "../shared/csurf.h"
 
 class CSurf_FP_8_Menu_Manager : public CSurf_FP_8_ChannelManager
@@ -172,7 +164,7 @@ public:
     }
 
     // Handle the encoder click
-    void HandleSelectClick(int index, int value) override
+    void HandleEndcoderPush(int value) override
     {
         if (value == 0)
         {
@@ -205,22 +197,16 @@ public:
         }
     }
 
-    // Handle the encoder increment
-    void HandleMuteClick(int index, int value) override
+    void HandleEndcoderIncrement(int value) override
     {
-        (void)index;
-        (void)value;
         int max_items = level == 0 ? (int)menu_items.size() : static_cast<int>(menu_options.at(option[0]).size());
-        option[level] = minmax(0, option[level] + 1, max_items - (level == 0 ? 1 : 0));
+        option[level] = minmax(0, option[level] + value, max_items - (level == 0 ? 1 : 0));
     }
 
-    // Handle the encoder decrement
-    void HandleSoloClick(int index, int value) override
+    void HandleEndcoderDecrement(int value) override
     {
-        (void)index;
-        (void)value;
         int max_items = level == 0 ? (int)menu_items.size() : static_cast<int>(menu_options.at(option[0]).size());
-        option[level] = minmax(0, option[level] - 1, max_items - (level == 0 ? 1 : 0));
+        option[level] = minmax(0, option[level] - value, max_items - (level == 0 ? 1 : 0));
     }
 
     void HandleFaderTouch(int index, int value) override

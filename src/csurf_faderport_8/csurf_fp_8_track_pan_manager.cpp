@@ -84,7 +84,7 @@ public:
             SetTrackColors(media_track, is_selected, true);
             track->SetTrackColor(color);
 
-            track->SetSelectButtonValue((!context->GetArm() && is_armed && !context->GetSettings()->GetDistractionFreeMode())
+            track->SetSelectButtonValue((!context->GetArm() && is_armed && !settings->GetDistractionFreeMode())
                                             ? BTN_VALUE_BLINK
                                             : BTN_VALUE_ON,
                                         forceUpdate);
@@ -138,7 +138,7 @@ public:
         int now = GetTickCount();
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
 
-        if (value == 0 && context->GetSettings()->GetMuteSoloMomentary())
+        if (value == 0 && settings->GetMuteSoloMomentary())
         {
             if (now - mute_start[index] > MOMENTARY_TIMEOUT)
             {
@@ -158,7 +158,7 @@ public:
         int now = GetTickCount();
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
 
-        if (value == 0 && context->GetSettings()->GetMuteSoloMomentary())
+        if (value == 0 && settings->GetMuteSoloMomentary())
         {
             if (now - solo_start[index] > MOMENTARY_TIMEOUT)
             {
@@ -177,7 +177,7 @@ public:
     {
         (void)value;
 
-        if (!context->GetSettings()->GetFaderReset())
+        if (!settings->GetFaderReset())
         {
             return;
         }

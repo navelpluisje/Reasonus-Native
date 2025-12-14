@@ -1,11 +1,7 @@
 #ifndef CSURF_FP_8_LAST_TOUCHED_FX_MANAGER_H_
 #define CSURF_FP_8_LAST_TOUCHED_FX_MANAGER_H_
 
-#include "csurf_fp_8_navigator.hpp"
-#include "csurf_fp_8_channel_manager_resources.hpp"
-#include "../controls/csurf_button.hpp"
 #include "csurf_fp_8_track.hpp"
-#include <vector>
 
 class CSurf_FP_8_LastTouchedFXManager
 {
