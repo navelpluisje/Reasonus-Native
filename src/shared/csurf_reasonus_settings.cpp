@@ -163,6 +163,11 @@ int ReaSonusSettings::GetLatchPreviewActionCode()
     return stoi(settings["surface"]["latch-preview-action-code"]);
 }
 
+int ReaSonusSettings::GetpluginStepSize()
+{
+    return stoi(settings["surface"]["plugin-step-size"]);
+}
+
 int ReaSonusSettings::GetTrackDisplay()
 {
     return stoi(settings["displays"]["track"]);

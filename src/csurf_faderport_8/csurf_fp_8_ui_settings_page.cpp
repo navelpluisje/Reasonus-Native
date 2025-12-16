@@ -34,6 +34,7 @@ protected:
     bool setting_momentary_mute_solo;
     bool setting_latch_preview_action_enable;
     bool setting_overwrite_time_code;
+    int setting_plugin_step_size;
     int setting_latch_preview_action;
     int setting_track_color_brightness = 25;
     int setting_time_code;
@@ -93,7 +94,7 @@ public:
         int min,
         int max,
         std::string tooltip,
-        std::string format)
+        std::string format = "%d")
     {
         double x_pos = ImGui::GetCursorPosX(m_ctx);
         double y_pos = ImGui::GetCursorPosY(m_ctx);
@@ -192,12 +193,6 @@ public:
 
                     RenderSettingsCheckbox(
                         m_ctx,
-                        i18n->t("settings", "plugin-control.label"),
-                        &setting_disable_plugins,
-                        i18n->t("settings", "plugin-control.tooltip"));
-
-                    RenderSettingsCheckbox(
-                        m_ctx,
                         i18n->t("settings", "distraction-free-mode.label"),
                         &setting_distraction_free_mode,
                         i18n->t("settings", "distraction-free-mode.tooltip"));
@@ -211,12 +206,6 @@ public:
                 {
                     selected_tab = 1;
                     ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 16);
-
-                    RenderSettingsCheckbox(
-                        m_ctx,
-                        i18n->t("settings", "untouch-after-learn.label"),
-                        &setting_untouch_after_learn,
-                        i18n->t("settings", "untouch-after-learn.tooltip"));
 
                     RenderSettingsCheckbox(
                         m_ctx,
@@ -264,9 +253,44 @@ public:
                 UiElements::PopReaSonusTabStyle(m_ctx);
 
                 UiElements::PushReaSonusTabStyle(m_ctx, selected_tab == 2);
-                if (ImGui::BeginTabItem(m_ctx, i18n->t("settings", "tab.display").c_str()))
+                if (ImGui::BeginTabItem(m_ctx, i18n->t("settings", "tab.plugins").c_str()))
                 {
                     selected_tab = 2;
+                    ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 16);
+                    ImGui::GetContentRegionAvail(m_ctx, &width, &height);
+
+                    if (ImGui::BeginChild(m_ctx, "settings-display", width / 2 - 8, 0.0, ImGui::ChildFlags_None))
+                    {
+
+                        RenderSettingsCheckbox(
+                            m_ctx,
+                            i18n->t("settings", "plugin-control.label"),
+                            &setting_disable_plugins,
+                            i18n->t("settings", "plugin-control.tooltip"));
+
+                        RenderSettingsCheckbox(
+                            m_ctx,
+                            i18n->t("settings", "untouch-after-learn.label"),
+                            &setting_untouch_after_learn,
+                            i18n->t("settings", "untouch-after-learn.tooltip"));
+
+                        RenderSettingsIntInput(
+                            m_ctx,
+                            i18n->t("settings", "plugin-step-size.label"),
+                            &setting_plugin_step_size,
+                            1,
+                            settings->GetSurface(),
+                            i18n->t("settings", "plugin-step-size.tooltip"));
+                        ImGui::EndChild(m_ctx);
+                    }
+                    ImGui::EndTabItem(m_ctx);
+                }
+                UiElements::PopReaSonusTabStyle(m_ctx);
+
+                UiElements::PushReaSonusTabStyle(m_ctx, selected_tab == 3);
+                if (ImGui::BeginTabItem(m_ctx, i18n->t("settings", "tab.display").c_str()))
+                {
+                    selected_tab = 3;
                     ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 16);
                     ImGui::GetContentRegionAvail(m_ctx, &width, &height);
 
@@ -345,6 +369,7 @@ public:
         settings->SetSetting("surface", "track-color-brightness", setting_track_color_brightness);
         settings->SetSetting("surface", "latch-preview-action-code", latch_preview_action_indexes[setting_latch_preview_action]);
         settings->SetSetting("surface", "time-code", time_code_indexes[setting_time_code]);
+        settings->SetSetting("surface", "plugin-step-size", setting_plugin_step_size);
         settings->SetSetting("displays", "track", track_display_indexes[setting_track_display]);
 
         if (settings->StoreSettings())
@@ -380,7 +405,7 @@ public:
         setting_momentary_mute_solo = settings->GetMuteSoloMomentary();
         setting_overwrite_time_code = settings->GetOverwriteTimeCode();
         setting_latch_preview_action_enable = settings->GetLatchPreviewActionEnabled();
-
+        setting_plugin_step_size = settings->GetpluginStepSize();
         setting_track_color_brightness = settings->GetTrackColorBrightness();
 
         index = std::find(latch_preview_action_indexes, latch_preview_action_indexes + 8, settings->GetLatchPreviewActionCode());

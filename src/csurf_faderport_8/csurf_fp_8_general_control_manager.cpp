@@ -255,6 +255,7 @@ public:
             break;
 
         case PanEncoderMenuMode:
+        case PanEncoderPluginStepSizeMode:
             hasBit(value, 6)
                 ? faderManager->HandleEncoderDecrement()
                 : faderManager->HandleEncoderIncrement();
@@ -266,13 +267,18 @@ public:
         case PanEncoderPanMode:
         case PanEncoderMixMode:
         case PanEncoderPluginEditMode:
-        case PanEncoderPluginControlMode:
             context->UpdateChannelManagerItemIndex(hasBit(value, 6) ? -1 : 1);
+            break;
+
+        case PanEncoderPluginControlMode:
+            int stepSize = stoi(settings->GetSetting("surface", "plugin-step-size", "1"));
+            context->UpdateChannelManagerItemIndex(hasBit(value, 6) ? 0 - stepSize : stepSize);
             break;
         }
     }
 
-    void HandleArmButton(int value)
+    void
+    HandleArmButton(int value)
     {
         if (context->GetShiftChannelLeft())
         {

@@ -7,12 +7,15 @@ class CSurf_FP_8_PluginControlManager : public CSurf_FP_8_ChannelManager
 {
 protected:
     mINI::INIStructure ini;
+    ReaSonusSettings *settings = ReaSonusSettings::GetInstance(FP_8);
     std::string fileName;
     int updateCount;
+    bool editStepSize;
+    int stepSize;
 
     std::string getParamKey(std::string prefix, int index)
     {
-        std::string controlIndex = std::to_string(context->GetChannelManagerItemIndex() + index);
+        std::string controlIndex = std::to_string(index);
         return prefix + controlIndex;
     }
 
@@ -53,6 +56,7 @@ public:
         GetCurrentPlugin();
         UpdateTracks();
         color = ButtonColorWhiteDim;
+        editStepSize = false;
     }
 
     ~CSurf_FP_8_PluginControlManager() {};
@@ -67,6 +71,7 @@ public:
 
         for (int i = 0; i < context->GetNbChannels(); i++)
         {
+            bool displayStepSize = editStepSize && i == 0;
             char buffer[255];
             int filterIndex = context->GetChannelManagerItemIndex() + i;
             CSurf_FP_8_Track *track = tracks.at(i);
@@ -96,24 +101,64 @@ public:
             paramKey = getParamKey("Fader_", filterIndex);
             if (ini.has(paramKey) && ini[paramKey]["param"] != "")
             {
-                track->SetDisplayLine(2, ALIGN_CENTER, ini[paramKey]["name"].c_str(), INVERT, forceUpdate);
-                TrackFX_GetFormattedParamValue(media_track, pluginId, stoi(ini[paramKey]["param"]), buffer, sizeof(buffer));
-                track->SetDisplayLine(3, ALIGN_CENTER, buffer, NON_INVERT, forceUpdate);
+                if (!displayStepSize)
+                {
+                    track->SetDisplayLine(2, ALIGN_CENTER, ini[paramKey]["name"].c_str(), INVERT, forceUpdate);
+                    TrackFX_GetFormattedParamValue(media_track, pluginId, stoi(ini[paramKey]["param"]), buffer, sizeof(buffer));
+                    track->SetDisplayLine(3, ALIGN_CENTER, buffer, NON_INVERT, forceUpdate);
+                }
                 double value = TrackFX_GetParam(media_track, pluginId, stoi(ini[paramKey]["param"]), &min, &max);
                 track->SetFaderValue((int)(value * 16383.0), forceUpdate);
                 track->SetValueBarValue((int)(value * 127.0));
             }
             else
             {
-                track->SetDisplayLine(2, ALIGN_CENTER, "", NON_INVERT, forceUpdate);
-                track->SetDisplayLine(3, ALIGN_CENTER, "", NON_INVERT, true);
+                if (!displayStepSize)
+                {
+                    track->SetDisplayLine(2, ALIGN_CENTER, "", NON_INVERT, forceUpdate);
+                    track->SetDisplayLine(3, ALIGN_CENTER, "", NON_INVERT, true);
+                }
                 track->SetFaderValue(0, forceUpdate);
                 track->SetValueBarMode(VALUEBAR_MODE_OFF);
                 track->SetValueBarValue(0);
             }
+
+            if (displayStepSize)
+            {
+                track->SetDisplayLine(2, ALIGN_CENTER, "Step size", INVERT, forceUpdate);
+                track->SetDisplayLine(3, ALIGN_CENTER, std::to_string(stepSize).c_str(), INVERT, forceUpdate);
+            }
         }
 
         forceUpdate = false;
+    }
+
+    void HandleEndcoderPush(int value) override
+    {
+        (void)value;
+        if (!editStepSize)
+        {
+            stepSize = stoi(settings->GetSetting("surface", "plugin-step-size", "1"));
+            context->SetPanEncoderMode(PanEncoderPluginStepSizeMode);
+        }
+        else
+        {
+            settings->SetAndSaveSetting("surface", "plugin-step-size", std::to_string(stepSize));
+            context->SetPanEncoderMode(PanEncoderPluginControlMode);
+        }
+        editStepSize = !editStepSize;
+    }
+
+    void HandleEndcoderIncrement(int value) override
+    {
+        (void)value;
+        stepSize = minmax(1, stepSize + 1, context->GetNbChannels());
+    }
+
+    void HandleEndcoderDecrement(int value) override
+    {
+        (void)value;
+        stepSize = minmax(1, stepSize - 1, context->GetNbChannels());
     }
 
     void HandleSelectClick(int index, int value) override

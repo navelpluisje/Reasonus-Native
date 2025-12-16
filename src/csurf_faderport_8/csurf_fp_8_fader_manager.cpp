@@ -292,7 +292,7 @@ void CSurf_FP_8_FaderManager::HandleMuteClick(int index, int value)
 
 void CSurf_FP_8_FaderManager::HandleEncoderIncrement()
 {
-    if (context->IsChannelMode(MenuMode))
+    if (context->IsChannelMode(MenuMode) || context->GetPanEncoderMode() == PanEncoderPluginStepSizeMode)
     {
         channelManager->HandleEndcoderIncrement(1);
     }
@@ -300,7 +300,7 @@ void CSurf_FP_8_FaderManager::HandleEncoderIncrement()
 
 void CSurf_FP_8_FaderManager::HandleEncoderDecrement()
 {
-    if (context->IsChannelMode(MenuMode))
+    if (context->IsChannelMode(MenuMode) || context->GetPanEncoderMode() == PanEncoderPluginStepSizeMode)
     {
         channelManager->HandleEndcoderDecrement(1);
     }
@@ -308,7 +308,7 @@ void CSurf_FP_8_FaderManager::HandleEncoderDecrement()
 
 void CSurf_FP_8_FaderManager::HandleEncoderPush()
 {
-    if (context->IsChannelMode(MenuMode))
+    if (context->IsChannelMode(MenuMode) || context->IsChannelMode(PluginControlMode))
     {
         channelManager->HandleEndcoderPush(1);
     }

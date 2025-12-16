@@ -125,6 +125,7 @@ public:
     double GetTrackColorBrightnessPercentage();
     bool GetLatchPreviewActionEnabled();
     int GetLatchPreviewActionCode();
+    int GetpluginStepSize();
     int GetTrackDisplay();
     int GetSurface();
     int GetMidiInput();

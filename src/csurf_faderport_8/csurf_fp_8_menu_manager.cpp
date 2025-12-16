@@ -8,9 +8,7 @@
 class CSurf_FP_8_Menu_Manager : public CSurf_FP_8_ChannelManager
 {
 protected:
-    mINI::INIStructure ini;
-
-    std::vector<std::string> menu_items = {"Plugin Ctr", "Last Param", "Master Fad", "Swap Shift", "Fader Reset", "Momentary", "Timecode", "Time type", "Trck Disp."};
+    std::vector<std::string> menu_items = {"Plugin Ctr", "Last Param", "Master Fad", "Swap Shift", "Fader Reset", "Momentary", "Timecode", "Time type", "Plgn Step", "Trck Disp."};
     std::vector<std::vector<std::string>> ini_keys = {
         {"surface", "disable-plugins"},
         {"surface", "erase-last-param-after-learn"},
@@ -20,6 +18,7 @@ protected:
         {"surface", "mute-solo-momentary"},
         {"surface", "overwrite-time-code"},
         {"surface", "time-code"},
+        {"surface", "plugin-step-size"},
         {"displays", "track"},
     };
 
@@ -32,6 +31,7 @@ protected:
         {{"Disable", "0"}, {"Enable", "1"}},
         {{"REAPER", "0"}, {"ReaSonus", "1"}},
         {{"Time", "0"}, {"Beats", "2"}, {"Seconds", "3"}, {"Samples", "4"}, {"H:M:S:Fr", "5"}, {"Abs. Frames", "8"}, {"Abs. 1", "8"}, {"Abs. 2", "8"}, {"Abs. 3", "8"}},
+        CreateSteps(),
         {{"Lrg Lrg", "4"}, {"Sm Sm Lrg", "5"}, {"Lrg Sm Sm", "7"}, {"Sm Lrg Sm", "8"}},
     };
 
@@ -44,8 +44,21 @@ protected:
         {"Momentary", "push mode", "mute/solo", "buttons", "", "", ""},
         {"Which", "time code", "you want", "to use?", "Reaper or", "ReaSonus", ""},
         {"Select the", "time code", "you want to", "use. Works", "only with", "ReaSonus", "selected"},
+        {"Set the", "step size", "for plug-", "in edit", "scroll", "", ""},
         {"Select the", "display to", "use in", "track mode", "", "", ""},
     };
+
+    std::vector<std::vector<std::string>> CreateSteps()
+    {
+        std::vector<std::vector<std::string>> result = {};
+
+        for (int i = 1; i < context->GetNbChannels(); i++)
+        {
+            result.push_back({std::to_string(i), std::to_string(i)});
+        }
+
+        return result;
+    }
 
     int level = 0;
     int option[2] = {0, -1};
@@ -58,8 +71,6 @@ public:
         midi_Output *m_midiout) : CSurf_FP_8_ChannelManager(tracks, navigator, context, m_midiout)
     {
         context->ResetChannelManagerItemIndex();
-        mINI::INIFile file(GetReaSonusIniPath(FP_8));
-        file.read(ini);
 
         for (int i = 1; i < context->GetNbChannels() - 1; i++)
         {
@@ -141,7 +152,7 @@ public:
                 std::string option_label = menu_options.at(option[0])[index][0];
                 std::string value = menu_options.at(option[0])[index][1];
 
-                if (value == ini[ini_keys[option[0]][0]][ini_keys[option[0]][1]])
+                if (value == settings->GetSetting(ini_keys[option[0]][0], ini_keys[option[0]][1]))
                 {
                     option_label = ">" + option_label;
                 }
@@ -180,9 +191,8 @@ public:
         }
         else if (level > 0 && option[1] < max_items)
         {
-            ini[ini_keys[option[0]][0]][ini_keys[option[0]][1]] = menu_options[option[0]][option[1]][1];
-            mINI::INIFile file(GetReaSonusIniPath(FP_8));
-            if (file.write(ini, true))
+            settings->SetSetting(ini_keys[option[0]][0], ini_keys[option[0]][1], menu_options[option[0]][option[1]][1]);
+            if (settings->StoreSettings())
             {
                 DAW::SetExtState(EXT_STATE_KEY_SAVED_SETTINGS, EXT_STATE_VALUE_TRUE, false);
 

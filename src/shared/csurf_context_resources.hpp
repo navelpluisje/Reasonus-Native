@@ -37,6 +37,7 @@ enum PanEncoderMode
     PanEncoderMixMode,
     PanEncoderPluginEditMode,
     PanEncoderPluginControlMode,
+    PanEncoderPluginStepSizeMode,
     PanEncoderMenuMode,
 };
 
