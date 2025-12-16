@@ -182,7 +182,6 @@ public:
             return;
         }
 
-        (void)index;
         int max_items = level == 0 ? (int)menu_items.size() : static_cast<int>(menu_options.at(option[0]).size());
         if (level > 0 && option[1] == max_items)
         {
