@@ -299,14 +299,10 @@ bool CSurf_FP_8_Navigator::TrackIsInBankTracks(MediaTrack *media_track)
     int index = stoi(DAW::GetTrackIndex(media_track));
     WDL_PtrList<MediaTrack> bank_tracks = GetBankTracks();
 
-    logInteger("bank size", bank_tracks.GetSize());
-    logInteger("nb tracks", context->GetNbBankChannels());
-
     for (int i = 0; i < bank_tracks.GetSize(); i++)
     {
         int other_index = stoi(DAW::GetTrackIndex(bank_tracks.Get(i)));
-        logInteger("index", index);
-        logInteger("other_index", other_index);
+
         if (index == other_index)
         {
             value = true;
