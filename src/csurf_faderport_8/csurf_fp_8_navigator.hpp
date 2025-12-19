@@ -120,6 +120,8 @@ class CSurf_FP_8_Navigator
 
     void HandleTrackCustomMultiSelectFilter();
 
+    bool TrackIsInBankTracks(MediaTrack *media_track);
+
 public:
     CSurf_FP_8_Navigator(CSurf_Context *context);
 

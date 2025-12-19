@@ -288,6 +288,25 @@ void CSurf_FP_8_Navigator::HandleTrackCustomMultiSelectFilter()
     SetOffset(0);
 }
 
+bool CSurf_FP_8_Navigator::TrackIsInBankTracks(MediaTrack *media_track)
+{
+    bool value = false;
+    int index = stoi(DAW::GetTrackIndex(media_track));
+    WDL_PtrList<MediaTrack> bank_tracks = GetBankTracks();
+
+    for (int i = 0; i < bank_tracks.GetSize(); i++)
+    {
+        int other_index = stoi(DAW::GetTrackIndex(bank_tracks.Get(i)));
+
+        if (index == other_index)
+        {
+            value = true;
+            break;
+        }
+    }
+    return value;
+}
+
 void CSurf_FP_8_Navigator::UpdateMixerPosition()
 {
     WDL_PtrList<MediaTrack> bank = GetBankTracks();
@@ -316,7 +335,8 @@ WDL_PtrList<MediaTrack> CSurf_FP_8_Navigator::GetBankTracks()
     WDL_PtrList<MediaTrack> bank;
     GetAllVisibleTracks(tracks, hasSolo, hasMute);
 
-    int channelCount = context->GetNbBankChannels() > tracks.GetSize() ? context->GetNbBankChannels() : tracks.GetSize();
+    int channelCount = context->GetNbBankChannels();
+    // > tracks.GetSize() ? context->GetNbBankChannels() : tracks.GetSize();
 
     for (int i = track_offset; i < track_offset + channelCount; i++)
     {
@@ -391,6 +411,11 @@ int CSurf_FP_8_Navigator::GetOffset()
 
 void CSurf_FP_8_Navigator::SetOffsetByTrack(MediaTrack *media_track)
 {
+    if (TrackIsInBankTracks(media_track))
+    {
+        return;
+    }
+
     int trackId = stoi(DAW::GetTrackIndex(media_track));
 
     for (int i = 0; i < tracks.GetSize(); i++)
