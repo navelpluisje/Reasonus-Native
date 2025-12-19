@@ -71,7 +71,7 @@ void CSurf_FP_V2_TrackManager::UpdateTrack()
 
     if (context->GetLastTouchedFxMode())
     {
-        double paramValue = 0.0, min, max;
+        double paramValue = 0.0;
         int trackNumber = -1;
         int fxNumber = -1;
         int paramNumber = -1;
@@ -79,7 +79,7 @@ void CSurf_FP_V2_TrackManager::UpdateTrack()
         GetLastTouchedFX(&trackNumber, &fxNumber, &paramNumber);
         if (MediaTrack *media_track = GetTrack(0, trackNumber - 1))
         {
-            paramValue = TrackFX_GetParam(media_track, fxNumber, paramNumber, &min, &max);
+            paramValue = TrackFX_GetParamNormalized(media_track, fxNumber, paramNumber);
             track->SetFaderValue((int)(paramValue * 16383.0), forceUpdate);
         }
     }
@@ -225,7 +225,7 @@ void CSurf_FP_V2_TrackManager::HandleFaderMove(int msb, int lsb)
         {
             if (MediaTrack *media_track = GetTrack(0, trackNumber - 1))
             {
-                TrackFX_SetParam(media_track, fxNumber, paramNumber, int14ToNormalized(msb, lsb));
+                TrackFX_SetParamNormalized(media_track, fxNumber, paramNumber, int14ToNormalized(msb, lsb));
             }
         }
         return;
