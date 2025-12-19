@@ -1,26 +1,21 @@
 #ifndef CSURF_FP_8_PLUGIN_CONTROL_MANAGER_C_
 #define CSURF_FP_8_PLUGIN_CONTROL_MANAGER_C_
 
-#include "../shared/csurf_context.cpp"
-#include <WDL/ptrlist.h>
-#include "csurf_fp_8_track.hpp"
 #include "csurf_fp_8_channel_manager.hpp"
-#include "csurf_fp_8_navigator.hpp"
-#include <mini/ini.h>
-#include <vector>
-#include "../shared/csurf_daw.hpp"
-#include "../shared/csurf_utils.hpp"
 
 class CSurf_FP_8_PluginControlManager : public CSurf_FP_8_ChannelManager
 {
 protected:
     mINI::INIStructure ini;
+    ReaSonusSettings *settings = ReaSonusSettings::GetInstance(FP_8);
     std::string fileName;
     int updateCount;
+    bool editStepSize;
+    int stepSize;
 
     std::string getParamKey(std::string prefix, int index)
     {
-        std::string controlIndex = std::to_string(context->GetChannelManagerItemIndex() + index);
+        std::string controlIndex = std::to_string(index);
         return prefix + controlIndex;
     }
 
@@ -61,6 +56,7 @@ public:
         GetCurrentPlugin();
         UpdateTracks();
         color = ButtonColorWhiteDim;
+        editStepSize = false;
     }
 
     ~CSurf_FP_8_PluginControlManager() {};
@@ -68,13 +64,13 @@ public:
     void UpdateTracks() override
     {
         std::string paramKey;
-        double min, max = 0.0;
 
         MediaTrack *media_track = context->GetPluginEditTrack();
         int pluginId = context->GetPluginEditPluginId();
 
         for (int i = 0; i < context->GetNbChannels(); i++)
         {
+            bool displayStepSize = editStepSize && i == 0;
             char buffer[255];
             int filterIndex = context->GetChannelManagerItemIndex() + i;
             CSurf_FP_8_Track *track = tracks.at(i);
@@ -91,7 +87,9 @@ public:
             paramKey = getParamKey("Select_", filterIndex);
             if (ini.has(paramKey) && ini[paramKey]["param"] != "")
             {
-                track->SetDisplayLine(0, ALIGN_CENTER, ini[paramKey]["name"].c_str(), INVERT, forceUpdate);
+                Inverted inverted = ini[paramKey].has("uninvert-label") && ini[paramKey]["uninvert-label"] == "1" ? NON_INVERT : INVERT;
+
+                track->SetDisplayLine(0, ALIGN_CENTER, ini[paramKey]["name"].c_str(), inverted, forceUpdate);
                 TrackFX_GetFormattedParamValue(media_track, pluginId, stoi(ini[paramKey]["param"]), buffer, sizeof(buffer));
                 track->SetDisplayLine(1, ALIGN_CENTER, buffer, NON_INVERT, forceUpdate);
             }
@@ -104,24 +102,64 @@ public:
             paramKey = getParamKey("Fader_", filterIndex);
             if (ini.has(paramKey) && ini[paramKey]["param"] != "")
             {
-                track->SetDisplayLine(2, ALIGN_CENTER, ini[paramKey]["name"].c_str(), INVERT, forceUpdate);
-                TrackFX_GetFormattedParamValue(media_track, pluginId, stoi(ini[paramKey]["param"]), buffer, sizeof(buffer));
-                track->SetDisplayLine(3, ALIGN_CENTER, buffer, NON_INVERT, forceUpdate);
-                double value = TrackFX_GetParam(media_track, pluginId, stoi(ini[paramKey]["param"]), &min, &max);
+                if (!displayStepSize)
+                {
+                    track->SetDisplayLine(2, ALIGN_CENTER, ini[paramKey]["name"].c_str(), INVERT, forceUpdate);
+                    TrackFX_GetFormattedParamValue(media_track, pluginId, stoi(ini[paramKey]["param"]), buffer, sizeof(buffer));
+                    track->SetDisplayLine(3, ALIGN_CENTER, buffer, NON_INVERT, forceUpdate);
+                }
+                double value = TrackFX_GetParamNormalized(media_track, pluginId, stoi(ini[paramKey]["param"]));
                 track->SetFaderValue((int)(value * 16383.0), forceUpdate);
                 track->SetValueBarValue((int)(value * 127.0));
             }
             else
             {
-                track->SetDisplayLine(2, ALIGN_CENTER, "", NON_INVERT, forceUpdate);
-                track->SetDisplayLine(3, ALIGN_CENTER, "", NON_INVERT, true);
+                if (!displayStepSize)
+                {
+                    track->SetDisplayLine(2, ALIGN_CENTER, "", NON_INVERT, forceUpdate);
+                    track->SetDisplayLine(3, ALIGN_CENTER, "", NON_INVERT, true);
+                }
                 track->SetFaderValue(0, forceUpdate);
                 track->SetValueBarMode(VALUEBAR_MODE_OFF);
                 track->SetValueBarValue(0);
             }
+
+            if (displayStepSize)
+            {
+                track->SetDisplayLine(2, ALIGN_CENTER, "Step size", INVERT, forceUpdate);
+                track->SetDisplayLine(3, ALIGN_CENTER, std::to_string(stepSize).c_str(), INVERT, forceUpdate);
+            }
         }
 
         forceUpdate = false;
+    }
+
+    void HandleEndcoderPush(int value) override
+    {
+        (void)value;
+        if (!editStepSize)
+        {
+            stepSize = stoi(settings->GetSetting("surface", "plugin-step-size", "1"));
+            context->SetPanEncoderMode(PanEncoderPluginStepSizeMode);
+        }
+        else
+        {
+            settings->SetAndSaveSetting("surface", "plugin-step-size", std::to_string(stepSize));
+            context->SetPanEncoderMode(PanEncoderPluginControlMode);
+        }
+        editStepSize = !editStepSize;
+    }
+
+    void HandleEndcoderIncrement(int value) override
+    {
+        (void)value;
+        stepSize = minmax(1, stepSize + 1, context->GetNbChannels());
+    }
+
+    void HandleEndcoderDecrement(int value) override
+    {
+        (void)value;
+        stepSize = minmax(1, stepSize - 1, context->GetNbChannels());
     }
 
     void HandleSelectClick(int index, int value) override
@@ -131,7 +169,6 @@ public:
             return;
         }
 
-        double min, max = 0.0;
         int controlIndex = context->GetChannelManagerItemIndex() + index;
         MediaTrack *media_track = context->GetPluginEditTrack();
         int pluginId = context->GetPluginEditPluginId();
@@ -146,15 +183,15 @@ public:
             {
                 nbSteps = 2;
             }
-            double value = TrackFX_GetParam(media_track, pluginId, paramId, &min, &max);
-            double stepSize = max / (nbSteps - 1);
+            double value = TrackFX_GetParamNormalized(media_track, pluginId, paramId);
+            double stepSize = 1.0 / (nbSteps - 1);
             double newValue = int((value + stepSize) * 100);
             if (newValue > 100)
             {
                 newValue = 0;
             }
 
-            TrackFX_SetParam(media_track, pluginId, paramId, newValue / 100);
+            TrackFX_SetParamNormalized(media_track, pluginId, paramId, newValue / 100);
         }
     }
 
@@ -204,7 +241,7 @@ public:
             MediaTrack *media_track = context->GetPluginEditTrack();
             double value = int14ToNormalized(msb, lsb);
 
-            TrackFX_SetParam(media_track, pluginId, stoi(ini[paramKey]["param"]), value);
+            TrackFX_SetParamNormalized(media_track, pluginId, stoi(ini[paramKey]["param"]), value);
         }
     }
 };

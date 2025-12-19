@@ -1,9 +1,6 @@
 #ifndef CSURF_FP_8_AUTOMATION_MANAGER_C_
 #define CSURF_FP_8_AUTOMATION_MANAGER_C_
 
-#include "../controls/csurf_color_button.hpp"
-#include "../shared/csurf_context.cpp"
-#include "../shared/csurf_utils.hpp"
 #include "csurf_fp_8_fader_manager.hpp"
 
 class CSurf_FP_8_AutomationManager
@@ -19,6 +16,8 @@ protected:
     CSurf_Context *context;
     CSurf_FP_8_FaderManager *faderManager;
     midi_Output *m_midiout;
+
+    ReaSonusSettings *settings = ReaSonusSettings::GetInstance(FP_8);
 
     int channelAutomationMode;
     int globalAutomationMode;
@@ -65,7 +64,7 @@ protected:
             trimButton->SetValue(IsAutomationSelected(AUTOMATION_TRIM) ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
             offButton->SetValue(IsAutomationSelected(AUTOMATION_PREVIEW) ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
             touchButton->SetValue(context->GetChannelMode() == MenuMode
-                                      ? (context->GetSettings()->GetDistractionFreeMode() ? BTN_VALUE_ON : BTN_VALUE_BLINK)
+                                      ? (settings->GetDistractionFreeMode() ? BTN_VALUE_ON : BTN_VALUE_BLINK)
                                   : IsAutomationSelected(AUTOMATION_TOUCH)
                                       ? BTN_VALUE_ON
                                       : BTN_VALUE_OFF,
@@ -241,9 +240,9 @@ public:
 
         MediaTrack *media_track = GetSelectedAutomationTrack();
         if (
-            (::GetTrackAutomationMode(media_track) == AUTOMATION_PREVIEW || ::GetGlobalAutomationOverride() == AUTOMATION_PREVIEW) && context->GetSettings()->GetLatchPreviewActionEnabled())
+            (::GetTrackAutomationMode(media_track) == AUTOMATION_PREVIEW || ::GetGlobalAutomationOverride() == AUTOMATION_PREVIEW) && settings->GetLatchPreviewActionEnabled())
         {
-            ::Main_OnCommandEx(context->GetSettings()->GetLatchPreviewActionCode(), 0, 0);
+            ::Main_OnCommandEx(settings->GetLatchPreviewActionCode(), 0, 0);
         }
         else
         {

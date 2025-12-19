@@ -4,6 +4,7 @@
 #include <vector>
 #include "csurf_ui_page_content.hpp"
 #include "../i18n/i18n.hpp"
+#include "../shared/csurf_reasonus_settings.hpp"
 
 enum FunctionTypes
 {
@@ -21,6 +22,7 @@ protected:
     ImGui_Image *icon_reset;
     std::string device;
     I18n *i18n;
+    ReaSonusSettings *settings;
     int selected_tab = 0;
 
 public:

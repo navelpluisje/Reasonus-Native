@@ -64,7 +64,7 @@ public:
 
         if (context->GetShowTimeCode())
         {
-            time_code = DAW::GetProjectTime(context->GetSettings()->GetOverwriteTimeCode(), context->GetSettings()->GetSurfaceTimeCode());
+            time_code = DAW::GetProjectTime(settings->GetOverwriteTimeCode(), settings->GetSurfaceTimeCode());
         }
 
         for (int i = 0; i < context->GetNbChannels(); i++)
@@ -112,7 +112,7 @@ public:
             SetTrackColors(media_track, is_selected, true);
             track->SetTrackColor(color);
             // If the track is armed always blink as an indication it is armed
-            track->SetSelectButtonValue((!context->GetArm() && is_armed && !context->GetSettings()->GetDistractionFreeMode())
+            track->SetSelectButtonValue((!context->GetArm() && is_armed && !settings->GetDistractionFreeMode())
                                             ? BTN_VALUE_BLINK
                                             : BTN_VALUE_ON,
                                         forceUpdate);
@@ -153,7 +153,7 @@ public:
                 }
                 else
                 {
-                    track->SetDisplayMode((DisplayMode)context->GetSettings()->GetTrackDisplay(), forceUpdate);
+                    track->SetDisplayMode((DisplayMode)settings->GetTrackDisplay(), forceUpdate);
                     track->SetDisplayLine(0, ALIGN_LEFT, DAW::GetTrackName(media_track).c_str(), NON_INVERT, forceUpdate);
                     track->SetDisplayLine(1, ALIGN_CENTER, DAW::GetTrackIndex(media_track).c_str(), NON_INVERT, forceUpdate);
                     track->SetDisplayLine(2, ALIGN_CENTER, context->GetPanPushMode() ? strPan1.c_str() : strPan2.c_str(), NON_INVERT, forceUpdate);
@@ -204,7 +204,7 @@ public:
         int now = GetTickCount();
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
 
-        if (value == 0 && context->GetSettings()->GetMuteSoloMomentary())
+        if (value == 0 && settings->GetMuteSoloMomentary())
         {
             if (now - mute_start[index] > MOMENTARY_TIMEOUT)
             {
@@ -234,7 +234,7 @@ public:
 
         int now = GetTickCount();
 
-        if (value == 0 && context->GetSettings()->GetMuteSoloMomentary())
+        if (value == 0 && settings->GetMuteSoloMomentary())
         {
             if (now - solo_start[index] > MOMENTARY_TIMEOUT)
             {
@@ -253,7 +253,7 @@ public:
     {
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
 
-        if (context->GetShiftChannelLeft() && context->GetSettings()->GetFaderReset())
+        if (context->GetShiftChannelLeft() && settings->GetFaderReset())
         {
             DAW::SetTrackVolume(media_track, 1.0);
         }

@@ -1,15 +1,9 @@
 #ifndef CSURF_FP_8_GENERAL_CONTROL_MANAGER_C_
 #define CSURF_FP_8_GENERAL_CONTROL_MANAGER_C_
 
-#include "../shared/csurf_context.cpp"
-#include "../shared/csurf_utils.hpp"
-#include "../controls/csurf_button.hpp"
-#include "../controls/csurf_color_button.hpp"
-#include "csurf_fp_8_navigator.hpp"
+#include "../shared/csurf_reasonus_settings.hpp"
 #include "csurf_fp_8_fader_manager.hpp"
-#include "csurf_fp_8_menu_manager.cpp"
 #include "csurf_fp_8_ui_control_panel.hpp"
-#include "../shared/csurf_faderport_ui_imgui_utils.hpp"
 
 class CSurf_FP_8_GeneralControlManager
 {
@@ -26,6 +20,7 @@ protected:
     CSurf_FP_8_Navigator *trackNavigator;
     CSurf_FP_8_FaderManager *faderManager;
     midi_Output *m_midiout;
+    ReaSonusSettings *settings = ReaSonusSettings::GetInstance(FP_8);
 
     ShiftState armState;
     ShiftState shiftState;
@@ -61,16 +56,16 @@ protected:
             macroButton->SetValue(ReaSonus8ControlPanel::control_panel_open ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
         }
 
-        soloClearButton->SetValue(hasSolo && !context->GetSettings()->GetDistractionFreeMode() ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
-        muteClearButton->SetValue(hasMute && !context->GetSettings()->GetDistractionFreeMode() ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+        soloClearButton->SetValue(hasSolo && !settings->GetDistractionFreeMode() ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+        muteClearButton->SetValue(hasMute && !settings->GetDistractionFreeMode() ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
         linkButton->SetValue(
             ButtonOnBlinkOff(
                 context->GetLastTouchedFxMode(),
                 context->GetChannelMode() == PluginEditMode,
-                context->GetSettings()->GetDistractionFreeMode()),
+                settings->GetDistractionFreeMode()),
             force);
-        shiftLeftButton->SetValue(((!context->GetSettings()->GetSwapShiftButtons() && context->GetShiftLeft()) ||
-                                   (context->GetShiftRight() && context->GetSettings()->GetSwapShiftButtons()))
+        shiftLeftButton->SetValue(((!settings->GetSwapShiftButtons() && context->GetShiftLeft()) ||
+                                   (context->GetShiftRight() && settings->GetSwapShiftButtons()))
                                       ? BTN_VALUE_ON
                                       : BTN_VALUE_OFF,
                                   force);
@@ -219,7 +214,13 @@ public:
             return;
         }
 
-        if (context->GetChannelMode() == MenuMode)
+        if (context->IsChannelMode(MenuMode))
+        {
+            faderManager->HandleEncoderPush();
+            return;
+        }
+
+        if (context->IsChannelMode(PluginControlMode))
         {
             faderManager->HandleEncoderPush();
             return;
@@ -245,14 +246,6 @@ public:
             return;
         }
 
-        if (context->GetChannelMode() == MenuMode)
-        {
-            hasBit(value, 6)
-                ? faderManager->HandleEncoderDecrement()
-                : faderManager->HandleEncoderIncrement();
-            return;
-        }
-
         switch (context->GetPanEncoderMode())
         {
         case PanEncoderTrackPanMode:
@@ -261,15 +254,31 @@ public:
                 : IncrementPan(value);
             break;
 
+        case PanEncoderMenuMode:
+        case PanEncoderPluginStepSizeMode:
+            hasBit(value, 6)
+                ? faderManager->HandleEncoderDecrement()
+                : faderManager->HandleEncoderIncrement();
+            break;
+
         case PanEncoderPluginMode:
         case PanEncoderSendMode:
         case PanEncoderReceiveMode:
+        case PanEncoderPanMode:
+        case PanEncoderMixMode:
+        case PanEncoderPluginEditMode:
             context->UpdateChannelManagerItemIndex(hasBit(value, 6) ? -1 : 1);
+            break;
+
+        case PanEncoderPluginControlMode:
+            int stepSize = stoi(settings->GetSetting("surface", "plugin-step-size", "1"));
+            context->UpdateChannelManagerItemIndex(hasBit(value, 6) ? 0 - stepSize : stepSize);
             break;
         }
     }
 
-    void HandleArmButton(int value)
+    void
+    HandleArmButton(int value)
     {
         if (context->GetShiftChannelLeft())
         {
@@ -349,7 +358,7 @@ public:
                 return;
             }
 
-            if (context->GetSettings()->GetPluginControl() &&
+            if (!settings->GetDisablePluginControl() &&
                 (context->IsChannelMode(PluginMode) ||
                  context->IsChannelMode(TrackPluginMode) ||
                  context->IsChannelMode(PluginControlMode) ||

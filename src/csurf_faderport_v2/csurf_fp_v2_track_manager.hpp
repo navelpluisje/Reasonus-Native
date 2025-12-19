@@ -1,10 +1,8 @@
 #ifndef CSURF_CHANNEL_MANAGER_V2_H_
 #define CSURF_CHANNEL_MANAGER_V2_H_
 
-#include "../shared/csurf_context.cpp"
 #include "csurf_fp_v2_navigator.hpp"
 #include "csurf_fp_v2_track.hpp"
-#include <vector>
 
 class CSurf_FP_V2_TrackManager
 {
@@ -14,6 +12,7 @@ protected:
     midi_Output *m_midiout;
 
     CSurf_FP_V2_Track *track;
+    ReaSonusSettings *settings = ReaSonusSettings::GetInstance(FP_V2);
 
     int mute_start = 0;
     int solo_start = 0;

@@ -1,15 +1,7 @@
 #include "../ui/csurf_ui_page_content.hpp"
-#include <string.h>
-#include <reaper_imgui_functions.h>
-#include "../ui/csurf_ui_colors.hpp"
-#include "../ui/csurf_ui_text_input.hpp"
-#include "../ui/csurf_ui_checkbox.hpp"
-#include "../ui/csurf_ui_images.h"
 #include "../ui/csurf_ui_action_input_text.hpp"
 #include "../ui/csurf_ui_list_box.hpp"
 #include "../ui/csurf_ui_filter_preview.hpp"
-#include "../i18n/i18n.hpp"
-#include "csurf_fp_8_ui_control_panel.hpp"
 
 class CSurf_FP_8_CustomFilterstPage : public CSurf_UI_PageContent
 {
@@ -40,44 +32,21 @@ protected:
     bool filter_match_multiple;
 
     I18n *i18n = I18n::GetInstance();
+    ReaSonusSettings *settings = ReaSonusSettings::GetInstance(FP_8);
 
     void SetFiltersKeys()
     {
         filter_keys.clear();
         filter_labels.clear();
-        int nbFilters = stoi(ini["filters"]["nb-filters"]);
 
-        for (int i = 0; i < nbFilters; i++)
-        {
-            filter_keys.push_back(ini["filters"][std::to_string(i)]);
-            filter_labels.push_back(ini[ini["filters"][std::to_string(i)]]["name"]);
-        }
+        filter_keys = settings->GetFilterKeys();
+        filter_labels = settings->GetFilterNames();
     }
 
-    void SetFilterText()
+    void CreateFilter(std::string filter_name)
     {
-        std::string filter_key = ini["filters"][std::to_string(selected_filter)];
-        std::string filter_text_string = ini[filter_key]["text"];
-        filter_text = split(filter_text_string, ",");
-    }
-
-    void CreateFilter()
-    {
-        std::string newKey = GenerateUniqueKey("filter_");
-        ini["filters"][ini["filters"]["nb-filters"]] = newKey;
-        ini["filters"]["nb-filters"] = std::to_string(stoi(ini["filters"]["nb-filters"]) + 1);
-        ini[newKey];
-        ini[newKey]["name"] = new_filter_name;
-        ini[newKey]["text"] = "";
-        ini[newKey]["case-insensitive"] = "0";
-        ini[newKey]["sibblings"] = "0";
-        ini[newKey]["parents"] = "0";
-        ini[newKey]["children"] = "0";
-        ini[newKey]["top-level"] = "0";
-        ini[newKey]["match-multiple"] = "0";
-
+        selected_filter = settings->AddNewFilter(filter_name);
         SetFiltersKeys();
-        selected_filter = (int)filter_keys.size() - 1;
         previous_selected_filter = selected_filter;
         edit_new_filter = true;
         PopulateFilter();
@@ -97,15 +66,18 @@ protected:
             filter_match_multiple = false;
             return;
         }
+
         std::string filter_key = filter_keys[selected_filter];
-        SetFilterText();
-        filter_name = ini[filter_key]["name"];
-        filter_case_insensitive = ini[filter_key]["case-insensitive"] == "1";
-        filter_siblings = ini[filter_key]["sibblings"] == "1";
-        filter_parents = ini[filter_key]["parents"] == "1";
-        filter_children = ini[filter_key]["children"] == "1";
-        filter_top_level = ini[filter_key]["top-level"] == "1";
-        filter_match_multiple = ini[filter_key]["match-multiple"] == "1";
+        mINI::INIMap filter = settings->GetFilter(filter_key);
+
+        filter_text = split(filter["text"], ",");
+        filter_name = filter["name"];
+        filter_case_insensitive = filter["case-insensitive"] == "1";
+        filter_siblings = filter["sibblings"] == "1";
+        filter_parents = filter["parents"] == "1";
+        filter_children = filter["children"] == "1";
+        filter_top_level = filter["top-level"] == "1";
+        filter_match_multiple = filter["match-multiple"] == "1";
     }
 
     void IsFilterDirty()
@@ -115,18 +87,20 @@ protected:
             filter_dirty = false;
             return;
         }
-        std::string filter_key = filter_keys[previous_selected_filter];
+
         std::string filter_text_string = join(filter_text, ",");
+        std::string filter_key = filter_keys[previous_selected_filter];
+        mINI::INIMap filter = settings->GetFilter(filter_key);
 
         filter_dirty =
-            filter_name.compare(ini[filter_key]["name"]) != 0 ||
-            filter_text_string.compare(ini[filter_key]["text"]) ||
-            filter_case_insensitive != (ini[filter_key]["case-insensitive"] == "1") ||
-            filter_siblings != (ini[filter_key]["sibblings"] == "1") ||
-            filter_parents != (ini[filter_key]["parents"] == "1") ||
-            filter_children != (ini[filter_key]["children"] == "1") ||
-            filter_top_level != (ini[filter_key]["top-level"] == "1") ||
-            filter_match_multiple != (ini[filter_key]["match-multiple"] == "1");
+            filter_name.compare(filter["name"]) != 0 ||
+            filter_text_string.compare(filter["text"]) ||
+            filter_case_insensitive != (filter["case-insensitive"] == "1") ||
+            filter_siblings != (filter["sibblings"] == "1") ||
+            filter_parents != (filter["parents"] == "1") ||
+            filter_children != (filter["children"] == "1") ||
+            filter_top_level != (filter["top-level"] == "1") ||
+            filter_match_multiple != (filter["match-multiple"] == "1");
     }
 
     void DirtyCheck()
@@ -138,6 +112,7 @@ protected:
                 i18n->t("filters", "popup.unsaved.message").c_str(),
                 i18n->t("filters", "popup.unsaved.title").c_str(),
                 4);
+
             if (res == 6)
             {
                 Save();
@@ -148,7 +123,7 @@ protected:
     void HandleAddFilter()
     {
         DirtyCheck();
-        CreateFilter();
+        CreateFilter(new_filter_name);
         new_filter_name = "";
     }
 
@@ -165,10 +140,11 @@ protected:
 
     void HandleRemoveFilterListItem(int index)
     {
-        ini.remove(filter_keys.at(index));
+        std::string filter_key = filter_keys.at(index);
         filter_keys.erase(filter_keys.begin() + index);
-        filter_labels.erase(filter_labels.begin() + index);
-        ini["filters"]["nb-filters"] = std::to_string(filter_keys.size());
+
+        settings->Removefilter(filter_key);
+
         SetFiltersKeys();
         selected_filter = selected_filter == 0 ? selected_filter : selected_filter - 1;
         previous_selected_filter = selected_filter;
@@ -185,10 +161,8 @@ protected:
         filter_labels[next_item] = previous_label;
         filter_keys[next_item] = previous_key;
         ImGui::ResetMouseDragDelta(m_ctx, ImGui::MouseButton_Left);
-        for (int i = 0; i < (int)filter_keys.size(); i++)
-        {
-            ini["filters"][std::to_string(i)] = filter_keys[i];
-        }
+
+        settings->UpdateFilterOrder(filter_keys);
         selected_filter = next_item;
         previous_selected_filter = next_item;
         PopulateFilter();
@@ -354,7 +328,7 @@ public:
 
     void Reset() override
     {
-        readAndCreateIni(ini, FP_8);
+        settings->UpdateSettings();
         SetFiltersKeys();
         PopulateFilter();
     }
@@ -365,7 +339,6 @@ public:
         {
             return;
         }
-        mINI::INIFile file(GetReaSonusIniPath(FP_8));
 
         int selected = selected_filter;
         if (selected_filter != previous_selected_filter)
@@ -373,22 +346,21 @@ public:
             selected = previous_selected_filter;
         }
         std::string filter_key = filter_keys[selected];
+        mINI::INIMap filter = settings->GetFilter(filter_key);
 
-        ini[filter_key]["name"] = filter_name;
-        ini[filter_key]["text"] = join(filter_text, ",");
-        ini[filter_key]["case-insensitive"] = filter_case_insensitive ? "1" : "0";
-        ini[filter_key]["sibblings"] = filter_siblings ? "1" : "0";
-        ini[filter_key]["parents"] = filter_parents ? "1" : "0";
-        ini[filter_key]["children"] = filter_children ? "1" : "0";
-        ini[filter_key]["top-level"] = filter_top_level ? "1" : "0";
-        ini[filter_key]["match-multiple"] = filter_match_multiple ? "1" : "0";
+        filter["name"] = filter_name;
+        filter["text"] = join(filter_text, ",");
+        filter["case-insensitive"] = filter_case_insensitive ? "1" : "0";
+        filter["sibblings"] = filter_siblings ? "1" : "0";
+        filter["parents"] = filter_parents ? "1" : "0";
+        filter["children"] = filter_children ? "1" : "0";
+        filter["top-level"] = filter_top_level ? "1" : "0";
+        filter["match-multiple"] = filter_match_multiple ? "1" : "0";
 
-        for (int i = 0; i < (int)filter_keys.size(); i++)
-        {
-            ini["filters"][std::to_string(i)] = filter_keys[i];
-        }
+        settings->UpdateFilter(filter_key, filter);
+        settings->UpdateFilterOrder(filter_keys);
 
-        if (file.write(ini, true))
+        if (settings->StoreSettings())
         {
             edit_new_filter = false;
             ReaSonus8ControlPanel::SetMessage(i18n->t("filters", "action.save.message"));

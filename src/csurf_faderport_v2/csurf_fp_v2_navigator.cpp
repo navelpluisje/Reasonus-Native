@@ -1,7 +1,5 @@
 #include "csurf_fp_v2_navigator.hpp"
-#include "../shared/csurf_utils.hpp"
 #include "../shared/csurf_daw.hpp"
-#include <mini/ini.h>
 
 void CSurf_FP_V2_Navigator::GetAllControllableTracks(WDL_PtrList<MediaTrack> &tracks, bool &hasSolo, bool &hasMute)
 {
@@ -39,7 +37,7 @@ void CSurf_FP_V2_Navigator::GetAllControllableTracks(WDL_PtrList<MediaTrack> &tr
             _all_armed = false;
         }
 
-        if (visible || context->GetSettings()->GetControlHiddenTracks())
+        if (visible || settings->GetControlHiddenTracks())
         {
             tracks.Add(media_track);
         }
@@ -173,7 +171,7 @@ MediaTrack *CSurf_FP_V2_Navigator::GetNextTrack()
 {
     if (track_offset + 1 > tracks.GetSize() - 1)
     {
-        if (context->GetSettings()->GetEndlessTrackScroll())
+        if (settings->GetEndlessTrackScroll())
         {
             track_offset = 0;
         }
@@ -193,7 +191,7 @@ MediaTrack *CSurf_FP_V2_Navigator::GetPreviousTrack()
 {
     if (track_offset - 1 < 0)
     {
-        if (context->GetSettings()->GetEndlessTrackScroll())
+        if (settings->GetEndlessTrackScroll())
         {
             track_offset = tracks.GetSize() - 1;
         }

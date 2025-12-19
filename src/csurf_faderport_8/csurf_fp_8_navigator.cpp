@@ -78,9 +78,7 @@ void CSurf_FP_8_Navigator::HandleAllTracksFilter()
 
 void CSurf_FP_8_Navigator::HandleTracksCustomFilter(std::string filterName)
 {
-    mINI::INIFile file(GetReaSonusIniPath(FP_8));
-    file.read(ini);
-    mINI::INIMap<std::string> filter = ini[filterName];
+    mINI::INIMap<std::string> filter = settings->GetFilter(filterName);
 
     std::map<int, bool> tracks = GetCustomFilterTracks(filter);
     std::map<int, bool> allTracks = GetAllTracksBase();
@@ -272,8 +270,6 @@ void CSurf_FP_8_Navigator::HandleTracksAllFoldersFilter()
 
 void CSurf_FP_8_Navigator::HandleTrackCustomMultiSelectFilter()
 {
-    mINI::INIFile file(GetReaSonusIniPath(FP_8));
-    file.read(ini);
     std::map<int, bool> allTracks = GetAllTracksBase();
     std::map<int, bool> tracks;
     std::map<int, bool> tmp_tracks;
@@ -281,8 +277,7 @@ void CSurf_FP_8_Navigator::HandleTrackCustomMultiSelectFilter()
     for (const int filter_index : selected_filters)
     {
         tmp_tracks.clear();
-        mINI::INIMap<std::string>
-            filter = ini[ini["filters"][std::to_string(filter_index)]];
+        mINI::INIMap<std::string> filter = settings->GetFilter(filter_index);
         tmp_tracks = GetCustomFilterTracks(filter);
         tracks.insert(tmp_tracks.begin(), tmp_tracks.end());
     }
@@ -579,9 +574,4 @@ bool CSurf_FP_8_Navigator::HasFilter(int filter_index)
 void CSurf_FP_8_Navigator::RemoveFilter(int filter_index)
 {
     selected_filters.erase(find(selected_filters.begin(), selected_filters.end(), filter_index));
-}
-
-void CSurf_FP_8_Navigator::HandleMultiSelectFilter()
-{
-    // Now do the filter magic
 }

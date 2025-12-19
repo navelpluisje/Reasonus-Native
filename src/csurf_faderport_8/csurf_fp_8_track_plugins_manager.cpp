@@ -87,12 +87,12 @@ public:
                     ButtonBlinkOnOff(
                         (context->GetShiftChannelLeft() && !DAW::GetTrackFxEnabled(plugin_track, plugin_index)),
                         !DAW::GetTrackFxEnabled(plugin_track, plugin_index),
-                        context->GetSettings()->GetDistractionFreeMode()));
+                        settings->GetDistractionFreeMode()));
                 track->SetSoloButtonValue(
                     ButtonBlinkOnOff(
                         DAW::GetTrackFxPanelOpen(plugin_track, plugin_index),
                         hasPluginConfigFile(plugin_track, plugin_index),
-                        context->GetSettings()->GetDistractionFreeMode()));
+                        settings->GetDistractionFreeMode()));
             }
             else
             {

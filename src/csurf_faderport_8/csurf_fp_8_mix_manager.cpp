@@ -1,9 +1,6 @@
 #ifndef CSURF_FP_8_MIX_MANAGER_C_
 #define CSURF_FP_8_MIX_MANAGER_C_
 
-#include "../controls/csurf_color_button.hpp"
-#include "csurf_fp_8_navigator.hpp"
-#include "../shared/csurf_context.cpp"
 #include "csurf_fp_8_fader_manager.hpp"
 
 class CSurf_FP_8_MixManager
@@ -15,6 +12,7 @@ protected:
     midi_Output *m_midiout;
 
     NavigatorFilter trackFilter = TrackAllFilter;
+    ReaSonusSettings *settings = ReaSonusSettings::GetInstance(FP_8);
 
     CSurf_ColorButton *mixAudioButton;
     CSurf_ColorButton *mixViButton;
@@ -32,8 +30,8 @@ protected:
         mixBusButton->SetValue((trackFilter == TrackTopFoldersFilter || trackFilter == TrackAllFoldersFilter || trackFilter == TrackHarwareOutputFilter) ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
         mixVcaButton->SetValue((trackFilter == TrackIsVcaFilter || trackFilter == TrackEffectsFilter) ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
         mixAllButton->SetValue((trackFilter == TrackAllFilter || trackFilter == TrackCustomFilter || trackFilter == TrackCustomMultiSelectFilter) ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
-        shiftRightButton->SetValue(((!context->GetSettings()->GetSwapShiftButtons() && context->GetShiftRight()) ||
-                                    (context->GetShiftLeft() && context->GetSettings()->GetSwapShiftButtons()))
+        shiftRightButton->SetValue(((!settings->GetSwapShiftButtons() && context->GetShiftRight()) ||
+                                    (context->GetShiftLeft() && settings->GetSwapShiftButtons()))
                                        ? BTN_VALUE_ON
                                        : BTN_VALUE_OFF,
                                    force);

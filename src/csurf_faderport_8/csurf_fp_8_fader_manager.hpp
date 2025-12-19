@@ -1,6 +1,11 @@
 #ifndef CSURF_FP_8_FADER_MANAGER_H_
 #define CSURF_FP_8_FADER_MANAGER_H_
 
+#include "csurf_fp_8_channel_manager.hpp"
+#include "csurf_fp_8_filter_manager.cpp"
+#include "csurf_fp_8_plugin_learn_manager.cpp"
+#include "csurf_fp_8_plugin_control_manager.cpp"
+#include "csurf_fp_8_menu_manager.cpp"
 #include "csurf_fp_8_track_manager.cpp"
 #include "csurf_fp_8_hui_plugins_manager.cpp"
 #include "csurf_fp_8_track_plugins_manager.cpp"
@@ -9,9 +14,6 @@
 #include "csurf_fp_8_hui_receives_manager.cpp"
 #include "csurf_fp_8_track_receives_manager.cpp"
 #include "csurf_fp_8_track_pan_manager.cpp"
-#include "../shared/csurf_context.cpp"
-#include "../controls/csurf_button.hpp"
-#include "csurf_fp_8_track.hpp"
 
 class CSurf_FP_8_FaderManager
 {
@@ -22,6 +24,8 @@ class CSurf_FP_8_FaderManager
     midi_Output *m_midiout;
     CSurf_FP_8_Navigator *navigator;
     CSurf_Context *context;
+
+    ReaSonusSettings *settings = ReaSonusSettings::GetInstance(FP_8);
 
     CSurf_Button *trackButton;
     CSurf_Button *pluginsButton;

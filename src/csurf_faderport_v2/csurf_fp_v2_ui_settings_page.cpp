@@ -1,5 +1,4 @@
 #include "../ui/csurf_ui_page_content.hpp"
-#include <reaper_imgui_functions.h>
 #include "../ui/csurf_ui_checkbox.hpp"
 #include "../shared/csurf.h"
 #include "../i18n/i18n.hpp"
@@ -9,12 +8,14 @@
 #include "../ui/csurf_ui_button_width.hpp"
 #include "../shared/csurf_daw.hpp"
 #include "csurf_fp_v2_ui_control_panel.hpp"
+#include "../shared/csurf_reasonus_settings.hpp"
 
 class CSurf_FP_V2_SettingsPage : public CSurf_UI_PageContent
 {
 protected:
     ImGui_Image *icon_info;
     I18n *i18n = I18n::GetInstance();
+    ReaSonusSettings *settings = ReaSonusSettings::GetInstance(FP_V2);
     ImGui_Font *main_font_bold;
 
     int setting_language;
@@ -177,19 +178,15 @@ public:
 
     void Save() override
     {
-        mINI::INIFile file(GetReaSonusIniPath(FP_V2));
-        readAndCreateIni(ini, FP_V2);
-
         DAW::SetExtState(EXT_STATE_KEY_UI_LANGUAGE, language_names[setting_language].c_str(), true);
-        ini["surface"]["mute-solo-momentary"] = momentary_mute_solo ? "1" : "0";
-        ini["surface"]["control-hidden-tracks"] = control_hidden_tracks ? "1" : "0";
-        ini["surface"]["can-disable-fader"] = can_disable_fader ? "1" : "0";
-        ini["surface"]["endless-track-scroll"] = endless_track_scroll ? "1" : "0";
-        ini["surface"]["latch-preview-action"] = setting_latch_preview_action_enable ? "1" : "0";
+        settings->SetSetting("surface", "mute-solo-momentary", momentary_mute_solo);
+        settings->SetSetting("surface", "control-hidden-tracks", control_hidden_tracks);
+        settings->SetSetting("surface", "can-disable-fader", can_disable_fader);
+        settings->SetSetting("surface", "endless-track-scroll", endless_track_scroll);
+        settings->SetSetting("surface", "latch-preview-action", setting_latch_preview_action_enable);
+        settings->SetSetting("surface", "latch-preview-action-code", latch_preview_action_indexes[setting_latch_preview_action]);
 
-        ini["surface"]["latch-preview-action-code"] = std::to_string(latch_preview_action_indexes[setting_latch_preview_action]);
-
-        if (file.write(ini, true))
+        if (settings->StoreSettings())
         {
             DAW::SetExtState(EXT_STATE_KEY_SAVED_SETTINGS, EXT_STATE_VALUE_TRUE, false);
             ReaSonusV2ControlPanel::SetMessage(i18n->t("settings", "action.save.message"));
@@ -201,13 +198,13 @@ public:
         auto language_index = std::find(language_names.begin(), language_names.end(), DAW::GetExtState(EXT_STATE_KEY_UI_LANGUAGE, "en-US"));
         setting_language = language_index - language_names.begin();
 
-        momentary_mute_solo = ini["surface"]["mute-solo-momentary"] == "1";
-        control_hidden_tracks = ini["surface"]["control-hidden-tracks"] == "1";
-        can_disable_fader = ini["surface"]["can-disable-fader"] == "1";
-        endless_track_scroll = ini["surface"]["endless-track-scrollr"] == "1";
-        setting_latch_preview_action_enable = ini["surface"]["latch-preview-action"] == "1";
+        momentary_mute_solo = settings->GetMuteSoloMomentary();
+        control_hidden_tracks = settings->GetControlHiddenTracks();
+        can_disable_fader = settings->GetCanDisableFader();
+        endless_track_scroll = settings->GetEndlessTrackScroll();
+        setting_latch_preview_action_enable = settings->GetLatchPreviewActionEnabled();
 
-        index = std::find(latch_preview_action_indexes, latch_preview_action_indexes + 8, stoi(ini["surface"]["latch-preview-action-code"]));
+        index = std::find(latch_preview_action_indexes, latch_preview_action_indexes + 8, settings->GetLatchPreviewActionCode());
         setting_latch_preview_action = index - latch_preview_action_indexes;
     }
 };

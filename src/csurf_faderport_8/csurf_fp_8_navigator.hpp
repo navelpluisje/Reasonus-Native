@@ -2,10 +2,10 @@
 #define CSURF_FP_8_NAVIGATOR_H_
 
 #include <WDL/ptrlist.h>
-#include <mini/ini.h>
 #include <map>
-#include <reaper_plugin.h>
-#include "../shared/csurf_utils.hpp"
+#include "../shared/csurf_reasonus_settings.hpp"
+// #include <reaper_plugin.h>
+// #include "../shared/csurf_utils.hpp"
 #include "../shared/csurf_context.cpp"
 
 enum NavigatorFilter
@@ -62,7 +62,7 @@ class CSurf_FP_8_Navigator
 {
     int track_offset = 0;
     CSurf_Context *context;
-    mINI::INIStructure ini;
+    ReaSonusSettings *settings = ReaSonusSettings::GetInstance(FP_8);
 
     WDL_PtrList<MediaTrack> tracks;
     bool hasSolo;
@@ -164,8 +164,6 @@ public:
     void RemoveFilter(int filter_index);
 
     bool HasFilter(int filter_index);
-
-    void HandleMultiSelectFilter();
 };
 
 #endif

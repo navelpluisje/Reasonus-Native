@@ -133,7 +133,7 @@ public:
                 ButtonBlinkOnOff(
                     (context->GetShiftChannelLeft() && DAW::GetTrackSendMute(media_track, send_index)),
                     DAW::GetTrackSendMute(media_track, send_index),
-                    context->GetSettings()->GetDistractionFreeMode()));
+                    settings->GetDistractionFreeMode()));
             track->SetSoloButtonValue(((context->GetShiftChannelLeft() && DAW::GetTrackSendMono(media_track, send_index)) || (!context->GetShiftChannelLeft() && DAW::GetTrackSendPhase(media_track, send_index)))
                                           ? BTN_VALUE_ON
                                           : BTN_VALUE_OFF);

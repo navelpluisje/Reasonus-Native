@@ -82,11 +82,8 @@ void CSurf_TransportManager::SetForwardingState()
 void CSurf_TransportManager::handleFootSwitchKey(std::string key)
 {
     std::string device = context->GetNbChannels() > 1 ? FP_8 : FP_V2;
-    mINI::INIFile file(GetReaSonusIniPath(device));
-    mINI::INIStructure ini;
-    file.read(ini);
+    std::string actionId = settings->GetFunction(key, true);
 
-    std::string actionId = ini["footswitch"][key];
     if (actionId == "0")
     {
         int result = MB("There is no action assigned to this function.\nDo you want to assign an action?", "No action assigned", 1);
@@ -128,6 +125,9 @@ CSurf_TransportManager::CSurf_TransportManager(CSurf_Context *context, midi_Outp
     repeatButton = new CSurf_Button(BTN_LOOP, BTN_VALUE_OFF, m_midiout);
     rewindButton = new CSurf_Button(BTN_REWIND, BTN_VALUE_OFF, m_midiout);
     forwardButton = new CSurf_Button(BTN_FORWARD, BTN_VALUE_OFF, m_midiout);
+
+    settings = ReaSonusSettings::GetInstance(context->GetNbChannels() > 1 ? FP_8 : FP_V2);
+
     Update();
 };
 
