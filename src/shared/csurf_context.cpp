@@ -4,7 +4,7 @@
 #include "csurf_context_resources.hpp"
 #include <cstdlib>
 #include "csurf_utils.hpp"
-#include "csurf_settings.cpp"
+#include "csurf_reasonus_settings.hpp"
 
 class CSurf_Context
 {
@@ -12,6 +12,7 @@ class CSurf_Context
      * @brief Number of channels
      */
     int nbChannels = 8;
+    std::string device = FP_8;
 
     // Shift keys
     bool shift_left = false;
@@ -53,19 +54,20 @@ class CSurf_Context
     ChannelMode previousChannelMode = TrackMode;
     ChannelMode previousPluginChannelMode = TrackMode;
     ChannelManagerType channelManagerType;
-    CSurf_Settings *settings;
+
+    ReaSonusSettings *settings;
 
 public:
     CSurf_Context(int nbChannels) : nbChannels(nbChannels)
     {
-        settings = new CSurf_Settings();
+        if (nbChannels == 1)
+        {
+            device = FP_V2;
+        }
+        settings = ReaSonusSettings::GetInstance(device);
     }
     ~CSurf_Context() {}
 
-    CSurf_Settings *GetSettings()
-    {
-        return settings;
-    }
     /**************************************************************************
      * Modifiers
      **************************************************************************/

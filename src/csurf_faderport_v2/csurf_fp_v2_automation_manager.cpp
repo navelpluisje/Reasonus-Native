@@ -2,10 +2,8 @@
 #define CSURF_AUTOMATION_MANAGER_C_
 
 #include "../controls/csurf_color_button.hpp"
-#include "../shared/csurf_context.cpp"
-#include "../shared/csurf_utils.hpp"
 #include "csurf_fp_v2_navigator.hpp"
-#include "../shared/csurf_daw.hpp"
+#include "../shared/csurf_reasonus_settings.hpp"
 
 class CSurf_FP_V2_AutomationManager
 {
@@ -17,6 +15,8 @@ protected:
     CSurf_Context *context;
     CSurf_FP_V2_Navigator *navigator;
     midi_Output *m_midiout;
+
+    ReaSonusSettings *settings = ReaSonusSettings::GetInstance(FP_V2);
 
     int channelAutomationMode;
 
@@ -126,9 +126,9 @@ public:
 
         if (context->GetShiftLeft())
         {
-            if (::GetTrackAutomationMode(media_track) == AUTOMATION_PREVIEW && context->GetSettings()->GetLatchPreviewActionEnabled())
+            if (::GetTrackAutomationMode(media_track) == AUTOMATION_PREVIEW && settings->GetLatchPreviewActionEnabled())
             {
-                ::Main_OnCommandEx(context->GetSettings()->GetLatchPreviewActionCode(), 0, 0);
+                ::Main_OnCommandEx(settings->GetLatchPreviewActionCode(), 0, 0);
             }
             else
             {

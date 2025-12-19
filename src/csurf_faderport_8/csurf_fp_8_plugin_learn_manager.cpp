@@ -196,7 +196,7 @@ public:
             ini[paramKey]["steps"] = std::to_string(nbSteps);
 
             SaveIniFile();
-            if (context->GetSettings()->GetUntouchAfterLearn())
+            if (settings->GetUntouchAfterLearn())
             {
                 DAW::SetTrackFXParamUntouched(media_track, pluginId);
             }
@@ -262,7 +262,7 @@ public:
             ini[paramKey]["param"] = std::to_string(paramId);
 
             SaveIniFile();
-            if (context->GetSettings()->GetUntouchAfterLearn())
+            if (settings->GetUntouchAfterLearn())
             {
                 DAW::SetTrackFXParamUntouched(media_track, pluginId);
             }

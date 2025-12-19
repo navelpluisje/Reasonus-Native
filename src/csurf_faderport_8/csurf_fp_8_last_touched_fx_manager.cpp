@@ -1,5 +1,4 @@
 #include "csurf_fp_8_last_touched_fx_manager.hpp"
-#include "../shared/csurf_utils.hpp"
 
 CSurf_FP_8_LastTouchedFXManager::CSurf_FP_8_LastTouchedFXManager(
     CSurf_FP_8_Track *track,

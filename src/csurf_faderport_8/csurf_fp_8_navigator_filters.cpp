@@ -1,7 +1,6 @@
 #include "csurf_fp_8_navigator_filters.hpp"
 #include "../shared/csurf_utils.hpp"
 #include "../shared/csurf_daw.hpp"
-#include <mini/ini.h>
 
 std::map<int, bool> GetSibblingTracks(std::map<int, bool> tracks)
 {

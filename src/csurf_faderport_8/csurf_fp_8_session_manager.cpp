@@ -1,14 +1,12 @@
 #ifndef CSURF_FP_8_SESSION_MANAGER_C_
 #define CSURF_FP_8_SESSION_MANAGER_C_
 
-#include "../controls/csurf_button.hpp"
-#include "../shared/csurf_utils.hpp"
-#include "../shared/csurf_context.cpp"
-#include "csurf_fp_8_navigator.hpp"
-#include "../shared/csurf_session_manager_actions.hpp"
 #include "csurf_fp_8_ui_control_panel.hpp"
+#include "csurf_fp_8_navigator.hpp"
+#include "../controls/csurf_button.hpp"
+#include "../shared/csurf_reasonus_settings.hpp"
 #include "../shared/csurf_faderport_ui_imgui_utils.hpp"
-#include <mini/ini.h>
+#include "../shared/csurf_session_manager_actions.hpp"
 
 enum SessionTypes
 {
@@ -33,6 +31,8 @@ protected:
     SessionTypes session_type = Channel;
     bool handleFunctionKeys = false;
 
+    ReaSonusSettings *settings = ReaSonusSettings::GetInstance(FP_8);
+
     CSurf_Button *channelButton;
     CSurf_Button *zoomButton;
     CSurf_Button *scrollButton;
@@ -47,7 +47,7 @@ protected:
     void SetButtonValues(bool force = false)
     {
         // With shift engaged, blink the selected button
-        Btn_Value valueOn = context->GetShiftLeft() && !context->GetSettings()->GetControlHiddenTracks() ? BTN_VALUE_BLINK : BTN_VALUE_ON;
+        Btn_Value valueOn = context->GetShiftLeft() && !settings->GetControlHiddenTracks() ? BTN_VALUE_BLINK : BTN_VALUE_ON;
 
         channelButton->SetValue(session_type == Channel ? valueOn : BTN_VALUE_OFF, force);
         zoomButton->SetValue(session_type == Zoom ? valueOn : BTN_VALUE_OFF, force);
@@ -61,11 +61,7 @@ protected:
 
     void handleFunctionKey(std::string key)
     {
-        mINI::INIFile file(GetReaSonusIniPath(FP_8));
-        mINI::INIStructure ini;
-        file.read(ini);
-
-        std::string actionId = ini["functions"][key];
+        std::string actionId = settings->GetFunction(key);
         if (actionId == "0")
         {
             int result = MB("There is no action assigned to this function.\nDo you want to assign an action?", "No action assigned", 1);
@@ -221,7 +217,7 @@ public:
             return;
         }
 
-        if (context->GetSettings()->GetMasterFaderModeEnabled())
+        if (settings->GetMasterFaderModeEnabled())
         {
             context->ToggleMasterFaderMode();
         }

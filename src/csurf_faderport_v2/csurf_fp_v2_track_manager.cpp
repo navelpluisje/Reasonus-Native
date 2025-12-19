@@ -1,10 +1,5 @@
-#include <vector>
-#include <WDL/ptrlist.h>
-#include "../shared/csurf_context.cpp"
-#include "../shared/csurf_daw.hpp"
-#include "../shared/csurf_utils.hpp"
 #include "csurf_fp_v2_track_manager.hpp"
-#include "csurf_fp_v2_navigator.hpp"
+#include "../shared/csurf_daw.hpp"
 
 const int MOMENTARY_TIMEOUT = 500;
 
@@ -127,7 +122,7 @@ void CSurf_FP_V2_TrackManager::HandleMuteClick(int index, int value)
     int now = GetTickCount();
     MediaTrack *media_track = navigator->GetControllerTrack();
 
-    if (value == 0 && context->GetSettings()->GetMuteSoloMomentary())
+    if (value == 0 && settings->GetMuteSoloMomentary())
     {
         if (now - mute_start > MOMENTARY_TIMEOUT)
         {
@@ -158,7 +153,7 @@ void CSurf_FP_V2_TrackManager::HandleSoloClick(int index, int value)
     int now = GetTickCount();
     MediaTrack *media_track = navigator->GetControllerTrack();
 
-    if (value == 0 && context->GetSettings()->GetMuteSoloMomentary())
+    if (value == 0 && settings->GetMuteSoloMomentary())
     {
         if (now - solo_start > MOMENTARY_TIMEOUT)
         {

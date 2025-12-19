@@ -1,11 +1,7 @@
 #include <string>
 #include <cmath>
 #include "csurf_fp_8_channel_manager_resources.hpp"
-#include "../shared/csurf_context.cpp"
 #include "../shared/csurf_daw.hpp"
-#include "csurf_fp_8_navigator.hpp"
-#include "../controls/csurf_button.hpp"
-#include "csurf_fp_8_track.hpp"
 
 /**
  * @brief Get a string representation of the pan value and the panMode. If panMode is 6, it will return the left pan representation

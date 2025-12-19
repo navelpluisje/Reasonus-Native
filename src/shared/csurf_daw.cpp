@@ -651,22 +651,35 @@ bool DAW::MediaItemHasAudio(MediaItem *media_item)
 /************************************************************************
  * Project
  ************************************************************************/
+/**
+ * Get the Time Mode. `projtimemode2` gets the time mode of the transport bar wne not overwritten by the ruler
+ * It returns -1 when overwritten by the ruler. In that case we get `projtimemode`, which is the ruler time code.
+ * When the ruler time code has a secondary time code, it somehow always return 0
+ */
 int DAW::GetProjectTimeMode()
 {
-    int TimeModeIndex = ::projectconfig_var_getoffs("projtimemode2", 0);
+    int size = 0;
+    int TimeModeIndex = ::projectconfig_var_getoffs("projtimemode2", &size);
+
     int *timeMode2Ptr_ = (int *)projectconfig_var_addr(0, TimeModeIndex);
-    // Get theh actrual value and not the pointer
     int val = *timeMode2Ptr_;
 
+    if (val == -1)
+    {
+        TimeModeIndex = ::projectconfig_var_getoffs("projtimemode", &size);
+
+        int *timeMode2Ptr_ = (int *)projectconfig_var_addr(0, TimeModeIndex);
+        val = *timeMode2Ptr_;
+    }
+
     // This will get rid of all the second measure data
-    return minmax(0, val, 256) & 255;
+    return val & 255;
 }
 
 int DAW::GetProjectMeasureOffset()
 {
     int TimeModeIndex = ::projectconfig_var_getoffs("projmeasoffs", 0);
     int *timeMode2Ptr_ = (int *)projectconfig_var_addr(0, TimeModeIndex);
-    // Get theh actrual value and not the pointer
     int val = *timeMode2Ptr_;
 
     return val;
@@ -676,7 +689,6 @@ double DAW::GetProjectTimeOffset()
 {
     int TimeModeIndex = ::projectconfig_var_getoffs("projtimeoffs", 0);
     double *timeMode2Ptr_ = (double *)projectconfig_var_addr(0, TimeModeIndex);
-    // Get theh actrual value and not the pointer
     double val = *timeMode2Ptr_;
 
     return val;
@@ -694,6 +706,8 @@ std::vector<std::string> GetTimeSegments(double tpos, int proj_time_mode)
     case -1: // Ruler, will be converted to Beat
     case 1:  // Beats + Time
     case 2:  // Beats
+    case 6:  // Beats Minimal
+    case 10: // Measure fractions
         value = split(std::string(beatTime), ".");
         // The first 2 items are 0-based so need an extra 1
         value[0] = std::to_string(std::stoi(value[0]) + 1);
