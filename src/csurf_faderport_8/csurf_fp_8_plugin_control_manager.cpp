@@ -90,7 +90,9 @@ public:
             paramKey = getParamKey("Select_", filterIndex);
             if (ini.has(paramKey) && ini[paramKey]["param"] != "")
             {
-                track->SetDisplayLine(0, ALIGN_CENTER, ini[paramKey]["name"].c_str(), INVERT, forceUpdate);
+                Inverted inverted = ini[paramKey].has("uninvert-label") && ini[paramKey]["uninvert-label"] == "1" ? NON_INVERT : INVERT;
+
+                track->SetDisplayLine(0, ALIGN_CENTER, ini[paramKey]["name"].c_str(), inverted, forceUpdate);
                 TrackFX_GetFormattedParamValue(media_track, pluginId, stoi(ini[paramKey]["param"]), buffer, sizeof(buffer));
                 track->SetDisplayLine(1, ALIGN_CENTER, buffer, NON_INVERT, forceUpdate);
             }
@@ -103,7 +105,9 @@ public:
             paramKey = getParamKey("Fader_", filterIndex);
             if (ini.has(paramKey) && ini[paramKey]["param"] != "")
             {
-                track->SetDisplayLine(2, ALIGN_CENTER, ini[paramKey]["name"].c_str(), INVERT, forceUpdate);
+                Inverted inverted = ini[paramKey].has("uninvert-label") && ini[paramKey]["uninvert-label"] == "1" ? NON_INVERT : INVERT;
+
+                track->SetDisplayLine(2, ALIGN_CENTER, ini[paramKey]["name"].c_str(), inverted, forceUpdate);
                 TrackFX_GetFormattedParamValue(media_track, pluginId, stoi(ini[paramKey]["param"]), buffer, sizeof(buffer));
                 track->SetDisplayLine(3, ALIGN_CENTER, buffer, NON_INVERT, forceUpdate);
                 double value = TrackFX_GetParamNormalized(media_track, pluginId, stoi(ini[paramKey]["param"]));
