@@ -424,7 +424,7 @@ void CSurf_FP_8_Navigator::SetOffsetByTrack(MediaTrack *media_track)
 
         if (trackId == id)
         {
-            SetOffset(i);
+            SetOffset((int)(i / context->GetNbChannels()) * context->GetNbChannels());
             break;
         }
     }
