@@ -30,6 +30,55 @@ const int AUTOMATION_WRITE = 3;
 const int time_code_indexes[6] = {0, 2, 3, 4, 5, 8};
 const std::string time_code_names[6] = {"Time", "Beats", "Seconds", "Samples", "Hr:Min:Sec:Fr", "Abs. Frames"};
 
+const std::vector<std::vector<std::string>> shared_settings = {
+    {"surface", "midiin", "0"},
+    {"surface", "midiout", "0"},
+    {"surface", "mute-solo-momentary", "0"},
+    {"surface", "latch-preview-action", "0"},
+    {"surface", "latch-preview-action-code", "42013"},
+    {"functions", "1", "0"},
+    {"functions", "2", "0"},
+    {"functions", "3", "0"},
+    {"functions", "4", "0"},
+    {"footswitch", "1", "0"},
+    {"footswitch", "2", "0"},
+    {"footswitch", "3", "0"},
+};
+
+const std::vector<std::vector<std::string>> fp_v2_settings = {
+    {"surface", "control-hidden-tracks", "0"},
+    {"surface", "can-disable-fader", "0"},
+    {"surface", "endless-track-scroll", "0"},
+};
+
+const std::vector<std::vector<std::string>> fp_8_settings = {
+    {"surface", "surface", "0"},
+    {"surface", "disable-plugins", "0"},
+    {"surface", "distraction-free", "0"},
+    {"surface", "erase-last-param-after-learn", "0"},
+    {"surface", "master-fader-mode", "0"},
+    {"surface", "swap-shift-buttons", "0"},
+    {"surface", "fader-reset", "0"},
+    {"surface", "overwrite-time-code", "1"},
+    {"surface", "time-code", "2"},
+    {"surface", "track-color-brightness", "25"},
+    {"surface", "plugin-step-size", "1"},
+    {"displays", "track", "8"},
+    {"functions", "5", "0"},
+    {"functions", "6", "0"},
+    {"functions", "7", "0"},
+    {"functions", "8", "0"},
+    {"functions", "9", "0"},
+    {"functions", "10", "0"},
+    {"functions", "11", "0"},
+    {"functions", "12", "0"},
+    {"functions", "13", "0"},
+    {"functions", "14", "0"},
+    {"functions", "15", "0"},
+    {"functions", "16", "0"},
+    {"filters", "nb-filters", "0"},
+};
+
 struct ShiftState
 {
     bool active = false;

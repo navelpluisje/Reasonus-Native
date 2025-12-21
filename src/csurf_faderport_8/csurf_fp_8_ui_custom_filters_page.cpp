@@ -181,8 +181,10 @@ protected:
     }
 
 public:
-    CSurf_FP_8_CustomFilterstPage(ImGui_Context *m_ctx) : CSurf_UI_PageContent(m_ctx, FP_8)
+    CSurf_FP_8_CustomFilterstPage(ImGui_Context *m_ctx) : CSurf_UI_PageContent(m_ctx)
     {
+        settings = ReaSonusSettings::GetInstance(FP_8);
+
         icon_add = ImGui::CreateImageFromMem(reinterpret_cast<const char *>(img_icon_add), sizeof(img_icon_add));
         ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(icon_add));
 

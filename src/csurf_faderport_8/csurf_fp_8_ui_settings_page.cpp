@@ -74,8 +74,10 @@ protected:
     };
 
 public:
-    CSurf_FP_8_SettingsPage(ImGui_Context *m_ctx) : CSurf_UI_PageContent(m_ctx, FP_8)
+    CSurf_FP_8_SettingsPage(ImGui_Context *m_ctx) : CSurf_UI_PageContent(m_ctx)
     {
+        settings = ReaSonusSettings::GetInstance(FP_8);
+
         main_font_bold = ImGui::CreateFont("Arial", ImGui::FontFlags_Bold);
         icon_info = ImGui::CreateImageFromMem(reinterpret_cast<const char *>(img_icon_info), sizeof(img_icon_info));
 

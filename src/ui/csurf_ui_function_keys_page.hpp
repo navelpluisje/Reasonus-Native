@@ -22,7 +22,6 @@ protected:
     ImGui_Image *icon_reset;
     std::string device;
     I18n *i18n;
-    ReaSonusSettings *settings;
     int selected_tab = 0;
 
 public:

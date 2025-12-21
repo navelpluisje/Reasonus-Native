@@ -6,18 +6,17 @@
 #include <reaper_imgui_functions.h>
 #include <mini/ini.h>
 #include "../shared/csurf_utils.hpp"
+#include "../shared/csurf_reasonus_settings.hpp"
 
 class CSurf_UI_PageContent
 {
 protected:
     ImGui_Context *m_ctx;
     mINI::INIStructure ini;
+    ReaSonusSettings *settings;
 
 public:
-    CSurf_UI_PageContent(ImGui_Context *m_ctx, std::string version) : m_ctx(m_ctx)
-    {
-        readAndCreateIni(ini, version);
-    };
+    CSurf_UI_PageContent(ImGui_Context *m_ctx) : m_ctx(m_ctx) {};
 
     virtual ~CSurf_UI_PageContent() {};
 

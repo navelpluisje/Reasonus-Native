@@ -6,7 +6,7 @@
 #include "csurf_ui_tooltip.hpp"
 #include "csurf_ui_colors.hpp"
 
-CSurf_UI_FunctionKeysPage::CSurf_UI_FunctionKeysPage(ImGui_Context *m_ctx, std::string _device) : CSurf_UI_PageContent(m_ctx, _device)
+CSurf_UI_FunctionKeysPage::CSurf_UI_FunctionKeysPage(ImGui_Context *m_ctx, std::string _device) : CSurf_UI_PageContent(m_ctx)
 {
     i18n = I18n::GetInstance();
     device = _device;

@@ -344,49 +344,24 @@ void readAndCreateIni(mINI::INIStructure &data, std::string device)
     if (!file.read(data))
     {
         RecursiveCreateDirectory((std::string(GetResourcePath()) + pathSeparator + "ReaSonus" + pathSeparator + "Plugins").c_str(), 0);
-        data["surface"]["midiin"] = "0";
-        data["surface"]["midiout"] = "0";
-        data["surface"]["mute-solo-momentary"] = "0";
-        data["functions"]["1"] = "0";
-        data["functions"]["2"] = "0";
-        data["functions"]["3"] = "0";
-        data["functions"]["4"] = "0";
-        data["footswitch"]["1"] = "0";
-        data["footswitch"]["2"] = "0";
-        data["footswitch"]["3"] = "0";
+        for (auto setting : shared_settings)
+        {
+            data[setting.at(0)][setting.at(1)] = setting.at(2);
+        }
+
         if (device == FP_V2)
         {
-            data["surface"]["control-hidden-tracks"] = "0";
-            data["surface"]["can-disable-fader"] = "0";
-            data["surface"]["endless-track-scroll"] = "0";
+            for (auto setting : fp_v2_settings)
+            {
+                data[setting.at(0)][setting.at(1)] = setting.at(2);
+            }
         }
         if (device == FP_8)
         {
-            data["surface"]["surface"] = "0";
-            data["surface"]["disable-plugins"] = "0";
-            data["surface"]["distraction-free"] = "0";
-            data["surface"]["erase-last-param-after-learn"] = "0";
-            data["surface"]["master-fader-mode"] = "0";
-            data["surface"]["swap-shift-buttons"] = "0";
-            data["surface"]["fader-reset"] = "0";
-            data["surface"]["overwrite-time-code"] = "1";
-            data["surface"]["time-code"] = "2";
-            data["surface"]["track-color-brightness"] = "25";
-            data["surface"]["plugin-step-size"] = "1";
-            data["displays"]["track"] = "8";
-            data["functions"]["5"] = "0";
-            data["functions"]["6"] = "0";
-            data["functions"]["7"] = "0";
-            data["functions"]["8"] = "0";
-            data["functions"]["9"] = "0";
-            data["functions"]["10"] = "0";
-            data["functions"]["11"] = "0";
-            data["functions"]["12"] = "0";
-            data["functions"]["13"] = "0";
-            data["functions"]["14"] = "0";
-            data["functions"]["15"] = "0";
-            data["functions"]["16"] = "0";
-            data["filters"]["nb-filters"] = "0";
+            for (auto setting : fp_8_settings)
+            {
+                data[setting.at(0)][setting.at(1)] = setting.at(2);
+            }
         }
         if (!file.generate(data, true))
         {
@@ -402,58 +377,45 @@ void readAndCreateIni(mINI::INIStructure &data, std::string device)
 
 void validateReaSonusIni(mINI::INIFile file, mINI::INIStructure &data, std::string device)
 {
-    data["surface"]["midiin"] = data["surface"].has("midiin") ? data["surface"]["midiin"] : "0";
-    data["surface"]["midiout"] = data["surface"].has("midiout") ? data["surface"]["midiout"] : "0";
-    data["surface"]["mute-solo-momentary"] = data["surface"].has("mute-solo-momentary") ? data["surface"]["mute-solo-momentary"] : "0";
-    data["surface"]["latch-preview-action"] = data["surface"].has("latch-preview-action") ? data["surface"]["latch-preview-action"] : "0";
-    data["surface"]["latch-preview-action-code"] = data["surface"].has("latch-preview-action-code") ? data["surface"]["latch-preview-action-code"] : "42013";
+    bool has_missing_settings = false;
 
-    data["functions"]["1"] = data["functions"].has("1") ? data["functions"]["1"] : "0";
-    data["functions"]["2"] = data["functions"].has("2") ? data["functions"]["2"] : "0";
-    data["functions"]["3"] = data["functions"].has("3") ? data["functions"]["3"] : "0";
-    data["functions"]["4"] = data["functions"].has("4") ? data["functions"]["4"] : "0";
-
-    data["footswitch"]["1"] = data["footswitch"].has("1") ? data["footswitch"]["1"] : "0";
-    data["footswitch"]["2"] = data["footswitch"].has("2") ? data["footswitch"]["2"] : "0";
-    data["footswitch"]["3"] = data["footswitch"].has("3") ? data["footswitch"]["3"] : "0";
+    for (auto setting : shared_settings)
+    {
+        if (!data[setting.at(0)].has(setting.at(1)))
+        {
+            data[setting.at(0)][setting.at(1)] = setting.at(2);
+            has_missing_settings = true;
+        }
+    }
 
     if (device == FP_V2)
     {
-        data["surface"]["control-hidden-tracks"] = data["surface"].has("control-hidden-tracks") ? data["surface"]["control-hidden-tracks"] : "0";
-        data["surface"]["can-disable-fader"] = data["surface"].has("can-disable-fader") ? data["surface"]["can-disable-fader"] : "0";
-        data["surface"]["endless-track-scroll"] = data["surface"].has("endless-track-scroll") ? data["surface"]["endless-track-scroll"] : "0";
+        for (auto setting : fp_v2_settings)
+        {
+            if (!data[setting.at(0)].has(setting.at(1)))
+            {
+                data[setting.at(0)][setting.at(1)] = setting.at(2);
+                has_missing_settings = true;
+            }
+        }
     }
 
     if (device == FP_8)
     {
-        data["surface"]["surface"] = data["surface"].has("surface") ? data["surface"]["surface"] : "0";
-        data["surface"]["disable-plugins"] = data["surface"].has("disable-plugins") ? data["surface"]["disable-plugins"] : "0";
-        data["surface"]["distraction-free"] = data["surface"].has("distraction-free") ? data["surface"]["distraction-free"] : "0";
-        data["surface"]["erase-last-param-after-learn"] = data["surface"].has("erase-last-param-after-learn") ? data["surface"]["erase-last-param-after-learn"] : "0";
-        data["surface"]["master-fader-mode"] = data["surface"].has("master-fader-mode") ? data["surface"]["master-fader-mode"] : "0";
-        data["surface"]["swap-shift-buttons"] = data["surface"].has("swap-shift-buttons") ? data["surface"]["swap-shift-buttons"] : "0";
-        data["surface"]["fader-reset"] = data["surface"].has("fader-reset") ? data["surface"]["fader-reset"] : "0";
-        data["surface"]["overwrite-time-code"] = data["surface"].has("overwrite-time-code") ? data["surface"]["overwrite-time-code"] : "1";
-        data["surface"]["time-code"] = data["surface"].has("time-code") ? data["surface"]["time-code"] : "2";
-        data["surface"]["track-color-brightness"] = data["surface"].has("track-color-brightness") ? data["surface"]["track-color-brightness"] : "25";
-        data["surface"]["plugin-step-size"] = data["surface"].has("plugin-step-size") ? data["surface"]["plugin-step-size"] : "1";
-        data["displays"]["track"] = data["displays"].has("track") ? data["displays"]["track"] : "8";
-        data["functions"]["5"] = data["functions"].has("5") ? data["functions"]["5"] : "0";
-        data["functions"]["6"] = data["functions"].has("6") ? data["functions"]["6"] : "0";
-        data["functions"]["7"] = data["functions"].has("7") ? data["functions"]["7"] : "0";
-        data["functions"]["8"] = data["functions"].has("8") ? data["functions"]["8"] : "0";
-        data["functions"]["9"] = data["functions"].has("9") ? data["functions"]["9"] : "0";
-        data["functions"]["10"] = data["functions"].has("10") ? data["functions"]["10"] : "0";
-        data["functions"]["11"] = data["functions"].has("11") ? data["functions"]["11"] : "0";
-        data["functions"]["12"] = data["functions"].has("12") ? data["functions"]["12"] : "0";
-        data["functions"]["13"] = data["functions"].has("13") ? data["functions"]["13"] : "0";
-        data["functions"]["14"] = data["functions"].has("14") ? data["functions"]["14"] : "0";
-        data["functions"]["15"] = data["functions"].has("15") ? data["functions"]["15"] : "0";
-        data["functions"]["16"] = data["functions"].has("16") ? data["functions"]["16"] : "0";
-        data["filters"]["nb-filters"] = data["filters"].has("nb-filters") ? data["filters"]["nb-filters"] : "0";
+        for (auto setting : fp_8_settings)
+        {
+            if (!data[setting.at(0)].has(setting.at(1)))
+            {
+                data[setting.at(0)][setting.at(1)] = setting.at(2);
+                has_missing_settings = true;
+            }
+        }
     }
 
-    file.write(data, true);
+    if (has_missing_settings)
+    {
+        file.write(data, true);
+    }
 }
 
 std::string GenerateUniqueKey(std::string prefix)

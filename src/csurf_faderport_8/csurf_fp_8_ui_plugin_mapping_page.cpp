@@ -46,6 +46,8 @@ protected:
 
     std::vector<std::string> invert_labels = {"Inverted", "Not inverted"};
 
+    std::vector<int> dirty_groups;
+
     bool channel_dirty = false;
 
     void SetPluginFolders()
@@ -254,10 +256,11 @@ protected:
     }
 
 public:
-    CSurf_FP_8_PluginMappingPage(ImGui_Context *m_ctx) : CSurf_UI_PageContent(m_ctx, FP_8)
+    CSurf_FP_8_PluginMappingPage(ImGui_Context *m_ctx) : CSurf_UI_PageContent(m_ctx)
     {
         main_font_bold = ImGui::CreateFont("Arial", ImGui::FontFlags_Bold);
         ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(main_font_bold));
+        settings = ReaSonusSettings::GetInstance(FP_8);
 
         SetPluginFolders();
     };

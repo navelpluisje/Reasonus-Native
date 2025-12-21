@@ -13,7 +13,7 @@ protected:
     I18n *i18n = I18n::GetInstance();
 
 public:
-    CSurf_UI_AboutPage(ImGui_Context *m_ctx, std::string _device) : CSurf_UI_PageContent(m_ctx, _device)
+    CSurf_UI_AboutPage(ImGui_Context *m_ctx, std::string _device) : CSurf_UI_PageContent(m_ctx)
     {
         device = _device;
         main_font_bold = ImGui::CreateFont("Arial", ImGui::FontFlags_Bold);
