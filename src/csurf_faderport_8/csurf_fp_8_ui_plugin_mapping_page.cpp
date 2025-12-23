@@ -315,8 +315,6 @@ protected:
             return false;
         }
 
-        ShowConsoleMsg(select.c_str());
-
         return plugin_params[select]["name"].compare(previous_plugin_params[select]["name"]) != 0 ||
                plugin_params[select]["steps"].compare(previous_plugin_params[select]["steps"]) != 0 ||
                plugin_params[select]["param"].compare(previous_plugin_params[select]["param"]) != 0 ||
@@ -427,7 +425,6 @@ public:
 
     void RenderChannelsList()
     {
-        ShowConsoleMsg("");
         ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_ItemSpacing, 4, 0);
         if (ImGui::BeginChild(m_ctx, "##channel-list", 0.0, 30))
         {
