@@ -10,6 +10,8 @@ class CSurf_FP_8_PluginMappingPage : public CSurf_UI_PageContent
 protected:
     ImGui_Font *main_font_bold;
     I18n *i18n = I18n::GetInstance();
+    mINI::INIStructure plugin_params;
+    mINI::INIStructure previous_plugin_params;
 
     int x = 0;
 
@@ -37,18 +39,19 @@ protected:
     int select_nb_steps;
     int select_param_index = -1;
     int previous_select_param_index = -1;
-    int select_uninvert_label;
+    int select_uninvert_label = 0;
 
     std::string fader_key = "";
     std::string fader_name;
     int fader_param_index;
-    int fader_uninvert_label;
+    int fader_uninvert_label = 0;
 
     std::vector<std::string> invert_labels = {"Inverted", "Not inverted"};
 
     std::vector<int> dirty_groups;
 
     bool channel_dirty = false;
+    bool plugin_dirty = false;
 
     void SetPluginFolders()
     {
@@ -106,10 +109,41 @@ protected:
         return plugin_folder_path + pathSeparator + developers[selected_developer] + pathSeparator + plugins[selected_developer][selected_plugin];
     }
 
+    /**
+     * Check if all the required fields are availebla. If not, add the field with a default value
+     */
+    void ValidatePluginData()
+    {
+        bool modified = false;
+        for (auto const &it : plugin_params)
+        {
+            auto const &section = it.first;
+            if (section.compare("global") == 0)
+            {
+                continue;
+            }
+
+            if (!plugin_params[section].has("uninvert-label") || plugin_params[section]["uninvert-label"].empty())
+            {
+                modified = true;
+                plugin_params[section]["uninvert-label"] = "0";
+            }
+        }
+
+        if (modified)
+        {
+            mINI::INIFile file(GetPluginPath());
+            file.write(plugin_params, true);
+        }
+    }
+
     bool SetPluginData()
     {
+        plugin_dirty = false;
         mINI::INIFile file(GetPluginPath());
-        file.read(ini);
+        file.read(plugin_params);
+        ValidatePluginData();
+        file.read(previous_plugin_params);
 
         if (!PluginExists())
         {
@@ -121,7 +155,7 @@ protected:
 
         for (int i = 0; i < 99; i++)
         {
-            if (ini.has("select_" + std::to_string(i)) || ini.has("fader_" + std::to_string(i)))
+            if (plugin_params.has("select_" + std::to_string(i)) || plugin_params.has("fader_" + std::to_string(i)))
             {
                 nb_channels = i;
             }
@@ -139,7 +173,7 @@ protected:
         // Create a track, add the plugin and start reading the params
         InsertTrackAtIndex(0, false);
         MediaTrack *media_track = GetTrack(0, 0);
-        int exist = TrackFX_AddByName(media_track, ini["global"]["origname"].c_str(), false, -1);
+        int exist = TrackFX_AddByName(media_track, plugin_params["global"]["origname"].c_str(), false, -1);
         DeleteTrack(media_track);
 
         return exist > -1;
@@ -157,7 +191,7 @@ protected:
         InsertTrackAtIndex(0, false);
         MediaTrack *media_track = GetTrack(0, 0);
 
-        TrackFX_AddByName(media_track, ini["global"]["origname"].c_str(), false, -1);
+        TrackFX_AddByName(media_track, plugin_params["global"]["origname"].c_str(), false, -1);
 
         for (int i = 0; i < std::min(TrackFX_GetNumParams(media_track, 0), 256); i++)
         {
@@ -180,14 +214,26 @@ protected:
         select_key = "select_" + std::to_string(selected_channel);
         fader_key = "fader_" + std::to_string(selected_channel);
 
-        if (ini.has(select_key))
+        if (plugin_params.has(select_key))
         {
-            select_name = ini[select_key]["name"];
-            select_nb_steps = stoi(ini[select_key]["steps"]);
-            select_uninvert_label = stoi(ini[select_key].has("uninvert-label") ? ini[select_key]["uninvert-label"] : "0");
-            int param_id = stoi(ini[select_key]["param"]);
-            const auto it = std::find_if(paramIds.begin(), paramIds.end(), [param_id](PluginParam param)
-                                         { return param_id == std::get<0>(param); });
+            if (!plugin_params[select_key].has("uninvert-label") || plugin_params[select_key]["uninvert-label"].empty())
+            {
+                plugin_params[select_key]["uninvert-label"] = "0";
+                previous_plugin_params[select_key]["uninvert-label"] = "0";
+            }
+
+            select_name = plugin_params[select_key]["name"];
+            select_nb_steps = stoi(plugin_params[select_key]["steps"]);
+            select_uninvert_label = stoi(plugin_params[select_key]["uninvert-label"]);
+            int param_id = stoi(plugin_params[select_key]["param"]);
+            const auto it = std::find_if(
+                paramIds.begin(),
+                paramIds.end(),
+                [param_id](PluginParam param)
+                {
+                    return param_id == std::get<0>(param);
+                });
+
             if (it != paramIds.end())
             {
                 select_param_index = it - paramIds.begin();
@@ -202,13 +248,24 @@ protected:
             select_uninvert_label = 0;
         }
 
-        if (ini.has(fader_key))
+        if (plugin_params.has(fader_key))
         {
-            fader_name = ini[fader_key]["name"];
-            int param_id = stoi(ini[fader_key]["param"]);
-            fader_uninvert_label = stoi(ini[fader_key].has("uninvert-label") ? ini[fader_key]["uninvert-label"] : "0");
-            const auto it = std::find_if(paramIds.begin(), paramIds.end(), [param_id](PluginParam param)
-                                         { return param_id == std::get<0>(param); });
+            if (!plugin_params[fader_key].has("uninvert-label") || plugin_params[fader_key]["uninvert-label"].empty())
+            {
+                plugin_params[fader_key]["uninvert-label"] = "0";
+                previous_plugin_params[fader_key]["uninvert-label"] = "0";
+            }
+
+            fader_name = plugin_params[fader_key]["name"];
+            int param_id = stoi(plugin_params[fader_key]["param"]);
+            fader_uninvert_label = stoi(plugin_params[fader_key].has("uninvert-label") ? plugin_params[fader_key]["uninvert-label"] : "0");
+            const auto it = std::find_if(
+                paramIds.begin(),
+                paramIds.end(),
+                [param_id](PluginParam param)
+                {
+                    return param_id == std::get<0>(param);
+                });
             if (it != paramIds.end())
             {
                 fader_param_index = it - paramIds.begin();
@@ -222,28 +279,82 @@ protected:
         }
     }
 
-    void IsChannelDirty()
+    void UpdateValues()
     {
-        bool select_dirty = select_key.compare("") != 0 &&
-                            ini.has(select_key) &&
-                            (select_name.compare(ini[select_key]["name"]) != 0 ||
-                             select_nb_steps != std::stoi(ini[select_key]["steps"]) ||
-                             stoi(ini[select_key]["param"]) != std::get<0>(paramIds[select_param_index]));
-        bool select_new = select_key.compare("") != 0 && !ini.has(select_key) && (select_param_index > 0);
+        if (select_param_index > 0)
+        {
+            plugin_params[select_key]["name"] = select_name;
+            plugin_params[select_key]["steps"] = std::to_string(select_nb_steps);
+            plugin_params[select_key]["param"] = std::to_string(std::get<0>(paramIds[select_param_index]));
+            plugin_params[select_key]["uninvert-label"] = std::to_string(select_uninvert_label);
+        }
 
-        bool fader_dirty = fader_key.compare("") != 0 &&
-                           ini.has(fader_key) &&
-                           (fader_name.compare(ini[fader_key]["name"]) != 0 ||
-                            stoi(ini[fader_key]["param"]) != std::get<0>(paramIds[fader_param_index]));
-        bool fader_new = fader_key.compare("") != 0 && !ini.has(fader_key) && (fader_param_index > 0);
+        if (fader_param_index > 0)
+        {
+            plugin_params[fader_key]["name"] = fader_name;
+            plugin_params[fader_key]["param"] = std::to_string(std::get<0>(paramIds[fader_param_index]));
+            plugin_params[fader_key]["uninvert-label"] = std::to_string(fader_uninvert_label);
+        }
+    }
 
-        channel_dirty = selected_channel > -1 && (select_dirty || fader_dirty || select_new || fader_new);
+    bool IsSelectDirty(int key)
+    {
+        std::string select = "select_" + std::to_string(key);
+        if (key == selected_channel)
+        {
+            if (select_param_index <= 0 && plugin_params.has(select))
+            {
+                plugin_params.remove(select);
+            }
+
+            UpdateValues();
+        }
+
+        if (!plugin_params.has(select))
+        {
+            return false;
+        }
+
+        ShowConsoleMsg(select.c_str());
+
+        return plugin_params[select]["name"].compare(previous_plugin_params[select]["name"]) != 0 ||
+               plugin_params[select]["steps"].compare(previous_plugin_params[select]["steps"]) != 0 ||
+               plugin_params[select]["param"].compare(previous_plugin_params[select]["param"]) != 0 ||
+               plugin_params[select]["uninvert-label"].compare(previous_plugin_params[select]["uninvert-label"]) != 0;
+    }
+
+    bool isFaderDirty(int key)
+    {
+        std::string fader = "fader_" + std::to_string(key);
+        if (key == selected_channel)
+        {
+            if (select_param_index <= 0 && plugin_params.has(fader))
+            {
+                plugin_params.remove(fader);
+            }
+
+            UpdateValues();
+        }
+
+        if (!plugin_params.has(fader))
+        {
+            return false;
+        }
+
+        return plugin_params[fader]["name"].compare(previous_plugin_params[fader]["name"]) != 0 ||
+               plugin_params[fader]["param"].compare(previous_plugin_params[fader]["param"]) != 0 ||
+               plugin_params[fader]["uninvert-label"].compare(previous_plugin_params[fader]["uninvert-label"]) != 0;
+    }
+
+    bool IsGroupDirty(int key)
+    {
+        plugin_dirty = IsSelectDirty(key) || isFaderDirty(key);
+        return plugin_dirty;
     }
 
     bool DirtyCheck()
     {
-        IsChannelDirty();
-        if (channel_dirty)
+        if (plugin_dirty)
         {
             int res = MB(i18n->t("mapping", "popup.unsaved.message").c_str(), i18n->t("mapping", "popup.unsaved.title").c_str(), 3);
             if (res == 6)
@@ -316,6 +427,7 @@ public:
 
     void RenderChannelsList()
     {
+        ShowConsoleMsg("");
         ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_ItemSpacing, 4, 0);
         if (ImGui::BeginChild(m_ctx, "##channel-list", 0.0, 30))
         {
@@ -326,8 +438,10 @@ public:
                 {
                     ImGui::SameLine(m_ctx);
                 }
+                bool dirty = IsGroupDirty(i);
+
                 UiElements::PushReaSonusChannelTabStyle(m_ctx, selected);
-                if (ImGui::Button(m_ctx, std::to_string(i + 1).c_str(), 30, 30))
+                if (ImGui::Button(m_ctx, (std::to_string(i + 1) + (dirty ? "*" : "")).c_str(), 30, 30))
                 {
                     selected_channel = i;
                 }
@@ -335,6 +449,7 @@ public:
             }
 
             ImGui::SameLine(m_ctx);
+
             UiElements::PushReaSonusChannelTabStyle(m_ctx, false);
             if (ImGui::Button(m_ctx, "+", 30, 30))
             {
@@ -453,7 +568,6 @@ public:
     {
         if (!render_started)
         {
-
             render_started = true;
             double space_x, space_y;
 
@@ -499,15 +613,8 @@ public:
 
             if (selected_channel != previous_selected_channel && selected_plugin_exists)
             {
-                if (DirtyCheck())
-                {
-                    PopulateFields();
-                    previous_selected_channel = selected_channel;
-                }
-                else
-                {
-                    selected_channel = previous_selected_channel;
-                }
+                PopulateFields();
+                previous_selected_channel = selected_channel;
             }
 
             if (select_param_index != previous_select_param_index)
@@ -568,8 +675,8 @@ public:
     void Reset() override
     {
         mINI::INIFile file(GetPluginPath());
-        file.read(ini);
-
+        file.read(plugin_params);
+        file.read(previous_plugin_params);
         PopulateFields();
     }
 
@@ -581,43 +688,7 @@ public:
         }
 
         mINI::INIFile file(GetPluginPath());
-
-        select_key = "select_" + std::to_string(selected_channel);
-        fader_key = "fader_" + std::to_string(selected_channel);
-
-        // We have a param
-        if (select_param_index > 0)
-        {
-            ini[select_key]["name"] = select_name;
-            ini[select_key]["param"] = std::to_string(std::get<0>(paramIds[select_param_index]));
-            ini[select_key]["origname"] = std::get<1>(paramIds[select_param_index]);
-            ini[select_key]["steps"] = std::to_string(select_nb_steps);
-            ini[select_key]["uninvert-label"] = std::to_string(select_uninvert_label);
-        }
-        else
-        {
-            if (ini.has(select_key))
-            {
-                ini.remove(select_key);
-            }
-        }
-
-        if (fader_param_index > 0)
-        {
-            ini[fader_key]["name"] = fader_name;
-            ini[fader_key]["param"] = std::to_string(std::get<0>(paramIds[fader_param_index]));
-            ini[fader_key]["origname"] = std::get<1>(paramIds[fader_param_index]);
-            ini[fader_key]["uninvert-label"] = std::to_string(fader_uninvert_label);
-        }
-        else
-        {
-            if (ini.has(fader_key))
-            {
-                ini.remove(fader_key);
-            }
-        }
-
-        if (file.write(ini, true))
+        if (file.write(plugin_params, true))
         {
             Reset();
             ReaSonus8ControlPanel::SetMessage(i18n->t("mapping", "action.save.message"));

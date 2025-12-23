@@ -1,10 +1,3 @@
-/*
-** reaper_csurf
-** FaderPort support
-** Copyright (C) 2007-2008 Cockos Incorporated
-** License: LGPL.
-*/
-
 #include <string>
 #include <vector>
 #include <reaper_plugin.h>
