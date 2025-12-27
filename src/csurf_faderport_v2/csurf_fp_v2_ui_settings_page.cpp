@@ -2,7 +2,7 @@
 #include "../ui/csurf_ui_checkbox.hpp"
 #include "../shared/csurf.h"
 #include "../i18n/i18n.hpp"
-#include "../ui/csurf_ui_images.h"
+#include "../ui/csurf_ui_int_input.hpp"
 #include "../ui/csurf_ui_tooltip.hpp"
 #include "../ui/csurf_ui_combo_input.hpp"
 #include "../ui/csurf_ui_button_width.hpp"
@@ -13,10 +13,7 @@
 class CSurf_FP_V2_SettingsPage : public CSurf_UI_PageContent
 {
 protected:
-    ImGui_Image *icon_info;
-    I18n *i18n = I18n::GetInstance();
     ReaSonusSettings *settings = ReaSonusSettings::GetInstance(FP_V2);
-    ImGui_Font *main_font_bold;
 
     int setting_language;
     bool edit_language = false;
@@ -44,55 +41,16 @@ protected:
     };
 
 public:
-    CSurf_FP_V2_SettingsPage(ImGui_Context *m_ctx) : CSurf_UI_PageContent(m_ctx)
+    CSurf_FP_V2_SettingsPage(ImGui_Context *m_ctx, CSurf_UI_Assets *assets) : CSurf_UI_PageContent(m_ctx, assets)
     {
+        i18n = I18n::GetInstance();
         settings = ReaSonusSettings::GetInstance(FP_V2);
 
-        main_font_bold = ImGui::CreateFont("Arial", ImGui::FontFlags_Bold);
-        icon_info = ImGui::CreateImageFromMem(reinterpret_cast<const char *>(img_icon_info), sizeof(img_icon_info));
-
-        ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(main_font_bold));
-        ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(icon_info));
         GetLanguages(language_names);
         Reset();
     };
 
     virtual ~CSurf_FP_V2_SettingsPage() {};
-
-    void RenderSettingsCheckbox(
-        ImGui_Context *m_ctx,
-        std::string label,
-        bool *value,
-        std::string tooltip)
-    {
-        double x_pos = ImGui::GetCursorPosX(m_ctx);
-        double y_pos = ImGui::GetCursorPosY(m_ctx);
-        std::string id = std::to_string(x_pos) + "-" + std::to_string(y_pos);
-
-        ReaSonusCheckBox(m_ctx, label.c_str(), value);
-        ImGui::SameLine(m_ctx);
-        ReaSonusTooltip(m_ctx, tooltip.c_str(), id.c_str(), icon_info);
-        ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 4);
-        ImGui::Dummy(m_ctx, 0, 0);
-    }
-
-    void RenderSettingsComboInput(
-        ImGui_Context *m_ctx,
-        std::string label,
-        std::vector<std::string> list,
-        int *value,
-        std::string tooltip)
-    {
-        double x_pos = ImGui::GetCursorPosX(m_ctx);
-        double y_pos = ImGui::GetCursorPosY(m_ctx);
-        std::string id = std::to_string(x_pos) + "-" + std::to_string(y_pos);
-
-        ReaSonusComboInput(m_ctx, label.c_str(), list, value, -20);
-        ImGui::SameLine(m_ctx);
-        ReaSonusTooltip(m_ctx, tooltip.c_str(), id.c_str(), icon_info, -20, 26);
-        ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 4);
-        ImGui::Dummy(m_ctx, 0, 0);
-    }
 
     void Render() override
     {
@@ -102,15 +60,16 @@ public:
             Main_OnCommandStringEx("_REASONUS_TRANSLATIONN_EDITOR");
         }
 
-        int language_button_width = getButtonWidth(m_ctx, i18n->t("settings", "language.button.label"), main_font_bold);
+        int language_button_width = getButtonWidth(m_ctx, i18n->t("settings", "language.button.label"), assets->GetMainFontBold());
 
         UiElements::PushReaSonusSettingsContentStyle(m_ctx);
         if (ImGui::BeginChild(m_ctx, "mapping_lists_content", 0.0, 0.0, ImGui::ChildFlags_FrameStyle, ImGui::ChildFlags_AutoResizeY))
         {
             if (ImGui::BeginChild(m_ctx, "language-select", -1 * language_button_width, 0.0, ImGui::ChildFlags_None | ImGui::ChildFlags_AutoResizeY))
             {
-                RenderSettingsComboInput(
+                RenderInfoComboInput(
                     m_ctx,
+                    assets,
                     i18n->t("settings", "language.label"),
                     language_names,
                     &setting_language,
@@ -122,7 +81,7 @@ public:
             if (ImGui::BeginChild(m_ctx, "language-action", 0.0, 0.0, ImGui::ChildFlags_None | ImGui::ChildFlags_AutoResizeY))
             {
                 ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 22);
-                UiElements::PushReaSonusButtonOutlineStyle(m_ctx, main_font_bold);
+                UiElements::PushReaSonusButtonOutlineStyle(m_ctx, assets->GetMainFontBold());
                 if (ImGui::Button(m_ctx, i18n->t("settings", "language.button.label").c_str()))
                 {
                     edit_language = true;
@@ -132,32 +91,37 @@ public:
                 ImGui::EndChild(m_ctx);
             }
 
-            RenderSettingsCheckbox(
+            RenderInfoCheckbox(
                 m_ctx,
+                assets,
                 i18n->t("settings", "momentary-mute.label"),
                 &momentary_mute_solo,
                 i18n->t("settings", "momentary-mute.tooltip"));
 
-            RenderSettingsCheckbox(
+            RenderInfoCheckbox(
                 m_ctx,
+                assets,
                 i18n->t("settings", "control_hidden_track.label"),
                 &control_hidden_tracks,
                 i18n->t("settings", "control_hidden_track.tooltip"));
 
-            RenderSettingsCheckbox(
+            RenderInfoCheckbox(
                 m_ctx,
+                assets,
                 i18n->t("settings", "can_disable_fader.label"),
                 &can_disable_fader,
                 i18n->t("settings", "can_disable_fader.tooltip"));
 
-            RenderSettingsCheckbox(
+            RenderInfoCheckbox(
                 m_ctx,
+                assets,
                 i18n->t("settings", "endless_track_scroll.label"),
                 &endless_track_scroll,
                 i18n->t("settings", "endless_track_scroll.tooltip"));
 
-            RenderSettingsCheckbox(
+            RenderInfoCheckbox(
                 m_ctx,
+                assets,
                 i18n->t("settings", "latch-preview-action-enable.label"),
                 &setting_latch_preview_action_enable,
                 i18n->t("settings", "latch-preview-action-enable.tooltip"));
@@ -165,8 +129,9 @@ public:
             if (setting_latch_preview_action_enable)
             {
                 ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + 26);
-                RenderSettingsComboInput(
+                RenderInfoComboInput(
                     m_ctx,
+                    assets,
                     i18n->t("settings", "latch-preview-action-list.label"),
                     latch_preview_action_names,
                     &setting_latch_preview_action,

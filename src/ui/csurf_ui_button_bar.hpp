@@ -7,8 +7,8 @@
 
 static void ReaSonusButtonBar(
     ImGui_Context *m_ctx,
+    CSurf_UI_Assets *assets,
     std::string action_label,
-    ImGui_Font *font,
     bool *action_value,
     bool has_cancel = false,
     bool *cancel_value = nullptr,
@@ -35,7 +35,7 @@ static void ReaSonusButtonBar(
             ImGui::SameLine(m_ctx);
         }
 
-        ImGui::PushFont(m_ctx, font, 13);
+        ImGui::PushFont(m_ctx, assets->GetMainFontBold(), 13);
         ImGui::CalcTextSize(m_ctx, action_label.c_str(), &x_pos_1, &y_pos_1);
         float buttonWidth1 = (int)x_pos_1 + button_padding_x * 2.f;
         ImGui::CalcTextSize(m_ctx, cancel_label.c_str(), &x_pos_1, &y_pos_1);
@@ -50,7 +50,7 @@ static void ReaSonusButtonBar(
 
         if (has_cancel)
         {
-            UiElements::PushReaSonusButtonOutlineStyle(m_ctx, font);
+            UiElements::PushReaSonusButtonOutlineStyle(m_ctx, assets->GetMainFontBold());
             if (ImGui::Button(m_ctx, cancel_label.c_str()))
             {
                 *cancel_value = true;
@@ -58,7 +58,7 @@ static void ReaSonusButtonBar(
             UiElements::PopReaSonusButtonOutlineStyle(m_ctx);
             ImGui::SameLine(m_ctx);
         }
-        UiElements::PushReaSonusButtonStyle(m_ctx, font);
+        UiElements::PushReaSonusButtonStyle(m_ctx, assets->GetMainFontBold());
         if (ImGui::Button(m_ctx, action_label.c_str()))
         {
             *action_value = true;

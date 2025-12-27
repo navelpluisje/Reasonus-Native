@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include <mini/ini.h>
+#include "csurf_ui_assets.hpp"
 
 class ReaSonusTranslationEditor
 {
@@ -21,6 +22,7 @@ public:
 
 private:
     static void Loop();
+    CSurf_UI_Assets *assets;
     static std::unique_ptr<ReaSonusTranslationEditor> s_inst;
     void InitAssets();
     void GetBaseLanguage();
@@ -36,11 +38,7 @@ private:
     void Frame();
 
     ImGui_Context *m_ctx;
-    ImGui_Font *main_font;
-    ImGui_Font *main_font_bold;
     ImGui_Image *logo;
-    ImGui_Image *icon_add;
-    ImGui_Image *icon_remove_list_item;
 
     std::vector<std::string> language_list;
     mINI::INIStructure base_file;

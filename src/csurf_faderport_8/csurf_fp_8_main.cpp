@@ -10,6 +10,7 @@
 #include "../shared/csurf_transport_manager.hpp"
 #include "../shared/csurf_utils.hpp"
 #include "../i18n/i18n.hpp"
+#include "../ui/csurf_ui_assets.hpp"
 #include "../shared/csurf_reasonus_settings.hpp"
 #include "csurf_fp_8_session_manager.cpp"
 #include "csurf_fp_8_mix_manager.cpp"

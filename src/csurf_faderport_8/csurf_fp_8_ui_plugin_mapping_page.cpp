@@ -1,15 +1,16 @@
 #include "../ui/csurf_ui_page_content.hpp"
 #include <string.h>
-#include "../ui/csurf_ui_text_input.hpp"
+#include "../ui/csurf_ui_icon.hpp"
 #include "../ui/csurf_ui_page_title.hpp"
+#include "../ui/csurf_ui_text_input.hpp"
+#include "../ui/csurf_ui_pagination_button.hpp"
+#include "../ui/csurf_ui_pagination_direction_button.hpp"
 
 typedef std::tuple<int, std::string, int> PluginParam;
 
 class CSurf_FP_8_PluginMappingPage : public CSurf_UI_PageContent
 {
 protected:
-    ImGui_Font *main_font_bold;
-    I18n *i18n = I18n::GetInstance();
     mINI::INIStructure plugin_params;
     mINI::INIStructure previous_plugin_params;
 
@@ -364,11 +365,20 @@ protected:
         return true;
     }
 
-public:
-    CSurf_FP_8_PluginMappingPage(ImGui_Context *m_ctx) : CSurf_UI_PageContent(m_ctx)
+    void HandlePreviousClick()
     {
-        main_font_bold = ImGui::CreateFont("Arial", ImGui::FontFlags_Bold);
-        ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(main_font_bold));
+        ShowConsoleMsg("Previous");
+    }
+
+    void HandleNextClick()
+    {
+        ShowConsoleMsg("Next");
+    }
+
+public:
+    CSurf_FP_8_PluginMappingPage(ImGui_Context *m_ctx, CSurf_UI_Assets *assets) : CSurf_UI_PageContent(m_ctx, assets)
+    {
+        i18n = I18n::GetInstance();
         settings = ReaSonusSettings::GetInstance(FP_8);
 
         SetPluginFolders();
@@ -428,22 +438,33 @@ public:
         ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_ItemSpacing, 4, 0);
         if (ImGui::BeginChild(m_ctx, "##channel-list", 0.0, 30))
         {
+            ReaSonusPaginationDirectionButton(
+                m_ctx,
+                PaginationPrevious,
+                "previous-button",
+                std::bind(&CSurf_FP_8_PluginMappingPage::HandlePreviousClick, this));
+
             for (int i = 0; i < nb_channels; i++)
             {
-                bool selected = selected_channel == i;
-                if (i > 0)
-                {
-                    ImGui::SameLine(m_ctx);
-                }
+                ImGui::SameLine(m_ctx);
                 bool dirty = IsGroupDirty(i);
 
-                UiElements::PushReaSonusChannelTabStyle(m_ctx, selected);
-                if (ImGui::Button(m_ctx, (std::to_string(i + 1) + (dirty ? "*" : "")).c_str(), 30, 30))
-                {
-                    selected_channel = i;
-                }
-                UiElements::PopReaSonusChannelTabStyle(m_ctx);
+                ReaSonusPaginationButton(
+                    m_ctx,
+                    assets,
+                    std::to_string(i + 1),
+                    i,
+                    dirty,
+                    &selected_channel);
             }
+
+            ImGui::SameLine(m_ctx);
+
+            ReaSonusPaginationDirectionButton(
+                m_ctx,
+                PaginationNext,
+                "next-button",
+                std::bind(&CSurf_FP_8_PluginMappingPage::HandlePreviousClick, this));
 
             ImGui::SameLine(m_ctx);
 
@@ -467,7 +488,11 @@ public:
         UiElements::PushReaSonusGroupStyle(m_ctx);
         if (ImGui::BeginChild(m_ctx, "mapping_content_select", 0.0, height, ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY))
         {
-            ReaSonusPageTitle(m_ctx, i18n->t("mapping", "edit.select.label").c_str(), main_font_bold);
+            ReaSonusIcon(m_ctx, assets, IconArrowLeft, 48, UI_COLORS::Accent, "unique-id");
+            ImGui::SameLine(m_ctx);
+            ReaSonusIcon(m_ctx, assets, IconArrowRight, 48, UI_COLORS::Accent, "unique-ids");
+
+            ReaSonusPageTitle(m_ctx, assets, i18n->t("mapping", "edit.select.label").c_str());
             if (params.size() > 0)
             {
                 ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
@@ -521,7 +546,7 @@ public:
         UiElements::PushReaSonusGroupStyle(m_ctx);
         if (ImGui::BeginChild(m_ctx, "mapping_content_fader", 0.0, height, ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY))
         {
-            ReaSonusPageTitle(m_ctx, i18n->t("mapping", "edit.fader.label"), main_font_bold);
+            ReaSonusPageTitle(m_ctx, assets, i18n->t("mapping", "edit.fader.label"));
             if (params.size() > 0)
             {
                 ReaSonusComboInput(m_ctx, i18n->t("mapping", "edit.fader.param.label"), params, &fader_param_index);

@@ -1,23 +1,15 @@
 #include "csurf_ui_function_keys_page.hpp"
-#include "csurf_ui_images.h"
 #include "../csurf_faderport_8/csurf_fp_8_ui_control_panel.hpp"
 #include "../csurf_faderport_v2/csurf_fp_v2_ui_control_panel.hpp"
 #include "csurf_ui_elements.hpp"
 #include "csurf_ui_tooltip.hpp"
 #include "csurf_ui_colors.hpp"
 
-CSurf_UI_FunctionKeysPage::CSurf_UI_FunctionKeysPage(ImGui_Context *m_ctx, std::string _device) : CSurf_UI_PageContent(m_ctx)
+CSurf_UI_FunctionKeysPage::CSurf_UI_FunctionKeysPage(ImGui_Context *m_ctx, CSurf_UI_Assets *assets, std::string _device) : CSurf_UI_PageContent(m_ctx, assets)
 {
     i18n = I18n::GetInstance();
     device = _device;
     settings = ReaSonusSettings::GetInstance(device);
-
-    function_font_bold = ImGui::CreateFont("Arial", ImGui::FontFlags_Bold);
-    ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(function_font_bold));
-    icon_search = ImGui::CreateImageFromMem(reinterpret_cast<const char *>(img_icon_search), sizeof(img_icon_search));
-    ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(icon_search));
-    icon_reset = ImGui::CreateImageFromMem(reinterpret_cast<const char *>(img_icon_restore), sizeof(img_icon_restore));
-    ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(icon_reset));
 
     Reset();
 };
@@ -129,7 +121,7 @@ void CSurf_UI_FunctionKeysPage::HandleResetButtonClick(int index, FunctionTypes 
     selected_action = 0;
 }
 
-void CSurf_UI_FunctionKeysPage::RenderFunction(ImGui_Context *m_ctx, int index, CSurf_UI_FunctionKeysPage &page, FunctionTypes type)
+void CSurf_UI_FunctionKeysPage::RenderFunction(ImGui_Context *m_ctx, int index, CSurf_UI_FunctionKeysPage &page, CSurf_UI_Assets *assets, FunctionTypes type)
 {
     int actionId = type == TypeFunction ? stoi(page.functions[index]) : stoi(page.footswitch[index]);
     double x_width, y_width;
@@ -153,7 +145,7 @@ void CSurf_UI_FunctionKeysPage::RenderFunction(ImGui_Context *m_ctx, int index, 
 
     if (ImGui::BeginChild(m_ctx, idx.c_str(), 0.0, 0.0, ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY | ImGui::ChildFlags_ResizeY))
     {
-        ImGui::PushFont(m_ctx, page.function_font_bold, 13);
+        ImGui::PushFont(m_ctx, assets->GetMainFontBold(), 13);
         ImGui::PushStyleColor(m_ctx, ImGui::Col_Text, UI_COLORS::Accent);
         if (type == TypeFunction)
         {
@@ -173,21 +165,26 @@ void CSurf_UI_FunctionKeysPage::RenderFunction(ImGui_Context *m_ctx, int index, 
         ImGui::GetContentRegionAvail(m_ctx, &x_width, &y_width);
         ImGui::SetCursorPosX(m_ctx, x_width - 55.0);
         ImGui::SetCursorPosY(m_ctx, 0);
-        UiElements::PushReaSonusFunctionButtonStyle(m_ctx);
 
-        if (ImGui::ImageButton(m_ctx, (button_idx + "reset").c_str(), page.icon_reset, 24, 24))
+        UiElements::PushReaSonusFunctionButtonStyle(m_ctx);
+        ImGui::PushFont(m_ctx, assets->GetIconFont(), 24);
+        if (ImGui::Button(m_ctx, std::string(1, IconRestore).c_str()))
         {
             HandleResetButtonClick(index, type);
         }
+        ImGui::PopFont(m_ctx);
         ReaSonusSimpleTooltip(m_ctx, page.i18n->t("functions", type_name + ".button.clear.tooltip"), "clear-function-tooltip" + std::to_string(index));
 
         ImGui::SetCursorPosX(m_ctx, x_width - 16.0);
         ImGui::SetCursorPosY(m_ctx, 0);
 
-        if (ImGui::ImageButton(m_ctx, button_idx.c_str(), page.icon_search, 24, 24))
+        ImGui::PushFont(m_ctx, assets->GetIconFont(), 24);
+        if (ImGui::Button(m_ctx, std::string(1, IconSearch).c_str()))
         {
             PromptForFunctionAction(index, type);
         }
+        ImGui::PopFont(m_ctx);
+
         ReaSonusSimpleTooltip(m_ctx, page.i18n->t("functions", type_name + ".button.tooltip"), "add-function-tooltip" + std::to_string(index));
 
         UiElements::PopReaSonusFunctionButtonStyle(m_ctx);
@@ -195,7 +192,7 @@ void CSurf_UI_FunctionKeysPage::RenderFunction(ImGui_Context *m_ctx, int index, 
     }
 }
 
-void CSurf_UI_FunctionKeysPage::RenderFunctionTab(std::string tab_label, FunctionTypes type, int tab_index, int start_index, int count)
+void CSurf_UI_FunctionKeysPage::RenderFunctionTab(std::string tab_label, FunctionTypes type, int tab_index, int start_index, int count, CSurf_UI_Assets *assets)
 {
     UiElements::PushReaSonusTabStyle(m_ctx, selected_tab == tab_index);
     if (ImGui::BeginTabItem(m_ctx, tab_label.c_str()))
@@ -212,7 +209,7 @@ void CSurf_UI_FunctionKeysPage::RenderFunctionTab(std::string tab_label, Functio
                     if (ImGui::TableNextColumn(m_ctx))
                     {
                         UiElements::PushReaSonusFunctionActionStyle(m_ctx);
-                        RenderFunction(m_ctx, i, *this, type);
+                        RenderFunction(m_ctx, i, *this, assets, type);
                         UiElements::PopReaSonusFunctionActionStyle(m_ctx);
                     }
                 }
@@ -233,8 +230,8 @@ void CSurf_UI_FunctionKeysPage::RenderFPV2FunctionGroup()
         UiElements::PushReaSonusTabBarStyle(m_ctx);
         if (ImGui::BeginTabBar(m_ctx, "FunctionsTabs", ImGui::TabBarFlags_None))
         {
-            RenderFunctionTab(i18n->t("functions", "tab.v2-functions"), TypeFunction, 0, 0, 4);
-            RenderFunctionTab(i18n->t("functions", "tab.footswitch"), TypeFootSwitch, 1, 0, 3);
+            RenderFunctionTab(i18n->t("functions", "tab.v2-functions"), TypeFunction, 0, 0, 4, assets);
+            RenderFunctionTab(i18n->t("functions", "tab.footswitch"), TypeFootSwitch, 1, 0, 3, assets);
 
             UiElements::PopReaSonusTabBarStyle(m_ctx);
             ImGui::EndTabBar(m_ctx);
@@ -250,9 +247,9 @@ void CSurf_UI_FunctionKeysPage::RenderFP8FunctionGroup()
         UiElements::PushReaSonusTabBarStyle(m_ctx);
         if (ImGui::BeginTabBar(m_ctx, "FunctionsTabs", ImGui::TabBarFlags_None))
         {
-            RenderFunctionTab(i18n->t("functions", "tab.left-shift"), TypeFunction, 0, 0, 8);
-            RenderFunctionTab(i18n->t("functions", "tab.right-shift"), TypeFunction, 1, 8, 8);
-            RenderFunctionTab(i18n->t("functions", "tab.footswitch"), TypeFootSwitch, 2, 0, 3);
+            RenderFunctionTab(i18n->t("functions", "tab.left-shift"), TypeFunction, 0, 0, 8, assets);
+            RenderFunctionTab(i18n->t("functions", "tab.right-shift"), TypeFunction, 1, 8, 8, assets);
+            RenderFunctionTab(i18n->t("functions", "tab.footswitch"), TypeFootSwitch, 2, 0, 3, assets);
 
             UiElements::PopReaSonusTabBarStyle(m_ctx);
             ImGui::EndTabBar(m_ctx);

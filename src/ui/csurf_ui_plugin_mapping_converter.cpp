@@ -5,26 +5,25 @@
 #include "csurf_ui_colors.hpp"
 #include "csurf_ui_vars.hpp"
 #include "csurf_ui_page_title.hpp"
-#include "csurf_ui_images.h"
 #include "csurf_ui_button_bar.hpp"
 #include "csurf_ui_list_box.hpp"
 #include "../shared/csurf_utils.hpp"
 
 constexpr const char *g_name{"ReaSonus Native V2 Control Panel"};
 
-std::unique_ptr<ReaSonusV2PluginMappingConverter> ReaSonusV2PluginMappingConverter::s_inst;
+std::unique_ptr<ReaSonusPluginMappingConverter> ReaSonusPluginMappingConverter::s_inst;
 
 static void reportError(const ImGui_Error &e)
 {
     ShowMessageBox(e.what(), g_name, 0);
 }
 
-ReaSonusV2PluginMappingConverter::ReaSonusV2PluginMappingConverter()
+ReaSonusPluginMappingConverter::ReaSonusPluginMappingConverter()
     : m_ctx{}
 {
     ImGui::init(plugin_getapi);
     m_ctx = ImGui::CreateContext(g_name);
-    InitAssets();
+    assets = new CSurf_UI_Assets(m_ctx);
 
     path_name = GetReaSonusZonesPath();
 
@@ -37,23 +36,12 @@ ReaSonusV2PluginMappingConverter::ReaSonusV2PluginMappingConverter()
     plugin_register("timer", reinterpret_cast<void *>(&Loop));
 }
 
-ReaSonusV2PluginMappingConverter::~ReaSonusV2PluginMappingConverter()
+ReaSonusPluginMappingConverter::~ReaSonusPluginMappingConverter()
 {
     plugin_register("-timer", reinterpret_cast<void *>(&Loop));
 }
 
-void ReaSonusV2PluginMappingConverter::InitAssets()
-{
-    main_font = ImGui::CreateFont("Arial");
-    main_font_bold = ImGui::CreateFont("Arial", ImGui::FontFlags_Bold);
-    logo = ImGui::CreateImageFromMem(reinterpret_cast<const char *>(reasonus_logo), sizeof(reasonus_logo));
-
-    ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(main_font));
-    ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(main_font_bold));
-    ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(logo));
-}
-
-void ReaSonusV2PluginMappingConverter::Start()
+void ReaSonusPluginMappingConverter::Start()
 {
     try
     {
@@ -64,7 +52,7 @@ void ReaSonusV2PluginMappingConverter::Start()
         }
         else
         {
-            s_inst.reset(new ReaSonusV2PluginMappingConverter);
+            s_inst.reset(new ReaSonusPluginMappingConverter);
         }
     }
     catch (const ImGui_Error &e)
@@ -74,7 +62,7 @@ void ReaSonusV2PluginMappingConverter::Start()
     }
 }
 
-void ReaSonusV2PluginMappingConverter::Stop()
+void ReaSonusPluginMappingConverter::Stop()
 {
     try
     {
@@ -91,7 +79,7 @@ void ReaSonusV2PluginMappingConverter::Stop()
     }
 }
 
-void ReaSonusV2PluginMappingConverter::Loop()
+void ReaSonusPluginMappingConverter::Loop()
 {
     try
     {
@@ -104,7 +92,7 @@ void ReaSonusV2PluginMappingConverter::Loop()
     }
 }
 
-void ReaSonusV2PluginMappingConverter::SetBaseFileNames(std::string folder)
+void ReaSonusPluginMappingConverter::SetBaseFileNames(std::string folder)
 {
     file_names.clear();
     int index = 0;
@@ -123,7 +111,7 @@ void ReaSonusV2PluginMappingConverter::SetBaseFileNames(std::string folder)
     }
 }
 
-void ReaSonusV2PluginMappingConverter::ConvertFile(std::string file_path)
+void ReaSonusPluginMappingConverter::ConvertFile(std::string file_path)
 {
     bool has_plugin = false;
     std::string plugin_name;
@@ -210,7 +198,7 @@ void ReaSonusV2PluginMappingConverter::ConvertFile(std::string file_path)
     }
 }
 
-void ReaSonusV2PluginMappingConverter::ConvertFiles()
+void ReaSonusPluginMappingConverter::ConvertFiles()
 {
     for (auto &file_name : file_names)
     {
@@ -218,7 +206,7 @@ void ReaSonusV2PluginMappingConverter::ConvertFiles()
     }
 }
 
-void ReaSonusV2PluginMappingConverter::Convert()
+void ReaSonusPluginMappingConverter::Convert()
 {
     unconverted_files.clear();
     converted_files.clear();
@@ -226,7 +214,7 @@ void ReaSonusV2PluginMappingConverter::Convert()
     ConvertFiles();
 }
 
-void ReaSonusV2PluginMappingConverter::Frame()
+void ReaSonusPluginMappingConverter::Frame()
 {
     if (close_clicked)
     {
@@ -242,7 +230,7 @@ void ReaSonusV2PluginMappingConverter::Frame()
 
     PushReaSonusColors(m_ctx);
     PushReaSonusStyle(m_ctx);
-    ImGui::PushFont(m_ctx, main_font, 13);
+    ImGui::PushFont(m_ctx, assets->GetMainFont(), 13);
     ImGui::SetNextWindowSize(m_ctx, 640, 612, ImGui::Cond_Once);
     bool open{true};
 
@@ -251,7 +239,7 @@ void ReaSonusV2PluginMappingConverter::Frame()
     {
         if (ImGui::BeginChild(m_ctx, "logo", 0.0, 52.0, ImGui::ChildFlags_None))
         {
-            ImGui::Image(m_ctx, logo, 200, 52);
+            ImGui::Image(m_ctx, assets->GetReaSonusLogo(), 200, 52);
 
             ImGui::EndChild(m_ctx); // logo
         }
@@ -264,7 +252,7 @@ void ReaSonusV2PluginMappingConverter::Frame()
                 UiElements::PushReaSonusGroupStyle(m_ctx);
                 if (ImGui::BeginChild(m_ctx, "actions_convert_info", 0.0, 0.0, ImGui::ChildFlags_FrameStyle))
                 {
-                    ReaSonusPageTitle(m_ctx, "Convert", main_font_bold);
+                    ReaSonusPageTitle(m_ctx, assets, "Convert");
                     ImGui::PushTextWrapPos(m_ctx, 260);
                     ImGui::Text(m_ctx, "This action will convert your old zon plugin files to the new ini files used by ReaSonus Native. If a file already exists for ReaSonus Native, the file will be ignored.");
                     ImGui::Text(m_ctx, "Once the action is finished, it will list the converted files and the skipped files.");
@@ -288,7 +276,7 @@ void ReaSonusV2PluginMappingConverter::Frame()
                 UiElements::PushReaSonusGroupStyle(m_ctx);
                 if (ImGui::BeginChild(m_ctx, "main_content_area", 0.0, 0.0, ImGui::ChildFlags_FrameStyle))
                 {
-                    ReaSonusPageTitle(m_ctx, "Converted files", main_font_bold);
+                    ReaSonusPageTitle(m_ctx, assets, "Converted files");
 
                     UiElements::PushReaSonusListBoxStyle(m_ctx);
                     if (ImGui::BeginListBox(m_ctx, "##converted_files", 0.0, 110))
@@ -302,7 +290,7 @@ void ReaSonusV2PluginMappingConverter::Frame()
                         ImGui::EndListBox(m_ctx); // converted_files
                     }
 
-                    ReaSonusPageTitle(m_ctx, "Unconverted files", main_font_bold);
+                    ReaSonusPageTitle(m_ctx, assets, "Unconverted files");
 
                     UiElements::PushReaSonusListBoxStyle(m_ctx);
                     if (ImGui::BeginListBox(m_ctx, "##unconverted_files", 0.0, 110))
@@ -336,7 +324,15 @@ void ReaSonusV2PluginMappingConverter::Frame()
             ImGui::EndChild(m_ctx); // path_info
         }
 
-        ReaSonusButtonBar(m_ctx, "Convert", main_font_bold, &convert_clicked, true, &close_clicked, "Close");
+        ReaSonusButtonBar(
+            m_ctx,
+            assets,
+            "Convert",
+            &convert_clicked,
+            true,
+            &close_clicked,
+            "Close",
+            &save_message);
 
         UiElements::PopReaSonusWindowStyle(m_ctx);
 

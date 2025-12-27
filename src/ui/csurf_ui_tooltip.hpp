@@ -4,21 +4,25 @@
 #include <reaper_imgui_functions.h>
 #include <string>
 #include "csurf_ui_elements.hpp"
+#include "csurf_ui_colors.hpp"
+#include "csurf_ui_icon.hpp"
 
 static void ReaSonusTooltip(
     ImGui_Context *m_ctx,
+    CSurf_UI_Assets *assets,
     std::string label,
     std::string id,
-    ImGui_Image *icon = nullptr,
     double icon_offset_x = 0,
     double icon_offset_y = -3)
 {
     ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + icon_offset_y);
     ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + icon_offset_x);
-    if (icon != nullptr)
-    {
-        ImGui::Image(m_ctx, icon, 24, 24);
-    }
+
+    ImGui::PushFont(m_ctx, assets->GetIconFont(), 22);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_Text, UI_COLORS::Accent);
+    ImGui::Text(m_ctx, std::string(1, IconInformation).c_str());
+    ImGui::PopStyleColor(m_ctx);
+    ImGui::PopFont(m_ctx);
 
     if (ImGui::BeginItemTooltip(m_ctx))
     {

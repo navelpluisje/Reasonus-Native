@@ -396,4 +396,6 @@ bool setWindowScrollPos(void *windowHWND, const char *scrollbar, int position);
  */
 void GetLanguages(std::vector<std::string> &language_names);
 
+double between(int min, int val, int max);
+
 #endif // CSURF_UTILS_H_

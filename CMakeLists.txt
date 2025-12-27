@@ -185,12 +185,12 @@ if(NOT EXISTS ${PROJECT_LIB_DIR}/assets)
 endif()
 
 # Create al ist of files we need to process
-file(GLOB_RECURSE COMPILED_RESOURCES ${PROJECT_SOURCE_DIR}/src/assets/*.png)
+file(GLOB_RECURSE COMPILED_RESOURCES ${PROJECT_SOURCE_DIR}/src/assets/*.png ${PROJECT_SOURCE_DIR}/src/assets/*.ttf)
 
 # Loop through the files and create an add_custom_command
 foreach(INPUT_FILE ${COMPILED_RESOURCES})
     # Create the output file name
-    string(REPLACE "png" "ipp" OUTPUT_FILE ${INPUT_FILE})
+    string(REGEX REPLACE "png|ttf" "ipp" OUTPUT_FILE ${INPUT_FILE})
     string(REPLACE "src" "lib" OUTPUT_FILE ${OUTPUT_FILE})
 
     # Custom command to run xxd

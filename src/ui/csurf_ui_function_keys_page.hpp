@@ -5,6 +5,7 @@
 #include "csurf_ui_page_content.hpp"
 #include "../i18n/i18n.hpp"
 #include "../shared/csurf_reasonus_settings.hpp"
+#include "csurf_ui_assets.hpp"
 
 enum FunctionTypes
 {
@@ -17,11 +18,7 @@ class CSurf_UI_FunctionKeysPage : public CSurf_UI_PageContent
 protected:
     std::vector<std::string> functions;
     std::vector<std::string> footswitch;
-    ImGui_Font *function_font_bold;
-    ImGui_Image *icon_search;
-    ImGui_Image *icon_reset;
     std::string device;
-    I18n *i18n;
     int selected_tab = 0;
 
 public:
@@ -30,7 +27,7 @@ public:
     static int selected_action;
     static FunctionTypes selected_type;
 
-    CSurf_UI_FunctionKeysPage(ImGui_Context *m_ctx, std::string _device);
+    CSurf_UI_FunctionKeysPage(ImGui_Context *m_ctx, CSurf_UI_Assets *assets, std::string _device);
 
     virtual ~CSurf_UI_FunctionKeysPage() {};
 
@@ -46,9 +43,9 @@ public:
 
     static void HandleResetButtonClick(int index, FunctionTypes type);
 
-    static void RenderFunction(ImGui_Context *m_ctx, int index, CSurf_UI_FunctionKeysPage &page, FunctionTypes type = TypeFunction);
+    static void RenderFunction(ImGui_Context *m_ctx, int index, CSurf_UI_FunctionKeysPage &page, CSurf_UI_Assets *assets, FunctionTypes type = TypeFunction);
 
-    void RenderFunctionTab(std::string tab_label, FunctionTypes type, int tab_index, int start_index, int count);
+    void RenderFunctionTab(std::string tab_label, FunctionTypes type, int tab_index, int start_index, int count, CSurf_UI_Assets *assets);
 
     void RenderFPV2FunctionGroup();
 

@@ -1,26 +1,27 @@
-#ifndef CSURF_FP_UI_MENU_BUTTON_H_
-#define CSURF_FP_UI_MENU_BUTTON_H_
+#ifndef CSURF_FP_UI_PAGINATION_BUTTON_H_
+#define CSURF_FP_UI_PAGINATION_BUTTON_H_
 
 #include <reaper_imgui_functions.h>
 #include <string>
 #include "csurf_ui_elements.hpp"
 #include <reaper_plugin_functions.h>
 #include "../shared/csurf_utils.hpp"
-#include "../ui/csurf_ui_assets.hpp"
+#include "csurf_ui_colors.hpp"
 
-static void ReaSonusMenuButton(
+static void ReaSonusPaginationButton(
     ImGui_Context *m_ctx,
     CSurf_UI_Assets *assets,
     std::string action_label,
-    IconFont icon,
     int value,
+    bool alert,
     int *active_item)
 {
-    int menu_button_width = 200;
-    int menu_button_height = 42;
+    int menu_button_width = 30;
+    int menu_button_height = 30;
 
-    int background_color = value == *active_item ? UI_COLORS::Accent_25 : UI_COLORS::Main_28;
-    int border_width = value == *active_item ? 2 : 1;
+    int background_color = value == *active_item ? UI_COLORS::Accent_25 : UI_COLORS::Main_18;
+    int border_color = value == *active_item ? UI_COLORS::Accent : UI_COLORS::Main_38;
+    int border_width = 1;
     double x_pos_1, y_pos_1, x_mouse_pos, y_mouse_pos;
 
     if (ImGui::BeginChild(m_ctx, ("##" + action_label).c_str(), menu_button_width, menu_button_height, ImGui::ChildFlags_FrameStyle))
@@ -49,16 +50,17 @@ static void ReaSonusMenuButton(
         ImGui_DrawList *list = ImGui::GetForegroundDrawList(m_ctx);
 
         ImGui::DrawList_AddRectFilled(list, x_pos_1, y_pos_1, x_pos_1 + menu_button_width, y_pos_1 + menu_button_height, background_color, 4);
-        ImGui::DrawList_AddRect(list, x_pos_1, y_pos_1, x_pos_1 + menu_button_width, y_pos_1 + menu_button_height, UI_COLORS::Accent, 4, ImGui::DrawFlags_None, border_width);
-        ImGui::PushFont(m_ctx, assets->GetIconFont(), 24);
-        ImGui::DrawList_AddText(list, x_pos_1 + 9, y_pos_1 + 9, UI_COLORS::White, std::string(1, icon).c_str());
-        ImGui::PopFont(m_ctx);
-
-        // ImGui::DrawList_AddImage(list, icon, x_pos_1 + 9, y_pos_1 + 9, x_pos_1 + 33, y_pos_1 + 33);
-
-        ImGui::PushFont(m_ctx, assets->GetMainFontBold(), 15);
-        double font_height = ImGui::GetTextLineHeight(m_ctx);
-        ImGui::DrawList_AddText(list, x_pos_1 + 42, y_pos_1 + (menu_button_height - font_height) / 2, UI_COLORS::White, action_label.c_str());
+        ImGui::DrawList_AddRect(list, x_pos_1, y_pos_1, x_pos_1 + menu_button_width, y_pos_1 + menu_button_height, border_color, 4, ImGui::DrawFlags_None, border_width);
+        if (alert)
+        {
+            ImGui::DrawList_AddCircleFilled(list, x_pos_1 + 27, y_pos_1 + 2, 5, border_color);
+            ImGui::DrawList_AddCircleFilled(list, x_pos_1 + 27, y_pos_1 + 2, 4, UI_COLORS::Main_18);
+            ImGui::DrawList_AddCircleFilled(list, x_pos_1 + 27, y_pos_1 + 2, 4, UI_COLORS::Success_50);
+        }
+        ImGui::PushFont(m_ctx, assets->GetMainFontBold(), 13);
+        double text_height, text_width;
+        ImGui::CalcTextSize(m_ctx, action_label.c_str(), &text_width, &text_height);
+        ImGui::DrawList_AddText(list, x_pos_1 + (menu_button_width - text_width) / 2, y_pos_1 + (menu_button_height - text_height) / 2, UI_COLORS::White, action_label.c_str());
         ImGui::PopFont(m_ctx);
 
         ImGui::EndChild(m_ctx);

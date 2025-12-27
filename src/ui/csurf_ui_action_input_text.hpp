@@ -20,10 +20,10 @@
  */
 static void ReaSonusActionInputText(
     ImGui_Context *m_ctx,
+    CSurf_UI_Assets *assets,
     std::string label,
     std::string *value,
     std::string hint,
-    ImGui_Image *icon,
     std::function<void()> callback)
 {
     double space_x, space_y;
@@ -43,14 +43,17 @@ static void ReaSonusActionInputText(
         ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 25);
 
         UiElements::PushReaSonusIconButtonStyle(m_ctx);
-        if (ImGui::ImageButton(m_ctx, "add-filter", icon, 20, 20))
+        ImGui::PushFont(m_ctx, assets->GetIconFont(), 20);
+        if (ImGui::Button(m_ctx, std::string(1, IconAddList).c_str()))
         {
             if ((*value).compare("") != 0)
             {
                 callback();
             }
         }
+        ImGui::PopFont(m_ctx);
         UiElements::PopReaSonusIconButtonStyle(m_ctx);
+
         ImGui::EndChild(m_ctx);
     }
 }

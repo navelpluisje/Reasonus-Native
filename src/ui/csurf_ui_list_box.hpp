@@ -23,11 +23,11 @@
  */
 static void ReaSonusExtendedListBox(
     ImGui_Context *m_ctx,
+    CSurf_UI_Assets *assets,
     std::string id,
     std::vector<std::string> items,
     int *selected_item,
     bool can_deselect,
-    ImGui_Image *delete_icon,
     std::function<void(int index)> remove_callback,
     bool sortable = false,
     std::function<void(int current_item, int next_item)> sort_callback = nullptr)
@@ -67,11 +67,13 @@ static void ReaSonusExtendedListBox(
                 ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + space_x - 18);
                 ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 2);
 
-                ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 4.0, 4.0);
-                if (ImGui::ImageButton(m_ctx, std::string("Remove-filter##" + std::to_string(i)).c_str(), delete_icon, 12, 12))
+                ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 1.0, 1.0);
+                ImGui::PushFont(m_ctx, assets->GetIconFont(), 16);
+                if (ImGui::Button(m_ctx, std::string(1, IconRemove).c_str()))
                 {
                     remove_callback(i);
                 }
+                ImGui::PopFont(m_ctx);
                 ImGui::PopStyleVar(m_ctx);
             }
         }

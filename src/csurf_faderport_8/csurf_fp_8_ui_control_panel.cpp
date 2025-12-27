@@ -7,7 +7,6 @@
 #include "../ui/csurf_ui_vars.hpp"
 #include "../ui/csurf_ui_menu_button.hpp"
 #include "../ui/csurf_ui_button_bar.hpp"
-#include "../ui/csurf_ui_images.h"
 #include "../ui/csurf_ui_function_keys_page.hpp"
 
 constexpr const char *g_name{"ReaSonus Native 8/16 Control Panel"};
@@ -30,7 +29,7 @@ ReaSonus8ControlPanel::ReaSonus8ControlPanel()
 
     ImGui::init(plugin_getapi);
     m_ctx = ImGui::CreateContext(g_name);
-    InitAssets();
+    assets = new CSurf_UI_Assets(m_ctx);
 
     plugin_register("timer", reinterpret_cast<void *>(&Loop));
 }
@@ -38,27 +37,6 @@ ReaSonus8ControlPanel::ReaSonus8ControlPanel()
 ReaSonus8ControlPanel::~ReaSonus8ControlPanel()
 {
     plugin_register("-timer", reinterpret_cast<void *>(&Loop));
-}
-
-void ReaSonus8ControlPanel::InitAssets()
-{
-    main_font = ImGui::CreateFont("Arial");
-    main_font_bold = ImGui::CreateFont("Arial", ImGui::FontFlags_Bold);
-    logo = ImGui::CreateImageFromMem(reinterpret_cast<const char *>(reasonus_logo), sizeof(reasonus_logo));
-    icon_settings = ImGui::CreateImageFromMem(reinterpret_cast<const char *>(img_icon_settings), sizeof(img_icon_settings));
-    icon_function_actions = ImGui::CreateImageFromMem(reinterpret_cast<const char *>(img_icon_function_actions), sizeof(img_icon_function_actions));
-    icon_custom_filters = ImGui::CreateImageFromMem(reinterpret_cast<const char *>(img_icon_custom_filters), sizeof(img_icon_custom_filters));
-    icon_plugin_mapping = ImGui::CreateImageFromMem(reinterpret_cast<const char *>(img_icon_param_mapping), sizeof(img_icon_param_mapping));
-    icon_about = ImGui::CreateImageFromMem(reinterpret_cast<const char *>(img_icon_about), sizeof(img_icon_about));
-
-    ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(main_font));
-    ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(main_font_bold));
-    ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(logo));
-    ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(icon_settings));
-    ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(icon_function_actions));
-    ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(icon_custom_filters));
-    ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(icon_plugin_mapping));
-    ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(icon_about));
 }
 
 void ReaSonus8ControlPanel::Start()
@@ -184,23 +162,23 @@ void ReaSonus8ControlPanel::SetPageContent()
             CSurf_UI_FunctionKeysPage::selected_function = -1;
             CSurf_UI_FunctionKeysPage::selected_action = -1;
 
-            page_content = new CSurf_UI_FunctionKeysPage(m_ctx, FP_8);
+            page_content = new CSurf_UI_FunctionKeysPage(m_ctx, assets, FP_8);
             break;
 
         case FILTERS_PAGE:
-            page_content = new CSurf_FP_8_CustomFilterstPage(m_ctx);
+            page_content = new CSurf_FP_8_CustomFilterstPage(m_ctx, assets);
             break;
 
         case MAPPING_PAGE:
-            page_content = new CSurf_FP_8_PluginMappingPage(m_ctx);
+            page_content = new CSurf_FP_8_PluginMappingPage(m_ctx, assets);
             break;
 
         case SETTINGS_PAGE:
-            page_content = new CSurf_FP_8_SettingsPage(m_ctx);
+            page_content = new CSurf_FP_8_SettingsPage(m_ctx, assets);
             break;
 
         case ABOUT_PAGE:
-            page_content = new CSurf_UI_AboutPage(m_ctx, FP_8);
+            page_content = new CSurf_UI_AboutPage(m_ctx, assets, FP_8);
             break;
         }
     }
@@ -247,7 +225,7 @@ void ReaSonus8ControlPanel::Frame()
 
     PushReaSonusColors(m_ctx);
     PushReaSonusStyle(m_ctx);
-    ImGui::PushFont(m_ctx, main_font, 13);
+    ImGui::PushFont(m_ctx, assets->GetMainFont(), 13);
     ImGui::SetNextWindowSize(m_ctx, 1024, 640, ImGui::Cond_Once);
     bool open{true};
     if (ImGui::Begin(m_ctx, g_name, &open, ImGui::WindowFlags_NoCollapse | ImGui::WindowFlags_NoResize))
@@ -261,13 +239,13 @@ void ReaSonus8ControlPanel::Frame()
             if (ImGui::BeginChild(m_ctx, "side_bar_content", 0.0, space_y - height - 10))
                 ;
             {
-                ImGui::Image(m_ctx, logo, 200, 52);
+                ImGui::Image(m_ctx, assets->GetReaSonusLogo(), 200, 52);
 
-                ReaSonusMenuButton(m_ctx, i18n->t("control-panel", menu_items[0]), main_font_bold, icon_function_actions, FUNCTIONS_PAGE, &current_page);
-                ReaSonusMenuButton(m_ctx, i18n->t("control-panel", menu_items[1]), main_font_bold, icon_custom_filters, FILTERS_PAGE, &current_page);
-                ReaSonusMenuButton(m_ctx, i18n->t("control-panel", menu_items[2]), main_font_bold, icon_plugin_mapping, MAPPING_PAGE, &current_page);
-                ReaSonusMenuButton(m_ctx, i18n->t("control-panel", menu_items[3]), main_font_bold, icon_settings, SETTINGS_PAGE, &current_page);
-                ReaSonusMenuButton(m_ctx, i18n->t("control-panel", menu_items[4]), main_font_bold, icon_about, ABOUT_PAGE, &current_page);
+                ReaSonusMenuButton(m_ctx, assets, i18n->t("control-panel", menu_items[0]), IconAction, FUNCTIONS_PAGE, &current_page);
+                ReaSonusMenuButton(m_ctx, assets, i18n->t("control-panel", menu_items[1]), IconCustomFilter, FILTERS_PAGE, &current_page);
+                ReaSonusMenuButton(m_ctx, assets, i18n->t("control-panel", menu_items[2]), IconSettings, MAPPING_PAGE, &current_page);
+                ReaSonusMenuButton(m_ctx, assets, i18n->t("control-panel", menu_items[3]), IconCog, SETTINGS_PAGE, &current_page);
+                ReaSonusMenuButton(m_ctx, assets, i18n->t("control-panel", menu_items[4]), IconInformation, ABOUT_PAGE, &current_page);
 
                 ImGui::EndChild(m_ctx);
             }
@@ -284,7 +262,7 @@ void ReaSonus8ControlPanel::Frame()
             UiElements::PopReaSonusContentStyle(m_ctx);
             if (ImGui::BeginChild(m_ctx, "main_content_area", 0.0, current_page != 4 ? -34.0 : 0, ImGui::ChildFlags_None))
             {
-                ReaSonusPageTitle(m_ctx, i18n->t("control-panel", menu_items[current_page]), main_font_bold);
+                ReaSonusPageTitle(m_ctx, assets, i18n->t("control-panel", menu_items[current_page]));
 
                 if (ImGui::BeginChild(m_ctx, "main_content_area", 0.0, -12.0, ImGui::ChildFlags_None))
                 {
@@ -297,8 +275,8 @@ void ReaSonus8ControlPanel::Frame()
             {
                 ReaSonusButtonBar(
                     m_ctx,
+                    assets,
                     i18n->t("control-panel", "button.save"),
-                    main_font_bold,
                     &save_clicked,
                     true,
                     &cancel_clicked,

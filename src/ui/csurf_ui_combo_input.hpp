@@ -44,4 +44,23 @@ static void ReaSonusComboInput(ImGui_Context *m_ctx, std::string label, std::vec
     UiElements::PopReaSonusFieldGroupStyle(m_ctx);
 }
 
+static void RenderInfoComboInput(
+    ImGui_Context *m_ctx,
+    CSurf_UI_Assets *assets,
+    std::string label,
+    std::vector<std::string> list,
+    int *value,
+    std::string tooltip)
+{
+    double x_pos = ImGui::GetCursorPosX(m_ctx);
+    double y_pos = ImGui::GetCursorPosY(m_ctx);
+    std::string id = std::to_string(x_pos) + "-" + std::to_string(y_pos);
+
+    ReaSonusComboInput(m_ctx, label.c_str(), list, value, -20);
+    ImGui::SameLine(m_ctx);
+    ReaSonusTooltip(m_ctx, assets, tooltip.c_str(), id.c_str(), -20, 26);
+    ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 4);
+    ImGui::Dummy(m_ctx, 0, 0);
+}
+
 #endif

@@ -6,7 +6,6 @@
 #include "csurf_ui_colors.hpp"
 #include "csurf_ui_vars.hpp"
 #include "csurf_ui_page_title.hpp"
-#include "csurf_ui_images.h"
 #include "csurf_ui_button_bar.hpp"
 #include "csurf_ui_list_box.hpp"
 #include "csurf_ui_action_input_text.hpp"
@@ -27,8 +26,8 @@ ReaSonusTranslationEditor::ReaSonusTranslationEditor()
 {
     ImGui::init(plugin_getapi);
     m_ctx = ImGui::CreateContext(g_name);
+    assets = new CSurf_UI_Assets(m_ctx);
 
-    InitAssets();
     GetBaseLanguage();
     GetLanguageList();
 
@@ -38,21 +37,6 @@ ReaSonusTranslationEditor::ReaSonusTranslationEditor()
 ReaSonusTranslationEditor::~ReaSonusTranslationEditor()
 {
     plugin_register("-timer", reinterpret_cast<void *>(&Loop));
-}
-
-void ReaSonusTranslationEditor::InitAssets()
-{
-    main_font = ImGui::CreateFont("Arial");
-    main_font_bold = ImGui::CreateFont("Arial", ImGui::FontFlags_Bold);
-    logo = ImGui::CreateImageFromMem(reinterpret_cast<const char *>(reasonus_logo), sizeof(reasonus_logo));
-    icon_add = ImGui::CreateImageFromMem(reinterpret_cast<const char *>(img_icon_add), sizeof(img_icon_add));
-    icon_remove_list_item = ImGui::CreateImageFromMem(reinterpret_cast<const char *>(img_icon_list_remove), sizeof(img_icon_list_remove));
-
-    ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(main_font));
-    ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(main_font_bold));
-    ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(logo));
-    ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(icon_add));
-    ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(icon_remove_list_item));
 }
 
 void ReaSonusTranslationEditor::Start()
@@ -334,7 +318,7 @@ void ReaSonusTranslationEditor::Frame()
 
     PushReaSonusColors(m_ctx);
     PushReaSonusStyle(m_ctx);
-    ImGui::PushFont(m_ctx, main_font, 13);
+    ImGui::PushFont(m_ctx, assets->GetMainFont(), 13);
     ImGui::SetNextWindowSize(m_ctx, 640, 612, ImGui::Cond_Once);
     bool open{true};
 
@@ -343,7 +327,7 @@ void ReaSonusTranslationEditor::Frame()
     {
         if (ImGui::BeginChild(m_ctx, "logo", 0.0, 52.0, ImGui::ChildFlags_None))
         {
-            ImGui::Image(m_ctx, logo, 200, 52);
+            ImGui::Image(m_ctx, assets->GetReaSonusLogo(), 200, 52);
             ImGui::SameLine(m_ctx);
 
             ImGui::EndChild(m_ctx); // logo
@@ -357,26 +341,26 @@ void ReaSonusTranslationEditor::Frame()
                 UiElements::PushReaSonusGroupStyle(m_ctx);
                 if (ImGui::BeginChild(m_ctx, "actions_convert_info", 0.0, 0.0, ImGui::ChildFlags_FrameStyle))
                 {
-                    ReaSonusPageTitle(m_ctx, "Languages", main_font_bold);
+                    ReaSonusPageTitle(m_ctx, assets, "Languages");
 
                     ReaSonusCheckBox(m_ctx, "Show only untranslated lines", &show_empty_only);
                     ReaSonusCheckBox(m_ctx, "Show the actual key", &show_translation_key);
 
                     ReaSonusActionInputText(
                         m_ctx,
+                        assets,
                         "Add a new language",
                         &new_language,
                         "Please use ISO names",
-                        icon_add,
                         std::bind(&ReaSonusTranslationEditor::HandleAddLanguage, this));
 
                     ReaSonusExtendedListBox(
                         m_ctx,
+                        assets,
                         "filters",
                         language_list,
                         &selected_language,
                         false,
-                        icon_remove_list_item,
                         std::bind(&ReaSonusTranslationEditor::HandleRemoveLanguageListItem, this, _1),
                         false);
 
@@ -399,7 +383,7 @@ void ReaSonusTranslationEditor::Frame()
                 {
                     std::string section = sections.first;
 
-                    ReaSonusPageTitle(m_ctx, section, main_font_bold);
+                    ReaSonusPageTitle(m_ctx, assets, section);
 
                     for (auto const &pair : sections.second)
                     {
@@ -420,7 +404,15 @@ void ReaSonusTranslationEditor::Frame()
             ImGui::EndChild(m_ctx); // actions_container
         }
 
-        ReaSonusButtonBar(m_ctx, "Save", main_font_bold, &save_clicked, true, &close_clicked, "Close", &save_message);
+        ReaSonusButtonBar(
+            m_ctx,
+            assets,
+            "Save",
+            &save_clicked,
+            true,
+            &close_clicked,
+            "Close",
+            &save_message);
 
         UiElements::PopReaSonusWindowStyle(m_ctx);
 

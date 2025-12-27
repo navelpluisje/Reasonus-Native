@@ -9,15 +9,12 @@ class CSurf_UI_AboutPage : public CSurf_UI_PageContent
 {
 protected:
     std::string device;
-    ImGui_Font *main_font_bold;
-    I18n *i18n = I18n::GetInstance();
 
 public:
-    CSurf_UI_AboutPage(ImGui_Context *m_ctx, std::string _device) : CSurf_UI_PageContent(m_ctx)
+    CSurf_UI_AboutPage(ImGui_Context *m_ctx, CSurf_UI_Assets *assets, std::string _device) : CSurf_UI_PageContent(m_ctx, assets)
     {
         device = _device;
-        main_font_bold = ImGui::CreateFont("Arial", ImGui::FontFlags_Bold);
-        ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(main_font_bold));
+        i18n = I18n::GetInstance();
     };
 
     virtual ~CSurf_UI_AboutPage() {};
@@ -35,7 +32,7 @@ public:
                 ImGui::GetContentRegionAvail(m_ctx, &available_width, &available_height);
                 ImGui::PushTextWrapPos(m_ctx, available_width);
 
-                ReaSonusPageTitle(m_ctx, i18n->t("about", "about.title").c_str(), main_font_bold);
+                ReaSonusPageTitle(m_ctx, assets, i18n->t("about", "about.title").c_str());
 
                 ImGui::Text(m_ctx, i18n->t("about", "about.top").c_str());
                 ImGui::BulletText(m_ctx, i18n->t("about", "about.list.1").c_str());
@@ -57,7 +54,7 @@ public:
                     ImGui::GetContentRegionAvail(m_ctx, &available_width, &available_height);
                     ImGui::PushTextWrapPos(m_ctx, available_width);
 
-                    ReaSonusPageTitle(m_ctx, i18n->t("about", "contribute.title").c_str(), main_font_bold);
+                    ReaSonusPageTitle(m_ctx, assets, i18n->t("about", "contribute.title").c_str());
                     ImGui::Text(m_ctx, i18n->t("about", "contribute.top").c_str());
                     ImGui::TextLinkOpenURL(m_ctx, i18n->t("about", "contribute.link.coffee").c_str(), "https://buymeacoffee.com/navelpluisje");
                     ImGui::SameLine(m_ctx);
@@ -92,7 +89,7 @@ public:
                         ImGui::GetContentRegionAvail(m_ctx, &available_width, &available_height);
                         ImGui::PushTextWrapPos(m_ctx, available_width);
 
-                        ReaSonusPageTitle(m_ctx, i18n->t("about", "thanks.title").c_str(), main_font_bold);
+                        ReaSonusPageTitle(m_ctx, assets, i18n->t("about", "thanks.title").c_str());
                         ImGui::Text(m_ctx, i18n->t("about", "thanks.bottom").c_str());
                         ImGui::BulletText(m_ctx, i18n->t("about", "thanks.list.1").c_str());
                         ImGui::BulletText(m_ctx, i18n->t("about", "thanks.list.2").c_str());

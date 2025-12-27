@@ -571,3 +571,17 @@ void GetLanguages(std::vector<std::string> &language_names)
         }
     }
 }
+
+/**
+ * Check if the value is betweemn the min and max value
+ * @property min The min value to check againt. The value should be larger the this value
+ * @property val The The value to test against
+ * @property max The max value to check againt. The value should be smaller the this value
+ *
+ * @return boolean value
+ */
+double between(int min, int val, int max)
+{
+    double diff = max - min;
+    return diff > 0 && diff < val;
+}

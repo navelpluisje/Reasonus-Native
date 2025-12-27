@@ -6,9 +6,6 @@
 class CSurf_FP_8_CustomFilterstPage : public CSurf_UI_PageContent
 {
 protected:
-    ImGui_Image *icon_add;
-    ImGui_Image *icon_remove_list_item;
-
     std::string device;
     int selected_filter = -1;
     int previous_selected_filter = -1;
@@ -30,9 +27,6 @@ protected:
     bool filter_children;
     bool filter_top_level;
     bool filter_match_multiple;
-
-    I18n *i18n = I18n::GetInstance();
-    ReaSonusSettings *settings = ReaSonusSettings::GetInstance(FP_8);
 
     void SetFiltersKeys()
     {
@@ -181,15 +175,10 @@ protected:
     }
 
 public:
-    CSurf_FP_8_CustomFilterstPage(ImGui_Context *m_ctx) : CSurf_UI_PageContent(m_ctx)
+    CSurf_FP_8_CustomFilterstPage(ImGui_Context *m_ctx, CSurf_UI_Assets *assets) : CSurf_UI_PageContent(m_ctx, assets)
     {
+        i18n = I18n::GetInstance();
         settings = ReaSonusSettings::GetInstance(FP_8);
-
-        icon_add = ImGui::CreateImageFromMem(reinterpret_cast<const char *>(img_icon_add), sizeof(img_icon_add));
-        ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(icon_add));
-
-        icon_remove_list_item = ImGui::CreateImageFromMem(reinterpret_cast<const char *>(img_icon_list_remove), sizeof(img_icon_list_remove));
-        ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(icon_remove_list_item));
 
         SetFiltersKeys();
     };
@@ -228,19 +217,19 @@ public:
                 {
                     ReaSonusActionInputText(
                         m_ctx,
+                        assets,
                         i18n->t("filters", "list.input.label").c_str(),
                         &new_filter_name,
                         i18n->t("filters", "list.input.placeholder").c_str(),
-                        icon_add,
                         std::bind(&CSurf_FP_8_CustomFilterstPage::HandleAddFilter, this));
 
                     ReaSonusExtendedListBox(
                         m_ctx,
+                        assets,
                         "filters",
                         filter_labels,
                         &selected_filter,
                         false,
-                        icon_remove_list_item,
                         std::bind(&CSurf_FP_8_CustomFilterstPage::HandleRemoveFilterListItem, this, _1),
                         true,
                         std::bind(&CSurf_FP_8_CustomFilterstPage::HandleSortFilterList, this, _1, _2));
@@ -276,19 +265,19 @@ public:
 
                         ReaSonusActionInputText(
                             m_ctx,
+                            assets,
                             i18n->t("filters", "content.text.label").c_str(),
                             &new_filter_text,
                             i18n->t("filters", "content.text.placeholder").c_str(),
-                            icon_add,
                             std::bind(&CSurf_FP_8_CustomFilterstPage::HandleAddFilterText, this));
 
                         ReaSonusExtendedListBox(
                             m_ctx,
+                            assets,
                             "filter-text-list",
                             filter_text,
                             &selected_filter_text,
                             true,
-                            icon_remove_list_item,
                             std::bind(&CSurf_FP_8_CustomFilterstPage::HandleRemoveFilterTextListItem, this, _1));
 
                         ImGui::EndChild(m_ctx);

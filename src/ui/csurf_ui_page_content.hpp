@@ -5,6 +5,8 @@
 #include <reaper_plugin_functions.h>
 #include <reaper_imgui_functions.h>
 #include <mini/ini.h>
+#include "csurf_ui_assets.hpp"
+#include "../i18n/i18n.hpp"
 #include "../shared/csurf_utils.hpp"
 #include "../shared/csurf_reasonus_settings.hpp"
 
@@ -14,9 +16,11 @@ protected:
     ImGui_Context *m_ctx;
     mINI::INIStructure ini;
     ReaSonusSettings *settings;
+    CSurf_UI_Assets *assets;
+    I18n *i18n;
 
 public:
-    CSurf_UI_PageContent(ImGui_Context *m_ctx) : m_ctx(m_ctx) {};
+    CSurf_UI_PageContent(ImGui_Context *m_ctx, CSurf_UI_Assets *assets) : m_ctx(m_ctx), assets(assets) {};
 
     virtual ~CSurf_UI_PageContent() {};
 
