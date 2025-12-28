@@ -23,10 +23,12 @@ static void ReaSonusIcon(
     {
         ImGui::GetItemRectMin(m_ctx, &x_pos, &y_pos);
 
-        ImGui_DrawList *icon_draw_list = ImGui::GetBackgroundDrawList(m_ctx);
+        ImGui_DrawList *icon_draw_list = ImGui::GetForegroundDrawList(m_ctx);
 
         ImGui::PushFont(m_ctx, assets->GetIconFont(), size);
+        ImGui::PushStyleColor(m_ctx, ImGui::Col_Text, color);
         ImGui::DrawList_AddText(icon_draw_list, x_pos, y_pos, color, std::string(1, icon).c_str());
+        ImGui::PopStyleColor(m_ctx);
         ImGui::PopFont(m_ctx);
 
         ImGui::EndChild(m_ctx);

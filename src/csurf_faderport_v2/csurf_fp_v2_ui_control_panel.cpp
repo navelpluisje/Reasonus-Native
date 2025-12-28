@@ -38,7 +38,7 @@ ReaSonusV2ControlPanel::~ReaSonusV2ControlPanel()
 
 void ReaSonusV2ControlPanel::Start(int page)
 {
-    SetActionState("_REASONUS_SHOW_REASONUS_8_CONTROL_WINDOW", 1);
+    SetActionState("_REASONUS_SHOW_REASONUS_V2_CONTROL_WINDOW", 1);
     current_page = page;
     try
     {
@@ -152,6 +152,13 @@ void ReaSonusV2ControlPanel::Frame()
             message = "";
             message_timer = 0;
         }
+    }
+
+    if (ImGui::IsKeyDown(m_ctx, ImGui::Key_Escape))
+    {
+        control_panel_open = false;
+        SetActionState("_REASONUS_SHOW_REASONUS_V2_CONTROL_WINDOW");
+        return s_inst.reset();
     }
 
     SetPageContent();

@@ -488,7 +488,7 @@ public:
         UiElements::PushReaSonusGroupStyle(m_ctx);
         if (ImGui::BeginChild(m_ctx, "mapping_content_select", 0.0, height, ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY))
         {
-            ReaSonusIcon(m_ctx, assets, IconArrowLeft, 48, UI_COLORS::Accent, "unique-id");
+            ReaSonusIcon(m_ctx, assets, IconCog, 48, UI_COLORS::Accent, "unique-id");
             ImGui::SameLine(m_ctx);
             ReaSonusIcon(m_ctx, assets, IconArrowRight, 48, UI_COLORS::Accent, "unique-ids");
 
@@ -576,14 +576,25 @@ public:
         }
     }
 
-    void RenderCenteredText(std::string content)
+    void RenderCenteredText(std::string content, IconFont icon)
     {
         double text_width, text_height, available_width, available_height;
         ImGui::GetContentRegionAvail(m_ctx, &available_width, &available_height);
+        ImGui::PushFont(m_ctx, assets->GetIconFont(), 84);
+        ImGui::PushStyleColor(m_ctx, ImGui::Col_Text, UI_COLORS::Accent);
+        ImGui::CalcTextSize(m_ctx, std::string(1, icon).c_str(), &text_width, &text_height);
+        ImGui::SetCursorPosX(m_ctx, available_width / 2 - text_width / 2);
+        ImGui::SetCursorPosY(m_ctx, (available_height / 2 - text_height / 2) - 50);
+        ImGui::Text(m_ctx, std::string(1, icon).c_str());
+        ImGui::PopStyleColor(m_ctx);
+        ImGui::PopFont(m_ctx);
+
+        ImGui::PushFont(m_ctx, assets->GetMainFont(), 15);
         ImGui::CalcTextSize(m_ctx, content.c_str(), &text_width, &text_height);
         ImGui::SetCursorPosX(m_ctx, available_width / 2 - text_width / 2);
-        ImGui::SetCursorPosY(m_ctx, available_height / 2 - text_height / 2);
+        ImGui::SetCursorPosY(m_ctx, (available_height / 2 - text_height / 2) + 40);
         ImGui::Text(m_ctx, content.c_str());
+        ImGui::PopFont(m_ctx);
     }
 
     void Render() override
@@ -673,15 +684,15 @@ public:
                     }
                     else if (!selected_plugin_exists && selected_plugin > -1)
                     {
-                        RenderCenteredText(i18n->t("mapping", "message.not-available"));
+                        RenderCenteredText(i18n->t("mapping", "message.not-available"), IconRemove);
                     }
                     else if (selected_developer > -1 && selected_plugin == -1)
                     {
-                        RenderCenteredText(i18n->t("mapping", "message.select-plugin"));
+                        RenderCenteredText(i18n->t("mapping", "message.select-plugin"), IconInstrument);
                     }
                     else
                     {
-                        RenderCenteredText(i18n->t("mapping", "message.select-developer"));
+                        RenderCenteredText(i18n->t("mapping", "message.select-developer"), IconUser);
                     }
 
                     ImGui::EndChild(m_ctx);
