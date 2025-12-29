@@ -399,13 +399,15 @@ protected:
         previous_selected_channel = selected_channel;
         PopulateFields();
 
-        channel_offset = minmax(0, index - 6, nb_channels - 13);
+        channel_offset = minmax(0, index - 6, max(nb_channels - 13, 0));
     }
 
     void AddChannel()
     {
         selected_channel = nb_channels;
         nb_channels += 1;
+
+        HandleChannelClick(selected_channel);
     }
 
 public:
@@ -682,6 +684,7 @@ public:
 
             if (selected_developer != previous_selected_developer)
             {
+                channel_offset = 0;
                 selected_plugin_exists = false;
                 if (DirtyCheck())
                 {
@@ -699,6 +702,7 @@ public:
 
             if (selected_plugin != previous_selected_plugin)
             {
+                channel_offset = 0;
                 if (DirtyCheck())
                 {
                     selected_channel = 0;
