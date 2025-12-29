@@ -352,6 +352,12 @@ bool IsWantedParam(std::string param_name);
 int minmax(int min, int value, int max);
 double minmax(double min, double value, double max);
 
+int min(int value_1, int value_2);
+double min(double value_1, double value_2);
+
+int max(int value_1, int value_2);
+double max(double value_1, double value_2);
+
 /**
  * @brief borrowed from https://github.com/juliansader/ReaExtensions
  *

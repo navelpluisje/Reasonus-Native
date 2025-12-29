@@ -8,17 +8,12 @@
 #include "../shared/csurf_utils.hpp"
 #include "csurf_ui_colors.hpp"
 
-enum PaginationDirection
-{
-    PaginationPrevious,
-    PaginationNext,
-};
-
-static void
-ReaSonusPaginationDirectionButton(
+static void ReaSonusPaginationIconButton(
     ImGui_Context *m_ctx,
-    PaginationDirection direction,
+    CSurf_UI_Assets *assets,
+    IconFont icon,
     std::string id,
+    bool disabled = false,
     std::function<void()> on_click = nullptr)
 {
     int menu_button_width = 30;
@@ -29,6 +24,7 @@ ReaSonusPaginationDirectionButton(
     int border_width = 1;
     double x_pos_1, y_pos_1, x_mouse_pos, y_mouse_pos;
 
+    ImGui::PushFont(m_ctx, assets->GetIconFont(), 20);
     if (ImGui::BeginChild(m_ctx, ("##" + id).c_str(), menu_button_width, menu_button_height, ImGui::ChildFlags_FrameStyle))
     {
         ImGui::GetMousePos(m_ctx, &x_mouse_pos, &y_mouse_pos);
@@ -49,24 +45,30 @@ ReaSonusPaginationDirectionButton(
         {
             background_color = UI_COLORS::Main_38;
             border_width = 2;
-            on_click();
+            if (!disabled)
+            {
+                on_click();
+            }
         }
 
         ImGui_DrawList *list = ImGui::GetForegroundDrawList(m_ctx);
 
         ImGui::DrawList_AddRectFilled(list, x_pos_1, y_pos_1, x_pos_1 + menu_button_width, y_pos_1 + menu_button_height, background_color, 4);
         ImGui::DrawList_AddRect(list, x_pos_1, y_pos_1, x_pos_1 + menu_button_width, y_pos_1 + menu_button_height, border_color, 4, ImGui::DrawFlags_None, border_width);
-
-        if (direction == PaginationPrevious)
-        {
-            ImGui::DrawList_AddTriangleFilled(list, x_pos_1 + 10, y_pos_1 + menu_button_height / 2, x_pos_1 + menu_button_width - 10, y_pos_1 + 10, x_pos_1 + menu_button_width - 10, y_pos_1 + menu_button_height - 10, UI_COLORS::White);
-        }
-        if (direction == PaginationNext)
-        {
-            ImGui::DrawList_AddTriangleFilled(list, x_pos_1 + menu_button_width - 10, y_pos_1 + menu_button_height / 2, x_pos_1 + 10, y_pos_1 + 10, x_pos_1 + 10, y_pos_1 + menu_button_height - 10, UI_COLORS::White);
-        }
+        ImGui::DrawList_AddText(list, x_pos_1 + 5, y_pos_1 + 5, disabled ? UI_COLORS::White_25 : UI_COLORS::White, std::string(1, icon).c_str());
         ImGui::EndChild(m_ctx);
     }
+    ImGui::PopFont(m_ctx);
+}
+
+static void ReaSonusPaginationIconButton(
+    ImGui_Context *m_ctx,
+    CSurf_UI_Assets *assets,
+    IconFont icon,
+    std::string id,
+    std::function<void()> on_click = nullptr)
+{
+    ReaSonusPaginationIconButton(m_ctx, assets, icon, id, false, on_click);
 }
 
 #endif

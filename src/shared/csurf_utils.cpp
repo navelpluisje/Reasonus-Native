@@ -487,6 +487,34 @@ double minmax(double min, double value, double max)
                : value;
 }
 
+int min(int value_1, int value_2)
+{
+    return value_1 < value_2
+               ? value_1
+               : value_2;
+}
+
+double min(double value_1, double value_2)
+{
+    return value_1 < value_2
+               ? value_1
+               : value_2;
+}
+
+int max(int value_1, int value_2)
+{
+    return value_1 > value_2
+               ? value_1
+               : value_2;
+}
+
+double max(double value_1, double value_2)
+{
+    return value_1 > value_2
+               ? value_1
+               : value_2;
+}
+
 HWND findWindowChildByID(HWND parentHWND, int ID)
 {
 #ifdef _WDL_SWELL

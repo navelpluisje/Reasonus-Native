@@ -1,10 +1,11 @@
 #include "../ui/csurf_ui_page_content.hpp"
 #include <string.h>
+#include "../shared/csurf_utils.hpp"
 #include "../ui/csurf_ui_icon.hpp"
 #include "../ui/csurf_ui_page_title.hpp"
 #include "../ui/csurf_ui_text_input.hpp"
 #include "../ui/csurf_ui_pagination_button.hpp"
-#include "../ui/csurf_ui_pagination_direction_button.hpp"
+#include "../ui/csurf_ui_pagination_icon_button.hpp"
 
 typedef std::tuple<int, std::string, int> PluginParam;
 
@@ -14,7 +15,8 @@ protected:
     mINI::INIStructure plugin_params;
     mINI::INIStructure previous_plugin_params;
 
-    int x = 0;
+    const int max_items = 13;
+    int channel_offset = 0;
 
     bool render_started = false;
     std::string plugin_folder_path = std::string(GetResourcePath()) + pathSeparator + "ReaSonus" + pathSeparator + "Plugins";
@@ -367,12 +369,43 @@ protected:
 
     void HandlePreviousClick()
     {
-        ShowConsoleMsg("Previous");
+        selected_channel = max(selected_channel - 1, 0);
+        previous_selected_channel = selected_channel;
+        PopulateFields();
+
+        int overflow = max(nb_channels - 13, 0);
+        if (overflow > 0 && selected_channel > 5 && selected_channel < (6 + overflow))
+        {
+            channel_offset -= 1;
+        }
     }
 
     void HandleNextClick()
     {
-        ShowConsoleMsg("Next");
+        selected_channel = min(selected_channel + 1, nb_channels - 1);
+        previous_selected_channel = selected_channel;
+        PopulateFields();
+
+        int overflow = max(nb_channels - 13, 0);
+        if (overflow > 0 && selected_channel > 6 && selected_channel < (7 + overflow))
+        {
+            channel_offset += 1;
+        }
+    }
+
+    void HandleChannelClick(int index)
+    {
+        selected_channel = index;
+        previous_selected_channel = selected_channel;
+        PopulateFields();
+
+        channel_offset = minmax(0, index - 6, nb_channels - 13);
+    }
+
+    void AddChannel()
+    {
+        selected_channel = nb_channels;
+        nb_channels += 1;
     }
 
 public:
@@ -435,17 +468,23 @@ public:
 
     void RenderChannelsList()
     {
-        ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_ItemSpacing, 4, 0);
+        using namespace std::placeholders; // for `_1, _2 etc`
         if (ImGui::BeginChild(m_ctx, "##channel-list", 0.0, 30))
         {
-            ReaSonusPaginationDirectionButton(
+            ReaSonusPaginationIconButton(
                 m_ctx,
-                PaginationPrevious,
+                assets,
+                IconArrowLeft,
                 "previous-button",
+                selected_channel == 0,
                 std::bind(&CSurf_FP_8_PluginMappingPage::HandlePreviousClick, this));
 
-            for (int i = 0; i < nb_channels; i++)
+            for (int i = channel_offset; i < min(max_items + channel_offset, nb_channels); i++)
             {
+                if (i > channel_offset)
+                {
+                    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_ItemSpacing, 4, 0);
+                }
                 ImGui::SameLine(m_ctx);
                 bool dirty = IsGroupDirty(i);
 
@@ -455,32 +494,69 @@ public:
                     std::to_string(i + 1),
                     i,
                     dirty,
-                    &selected_channel);
+                    selected_channel == i,
+                    std::bind(&CSurf_FP_8_PluginMappingPage::HandleChannelClick, this, _1));
+
+                if (i > channel_offset)
+                {
+                    ImGui::PopStyleVar(m_ctx);
+                }
             }
 
             ImGui::SameLine(m_ctx);
 
-            ReaSonusPaginationDirectionButton(
+            ReaSonusPaginationIconButton(
                 m_ctx,
-                PaginationNext,
+                assets,
+                IconArrowRight,
                 "next-button",
-                std::bind(&CSurf_FP_8_PluginMappingPage::HandlePreviousClick, this));
+                selected_channel == nb_channels - 1,
+                std::bind(&CSurf_FP_8_PluginMappingPage::HandleNextClick, this));
 
-            ImGui::SameLine(m_ctx);
-
-            UiElements::PushReaSonusChannelTabStyle(m_ctx, false);
-            if (ImGui::Button(m_ctx, "+", 30, 30))
-            {
-                selected_channel = nb_channels;
-                nb_channels += 1;
-            }
-            UiElements::PopReaSonusChannelTabStyle(m_ctx);
-
-            ImGui::PopStyleVar(m_ctx);
             ImGui::EndChild(m_ctx);
         }
     }
 
+    void RenderInformationBar()
+    {
+        UiElements::PushReaSonusGroupStyle(m_ctx);
+        if (ImGui::BeginChild(m_ctx, "mapping_content_select", 0.0, 54.0, ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY))
+        {
+            ReaSonusPaginationIconButton(
+                m_ctx,
+                assets,
+                IconFilter,
+                "mapping-filter",
+                std::bind(&CSurf_FP_8_PluginMappingPage::HandlePreviousClick, this));
+
+            ImGui::SameLine(m_ctx);
+
+            ReaSonusPaginationIconButton(
+                m_ctx,
+                assets,
+                IconAddInPlace,
+                "mapping-add-location",
+                std::bind(&CSurf_FP_8_PluginMappingPage::HandlePreviousClick, this));
+
+            ImGui::SameLine(m_ctx);
+
+            ReaSonusPaginationIconButton(
+                m_ctx,
+                assets,
+                IconAdd,
+                "mapping-add",
+                std::bind(&CSurf_FP_8_PluginMappingPage::AddChannel, this));
+
+            ImGui::SameLine(m_ctx);
+            ImGui::Text(m_ctx, std::to_string(selected_channel).c_str());
+            ImGui::SameLine(m_ctx);
+            ImGui::Text(m_ctx, " :: ");
+            ImGui::SameLine(m_ctx);
+            ImGui::Text(m_ctx, std::to_string(channel_offset).c_str());
+            ImGui::EndChild(m_ctx);
+        }
+        UiElements::PopReaSonusGroupStyle(m_ctx);
+    }
     void RenderMappingSelect(double height)
     {
         double space_x, space_y;
@@ -488,9 +564,9 @@ public:
         UiElements::PushReaSonusGroupStyle(m_ctx);
         if (ImGui::BeginChild(m_ctx, "mapping_content_select", 0.0, height, ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY))
         {
-            ReaSonusIcon(m_ctx, assets, IconCog, 48, UI_COLORS::Accent, "unique-id");
-            ImGui::SameLine(m_ctx);
-            ReaSonusIcon(m_ctx, assets, IconArrowRight, 48, UI_COLORS::Accent, "unique-ids");
+            // ReaSonusIcon(m_ctx, assets, IconCog, 48, UI_COLORS::Accent, "unique-id");
+            // ImGui::SameLine(m_ctx);
+            // ReaSonusIcon(m_ctx, assets, IconArrowRight, 48, UI_COLORS::Accent, "unique-ids");
 
             ReaSonusPageTitle(m_ctx, assets, i18n->t("mapping", "edit.select.label").c_str());
             if (params.size() > 0)
@@ -668,6 +744,7 @@ public:
                     {
                         ImGui::Text(m_ctx, selected_plugin < 0 ? "Channels" : std::string(developers[selected_developer] + " :: " + plugins[selected_developer][selected_plugin]).c_str());
                         ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 4);
+                        RenderInformationBar();
                         RenderChannelsList();
 
                         if (ImGui::BeginChild(m_ctx, "mapping_content_area", 0.0, 0.0))

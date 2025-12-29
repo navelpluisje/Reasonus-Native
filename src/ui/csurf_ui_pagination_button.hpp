@@ -14,13 +14,14 @@ static void ReaSonusPaginationButton(
     std::string action_label,
     int value,
     bool alert,
-    int *active_item)
+    bool selected,
+    std::function<void(int index)> on_click = nullptr)
 {
     int menu_button_width = 30;
     int menu_button_height = 30;
 
-    int background_color = value == *active_item ? UI_COLORS::Accent_25 : UI_COLORS::Main_18;
-    int border_color = value == *active_item ? UI_COLORS::Accent : UI_COLORS::Main_38;
+    int background_color = selected ? UI_COLORS::Accent_25 : UI_COLORS::Main_18;
+    int border_color = selected ? UI_COLORS::Accent : UI_COLORS::Main_38;
     int border_width = 1;
     double x_pos_1, y_pos_1, x_mouse_pos, y_mouse_pos;
 
@@ -34,7 +35,7 @@ static void ReaSonusPaginationButton(
         if (hovered)
         {
             ImGui::SetMouseCursor(m_ctx, ImGui::MouseCursor_Hand);
-            background_color = value == *active_item ? UI_COLORS::Accent_50 : UI_COLORS::Main_38;
+            background_color = selected ? UI_COLORS::Accent_50 : UI_COLORS::Main_38;
         }
 
         /**
@@ -42,9 +43,9 @@ static void ReaSonusPaginationButton(
          */
         if (ImGui::IsItemActive(m_ctx) || (hovered && ImGui::IsMouseClicked(m_ctx, 0)))
         {
-            background_color = value == *active_item ? UI_COLORS::Accent_50 : UI_COLORS::Main_38;
+            background_color = selected ? UI_COLORS::Accent_50 : UI_COLORS::Main_38;
             border_width = 3;
-            *active_item = value;
+            on_click(value);
         }
 
         ImGui_DrawList *list = ImGui::GetForegroundDrawList(m_ctx);

@@ -6,6 +6,8 @@
 namespace UI_COLORS
 {
     const int White = 0xffffffff;
+    const int White_50 = 0xffffff7f;
+    const int White_25 = 0xffffff3f;
     const int Main_15 = 0x272727ff;
     const int Main_18 = 0x2e2e2eff;
     const int Main_23 = 0x383A3CFF;
