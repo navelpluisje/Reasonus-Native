@@ -471,6 +471,7 @@ public:
     void RenderChannelsList()
     {
         using namespace std::placeholders; // for `_1, _2 etc`
+        bool has_style_var = false;
         if (ImGui::BeginChild(m_ctx, "##channel-list", 0.0, 30))
         {
             ReaSonusPaginationIconButton(
@@ -483,10 +484,13 @@ public:
 
             for (int i = channel_offset; i < min(max_items + channel_offset, nb_channels); i++)
             {
+                has_style_var = false;
                 if (i > channel_offset)
                 {
+                    has_style_var = true;
                     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_ItemSpacing, 4, 0);
                 }
+
                 ImGui::SameLine(m_ctx);
                 bool dirty = IsGroupDirty(i);
 
@@ -499,7 +503,7 @@ public:
                     selected_channel == i,
                     std::bind(&CSurf_FP_8_PluginMappingPage::HandleChannelClick, this, _1));
 
-                if (i > channel_offset)
+                if (has_style_var)
                 {
                     ImGui::PopStyleVar(m_ctx);
                 }
