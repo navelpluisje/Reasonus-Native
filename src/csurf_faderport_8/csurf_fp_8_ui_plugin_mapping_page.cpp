@@ -402,12 +402,64 @@ protected:
         channel_offset = minmax(0, index - 6, max(nb_channels - 13, 0));
     }
 
-    void AddChannel()
+    void HandleAddChannel()
     {
         selected_channel = nb_channels;
         nb_channels += 1;
 
         HandleChannelClick(selected_channel);
+    }
+
+    void HandleDeleteChannel()
+    {
+        std::string select = "select_" + std::to_string(selected_channel);
+        std::string fader = "fader_" + std::to_string(selected_channel);
+        std::string next_select, next_fader;
+
+        if (plugin_params.has(select))
+        {
+            plugin_params.remove(select);
+        }
+        if (plugin_params.has(fader))
+        {
+            plugin_params.remove(fader);
+        }
+
+        nb_channels -= 1;
+
+        if (selected_channel == nb_channels)
+        {
+            HandleChannelClick(selected_channel - 1);
+            return;
+        }
+
+        for (int i = selected_channel; i <= nb_channels; i++)
+        {
+            select = "select_" + std::to_string(i);
+            fader = "fader_" + std::to_string(i);
+            next_select = "select_" + std::to_string(i + 1);
+            next_fader = "fader_" + std::to_string(i + 1);
+
+            if (plugin_params.has(next_select))
+            {
+                plugin_params.set(select, plugin_params[next_select]);
+            }
+            else
+            {
+                plugin_params.remove(select);
+            }
+
+            if (plugin_params.has(next_fader))
+            {
+                plugin_params.set(fader, plugin_params[next_fader]);
+            }
+            else
+            {
+                plugin_params.remove(fader);
+            }
+        }
+
+        PopulateFields();
     }
 
 public:
@@ -551,7 +603,16 @@ public:
                 assets,
                 IconAdd,
                 "mapping-add",
-                std::bind(&CSurf_FP_8_PluginMappingPage::AddChannel, this));
+                std::bind(&CSurf_FP_8_PluginMappingPage::HandleAddChannel, this));
+
+            ImGui::SameLine(m_ctx);
+
+            ReaSonusPaginationIconButton(
+                m_ctx,
+                assets,
+                IconDelete,
+                "mapping-delete",
+                std::bind(&CSurf_FP_8_PluginMappingPage::HandleDeleteChannel, this));
 
             ImGui::SameLine(m_ctx);
             ImGui::Text(m_ctx, std::to_string(selected_channel).c_str());
@@ -792,9 +853,7 @@ public:
 
     void Reset() override
     {
-        mINI::INIFile file(GetPluginPath());
-        file.read(plugin_params);
-        file.read(previous_plugin_params);
+        SetPluginData();
         PopulateFields();
     }
 

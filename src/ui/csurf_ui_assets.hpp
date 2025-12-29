@@ -26,6 +26,7 @@ enum IconFont
     IconCog = 'p',
     IconInformation = 'q',
     IconRemove = 'r',
+    IconDelete = 's',
 };
 
 class CSurf_UI_Assets
