@@ -356,7 +356,7 @@ protected:
 
     bool DirtyCheck()
     {
-        if (plugin_dirty)
+        if (changed_items > 0)
         {
             int res = MB(i18n->t("mapping", "popup.unsaved.message").c_str(), i18n->t("mapping", "popup.unsaved.title").c_str(), 3);
             if (res == 6)
@@ -834,6 +834,7 @@ public:
                     selected_plugin = -1;
                     previous_selected_plugin = -1;
                     selected_channel = 0;
+                    changed_items = 0;
                     previous_selected_channel = 0;
                     previous_selected_developer = selected_developer;
                 }
