@@ -5,7 +5,7 @@
 #include "../ui/csurf_ui_page_title.hpp"
 #include "../ui/csurf_ui_text_input.hpp"
 #include "../ui/csurf_ui_pagination_button.hpp"
-#include "../ui/csurf_ui_pagination_icon_button.hpp"
+#include "../ui/csurf_ui_icon_button.hpp"
 
 typedef std::tuple<int, std::string, int> PluginParam;
 
@@ -17,6 +17,7 @@ protected:
 
     const int max_items = 13;
     int channel_offset = 0;
+    int changed_items = 0;
 
     bool render_started = false;
     std::string plugin_folder_path = std::string(GetResourcePath()) + pathSeparator + "ReaSonus" + pathSeparator + "Plugins";
@@ -373,7 +374,7 @@ protected:
         previous_selected_channel = selected_channel;
         PopulateFields();
 
-        int overflow = max(nb_channels - 13, 0);
+        int overflow = max(nb_channels - max_items, 0);
         if (overflow > 0 && selected_channel > 5 && selected_channel < (6 + overflow))
         {
             channel_offset -= 1;
@@ -386,7 +387,7 @@ protected:
         previous_selected_channel = selected_channel;
         PopulateFields();
 
-        int overflow = max(nb_channels - 13, 0);
+        int overflow = max(nb_channels - max_items, 0);
         if (overflow > 0 && selected_channel > 6 && selected_channel < (7 + overflow))
         {
             channel_offset += 1;
@@ -399,13 +400,64 @@ protected:
         previous_selected_channel = selected_channel;
         PopulateFields();
 
-        channel_offset = minmax(0, index - 6, max(nb_channels - 13, 0));
+        channel_offset = minmax(0, index - 6, max(nb_channels - max_items, 0));
     }
 
-    void HandleAddChannel()
+    void HandleResetChannel()
     {
-        selected_channel = nb_channels;
+        std::string select = "select_" + std::to_string(selected_channel);
+        std::string fader = "fader_" + std::to_string(selected_channel);
+
+        plugin_params.set(select, previous_plugin_params[select]);
+        plugin_params.set(fader, previous_plugin_params[fader]);
+
+        PopulateFields();
+    }
+
+    void HandleAddChannelAfterSelected()
+    {
+        std::string select, fader, next_select, next_fader;
+
+        selected_channel = selected_channel + 1;
         nb_channels += 1;
+
+        for (int i = nb_channels - 1; i >= selected_channel; i--)
+        {
+            select = "select_" + std::to_string(i);
+            fader = "fader_" + std::to_string(i);
+            next_select = "select_" + std::to_string(i + 1);
+            next_fader = "fader_" + std::to_string(i + 1);
+
+            if (plugin_params.has(select))
+            {
+                plugin_params.set(next_select, plugin_params[select]);
+            }
+            else
+            {
+                plugin_params.remove(next_select);
+            }
+
+            if (plugin_params.has(fader))
+            {
+                plugin_params.set(next_fader, plugin_params[fader]);
+            }
+            else
+            {
+                plugin_params.remove(next_fader);
+            }
+        }
+
+        select = "select_" + std::to_string(selected_channel);
+        fader = "fader_" + std::to_string(selected_channel);
+
+        if (plugin_params.has(select))
+        {
+            plugin_params.remove(select);
+        }
+        if (plugin_params.has(fader))
+        {
+            plugin_params.remove(fader);
+        }
 
         HandleChannelClick(selected_channel);
     }
@@ -473,7 +525,7 @@ public:
 
     virtual ~CSurf_FP_8_PluginMappingPage() {};
 
-    void RenderMappingsLlist()
+    void RenderMappingsList()
     {
         if (ImGui::BeginChild(m_ctx, "mapping_lists", 240.0, 0.0))
         {
@@ -523,15 +575,21 @@ public:
     void RenderChannelsList()
     {
         using namespace std::placeholders; // for `_1, _2 etc`
+
+        double space_x, space_y;
+        changed_items = 0;
         bool has_style_var = false;
+        ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_ItemSpacing, 12, 12);
+
         if (ImGui::BeginChild(m_ctx, "##channel-list", 0.0, 30))
         {
-            ReaSonusPaginationIconButton(
+            ReaSonusIconButton(
                 m_ctx,
                 assets,
                 IconArrowLeft,
                 "previous-button",
                 selected_channel == 0,
+                ButtonThemeDefault,
                 std::bind(&CSurf_FP_8_PluginMappingPage::HandlePreviousClick, this));
 
             for (int i = channel_offset; i < min(max_items + channel_offset, nb_channels); i++)
@@ -545,6 +603,11 @@ public:
 
                 ImGui::SameLine(m_ctx);
                 bool dirty = IsGroupDirty(i);
+
+                if (dirty)
+                {
+                    changed_items += 1;
+                }
 
                 ReaSonusPaginationButton(
                     m_ctx,
@@ -562,64 +625,79 @@ public:
             }
 
             ImGui::SameLine(m_ctx);
+            ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
+            ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + space_x - 32);
 
-            ReaSonusPaginationIconButton(
+            ReaSonusIconButton(
                 m_ctx,
                 assets,
                 IconArrowRight,
                 "next-button",
                 selected_channel == nb_channels - 1,
+                ButtonThemeDefault,
                 std::bind(&CSurf_FP_8_PluginMappingPage::HandleNextClick, this));
 
             ImGui::EndChild(m_ctx);
         }
+        ImGui::PopStyleVar(m_ctx);
     }
 
     void RenderInformationBar()
     {
+        double space_x, space_y;
+
         UiElements::PushReaSonusGroupStyle(m_ctx);
         if (ImGui::BeginChild(m_ctx, "mapping_content_select", 0.0, 54.0, ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY))
         {
-            ReaSonusPaginationIconButton(
-                m_ctx,
-                assets,
-                IconFilter,
-                "mapping-filter",
-                std::bind(&CSurf_FP_8_PluginMappingPage::HandlePreviousClick, this));
+            ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
+
+            if (ImGui::BeginChild(m_ctx, "mapping_content_select", 0.0, space_y, ImGui::ChildFlags_AutoResizeY))
+            {
+                ImGui::PushFont(m_ctx, assets->GetMainFontBold(), 13);
+                ImGui::PushStyleColor(m_ctx, ImGui::Col_Text, UI_COLORS::Accent);
+                ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 8);
+
+                ImGui::Text(m_ctx, i18n->t("mapping", "edit.message.changed", std::to_string(changed_items), std::to_string(nb_channels)).c_str());
+
+                ImGui::PopStyleColor(m_ctx);
+                ImGui::PopFont(m_ctx);
+                ImGui::EndChild(m_ctx);
+            }
 
             ImGui::SameLine(m_ctx);
 
-            ReaSonusPaginationIconButton(
+            ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
+
+            ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + space_x - 106);
+
+            ReaSonusIconButton(
                 m_ctx,
                 assets,
-                IconAddInPlace,
-                "mapping-add-location",
-                std::bind(&CSurf_FP_8_PluginMappingPage::HandlePreviousClick, this));
+                IconUndo,
+                "mapping-reset-group",
+                ButtonThemeAccent,
+                std::bind(&CSurf_FP_8_PluginMappingPage::HandleResetChannel, this));
 
             ImGui::SameLine(m_ctx);
 
-            ReaSonusPaginationIconButton(
+            ReaSonusIconButton(
                 m_ctx,
                 assets,
                 IconAdd,
                 "mapping-add",
-                std::bind(&CSurf_FP_8_PluginMappingPage::HandleAddChannel, this));
+                ButtonThemeAccent,
+                std::bind(&CSurf_FP_8_PluginMappingPage::HandleAddChannelAfterSelected, this));
 
             ImGui::SameLine(m_ctx);
 
-            ReaSonusPaginationIconButton(
+            ReaSonusIconButton(
                 m_ctx,
                 assets,
                 IconDelete,
                 "mapping-delete",
+                ButtonThemeAccent,
                 std::bind(&CSurf_FP_8_PluginMappingPage::HandleDeleteChannel, this));
 
-            ImGui::SameLine(m_ctx);
-            ImGui::Text(m_ctx, std::to_string(selected_channel).c_str());
-            ImGui::SameLine(m_ctx);
-            ImGui::Text(m_ctx, " :: ");
-            ImGui::SameLine(m_ctx);
-            ImGui::Text(m_ctx, std::to_string(channel_offset).c_str());
             ImGui::EndChild(m_ctx);
         }
         UiElements::PopReaSonusGroupStyle(m_ctx);
@@ -804,14 +882,14 @@ public:
             ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_ItemSpacing, 12.0, 12.0);
             if (ImGui::BeginChild(m_ctx, "main_mapping_content", 0.0, 0.0, ImGui::ChildFlags_None))
             {
-                RenderMappingsLlist();
+                RenderMappingsList();
                 ImGui::SameLine(m_ctx);
 
                 if (ImGui::BeginChild(m_ctx, "mapping_content", 0.0, 0.0))
                 {
                     if (selected_plugin > -1 && selected_plugin_exists)
                     {
-                        ImGui::Text(m_ctx, selected_plugin < 0 ? "Channels" : std::string(developers[selected_developer] + " :: " + plugins[selected_developer][selected_plugin]).c_str());
+                        ImGui::Text(m_ctx, selected_plugin < 0 ? "Groups" : std::string(developers[selected_developer] + " :: " + plugins[selected_developer][selected_plugin]).c_str());
                         ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 4);
                         RenderInformationBar();
                         RenderChannelsList();
@@ -853,6 +931,8 @@ public:
 
     void Reset() override
     {
+        channel_offset = 0;
+        selected_channel = 0;
         SetPluginData();
         PopulateFields();
     }

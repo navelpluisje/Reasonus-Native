@@ -8,19 +8,28 @@
 #include "../shared/csurf_utils.hpp"
 #include "csurf_ui_colors.hpp"
 
-static void ReaSonusPaginationIconButton(
+enum IconButtonTheme
+{
+    ButtonThemeDefault,
+    ButtonThemeAccent,
+};
+
+static void ReaSonusIconButton(
     ImGui_Context *m_ctx,
     CSurf_UI_Assets *assets,
     IconFont icon,
     std::string id,
     bool disabled = false,
+    IconButtonTheme theme = ButtonThemeDefault,
     std::function<void()> on_click = nullptr)
 {
     int menu_button_width = 30;
     int menu_button_height = 30;
 
-    int background_color = UI_COLORS::Main_18;
-    int border_color = UI_COLORS::Main_38;
+    int background_color = theme == ButtonThemeDefault ? UI_COLORS::Main_18 : UI_COLORS::Transparent;
+    int border_color = theme == ButtonThemeDefault ? UI_COLORS::Main_38 : UI_COLORS::Transparent;
+    int text_color = theme == ButtonThemeDefault ? UI_COLORS::White : UI_COLORS::Accent;
+
     int border_width = 1;
     double x_pos_1, y_pos_1, x_mouse_pos, y_mouse_pos;
 
@@ -35,7 +44,13 @@ static void ReaSonusPaginationIconButton(
         if (hovered)
         {
             ImGui::SetMouseCursor(m_ctx, ImGui::MouseCursor_Hand);
-            background_color = UI_COLORS::Main_38;
+            background_color = theme == ButtonThemeDefault ? UI_COLORS::Main_38 : UI_COLORS::Transparent;
+            border_color = theme == ButtonThemeDefault ? UI_COLORS::Main_38 : UI_COLORS::Accent_50;
+        }
+
+        if (disabled)
+        {
+            text_color = theme == ButtonThemeDefault ? UI_COLORS::White_25 : UI_COLORS::Accent_25;
         }
 
         /**
@@ -43,7 +58,7 @@ static void ReaSonusPaginationIconButton(
          */
         if ((hovered && ImGui::IsMouseReleased(m_ctx, 0)))
         {
-            background_color = UI_COLORS::Main_38;
+            background_color = theme == ButtonThemeDefault ? UI_COLORS::Main_38 : UI_COLORS::Transparent;
             border_width = 2;
             if (!disabled)
             {
@@ -55,20 +70,21 @@ static void ReaSonusPaginationIconButton(
 
         ImGui::DrawList_AddRectFilled(list, x_pos_1, y_pos_1, x_pos_1 + menu_button_width, y_pos_1 + menu_button_height, background_color, 4);
         ImGui::DrawList_AddRect(list, x_pos_1, y_pos_1, x_pos_1 + menu_button_width, y_pos_1 + menu_button_height, border_color, 4, ImGui::DrawFlags_None, border_width);
-        ImGui::DrawList_AddText(list, x_pos_1 + 5, y_pos_1 + 5, disabled ? UI_COLORS::White_25 : UI_COLORS::White, std::string(1, icon).c_str());
+        ImGui::DrawList_AddText(list, x_pos_1 + 5, y_pos_1 + 5, text_color, std::string(1, icon).c_str());
         ImGui::EndChild(m_ctx);
     }
     ImGui::PopFont(m_ctx);
 }
 
-static void ReaSonusPaginationIconButton(
+static void ReaSonusIconButton(
     ImGui_Context *m_ctx,
     CSurf_UI_Assets *assets,
     IconFont icon,
     std::string id,
+    IconButtonTheme theme = ButtonThemeDefault,
     std::function<void()> on_click = nullptr)
 {
-    ReaSonusPaginationIconButton(m_ctx, assets, icon, id, false, on_click);
+    ReaSonusIconButton(m_ctx, assets, icon, id, false, theme, on_click);
 }
 
 #endif
