@@ -416,9 +416,14 @@ protected:
 
     void HandleAddChannelAfterSelected()
     {
+        HandleAddChannelAfter(selected_channel);
+    }
+
+    void HandleAddChannelAfter(int index)
+    {
         std::string select, fader, next_select, next_fader;
 
-        selected_channel = selected_channel + 1;
+        selected_channel = index + 1;
         nb_channels += 1;
 
         for (int i = nb_channels - 1; i >= selected_channel; i--)
@@ -464,8 +469,13 @@ protected:
 
     void HandleDeleteChannel()
     {
-        std::string select = "select_" + std::to_string(selected_channel);
-        std::string fader = "fader_" + std::to_string(selected_channel);
+        HandleDeleteChannelById(selected_channel);
+    }
+
+    void HandleDeleteChannelById(int index)
+    {
+        std::string select = "select_" + std::to_string(index);
+        std::string fader = "fader_" + std::to_string(index);
         std::string next_select, next_fader;
 
         if (plugin_params.has(select))
@@ -485,7 +495,7 @@ protected:
             return;
         }
 
-        for (int i = selected_channel; i <= nb_channels; i++)
+        for (int i = index; i <= nb_channels; i++)
         {
             select = "select_" + std::to_string(i);
             fader = "fader_" + std::to_string(i);
@@ -510,8 +520,44 @@ protected:
                 plugin_params.remove(fader);
             }
         }
-
         PopulateFields();
+    }
+
+    void handleGroupDrop(int from, int to)
+    {
+        if (from == to)
+        {
+            return;
+        }
+        int from_id = to > from ? from : from + 1;
+        int to_id = to < from ? to : to + 1;
+
+        std::string select = "select_" + std::to_string(to_id);
+        std::string fader = "fader_" + std::to_string(to_id);
+        std::string from_select = "select_" + std::to_string(from_id);
+        std::string from_fader = "fader_" + std::to_string(from_id);
+
+        this->HandleAddChannelAfter(to_id - 1);
+
+        if (plugin_params.has(from_select))
+        {
+            plugin_params.set(select, plugin_params[from_select]);
+        }
+        else
+        {
+            plugin_params.remove(select);
+        }
+
+        if (plugin_params.has(from_fader))
+        {
+            plugin_params.set(fader, plugin_params[from_fader]);
+        }
+        else
+        {
+            plugin_params.remove(fader);
+        }
+
+        HandleDeleteChannelById(from_id);
     }
 
 public:
@@ -616,7 +662,8 @@ public:
                     i,
                     dirty,
                     selected_channel == i,
-                    std::bind(&CSurf_FP_8_PluginMappingPage::HandleChannelClick, this, _1));
+                    std::bind(&CSurf_FP_8_PluginMappingPage::HandleChannelClick, this, _1),
+                    std::bind(&CSurf_FP_8_PluginMappingPage::handleGroupDrop, this, _1, _2));
 
                 if (has_style_var)
                 {
@@ -702,6 +749,7 @@ public:
         }
         UiElements::PopReaSonusGroupStyle(m_ctx);
     }
+
     void RenderMappingSelect(double height)
     {
         double space_x, space_y;
