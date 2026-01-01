@@ -32,7 +32,7 @@ public:
                 ImGui::GetContentRegionAvail(m_ctx, &available_width, &available_height);
                 ImGui::PushTextWrapPos(m_ctx, available_width);
 
-                ReaSonusPageTitle(m_ctx, assets, i18n->t("about", "about.title").c_str());
+                ReaSonusPageTitle(m_ctx, assets, i18n->t("about", "about.title").c_str(), true);
 
                 ImGui::Text(m_ctx, i18n->t("about", "about.top").c_str());
                 ImGui::BulletText(m_ctx, i18n->t("about", "about.list.1").c_str());
@@ -49,12 +49,12 @@ public:
             if (ImGui::BeginChild(m_ctx, "filter_content", 0.0, 0.0))
             {
                 UiElements::PushReaSonusGroupStyle(m_ctx);
-                if (ImGui::BeginChild(m_ctx, "Contribute & Links", 0.0, 278.0, ImGui::ChildFlags_FrameStyle))
+                if (ImGui::BeginChild(m_ctx, "Contribute & Links", 0.0, device != FP_V2 ? 288.0 : 0.0, ImGui::ChildFlags_FrameStyle))
                 {
                     ImGui::GetContentRegionAvail(m_ctx, &available_width, &available_height);
                     ImGui::PushTextWrapPos(m_ctx, available_width);
 
-                    ReaSonusPageTitle(m_ctx, assets, i18n->t("about", "contribute.title").c_str());
+                    ReaSonusPageTitle(m_ctx, assets, i18n->t("about", "contribute.title").c_str(), true);
                     ImGui::Text(m_ctx, i18n->t("about", "contribute.top").c_str());
                     ImGui::TextLinkOpenURL(m_ctx, i18n->t("about", "contribute.link.coffee").c_str(), "https://buymeacoffee.com/navelpluisje");
                     ImGui::SameLine(m_ctx);
@@ -89,7 +89,7 @@ public:
                         ImGui::GetContentRegionAvail(m_ctx, &available_width, &available_height);
                         ImGui::PushTextWrapPos(m_ctx, available_width);
 
-                        ReaSonusPageTitle(m_ctx, assets, i18n->t("about", "thanks.title").c_str());
+                        ReaSonusPageTitle(m_ctx, assets, i18n->t("about", "thanks.title").c_str(), true);
                         ImGui::Text(m_ctx, i18n->t("about", "thanks.bottom").c_str());
                         ImGui::BulletText(m_ctx, i18n->t("about", "thanks.list.1").c_str());
                         ImGui::BulletText(m_ctx, i18n->t("about", "thanks.list.2").c_str());

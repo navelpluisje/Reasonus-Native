@@ -318,7 +318,7 @@ void ReaSonusTranslationEditor::Frame()
 
     PushReaSonusColors(m_ctx);
     PushReaSonusStyle(m_ctx);
-    ImGui::PushFont(m_ctx, assets->GetMainFont(), 13);
+    ImGui::PushFont(m_ctx, assets->GetMainFont(), FontSizeDefault);
     ImGui::SetNextWindowSize(m_ctx, 640, 612, ImGui::Cond_Once);
     bool open{true};
 

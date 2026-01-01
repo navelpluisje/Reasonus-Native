@@ -5,7 +5,6 @@
 #include <string>
 #include "csurf_ui_elements.hpp"
 #include "csurf_ui_colors.hpp"
-#include "csurf_ui_icon.hpp"
 
 static void ReaSonusSimpleTooltip(
     ImGui_Context *m_ctx,

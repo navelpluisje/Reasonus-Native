@@ -29,6 +29,13 @@ enum IconFont
     IconDelete = 's',
 };
 
+enum FonSize
+{
+    FontSizeDefault = 14,
+    FontSizeLarge = 16,
+    FontSizePageTitle = 18,
+};
+
 class CSurf_UI_Assets
 {
 private:

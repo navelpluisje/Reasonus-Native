@@ -7,13 +7,13 @@
 #include "csurf_ui_elements.hpp"
 #include "csurf_ui_assets.hpp"
 
-static void ReaSonusPageTitle(ImGui_Context *m_ctx, CSurf_UI_Assets *assets, std::string label)
+static void ReaSonusPageTitle(ImGui_Context *m_ctx, CSurf_UI_Assets *assets, std::string label, bool sub_title = false)
 {
     std::string id = "##" + label;
     UiElements::PushReaSonusPageTitleStyle(m_ctx);
     if (ImGui::BeginChild(m_ctx, ("container" + label).c_str(), 0.0, 32.0, ImGui::ChildFlags_FrameStyle))
     {
-        ImGui::PushFont(m_ctx, assets->GetMainFontBold(), 15);
+        ImGui::PushFont(m_ctx, assets->GetMainFontBold(), sub_title ? FontSizeLarge : FontSizePageTitle);
         ImGui::Text(m_ctx, label.c_str());
         ImGui::PopFont(m_ctx);
 

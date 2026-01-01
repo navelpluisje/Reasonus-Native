@@ -225,8 +225,8 @@ void ReaSonus8ControlPanel::Frame()
 
     PushReaSonusColors(m_ctx);
     PushReaSonusStyle(m_ctx);
-    ImGui::PushFont(m_ctx, assets->GetMainFont(), 13);
-    ImGui::SetNextWindowSize(m_ctx, 1024, 640, ImGui::Cond_Once);
+    ImGui::PushFont(m_ctx, assets->GetMainFont(), FontSizeDefault);
+    ImGui::SetNextWindowSize(m_ctx, 1048, 660, ImGui::Cond_Once);
     bool open{true};
     if (ImGui::Begin(m_ctx, g_name, &open, ImGui::WindowFlags_NoCollapse | ImGui::WindowFlags_NoResize))
     {
@@ -262,7 +262,7 @@ void ReaSonus8ControlPanel::Frame()
             UiElements::PopReaSonusContentStyle(m_ctx);
             if (ImGui::BeginChild(m_ctx, "main_content_area", 0.0, current_page != 4 ? -34.0 : 0, ImGui::ChildFlags_None))
             {
-                ReaSonusPageTitle(m_ctx, assets, i18n->t("control-panel", menu_items[current_page]));
+                ReaSonusPageTitle(m_ctx, assets, i18n->t("control-panel", menu_items[current_page]), false);
 
                 if (ImGui::BeginChild(m_ctx, "main_content_area", 0.0, -12.0, ImGui::ChildFlags_None))
                 {

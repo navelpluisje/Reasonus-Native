@@ -1,7 +1,6 @@
 #include "../ui/csurf_ui_page_content.hpp"
 #include <string.h>
 #include "../shared/csurf_utils.hpp"
-#include "../ui/csurf_ui_icon.hpp"
 #include "../ui/csurf_ui_page_title.hpp"
 #include "../ui/csurf_ui_text_input.hpp"
 #include "../ui/csurf_ui_pagination_button.hpp"
@@ -557,6 +556,7 @@ protected:
             plugin_params.remove(fader);
         }
 
+        selected_channel = to;
         HandleDeleteChannelById(from_id);
     }
 
@@ -700,7 +700,7 @@ public:
 
             if (ImGui::BeginChild(m_ctx, "mapping_content_select", 0.0, space_y, ImGui::ChildFlags_AutoResizeY))
             {
-                ImGui::PushFont(m_ctx, assets->GetMainFontBold(), 13);
+                ImGui::PushFont(m_ctx, assets->GetMainFontBold(), FontSizeDefault);
                 ImGui::PushStyleColor(m_ctx, ImGui::Col_Text, UI_COLORS::Accent);
                 ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 8);
 
@@ -761,7 +761,7 @@ public:
             // ImGui::SameLine(m_ctx);
             // ReaSonusIcon(m_ctx, assets, IconArrowRight, 48, UI_COLORS::Accent, "unique-ids");
 
-            ReaSonusPageTitle(m_ctx, assets, i18n->t("mapping", "edit.select.label").c_str());
+            ReaSonusPageTitle(m_ctx, assets, i18n->t("mapping", "edit.select.label").c_str(), true);
             if (params.size() > 0)
             {
                 ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
@@ -815,7 +815,7 @@ public:
         UiElements::PushReaSonusGroupStyle(m_ctx);
         if (ImGui::BeginChild(m_ctx, "mapping_content_fader", 0.0, height, ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY))
         {
-            ReaSonusPageTitle(m_ctx, assets, i18n->t("mapping", "edit.fader.label"));
+            ReaSonusPageTitle(m_ctx, assets, i18n->t("mapping", "edit.fader.label"), true);
             if (params.size() > 0)
             {
                 ReaSonusComboInput(m_ctx, i18n->t("mapping", "edit.fader.param.label"), params, &fader_param_index);
@@ -858,7 +858,7 @@ public:
         ImGui::PopStyleColor(m_ctx);
         ImGui::PopFont(m_ctx);
 
-        ImGui::PushFont(m_ctx, assets->GetMainFont(), 15);
+        ImGui::PushFont(m_ctx, assets->GetMainFont(), FontSizeLarge);
         ImGui::CalcTextSize(m_ctx, content.c_str(), &text_width, &text_height);
         ImGui::SetCursorPosX(m_ctx, available_width / 2 - text_width / 2);
         ImGui::SetCursorPosY(m_ctx, (available_height / 2 - text_height / 2) + 40);

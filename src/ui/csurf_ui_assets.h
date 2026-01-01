@@ -9,4 +9,12 @@ constexpr unsigned char reasonus_icons_file[] = {
 #include "../../lib/assets/reasonus-icons.ipp"
 };
 
+constexpr unsigned char reasonus_font_normal_file[] = {
+#include "../../lib/assets/Roboto-Regular.ipp"
+};
+
+constexpr unsigned char reasonus_font_bold_file[] = {
+#include "../../lib/assets/Roboto-Bold.ipp"
+};
+
 #endif

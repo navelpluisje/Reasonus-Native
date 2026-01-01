@@ -3,10 +3,10 @@
 
 CSurf_UI_Assets::CSurf_UI_Assets(ImGui_Context *m_ctx)
 {
-    main_font = ImGui::CreateFont("Arial", ImGui::FontFlags_None);
+    main_font = ImGui::CreateFontFromMem(reinterpret_cast<const char *>(reasonus_font_normal_file), sizeof(reasonus_font_normal_file));
     ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(main_font));
 
-    main_font_bold = ImGui::CreateFont("Arial", ImGui::FontFlags_Bold);
+    main_font_bold = ImGui::CreateFontFromMem(reinterpret_cast<const char *>(reasonus_font_bold_file), sizeof(reasonus_font_bold_file));
     ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(main_font_bold));
 
     icon_font = ImGui::CreateFontFromMem(reinterpret_cast<const char *>(reasonus_icons_file), sizeof(reasonus_icons_file));

@@ -1,5 +1,6 @@
 #include "csurf_ui_elements.hpp"
 #include "csurf_ui_colors.hpp"
+#include "csurf_ui_assets.hpp"
 
 void UiElements::PushReaSonusWindowStyle(ImGui_Context *m_ctx)
 {
@@ -106,7 +107,7 @@ void UiElements::PopReaSonusFieldGroupStyle(ImGui_Context *m_ctx)
 
 void UiElements::PushReaSonusButtonStyle(ImGui_Context *m_ctx, ImGui_Font *button_font)
 {
-    ImGui::PushFont(m_ctx, button_font, 13);
+    ImGui::PushFont(m_ctx, button_font, FontSizeDefault);
 
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_ButtonTextAlign, 0.5, 0.5);
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 16, 8);
@@ -129,7 +130,7 @@ void UiElements::PopReaSonusButtonStyle(ImGui_Context *m_ctx)
 
 void UiElements::PushReaSonusButtonOutlineStyle(ImGui_Context *m_ctx, ImGui_Font *button_font)
 {
-    ImGui::PushFont(m_ctx, button_font, 13);
+    ImGui::PushFont(m_ctx, button_font, FontSizeDefault);
 
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_ButtonTextAlign, 0.5, 0.5);
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 16, 8);

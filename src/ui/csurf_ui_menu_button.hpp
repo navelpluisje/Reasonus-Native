@@ -56,7 +56,7 @@ static void ReaSonusMenuButton(
 
         // ImGui::DrawList_AddImage(list, icon, x_pos_1 + 9, y_pos_1 + 9, x_pos_1 + 33, y_pos_1 + 33);
 
-        ImGui::PushFont(m_ctx, assets->GetMainFontBold(), 15);
+        ImGui::PushFont(m_ctx, assets->GetMainFontBold(), FontSizeLarge);
         double font_height = ImGui::GetTextLineHeight(m_ctx);
         ImGui::DrawList_AddText(list, x_pos_1 + 42, y_pos_1 + (menu_button_height - font_height) / 2, UI_COLORS::White, action_label.c_str());
         ImGui::PopFont(m_ctx);

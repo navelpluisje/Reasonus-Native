@@ -61,7 +61,7 @@ static void ReaSonusPaginationButton(
             ImGui::DrawList_AddCircleFilled(list, x_pos_1 + 27, y_pos_1 + 2, 4, UI_COLORS::Main_18);
             ImGui::DrawList_AddCircleFilled(list, x_pos_1 + 27, y_pos_1 + 2, 4, UI_COLORS::Success_50);
         }
-        ImGui::PushFont(m_ctx, assets->GetMainFontBold(), 13);
+        ImGui::PushFont(m_ctx, assets->GetMainFontBold(), FontSizeDefault);
         ImGui::CalcTextSize(m_ctx, action_label.c_str(), &text_width, &text_height);
         ImGui::DrawList_AddText(list, x_pos_1 + (menu_button_width - text_width) / 2, y_pos_1 + (menu_button_height - text_height) / 2, UI_COLORS::White, action_label.c_str());
         ImGui::PopFont(m_ctx);
@@ -86,7 +86,7 @@ static void ReaSonusPaginationButton(
                 ImGui::DrawList_AddRectFilled(list, x_pos_1 - 20, y_pos_1 + 40, x_pos_1 + menu_button_width - 20, y_pos_1 + menu_button_height + 40, background_color, 4);
                 ImGui::DrawList_AddRect(list, x_pos_1 - 20, y_pos_1 + 40, x_pos_1 + menu_button_width - 20, y_pos_1 + menu_button_height + 40, border_color, 4, ImGui::DrawFlags_None, 1);
 
-                ImGui::PushFont(m_ctx, assets->GetMainFontBold(), 13);
+                ImGui::PushFont(m_ctx, assets->GetMainFontBold(), FontSizeDefault);
                 ImGui::CalcTextSize(m_ctx, action_label.c_str(), &text_width, &text_height);
                 ImGui::DrawList_AddText(list, x_pos_1 - 20 + (menu_button_width - text_width) / 2, y_pos_1 + 40 + (menu_button_height - text_height) / 2, UI_COLORS::White, action_label.c_str());
                 ImGui::PopFont(m_ctx);

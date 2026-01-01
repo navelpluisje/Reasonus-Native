@@ -145,7 +145,7 @@ void CSurf_UI_FunctionKeysPage::RenderFunction(ImGui_Context *m_ctx, int index, 
 
     if (ImGui::BeginChild(m_ctx, idx.c_str(), 0.0, 0.0, ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY | ImGui::ChildFlags_ResizeY))
     {
-        ImGui::PushFont(m_ctx, assets->GetMainFontBold(), 13);
+        ImGui::PushFont(m_ctx, assets->GetMainFontBold(), FontSizeDefault);
         ImGui::PushStyleColor(m_ctx, ImGui::Col_Text, UI_COLORS::Accent);
         if (type == TypeFunction)
         {

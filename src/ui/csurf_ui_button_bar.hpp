@@ -35,7 +35,7 @@ static void ReaSonusButtonBar(
             ImGui::SameLine(m_ctx);
         }
 
-        ImGui::PushFont(m_ctx, assets->GetMainFontBold(), 13);
+        ImGui::PushFont(m_ctx, assets->GetMainFontBold(), FontSizeDefault);
         ImGui::CalcTextSize(m_ctx, action_label.c_str(), &x_pos_1, &y_pos_1);
         float buttonWidth1 = (int)x_pos_1 + button_padding_x * 2.f;
         ImGui::CalcTextSize(m_ctx, cancel_label.c_str(), &x_pos_1, &y_pos_1);
