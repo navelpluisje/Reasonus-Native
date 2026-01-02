@@ -1,15 +1,7 @@
 #include "../ui/csurf_ui_page_content.hpp"
 #include <string.h>
-#include <reaper_imgui_functions.h>
-#include "../ui/csurf_ui_elements.hpp"
-#include "../ui/csurf_ui_combo_input.hpp"
-#include "../shared/csurf_utils.hpp"
 #include "../ui/csurf_ui_text_input.hpp"
-#include "../ui/csurf_ui_int_input.hpp"
 #include "../ui/csurf_ui_page_title.hpp"
-#include "../shared/csurf_daw.hpp"
-#include "../i18n/i18n.hpp"
-#include "csurf_fp_8_ui_control_panel.hpp"
 
 typedef std::tuple<int, std::string, int> PluginParam;
 
@@ -45,10 +37,14 @@ protected:
     int select_nb_steps;
     int select_param_index = -1;
     int previous_select_param_index = -1;
+    int select_uninvert_label;
 
     std::string fader_key = "";
     std::string fader_name;
     int fader_param_index;
+    int fader_uninvert_label;
+
+    std::vector<std::string> invert_labels = {"Inverted", "Not inverted"};
 
     bool channel_dirty = false;
 
@@ -186,6 +182,7 @@ protected:
         {
             select_name = ini[select_key]["name"];
             select_nb_steps = stoi(ini[select_key]["steps"]);
+            select_uninvert_label = stoi(ini[select_key].has("uninvert-label") ? ini[select_key]["uninvert-label"] : "0");
             int param_id = stoi(ini[select_key]["param"]);
             const auto it = std::find_if(paramIds.begin(), paramIds.end(), [param_id](PluginParam param)
                                          { return param_id == std::get<0>(param); });
@@ -200,12 +197,14 @@ protected:
             select_name = "";
             select_nb_steps = 0;
             select_param_index = 0;
+            select_uninvert_label = 0;
         }
 
         if (ini.has(fader_key))
         {
             fader_name = ini[fader_key]["name"];
             int param_id = stoi(ini[fader_key]["param"]);
+            fader_uninvert_label = stoi(ini[fader_key].has("uninvert-label") ? ini[fader_key]["uninvert-label"] : "0");
             const auto it = std::find_if(paramIds.begin(), paramIds.end(), [param_id](PluginParam param)
                                          { return param_id == std::get<0>(param); });
             if (it != paramIds.end())
@@ -217,15 +216,23 @@ protected:
         {
             fader_name = "";
             fader_param_index = 0;
+            fader_uninvert_label = 0;
         }
     }
 
     void IsChannelDirty()
     {
-        bool select_dirty = select_key.compare("") != 0 && ini.has(select_key) && (select_name.compare(ini[select_key]["name"]) != 0 || select_nb_steps != std::stoi(ini[select_key]["steps"]) || stoi(ini[select_key]["param"]) != std::get<0>(paramIds[select_param_index]));
+        bool select_dirty = select_key.compare("") != 0 &&
+                            ini.has(select_key) &&
+                            (select_name.compare(ini[select_key]["name"]) != 0 ||
+                             select_nb_steps != std::stoi(ini[select_key]["steps"]) ||
+                             stoi(ini[select_key]["param"]) != std::get<0>(paramIds[select_param_index]));
         bool select_new = select_key.compare("") != 0 && !ini.has(select_key) && (select_param_index > 0);
 
-        bool fader_dirty = fader_key.compare("") != 0 && ini.has(fader_key) && (fader_name.compare(ini[fader_key]["name"]) != 0 || stoi(ini[fader_key]["param"]) != std::get<0>(paramIds[fader_param_index]));
+        bool fader_dirty = fader_key.compare("") != 0 &&
+                           ini.has(fader_key) &&
+                           (fader_name.compare(ini[fader_key]["name"]) != 0 ||
+                            stoi(ini[fader_key]["param"]) != std::get<0>(paramIds[fader_param_index]));
         bool fader_new = fader_key.compare("") != 0 && !ini.has(fader_key) && (fader_param_index > 0);
 
         channel_dirty = selected_channel > -1 && (select_dirty || fader_dirty || select_new || fader_new);
@@ -348,12 +355,25 @@ public:
             ReaSonusPageTitle(m_ctx, i18n->t("mapping", "edit.select.label").c_str(), main_font_bold);
             if (params.size() > 0)
             {
+                ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
+
                 ReaSonusComboInput(
                     m_ctx,
                     i18n->t("mapping", "edit.select.param.label"),
                     params,
-                    &select_param_index);
+                    &select_param_index,
+                    space_x * 0.7);
+
+                ImGui::SameLine(m_ctx);
+
+                ReaSonusIntInput(
+                    m_ctx,
+                    i18n->t("mapping", "edit.select.param.steps"),
+                    &select_nb_steps,
+                    0,
+                    20);
             }
+
             if (ImGui::BeginChild(m_ctx, "filter_content_input", 0.0, 0.0, ImGui::ChildFlags_AutoResizeY))
             {
                 ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
@@ -366,12 +386,12 @@ public:
                     space_x * 0.7);
                 ImGui::SameLine(m_ctx);
 
-                ReaSonusIntInput(
+                ReaSonusComboInput(
                     m_ctx,
-                    i18n->t("mapping", "edit.select.param.steps"),
-                    &select_nb_steps,
-                    0,
-                    20);
+                    i18n->t("mapping", "edit.select.label-uninvert.label"),
+                    invert_labels,
+                    &select_uninvert_label);
+
                 ImGui::EndChild(m_ctx);
             }
             UiElements::PopReaSonusGroupStyle(m_ctx);
@@ -381,6 +401,8 @@ public:
 
     void RenderMappingFader(double height)
     {
+        double space_x, space_y;
+
         UiElements::PushReaSonusGroupStyle(m_ctx);
         if (ImGui::BeginChild(m_ctx, "mapping_content_fader", 0.0, height, ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY))
         {
@@ -389,7 +411,27 @@ public:
             {
                 ReaSonusComboInput(m_ctx, i18n->t("mapping", "edit.fader.param.label"), params, &fader_param_index);
             }
-            ReaSonusTextInput(m_ctx, i18n->t("mapping", "edit.fader.param-name.label"), &fader_name, i18n->t("mapping", "edit.fader.param-name.placeholder"));
+            if (ImGui::BeginChild(m_ctx, "filter_content_input", 0.0, 0.0, ImGui::ChildFlags_AutoResizeY))
+            {
+                ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
+
+                ReaSonusTextInput(
+                    m_ctx,
+                    i18n->t("mapping", "edit.fader.param-name.label"),
+                    &fader_name,
+                    i18n->t("mapping", "edit.fader.param-name.placeholder"),
+                    space_x * 0.7);
+
+                ImGui::SameLine(m_ctx);
+
+                ReaSonusComboInput(
+                    m_ctx,
+                    i18n->t("mapping", "edit.fader.label-uninvert.label"),
+                    invert_labels,
+                    &fader_uninvert_label);
+
+                ImGui::EndChild(m_ctx);
+            }
             ImGui::EndChild(m_ctx);
         }
     }
@@ -547,6 +589,7 @@ public:
             ini[select_key]["param"] = std::to_string(std::get<0>(paramIds[select_param_index]));
             ini[select_key]["origname"] = std::get<1>(paramIds[select_param_index]);
             ini[select_key]["steps"] = std::to_string(select_nb_steps);
+            ini[select_key]["uninvert-label"] = std::to_string(select_uninvert_label);
         }
         else
         {
@@ -561,6 +604,7 @@ public:
             ini[fader_key]["name"] = fader_name;
             ini[fader_key]["param"] = std::to_string(std::get<0>(paramIds[fader_param_index]));
             ini[fader_key]["origname"] = std::get<1>(paramIds[fader_param_index]);
+            ini[fader_key]["uninvert-label"] = std::to_string(fader_uninvert_label);
         }
         else
         {

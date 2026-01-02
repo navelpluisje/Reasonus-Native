@@ -78,9 +78,7 @@ void CSurf_FP_8_Navigator::HandleAllTracksFilter()
 
 void CSurf_FP_8_Navigator::HandleTracksCustomFilter(std::string filterName)
 {
-    mINI::INIFile file(GetReaSonusIniPath(FP_8));
-    file.read(ini);
-    mINI::INIMap<std::string> filter = ini[filterName];
+    mINI::INIMap<std::string> filter = settings->GetFilter(filterName);
 
     std::map<int, bool> tracks = GetCustomFilterTracks(filter);
     std::map<int, bool> allTracks = GetAllTracksBase();
@@ -272,8 +270,6 @@ void CSurf_FP_8_Navigator::HandleTracksAllFoldersFilter()
 
 void CSurf_FP_8_Navigator::HandleTrackCustomMultiSelectFilter()
 {
-    mINI::INIFile file(GetReaSonusIniPath(FP_8));
-    file.read(ini);
     std::map<int, bool> allTracks = GetAllTracksBase();
     std::map<int, bool> tracks;
     std::map<int, bool> tmp_tracks;
@@ -281,8 +277,7 @@ void CSurf_FP_8_Navigator::HandleTrackCustomMultiSelectFilter()
     for (const int filter_index : selected_filters)
     {
         tmp_tracks.clear();
-        mINI::INIMap<std::string>
-            filter = ini[ini["filters"][std::to_string(filter_index)]];
+        mINI::INIMap<std::string> filter = settings->GetFilter(filter_index);
         tmp_tracks = GetCustomFilterTracks(filter);
         tracks.insert(tmp_tracks.begin(), tmp_tracks.end());
     }
@@ -291,6 +286,25 @@ void CSurf_FP_8_Navigator::HandleTrackCustomMultiSelectFilter()
 
     SetTrackUIVisibility(tracks);
     SetOffset(0);
+}
+
+bool CSurf_FP_8_Navigator::TrackIsInBankTracks(MediaTrack *media_track)
+{
+    bool value = false;
+    int index = stoi(DAW::GetTrackIndex(media_track));
+    WDL_PtrList<MediaTrack> bank_tracks = GetBankTracks();
+
+    for (int i = 0; i < bank_tracks.GetSize(); i++)
+    {
+        int other_index = stoi(DAW::GetTrackIndex(bank_tracks.Get(i)));
+
+        if (index == other_index)
+        {
+            value = true;
+            break;
+        }
+    }
+    return value;
 }
 
 void CSurf_FP_8_Navigator::UpdateMixerPosition()
@@ -321,7 +335,8 @@ WDL_PtrList<MediaTrack> CSurf_FP_8_Navigator::GetBankTracks()
     WDL_PtrList<MediaTrack> bank;
     GetAllVisibleTracks(tracks, hasSolo, hasMute);
 
-    int channelCount = context->GetNbBankChannels() > tracks.GetSize() ? context->GetNbBankChannels() : tracks.GetSize();
+    int channelCount = context->GetNbBankChannels();
+    // > tracks.GetSize() ? context->GetNbBankChannels() : tracks.GetSize();
 
     for (int i = track_offset; i < track_offset + channelCount; i++)
     {
@@ -396,6 +411,11 @@ int CSurf_FP_8_Navigator::GetOffset()
 
 void CSurf_FP_8_Navigator::SetOffsetByTrack(MediaTrack *media_track)
 {
+    if (TrackIsInBankTracks(media_track))
+    {
+        return;
+    }
+
     int trackId = stoi(DAW::GetTrackIndex(media_track));
 
     for (int i = 0; i < tracks.GetSize(); i++)
@@ -404,7 +424,7 @@ void CSurf_FP_8_Navigator::SetOffsetByTrack(MediaTrack *media_track)
 
         if (trackId == id)
         {
-            SetOffset(i);
+            SetOffset((int)(i / context->GetNbChannels()) * context->GetNbChannels());
             break;
         }
     }
@@ -554,9 +574,4 @@ bool CSurf_FP_8_Navigator::HasFilter(int filter_index)
 void CSurf_FP_8_Navigator::RemoveFilter(int filter_index)
 {
     selected_filters.erase(find(selected_filters.begin(), selected_filters.end(), filter_index));
-}
-
-void CSurf_FP_8_Navigator::HandleMultiSelectFilter()
-{
-    // Now do the filter magic
 }

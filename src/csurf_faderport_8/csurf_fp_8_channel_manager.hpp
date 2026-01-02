@@ -5,8 +5,7 @@
 #include "csurf_fp_8_navigator.hpp"
 #include "csurf_fp_8_channel_manager_resources.hpp"
 #include "csurf_fp_8_track.hpp"
-#include "../shared/csurf_context.cpp"
-#include "../controls/csurf_button.hpp"
+#include "../shared/csurf_reasonus_settings.hpp"
 #include "../shared/csurf_daw.hpp"
 
 class CSurf_FP_8_ChannelManager
@@ -16,6 +15,7 @@ protected:
     CSurf_FP_8_Navigator *navigator;
     CSurf_Context *context;
     midi_Output *m_midiout;
+    ReaSonusSettings *settings = ReaSonusSettings::GetInstance(FP_8);
 
     ButtonColor color;
 
@@ -23,7 +23,7 @@ protected:
 
     virtual void SetTrackColors(MediaTrack *media_track, bool is_selected, bool has_arm = false)
     {
-        double brightness = is_selected ? 1 : context->GetSettings()->GetTrackColorBrightnessPercentage();
+        double brightness = is_selected ? 1 : settings->GetTrackColorBrightnessPercentage();
 
         if (!media_track)
         {
@@ -35,7 +35,7 @@ protected:
         int green = 0x00;
         int blue = 0x00;
 
-        if (!(context->GetArm() && has_arm) && !(DAW::IsTrackArmed(media_track) && context->GetSettings()->GetDistractionFreeMode()))
+        if (!(context->GetArm() && has_arm) && !(DAW::IsTrackArmed(media_track) && settings->GetDistractionFreeMode()))
         {
             int trackColor = ::GetTrackColor(media_track);
             if (trackColor == 0)
@@ -67,6 +67,21 @@ public:
     };
 
     virtual void UpdateTracks() {};
+
+    virtual void HandleEndcoderPush(int value)
+    {
+        (void)value;
+    };
+
+    virtual void HandleEndcoderIncrement(int value)
+    {
+        (void)value;
+    };
+
+    virtual void HandleEndcoderDecrement(int value)
+    {
+        (void)value;
+    };
 
     virtual void HandleSelectClick(int index, int value)
     {

@@ -17,6 +17,7 @@
 #include "../shared/csurf_transport_manager.hpp"
 #include "../shared/csurf_utils.hpp"
 #include "../shared/csurf_daw.hpp"
+#include "../shared/csurf_reasonus_settings.hpp"
 #include "csurf_fp_v2_session_manager.cpp"
 #include "csurf_fp_v2_track_manager.hpp"
 #include "csurf_fp_v2_automation_manager.cpp"
@@ -27,6 +28,7 @@
 
 extern HWND g_hwnd;
 extern REAPER_PLUGIN_HINSTANCE g_hInst;
+ReaSonusSettings *ReaSonusSettings::instanceV2Ptr = nullptr;
 
 class CSurf_FaderPortV2 : public IReaperControlSurface
 {
@@ -46,9 +48,8 @@ class CSurf_FaderPortV2 : public IReaperControlSurface
   DWORD surface_update_keepalive;
   DWORD surface_update_settings_check;
 
-  mINI::INIStructure ini;
-
   I18n *i18n = I18n::GetInstance();
+  ReaSonusSettings *settings = ReaSonusSettings::GetInstance(FP_V2);
 
   WDL_String descspace;
   char configtmp[1024];
@@ -229,15 +230,7 @@ class CSurf_FaderPortV2 : public IReaperControlSurface
 
   void updateSettings()
   {
-    readAndCreateIni(ini, FP_V2);
-
-    i18n->SetLanguage(DAW::GetExtState(EXT_STATE_KEY_UI_LANGUAGE, "en-US"));
-    context->GetSettings()->SetLatchPreviewActionEnabled(ini["surface"].has("latch-preview-action") && ini["surface"]["latch-preview-action"] == "1");
-    context->GetSettings()->SetLatchPreviewActionCode(ini["surface"].has("latch-preview-action-code") && std::stoi(ini["surface"]["latch-preview-action-code"]));
-    context->GetSettings()->SetMuteSoloMomentary(ini["surface"].has("mute-solo-momentary") && ini["surface"]["mute-solo-momentary"] == "1");
-    context->GetSettings()->SetControlHiddenTracks(ini["surface"].has("control-hidden-tracks") && ini["surface"]["control-hidden-tracks"] == "1");
-    context->GetSettings()->SetCanDisableFader(ini["surface"].has("can-disable-fader") && ini["surface"]["can-disable-fader"] == "1");
-    context->GetSettings()->SetEndlessTrackScroll(ini["surface"].has("endless-track-scroll") && ini["surface"]["endless-track-scroll"] == "1");
+    settings->UpdateSettings();
   }
 
 public:
@@ -249,7 +242,6 @@ public:
     /**
      * First we check if we have the ini file. If not we create it with default values
      */
-    readAndCreateIni(ini, FP_V2);
     if (std::string(GIT_VERSION).compare(DAW::GetExtState(EXT_STATE_KEY_VERSION, "")) != 0)
     {
       DAW::SetExtState(EXT_STATE_KEY_VERSION, GIT_VERSION, true);
@@ -257,8 +249,8 @@ public:
     }
 
     errStats = 0;
-    m_midi_in_dev = stoi(ini["surface"]["midiin"]);
-    m_midi_out_dev = stoi(ini["surface"]["midiout"]);
+    m_midi_in_dev = settings->GetMidiInput();
+    m_midi_out_dev = settings->GetMidiOutput();
 
     surface_update_lastrun = 0;
 
@@ -421,11 +413,11 @@ public:
       return;
     }
 
-    if (!context->GetSettings()->GetControlHiddenTracks() && DAW::IsTrackVisible(media_track))
+    if (!settings->GetControlHiddenTracks() && DAW::IsTrackVisible(media_track))
     {
       trackNavigator->SetOffsetByTrack(media_track);
     }
-    else if (context->GetSettings()->GetControlHiddenTracks())
+    else if (settings->GetControlHiddenTracks())
     {
       trackNavigator->SetOffset(track_index - 1);
     }

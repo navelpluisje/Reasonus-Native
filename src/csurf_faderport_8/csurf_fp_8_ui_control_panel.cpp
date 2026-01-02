@@ -3,14 +3,12 @@
 #include "csurf_fp_8_ui_settings_page.cpp"
 #include "csurf_fp_8_ui_plugin_mapping_page.cpp"
 #include "csurf_fp_8_ui_custom_filters_page.cpp"
-#include "../ui/csurf_ui_function_keys_page.hpp"
 #include "../ui/csurf_ui_about_page.cpp"
-#include "../ui/csurf_ui_colors.hpp"
 #include "../ui/csurf_ui_vars.hpp"
 #include "../ui/csurf_ui_menu_button.hpp"
-#include "../ui/csurf_ui_page_title.hpp"
 #include "../ui/csurf_ui_button_bar.hpp"
 #include "../ui/csurf_ui_images.h"
+#include "../ui/csurf_ui_function_keys_page.hpp"
 
 constexpr const char *g_name{"ReaSonus Native 8/16 Control Panel"};
 
