@@ -231,7 +231,7 @@ void ReaSonusPluginMappingConverter::Frame()
     PushReaSonusColors(m_ctx);
     PushReaSonusStyle(m_ctx);
     ImGui::PushFont(m_ctx, assets->GetMainFont(), FontSizeDefault);
-    ImGui::SetNextWindowSize(m_ctx, 640, 612, ImGui::Cond_Once);
+    ImGui::SetNextWindowSize(m_ctx, 640, 632, ImGui::Cond_Once);
     bool open{true};
 
     UiElements::PushReaSonusWindowStyle(m_ctx);

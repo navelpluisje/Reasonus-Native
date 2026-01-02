@@ -625,7 +625,7 @@ public:
         double space_x, space_y;
         changed_items = 0;
         bool has_style_var = false;
-        ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_ItemSpacing, 12, 12);
+        ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_ItemSpacing, 22, 12);
 
         if (ImGui::BeginChild(m_ctx, "##channel-list", 0.0, 30))
         {
@@ -757,10 +757,6 @@ public:
         UiElements::PushReaSonusGroupStyle(m_ctx);
         if (ImGui::BeginChild(m_ctx, "mapping_content_select", 0.0, height, ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY))
         {
-            // ReaSonusIcon(m_ctx, assets, IconCog, 48, UI_COLORS::Accent, "unique-id");
-            // ImGui::SameLine(m_ctx);
-            // ReaSonusIcon(m_ctx, assets, IconArrowRight, 48, UI_COLORS::Accent, "unique-ids");
-
             ReaSonusPageTitle(m_ctx, assets, i18n->t("mapping", "edit.select.label").c_str(), true);
             if (params.size() > 0)
             {

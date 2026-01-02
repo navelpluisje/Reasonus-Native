@@ -343,7 +343,7 @@ void ReaSonusTranslationEditor::Frame()
                 {
                     ReaSonusPageTitle(m_ctx, assets, "Languages");
 
-                    ReaSonusCheckBox(m_ctx, "Show only untranslated lines", &show_empty_only);
+                    ReaSonusCheckBox(m_ctx, "Show untranslated only", &show_empty_only);
                     ReaSonusCheckBox(m_ctx, "Show the actual key", &show_translation_key);
 
                     ReaSonusActionInputText(
