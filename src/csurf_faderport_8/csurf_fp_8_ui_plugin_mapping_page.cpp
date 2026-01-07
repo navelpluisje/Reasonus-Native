@@ -184,6 +184,7 @@ protected:
 
     void GetPluginParams()
     {
+        int paramCount = 0;
         // Prepare the vectors
         params.clear();
         paramIds.clear();
@@ -196,12 +197,13 @@ protected:
 
         TrackFX_AddByName(media_track, plugin_params["global"]["origname"].c_str(), false, -1);
 
-        for (int i = 0; i < std::min(TrackFX_GetNumParams(media_track, 0), 256); i++)
+        for (int i = 0; i < TrackFX_GetNumParams(media_track, 0); i++)
         {
             std::string param_name = DAW::GetTrackFxParamName(media_track, 0, i);
 
             if (IsWantedParam(std::string(param_name)))
             {
+                paramCount++;
                 int steps = DAW::GetTrackFxParamNbSteps(media_track, 0, i);
                 params.push_back(std::string(param_name));
                 paramIds.push_back({i, std::string(param_name), steps});
