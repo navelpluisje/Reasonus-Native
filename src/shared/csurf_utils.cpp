@@ -127,29 +127,22 @@ std::string StripPluginDeveloper(std::string pluginName)
 std::string StripPluginNamePrefixes(char *name)
 {
     std::string s = std::string(name);
-    std::string delimiter = ": ";
-    int pos = (int)(s.find(delimiter) + size(delimiter));
-    if (pos < 0)
-    {
-        return s;
-    }
-    s.erase(0, pos);
-    return s;
+    std::vector<std::string> stripped_name = split(s, ": ");
+    return stripped_name[stripped_name.size() - 1];
 }
 
 std::string StripPluginChannelPostfix(char *name)
 {
     std::string s = std::string(name);
-    std::string delimiter = " (32 out)";
-    int pos = (int)s.find(delimiter);
-    if (pos < 0)
+    std::vector<std::string> delimiters = {" (4 out)", " (32 out)", " (16 out)", " (8ch)", " (16ch)", " (x86_64)"};
+
+    for (const std::string &delimiter : delimiters)
     {
-        return s;
+        std::vector<std::string> tmp = split(s, delimiter);
+        s = join(tmp, "");
     }
-    s.erase(s.find(delimiter), size(delimiter));
     return s;
 }
-
 bool IsPluginFX(std::string name)
 {
     std::string delimiter = ": ";
@@ -612,4 +605,37 @@ double between(int min, int val, int max)
 {
     double diff = max - min;
     return diff > 0 && diff < val;
+}
+
+/**
+ * @brief Check if a string starts with the given string
+ *
+ * @param str The string to check for the prefix
+ * @param prefix the prefix to check for
+ * @return true If the string starts with the prefix
+ * @return false If the string does not start with the prefix
+ */
+bool startsWith(const std::string &str, const std::string &prefix)
+{
+    return str.rfind(prefix, 0) == 0;
+}
+bool startsWith(const char *str, const std::string &prefix)
+{
+    return std::string(str).rfind(prefix, 0) == 0;
+}
+
+/**
+ * @brief Transform a string to upper case
+ *
+ * @param val The string to transform
+ * @return std::string
+ */
+std::string toUpper(std::string val)
+{
+    for (int i = 0; i < (int)val.size(); i++)
+    {
+        val[i] = toupper(val[i]);
+    }
+
+    return val;
 }

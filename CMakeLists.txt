@@ -157,6 +157,10 @@ target_link_libraries(reaper-sdk INTERFACE mINI)
 # target_link_libraries(reaper-sdk INTERFACE ${PROJECT_LIB_DIR}/reaImgui/reaper_imgui_functions.h)  
 target_include_directories(reaper-sdk INTERFACE ${PROJECT_LIB_DIR}/reaImgui)
 
+find_package(SQLite3 REQUIRED)
+include_directories(${SQLite3_INCLUDE_DIRS})
+target_link_libraries(reaper-sdk INTERFACE SQLite::SQLite3)
+
 # ------------------------------------------------------------------------------
 # Find and Link WDL + SWELL
 # ------------------------------------------------------------------------------

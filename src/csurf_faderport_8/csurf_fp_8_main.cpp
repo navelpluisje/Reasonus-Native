@@ -389,6 +389,9 @@ public:
     (void)indev;
     (void)outdev;
 
+    /**
+     * If we have a new version we check for a new locales file
+     */
     if (std::string(GIT_VERSION).compare(DAW::GetExtState(EXT_STATE_KEY_VERSION, "")) != 0)
     {
       DAW::SetExtState(EXT_STATE_KEY_VERSION, GIT_VERSION, true);
@@ -408,13 +411,20 @@ public:
     context = new CSurf_Context(settings->GetSurface());
     updateSettings();
 
+    /**
+     * Create the tracks. One for every channel of the FaderPort
+     */
     for (int i = 0; i < context->GetNbChannels(); i++)
     {
       CSurf_FP_8_Track *track = new CSurf_FP_8_Track(i, context, m_midiout);
       tracks.push_back(track);
     }
-    lastTouchedFxTrack = new CSurf_FP_8_Track(context->GetNbChannels() - 1, context, m_midiout);
 
+    /**
+     * Define all teh functionality. Most are linked to an area of the controller
+     *
+     */
+    lastTouchedFxTrack = new CSurf_FP_8_Track(context->GetNbChannels() - 1, context, m_midiout);
     trackNavigator = new CSurf_FP_8_Navigator(context);
     sessionManager = new CSurf_FP_8_SessionManager(context, trackNavigator, m_midiout);
     faderManager = new CSurf_FP_8_FaderManager(context, trackNavigator, m_midiout);
@@ -452,6 +462,9 @@ public:
 
   ~CSurf_FaderPort()
   {
+    /**
+     * On close we show a friendly message to the users
+     */
     if (m_midiout)
     {
       // Reset all displays, faders and track buttons after closing Reaper
@@ -475,6 +488,9 @@ public:
       tracks.at((int)tracks.size() - 1)->SetDisplayLine(0, ALIGN_LEFT, "onus", INVERT);
     }
 
+    /**
+     * Now we can delete the midi connections
+     */
     DELETE_ASYNC(m_midiout);
     DELETE_ASYNC(m_midiin);
   }
@@ -517,6 +533,9 @@ public:
 
   void Run()
   {
+    /**
+     * Check if we have a midi in signal. If so, loop through them call OnMIDIEvent
+     */
     if (m_midiin)
     {
       m_midiin->SwapBufsPrecise(GetTickCount(), 0.0);

@@ -5,12 +5,15 @@
 #include "../ui/csurf_ui_text_input.hpp"
 #include "../ui/csurf_ui_pagination_button.hpp"
 #include "../ui/csurf_ui_icon_button.hpp"
+#include "../shared/csurf_database.hpp"
+#include "../shared/csurf_plugin_mapping_utils.hpp"
 
 typedef std::tuple<int, std::string, int> PluginParam;
 
 class CSurf_FP_8_PluginMappingPage : public CSurf_UI_PageContent
 {
 protected:
+    Database *db;
     mINI::INIStructure plugin_params;
     mINI::INIStructure previous_plugin_params;
 
@@ -565,6 +568,8 @@ public:
     {
         i18n = I18n::GetInstance();
         settings = ReaSonusSettings::GetInstance(FP_8);
+        db = new Database("test.db");
+        PopulatePluginsDatabase(db);
 
         SetPluginFolders();
     };

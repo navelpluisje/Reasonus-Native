@@ -404,4 +404,9 @@ void GetLanguages(std::vector<std::string> &language_names);
 
 double between(int min, int val, int max);
 
+bool startsWith(const std::string &str, const std::string &prefix);
+bool startsWith(const char *str, const std::string &prefix);
+
+std::string toUpper(std::string val);
+
 #endif // CSURF_UTILS_H_

@@ -308,11 +308,6 @@ public:
     DELETE_ASYNC(m_midiin);
   }
 
-  CSurf_Context GetContext()
-  {
-    return *context;
-  }
-
   const char *GetTypeString()
   {
     return "REASONUS_FADERPORT_V2";
