@@ -28,7 +28,7 @@ static void ReaSonusExtendedListBox(
     std::vector<std::string> items,
     int *selected_item,
     bool can_deselect,
-    std::function<void(int index)> remove_callback,
+    std::function<void(int index)> remove_callback = nullptr,
     bool sortable = false,
     std::function<void(int current_item, int next_item)> sort_callback = nullptr)
 {
@@ -60,7 +60,7 @@ static void ReaSonusExtendedListBox(
                 }
             }
 
-            if (selected)
+            if (selected && remove_callback != nullptr)
             {
                 ImGui::SameLine(m_ctx);
                 ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);

@@ -49,6 +49,9 @@ private:
     // Images
     ImGui_Image *reasonus_logo;
 
+    // Filters
+    ImGui_TextFilter *combo_filter;
+
 public:
     CSurf_UI_Assets(ImGui_Context *m_ctx);
 
@@ -57,6 +60,8 @@ public:
     ImGui_Font *GetIconFont();
 
     ImGui_Image *GetReaSonusLogo();
+
+    ImGui_TextFilter *GetReaComboFilter();
 };
 
 #endif

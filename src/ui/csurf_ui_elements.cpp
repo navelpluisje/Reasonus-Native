@@ -355,7 +355,7 @@ void UiElements::PopReaSonusFunctionButtonStyle(ImGui_Context *m_ctx)
     ImGui::PopStyleColor(m_ctx, 5);
 };
 
-void UiElements::PushReaSonusIconButtonStyle(ImGui_Context *m_ctx)
+void UiElements::PushReaSonusIconButtonStyle(ImGui_Context *m_ctx, CSurf_UI_Assets *assets)
 {
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 4, 4);
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameRounding, 4);
@@ -368,12 +368,15 @@ void UiElements::PushReaSonusIconButtonStyle(ImGui_Context *m_ctx)
     ImGui::PushStyleColor(m_ctx, ImGui::Col_ButtonHovered, UI_COLORS::Main_28);
 
     ImGui::PushItemWidth(m_ctx, -1);
+
+    ImGui::PushFont(m_ctx, assets->GetIconFont(), 20);
 };
 
 void UiElements::PopReaSonusIconButtonStyle(ImGui_Context *m_ctx)
 {
     ImGui::PopStyleVar(m_ctx, 3);
     ImGui::PopStyleColor(m_ctx, 5);
+    ImGui::PopFont(m_ctx);
 };
 
 void UiElements::PushReaSonusTooltipStyle(ImGui_Context *m_ctx)
@@ -497,5 +500,21 @@ void UiElements::PushReaSonusTranslationItemStyle(ImGui_Context *m_ctx)
 void UiElements::PopReaSonusTranslationItemStyle(ImGui_Context *m_ctx)
 {
     ImGui::PopStyleVar(m_ctx, 1);
+    ImGui::PopStyleColor(m_ctx, 2);
+}
+
+void UiElements::PushReaSonusModalStyle(ImGui_Context *m_ctx)
+{
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_WindowPadding, 8, 8);
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_WindowBorderSize, 1);
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_WindowRounding, 8);
+
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_Border, UI_COLORS::Accent);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_WindowBg, UI_COLORS::Accent);
+}
+
+void UiElements::PopReaSonusModalStyle(ImGui_Context *m_ctx)
+{
+    ImGui::PopStyleVar(m_ctx, 3);
     ImGui::PopStyleColor(m_ctx, 2);
 }

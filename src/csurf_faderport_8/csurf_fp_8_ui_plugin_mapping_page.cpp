@@ -5,6 +5,8 @@
 #include "../ui/csurf_ui_text_input.hpp"
 #include "../ui/csurf_ui_pagination_button.hpp"
 #include "../ui/csurf_ui_icon_button.hpp"
+#include "../ui/csurf_ui_list_box.hpp"
+#include "../ui/csurf_ui_search_combo_input.hpp"
 
 typedef std::tuple<int, std::string, int> PluginParam;
 
@@ -43,11 +45,14 @@ protected:
     int select_param_index = -1;
     int previous_select_param_index = -1;
     int select_uninvert_label = 0;
+    std::string select_search = "";
 
     std::string fader_key = "";
     std::string fader_name;
     int fader_param_index;
     int fader_uninvert_label = 0;
+
+    bool open_modal = true;
 
     std::vector<std::string> invert_labels = {"Inverted", "Not inverted"};
 
@@ -184,7 +189,6 @@ protected:
 
     void GetPluginParams()
     {
-        int paramCount = 0;
         // Prepare the vectors
         params.clear();
         paramIds.clear();
@@ -203,7 +207,6 @@ protected:
 
             if (IsWantedParam(std::string(param_name)))
             {
-                paramCount++;
                 int steps = DAW::GetTrackFxParamNbSteps(media_track, 0, i);
                 params.push_back(std::string(param_name));
                 paramIds.push_back({i, std::string(param_name), steps});
@@ -764,11 +767,13 @@ public:
             {
                 ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
 
-                ReaSonusComboInput(
+                ReaSonusSearchComboInput(
                     m_ctx,
+                    assets,
                     i18n->t("mapping", "edit.select.param.label"),
                     params,
                     &select_param_index,
+                    &select_search,
                     space_x * 0.7);
 
                 ImGui::SameLine(m_ctx);
@@ -947,9 +952,11 @@ public:
                             double height = (space_y - 12) / 2;
 
                             RenderMappingSelect(height);
+
                             RenderMappingFader(height);
 
                             UiElements::PopReaSonusGroupStyle(m_ctx);
+
                             ImGui::EndChild(m_ctx);
                         }
                     }

@@ -42,8 +42,7 @@ static void ReaSonusActionInputText(
         ImGui::SameLine(m_ctx);
         ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 25);
 
-        UiElements::PushReaSonusIconButtonStyle(m_ctx);
-        ImGui::PushFont(m_ctx, assets->GetIconFont(), 20);
+        UiElements::PushReaSonusIconButtonStyle(m_ctx, assets);
         if (ImGui::Button(m_ctx, std::string(1, IconAddList).c_str()))
         {
             if ((*value).compare("") != 0)
@@ -51,7 +50,6 @@ static void ReaSonusActionInputText(
                 callback();
             }
         }
-        ImGui::PopFont(m_ctx);
         UiElements::PopReaSonusIconButtonStyle(m_ctx);
 
         ImGui::EndChild(m_ctx);

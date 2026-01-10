@@ -14,6 +14,9 @@ CSurf_UI_Assets::CSurf_UI_Assets(ImGui_Context *m_ctx)
 
     reasonus_logo = ImGui::CreateImageFromMem(reinterpret_cast<const char *>(reasonus_logo_file), sizeof(reasonus_logo_file));
     ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(reasonus_logo));
+
+    combo_filter = ImGui::CreateTextFilter("");
+    ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(combo_filter));
 }
 
 ImGui_Font *CSurf_UI_Assets::GetMainFont()
@@ -35,4 +38,9 @@ ImGui_Font *CSurf_UI_Assets::GetIconFont()
 ImGui_Image *CSurf_UI_Assets::GetReaSonusLogo()
 {
     return reasonus_logo;
+}
+
+ImGui_TextFilter *CSurf_UI_Assets::GetReaComboFilter()
+{
+    return combo_filter;
 }

@@ -103,17 +103,18 @@ static void PushReaSonusColors(ImGui_Context *m_ctx)
     ImGui::PushStyleColor(m_ctx, ImGui::Col_TableRowBg, UI_COLORS::Transparent);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_TableRowBgAlt, 0xFFFFFF0F);
 
-    ImGui::PushStyleColor(m_ctx, ImGui::Col_TextSelectedBg, 0x4296FA59);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_TextSelectedBg, UI_COLORS::Accent_25);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_DragDropTarget, UI_COLORS::Accent);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_NavCursor, 0x4296FAFF);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_NavWindowingHighlight, 0xFFFFFFB3);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_NavWindowingDimBg, 0xCCCCCC33);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_ModalWindowDimBg, 0xCCCCCC59);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_InputTextCursor, UI_COLORS::Accent);
 }
 
 static void PopReaSonusColors(ImGui_Context *m_ctx)
 {
-    ImGui::PopStyleColor(m_ctx, 57);
+    ImGui::PopStyleColor(m_ctx, 58);
 }
 
 #endif
