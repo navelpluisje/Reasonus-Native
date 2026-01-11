@@ -375,27 +375,49 @@ protected:
 
     void HandlePreviousClick()
     {
-        selected_channel = max(selected_channel - 1, 0);
+        int step_size = 1;
+
+        if (ImGui::IsKeyDown(m_ctx, ImGui::Key_LeftShift))
+        {
+            step_size = 13;
+        }
+
+        selected_channel = max(selected_channel - step_size, 0);
         previous_selected_channel = selected_channel;
         PopulateFields();
 
         int overflow = max(nb_channels - max_items, 0);
         if (overflow > 0 && selected_channel > 5 && selected_channel < (6 + overflow))
         {
-            channel_offset -= 1;
+            channel_offset -= step_size;
+        }
+        else
+        {
+            channel_offset = minmax(0, selected_channel - 6, max(nb_channels - max_items, 0));
         }
     }
 
     void HandleNextClick()
     {
-        selected_channel = min(selected_channel + 1, nb_channels - 1);
+        int step_size = 1;
+
+        if (ImGui::IsKeyDown(m_ctx, ImGui::Key_LeftShift))
+        {
+            step_size = 13;
+        }
+
+        selected_channel = min(selected_channel + step_size, nb_channels - 1);
         previous_selected_channel = selected_channel;
         PopulateFields();
 
         int overflow = max(nb_channels - max_items, 0);
         if (overflow > 0 && selected_channel > 6 && selected_channel < (7 + overflow))
         {
-            channel_offset += 1;
+            channel_offset += step_size;
+        }
+        else
+        {
+            channel_offset = minmax(0, selected_channel - 6, max(nb_channels - max_items, 0));
         }
     }
 
@@ -1019,6 +1041,7 @@ public:
 
     void Save() override
     {
+        int prev_selected_plugin = selected_channel;
         if (selected_plugin < 0)
         {
             return;
@@ -1028,6 +1051,7 @@ public:
         if (file.write(plugin_params, true))
         {
             Reset();
+            selected_channel = prev_selected_plugin;
             ReaSonus8ControlPanel::SetMessage(i18n->t("mapping", "action.save.message"));
         };
     }
