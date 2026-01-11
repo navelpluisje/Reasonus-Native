@@ -202,7 +202,7 @@ void ReaSonus8ControlPanel::Frame()
         }
     }
 
-    if (ImGui::IsKeyDown(m_ctx, ImGui::Key_Escape))
+    if (!ImGui::IsPopupOpen(m_ctx, "", ImGui::PopupFlags_AnyPopup) && ImGui::IsKeyDown(m_ctx, ImGui::Key_Escape))
     {
         control_panel_open = false;
         SetActionState("_REASONUS_SHOW_REASONUS_8_CONTROL_WINDOW");

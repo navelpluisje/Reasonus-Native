@@ -18,7 +18,7 @@ enum IconFont
     IconAdd = 'h',
     IconAddList = 'i',
     IconAddInPlace = 'j',
-    IconSearch = 'k',
+    IconSearchAction = 'k',
     IconUser = 'l',
     IconInstrument = 'm',
     IconAction = 'n',
@@ -27,6 +27,8 @@ enum IconFont
     IconInformation = 'q',
     IconRemove = 'r',
     IconDelete = 's',
+    IconSearch = 't',
+    IconGoTo = 'u',
 };
 
 enum FonSize

@@ -7,6 +7,7 @@
 #include "../ui/csurf_ui_icon_button.hpp"
 #include "../ui/csurf_ui_list_box.hpp"
 #include "../ui/csurf_ui_search_combo_input.hpp"
+#include "../ui/csurf_ui_goto_input.hpp"
 
 typedef std::tuple<int, std::string, int> PluginParam;
 
@@ -38,6 +39,7 @@ protected:
     std::vector<PluginParam> paramIds;
     std::vector<std::string> params;
     int selected_param = 0;
+    std::string param_search_query = "";
 
     std::string select_key = "";
     std::string select_name;
@@ -45,7 +47,6 @@ protected:
     int select_param_index = -1;
     int previous_select_param_index = -1;
     int select_uninvert_label = 0;
-    std::string select_search = "";
 
     std::string fader_key = "";
     std::string fader_name;
@@ -412,8 +413,23 @@ protected:
         std::string select = "select_" + std::to_string(selected_channel);
         std::string fader = "fader_" + std::to_string(selected_channel);
 
-        plugin_params.set(select, previous_plugin_params[select]);
-        plugin_params.set(fader, previous_plugin_params[fader]);
+        if (previous_plugin_params.has(select) && !previous_plugin_params[select]["param"].empty())
+        {
+            plugin_params.set(select, previous_plugin_params[select]);
+        }
+        else
+        {
+            plugin_params.remove(select);
+        }
+
+        if (previous_plugin_params.has(fader) && !previous_plugin_params[fader]["param"].empty())
+        {
+            plugin_params.set(fader, previous_plugin_params[fader]);
+        }
+        else
+        {
+            plugin_params.remove(fader);
+        }
 
         PopulateFields();
     }
@@ -720,7 +736,11 @@ public:
 
             ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
 
-            ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + space_x - 106);
+            ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + space_x - 144);
+
+            ReaSonusGoToInput(m_ctx, assets, &selected_channel);
+
+            ImGui::SameLine(m_ctx);
 
             ReaSonusIconButton(
                 m_ctx,
@@ -773,7 +793,7 @@ public:
                     i18n->t("mapping", "edit.select.param.label"),
                     params,
                     &select_param_index,
-                    &select_search,
+                    &param_search_query,
                     space_x * 0.7);
 
                 ImGui::SameLine(m_ctx);
@@ -821,7 +841,13 @@ public:
             ReaSonusPageTitle(m_ctx, assets, i18n->t("mapping", "edit.fader.label"), true);
             if (params.size() > 0)
             {
-                ReaSonusComboInput(m_ctx, i18n->t("mapping", "edit.fader.param.label"), params, &fader_param_index);
+                ReaSonusSearchComboInput(
+                    m_ctx,
+                    assets,
+                    i18n->t("mapping", "edit.fader.param.label"),
+                    params,
+                    &fader_param_index,
+                    &param_search_query);
             }
             if (ImGui::BeginChild(m_ctx, "filter_content_input", 0.0, 0.0, ImGui::ChildFlags_AutoResizeY))
             {

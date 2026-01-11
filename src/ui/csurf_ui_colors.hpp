@@ -21,6 +21,9 @@ namespace UI_COLORS
     const int Success = 0x58D23AFF;
     const int Success_50 = 0x58D23A7F;
     const int Transparent = 0x00000000;
+    const int Transparent_25 = 0x2727273f;
+    const int Transparent_50 = 0x2727277f;
+    const int Transparent_75 = 0x272727Bf;
 
     const int FormFieldBorder = UI_COLORS::Main_38;
     const int FormFieldBg = UI_COLORS::Main_23;

@@ -505,16 +505,20 @@ void UiElements::PopReaSonusTranslationItemStyle(ImGui_Context *m_ctx)
 
 void UiElements::PushReaSonusModalStyle(ImGui_Context *m_ctx)
 {
-    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_WindowPadding, 8, 8);
-    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_WindowBorderSize, 1);
-    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_WindowRounding, 8);
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 8, 8);
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameRounding, 8);
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_ChildRounding, 8);
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_PopupRounding, 8);
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_PopupBorderSize, 1);
 
     ImGui::PushStyleColor(m_ctx, ImGui::Col_Border, UI_COLORS::Accent);
-    ImGui::PushStyleColor(m_ctx, ImGui::Col_WindowBg, UI_COLORS::Accent);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_PopupBg, UI_COLORS::Main_15);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBg, UI_COLORS::Transparent);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_ModalWindowDimBg, UI_COLORS::Transparent);
 }
 
 void UiElements::PopReaSonusModalStyle(ImGui_Context *m_ctx)
 {
-    ImGui::PopStyleVar(m_ctx, 3);
-    ImGui::PopStyleColor(m_ctx, 2);
+    ImGui::PopStyleVar(m_ctx, 5);
+    ImGui::PopStyleColor(m_ctx, 4);
 }

@@ -179,7 +179,7 @@ void CSurf_UI_FunctionKeysPage::RenderFunction(ImGui_Context *m_ctx, int index, 
         ImGui::SetCursorPosY(m_ctx, 0);
 
         ImGui::PushFont(m_ctx, assets->GetIconFont(), 24);
-        if (ImGui::Button(m_ctx, std::string(1, IconSearch).c_str()))
+        if (ImGui::Button(m_ctx, std::string(1, IconSearchAction).c_str()))
         {
             PromptForFunctionAction(index, type);
         }

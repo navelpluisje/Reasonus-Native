@@ -12,9 +12,10 @@ enum IconButtonTheme
 {
     ButtonThemeDefault,
     ButtonThemeAccent,
+    ButtonThemeModal,
 };
 
-static void ReaSonusIconButton(
+static bool ReaSonusIconButton(
     ImGui_Context *m_ctx,
     CSurf_UI_Assets *assets,
     IconFont icon,
@@ -23,12 +24,13 @@ static void ReaSonusIconButton(
     IconButtonTheme theme = ButtonThemeDefault,
     std::function<void()> on_click = nullptr)
 {
+    bool return_value = false;
     int menu_button_width = 30;
     int menu_button_height = 30;
 
     int background_color = theme == ButtonThemeDefault ? UI_COLORS::Main_18 : UI_COLORS::Transparent;
-    int border_color = theme == ButtonThemeDefault ? UI_COLORS::Main_38 : UI_COLORS::Transparent;
-    int text_color = theme == ButtonThemeDefault ? UI_COLORS::White : UI_COLORS::Accent;
+    int border_color = (theme == ButtonThemeDefault || theme == ButtonThemeModal) ? UI_COLORS::Main_38 : UI_COLORS::Transparent;
+    int text_color = (theme == ButtonThemeAccent || theme == ButtonThemeModal) ? UI_COLORS::Accent : UI_COLORS::White;
 
     int border_width = 1;
     double x_pos_1, y_pos_1, x_mouse_pos, y_mouse_pos;
@@ -45,7 +47,10 @@ static void ReaSonusIconButton(
         {
             ImGui::SetMouseCursor(m_ctx, ImGui::MouseCursor_Hand);
             background_color = theme == ButtonThemeDefault ? UI_COLORS::Main_38 : UI_COLORS::Transparent;
-            border_color = theme == ButtonThemeDefault ? UI_COLORS::Main_38 : UI_COLORS::Accent_50;
+            border_color = theme == ButtonThemeDefault  ? UI_COLORS::Main_38
+                           : theme == ButtonThemeAccent ? UI_COLORS::Accent_50
+                                                        : UI_COLORS::Accent;
+            // ImGui::SetMouseCursor(m_ctx, ImGui::MouseCursor_Hand);
         }
 
         if (disabled)
@@ -62,11 +67,15 @@ static void ReaSonusIconButton(
             border_width = 2;
             if (!disabled)
             {
-                on_click();
+                if (on_click != nullptr)
+                {
+                    on_click();
+                }
+                return_value = true;
             }
         }
 
-        ImGui_DrawList *list = ImGui::GetWindowDrawList(m_ctx);
+        ImGui_DrawList *list = ImGui::GetForegroundDrawList(m_ctx);
 
         ImGui::DrawList_AddRectFilled(list, x_pos_1, y_pos_1, x_pos_1 + menu_button_width, y_pos_1 + menu_button_height, background_color, 4);
         ImGui::DrawList_AddRect(list, x_pos_1, y_pos_1, x_pos_1 + menu_button_width, y_pos_1 + menu_button_height, border_color, 4, ImGui::DrawFlags_None, border_width);
@@ -74,9 +83,11 @@ static void ReaSonusIconButton(
         ImGui::EndChild(m_ctx);
     }
     ImGui::PopFont(m_ctx);
+
+    return return_value;
 }
 
-static void ReaSonusIconButton(
+static bool ReaSonusIconButton(
     ImGui_Context *m_ctx,
     CSurf_UI_Assets *assets,
     IconFont icon,
@@ -84,7 +95,7 @@ static void ReaSonusIconButton(
     IconButtonTheme theme = ButtonThemeDefault,
     std::function<void()> on_click = nullptr)
 {
-    ReaSonusIconButton(m_ctx, assets, icon, id, false, theme, on_click);
+    return ReaSonusIconButton(m_ctx, assets, icon, id, false, theme, on_click);
 }
 
 #endif
