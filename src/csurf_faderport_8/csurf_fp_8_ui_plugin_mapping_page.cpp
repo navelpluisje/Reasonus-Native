@@ -989,7 +989,7 @@ public:
                 {
                     if (selected_plugin > -1 && selected_plugin_exists)
                     {
-                        ImGui::Text(m_ctx, selected_plugin < 0 ? "Groups" : std::string(developers[selected_developer] + " :: " + plugins[selected_developer][selected_plugin]).c_str());
+                        ImGui::Text(m_ctx, selected_plugin < 0 || selected_plugin >= plugins[selected_developer].size() ? "Groups" : std::string(developers[selected_developer] + " :: " + plugins[selected_developer][selected_plugin]).c_str());
                         ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 4);
                         RenderInformationBar();
                         RenderChannelsList();
