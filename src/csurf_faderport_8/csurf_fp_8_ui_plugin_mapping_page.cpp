@@ -153,6 +153,7 @@ protected:
         file.read(plugin_params);
         ValidatePluginData();
         file.read(previous_plugin_params);
+        nb_channels = 0;
 
         if (!PluginExists())
         {
@@ -162,35 +163,19 @@ protected:
 
         selected_plugin_exists = true;
 
-        nb_channels = 0;
-        for (auto const& it : plugin_params)
+        for (auto const &it : plugin_params)
         {
-            bool found_section = false;
-            std::string section = it.first.c_str();
+            std::string section = it.first;
+            std::string group_id = split(section, "_").back();
 
-            if (section.find("select_") == 0)
+            if (!isInteger(group_id))
             {
-                section.replace(0, 7, "");
-                found_section = true;
-            }
-            else if (section.find("fader_") == 0)
-            {
-                section.replace(0, 6, "");
-                found_section = true;
+                continue;
             }
 
-            if (found_section && isInteger(section))
-            {
-                int index = stoi(section);
-                if (index > nb_channels)
-                {
-                    nb_channels = index;
-                }
-            }
+            nb_channels = max(std::stoi(group_id) + 1, nb_channels);
         }
 
-        // AN extra + to set the add button
-        nb_channels++;
         GetPluginParams();
 
         return true;
@@ -287,6 +272,7 @@ protected:
             fader_name = plugin_params[fader_key]["name"];
             int param_id = stoi(plugin_params[fader_key]["param"]);
             fader_uninvert_label = stoi(plugin_params[fader_key].has("uninvert-label") ? plugin_params[fader_key]["uninvert-label"] : "0");
+
             const auto it = std::find_if(
                 paramIds.begin(),
                 paramIds.end(),
@@ -1060,7 +1046,6 @@ public:
 
     void Save() override
     {
-        int prev_selected_plugin = selected_channel;
         if (selected_plugin < 0)
         {
             return;
@@ -1069,8 +1054,6 @@ public:
         mINI::INIFile file(GetPluginPath());
         if (file.write(plugin_params, true))
         {
-            Reset();
-            selected_channel = prev_selected_plugin;
             ReaSonus8ControlPanel::SetMessage(i18n->t("mapping", "action.save.message"));
         };
     }
