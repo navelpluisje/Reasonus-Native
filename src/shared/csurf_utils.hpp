@@ -63,6 +63,7 @@ const std::vector<std::vector<std::string>> fp_8_settings = {
     {"surface", "time-code", "2"},
     {"surface", "track-color-brightness", "25"},
     {"surface", "plugin-step-size", "1"},
+    {"surface", "plugin-map-param-clear", "0"},
     {"displays", "track", "8"},
     {"functions", "5", "0"},
     {"functions", "6", "0"},

@@ -39,7 +39,8 @@ protected:
     std::vector<PluginParam> paramIds;
     std::vector<std::string> params;
     int selected_param = 0;
-    std::string param_search_query = "";
+    std::string select_search_query = "";
+    std::string fader_search_query = "";
 
     std::string select_key = "";
     std::string select_name;
@@ -400,6 +401,8 @@ protected:
         {
             channel_offset = minmax(0, selected_channel - 6, max(nb_channels - max_items, 0));
         }
+        select_search_query.clear();
+        fader_search_query.clear();
     }
 
     void HandleNextClick()
@@ -424,6 +427,8 @@ protected:
         {
             channel_offset = minmax(0, selected_channel - 6, max(nb_channels - max_items, 0));
         }
+        select_search_query.clear();
+        fader_search_query.clear();
     }
 
     void HandleChannelClick(int index)
@@ -433,6 +438,9 @@ protected:
         PopulateFields();
 
         channel_offset = minmax(0, index - 6, max(nb_channels - max_items, 0));
+
+        select_search_query.clear();
+        fader_search_query.clear();
     }
 
     void HandleResetChannel()
@@ -820,7 +828,8 @@ public:
                     i18n->t("mapping", "edit.select.param.label"),
                     params,
                     &select_param_index,
-                    &param_search_query,
+                    &select_search_query,
+                    settings->ShouldClearParamInput(),
                     space_x * 0.7);
 
                 ImGui::SameLine(m_ctx);
@@ -874,7 +883,8 @@ public:
                     i18n->t("mapping", "edit.fader.param.label"),
                     params,
                     &fader_param_index,
-                    &param_search_query);
+                    &fader_search_query,
+                    settings->ShouldClearParamInput());
             }
             if (ImGui::BeginChild(m_ctx, "filter_content_input", 0.0, 0.0, ImGui::ChildFlags_AutoResizeY))
             {
@@ -994,7 +1004,9 @@ public:
                 {
                     if (selected_plugin > -1 && selected_plugin_exists)
                     {
-                        ImGui::Text(m_ctx, selected_plugin < 0 || selected_plugin >= plugins[selected_developer].size() ? "Groups" : std::string(developers[selected_developer] + " :: " + plugins[selected_developer][selected_plugin]).c_str());
+                        ImGui::Text(m_ctx, selected_plugin < 0 || selected_plugin >= (int)plugins[selected_developer].size()
+                                               ? "Groups"
+                                               : std::string(developers[selected_developer] + " :: " + plugins[selected_developer][selected_plugin]).c_str());
                         ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 4);
                         RenderInformationBar();
                         RenderChannelsList();

@@ -5,10 +5,17 @@
 #include <string>
 #include <vector>
 #include "csurf_ui_elements.hpp"
-// #include "csurf_ui_combo_input.hpp"
 #include "csurf_ui_icon_button.hpp"
 
-static void ReaSonusSearchComboInput(ImGui_Context *m_ctx, CSurf_UI_Assets *assets, std::string label, std::vector<std::string> list, int *value, std::string *search_query, double width = 0.0)
+static void ReaSonusSearchComboInput(
+    ImGui_Context *m_ctx,
+    CSurf_UI_Assets *assets,
+    std::string label,
+    std::vector<std::string> list,
+    int *value,
+    std::string *search_query,
+    bool clear_param,
+    double width = 0.0)
 {
     int label_offset = 24;
     double modal_x, modal_y;
@@ -41,7 +48,6 @@ static void ReaSonusSearchComboInput(ImGui_Context *m_ctx, CSurf_UI_Assets *asse
         ImGui::InputTextWithHint(m_ctx, ("##" + label).c_str(), "Hint", text, sizeof(text));
         if (ImGui::IsItemClicked(m_ctx))
         {
-            *search_query = "";
             ImGui::OpenPopup(m_ctx, "search-combo-modal");
         }
         UiElements::PopReaSonusInputStyle(m_ctx);
@@ -55,7 +61,6 @@ static void ReaSonusSearchComboInput(ImGui_Context *m_ctx, CSurf_UI_Assets *asse
         UiElements::PushReaSonusIconButtonStyle(m_ctx, assets);
         if (ImGui::Button(m_ctx, std::string(1, IconSearch).c_str(), 31, 31))
         {
-            *search_query = "";
             ImGui::OpenPopup(m_ctx, "search-combo-modal");
         }
         UiElements::PopReaSonusIconButtonStyle(m_ctx);
@@ -91,7 +96,14 @@ static void ReaSonusSearchComboInput(ImGui_Context *m_ctx, CSurf_UI_Assets *asse
                 UiElements::PushReaSonusIconButtonStyle(m_ctx, assets);
                 if (ImGui::Button(m_ctx, std::string(1, IconRemove).c_str(), 31, 31))
                 {
-                    ImGui::CloseCurrentPopup(m_ctx);
+                    if (clear_param)
+                    {
+                        *search_query = "";
+                    }
+                    else
+                    {
+                        ImGui::CloseCurrentPopup(m_ctx);
+                    }
                 }
                 UiElements::PopReaSonusIconButtonStyle(m_ctx);
 

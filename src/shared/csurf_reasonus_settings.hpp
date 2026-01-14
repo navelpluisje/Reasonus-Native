@@ -130,6 +130,7 @@ public:
     int GetSurface();
     int GetMidiInput();
     int GetMidiOutput();
+    bool ShouldClearParamInput();
 
     /**
      * Settings for the FaderPort 2

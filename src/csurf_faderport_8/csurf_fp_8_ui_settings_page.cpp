@@ -31,6 +31,7 @@ protected:
     bool setting_momentary_mute_solo;
     bool setting_latch_preview_action_enable;
     bool setting_overwrite_time_code;
+    bool setting_plugin_map_param_clear;
     int setting_plugin_step_size;
     int setting_latch_preview_action;
     int setting_track_color_brightness = 25;
@@ -234,6 +235,21 @@ public:
                             i18n->t("settings", "plugin-step-size.tooltip"));
                         ImGui::EndChild(m_ctx);
                     }
+
+                    ImGui::SameLine(m_ctx);
+                    ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + 16);
+                    if (ImGui::BeginChild(m_ctx, "settings-colors", width / 2 - 8, 0.0, ImGui::ChildFlags_None))
+                    {
+                        RenderInfoCheckbox(
+                            m_ctx,
+                            assets,
+                            i18n->t("settings", "plugin-map-param-clear.label"),
+                            &setting_plugin_map_param_clear,
+                            i18n->t("settings", "plugin-map-param-clear.tooltip"));
+
+                        ImGui::EndChild(m_ctx);
+                    }
+
                     ImGui::EndTabItem(m_ctx);
                 }
                 UiElements::PopReaSonusTabStyle(m_ctx);
@@ -325,6 +341,7 @@ public:
         settings->SetSetting("surface", "latch-preview-action-code", latch_preview_action_indexes[setting_latch_preview_action]);
         settings->SetSetting("surface", "time-code", time_code_indexes[setting_time_code]);
         settings->SetSetting("surface", "plugin-step-size", setting_plugin_step_size);
+        settings->SetSetting("surface", "plugin-map-param-clear", setting_plugin_map_param_clear);
         settings->SetSetting("displays", "track", track_display_indexes[setting_track_display]);
 
         if (settings->StoreSettings())
@@ -362,6 +379,7 @@ public:
         setting_latch_preview_action_enable = settings->GetLatchPreviewActionEnabled();
         setting_plugin_step_size = settings->GetpluginStepSize();
         setting_track_color_brightness = settings->GetTrackColorBrightness();
+        setting_plugin_map_param_clear = settings->ShouldClearParamInput();
 
         index = std::find(latch_preview_action_indexes, latch_preview_action_indexes + 8, settings->GetLatchPreviewActionCode());
         setting_latch_preview_action = index - latch_preview_action_indexes;
