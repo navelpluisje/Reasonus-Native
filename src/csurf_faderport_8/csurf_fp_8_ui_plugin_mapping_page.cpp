@@ -153,6 +153,7 @@ protected:
         file.read(plugin_params);
         ValidatePluginData();
         file.read(previous_plugin_params);
+        nb_channels = 0;
 
         if (!PluginExists())
         {
@@ -162,16 +163,19 @@ protected:
 
         selected_plugin_exists = true;
 
-        for (int i = 0; i < 99; i++)
+        for (auto const &it : plugin_params)
         {
-            if (plugin_params.has("select_" + std::to_string(i)) || plugin_params.has("fader_" + std::to_string(i)))
+            std::string section = it.first.c_str();
+            std::string group_id = split(section, "_").back();
+
+            if (!isInteger(group_id))
             {
-                nb_channels = i;
+                continue;
             }
+
+            nb_channels = max(std::stoi(group_id) + 1, nb_channels);
         }
 
-        // AN extra + to set the add button
-        nb_channels++;
         GetPluginParams();
 
         return true;
@@ -268,6 +272,7 @@ protected:
             fader_name = plugin_params[fader_key]["name"];
             int param_id = stoi(plugin_params[fader_key]["param"]);
             fader_uninvert_label = stoi(plugin_params[fader_key].has("uninvert-label") ? plugin_params[fader_key]["uninvert-label"] : "0");
+
             const auto it = std::find_if(
                 paramIds.begin(),
                 paramIds.end(),
@@ -989,7 +994,7 @@ public:
                 {
                     if (selected_plugin > -1 && selected_plugin_exists)
                     {
-                        ImGui::Text(m_ctx, selected_plugin < 0 ? "Groups" : std::string(developers[selected_developer] + " :: " + plugins[selected_developer][selected_plugin]).c_str());
+                        ImGui::Text(m_ctx, selected_plugin < 0 || selected_plugin >= plugins[selected_developer].size() ? "Groups" : std::string(developers[selected_developer] + " :: " + plugins[selected_developer][selected_plugin]).c_str());
                         ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 4);
                         RenderInformationBar();
                         RenderChannelsList();
