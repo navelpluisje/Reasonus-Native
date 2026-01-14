@@ -1046,7 +1046,6 @@ public:
 
     void Save() override
     {
-        int prev_selected_plugin = selected_channel;
         if (selected_plugin < 0)
         {
             return;
@@ -1055,8 +1054,6 @@ public:
         mINI::INIFile file(GetPluginPath());
         if (file.write(plugin_params, true))
         {
-            Reset();
-            selected_channel = prev_selected_plugin;
             ReaSonus8ControlPanel::SetMessage(i18n->t("mapping", "action.save.message"));
         };
     }
