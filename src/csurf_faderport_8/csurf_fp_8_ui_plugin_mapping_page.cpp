@@ -162,11 +162,30 @@ protected:
 
         selected_plugin_exists = true;
 
-        for (int i = 0; i < 99; i++)
+        nb_channels = 0;
+        for (auto const& it : plugin_params)
         {
-            if (plugin_params.has("select_" + std::to_string(i)) || plugin_params.has("fader_" + std::to_string(i)))
+            bool found_section = false;
+            std::string section = it.first.c_str();
+
+            if (section.find("select_") == 0)
             {
-                nb_channels = i;
+                section.replace(0, 7, "");
+                found_section = true;
+            }
+            else if (section.find("fader_") == 0)
+            {
+                section.replace(0, 6, "");
+                found_section = true;
+            }
+
+            if (found_section && isInteger(section))
+            {
+                int index = stoi(section);
+                if (index > nb_channels)
+                {
+                    nb_channels = index;
+                }
             }
         }
 
