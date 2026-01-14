@@ -165,7 +165,7 @@ protected:
 
         for (auto const &it : plugin_params)
         {
-            std::string section = it.first.c_str();
+            std::string section = it.first;
             std::string group_id = split(section, "_").back();
 
             if (!isInteger(group_id))
