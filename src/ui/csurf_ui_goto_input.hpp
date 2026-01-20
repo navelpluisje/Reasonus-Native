@@ -7,7 +7,7 @@
 #include "csurf_ui_elements.hpp"
 #include "csurf_ui_icon_button.hpp"
 
-static void ReaSonusGoToInput(ImGui_Context *m_ctx, CSurf_UI_Assets *assets, int *value)
+static void ReaSonusGoToInput(ImGui_Context *m_ctx, CSurf_UI_Assets *assets, int *value, int max_value)
 {
     double modal_x, modal_y;
     ImGui::GetCursorScreenPos(m_ctx, &modal_x, &modal_y);
@@ -65,11 +65,25 @@ static void ReaSonusGoToInput(ImGui_Context *m_ctx, CSurf_UI_Assets *assets, int
                 {
                     ImGui::SetKeyboardFocusHere(m_ctx);
                 }
-                if (ImGui::InputText(m_ctx, "##goto-input", str_value, sizeof(str_value), ImGui::InputTextFlags_CharsDecimal || ImGui::InputTextFlags_EnterReturnsTrue))
+                if (ImGui::InputText(
+                        m_ctx,
+                        "##goto-input",
+                        str_value,
+                        sizeof(str_value),
+                        ImGui::InputTextFlags_CallbackCharFilter,
+                        assets->GetOnlyDigetsFilter()))
                 {
-                    if (!std::string(str_value).empty())
+                    if (!std::string(str_value).empty() && isInteger(std::string(str_value)))
                     {
-                        *value = stoi(std::string(str_value)) - 1;
+                        int val = stoi(std::string(str_value)) - 1;
+                        if (val < max_value)
+                        {
+                            *value = stoi(std::string(str_value)) - 1;
+                        }
+                    }
+                    else
+                    {
+                        *value = *value;
                     }
                 }
 

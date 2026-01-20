@@ -83,6 +83,7 @@ public:
     static bool TrackHasFx(MediaTrack *media_track);
     static bool HasTrackFx(MediaTrack *media_track, int fx);
     static std::string GetTrackFxName(MediaTrack *media_track, int fx, bool full = false);
+    static std::string GetTrackFxType(MediaTrack *media_track, int fx);
     static std::string GetTrackFxDeveloper(MediaTrack *media_track, int fx);
     static bool GetTrackFxEnabled(MediaTrack *media_track, int fx);
     static bool GetTrackFxOffline(MediaTrack *media_track, int fx);

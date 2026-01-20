@@ -6,12 +6,14 @@
 #include <reaper_plugin_functions.h>
 #include <mini/ini.h>
 
-const char pathSeparator =
+const char PATH_SEPARATOR =
 #ifdef _WIN32
     '\\';
 #else
     '/';
 #endif
+
+const std::string PREFIX_SEPARATOR = ": ";
 
 const int TOGGLE_SPEED = 150;
 const int DOUBLE_CLICK_SPEED = 750;
@@ -297,7 +299,7 @@ std::string GetReaSonusIniPath(std::string device);
 
 std::string GetReaSonusZonesPath();
 
-std::string GetReaSonusPluginPath(std::string developer, std::string pluginName, bool create = false);
+std::string GetReaSonusPluginPath(std::string developer, std::string plugin_name, std::string plugin_type, bool create = false);
 
 std::string GetReaSonusLocalesFolderPath();
 std::string GetReaSonusLocalesPath(std::string language);
@@ -404,5 +406,11 @@ bool setWindowScrollPos(void *windowHWND, const char *scrollbar, int position);
 void GetLanguages(std::vector<std::string> &language_names);
 
 double between(int min, int val, int max);
+
+bool createPathIfNotExist(std::string path);
+
+std::string createPathName(std::vector<std::string> path_elements);
+
+std::string toLowerCase(std::string value);
 
 #endif // CSURF_UTILS_H_

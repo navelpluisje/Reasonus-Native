@@ -126,34 +126,22 @@ std::string StripPluginDeveloper(std::string pluginName)
 
 std::string StripPluginNamePrefixes(char *name)
 {
-    std::string s = std::string(name);
-    std::string delimiter = ": ";
-    int pos = (int)(s.find(delimiter) + size(delimiter));
-    if (pos < 0)
-    {
-        return s;
-    }
-    s.erase(0, pos);
-    return s;
+    std::vector<std::string> splitted_name = split(std::string(name), PREFIX_SEPARATOR);
+
+    return splitted_name[splitted_name.size() - 1];
 }
 
 std::string StripPluginChannelPostfix(char *name)
 {
-    std::string s = std::string(name);
-    std::string delimiter = " (32 out)";
-    int pos = (int)s.find(delimiter);
-    if (pos < 0)
-    {
-        return s;
-    }
-    s.erase(s.find(delimiter), size(delimiter));
-    return s;
+    std::vector<std::string> splitted_name = split(std::string(name), " (");
+    splitted_name.pop_back();
+
+    return join(splitted_name, " (");
 }
 
 bool IsPluginFX(std::string name)
 {
-    std::string delimiter = ": ";
-    int pos = (int)name.find(delimiter);
+    int pos = (int)name.find(PREFIX_SEPARATOR);
     // If we can not find the delimiter, we can not determine the type of plugin, so asume it's an effect
     if (pos < 0)
     {
@@ -214,41 +202,43 @@ std::string GetAutomationString(int automationMode)
 std::string GetReaSonusFolderPath()
 {
     std::string recource_path = std::string(GetResourcePath());
-    return recource_path + pathSeparator + "ReaSonus";
+    return createPathName({recource_path, "ReaSonus"});
 }
 
-std::string GetReaSonusIniPath(std::string device) { return GetReaSonusFolderPath() + pathSeparator + device + ".ini"; }
-
-std::string GetReaSonusZonesPath() { return std::string(GetResourcePath()) + pathSeparator + "CSI" + pathSeparator + "Zones" + pathSeparator + "ReasonusFaderPort" + pathSeparator + "_ReaSonusEffects"; }
-
-std::string GetReaSonusPluginPath(std::string developer, std::string pluginName, bool create)
+std::string GetReaSonusIniPath(std::string device)
 {
-    std::string path = GetReaSonusFolderPath() + pathSeparator + "Plugins" + pathSeparator + developer;
+    return createPathName({GetReaSonusFolderPath(), device + ".ini"});
+}
+
+std::string GetReaSonusZonesPath()
+{
+    return createPathName({std::string(GetResourcePath()), "CSI", "Zones", "ReasonusFaderPort", "_ReaSonusEffects"});
+}
+
+std::string GetReaSonusPluginPath(std::string developer, std::string plugin_name, std::string plugin_type, bool create)
+{
+    std::string path = createPathName({std::string(GetResourcePath()), "ReaSonus", "Plugins", developer});
 
     if (create)
     {
-#ifdef _WIN32
-        SHCreateDirectoryEx(NULL, path.c_str(), NULL);
-#else
-        RecursiveCreateDirectory(path.c_str(), 0);
-#endif
+        createPathIfNotExist(path);
     }
-    return path + pathSeparator + pluginName + ".ini";
+    return createPathName({path, plugin_name + "." + plugin_type + ".ini"});
 }
 
 std::string GetReaSonusLocalesFolderPath()
 {
-    return GetReaSonusFolderPath() + pathSeparator + "Locales";
+    return createPathName({GetReaSonusFolderPath(), "Locales"});
 }
 
 std::string GetReaSonusLocalesPath(std::string language)
 {
-    return GetReaSonusLocalesFolderPath() + pathSeparator + language + ".ini";
+    return createPathName({GetReaSonusLocalesFolderPath(), language + ".ini"});
 }
 
 std::string GetReaSonusLocalesRootFile()
 {
-    return std::string(GetResourcePath()) + pathSeparator + "UserPlugins" + pathSeparator + "ReaSonus" + pathSeparator + "en-US.ini";
+    return createPathName({std::string(GetResourcePath()), "UserPlugins", "ReaSonus", "en-US.ini"});
 }
 
 bool isInteger(std::string value)
@@ -318,10 +308,11 @@ std::string join(std::vector<std::string> list, std::string delimiter)
 
 bool hasPluginConfigFile(MediaTrack *media_track, int pluginId)
 {
-    std::string pluginName = DAW::GetTrackFxName(media_track, pluginId);
-    std::string developerName = DAW::GetTrackFxDeveloper(media_track, pluginId);
+    std::string plugin_name = DAW::GetTrackFxName(media_track, pluginId);
+    std::string developer_name = DAW::GetTrackFxDeveloper(media_track, pluginId);
+    std::string plugin_type = DAW::GetTrackFxType(media_track, pluginId);
 
-    return file_exists(GetReaSonusPluginPath(developerName, pluginName).c_str());
+    return file_exists(GetReaSonusPluginPath(developer_name, plugin_name, plugin_type).c_str());
 }
 
 void logInteger(const char *key, int value)
@@ -343,7 +334,7 @@ void readAndCreateIni(mINI::INIStructure &data, std::string device)
     mINI::INIFile file(GetReaSonusIniPath(device));
     if (!file.read(data))
     {
-        RecursiveCreateDirectory((std::string(GetResourcePath()) + pathSeparator + "ReaSonus" + pathSeparator + "Plugins").c_str(), 0);
+        RecursiveCreateDirectory(createPathName({std::string(GetResourcePath()), "ReaSonus", "Plugins"}).c_str(), 0);
         for (auto setting : shared_settings)
         {
             data[setting.at(0)][setting.at(1)] = setting.at(2);
@@ -612,4 +603,36 @@ double between(int min, int val, int max)
 {
     double diff = max - min;
     return diff > 0 && diff < val;
+}
+
+/**
+ * @brief Create a Path If Not Exist object
+ *
+ * @param path
+ * @return true when path exists
+ * @return false when path not exists
+ */
+bool createPathIfNotExist(std::string path)
+{
+    if (!std::filesystem::exists(path))
+    {
+#ifdef _WIN32
+        SHCreateDirectoryEx(NULL, path.c_str(), NULL);
+#else
+        RecursiveCreateDirectory(path.c_str(), 0);
+#endif
+    }
+
+    return std::filesystem::exists(path);
+}
+
+std::string createPathName(std::vector<std::string> path_elements)
+{
+    return join(path_elements, std::string(1, PATH_SEPARATOR));
+}
+
+std::string toLowerCase(std::string value)
+{
+    std::transform(value.begin(), value.end(), value.begin(), ::tolower);
+    return value;
 }
