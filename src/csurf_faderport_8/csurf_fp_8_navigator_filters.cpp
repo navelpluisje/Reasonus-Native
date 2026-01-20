@@ -149,19 +149,19 @@ std::map<int, bool> GetCustomFilterTracks(mINI::INIMap<std::string> filter)
     return tracks;
 }
 
-bool FuzzyMatch(std::string trackName, std::string matches, bool case_insensitive)
+bool FuzzyMatch(std::string track_name, std::string matches, bool case_insensitive)
 {
     bool match = false;
 
     if (case_insensitive)
     {
-        std::transform(trackName.begin(), trackName.end(), trackName.begin(), ::tolower);
-        std::transform(matches.begin(), matches.end(), matches.begin(), ::tolower);
+        track_name = toLowerCase(track_name);
+        matches = toLowerCase(matches);
     }
 
     for (const std::string &val : split(matches, ","))
     {
-        std::string::size_type found = trackName.find(val);
+        std::string::size_type found = track_name.find(val);
         match = match || found != std::string::npos;
     }
 

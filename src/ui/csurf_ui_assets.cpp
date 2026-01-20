@@ -17,6 +17,10 @@ CSurf_UI_Assets::CSurf_UI_Assets(ImGui_Context *m_ctx)
 
     combo_filter = ImGui::CreateTextFilter("");
     ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(combo_filter));
+
+    const char *callback = "EventChar < 48 || EventChar > 57 ? EventChar = 0;";
+    onlyDigitsFilter = ImGui::CreateFunctionFromEEL(callback);
+    ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(onlyDigitsFilter));
 }
 
 ImGui_Font *CSurf_UI_Assets::GetMainFont()
@@ -43,4 +47,9 @@ ImGui_Image *CSurf_UI_Assets::GetReaSonusLogo()
 ImGui_TextFilter *CSurf_UI_Assets::GetReaComboFilter()
 {
     return combo_filter;
+}
+
+ImGui_Function *CSurf_UI_Assets::GetOnlyDigetsFilter()
+{
+    return onlyDigitsFilter;
 }

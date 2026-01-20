@@ -22,18 +22,20 @@ protected:
     void GetCurrentPlugin()
     {
         MediaTrack *media_track = context->GetPluginEditTrack();
-        int pluginId = context->GetPluginEditPluginId();
-        std::string pluginName = DAW::GetTrackFxName(media_track, pluginId);
-        std::string developerName = DAW::GetTrackFxDeveloper(media_track, pluginId);
-        fileName = GetReaSonusPluginPath(developerName, pluginName);
+        int plugin_id = context->GetPluginEditPluginId();
+        std::string plugin_type = DAW::GetTrackFxType(media_track, plugin_id);
+        std::string plugin_name = DAW::GetTrackFxName(media_track, plugin_id);
+        std::string developer_name = DAW::GetTrackFxDeveloper(media_track, plugin_id);
+        fileName = GetReaSonusPluginPath(developer_name, plugin_name, plugin_type);
 
         mINI::INIFile file(fileName);
         if (!file.read(ini))
         {
             ini["Global"];
-            ini["Global"]["origName"] = pluginName;
-            ini["Global"]["name"] = pluginName;
-            ini["Global"]["developer"] = developerName;
+            ini["Global"]["origName"] = plugin_name;
+            ini["Global"]["name"] = plugin_name;
+            ini["Global"]["type"] = plugin_type;
+            ini["Global"]["developer"] = developer_name;
             (void)file.generate(ini, true);
         }
     }

@@ -24,7 +24,7 @@ static void ReaSonusButtonBar(
         if (!message->empty())
         {
             UiElements::PushReaSonusButtonBarMessageStyle(m_ctx);
-            if (ImGui::BeginChild(m_ctx, "message-box", 0, 0, ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeX, ImGui::ChildFlags_AutoResizeY))
+            if (ImGui::BeginChild(m_ctx, "message-box", 0, 0, ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeX | ImGui::WindowFlags_NoScrollbar | ImGui::ChildFlags_AutoResizeY))
             {
                 ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 2);
                 ImGui::Text(m_ctx, message->c_str());

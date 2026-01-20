@@ -22,7 +22,7 @@ protected:
     int changed_items = 0;
 
     bool render_started = false;
-    std::string plugin_folder_path = std::string(GetResourcePath()) + pathSeparator + "ReaSonus" + pathSeparator + "Plugins";
+    std::string plugin_folder_path = createPathName({std::string(GetResourcePath()), "ReaSonus", "Plugins"});
     std::vector<std::string> developers;
     int selected_developer = -1;
     int previous_selected_developer = -1;
@@ -89,7 +89,7 @@ protected:
     {
         bool has_next = true;
         int index = 0;
-        std::string path = plugin_folder_path + pathSeparator + developer;
+        std::string path = createPathName({plugin_folder_path, developer});
         std::vector<std::string> developer_plugins;
 
         while (has_next)
@@ -116,7 +116,12 @@ protected:
 
     std::string GetPluginPath()
     {
-        return plugin_folder_path + pathSeparator + developers[selected_developer] + pathSeparator + plugins[selected_developer][selected_plugin];
+        return createPathName({plugin_folder_path, developers[selected_developer], plugins[selected_developer][selected_plugin]});
+    }
+
+    std::string GetPluginSavePath()
+    {
+        return createPathName({plugin_folder_path, developers[previous_selected_developer], plugins[previous_selected_developer][previous_selected_plugin]});
     }
 
     /**
@@ -372,6 +377,7 @@ protected:
             int res = MB(i18n->t("mapping", "popup.unsaved.message").c_str(), i18n->t("mapping", "popup.unsaved.title").c_str(), 3);
             if (res == 6)
             {
+                ShowConsoleMsg("SAVE!1");
                 Save();
             }
             return res != 2;
@@ -616,6 +622,20 @@ protected:
         HandleDeleteChannelById(from_id);
     }
 
+    std::string formatPluginName(std::string plugin_name)
+    {
+        std::vector<std::string> splitted_plugin_name = split(plugin_name, ".");
+
+        splitted_plugin_name.pop_back();
+
+        if (splitted_plugin_name.size() > 1)
+        {
+            return splitted_plugin_name.at(0) + " (" + splitted_plugin_name.at(1) + ")";
+        }
+
+        return splitted_plugin_name.at(0);
+    }
+
 public:
     CSurf_FP_8_PluginMappingPage(ImGui_Context *m_ctx, CSurf_UI_Assets *assets) : CSurf_UI_PageContent(m_ctx, assets)
     {
@@ -657,7 +677,7 @@ public:
                         for (int j = 0; j < (int)developer_plugins.size(); j++)
                         {
                             bool selected = selected_developer == i && selected_plugin == j;
-                            if (ImGui::Selectable(m_ctx, developer_plugins.at(j).c_str(), &selected))
+                            if (ImGui::Selectable(m_ctx, formatPluginName(developer_plugins.at(j)).c_str(), &selected))
                             {
                                 selected_plugin = j;
                             }
@@ -770,10 +790,9 @@ public:
             ImGui::SameLine(m_ctx);
 
             ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
-
             ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + space_x - 144);
 
-            ReaSonusGoToInput(m_ctx, assets, &selected_channel);
+            ReaSonusGoToInput(m_ctx, assets, &selected_channel, nb_channels);
 
             ImGui::SameLine(m_ctx);
 
@@ -984,7 +1003,7 @@ public:
 
             if (selected_channel != previous_selected_channel && selected_plugin_exists)
             {
-                PopulateFields();
+                HandleChannelClick(selected_channel);
                 previous_selected_channel = selected_channel;
             }
 
@@ -1063,11 +1082,13 @@ public:
             return;
         }
 
-        mINI::INIFile file(GetPluginPath());
+        mINI::INIFile file(GetPluginSavePath());
         if (file.write(plugin_params, true))
         {
             ReaSonus8ControlPanel::SetMessage(i18n->t("mapping", "action.save.message"));
         };
+        SetPluginData();
+        PopulateFields();
     }
 
     void SetPageProperty(int type, std::string value) override

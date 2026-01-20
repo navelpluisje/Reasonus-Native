@@ -128,7 +128,7 @@ void CSurf_UI_FunctionKeysPage::RenderFunction(ImGui_Context *m_ctx, int index, 
     std::string type_name = type == TypeFunction ? "item" : "footswitch";
     const char *fullName = kbd_getTextFromCmd(actionId, 0);
 
-    std::vector<std::string> actionInfo = split(fullName, ": ");
+    std::vector<std::string> actionInfo = split(fullName, PREFIX_SEPARATOR);
 
     std::string idx = "function-key-" + std::to_string(index);
     std::string button_idx = "button-key-" + std::to_string(index);

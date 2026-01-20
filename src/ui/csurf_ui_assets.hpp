@@ -54,6 +54,9 @@ private:
     // Filters
     ImGui_TextFilter *combo_filter;
 
+    // EEL Functions
+    ImGui_Function *onlyDigitsFilter;
+
 public:
     CSurf_UI_Assets(ImGui_Context *m_ctx);
 
@@ -64,6 +67,8 @@ public:
     ImGui_Image *GetReaSonusLogo();
 
     ImGui_TextFilter *GetReaComboFilter();
+
+    ImGui_Function *GetOnlyDigetsFilter();
 };
 
 #endif
