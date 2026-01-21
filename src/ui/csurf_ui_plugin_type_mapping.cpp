@@ -91,6 +91,8 @@ void ReaSonusPluginTypeMapping::SetPluginFolders()
     int index = 0;
     developers.clear();
     plugins.clear();
+    selected_developer = -1;
+    selected_plugin = -1;
     selected_plugin_type = -1;
 
     while (has_next)
@@ -115,8 +117,11 @@ void ReaSonusPluginTypeMapping::SetPluginFolders()
         }
     }
 
-    selected_developer = 0;
-    selected_plugin = 0;
+    if (developers.size() > 0)
+    {
+        selected_developer = 0;
+        selected_plugin = 0;
+    }
 }
 
 std::vector<std::string> ReaSonusPluginTypeMapping::SetDeveloperPlugins(std::string developer)
@@ -150,6 +155,11 @@ std::vector<std::string> ReaSonusPluginTypeMapping::SetDeveloperPlugins(std::str
 
 bool ReaSonusPluginTypeMapping::AddPluginType()
 {
+    if (selected_plugin_type < 0)
+    {
+        return false;
+    }
+
     /**
      * Create the current plugin path
      */
