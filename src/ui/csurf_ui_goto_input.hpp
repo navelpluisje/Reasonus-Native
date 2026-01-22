@@ -6,6 +6,7 @@
 #include <vector>
 #include "csurf_ui_elements.hpp"
 #include "csurf_ui_icon_button.hpp"
+#include "../shared/csurf_context.cpp"
 
 static void ReaSonusGoToInput(ImGui_Context *m_ctx, CSurf_UI_Assets *assets, int *value, int max_value)
 {
@@ -65,11 +66,15 @@ static void ReaSonusGoToInput(ImGui_Context *m_ctx, CSurf_UI_Assets *assets, int
                 {
                     ImGui::SetKeyboardFocusHere(m_ctx);
                 }
+
+                int max_group_count = CSurf_Context::GetPluginMaxGroupCount();
+                int str_value_buffer_length = std::to_string(max_group_count).length() + 1;
+
                 if (ImGui::InputText(
                         m_ctx,
                         "##goto-input",
                         str_value,
-                        sizeof(str_value),
+                        str_value_buffer_length,
                         ImGui::InputTextFlags_CallbackCharFilter,
                         assets->GetOnlyDigetsFilter()))
                 {
