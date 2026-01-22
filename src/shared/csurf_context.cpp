@@ -357,6 +357,11 @@ public:
     {
         channelManagerItemsCount = 0;
     }
+	
+    static int GetPluginMaxGroupCount()
+    {
+        return 1024;
+    }
 
     /**************************************************************************
      * Channel modes

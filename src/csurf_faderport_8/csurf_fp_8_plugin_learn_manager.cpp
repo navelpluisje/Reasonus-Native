@@ -54,7 +54,7 @@ public:
         midi_Output *m_midiout) : CSurf_FP_8_ChannelManager(tracks, navigator, context, m_midiout)
     {
         context->ResetChannelManagerItemIndex();
-        context->SetChannelManagerItemsCount(127);
+        context->SetChannelManagerItemsCount(CSurf_Context::GetPluginMaxGroupCount());
         GetCurrentPlugin();
         UpdateTracks();
         color = ButtonColorWhiteDim;
