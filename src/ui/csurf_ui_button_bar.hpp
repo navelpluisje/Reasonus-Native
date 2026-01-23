@@ -19,7 +19,7 @@ static void ReaSonusButtonBar(
     int button_padding_x = 16;
 
     UiElements::PushReaSonusButtonBarContainerStyle(m_ctx);
-    if (ImGui::BeginChild(m_ctx, "button-bar", 0.0, 34.0, ImGui::ChildFlags_FrameStyle))
+    if (ImGui::BeginChild(m_ctx, "button-bar", 0.0, 36.0, ImGui::ChildFlags_FrameStyle))
     {
         if (!message->empty())
         {

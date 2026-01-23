@@ -49,7 +49,7 @@ public:
             if (ImGui::BeginChild(m_ctx, "filter_content", 0.0, 0.0))
             {
                 UiElements::PushReaSonusGroupStyle(m_ctx);
-                if (ImGui::BeginChild(m_ctx, "Contribute & Links", 0.0, device != FP_V2 ? 288.0 : 0.0, ImGui::ChildFlags_FrameStyle))
+                if (ImGui::BeginChild(m_ctx, "Contribute & Links", 0.0, device != FP_V2 ? 292.0 : 0.0, ImGui::ChildFlags_FrameStyle))
                 {
                     ImGui::GetContentRegionAvail(m_ctx, &available_width, &available_height);
                     ImGui::PushTextWrapPos(m_ctx, available_width);
