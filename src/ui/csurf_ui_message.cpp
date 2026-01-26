@@ -1,3 +1,4 @@
+#include "csurf_ui_plugin_type_mapping.hpp"
 #include "csurf_ui_message.hpp"
 #include "csurf_ui_colors.hpp"
 #include "csurf_ui_vars.hpp"
@@ -5,7 +6,7 @@
 #include "csurf_ui_button_bar.hpp"
 #include "../shared/csurf_utils.hpp"
 
-constexpr const char *g_name{"ReaSonus Native Message"};
+constexpr const char *g_name{"ReaSonus Native New Version"};
 
 std::unique_ptr<ReaSonusMessage> ReaSonusMessage::s_inst;
 
@@ -82,7 +83,7 @@ void ReaSonusMessage::Loop()
 
 void ReaSonusMessage::Frame()
 {
-    using namespace std::placeholders; // for `_1, _2 etc`
+    double width, height;
 
     if (close_clicked)
     {
@@ -93,18 +94,18 @@ void ReaSonusMessage::Frame()
     if (save_clicked)
     {
         save_clicked = false;
+        ReaSonusPluginTypeMapping::Start();
     }
 
     PushReaSonusColors(m_ctx);
     PushReaSonusStyle(m_ctx);
     ImGui::PushFont(m_ctx, assets->GetMainFont(), FontSizeDefault);
-    ImGui::SetNextWindowSize(m_ctx, 640, 612, ImGui::Cond_Once);
     bool open{true};
 
     UiElements::PushReaSonusWindowStyle(m_ctx);
-    if (ImGui::Begin(m_ctx, g_name, &open, ImGui::WindowFlags_NoCollapse))
+    if (ImGui::Begin(m_ctx, g_name, &open, ImGui::WindowFlags_NoCollapse | ImGui::WindowFlags_AlwaysAutoResize))
     {
-        if (ImGui::BeginChild(m_ctx, "logo", 0.0, 52.0, ImGui::ChildFlags_None))
+        if (ImGui::BeginChild(m_ctx, "logo", 640.0, 52.0, ImGui::ChildFlags_None))
         {
             ImGui::Image(m_ctx, assets->GetReaSonusLogo(), 200, 52);
             ImGui::SameLine(m_ctx);
@@ -113,13 +114,31 @@ void ReaSonusMessage::Frame()
         }
 
         UiElements::PushReaSonusGroupStyle(m_ctx);
-        if (ImGui::BeginChild(m_ctx, "actions_container", 0.0, -52.0, ImGui::ChildFlags_None))
+        if (ImGui::BeginChild(m_ctx, "actions_container", 0.0, 0.0, ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY))
         {
 
-            ReaSonusPageTitle(m_ctx, assets, "Languages");
+            ReaSonusPageTitle(m_ctx, assets, "ReaSonus Native New Version");
+            ImGui::GetContentRegionAvail(m_ctx, &width, &height);
+            ImGui::PushTextWrapPos(m_ctx, width - 24);
 
+            ImGui::Text(m_ctx, "This ReaSonus Native version has a lot of changes for the plugin mapping. Some of the changes are:");
+            ImGui::BulletText(m_ctx, "'Unlimited' amount of groups.");
+            ImGui::BulletText(m_ctx, "Added a search in the parameter selection.");
+            ImGui::BulletText(m_ctx, "Added option to not invert the label text.");
+            ImGui::BulletText(m_ctx, "Added `next` and `previous` button to scroll through the list of groups. Using them with the left shift of your keyboard will navigate by grops of 13.");
+            ImGui::BulletText(m_ctx, "Added setting for the step size when scrolling through the groups on the device.");
+            ImGui::BulletText(m_ctx, "Added drag and drop support for groups.");
+            ImGui::BulletText(m_ctx, "Added option to add or delete a group at any point.");
+            ImGui::BulletText(m_ctx, "Added an indicator for changed groups.");
+            ImGui::BulletText(m_ctx, "The version number in ReaSonus Control Panel is now clickable and will open this window.");
+
+            ImGui::Text(m_ctx, "Beside all these nice improvements, some bugs were fixed as well. When creating a plugin mapping, the plugin type was not taken in account. This can potentially cause issues as the mapping between plugin types can differ");
+            ImGui::Text(m_ctx, "There has been created a Plugin Type Mapping tool to help you set the type for your mappings. The possitive is you only have to do this once. Click the `Open type Mapping` button below to start the mapping.");
+            ImGui::Text(m_ctx, "The tool is also available in the actions list (search for: 'plugin type`)");
+
+            ImGui::PopTextWrapPos(m_ctx);
             UiElements::PopReaSonusGroupStyle(m_ctx);
-            ImGui::EndChild(m_ctx); // actions_info
+            ImGui::EndChild(m_ctx);
         }
 
         ReaSonusButtonBar(

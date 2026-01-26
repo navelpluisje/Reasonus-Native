@@ -7,6 +7,7 @@
 #include "../ui/csurf_ui_vars.hpp"
 #include "../ui/csurf_ui_menu_button.hpp"
 #include "../ui/csurf_ui_button_bar.hpp"
+#include "../ui/csurf_ui_message.hpp"
 #include "../ui/csurf_ui_function_keys_page.hpp"
 
 constexpr const char *g_name{"ReaSonus Native 8/16 Control Panel"};
@@ -250,7 +251,10 @@ void ReaSonus8ControlPanel::Frame()
                 ImGui::EndChild(m_ctx);
             }
 
-            ImGui::Text(m_ctx, GIT_VERSION);
+            if (ImGui::TextLink(m_ctx, GIT_VERSION))
+            {
+                ReaSonusMessage::Start();
+            }
 
             ImGui::EndChild(m_ctx);
             UiElements::PopReaSonusSidebarStyle(m_ctx);

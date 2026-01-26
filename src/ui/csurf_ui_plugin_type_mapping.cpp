@@ -155,7 +155,7 @@ std::vector<std::string> ReaSonusPluginTypeMapping::SetDeveloperPlugins(std::str
 
 bool ReaSonusPluginTypeMapping::AddPluginType()
 {
-    if (selected_plugin_type < 0)
+    if (selected_plugin_type < 0 || selected_plugin < 0)
     {
         return false;
     }
