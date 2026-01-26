@@ -42,8 +42,8 @@ static void ReaSonusGoToInput(ImGui_Context *m_ctx, CSurf_UI_Assets *assets, int
         /**
          * Create the modal
          */
-        ImGui::SetNextWindowPos(m_ctx, modal_x - 48, modal_y - 8);
-        ImGui::SetNextWindowSize(m_ctx, 86, 46);
+        ImGui::SetNextWindowPos(m_ctx, modal_x - 63, modal_y - 8);
+        ImGui::SetNextWindowSize(m_ctx, 101, 46);
 
         UiElements::PushReaSonusModalStyle(m_ctx);
         if (ImGui::BeginPopup(m_ctx, "goto-modal", ImGui::WindowFlags_TopMost | ImGui::WindowFlags_NoTitleBar | ImGui::WindowFlags_NoResize | ImGui::WindowFlags_NoMove))
@@ -56,12 +56,12 @@ static void ReaSonusGoToInput(ImGui_Context *m_ctx, CSurf_UI_Assets *assets, int
                 ImGui::CloseCurrentPopup(m_ctx);
             }
 
-            if (ImGui::BeginChild(m_ctx, "goto-modal-content", 86, 46, ImGui::ChildFlags_FrameStyle, ImGui::WindowFlags_NoNavFocus))
+            if (ImGui::BeginChild(m_ctx, "goto-modal-content", 98, 46, ImGui::ChildFlags_FrameStyle, ImGui::WindowFlags_NoNavFocus | ImGui::WindowFlags_NoScrollbar))
             {
                 UiElements::PushReaSonusInputStyle(m_ctx);
                 ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 7, 7);
 
-                ImGui::SetNextItemWidth(m_ctx, 41);
+                ImGui::SetNextItemWidth(m_ctx, 48);
                 if (ImGui::IsWindowAppearing(m_ctx))
                 {
                     ImGui::SetKeyboardFocusHere(m_ctx);
