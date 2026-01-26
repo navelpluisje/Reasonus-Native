@@ -244,7 +244,7 @@ void ReaSonusPluginTypeMapping::Frame()
     if (close_clicked)
     {
         close_clicked = false;
-        Stop();
+        return Stop();
     }
 
     if (add_type_clicked)

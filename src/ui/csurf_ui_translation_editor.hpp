@@ -24,7 +24,6 @@ private:
     static void Loop();
     CSurf_UI_Assets *assets;
     static std::unique_ptr<ReaSonusTranslationEditor> s_inst;
-    void InitAssets();
     void GetBaseLanguage();
     void GetSelectedLanguage();
     void GetLanguageList();

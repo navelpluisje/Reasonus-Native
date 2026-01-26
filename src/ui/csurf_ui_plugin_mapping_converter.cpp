@@ -219,7 +219,7 @@ void ReaSonusPluginMappingConverter::Frame()
     if (close_clicked)
     {
         close_clicked = false;
-        Stop();
+        return Stop();
     }
 
     if (convert_clicked)

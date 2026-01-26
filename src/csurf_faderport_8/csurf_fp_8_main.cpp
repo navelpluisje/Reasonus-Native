@@ -11,6 +11,7 @@
 #include "../shared/csurf_utils.hpp"
 #include "../i18n/i18n.hpp"
 #include "../ui/csurf_ui_assets.hpp"
+#include "../ui/csurf_ui_message.hpp"
 #include "../shared/csurf_reasonus_settings.hpp"
 #include "csurf_fp_8_session_manager.cpp"
 #include "csurf_fp_8_mix_manager.cpp"
@@ -391,6 +392,7 @@ public:
 
     if (std::string(GIT_VERSION).compare(DAW::GetExtState(EXT_STATE_KEY_VERSION, "")) != 0)
     {
+      ReaSonusMessage::Start();
       DAW::SetExtState(EXT_STATE_KEY_VERSION, GIT_VERSION, true);
       I18n::checkLocalesFiles();
     }

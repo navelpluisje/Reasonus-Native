@@ -304,7 +304,7 @@ void ReaSonusTranslationEditor::Frame()
     if (close_clicked)
     {
         close_clicked = false;
-        Stop();
+        return Stop();
     }
 
     if (save_clicked)
