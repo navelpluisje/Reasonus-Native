@@ -1069,6 +1069,11 @@ public:
 
     void Reset() override
     {
+        if (selected_plugin < 0)
+        {
+            return;
+        }
+		
         channel_offset = 0;
         selected_channel = 0;
         SetPluginData();

@@ -106,7 +106,9 @@ public:
             {
                 if (!displayStepSize)
                 {
-                    track->SetDisplayLine(2, ALIGN_CENTER, ini[paramKey]["name"].c_str(), INVERT, forceUpdate);
+                    Inverted inverted = ini[paramKey].has("uninvert-label") && ini[paramKey]["uninvert-label"] == "1" ? NON_INVERT : INVERT;
+					
+                    track->SetDisplayLine(2, ALIGN_CENTER, ini[paramKey]["name"].c_str(), inverted, forceUpdate);
                     TrackFX_GetFormattedParamValue(media_track, pluginId, stoi(ini[paramKey]["param"]), buffer, sizeof(buffer));
                     track->SetDisplayLine(3, ALIGN_CENTER, buffer, NON_INVERT, forceUpdate);
                 }
