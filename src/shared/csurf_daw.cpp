@@ -333,12 +333,31 @@ std::string DAW::GetTrackFxName(MediaTrack *media_track, int fx, bool full)
         return StripPluginNamePrefixes(pluginName);
     }
     std::vector<std::string> pluginNameParts = split(StripPluginNamePrefixes(StripPluginChannelPostfix(pluginName).data()), " (");
+
     if (pluginNameParts.size() > 1)
     {
         pluginNameParts.pop_back();
     }
 
     return join(pluginNameParts, " (");
+}
+
+std::string DAW::GetTrackFxType(MediaTrack *media_track, int fx)
+{
+    char pluginName[256] = "";
+    if (!::TrackFX_GetFXName(media_track, fx, pluginName, std::size(pluginName)))
+    {
+        return "No FX";
+    }
+
+    std::vector<std::string> pluginNameParts = split(pluginName, PREFIX_SEPARATOR);
+
+    if (pluginNameParts.size() > 1)
+    {
+        return toLowerCase(pluginNameParts.at(0));
+    }
+
+    return "unkown";
 }
 
 std::string DAW::GetTrackFxDeveloper(MediaTrack *media_track, int fx)
@@ -348,7 +367,8 @@ std::string DAW::GetTrackFxDeveloper(MediaTrack *media_track, int fx)
     {
         return "No Dev";
     }
-    std::vector<std::string> pluginNameParts = split(StripPluginNamePrefixes(StripPluginChannelPostfix(pluginName).data()), " (");
+
+    std::vector<std::string> pluginNameParts = split(pluginName, " (");
     std::string developer = pluginNameParts.at(pluginNameParts.size() - 1);
     if (!developer.empty())
     {

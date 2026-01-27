@@ -5,7 +5,7 @@
 #include <string>
 #include "csurf_ui_elements.hpp"
 
-static void ReaSonusTextInput(ImGui_Context *m_ctx, std::string label, std::string *value, std::string hint, double width = 0.0)
+static void ReaSonusTextInput(ImGui_Context *m_ctx, std::string label, std::string *value, std::string hint, double width = 0.0, bool select = false)
 {
     static char text[255];
     strcpy(text, (*value).c_str());
@@ -18,6 +18,10 @@ static void ReaSonusTextInput(ImGui_Context *m_ctx, std::string label, std::stri
         ImGui::Text(m_ctx, label.c_str());
 
         UiElements::PushReaSonusInputStyle(m_ctx);
+        if (select)
+        {
+            ImGui::SetKeyboardFocusHere(m_ctx);
+        }
         if (ImGui::InputTextWithHint(m_ctx, ("##" + label).c_str(), hint.c_str(), text, sizeof(text)))
         {
             *value = std::string(text);

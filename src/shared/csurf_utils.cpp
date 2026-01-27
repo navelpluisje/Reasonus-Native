@@ -126,34 +126,22 @@ std::string StripPluginDeveloper(std::string pluginName)
 
 std::string StripPluginNamePrefixes(char *name)
 {
-    std::string s = std::string(name);
-    std::string delimiter = ": ";
-    int pos = (int)(s.find(delimiter) + size(delimiter));
-    if (pos < 0)
-    {
-        return s;
-    }
-    s.erase(0, pos);
-    return s;
+    std::vector<std::string> splitted_name = split(std::string(name), PREFIX_SEPARATOR);
+
+    return splitted_name[splitted_name.size() - 1];
 }
 
 std::string StripPluginChannelPostfix(char *name)
 {
-    std::string s = std::string(name);
-    std::string delimiter = " (32 out)";
-    int pos = (int)s.find(delimiter);
-    if (pos < 0)
-    {
-        return s;
-    }
-    s.erase(s.find(delimiter), size(delimiter));
-    return s;
+    std::vector<std::string> splitted_name = split(std::string(name), " (");
+    splitted_name.pop_back();
+
+    return join(splitted_name, " (");
 }
 
 bool IsPluginFX(std::string name)
 {
-    std::string delimiter = ": ";
-    int pos = (int)name.find(delimiter);
+    int pos = (int)name.find(PREFIX_SEPARATOR);
     // If we can not find the delimiter, we can not determine the type of plugin, so asume it's an effect
     if (pos < 0)
     {
@@ -214,41 +202,43 @@ std::string GetAutomationString(int automationMode)
 std::string GetReaSonusFolderPath()
 {
     std::string recource_path = std::string(GetResourcePath());
-    return recource_path + pathSeparator + "ReaSonus";
+    return createPathName({recource_path, "ReaSonus"});
 }
 
-std::string GetReaSonusIniPath(std::string device) { return GetReaSonusFolderPath() + pathSeparator + device + ".ini"; }
-
-std::string GetReaSonusZonesPath() { return std::string(GetResourcePath()) + pathSeparator + "CSI" + pathSeparator + "Zones" + pathSeparator + "ReasonusFaderPort" + pathSeparator + "_ReaSonusEffects"; }
-
-std::string GetReaSonusPluginPath(std::string developer, std::string pluginName, bool create)
+std::string GetReaSonusIniPath(std::string device)
 {
-    std::string path = GetReaSonusFolderPath() + pathSeparator + "Plugins" + pathSeparator + developer;
+    return createPathName({GetReaSonusFolderPath(), device + ".ini"});
+}
+
+std::string GetReaSonusZonesPath()
+{
+    return createPathName({std::string(GetResourcePath()), "CSI", "Zones", "ReasonusFaderPort", "_ReaSonusEffects"});
+}
+
+std::string GetReaSonusPluginPath(std::string developer, std::string plugin_name, std::string plugin_type, bool create)
+{
+    std::string path = createPathName({std::string(GetResourcePath()), "ReaSonus", "Plugins", developer});
 
     if (create)
     {
-#ifdef _WIN32
-        SHCreateDirectoryEx(NULL, path.c_str(), NULL);
-#else
-        RecursiveCreateDirectory(path.c_str(), 0);
-#endif
+        createPathIfNotExist(path);
     }
-    return path + pathSeparator + pluginName + ".ini";
+    return createPathName({path, plugin_name + "." + plugin_type + ".ini"});
 }
 
 std::string GetReaSonusLocalesFolderPath()
 {
-    return GetReaSonusFolderPath() + pathSeparator + "Locales";
+    return createPathName({GetReaSonusFolderPath(), "Locales"});
 }
 
 std::string GetReaSonusLocalesPath(std::string language)
 {
-    return GetReaSonusLocalesFolderPath() + pathSeparator + language + ".ini";
+    return createPathName({GetReaSonusLocalesFolderPath(), language + ".ini"});
 }
 
 std::string GetReaSonusLocalesRootFile()
 {
-    return std::string(GetResourcePath()) + pathSeparator + "UserPlugins" + pathSeparator + "ReaSonus" + pathSeparator + "en-US.ini";
+    return createPathName({std::string(GetResourcePath()), "UserPlugins", "ReaSonus", "en-US.ini"});
 }
 
 bool isInteger(std::string value)
@@ -318,10 +308,11 @@ std::string join(std::vector<std::string> list, std::string delimiter)
 
 bool hasPluginConfigFile(MediaTrack *media_track, int pluginId)
 {
-    std::string pluginName = DAW::GetTrackFxName(media_track, pluginId);
-    std::string developerName = DAW::GetTrackFxDeveloper(media_track, pluginId);
+    std::string plugin_name = DAW::GetTrackFxName(media_track, pluginId);
+    std::string developer_name = DAW::GetTrackFxDeveloper(media_track, pluginId);
+    std::string plugin_type = DAW::GetTrackFxType(media_track, pluginId);
 
-    return file_exists(GetReaSonusPluginPath(developerName, pluginName).c_str());
+    return file_exists(GetReaSonusPluginPath(developer_name, plugin_name, plugin_type).c_str());
 }
 
 void logInteger(const char *key, int value)
@@ -343,50 +334,25 @@ void readAndCreateIni(mINI::INIStructure &data, std::string device)
     mINI::INIFile file(GetReaSonusIniPath(device));
     if (!file.read(data))
     {
-        RecursiveCreateDirectory((std::string(GetResourcePath()) + pathSeparator + "ReaSonus" + pathSeparator + "Plugins").c_str(), 0);
-        data["surface"]["midiin"] = "0";
-        data["surface"]["midiout"] = "0";
-        data["surface"]["mute-solo-momentary"] = "0";
-        data["functions"]["1"] = "0";
-        data["functions"]["2"] = "0";
-        data["functions"]["3"] = "0";
-        data["functions"]["4"] = "0";
-        data["footswitch"]["1"] = "0";
-        data["footswitch"]["2"] = "0";
-        data["footswitch"]["3"] = "0";
+        RecursiveCreateDirectory(createPathName({std::string(GetResourcePath()), "ReaSonus", "Plugins"}).c_str(), 0);
+        for (auto setting : shared_settings)
+        {
+            data[setting.at(0)][setting.at(1)] = setting.at(2);
+        }
+
         if (device == FP_V2)
         {
-            data["surface"]["control-hidden-tracks"] = "0";
-            data["surface"]["can-disable-fader"] = "0";
-            data["surface"]["endless-track-scroll"] = "0";
+            for (auto setting : fp_v2_settings)
+            {
+                data[setting.at(0)][setting.at(1)] = setting.at(2);
+            }
         }
         if (device == FP_8)
         {
-            data["surface"]["surface"] = "0";
-            data["surface"]["disable-plugins"] = "0";
-            data["surface"]["distraction-free"] = "0";
-            data["surface"]["erase-last-param-after-learn"] = "0";
-            data["surface"]["master-fader-mode"] = "0";
-            data["surface"]["swap-shift-buttons"] = "0";
-            data["surface"]["fader-reset"] = "0";
-            data["surface"]["overwrite-time-code"] = "1";
-            data["surface"]["time-code"] = "2";
-            data["surface"]["track-color-brightness"] = "25";
-            data["surface"]["plugin-step-size"] = "1";
-            data["displays"]["track"] = "8";
-            data["functions"]["5"] = "0";
-            data["functions"]["6"] = "0";
-            data["functions"]["7"] = "0";
-            data["functions"]["8"] = "0";
-            data["functions"]["9"] = "0";
-            data["functions"]["10"] = "0";
-            data["functions"]["11"] = "0";
-            data["functions"]["12"] = "0";
-            data["functions"]["13"] = "0";
-            data["functions"]["14"] = "0";
-            data["functions"]["15"] = "0";
-            data["functions"]["16"] = "0";
-            data["filters"]["nb-filters"] = "0";
+            for (auto setting : fp_8_settings)
+            {
+                data[setting.at(0)][setting.at(1)] = setting.at(2);
+            }
         }
         if (!file.generate(data, true))
         {
@@ -402,58 +368,45 @@ void readAndCreateIni(mINI::INIStructure &data, std::string device)
 
 void validateReaSonusIni(mINI::INIFile file, mINI::INIStructure &data, std::string device)
 {
-    data["surface"]["midiin"] = data["surface"].has("midiin") ? data["surface"]["midiin"] : "0";
-    data["surface"]["midiout"] = data["surface"].has("midiout") ? data["surface"]["midiout"] : "0";
-    data["surface"]["mute-solo-momentary"] = data["surface"].has("mute-solo-momentary") ? data["surface"]["mute-solo-momentary"] : "0";
-    data["surface"]["latch-preview-action"] = data["surface"].has("latch-preview-action") ? data["surface"]["latch-preview-action"] : "0";
-    data["surface"]["latch-preview-action-code"] = data["surface"].has("latch-preview-action-code") ? data["surface"]["latch-preview-action-code"] : "42013";
+    bool has_missing_settings = false;
 
-    data["functions"]["1"] = data["functions"].has("1") ? data["functions"]["1"] : "0";
-    data["functions"]["2"] = data["functions"].has("2") ? data["functions"]["2"] : "0";
-    data["functions"]["3"] = data["functions"].has("3") ? data["functions"]["3"] : "0";
-    data["functions"]["4"] = data["functions"].has("4") ? data["functions"]["4"] : "0";
-
-    data["footswitch"]["1"] = data["footswitch"].has("1") ? data["footswitch"]["1"] : "0";
-    data["footswitch"]["2"] = data["footswitch"].has("2") ? data["footswitch"]["2"] : "0";
-    data["footswitch"]["3"] = data["footswitch"].has("3") ? data["footswitch"]["3"] : "0";
+    for (auto setting : shared_settings)
+    {
+        if (!data[setting.at(0)].has(setting.at(1)))
+        {
+            data[setting.at(0)][setting.at(1)] = setting.at(2);
+            has_missing_settings = true;
+        }
+    }
 
     if (device == FP_V2)
     {
-        data["surface"]["control-hidden-tracks"] = data["surface"].has("control-hidden-tracks") ? data["surface"]["control-hidden-tracks"] : "0";
-        data["surface"]["can-disable-fader"] = data["surface"].has("can-disable-fader") ? data["surface"]["can-disable-fader"] : "0";
-        data["surface"]["endless-track-scroll"] = data["surface"].has("endless-track-scroll") ? data["surface"]["endless-track-scroll"] : "0";
+        for (auto setting : fp_v2_settings)
+        {
+            if (!data[setting.at(0)].has(setting.at(1)))
+            {
+                data[setting.at(0)][setting.at(1)] = setting.at(2);
+                has_missing_settings = true;
+            }
+        }
     }
 
     if (device == FP_8)
     {
-        data["surface"]["surface"] = data["surface"].has("surface") ? data["surface"]["surface"] : "0";
-        data["surface"]["disable-plugins"] = data["surface"].has("disable-plugins") ? data["surface"]["disable-plugins"] : "0";
-        data["surface"]["distraction-free"] = data["surface"].has("distraction-free") ? data["surface"]["distraction-free"] : "0";
-        data["surface"]["erase-last-param-after-learn"] = data["surface"].has("erase-last-param-after-learn") ? data["surface"]["erase-last-param-after-learn"] : "0";
-        data["surface"]["master-fader-mode"] = data["surface"].has("master-fader-mode") ? data["surface"]["master-fader-mode"] : "0";
-        data["surface"]["swap-shift-buttons"] = data["surface"].has("swap-shift-buttons") ? data["surface"]["swap-shift-buttons"] : "0";
-        data["surface"]["fader-reset"] = data["surface"].has("fader-reset") ? data["surface"]["fader-reset"] : "0";
-        data["surface"]["overwrite-time-code"] = data["surface"].has("overwrite-time-code") ? data["surface"]["overwrite-time-code"] : "1";
-        data["surface"]["time-code"] = data["surface"].has("time-code") ? data["surface"]["time-code"] : "2";
-        data["surface"]["track-color-brightness"] = data["surface"].has("track-color-brightness") ? data["surface"]["track-color-brightness"] : "25";
-        data["surface"]["plugin-step-size"] = data["surface"].has("plugin-step-size") ? data["surface"]["plugin-step-size"] : "1";
-        data["displays"]["track"] = data["displays"].has("track") ? data["displays"]["track"] : "8";
-        data["functions"]["5"] = data["functions"].has("5") ? data["functions"]["5"] : "0";
-        data["functions"]["6"] = data["functions"].has("6") ? data["functions"]["6"] : "0";
-        data["functions"]["7"] = data["functions"].has("7") ? data["functions"]["7"] : "0";
-        data["functions"]["8"] = data["functions"].has("8") ? data["functions"]["8"] : "0";
-        data["functions"]["9"] = data["functions"].has("9") ? data["functions"]["9"] : "0";
-        data["functions"]["10"] = data["functions"].has("10") ? data["functions"]["10"] : "0";
-        data["functions"]["11"] = data["functions"].has("11") ? data["functions"]["11"] : "0";
-        data["functions"]["12"] = data["functions"].has("12") ? data["functions"]["12"] : "0";
-        data["functions"]["13"] = data["functions"].has("13") ? data["functions"]["13"] : "0";
-        data["functions"]["14"] = data["functions"].has("14") ? data["functions"]["14"] : "0";
-        data["functions"]["15"] = data["functions"].has("15") ? data["functions"]["15"] : "0";
-        data["functions"]["16"] = data["functions"].has("16") ? data["functions"]["16"] : "0";
-        data["filters"]["nb-filters"] = data["filters"].has("nb-filters") ? data["filters"]["nb-filters"] : "0";
+        for (auto setting : fp_8_settings)
+        {
+            if (!data[setting.at(0)].has(setting.at(1)))
+            {
+                data[setting.at(0)][setting.at(1)] = setting.at(2);
+                has_missing_settings = true;
+            }
+        }
     }
 
-    file.write(data, true);
+    if (has_missing_settings)
+    {
+        file.write(data, true);
+    }
 }
 
 std::string GenerateUniqueKey(std::string prefix)
@@ -523,6 +476,34 @@ double minmax(double min, double value, double max)
            : value > max
                ? max
                : value;
+}
+
+int min(int value_1, int value_2)
+{
+    return value_1 < value_2
+               ? value_1
+               : value_2;
+}
+
+double min(double value_1, double value_2)
+{
+    return value_1 < value_2
+               ? value_1
+               : value_2;
+}
+
+int max(int value_1, int value_2)
+{
+    return value_1 > value_2
+               ? value_1
+               : value_2;
+}
+
+double max(double value_1, double value_2)
+{
+    return value_1 > value_2
+               ? value_1
+               : value_2;
 }
 
 HWND findWindowChildByID(HWND parentHWND, int ID)
@@ -608,4 +589,50 @@ void GetLanguages(std::vector<std::string> &language_names)
             }
         }
     }
+}
+
+/**
+ * Check if the value is betweemn the min and max value
+ * @property min The min value to check againt. The value should be larger the this value
+ * @property val The The value to test against
+ * @property max The max value to check againt. The value should be smaller the this value
+ *
+ * @return boolean value
+ */
+double between(int min, int val, int max)
+{
+    double diff = max - min;
+    return diff > 0 && diff < val;
+}
+
+/**
+ * @brief Create a Path If Not Exist object
+ *
+ * @param path
+ * @return true when path exists
+ * @return false when path not exists
+ */
+bool createPathIfNotExist(std::string path)
+{
+    if (!std::filesystem::exists(path))
+    {
+#ifdef _WIN32
+        SHCreateDirectoryEx(NULL, path.c_str(), NULL);
+#else
+        RecursiveCreateDirectory(path.c_str(), 0);
+#endif
+    }
+
+    return std::filesystem::exists(path);
+}
+
+std::string createPathName(std::vector<std::string> path_elements)
+{
+    return join(path_elements, std::string(1, PATH_SEPARATOR));
+}
+
+std::string toLowerCase(std::string value)
+{
+    std::transform(value.begin(), value.end(), value.begin(), ::tolower);
+    return value;
 }

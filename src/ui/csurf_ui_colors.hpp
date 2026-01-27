@@ -6,6 +6,8 @@
 namespace UI_COLORS
 {
     const int White = 0xffffffff;
+    const int White_50 = 0xffffff7f;
+    const int White_25 = 0xffffff3f;
     const int Main_15 = 0x272727ff;
     const int Main_18 = 0x2e2e2eff;
     const int Main_23 = 0x383A3CFF;
@@ -19,6 +21,9 @@ namespace UI_COLORS
     const int Success = 0x58D23AFF;
     const int Success_50 = 0x58D23A7F;
     const int Transparent = 0x00000000;
+    const int Transparent_25 = 0x2727273f;
+    const int Transparent_50 = 0x2727277f;
+    const int Transparent_75 = 0x272727Bf;
 
     const int FormFieldBorder = UI_COLORS::Main_38;
     const int FormFieldBg = UI_COLORS::Main_23;
@@ -101,17 +106,18 @@ static void PushReaSonusColors(ImGui_Context *m_ctx)
     ImGui::PushStyleColor(m_ctx, ImGui::Col_TableRowBg, UI_COLORS::Transparent);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_TableRowBgAlt, 0xFFFFFF0F);
 
-    ImGui::PushStyleColor(m_ctx, ImGui::Col_TextSelectedBg, 0x4296FA59);
-    ImGui::PushStyleColor(m_ctx, ImGui::Col_DragDropTarget, 0xFFFF00E6);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_TextSelectedBg, UI_COLORS::Accent_25);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_DragDropTarget, UI_COLORS::Accent);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_NavCursor, 0x4296FAFF);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_NavWindowingHighlight, 0xFFFFFFB3);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_NavWindowingDimBg, 0xCCCCCC33);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_ModalWindowDimBg, 0xCCCCCC59);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_InputTextCursor, UI_COLORS::Accent);
 }
 
 static void PopReaSonusColors(ImGui_Context *m_ctx)
 {
-    ImGui::PopStyleColor(m_ctx, 57);
+    ImGui::PopStyleColor(m_ctx, 58);
 }
 
 #endif

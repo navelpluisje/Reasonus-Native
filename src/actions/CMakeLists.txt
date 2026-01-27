@@ -17,5 +17,6 @@ target_sources(${PROJECT_NAME}
         action_ui_convert_plugin_zon_to_ini.cpp
         action_ui_fp_8_control_panel.cpp
         action_ui_fp_v2_control_panel.cpp
+        action_ui_plugin_type_mapping.cpp
         action_ui_translations_editor.cpp
     )

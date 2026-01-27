@@ -147,11 +147,9 @@ public:
     void Update()
     {
         // Get selected track and get the atomation type
-        if (context->GetShiftRight())
-        {
-            globalAutomationMode = GetGlobalAutomationOverride();
-        }
-        else if (context->GetShiftLeft())
+        globalAutomationMode = GetGlobalAutomationOverride();
+
+        if (context->GetShiftLeft())
         {
             canRedo = Undo_CanRedo2(0) != NULL;
             canUndo = Undo_CanUndo2(0) != NULL;

@@ -1,6 +1,6 @@
-#include "action_ui_convert_plugin_zon_to_ini.hpp"
+#include "action_ui_plugin_type_mapping.hpp"
 #include "../shared/csurf_utils.hpp"
-#include "../ui/csurf_ui_plugin_mapping_converter.hpp"
+#include "../ui/csurf_ui_plugin_type_mapping.hpp"
 
 #define STRINGIZE_DEF(x) #x
 #define STRINGIZE(x) STRINGIZE_DEF(x)
@@ -8,26 +8,26 @@
 #define max(a, b) ((a) > (b) ? (a) : (b))
 
 // confine my plugin to namespace
-namespace ACTION_UI_CONVERT_PLUGIN_ZON_TO_INI
+namespace ACTION_UI_PLUGIN_TYPE_MAPPING
 {
     // some global non-const variables
     // the necessary 'evil'
     int command_id{0};
-    constexpr auto command_name = "REASONUS_CONVERT_PLUGIN_ZON_TO_INI";
-    constexpr auto action_name = "Reasonus: Convert the old zon mappings to the new ini mappings";
+    constexpr auto command_name = "REASONUS_CONVERT_PLUGIN_TYPE";
+    constexpr auto action_name = "Reasonus: Set the correct plugin type for the already created plugins";
     custom_action_register_t action = {0, command_name, action_name, nullptr};
 
     // the main function of my plugin
     // gets called via callback or timer
     void MainFunctionOfMyPlugin()
     {
-        if (ReaSonusPluginMappingConverter::converter_open)
+        if (ReaSonusPluginTypeMapping::window_open)
         {
-            ReaSonusPluginMappingConverter::Stop();
+            ReaSonusPluginTypeMapping::Stop();
         }
         else
         {
-            ReaSonusPluginMappingConverter::Start();
+            ReaSonusPluginTypeMapping::Start();
         }
     }
 
@@ -82,4 +82,4 @@ namespace ACTION_UI_CONVERT_PLUGIN_ZON_TO_INI
         plugin_register("-hookcommand2", (void *)OnAction);
     }
 
-} // namespace ACTION_UI_CONVERT_PLUGIN_ZON_TO_INI
+} // namespace ACTION_UI_PLUGIN_TYPE_MAPPING

@@ -9,8 +9,9 @@
 #include <string>
 #include <vector>
 #include <regex>
+#include "csurf_ui_assets.hpp"
 
-class ReaSonusV2PluginMappingConverter
+class ReaSonusPluginMappingConverter
 {
 public:
     inline static bool converter_open = false;
@@ -18,7 +19,7 @@ public:
     static void Start();
     static void Stop();
 
-    ~ReaSonusV2PluginMappingConverter();
+    ~ReaSonusPluginMappingConverter();
 
     // Regular expressions:
     std::regex select;
@@ -29,21 +30,18 @@ public:
 
 private:
     static void Loop();
-    static std::unique_ptr<ReaSonusV2PluginMappingConverter> s_inst;
-    void InitAssets();
+    static std::unique_ptr<ReaSonusPluginMappingConverter> s_inst;
+    CSurf_UI_Assets *assets;
     void SetBaseFileNames(std::string folder);
     void ConvertFile(std::string file_path);
     void ConvertFiles();
     void Convert();
 
-    ReaSonusV2PluginMappingConverter();
+    ReaSonusPluginMappingConverter();
     void Frame();
 
     ImGui_Context *m_ctx;
-    ImGui_Font *main_font;
-    ImGui_Font *main_font_bold;
-    ImGui_Image *logo;
-
+    std::string save_message;
     bool convert_clicked = false;
     bool close_clicked = false;
     std::vector<std::string> converted_files;

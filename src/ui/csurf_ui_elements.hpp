@@ -2,6 +2,7 @@
 #define CSURF_FP_UI_ELEMENTS_H_
 
 #include <reaper_imgui_functions.h>
+#include "csurf_ui_assets.hpp"
 
 class UiElements
 {
@@ -78,7 +79,7 @@ public:
 
     static void PopReaSonusFunctionButtonStyle(ImGui_Context *m_ctx);
 
-    static void PushReaSonusIconButtonStyle(ImGui_Context *m_ctx);
+    static void PushReaSonusIconButtonStyle(ImGui_Context *m_ctx, CSurf_UI_Assets *assets);
 
     static void PopReaSonusIconButtonStyle(ImGui_Context *m_ctx);
 
@@ -105,6 +106,10 @@ public:
     static void PushReaSonusTranslationItemStyle(ImGui_Context *m_ctx);
 
     static void PopReaSonusTranslationItemStyle(ImGui_Context *m_ctx);
+
+    static void PushReaSonusModalStyle(ImGui_Context *m_ctx);
+
+    static void PopReaSonusModalStyle(ImGui_Context *m_ctx);
 };
 
 #endif

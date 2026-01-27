@@ -52,7 +52,7 @@ static void ReaSonusFilterPreview(ImGui_Context *m_ctx, int value)
     {
         ImGui::GetItemRectMin(m_ctx, &x, &y);
         ImGui::GetContentRegionAvail(m_ctx, &width, &height);
-        ImGui_DrawList *list = ImGui::GetForegroundDrawList(m_ctx);
+        ImGui_DrawList *list = ImGui::GetWindowDrawList(m_ctx);
         double track_width = (width - (9 * 6)) / 10;
 
         for (int i = 0; i < (int)track_level.size(); i++)

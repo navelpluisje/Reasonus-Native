@@ -173,6 +173,11 @@ int ReaSonusSettings::GetTrackDisplay()
     return stoi(settings["displays"]["track"]);
 }
 
+bool ReaSonusSettings::ShouldClearParamInput()
+{
+    return stoi(settings["surface"]["plugin-map-param-clear"]);
+}
+
 /**
  * Settings for the FaderPort 2
  */
