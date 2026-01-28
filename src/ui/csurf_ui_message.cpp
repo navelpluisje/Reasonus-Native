@@ -1,3 +1,4 @@
+#include "config.h"
 #include "csurf_ui_plugin_type_mapping.hpp"
 #include "csurf_ui_message.hpp"
 #include "csurf_ui_colors.hpp"
@@ -117,7 +118,7 @@ void ReaSonusMessage::Frame()
         if (ImGui::BeginChild(m_ctx, "actions_container", 0.0, 0.0, ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY))
         {
 
-            ReaSonusPageTitle(m_ctx, assets, "ReaSonus Native New Version");
+            ReaSonusPageTitle(m_ctx, assets, "ReaSonus Native New Version: " + std::string(GIT_VERSION));
             ImGui::GetContentRegionAvail(m_ctx, &width, &height);
             ImGui::PushTextWrapPos(m_ctx, width - 24);
 
