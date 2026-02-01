@@ -144,7 +144,7 @@ public:
     };
     ~CSurf_FP_8_AutomationManager() {};
 
-    void Update()
+    void Update(bool force_update = false)
     {
         // Get selected track and get the atomation type
         globalAutomationMode = GetGlobalAutomationOverride();
@@ -161,8 +161,8 @@ public:
             channelAutomationMode = GetTrackAutomationMode(media_track);
         }
 
-        SetButtonColors();
-        SetButtonValue();
+        SetButtonColors(force_update);
+        SetButtonValue(force_update);
     };
 
     void Refresh(bool force = false)

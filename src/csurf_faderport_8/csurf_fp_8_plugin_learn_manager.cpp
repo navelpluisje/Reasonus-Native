@@ -56,13 +56,13 @@ public:
         context->ResetChannelManagerItemIndex();
         context->SetChannelManagerItemsCount(CSurf_Context::GetPluginMaxGroupCount());
         GetCurrentPlugin();
-        UpdateTracks();
+        UpdateTracks(true);
         color = ButtonColorWhiteDim;
     }
 
     ~CSurf_FP_8_PluginLearnManager() {};
 
-    void UpdateTracks() override
+    void UpdateTracks(bool force_update) override
     {
         std::string paramKey;
         int trackId, itemNumber, takeId, pluginId, paramId;
@@ -85,40 +85,40 @@ public:
             track->SetTrackColor(color);
 
             // If the track is armed always blink as an indication it is armed
-            track->SetSelectButtonValue(BTN_VALUE_OFF, forceUpdate);
-            track->SetMuteButtonValue(BTN_VALUE_OFF, forceUpdate);
-            track->SetSoloButtonValue(BTN_VALUE_OFF, forceUpdate);
-            track->SetFaderValue(0, forceUpdate);
+            track->SetSelectButtonValue(BTN_VALUE_OFF, force_update);
+            track->SetMuteButtonValue(BTN_VALUE_OFF, force_update);
+            track->SetSoloButtonValue(BTN_VALUE_OFF, force_update);
+            track->SetFaderValue(0, force_update);
             track->SetValueBarMode(VALUEBAR_MODE_NORMAL);
             track->SetValueBarValue(0);
 
-            track->SetDisplayMode(DISPLAY_MODE_2, forceUpdate);
+            track->SetDisplayMode(DISPLAY_MODE_2, force_update);
 
             paramKey = getParamKey("Select_", paramIndex);
             if (ini.has(paramKey))
             {
-                track->SetDisplayLine(0, ALIGN_CENTER, ini[paramKey]["name"].c_str(), INVERT, forceUpdate);
+                track->SetDisplayLine(0, ALIGN_CENTER, ini[paramKey]["name"].c_str(), INVERT, force_update);
             }
             else
             {
-                track->SetDisplayLine(0, ALIGN_CENTER, "Free", INVERT, forceUpdate);
+                track->SetDisplayLine(0, ALIGN_CENTER, "Free", INVERT, force_update);
             }
 
             paramKey = getParamKey("Fader_", paramIndex);
             if (ini.has(paramKey))
             {
-                track->SetDisplayLine(2, ALIGN_CENTER, ini[paramKey]["name"].c_str(), INVERT, forceUpdate);
+                track->SetDisplayLine(2, ALIGN_CENTER, ini[paramKey]["name"].c_str(), INVERT, force_update);
             }
             else
             {
-                track->SetDisplayLine(2, ALIGN_CENTER, "Free", INVERT, forceUpdate);
+                track->SetDisplayLine(2, ALIGN_CENTER, "Free", INVERT, force_update);
             }
 
             track->SetDisplayLine(1, ALIGN_CENTER, "", NON_INVERT, true);
             track->SetDisplayLine(3, ALIGN_CENTER, "", NON_INVERT, true);
         }
 
-        forceUpdate = false;
+        force_update = false;
     }
 
     void OpenMappingUi(int plugin_id, int channel)

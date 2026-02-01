@@ -36,11 +36,11 @@ public:
     {
         context->ResetChannelManagerItemIndex();
         context->SetChannelManagerType(Hui);
-        UpdateTracks();
+        UpdateTracks(true);
     }
     ~CSurf_FP_8_PluginsManager() {};
 
-    void UpdateTracks() override
+    void UpdateTracks(bool force_update) override
     {
         nb_plugins = 0;
         WDL_PtrList<MediaTrack> media_tracks = navigator->GetBankTracks();
@@ -96,10 +96,10 @@ public:
 
             if (DAW::HasTrackFx(media_track, plugin_index))
             {
-                track->SetDisplayLine(0, ALIGN_LEFT, DAW::GetTrackName(media_track).c_str());
-                track->SetDisplayLine(1, ALIGN_LEFT, DAW::GetTrackFxName(media_track, plugin_index).c_str(), INVERT);
-                track->SetDisplayLine(2, ALIGN_CENTER, DAW::GetTrackFxSurfceEnabled(media_track, plugin_index).c_str());
-                track->SetDisplayLine(3, ALIGN_CENTER, Progress(plugin_index + 1, nb_track_plugins[i]).c_str());
+                track->SetDisplayLine(0, ALIGN_LEFT, DAW::GetTrackName(media_track).c_str(), NON_INVERT, force_update);
+                track->SetDisplayLine(1, ALIGN_LEFT, DAW::GetTrackFxName(media_track, plugin_index).c_str(), INVERT, force_update);
+                track->SetDisplayLine(2, ALIGN_CENTER, DAW::GetTrackFxSurfceEnabled(media_track, plugin_index).c_str(), NON_INVERT, force_update);
+                track->SetDisplayLine(3, ALIGN_CENTER, Progress(plugin_index + 1, nb_track_plugins[i]).c_str(), NON_INVERT, force_update);
                 track->SetMuteButtonValue(
                     ButtonBlinkOnOff(
                         (context->GetShiftChannelLeft() && !DAW::GetTrackFxEnabled(media_track, plugin_index)),
@@ -113,21 +113,21 @@ public:
             }
             else
             {
-                track->SetDisplayLine(0, ALIGN_LEFT, DAW::GetTrackName(media_track).c_str());
-                track->SetDisplayLine(1, ALIGN_LEFT, "No Fx", INVERT);
-                track->SetDisplayLine(2, ALIGN_CENTER, "");
-                track->SetDisplayLine(3, ALIGN_CENTER, "");
-                track->SetMuteButtonValue(BTN_VALUE_OFF);
-                track->SetSoloButtonValue(BTN_VALUE_OFF);
+                track->SetDisplayLine(0, ALIGN_LEFT, DAW::GetTrackName(media_track).c_str(), NON_INVERT, force_update);
+                track->SetDisplayLine(1, ALIGN_LEFT, "No Fx", INVERT, force_update);
+                track->SetDisplayLine(2, ALIGN_CENTER, "", NON_INVERT, force_update);
+                track->SetDisplayLine(3, ALIGN_CENTER, "", NON_INVERT, force_update);
+                track->SetMuteButtonValue(BTN_VALUE_OFF, force_update);
+                track->SetSoloButtonValue(BTN_VALUE_OFF, force_update);
             }
 
             track->SetTrackColor(color);
-            track->SetSelectButtonValue(BTN_VALUE_ON);
-            track->SetFaderValue(fader_value);
+            track->SetSelectButtonValue(BTN_VALUE_ON, force_update);
+            track->SetFaderValue(fader_value, force_update);
             track->SetValueBarMode(VALUEBAR_MODE_BIPOLAR);
             track->SetValueBarValue(value_bar_value);
 
-            track->SetDisplayMode(DISPLAY_MODE_2);
+            track->SetDisplayMode(DISPLAY_MODE_2, force_update);
         }
     }
 

@@ -10,7 +10,7 @@ CSurf_FP_8_LastTouchedFXManager::CSurf_FP_8_LastTouchedFXManager(
     track->SetSelectButtonValue(BTN_VALUE_OFF);
 };
 
-void CSurf_FP_8_LastTouchedFXManager::UpdateTrack()
+void CSurf_FP_8_LastTouchedFXManager::UpdateTrack(bool force_update)
 {
     int trackNumber = -1;
     int fxNumber = -1;
@@ -23,7 +23,7 @@ void CSurf_FP_8_LastTouchedFXManager::UpdateTrack()
 
     if (hasLastTouchedFxEnabled != context->GetLastTouchedFxMode() && context->GetLastTouchedFxMode())
     {
-        forceUpdate = true;
+        force_update = true;
     }
 
     if (GetLastTouchedFX(&trackNumber, &fxNumber, &paramNumber))
@@ -47,19 +47,19 @@ void CSurf_FP_8_LastTouchedFXManager::UpdateTrack()
         trackName = "No Track";
     }
 
-    track->SetDisplayMode(DISPLAY_MODE_2, forceUpdate);
-    track->SetDisplayLine(0, ALIGN_LEFT, trackName, NON_INVERT, forceUpdate);
-    track->SetDisplayLine(1, ALIGN_LEFT, paramNumber < 0 ? "No Param" : StripPluginNamePrefixes(fxName).c_str(), INVERT, forceUpdate);
-    track->SetDisplayLine(2, ALIGN_LEFT, paramNumber < 0 ? "  " : std::string(paramName).c_str(), NON_INVERT, forceUpdate);
-    track->SetDisplayLine(3, ALIGN_CENTER, paramNumber < 0 ? "  " : paramValueString, NON_INVERT, forceUpdate);
-    track->SetFaderValue((int)(paramValue * 16383.0), forceUpdate);
+    track->SetDisplayMode(DISPLAY_MODE_2, force_update);
+    track->SetDisplayLine(0, ALIGN_LEFT, trackName, NON_INVERT, force_update);
+    track->SetDisplayLine(1, ALIGN_LEFT, paramNumber < 0 ? "No Param" : StripPluginNamePrefixes(fxName).c_str(), INVERT, force_update);
+    track->SetDisplayLine(2, ALIGN_LEFT, paramNumber < 0 ? "  " : std::string(paramName).c_str(), NON_INVERT, force_update);
+    track->SetDisplayLine(3, ALIGN_CENTER, paramNumber < 0 ? "  " : paramValueString, NON_INVERT, force_update);
+    track->SetFaderValue((int)(paramValue * 16383.0), force_update);
 
-    track->SetMuteButtonValue(BTN_VALUE_OFF, forceUpdate);
-    track->SetSoloButtonValue(BTN_VALUE_OFF, forceUpdate);
-    track->SetSelectButtonValue(BTN_VALUE_OFF, forceUpdate);
+    track->SetMuteButtonValue(BTN_VALUE_OFF, force_update);
+    track->SetSoloButtonValue(BTN_VALUE_OFF, force_update);
+    track->SetSelectButtonValue(BTN_VALUE_OFF, force_update);
 
     hasLastTouchedFxEnabled = context->GetLastTouchedFxMode();
-    forceUpdate = false;
+    force_update = false;
 };
 
 void CSurf_FP_8_LastTouchedFXManager::HandleSelectClick(int index)

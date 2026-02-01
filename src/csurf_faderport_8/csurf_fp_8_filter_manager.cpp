@@ -56,11 +56,11 @@ public:
         context->ResetChannelManagerItemIndex();
         context->ResetChannelManagerItemsCount();
         GetFilters();
-        UpdateTracks();
+        UpdateTracks(true);
     }
     ~CSurf_FP_8_FilterManager() {};
 
-    void UpdateTracks() override
+    void UpdateTracks(bool force_update) override
     {
         WDL_PtrList<MediaTrack> media_tracks = navigator->GetBankTracks();
         context->SetChannelManagerItemsCount(static_cast<int>(filters.size()) + 1);
@@ -78,31 +78,31 @@ public:
             GetFaderValue(media_track, &fader_value, &value_bar_value, &strPan1, &strPan2);
 
             track->SetTrackColor(color);
-            track->SetSelectButtonValue(BTN_VALUE_ON, forceUpdate);
-            track->SetMuteButtonValue(DAW::IsTrackMuted(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
-            track->SetSoloButtonValue(DAW::IsTrackSoloed(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
-            track->SetFaderValue(fader_value, forceUpdate);
+            track->SetSelectButtonValue(BTN_VALUE_ON, force_update);
+            track->SetMuteButtonValue(DAW::IsTrackMuted(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, force_update);
+            track->SetSoloButtonValue(DAW::IsTrackSoloed(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, force_update);
+            track->SetFaderValue(fader_value, force_update);
             track->SetValueBarMode(VALUEBAR_MODE_NORMAL);
             track->SetValueBarValue(0);
 
-            track->SetDisplayMode(DISPLAY_MODE_2, forceUpdate);
-            track->SetDisplayLine(0, ALIGN_CENTER, DAW::GetTrackName(media_track).c_str(), NON_INVERT, forceUpdate);
+            track->SetDisplayMode(DISPLAY_MODE_2, force_update);
+            track->SetDisplayLine(0, ALIGN_CENTER, DAW::GetTrackName(media_track).c_str(), NON_INVERT, force_update);
 
             if (filter_index < (int)filters.size())
             {
-                track->SetDisplayLine(1, ALIGN_CENTER, "Filter", INVERT, forceUpdate);
-                track->SetDisplayLine(2, ALIGN_CENTER, filters.at(filter_index).name.c_str(), NON_INVERT, forceUpdate);
-                track->SetDisplayLine(3, ALIGN_CENTER, "", NON_INVERT, forceUpdate);
+                track->SetDisplayLine(1, ALIGN_CENTER, "Filter", INVERT, force_update);
+                track->SetDisplayLine(2, ALIGN_CENTER, filters.at(filter_index).name.c_str(), NON_INVERT, force_update);
+                track->SetDisplayLine(3, ALIGN_CENTER, "", NON_INVERT, force_update);
             }
             else
             {
-                track->SetDisplayLine(1, ALIGN_CENTER, "No Fltr", INVERT, forceUpdate);
-                track->SetDisplayLine(2, ALIGN_CENTER, "", NON_INVERT, forceUpdate);
-                track->SetDisplayLine(3, ALIGN_CENTER, "Create", NON_INVERT, forceUpdate);
+                track->SetDisplayLine(1, ALIGN_CENTER, "No Fltr", INVERT, force_update);
+                track->SetDisplayLine(2, ALIGN_CENTER, "", NON_INVERT, force_update);
+                track->SetDisplayLine(3, ALIGN_CENTER, "Create", NON_INVERT, force_update);
             }
         }
 
-        forceUpdate = false;
+        force_update = false;
     }
 
     void HandleSelectClick(int index, int value) override

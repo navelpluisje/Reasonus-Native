@@ -37,11 +37,11 @@ public:
         context->ResetChannelManagerItemsCount();
         context->SetChannelManagerType(Track);
 
-        UpdateTracks();
+        UpdateTracks(true);
     }
     ~CSurf_FP_8_TrackReceivesManager() {};
 
-    void UpdateTracks() override
+    void UpdateTracks(bool force_update) override
     {
         WDL_PtrList<MediaTrack> media_tracks = navigator->GetBankTracks();
         MediaTrack *receives_track = GetSelectedTrack(0, 0);
@@ -69,27 +69,27 @@ public:
 
             if (!media_track)
             {
-                track->SetDisplayLine(0, ALIGN_LEFT, "", NON_INVERT);
+                track->SetDisplayLine(0, ALIGN_LEFT, "", NON_INVERT, force_update);
             }
             else
             {
-                track->SetDisplayLine(0, ALIGN_LEFT, DAW::GetTrackName(media_track).c_str(), receives_track == media_track ? INVERT : NON_INVERT);
+                track->SetDisplayLine(0, ALIGN_LEFT, DAW::GetTrackName(media_track).c_str(), receives_track == media_track ? INVERT : NON_INVERT, force_update);
             }
 
             if (DAW::HasTrackReceive(receives_track, receive_index))
             {
                 if (add_receive_enabled)
                 {
-                    track->SetDisplayLine(1, ALIGN_LEFT, ("Trk: " + DAW::GetTrackIndex(add_receive_track)).c_str(), INVERT);
-                    track->SetDisplayLine(2, ALIGN_CENTER, DAW::GetTrackName(add_receive_track).c_str(), INVERT);
+                    track->SetDisplayLine(1, ALIGN_LEFT, ("Trk: " + DAW::GetTrackIndex(add_receive_track)).c_str(), INVERT, force_update);
+                    track->SetDisplayLine(2, ALIGN_CENTER, DAW::GetTrackName(add_receive_track).c_str(), INVERT, force_update);
                 }
                 else
                 {
-                    track->SetDisplayLine(1, ALIGN_LEFT, DAW::GetTrackReceiveSrcName(receives_track, receive_index).c_str(), INVERT);
-                    track->SetDisplayLine(2, ALIGN_CENTER, DAW::GetTrackSurfaceReceiveMode(receives_track, receive_index).c_str());
+                    track->SetDisplayLine(1, ALIGN_LEFT, DAW::GetTrackReceiveSrcName(receives_track, receive_index).c_str(), INVERT, force_update);
+                    track->SetDisplayLine(2, ALIGN_CENTER, DAW::GetTrackSurfaceReceiveMode(receives_track, receive_index).c_str(), NON_INVERT, force_update);
                 }
-                track->SetDisplayLine(3, ALIGN_CENTER, DAW::GetTrackSurfaceReceiveAutoMode(receives_track, receive_index).c_str());
-                track->SetFaderValue(fader_value);
+                track->SetDisplayLine(3, ALIGN_CENTER, DAW::GetTrackSurfaceReceiveAutoMode(receives_track, receive_index).c_str(), NON_INVERT, force_update);
+                track->SetFaderValue(fader_value, force_update);
                 track->SetValueBarMode(context->GetShiftChannelLeft() ? VALUEBAR_MODE_FILL : VALUEBAR_MODE_BIPOLAR);
                 track->SetValueBarValue(value_bar_value);
             }
@@ -97,32 +97,34 @@ public:
             {
                 if (add_receive_enabled)
                 {
-                    track->SetDisplayLine(1, ALIGN_LEFT, ("Trk: " + DAW::GetTrackIndex(add_receive_track)).c_str(), INVERT);
-                    track->SetDisplayLine(2, ALIGN_CENTER, DAW::GetTrackName(add_receive_track).c_str(), INVERT);
+                    track->SetDisplayLine(1, ALIGN_LEFT, ("Trk: " + DAW::GetTrackIndex(add_receive_track)).c_str(), INVERT, force_update);
+                    track->SetDisplayLine(2, ALIGN_CENTER, DAW::GetTrackName(add_receive_track).c_str(), INVERT, force_update);
                 }
                 else
                 {
-                    track->SetDisplayLine(1, ALIGN_LEFT, "No Rcvs", INVERT);
-                    track->SetDisplayLine(2, ALIGN_CENTER, "");
+                    track->SetDisplayLine(1, ALIGN_LEFT, "No Rcvs", INVERT, force_update);
+                    track->SetDisplayLine(2, ALIGN_CENTER, "", NON_INVERT, force_update);
                 }
-                track->SetDisplayLine(3, ALIGN_CENTER, "");
-                track->SetFaderValue(0);
+                track->SetDisplayLine(3, ALIGN_CENTER, "", NON_INVERT, force_update);
+                track->SetFaderValue(0, force_update);
                 track->SetValueBarMode(VALUEBAR_MODE_FILL);
                 track->SetValueBarValue(0);
             }
 
             track->SetTrackColor(color);
-            track->SetSelectButtonValue(BTN_VALUE_ON);
+            track->SetSelectButtonValue(BTN_VALUE_ON, force_update);
             track->SetMuteButtonValue(
                 ButtonBlinkOnOff(
                     (context->GetShiftChannelLeft() && DAW::GetTrackReceiveMute(receives_track, receive_index)),
                     DAW::GetTrackReceiveMute(receives_track, receive_index),
-                    settings->GetDistractionFreeMode()));
+                    settings->GetDistractionFreeMode()),
+                force_update);
             track->SetSoloButtonValue(((context->GetShiftChannelLeft() && DAW::GetTrackReceiveMono(receives_track, receive_index)) || (!context->GetShiftChannelLeft() && DAW::GetTrackReceivePhase(receives_track, receive_index)))
                                           ? BTN_VALUE_ON
-                                          : BTN_VALUE_OFF);
+                                          : BTN_VALUE_OFF,
+                                      force_update);
 
-            track->SetDisplayMode(DISPLAY_MODE_2);
+            track->SetDisplayMode(DISPLAY_MODE_2, force_update);
         }
     }
 

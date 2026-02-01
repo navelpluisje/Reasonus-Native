@@ -29,7 +29,7 @@ void CSurf_FP_8_FaderManager::SetChannelMode(ChannelMode channelMode, bool updat
     context->SetChannelMode(channelMode);
     if (updateButtons)
     {
-        SetButtonValues();
+        SetButtonValues(true);
     }
 
     switch (channelMode)
@@ -280,9 +280,14 @@ void CSurf_FP_8_FaderManager::SetPluginControlMode()
 }
 
 // ADD ALL THE TRACKMANAGERS METHODS HERE TO PROXY THEM
-void CSurf_FP_8_FaderManager::UpdateTracks()
+void CSurf_FP_8_FaderManager::UpdateTracks(bool force_update)
 {
-    channelManager->UpdateTracks();
+    if (force_update)
+    {
+        SetButtonValues(force_update);
+    }
+
+    channelManager->UpdateTracks(force_update);
 }
 
 void CSurf_FP_8_FaderManager::HandleMuteClick(int index, int value)
