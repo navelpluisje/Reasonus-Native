@@ -259,7 +259,7 @@ public:
      */
     bool isVersionFound = (std::string(GIT_VERSION).compare(DAW::GetExtState(EXT_STATE_KEY_VERSION, "")) != 0);
     bool isIniFound = std::filesystem::exists(GetReaSonusIniPath(FP_V2));
-    bool isLocalesFolderFound = std::filesystem::exists(GetReaSonusLocalesFolderPath()); // At least, the Locales folder must be found
+    bool isLocalesFolderFound = std::filesystem::exists(GetReaSonusLocalesFolderPath());
 
     if (!(isVersionFound && isIniFound && isLocalesFolderFound))
     {

@@ -9,6 +9,7 @@ I18n::I18n() {}
 
 void I18n::SetLanguage(std::string lang)
 {
+    LOG("I18n::SetLanguage: %s", lang.c_str());
     if (this->language.compare(lang) == 0)
     {
         return;
@@ -21,7 +22,11 @@ void I18n::SetLanguage(std::string lang)
     if (!file.read(translations))
     {
         mINI::INIFile file(GetReaSonusLocalesPath("en-US"));
-        file.read(translations);
+        if (!file.read(translations))
+        {
+            LOG("[WARNING] Failed to read translations file!");
+            return;
+        }
     }
 }
 
@@ -29,6 +34,7 @@ std::string I18n::t(std::string group, std::string key)
 {
     if (!this->translations.has(group) || !this->translations[group].has(key))
     {
+        LOG("[WARNING] I18n::t: Not found! (group=%s, key=%s)", group.c_str(), key.c_str());
         return key;
     }
     return this->translations[group][key];
