@@ -128,6 +128,11 @@ std::string StripPluginNamePrefixes(char *name)
 {
     std::vector<std::string> splitted_name = split(std::string(name), PREFIX_SEPARATOR);
 
+    if (splitted_name.size() == 0)
+    {
+        return std::string(name);
+    }
+
     return splitted_name[splitted_name.size() - 1];
 }
 
