@@ -230,6 +230,7 @@ class CSurf_FaderPortV2 : public IReaperControlSurface
 
   void updateSettings()
   {
+    i18n->SetLanguage(DAW::GetExtState(EXT_STATE_KEY_UI_LANGUAGE, "en-US"));
     settings->UpdateSettings();
   }
 
