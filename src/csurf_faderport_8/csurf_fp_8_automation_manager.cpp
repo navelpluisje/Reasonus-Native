@@ -19,8 +19,8 @@ protected:
 
     ReaSonusSettings *settings = ReaSonusSettings::GetInstance(FP_8);
 
-    int channelAutomationMode;
-    int globalAutomationMode;
+    int channelAutomationMode = 0;
+    int globalAutomationMode = 0;
     bool canSafe = false;
     bool canUndo = false;
     bool canRedo = false;

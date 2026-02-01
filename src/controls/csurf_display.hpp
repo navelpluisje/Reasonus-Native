@@ -12,7 +12,7 @@ protected:
     std::string values[7] = {"", "", "", "", "", "", ""};
     Inverted inverted[7] = {NON_INVERT, NON_INVERT, NON_INVERT, NON_INVERT, NON_INVERT, NON_INVERT, NON_INVERT};
     Alignment alignment[7] = {ALIGN_LEFT, ALIGN_LEFT, ALIGN_LEFT, ALIGN_LEFT, ALIGN_LEFT, ALIGN_LEFT, ALIGN_LEFT};
-    DisplayMode displayMode;
+    DisplayMode displayMode = DISPLAY_MODE_0;
     midi_Output *m_midiout;
     int device_id;
 

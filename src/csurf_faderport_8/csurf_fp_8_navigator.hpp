@@ -66,8 +66,8 @@ class CSurf_FP_8_Navigator
     ReaSonusSettings *settings = ReaSonusSettings::GetInstance(FP_8);
 
     WDL_PtrList<MediaTrack> tracks;
-    bool hasSolo;
-    bool hasMute;
+    bool hasSolo = false;
+    bool hasMute = false;
     bool trackTouched[16] = {
         false,
         false,

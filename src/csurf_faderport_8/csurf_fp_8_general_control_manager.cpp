@@ -25,14 +25,14 @@ protected:
     ShiftState armState;
     ShiftState shiftState;
     DoubleClickState dbcState;
-    bool hasSolo;
-    bool hasMute;
-    bool hasSelectedBypass;
-    bool hasGlobalBypass;
-    bool followCursor;
-    bool last_touched_fx_mode;
+    bool hasSolo = false;
+    bool hasMute = false;
+    bool hasSelectedBypass = false;
+    bool hasGlobalBypass = false;
+    bool followCursor = false;
+    bool last_touched_fx_mode = false;
 
-    bool functionsDialogOpen;
+    bool functionsDialogOpen = false;
 
     void SetButtonValue(bool force = false)
     {

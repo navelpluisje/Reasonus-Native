@@ -13,7 +13,7 @@ protected:
     Btn_Types type;
     midi_Output *m_midiout;
 
-    void SendValue();
+    virtual void SendValue();
 
 public:
     CSurf_Button(Btn_Types type, Btn_Value value, midi_Output *m_midiout);
