@@ -79,7 +79,7 @@ class CSurf_FaderPortV2 : public IReaperControlSurface
     }
 
     /**
-     * BUTTONS
+     * BUTTON PRESS
      */
     else if (evt->midi_message[0] == MIDI_MESSAGE_BUTTON)
     {
@@ -226,6 +226,17 @@ class CSurf_FaderPortV2 : public IReaperControlSurface
       else if (evt->midi_message[1] == ENCODER_CLICK_PAN)
       {
         sessionManager->HandleEncoderClick(evt->midi_message[2]);
+      }
+    }
+    /**
+     * BUTTON RELEASE
+     */
+    else if (evt->midi_message[0] == MIDI_MESSAGE_BUTTON_OFF)
+    {
+      if (evt->midi_message[1] == BTN_SHIFT_LEFT)
+      {
+        generalControlManager->HandleShiftButton(0);
+        sessionManager->Refresh();
       }
     }
   }
