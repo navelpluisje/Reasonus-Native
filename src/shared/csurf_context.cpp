@@ -48,7 +48,7 @@ class CSurf_Context
     int pluginEditParamId;
 
     // disable fader on v2
-    bool fader_disabled;
+    bool fader_disabled = false;
 
     ChannelMode channelMode = TrackMode;
     ChannelMode previousChannelMode = TrackMode;
