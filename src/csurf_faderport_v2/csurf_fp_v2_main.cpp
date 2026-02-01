@@ -7,6 +7,7 @@
 
 #include <string>
 #include <vector>
+#include <filesystem>
 #include <reaper_plugin.h>
 #include <WDL/wdltypes.h> // might be unnecessary in future
 #include <WDL/ptrlist.h>
@@ -256,10 +257,19 @@ public:
     /**
      * First we check if we have the ini file. If not we create it with default values
      */
-    if (std::string(GIT_VERSION).compare(DAW::GetExtState(EXT_STATE_KEY_VERSION, "")) != 0)
+    bool isVersionFound = (std::string(GIT_VERSION).compare(DAW::GetExtState(EXT_STATE_KEY_VERSION, "")) != 0);
+    bool isIniFound = std::filesystem::exists(GetReaSonusIniPath(FP_V2));
+    bool isLocalesFolderFound = std::filesystem::exists(GetReaSonusLocalesFolderPath()); // At least, the Locales folder must be found
+
+    if (!(isVersionFound && isIniFound && isLocalesFolderFound))
     {
+      LOG("CSurf_FaderPortV2: Creating default settings files");
       DAW::SetExtState(EXT_STATE_KEY_VERSION, GIT_VERSION, true);
       I18n::checkLocalesFiles();
+    }
+    else
+    {
+      LOG("CSurf_FaderPortV2: Using existing settings files");
     }
 
     errStats = 0;

@@ -3,6 +3,7 @@
 #include <mini/ini.h>
 #include "../i18n/i18n.hpp"
 #include "../shared/csurf_utils.hpp"
+#include "../shared/csurf_log.hpp"
 
 I18n::I18n() {}
 
@@ -77,6 +78,7 @@ void I18n::checkLocalesFiles()
 
         if (!std::filesystem::exists(dirPath))
         {
+            LOG("I18n::checkLocalesFiles: Create directory: %s", dirPath.c_str());
             std::filesystem::create_directory(dirPath);
         }
 
@@ -84,6 +86,7 @@ void I18n::checkLocalesFiles()
     }
     catch (std::filesystem::filesystem_error &e)
     {
+        LOG("I18n::checkLocalesFiles: File system error: %s", e.what());
         ShowConsoleMsg(e.what());
         return;
     }

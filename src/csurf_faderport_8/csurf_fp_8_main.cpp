@@ -1,5 +1,6 @@
 #include <string>
 #include <vector>
+#include <filesystem>
 #include <reaper_plugin.h>
 #include <WDL/wdltypes.h> // might be unnecessary in future
 #include <WDL/ptrlist.h>
@@ -392,11 +393,20 @@ public:
     (void)indev;
     (void)outdev;
 
-    if (std::string(GIT_VERSION).compare(DAW::GetExtState(EXT_STATE_KEY_VERSION, "")) != 0)
+    bool isVersionFound = (std::string(GIT_VERSION).compare(DAW::GetExtState(EXT_STATE_KEY_VERSION, "")) != 0);
+    bool isIniFound = std::filesystem::exists(GetReaSonusIniPath(FP_V2));
+    bool isLocalesFolderFound = std::filesystem::exists(GetReaSonusLocalesFolderPath());
+
+    if (!(isVersionFound && isIniFound && isLocalesFolderFound))
     {
       ReaSonusMessage::Start();
+      LOG("CSurf_FaderPort: Creating default settings files");
       DAW::SetExtState(EXT_STATE_KEY_VERSION, GIT_VERSION, true);
       I18n::checkLocalesFiles();
+    }
+    else
+    {
+      LOG("CSurf_FaderPort: Using existing settings files");
     }
 
     errStats = 0;
