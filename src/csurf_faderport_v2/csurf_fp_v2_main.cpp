@@ -18,6 +18,7 @@
 #include "../shared/csurf_utils.hpp"
 #include "../shared/csurf_daw.hpp"
 #include "../shared/csurf_reasonus_settings.hpp"
+#include "../shared/csurf_log.hpp"
 #include "csurf_fp_v2_session_manager.cpp"
 #include "csurf_fp_v2_track_manager.hpp"
 #include "csurf_fp_v2_automation_manager.cpp"
@@ -56,6 +57,7 @@ class CSurf_FaderPortV2 : public IReaperControlSurface
 
   void OnMIDIEvent(MIDI_event_t *evt)
   {
+    LOG("CSurf_FaderPortV2::OnMIDIEvent: [0x%02x, 0x%02x, 0x%02x]", evt->midi_message[0], evt->midi_message[1], evt->midi_message[2]);
 
     /**
      * Fader values
@@ -290,6 +292,7 @@ public:
 
     if (m_midiout)
     {
+      LOG("CSurf_FaderPortV2: Sending MIDI startup sequence");
       m_midiout->Send(0xb0, 0x00, 0x06, -1);
       m_midiout->Send(0xb0, 0x20, 0x27, -1);
     }
@@ -299,6 +302,7 @@ public:
   {
     if (m_midiout)
     {
+      LOG("~CSurf_FaderPortV2: Sending MIDI shutdown sequence");
       int x;
       for (x = 0; x < 0x30; x++) // lights out§
         m_midiout->Send(0xa0, x, 0x00, -1);

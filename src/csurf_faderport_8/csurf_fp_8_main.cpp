@@ -9,6 +9,7 @@
 #include "../shared/csurf.h"
 #include "../shared/csurf_transport_manager.hpp"
 #include "../shared/csurf_utils.hpp"
+#include "../shared/csurf_log.hpp"
 #include "../i18n/i18n.hpp"
 #include "../ui/csurf_ui_assets.hpp"
 #include "../ui/csurf_ui_message.hpp"
@@ -61,6 +62,7 @@ class CSurf_FaderPort : public IReaperControlSurface
 
   void OnMIDIEvent(MIDI_event_t *evt)
   {
+    LOG("CSurf_FaderPort::OnMIDIEvent: [0x%02x, 0x%02x, 0x%02x]", evt->midi_message[0], evt->midi_message[1], evt->midi_message[2]);
 
     /**
      * Fader values
