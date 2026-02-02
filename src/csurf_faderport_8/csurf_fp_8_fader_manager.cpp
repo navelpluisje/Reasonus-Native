@@ -6,7 +6,7 @@ void CSurf_FP_8_FaderManager::SetButtonValues(bool force)
     trackButton->SetValue(context->IsChannelMode(TrackMode) ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
     pluginsButton->SetValue(
         ButtonOnBlinkOff(
-            context->IsChannelMode(PluginMode),
+            context->IsChannelMode(PluginMode) || context->IsChannelMode(PluginControlMode),
             context->IsChannelMode(TrackPluginMode),
             settings->GetDistractionFreeMode()),
         force);
