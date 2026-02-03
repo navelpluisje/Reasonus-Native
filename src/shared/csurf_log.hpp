@@ -9,6 +9,7 @@ class CSurf_Log
 {
 private:
     std::string m_filename = "";
+    int m_logLevel = 3;
 
     CSurf_Log();
 
@@ -25,39 +26,13 @@ public:
         return log;
     }
 
-    void Write(const std::string &_level, const char *_fmt, ...);
+    void Write(int _level, const char *_fmt, ...);
 };
 
-#define LOG_LEVEL 3 // 1=ERROR, 2=WARNING, 3=INFO, 4=DEBUG, 5=TRACE
-
-#if LOG_LEVEL >= 1
-#define LOG_ERROR(msg, ...) { CSurf_Log::GetInstance().Write("ERROR", (msg), ##__VA_ARGS__); }
-#else
-#define LOG_ERROR(msg, ...) {}
-#endif
-
-#if LOG_LEVEL >= 2
-#define LOG_WARNING(msg, ...) { CSurf_Log::GetInstance().Write("WARNING", (msg), ##__VA_ARGS__); }
-#else
-#define LOG_WARNING(msg, ...) {}
-#endif
-
-#if LOG_LEVEL >= 3
-#define LOG_INFO(msg, ...) { CSurf_Log::GetInstance().Write("INFO", (msg), ##__VA_ARGS__); }
-#else
-#define LOG_INFO(msg, ...) {}
-#endif
-
-#if LOG_LEVEL >= 4
-#define LOG_DEBUG(msg, ...) { CSurf_Log::GetInstance().Write("DEBUG", (msg), ##__VA_ARGS__); }
-#else
-#define LOG_DEBUG(msg, ...) {}
-#endif
-
-#if LOG_LEVEL >= 5
-#define LOG_TRACE(msg, ...) { CSurf_Log::GetInstance().Write("TRACE", (msg), ##__VA_ARGS__); }
-#else
-#define LOG_TRACE(msg, ...) {}
-#endif
+#define LOG_ERROR(msg, ...) { CSurf_Log::GetInstance().Write(1, (msg), ##__VA_ARGS__); }
+#define LOG_WARNING(msg, ...) { CSurf_Log::GetInstance().Write(2, (msg), ##__VA_ARGS__); }
+#define LOG_INFO(msg, ...) { CSurf_Log::GetInstance().Write(3, (msg), ##__VA_ARGS__); }
+#define LOG_DEBUG(msg, ...) { CSurf_Log::GetInstance().Write(4, (msg), ##__VA_ARGS__); }
+#define LOG_TRACE(msg, ...) { CSurf_Log::GetInstance().Write(5, (msg), ##__VA_ARGS__); }
 
 #endif
