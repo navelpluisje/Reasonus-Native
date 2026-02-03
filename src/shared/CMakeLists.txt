@@ -8,4 +8,5 @@ target_sources(${PROJECT_NAME}
         csurf_utils.cpp
         csurf_session_manager_actions.cpp
         csurf_reasonus_settings.cpp
+        csurf_log.cpp
         )

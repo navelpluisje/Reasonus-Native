@@ -295,7 +295,7 @@ else()
     target_compile_options(
         ${PROJECT_NAME}
         PRIVATE
-        -Wall -Wextra -Wno-unused -Wno-missing-field-initializers
+        -Wall -Wextra -Wno-unused -Wno-missing-field-initializers -Wno-parentheses
     )
 endif()
 

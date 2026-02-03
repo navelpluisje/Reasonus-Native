@@ -1,5 +1,5 @@
-#include "csurf_button.hpp"
 #include "../shared/csurf_log.hpp"
+#include "csurf_button.hpp"
 
 void CSurf_Button::SendValue()
 {
