@@ -132,6 +132,7 @@ void ReaSonusMessage::Frame()
             ImGui::BulletText(m_ctx, "Added option to add or delete a group at any point.");
             ImGui::BulletText(m_ctx, "Added an indicator for changed groups.");
             ImGui::BulletText(m_ctx, "The version number in ReaSonus Control Panel is now clickable and will open this window.");
+            ImGui::BulletText(m_ctx, "Fixed an issue with wrong illuminated Atomation button");
 
             ImGui::Text(m_ctx, "Beside all these nice improvements, some bugs were fixed as well. When creating a plugin mapping, the plugin type was not taken in account. This can potentially cause issues as the mapping between plugin types can differ");
             ImGui::Text(m_ctx, "There has been created a Plugin Type Mapping tool to help you set the type for your mappings. The possitive is you only have to do this once. Click the `Open type Mapping` button below to start the mapping.");
