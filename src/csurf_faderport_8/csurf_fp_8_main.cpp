@@ -66,6 +66,16 @@ class CSurf_FaderPort : public IReaperControlSurface
     LOG("CSurf_FaderPort::OnMIDIEvent: [0x%02x, 0x%02x, 0x%02x]", evt->midi_message[0], evt->midi_message[1], evt->midi_message[2]);
 
     /**
+     * Change "BUTTON_OFF" events into "BUTTON_ON-with-velocity-zero" events so they are handled the same way
+     */
+    if (evt->midi_message[0] == MIDI_MESSAGE_BUTTON_OFF)
+    {
+      evt->midi_message[0] = MIDI_MESSAGE_BUTTON;
+      evt->midi_message[2] = 0x00;
+      LOG("CSurf_FaderPortV2::OnMIDIEvent: [0x%02x, 0x%02x, 0x%02x] (remapped)", evt->midi_message[0], evt->midi_message[1], evt->midi_message[2]);
+    }
+
+    /**
      * Fader values
      */
     if (evt->midi_message[0] >= FADER_1 && evt->midi_message[0] <= FADER_16)

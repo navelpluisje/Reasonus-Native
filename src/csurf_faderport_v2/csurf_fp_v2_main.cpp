@@ -58,7 +58,17 @@ class CSurf_FaderPortV2 : public IReaperControlSurface
 
   void OnMIDIEvent(MIDI_event_t *evt)
   {
-    LOG("CSurf_FaderPortV2::OnMIDIEvent: [0x%02x, 0x%02x, 0x%02x]", evt->midi_message[0], evt->midi_message[1], evt->midi_message[2]);
+    LOG("CSurf_FaderPort::OnMIDIEvent: [0x%02x, 0x%02x, 0x%02x]", evt->midi_message[0], evt->midi_message[1], evt->midi_message[2]);
+
+    /**
+     * Change "BUTTON_OFF" events into "BUTTON_ON-with-velocity-zero" events so they are handled the same way
+     */
+    if (evt->midi_message[0] == MIDI_MESSAGE_BUTTON_OFF)
+    {
+      evt->midi_message[0] = MIDI_MESSAGE_BUTTON;
+      evt->midi_message[2] = 0x00;
+      LOG("CSurf_FaderPortV2::OnMIDIEvent: [0x%02x, 0x%02x, 0x%02x] (remapped)", evt->midi_message[0], evt->midi_message[1], evt->midi_message[2]);
+    }
 
     /**
      * Fader values
@@ -227,17 +237,6 @@ class CSurf_FaderPortV2 : public IReaperControlSurface
       else if (evt->midi_message[1] == ENCODER_CLICK_PAN)
       {
         sessionManager->HandleEncoderClick(evt->midi_message[2]);
-      }
-    }
-    /**
-     * BUTTON RELEASE
-     */
-    else if (evt->midi_message[0] == MIDI_MESSAGE_BUTTON_OFF)
-    {
-      if (evt->midi_message[1] == BTN_SHIFT_LEFT)
-      {
-        generalControlManager->HandleShiftButton(0);
-        sessionManager->Refresh();
       }
     }
   }
