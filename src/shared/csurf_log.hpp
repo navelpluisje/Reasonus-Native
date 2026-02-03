@@ -28,10 +28,36 @@ public:
     void Write(const std::string &_level, const char *_fmt, ...);
 };
 
-#if 0 // 1=Logging enabled, 0=Logging disabled
-#define LOG(msg, ...) { CSurf_Log::GetInstance().Write("INFO", (msg), ##__VA_ARGS__); }
+#define LOG_LEVEL 3 // 1=ERROR, 2=WARNING, 3=INFO, 4=DEBUG, 5=TRACE
+
+#if LOG_LEVEL >= 1
+#define LOG_ERROR(msg, ...) { CSurf_Log::GetInstance().Write("ERROR", (msg), ##__VA_ARGS__); }
 #else
-#define LOG(msg, ...) {}
+#define LOG_ERROR(msg, ...) {}
+#endif
+
+#if LOG_LEVEL >= 2
+#define LOG_WARNING(msg, ...) { CSurf_Log::GetInstance().Write("WARNING", (msg), ##__VA_ARGS__); }
+#else
+#define LOG_WARNING(msg, ...) {}
+#endif
+
+#if LOG_LEVEL >= 3
+#define LOG_INFO(msg, ...) { CSurf_Log::GetInstance().Write("INFO", (msg), ##__VA_ARGS__); }
+#else
+#define LOG_INFO(msg, ...) {}
+#endif
+
+#if LOG_LEVEL >= 4
+#define LOG_DEBUG(msg, ...) { CSurf_Log::GetInstance().Write("DEBUG", (msg), ##__VA_ARGS__); }
+#else
+#define LOG_DEBUG(msg, ...) {}
+#endif
+
+#if LOG_LEVEL >= 5
+#define LOG_TRACE(msg, ...) { CSurf_Log::GetInstance().Write("TRACE", (msg), ##__VA_ARGS__); }
+#else
+#define LOG_TRACE(msg, ...) {}
 #endif
 
 #endif

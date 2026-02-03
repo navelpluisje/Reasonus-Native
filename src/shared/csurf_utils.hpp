@@ -91,7 +91,7 @@ struct ShiftState
 
     void SetValue(bool value)
     {
-        LOG("ShiftState::SetValue: %d", value);
+        LOG_DEBUG("ShiftState::SetValue: %d", value);
         int time = GetTickCount();
         active = value;
 
@@ -111,19 +111,19 @@ struct ShiftState
 
     void ToggleInvert()
     {
-        LOG("ShiftState::ToggleInvert");
+        LOG_DEBUG("ShiftState::ToggleInvert");
         invert = !invert;
     }
 
     bool IsActive()
     {
-        LOG("ShiftState::IsActive(%d)", invert ? !active : active);
+        LOG_DEBUG("ShiftState::IsActive: %d", invert ? !active : active);
         return invert ? !active : active;
     }
 
     bool IsLocked()
     {
-        LOG("ShiftState::IsLocked(%d)", invert);
+        LOG_DEBUG("ShiftState::IsLocked: %d", invert);
         return invert;
     }
 };

@@ -58,7 +58,7 @@ class CSurf_FaderPortV2 : public IReaperControlSurface
 
   void OnMIDIEvent(MIDI_event_t *evt)
   {
-    LOG("CSurf_FaderPort::OnMIDIEvent: [0x%02x, 0x%02x, 0x%02x]", evt->midi_message[0], evt->midi_message[1], evt->midi_message[2]);
+    LOG_DEBUG("CSurf_FaderPort::OnMIDIEvent: [0x%02x, 0x%02x, 0x%02x]", evt->midi_message[0], evt->midi_message[1], evt->midi_message[2]);
 
     /**
      * Change "BUTTON_OFF" events into "BUTTON_ON-with-velocity-zero" events so they are handled the same way
@@ -67,7 +67,7 @@ class CSurf_FaderPortV2 : public IReaperControlSurface
     {
       evt->midi_message[0] = MIDI_MESSAGE_BUTTON;
       evt->midi_message[2] = 0x00;
-      LOG("CSurf_FaderPortV2::OnMIDIEvent: [0x%02x, 0x%02x, 0x%02x] (remapped)", evt->midi_message[0], evt->midi_message[1], evt->midi_message[2]);
+      LOG_DEBUG("CSurf_FaderPortV2::OnMIDIEvent: [0x%02x, 0x%02x, 0x%02x] (remapped)", evt->midi_message[0], evt->midi_message[1], evt->midi_message[2]);
     }
 
     /**
@@ -262,13 +262,13 @@ public:
 
     if (!(isVersionFound && isIniFound && isLocalesFolderFound))
     {
-      LOG("CSurf_FaderPortV2: Creating default settings files");
+      LOG_DEBUG("CSurf_FaderPortV2: Creating default settings files");
       DAW::SetExtState(EXT_STATE_KEY_VERSION, GIT_VERSION, true);
       I18n::checkLocalesFiles();
     }
     else
     {
-      LOG("CSurf_FaderPortV2: Using existing settings files");
+      LOG_DEBUG("CSurf_FaderPortV2: Using existing settings files");
     }
 
     errStats = 0;
@@ -312,7 +312,7 @@ public:
 
     if (m_midiout)
     {
-      LOG("CSurf_FaderPortV2: Sending MIDI startup sequence");
+      LOG_DEBUG("CSurf_FaderPortV2: Sending MIDI startup sequence");
       m_midiout->Send(0xb0, 0x00, 0x06, -1);
       m_midiout->Send(0xb0, 0x20, 0x27, -1);
     }
@@ -322,7 +322,7 @@ public:
   {
     if (m_midiout)
     {
-      LOG("~CSurf_FaderPortV2: Sending MIDI shutdown sequence");
+      LOG_DEBUG("~CSurf_FaderPortV2: Sending MIDI shutdown sequence");
       int x;
       for (x = 0; x < 0x30; x++) // lights out§
         m_midiout->Send(0xa0, x, 0x00, -1);
@@ -451,6 +451,7 @@ public:
 
 static IReaperControlSurface *createFuncV2(const char *type_string, const char *configString, int *errStats)
 {
+  LOG_INFO("Creating Faderport V2 control surface");
   (void)type_string;
   int parms[4];
   parseParms(configString, parms);

@@ -63,7 +63,7 @@ class CSurf_FaderPort : public IReaperControlSurface
 
   void OnMIDIEvent(MIDI_event_t *evt)
   {
-    LOG("CSurf_FaderPort::OnMIDIEvent: [0x%02x, 0x%02x, 0x%02x]", evt->midi_message[0], evt->midi_message[1], evt->midi_message[2]);
+    LOG_DEBUG("CSurf_FaderPort::OnMIDIEvent: [0x%02x, 0x%02x, 0x%02x]", evt->midi_message[0], evt->midi_message[1], evt->midi_message[2]);
 
     /**
      * Change "BUTTON_OFF" events into "BUTTON_ON-with-velocity-zero" events so they are handled the same way
@@ -72,7 +72,7 @@ class CSurf_FaderPort : public IReaperControlSurface
     {
       evt->midi_message[0] = MIDI_MESSAGE_BUTTON;
       evt->midi_message[2] = 0x00;
-      LOG("CSurf_FaderPortV2::OnMIDIEvent: [0x%02x, 0x%02x, 0x%02x] (remapped)", evt->midi_message[0], evt->midi_message[1], evt->midi_message[2]);
+      LOG_DEBUG("CSurf_FaderPortV2::OnMIDIEvent: [0x%02x, 0x%02x, 0x%02x] (remapped)", evt->midi_message[0], evt->midi_message[1], evt->midi_message[2]);
     }
 
     /**
@@ -410,13 +410,13 @@ public:
     if (!(isVersionFound && isIniFound && isLocalesFolderFound))
     {
       ReaSonusMessage::Start();
-      LOG("CSurf_FaderPort: Creating default settings files");
+      LOG_DEBUG("CSurf_FaderPort: Creating default settings files");
       DAW::SetExtState(EXT_STATE_KEY_VERSION, GIT_VERSION, true);
       I18n::checkLocalesFiles();
     }
     else
     {
-      LOG("CSurf_FaderPort: Using existing settings files");
+      LOG_DEBUG("CSurf_FaderPort: Using existing settings files");
     }
 
     errStats = 0;
@@ -640,6 +640,7 @@ public:
 
 static IReaperControlSurface *createFunc(const char *type_string, const char *configString, int *errStats)
 {
+  LOG_INFO("Creating Faderport 8 control surface");
   (void)type_string;
   int parms[4];
   parseParms(configString, parms);

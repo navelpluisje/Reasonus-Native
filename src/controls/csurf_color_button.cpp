@@ -12,7 +12,7 @@ void CSurf_ColorButton::SendValue()
 {
     if (m_midiout)
     {
-        LOG("CSurf_ColorButton::SendValue: [0x%02x, 0x%02x, 0x%02x]", MIDI_MESSAGE_BUTTON, type, value);
+        LOG_DEBUG("CSurf_ColorButton::SendValue: [0x%02x, 0x%02x, 0x%02x]", MIDI_MESSAGE_BUTTON, type, value);
         m_midiout->Send(MIDI_MESSAGE_BUTTON, type, value, -1);
     }
 };
@@ -21,9 +21,9 @@ void CSurf_ColorButton::SendColor()
 {
     if (m_midiout)
     {
-        LOG("CSurf_ColorButton::SendColor: [0x%02x, 0x%02x, 0x%02x]", MIDI_MESSAGE_COLOR_RED, type, color.red);
-        LOG("CSurf_ColorButton::SendColor: [0x%02x, 0x%02x, 0x%02x]", MIDI_MESSAGE_COLOR_GREEN, type, color.green);
-        LOG("CSurf_ColorButton::SendColor: [0x%02x, 0x%02x, 0x%02x]", MIDI_MESSAGE_COLOR_BLUE, type, color.blue);
+        LOG_DEBUG("CSurf_ColorButton::SendColor: [0x%02x, 0x%02x, 0x%02x]", MIDI_MESSAGE_COLOR_RED, type, color.red);
+        LOG_DEBUG("CSurf_ColorButton::SendColor: [0x%02x, 0x%02x, 0x%02x]", MIDI_MESSAGE_COLOR_GREEN, type, color.green);
+        LOG_DEBUG("CSurf_ColorButton::SendColor: [0x%02x, 0x%02x, 0x%02x]", MIDI_MESSAGE_COLOR_BLUE, type, color.blue);
         m_midiout->Send(MIDI_MESSAGE_COLOR_RED, type, color.red, -1);
         m_midiout->Send(MIDI_MESSAGE_COLOR_GREEN, type, color.green, -1);
         m_midiout->Send(MIDI_MESSAGE_COLOR_BLUE, type, color.blue, -1);
