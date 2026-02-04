@@ -10,7 +10,7 @@ class CSurf_FP_8_PluginLearnManager : public CSurf_FP_8_ChannelManager
 protected:
     mINI::INIStructure ini;
     std::string fileName;
-    int updateCount;
+    int updateCount = 0;
 
     std::string getParamKey(std::string prefix, int index)
     {

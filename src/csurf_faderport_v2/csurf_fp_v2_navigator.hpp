@@ -11,11 +11,11 @@ class CSurf_FP_V2_Navigator
     ReaSonusSettings *settings = ReaSonusSettings::GetInstance(FP_V2);
 
     WDL_PtrList<MediaTrack> tracks;
-    bool hasSolo;
-    bool hasMute;
-    bool hasArmed;
-    bool hasAllArmed;
-    bool isTouched;
+    bool hasSolo = false;
+    bool hasMute = false;
+    bool hasArmed = false;
+    bool hasAllArmed = false;
+    bool isTouched = false;
 
     void UpdateMixerPosition();
 

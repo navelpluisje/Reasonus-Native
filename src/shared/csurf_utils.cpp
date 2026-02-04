@@ -1,4 +1,5 @@
 #include "../shared/csurf_utils.hpp"
+#include "../shared/csurf_log.hpp"
 #include "../shared/csurf.h"
 #include "csurf_daw.hpp"
 #include <WDL/db2val.h>

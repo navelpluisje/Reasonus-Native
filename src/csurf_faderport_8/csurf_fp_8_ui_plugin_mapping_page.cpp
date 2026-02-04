@@ -44,14 +44,14 @@ protected:
 
     std::string select_key = "";
     std::string select_name;
-    int select_nb_steps;
+    int select_nb_steps = 0;
     int select_param_index = -1;
     int previous_select_param_index = -1;
     int select_uninvert_label = 0;
 
     std::string fader_key = "";
     std::string fader_name;
-    int fader_param_index;
+    int fader_param_index = 0;
     int fader_uninvert_label = 0;
 
     bool open_modal = true;

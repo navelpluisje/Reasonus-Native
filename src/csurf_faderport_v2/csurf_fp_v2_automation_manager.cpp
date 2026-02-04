@@ -18,7 +18,7 @@ protected:
 
     ReaSonusSettings *settings = ReaSonusSettings::GetInstance(FP_V2);
 
-    int channelAutomationMode;
+    int channelAutomationMode = 0;
 
     bool isAutomationMode(int automationMode, bool not_selected)
     {

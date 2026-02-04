@@ -11,7 +11,7 @@ private:
     I18n();
 
     mINI::INIStructure ini;
-    std::string language;
+    std::string language = "";
     mINI::INIStructure translations;
     static I18n *instancePtr;
 

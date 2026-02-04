@@ -1,9 +1,11 @@
 #include "csurf_fader.hpp"
+#include "../shared/csurf_log.hpp"
 
 void CSurf_Fader::SendValue()
 {
     if (m_midiout)
     {
+        LOG_DEBUG("CSurf_Fader::SendValue: [0x%02x, 0x%02x, 0x%02x]", 0xe0 + channel, value & 0x7f, (value >> 7) & 0x7f);
         m_midiout->Send(0xe0 + channel, value & 0x7f, (value >> 7) & 0x7f, -1);
     }
 };

@@ -1,10 +1,11 @@
+#include "../shared/csurf_log.hpp"
 #include "csurf_button.hpp"
 
 void CSurf_Button::SendValue()
 {
     if (m_midiout)
     {
-
+        LOG_DEBUG("CSurf_Button::SendValue: [0x%02x, 0x%02x, 0x%02x]", MIDI_MESSAGE_BUTTON, type, value);
         m_midiout->Send(MIDI_MESSAGE_BUTTON, type, value, -1);
     }
 }

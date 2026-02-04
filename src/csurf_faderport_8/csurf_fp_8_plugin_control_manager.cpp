@@ -9,9 +9,9 @@ protected:
     mINI::INIStructure ini;
     ReaSonusSettings *settings = ReaSonusSettings::GetInstance(FP_8);
     std::string fileName;
-    int updateCount;
-    bool editStepSize;
-    int stepSize;
+    int updateCount = 0;
+    bool editStepSize = 0;
+    int stepSize = 0;
 
     std::string getParamKey(std::string prefix, int index)
     {

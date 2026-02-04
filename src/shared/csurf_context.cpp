@@ -43,17 +43,17 @@ class CSurf_Context
     int channelManagerItemsCount = 0;
 
     // Plugin Edit fields
-    MediaTrack *pluginEditTrack;
-    int pluginEditPluginId;
-    int pluginEditParamId;
+    MediaTrack *pluginEditTrack = nullptr;
+    int pluginEditPluginId = 0;
+    int pluginEditParamId = 0;
 
     // disable fader on v2
-    bool fader_disabled;
+    bool fader_disabled = false;
 
     ChannelMode channelMode = TrackMode;
     ChannelMode previousChannelMode = TrackMode;
     ChannelMode previousPluginChannelMode = TrackMode;
-    ChannelManagerType channelManagerType;
+    ChannelManagerType channelManagerType = Track;
 
     ReaSonusSettings *settings;
 

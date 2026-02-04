@@ -1,3 +1,4 @@
+#include <vector>
 #include "../ui/csurf_ui_page_content.hpp"
 #include "../ui/csurf_ui_checkbox.hpp"
 #include "../shared/csurf.h"
@@ -9,21 +10,22 @@
 #include "../shared/csurf_daw.hpp"
 #include "csurf_fp_v2_ui_control_panel.hpp"
 #include "../shared/csurf_reasonus_settings.hpp"
+#include "../shared/csurf_log.hpp"
 
 class CSurf_FP_V2_SettingsPage : public CSurf_UI_PageContent
 {
 protected:
     ReaSonusSettings *settings = ReaSonusSettings::GetInstance(FP_V2);
 
-    int setting_language;
+    int setting_language = 0;
     bool edit_language = false;
     bool previous_edit_language = false;
-    bool momentary_mute_solo;
-    bool control_hidden_tracks;
-    bool can_disable_fader;
-    bool endless_track_scroll;
-    bool setting_latch_preview_action_enable;
-    int setting_latch_preview_action;
+    bool momentary_mute_solo = false;
+    bool control_hidden_tracks = false;
+    bool can_disable_fader = false;
+    bool endless_track_scroll = false;
+    bool setting_latch_preview_action_enable = false;
+    int setting_latch_preview_action = false;
     int *index;
 
     std::vector<std::string> language_names = {};

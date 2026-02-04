@@ -1,5 +1,6 @@
 #include <string>
 #include <vector>
+#include <filesystem>
 #include <reaper_plugin.h>
 #include <WDL/wdltypes.h> // might be unnecessary in future
 #include <WDL/ptrlist.h>
@@ -9,6 +10,7 @@
 #include "../shared/csurf.h"
 #include "../shared/csurf_transport_manager.hpp"
 #include "../shared/csurf_utils.hpp"
+#include "../shared/csurf_log.hpp"
 #include "../i18n/i18n.hpp"
 #include "../ui/csurf_ui_assets.hpp"
 #include "../ui/csurf_ui_message.hpp"
@@ -61,6 +63,17 @@ class CSurf_FaderPort : public IReaperControlSurface
 
   void OnMIDIEvent(MIDI_event_t *evt)
   {
+    LOG_DEBUG("CSurf_FaderPort::OnMIDIEvent: [0x%02x, 0x%02x, 0x%02x]", evt->midi_message[0], evt->midi_message[1], evt->midi_message[2]);
+
+    /**
+     * Change "BUTTON_OFF" events into "BUTTON_ON-with-velocity-zero" events so they are handled the same way
+     */
+    if (evt->midi_message[0] == MIDI_MESSAGE_BUTTON_OFF)
+    {
+      evt->midi_message[0] = MIDI_MESSAGE_BUTTON;
+      evt->midi_message[2] = 0x00;
+      LOG_DEBUG("CSurf_FaderPortV2::OnMIDIEvent: [0x%02x, 0x%02x, 0x%02x] (remapped)", evt->midi_message[0], evt->midi_message[1], evt->midi_message[2]);
+    }
 
     /**
      * Fader values
@@ -390,11 +403,20 @@ public:
     (void)indev;
     (void)outdev;
 
-    if (std::string(GIT_VERSION).compare(DAW::GetExtState(EXT_STATE_KEY_VERSION, "")) != 0)
+    bool isVersionFound = (std::string(GIT_VERSION).compare(DAW::GetExtState(EXT_STATE_KEY_VERSION, "")) != 0);
+    bool isIniFound = std::filesystem::exists(GetReaSonusIniPath(FP_8));
+    bool isLocalesFolderFound = std::filesystem::exists(GetReaSonusLocalesFolderPath());
+
+    if (!(isVersionFound && isIniFound && isLocalesFolderFound))
     {
       ReaSonusMessage::Start();
+      LOG_DEBUG("CSurf_FaderPort: Creating default settings files");
       DAW::SetExtState(EXT_STATE_KEY_VERSION, GIT_VERSION, true);
       I18n::checkLocalesFiles();
+    }
+    else
+    {
+      LOG_DEBUG("CSurf_FaderPort: Using existing settings files");
     }
 
     errStats = 0;
@@ -618,6 +640,7 @@ public:
 
 static IReaperControlSurface *createFunc(const char *type_string, const char *configString, int *errStats)
 {
+  LOG_INFO("Creating Faderport 8 control surface");
   (void)type_string;
   int parms[4];
   parseParms(configString, parms);

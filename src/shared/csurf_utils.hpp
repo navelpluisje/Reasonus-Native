@@ -5,6 +5,7 @@
 #include <WDL/wdltypes.h> // might be unnecessary in future
 #include <reaper_plugin_functions.h>
 #include <mini/ini.h>
+#include "csurf_log.hpp"
 
 const char PATH_SEPARATOR =
 #ifdef _WIN32
@@ -90,6 +91,7 @@ struct ShiftState
 
     void SetValue(bool value)
     {
+        LOG_DEBUG("ShiftState::SetValue: %d", value);
         int time = GetTickCount();
         active = value;
 
@@ -109,16 +111,19 @@ struct ShiftState
 
     void ToggleInvert()
     {
+        LOG_DEBUG("ShiftState::ToggleInvert");
         invert = !invert;
     }
 
     bool IsActive()
     {
+        LOG_DEBUG("ShiftState::IsActive: %d", invert ? !active : active);
         return invert ? !active : active;
     }
 
     bool IsLocked()
     {
+        LOG_DEBUG("ShiftState::IsLocked: %d", invert);
         return invert;
     }
 };

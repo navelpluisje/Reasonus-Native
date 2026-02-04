@@ -3,11 +3,13 @@
 #include <mini/ini.h>
 #include "../i18n/i18n.hpp"
 #include "../shared/csurf_utils.hpp"
+#include "../shared/csurf_log.hpp"
 
 I18n::I18n() {}
 
 void I18n::SetLanguage(std::string lang)
 {
+    LOG_DEBUG("I18n::SetLanguage: %s", lang.c_str());
     if (this->language.compare(lang) == 0)
     {
         return;
@@ -20,7 +22,11 @@ void I18n::SetLanguage(std::string lang)
     if (!file.read(translations))
     {
         mINI::INIFile file(GetReaSonusLocalesPath("en-US"));
-        file.read(translations);
+        if (!file.read(translations))
+        {
+            LOG_WARNING("Failed to read translations file!");
+            return;
+        }
     }
 }
 
@@ -28,6 +34,7 @@ std::string I18n::t(std::string group, std::string key)
 {
     if (!this->translations.has(group) || !this->translations[group].has(key))
     {
+        LOG_WARNING("I18n::t: Not found! (group=%s, key=%s)", group.c_str(), key.c_str());
         return key;
     }
     return this->translations[group][key];
@@ -77,6 +84,7 @@ void I18n::checkLocalesFiles()
 
         if (!std::filesystem::exists(dirPath))
         {
+            LOG_DEBUG("I18n::checkLocalesFiles: Create directory: %s", dirPath.c_str());
             std::filesystem::create_directory(dirPath);
         }
 
@@ -84,6 +92,7 @@ void I18n::checkLocalesFiles()
     }
     catch (std::filesystem::filesystem_error &e)
     {
+        LOG_DEBUG("I18n::checkLocalesFiles: File system error: %s", e.what());
         ShowConsoleMsg(e.what());
         return;
     }

@@ -7,6 +7,7 @@
 
 #include <string>
 #include <vector>
+#include <filesystem>
 #include <reaper_plugin.h>
 #include <WDL/wdltypes.h> // might be unnecessary in future
 #include <WDL/ptrlist.h>
@@ -18,6 +19,7 @@
 #include "../shared/csurf_utils.hpp"
 #include "../shared/csurf_daw.hpp"
 #include "../shared/csurf_reasonus_settings.hpp"
+#include "../shared/csurf_log.hpp"
 #include "csurf_fp_v2_session_manager.cpp"
 #include "csurf_fp_v2_track_manager.hpp"
 #include "csurf_fp_v2_automation_manager.cpp"
@@ -56,6 +58,17 @@ class CSurf_FaderPortV2 : public IReaperControlSurface
 
   void OnMIDIEvent(MIDI_event_t *evt)
   {
+    LOG_DEBUG("CSurf_FaderPort::OnMIDIEvent: [0x%02x, 0x%02x, 0x%02x]", evt->midi_message[0], evt->midi_message[1], evt->midi_message[2]);
+
+    /**
+     * Change "BUTTON_OFF" events into "BUTTON_ON-with-velocity-zero" events so they are handled the same way
+     */
+    if (evt->midi_message[0] == MIDI_MESSAGE_BUTTON_OFF)
+    {
+      evt->midi_message[0] = MIDI_MESSAGE_BUTTON;
+      evt->midi_message[2] = 0x00;
+      LOG_DEBUG("CSurf_FaderPortV2::OnMIDIEvent: [0x%02x, 0x%02x, 0x%02x] (remapped)", evt->midi_message[0], evt->midi_message[1], evt->midi_message[2]);
+    }
 
     /**
      * Fader values
@@ -77,7 +90,7 @@ class CSurf_FaderPortV2 : public IReaperControlSurface
     }
 
     /**
-     * BUTTONS
+     * BUTTON PRESS
      */
     else if (evt->midi_message[0] == MIDI_MESSAGE_BUTTON)
     {
@@ -243,10 +256,19 @@ public:
     /**
      * First we check if we have the ini file. If not we create it with default values
      */
-    if (std::string(GIT_VERSION).compare(DAW::GetExtState(EXT_STATE_KEY_VERSION, "")) != 0)
+    bool isVersionFound = (std::string(GIT_VERSION).compare(DAW::GetExtState(EXT_STATE_KEY_VERSION, "")) != 0);
+    bool isIniFound = std::filesystem::exists(GetReaSonusIniPath(FP_V2));
+    bool isLocalesFolderFound = std::filesystem::exists(GetReaSonusLocalesFolderPath());
+
+    if (!(isVersionFound && isIniFound && isLocalesFolderFound))
     {
+      LOG_DEBUG("CSurf_FaderPortV2: Creating default settings files");
       DAW::SetExtState(EXT_STATE_KEY_VERSION, GIT_VERSION, true);
       I18n::checkLocalesFiles();
+    }
+    else
+    {
+      LOG_DEBUG("CSurf_FaderPortV2: Using existing settings files");
     }
 
     errStats = 0;
@@ -290,6 +312,7 @@ public:
 
     if (m_midiout)
     {
+      LOG_DEBUG("CSurf_FaderPortV2: Sending MIDI startup sequence");
       m_midiout->Send(0xb0, 0x00, 0x06, -1);
       m_midiout->Send(0xb0, 0x20, 0x27, -1);
     }
@@ -299,6 +322,7 @@ public:
   {
     if (m_midiout)
     {
+      LOG_DEBUG("~CSurf_FaderPortV2: Sending MIDI shutdown sequence");
       int x;
       for (x = 0; x < 0x30; x++) // lights out§
         m_midiout->Send(0xa0, x, 0x00, -1);
@@ -427,6 +451,7 @@ public:
 
 static IReaperControlSurface *createFuncV2(const char *type_string, const char *configString, int *errStats)
 {
+  LOG_INFO("Creating Faderport V2 control surface");
   (void)type_string;
   int parms[4];
   parseParms(configString, parms);

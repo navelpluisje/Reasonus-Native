@@ -13,7 +13,7 @@ protected:
     std::vector<std::string> filter_keys = {};
     std::vector<std::string> filter_labels = {};
 
-    bool filter_dirty;
+    bool filter_dirty = false;
     std::string new_filter_text;
     std::string new_filter_name = "";
     bool edit_new_filter = false;
@@ -21,12 +21,12 @@ protected:
     std::string filter_name;
     std::vector<std::string> filter_text;
     int selected_filter_text = -1;
-    bool filter_case_insensitive;
-    bool filter_siblings;
-    bool filter_parents;
-    bool filter_children;
-    bool filter_top_level;
-    bool filter_match_multiple;
+    bool filter_case_insensitive = false;
+    bool filter_siblings = false;
+    bool filter_parents = false;
+    bool filter_children = false;
+    bool filter_top_level = false;
+    bool filter_match_multiple = false;
 
     void SetFiltersKeys()
     {
