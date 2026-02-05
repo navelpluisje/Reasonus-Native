@@ -109,7 +109,7 @@ void CSurf_TransportManager::handleFootSwitchKey(std::string key)
 
     if (isInteger(actionId))
     {
-        Main_OnCommandEx(stoi(actionId), 0, 0);
+        Main_OnCommandAsyncEx(stoi(actionId), 0, 0);
     }
     else
     {

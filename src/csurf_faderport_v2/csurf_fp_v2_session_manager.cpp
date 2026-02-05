@@ -104,7 +104,7 @@ protected:
 
         if (isInteger(actionId))
         {
-            Main_OnCommandEx(stoi(actionId), 0, 0);
+            Main_OnCommandAsyncEx(stoi(actionId), 0, 0);
         }
         else
         {
@@ -315,7 +315,7 @@ public:
         // Once selected and repressing it again, it will edit the region near the cursor
         if (session_type == Section)
         {
-            Main_OnCommandEx(40616, 0, 0); // Markers: Edit region near cursor
+            Main_OnCommandAsyncEx(40616, 0, 0); // Markers: Edit region near cursor
         }
         SetSession(Section);
     }
@@ -336,7 +336,7 @@ public:
         // Once selected and repressing it again, it will create a marker
         if (session_type == Marker)
         {
-            Main_OnCommandEx(40157, 0, 0); // Markers: Insert marker at current position
+            Main_OnCommandAsyncEx(40157, 0, 0); // Markers: Insert marker at current position
         }
         SetSession(Marker);
     }
@@ -362,8 +362,8 @@ public:
                                     : DAW::SetUniqueSelectedTrack(trackNavigator->GetPreviousTrack());
             break;
         case Zoom:
-            context->GetShiftLeft() ? Main_OnCommandEx(40112, 0, 0) // View: Zoom out vertical
-                                    : Main_OnCommandEx(1011, 0, 0); // View: Zoom out horizontal
+            context->GetShiftLeft() ? Main_OnCommandAsyncEx(40112, 0, 0) // View: Zoom out vertical
+                                    : Main_OnCommandAsyncEx(1011, 0, 0); // View: Zoom out horizontal
             break;
         case Scroll:
             context->GetShiftLeft() ? DAW::EditUndo()
@@ -375,14 +375,14 @@ public:
             break;
         case Click:
             context->GetShiftLeft() ? DAW::EditUndo()
-                                    : Main_OnCommandEx(42456, 0, 0); // Options: Set metronome speed to 1x
+                                    : Main_OnCommandAsyncEx(42456, 0, 0); // Options: Set metronome speed to 1x
             break;
         case Section:
-            context->GetShiftLeft() ? Main_OnCommandEx(40625, 0, 0)               // Time selection: Set start point
+            context->GetShiftLeft() ? Main_OnCommandAsyncEx(40625, 0, 0)          // Time selection: Set start point
                                     : Main_OnCommandStringEx("_SWS_SELPREVMORR"); // SWS: Goto/select previous marker/region
             break;
         case Marker:
-            context->GetShiftLeft() ? Main_OnCommandEx(40029, 0, 0)               // Edit: Undo
+            context->GetShiftLeft() ? Main_OnCommandAsyncEx(40029, 0, 0)          // Edit: Undo
                                     : Main_OnCommandStringEx("_SWS_SELPREVMORR"); // SWS: Goto/select previous marker/region
             break;
         }
@@ -409,8 +409,8 @@ public:
                                     : DAW::SetUniqueSelectedTrack(trackNavigator->GetNextTrack());
             break;
         case Zoom:
-            context->GetShiftLeft() ? Main_OnCommandEx(40111, 0, 0) // View: Zoom in vertical
-                                    : Main_OnCommandEx(1012, 0, 0); // View: Zoom in horizontal
+            context->GetShiftLeft() ? Main_OnCommandAsyncEx(40111, 0, 0) // View: Zoom in vertical
+                                    : Main_OnCommandAsyncEx(1012, 0, 0); // View: Zoom in horizontal
             break;
         case Scroll:
             context->GetShiftLeft() ? DAW::EditRedo()
@@ -422,10 +422,10 @@ public:
             break;
         case Click:
             context->GetShiftLeft() ? DAW::EditRedo()
-                                    : Main_OnCommandEx(42457, 0, 0); // Options: Set metronome speed to 2x
+                                    : Main_OnCommandAsyncEx(42457, 0, 0); // Options: Set metronome speed to 2x
             break;
         case Section:
-            context->GetShiftLeft() ? Main_OnCommandEx(40626, 0, 0)               // Time selection: Set end point
+            context->GetShiftLeft() ? Main_OnCommandAsyncEx(40626, 0, 0)          // Time selection: Set end point
                                     : Main_OnCommandStringEx("_SWS_SELNEXTMORR"); // SWS: Goto/select next marker/region
 
             break;
@@ -444,15 +444,15 @@ public:
             IncrementPan(value);
             break;
         case Channel:
-            Main_OnCommandEx(40285, 0, 0); // Track: Go to next track
+            Main_OnCommandAsyncEx(40285, 0, 0); // Track: Go to next track
             break;
         case Zoom:
-            context->GetShiftLeft() ? Main_OnCommandEx(40111, 0, 0) // View: Zoom in vertical
-                                    : Main_OnCommandEx(1012, 0, 0); // View: Zoom in horizontal
+            context->GetShiftLeft() ? Main_OnCommandAsyncEx(40111, 0, 0) // View: Zoom in vertical
+                                    : Main_OnCommandAsyncEx(1012, 0, 0); // View: Zoom in horizontal
             break;
         case Scroll:
-            context->GetShiftLeft() ? Main_OnCommandEx(40141, 0, 0)  // View: Scroll view left
-                                    : Main_OnCommandEx(40139, 0, 0); // View: Scroll view up
+            context->GetShiftLeft() ? Main_OnCommandAsyncEx(40141, 0, 0)  // View: Scroll view left
+                                    : Main_OnCommandAsyncEx(40139, 0, 0); // View: Scroll view up
             break;
         case Master:
             IncrementPan(value);
@@ -461,12 +461,12 @@ public:
             IncrementMetronomeVolume();
             break;
         case Section:
-            context->GetShiftLeft() ? Main_OnCommandEx(40105, 0, 0)  // View: Move cursor right one pixel
-                                    : Main_OnCommandEx(41044, 0, 0); // Move edit cursor forward one beat
+            context->GetShiftLeft() ? Main_OnCommandAsyncEx(40105, 0, 0)  // View: Move cursor right one pixel
+                                    : Main_OnCommandAsyncEx(41044, 0, 0); // Move edit cursor forward one beat
             break;
         case Marker:
-            context->GetShiftLeft() ? Main_OnCommandEx(40105, 0, 0)  // View: Move cursor right one pixel
-                                    : Main_OnCommandEx(41044, 0, 0); // Move edit cursor forward one beat
+            context->GetShiftLeft() ? Main_OnCommandAsyncEx(40105, 0, 0)  // View: Move cursor right one pixel
+                                    : Main_OnCommandAsyncEx(41044, 0, 0); // Move edit cursor forward one beat
             break;
         }
     }
@@ -479,15 +479,15 @@ public:
             DecrementPan(value);
             break;
         case Channel:
-            Main_OnCommandEx(40286, 0, 0); // Track: Go to previous track
+            Main_OnCommandAsyncEx(40286, 0, 0); // Track: Go to previous track
             break;
         case Zoom:
-            context->GetShiftLeft() ? Main_OnCommandEx(40112, 0, 0) // View: Zoom out vertical
-                                    : Main_OnCommandEx(1011, 0, 0); // View: Zoom out horizontal
+            context->GetShiftLeft() ? Main_OnCommandAsyncEx(40112, 0, 0) // View: Zoom out vertical
+                                    : Main_OnCommandAsyncEx(1011, 0, 0); // View: Zoom out horizontal
             break;
         case Scroll:
-            context->GetShiftLeft() ? Main_OnCommandEx(40140, 0, 0)  // View: Scroll view right
-                                    : Main_OnCommandEx(40138, 0, 0); // View: Scroll view down
+            context->GetShiftLeft() ? Main_OnCommandAsyncEx(40140, 0, 0)  // View: Scroll view right
+                                    : Main_OnCommandAsyncEx(40138, 0, 0); // View: Scroll view down
             break;
         case Master:
             DecrementPan(value);
@@ -496,12 +496,12 @@ public:
             DecrementMetronomeVolume();
             break;
         case Section:
-            context->GetShiftLeft() ? Main_OnCommandEx(40104, 0, 0)  // View: Move cursor left one pixel, View: Move cursor right one pixel
-                                    : Main_OnCommandEx(41045, 0, 0); // Move edit cursor back one beat, Move edit cursor forward one beat
+            context->GetShiftLeft() ? Main_OnCommandAsyncEx(40104, 0, 0)  // View: Move cursor left one pixel, View: Move cursor right one pixel
+                                    : Main_OnCommandAsyncEx(41045, 0, 0); // Move edit cursor back one beat, Move edit cursor forward one beat
             break;
         case Marker:
-            context->GetShiftLeft() ? Main_OnCommandEx(40104, 0, 0)  // View: Move cursor left one pixel, View: Move cursor right one pixel
-                                    : Main_OnCommandEx(41045, 0, 0); // Move edit cursor back one beat, Move edit cursor forward one beat
+            context->GetShiftLeft() ? Main_OnCommandAsyncEx(40104, 0, 0)  // View: Move cursor left one pixel, View: Move cursor right one pixel
+                                    : Main_OnCommandAsyncEx(41045, 0, 0); // Move edit cursor back one beat, Move edit cursor forward one beat
             break;
         }
     }
@@ -522,28 +522,28 @@ public:
         case Channel:
             break;
         case Zoom:
-            context->GetShiftLeft() ? Main_OnCommandEx(40113, 0, 0)  // View: Toggle track zoom to maximum height
-                                    : Main_OnCommandEx(40110, 0, 0); // View: Toggle track zoom to minimum height
+            context->GetShiftLeft() ? Main_OnCommandAsyncEx(40113, 0, 0)  // View: Toggle track zoom to maximum height
+                                    : Main_OnCommandAsyncEx(40110, 0, 0); // View: Toggle track zoom to minimum height
             break;
         case Scroll:
             context->GetShiftLeft() ? Main_OnCommandStringEx("_SWS_HSCROLLPLAY50") // SWS: Horizontal scroll to put play cursor at 50%
-                                    : Main_OnCommandEx(40913, 0, 0);               // Track: Vertical scroll selected tracks into view
+                                    : Main_OnCommandAsyncEx(40913, 0, 0);          // Track: Vertical scroll selected tracks into view
             break;
         case Master:
             context->GetShiftLeft() ? DAW::EditSave()
                                     : resetPan();
             break;
         case Click:
-            context->GetShiftLeft() ? Main_OnCommandEx(40363, 0, 0)  // Options: Show metronome/pre-roll settings
-                                    : Main_OnCommandEx(40364, 0, 0); // Options: Toggle metronome
+            context->GetShiftLeft() ? Main_OnCommandAsyncEx(40363, 0, 0)  // Options: Show metronome/pre-roll settings
+                                    : Main_OnCommandAsyncEx(40364, 0, 0); // Options: Toggle metronome
             break;
         case Section:
-            context->GetShiftLeft() ? Main_OnCommandEx(40615, 0, 0)  // Markers: Delete region near cursor
-                                    : Main_OnCommandEx(40306, 0, 0); // Markers: Insert region from time selection and edit..
+            context->GetShiftLeft() ? Main_OnCommandAsyncEx(40615, 0, 0)  // Markers: Delete region near cursor
+                                    : Main_OnCommandAsyncEx(40306, 0, 0); // Markers: Insert region from time selection and edit..
             break;
         case Marker:
-            context->GetShiftLeft() ? Main_OnCommandEx(40613, 0, 0)  // Markers: Delete marker near cursor
-                                    : Main_OnCommandEx(40171, 0, 0); // Markers: Insert and/or edit marker at current position
+            context->GetShiftLeft() ? Main_OnCommandAsyncEx(40613, 0, 0)  // Markers: Delete marker near cursor
+                                    : Main_OnCommandAsyncEx(40171, 0, 0); // Markers: Insert and/or edit marker at current position
             break;
         }
     }

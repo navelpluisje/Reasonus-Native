@@ -115,7 +115,7 @@ void CSurf_FP_V2_TrackManager::HandleMuteClick(int index, int value)
             return;
         }
 
-        Main_OnCommandEx(40339, 0, 0); // Track: Unmute all tracks
+        Main_OnCommandAsyncEx(40339, 0, 0); // Track: Unmute all tracks
         return;
     }
 
@@ -146,7 +146,7 @@ void CSurf_FP_V2_TrackManager::HandleSoloClick(int index, int value)
         {
             return;
         }
-        Main_OnCommandEx(40340, 0, 0); // Track: Unsolo all tracks
+        Main_OnCommandAsyncEx(40340, 0, 0); // Track: Unsolo all tracks
         return;
     }
 
@@ -182,11 +182,11 @@ void CSurf_FP_V2_TrackManager::HandleArmClick(int index, int value)
     {
         if (navigator->HasAllArmedTracks())
         {
-            Main_OnCommandEx(40491, 0, 0); // Track: Unarm all tracks for recording
+            Main_OnCommandAsyncEx(40491, 0, 0); // Track: Unarm all tracks for recording
         }
         else
         {
-            Main_OnCommandEx(40490, 0, 0); // Track: Arm all tracks for recording
+            Main_OnCommandAsyncEx(40490, 0, 0); // Track: Arm all tracks for recording
         }
         return;
     }
@@ -209,7 +209,7 @@ void CSurf_FP_V2_TrackManager::HandleBypassClick(int index, int value)
         return;
     }
 
-    context->GetShiftLeft() ? Main_OnCommandEx(40344, 0, 0)          // Track: Toggle FX bypass on all tracks
+    context->GetShiftLeft() ? Main_OnCommandAsyncEx(40344, 0, 0)     // Track: Toggle FX bypass on all tracks
                             : DAW::ToggleTrackFxBypass(media_track); // Track: Toggle FX bypass for selected tracks
 }
 

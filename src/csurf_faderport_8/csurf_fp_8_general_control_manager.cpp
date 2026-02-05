@@ -282,11 +282,11 @@ public:
     {
         if (context->GetShiftChannelLeft())
         {
-            Main_OnCommandEx(40490, 0, 0); // Track: Arm all tracks for recording
+            Main_OnCommandAsyncEx(40490, 0, 0); // Track: Arm all tracks for recording
         }
         else if (context->GetShiftChannelRight())
         {
-            Main_OnCommandEx(40491, 0, 0); // Track: Unarm all tracks for recording
+            Main_OnCommandAsyncEx(40491, 0, 0); // Track: Unarm all tracks for recording
         }
         else
         {
@@ -304,7 +304,7 @@ public:
             return;
         }
 
-        Main_OnCommandEx(40340, 0, 0); // Track: Unsolo all tracks
+        Main_OnCommandAsyncEx(40340, 0, 0); // Track: Unsolo all tracks
     };
 
     void HandleMuteClearButton(int value)
@@ -314,7 +314,7 @@ public:
             return;
         }
 
-        Main_OnCommandEx(40339, 0, 0); // Track: Unmute all tracks
+        Main_OnCommandAsyncEx(40339, 0, 0); // Track: Unmute all tracks
     };
 
     void HandleBypassButton(int value)
@@ -324,8 +324,8 @@ public:
             return;
         }
 
-        context->GetShiftLeft() ? Main_OnCommandEx(40344, 0, 0) // Track: Toggle FX bypass on all tracks
-                                : Main_OnCommandEx(8, 0, 0);    // Track: Toggle FX bypass for selected tracks
+        context->GetShiftLeft() ? Main_OnCommandAsyncEx(40344, 0, 0) // Track: Toggle FX bypass on all tracks
+                                : Main_OnCommandAsyncEx(8, 0, 0);    // Track: Toggle FX bypass for selected tracks
     };
 
     void HandleMacroButton(int value)
