@@ -174,6 +174,8 @@ struct DoubleClickState
 
 void Main_OnCommandStringEx(std::string action_name, int flag = 0, ReaProject *proj = 0);
 
+void Main_OnCommandAsyncEx(int action_id, int flag = 0, ReaProject *proj = 0);
+
 void SetActionState(int actionId);
 
 void SetActionState(std::string action_name);

@@ -64,21 +64,21 @@ void DecrementMasterPan(int val, bool left_shift)
 void IncrementMetronomeVolume()
 {
     int actionId = NamedCommandLookup("_S&M_METRO_VOL_UP");
-    Main_OnCommandEx(actionId, 0, 0);
-    Main_OnCommandEx(actionId, 0, 0);
-    Main_OnCommandEx(actionId, 0, 0);
-    Main_OnCommandEx(actionId, 0, 0);
-    Main_OnCommandEx(actionId, 0, 0);
-    Main_OnCommandEx(actionId, 0, 0);
+    Main_OnCommandAsyncEx(actionId, 0, 0);
+    Main_OnCommandAsyncEx(actionId, 0, 0);
+    Main_OnCommandAsyncEx(actionId, 0, 0);
+    Main_OnCommandAsyncEx(actionId, 0, 0);
+    Main_OnCommandAsyncEx(actionId, 0, 0);
+    Main_OnCommandAsyncEx(actionId, 0, 0);
 }
 
 void DecrementMetronomeVolume()
 {
     int actionId = NamedCommandLookup("_S&M_METRO_VOL_DOWN");
-    Main_OnCommandEx(actionId, 0, 0);
-    Main_OnCommandEx(actionId, 0, 0);
-    Main_OnCommandEx(actionId, 0, 0);
-    Main_OnCommandEx(actionId, 0, 0);
-    Main_OnCommandEx(actionId, 0, 0);
-    Main_OnCommandEx(actionId, 0, 0);
+    Main_OnCommandAsyncEx(actionId, 0, 0);
+    Main_OnCommandAsyncEx(actionId, 0, 0);
+    Main_OnCommandAsyncEx(actionId, 0, 0);
+    Main_OnCommandAsyncEx(actionId, 0, 0);
+    Main_OnCommandAsyncEx(actionId, 0, 0);
+    Main_OnCommandAsyncEx(actionId, 0, 0);
 }

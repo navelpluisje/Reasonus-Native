@@ -14,7 +14,16 @@
 void Main_OnCommandStringEx(std::string action_name, int flag, ReaProject *proj)
 {
     int actionId = NamedCommandLookup(action_name.c_str());
-    Main_OnCommandEx(actionId, flag, proj);
+    Main_OnCommandAsyncEx(actionId, flag, proj);
+}
+
+void Main_OnCommandAsyncEx(int action_id, int flag, ReaProject *proj)
+{
+    (void)proj;
+    if (!PostMessage(GetMainHwnd(), WM_COMMAND, action_id, flag))
+    {
+        // Add LOG later.
+    }
 }
 
 void SetActionState(int actionId)
@@ -22,7 +31,7 @@ void SetActionState(int actionId)
     int state = GetToggleCommandStateEx(0, actionId);
     if (state == 1)
     {
-        Main_OnCommandEx(actionId, 0, 0);
+        Main_OnCommandAsyncEx(actionId, 0, 0);
     }
 }
 
