@@ -240,7 +240,7 @@ public:
         if (
             (::GetTrackAutomationMode(media_track) == AUTOMATION_PREVIEW || ::GetGlobalAutomationOverride() == AUTOMATION_PREVIEW) && settings->GetLatchPreviewActionEnabled())
         {
-            ::Main_OnCommandAsyncEx(settings->GetLatchPreviewActionCode(), 0, 0);
+            Main_OnCommandAsyncEx(settings->GetLatchPreviewActionCode(), 0, 0);
         }
         else
         {
