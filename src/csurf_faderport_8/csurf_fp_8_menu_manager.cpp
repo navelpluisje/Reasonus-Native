@@ -98,11 +98,11 @@ public:
         tracks.at(last_display_index)->SetDisplayLine(2, ALIGN_CENTER, "", NON_INVERT);
         tracks.at(last_display_index)->SetDisplayLine(3, ALIGN_CENTER, "", NON_INVERT);
 
-        UpdateTracks();
+        UpdateTracks(true);
     }
     ~CSurf_FP_8_Menu_Manager() {};
 
-    void UpdateTracks() override
+    void UpdateTracks(bool force_update) override
     {
         int nb_menu_items = static_cast<int>(menu_items.size());
         int nb_options = static_cast<int>(menu_options.at(option[0]).size());
@@ -138,11 +138,11 @@ public:
 
             if (index < nb_menu_items)
             {
-                tracks.at(1)->SetDisplayLine(i, ALIGN_LEFT, menu_items[index].c_str(), option[0] == index ? INVERT : NON_INVERT);
+                tracks.at(1)->SetDisplayLine(i, ALIGN_LEFT, menu_items[index].c_str(), option[0] == index ? INVERT : NON_INVERT, force_update);
             }
             else
             {
-                tracks.at(1)->SetDisplayLine(i, ALIGN_LEFT, "", NON_INVERT);
+                tracks.at(1)->SetDisplayLine(i, ALIGN_LEFT, "", NON_INVERT, force_update);
             }
 
             index = i + option_offset;
@@ -156,21 +156,21 @@ public:
                 {
                     option_label = ">" + option_label;
                 }
-                tracks.at(2)->SetDisplayLine(i, ALIGN_LEFT, option_label.c_str(), option[1] == index ? INVERT : NON_INVERT);
+                tracks.at(2)->SetDisplayLine(i, ALIGN_LEFT, option_label.c_str(), option[1] == index ? INVERT : NON_INVERT, force_update);
             }
             else if (index == nb_options)
             {
-                tracks.at(2)->SetDisplayLine(i, ALIGN_LEFT, "<- Back", option[1] == nb_options ? INVERT : NON_INVERT);
+                tracks.at(2)->SetDisplayLine(i, ALIGN_LEFT, "<- Back", option[1] == nb_options ? INVERT : NON_INVERT, force_update);
             }
             else
             {
-                tracks.at(2)->SetDisplayLine(i, ALIGN_LEFT, "", NON_INVERT);
+                tracks.at(2)->SetDisplayLine(i, ALIGN_LEFT, "", NON_INVERT, force_update);
             }
 
             /**
              * Set the description
              */
-            tracks.at(4)->SetDisplayLine(i, ALIGN_LEFT, menu_descriptions[option[0]][i].c_str());
+            tracks.at(4)->SetDisplayLine(i, ALIGN_LEFT, menu_descriptions[option[0]][i].c_str(), NON_INVERT, force_update);
         }
     }
 

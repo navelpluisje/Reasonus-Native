@@ -47,7 +47,7 @@ class CSurf_TransportManager
 public:
     CSurf_TransportManager(CSurf_Context *context, midi_Output *m_midiout);
 
-    void Update();
+    void Update(bool force_update = false);
 
     void Refresh(bool force);
 

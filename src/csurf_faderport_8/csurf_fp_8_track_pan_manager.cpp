@@ -42,11 +42,11 @@ public:
         CSurf_Context *context,
         midi_Output *m_midiout) : CSurf_FP_8_ChannelManager(tracks, navigator, context, m_midiout)
     {
-        UpdateTracks();
+        UpdateTracks(true);
     }
     ~CSurf_FP_8_PanManager() {}
 
-    void UpdateTracks() override
+    void UpdateTracks(bool force_update) override
     {
         WDL_PtrList<MediaTrack> media_tracks = navigator->GetBankTracks();
         std::vector<std::string> time_code;
@@ -71,7 +71,7 @@ public:
 
             if (!media_track || (::CountTracks(0) < i && !is_master_track))
             {
-                track->ClearTrack(true, forceUpdate);
+                track->ClearTrack(true, force_update);
                 continue;
             }
 
@@ -87,21 +87,21 @@ public:
             track->SetSelectButtonValue((!context->GetArm() && is_armed && !settings->GetDistractionFreeMode())
                                             ? BTN_VALUE_BLINK
                                             : BTN_VALUE_ON,
-                                        forceUpdate);
-            track->SetMuteButtonValue(DAW::IsTrackMuted(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
-            track->SetSoloButtonValue(DAW::IsTrackSoloed(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
+                                        force_update);
+            track->SetMuteButtonValue(DAW::IsTrackMuted(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, force_update);
+            track->SetSoloButtonValue(DAW::IsTrackSoloed(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, force_update);
 
-            track->SetFaderValue(fader_value, forceUpdate);
+            track->SetFaderValue(fader_value, force_update);
             track->SetValueBarMode(VALUEBAR_MODE_FILL);
             track->SetValueBarValue(value_bar_value);
 
-            track->SetDisplayMode(DISPLAY_MODE_2, forceUpdate);
-            track->SetDisplayLine(0, ALIGN_CENTER, DAW::GetTrackName(media_track).c_str(), NON_INVERT, forceUpdate);
-            track->SetDisplayLine(1, ALIGN_CENTER, DAW::GetTrackIndex(media_track).c_str(), NON_INVERT, forceUpdate);
-            track->SetDisplayLine(2, ALIGN_CENTER, str_pan_1.c_str(), context->IsChannelMode(PanMode1) ? INVERT : NON_INVERT, forceUpdate);
-            track->SetDisplayLine(3, ALIGN_CENTER, str_pan_2.c_str(), context->IsChannelMode(PanMode2) ? INVERT : NON_INVERT, forceUpdate);
+            track->SetDisplayMode(DISPLAY_MODE_2, force_update);
+            track->SetDisplayLine(0, ALIGN_CENTER, DAW::GetTrackName(media_track).c_str(), NON_INVERT, force_update);
+            track->SetDisplayLine(1, ALIGN_CENTER, DAW::GetTrackIndex(media_track).c_str(), NON_INVERT, force_update);
+            track->SetDisplayLine(2, ALIGN_CENTER, str_pan_1.c_str(), context->IsChannelMode(PanMode1) ? INVERT : NON_INVERT, force_update);
+            track->SetDisplayLine(3, ALIGN_CENTER, str_pan_2.c_str(), context->IsChannelMode(PanMode2) ? INVERT : NON_INVERT, force_update);
         }
-        forceUpdate = false;
+        force_update = false;
     }
 
     void HandleSelectClick(int index, int value) override

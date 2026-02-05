@@ -174,7 +174,7 @@ public:
 
     ~CSurf_FP_8_GeneralControlManager() {};
 
-    void Update()
+    void Update(bool force_update = false)
     {
         hasSolo = trackNavigator->HasTracksWithSolo();
         hasMute = trackNavigator->HasTracksWithMute();
@@ -184,8 +184,8 @@ public:
         last_touched_fx_mode = context->GetLastTouchedFxMode();
         functionsDialogOpen = ReaSonus8ControlPanel::control_panel_open && ReaSonus8ControlPanel::current_page == ReaSonus8ControlPanel::FUNCTIONS_PAGE;
 
-        SetButtonValue();
-        SetButtonColors();
+        SetButtonValue(force_update);
+        SetButtonColors(force_update);
     };
 
     void Refresh(bool force = false)

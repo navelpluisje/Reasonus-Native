@@ -71,7 +71,7 @@ public:
     void HandleEncoderPush();
 
     // ADD ALL THE TRACKMANAGERS METHODS HERE TO PROXY THEM
-    void UpdateTracks();
+    void UpdateTracks(bool force_update = false);
     void HandleMuteClick(int index, int value);
     void HandleSoloClick(int index, int value);
     void HandleSelectClick(int index, int value);

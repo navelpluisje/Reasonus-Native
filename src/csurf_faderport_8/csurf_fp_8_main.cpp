@@ -537,18 +537,25 @@ public:
       DWORD now = GetTickCount();
       if ((now - surface_update_lastrun) >= 10)
       {
-        faderManager->UpdateTracks();
+        bool force_update = (now - surface_update_lastrun) >= 2000;
+
+        faderManager->UpdateTracks(force_update);
         if (context->GetLastTouchedFxMode())
         {
-          lastTouchedFxManager->UpdateTrack();
+          lastTouchedFxManager->UpdateTrack(force_update);
         }
         else
         {
           lastTouchedFxManager->resetLastTouchedFxEnabled();
         }
-        transportManager->Update();
-        automationManager->Update();
-        generalControlManager->Update();
+        transportManager->Update(force_update);
+        automationManager->Update(force_update);
+        generalControlManager->Update(force_update);
+
+        if (force_update)
+        {
+          mixManager->Refresh(force_update);
+        }
 
         surface_update_lastrun = now;
       }
