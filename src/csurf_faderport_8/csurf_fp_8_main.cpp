@@ -519,9 +519,6 @@ public:
 
   void Run()
   {
-    ShowConsoleMsg("");
-    logInteger("tick", GetTickCount());
-
     if (m_midiin)
     {
       m_midiin->SwapBufsPrecise(GetTickCount(), 0.0);
