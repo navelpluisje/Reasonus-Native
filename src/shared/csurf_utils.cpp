@@ -14,7 +14,7 @@
 void Main_OnCommandStringEx(std::string action_name, int flag, ReaProject *proj)
 {
     int actionId = NamedCommandLookup(action_name.c_str());
-    Main_OnCommandAsyncEx(actionId, flag, proj);
+    Main_OnCommandEx(actionId, flag, proj);
 }
 
 void Main_OnCommandAsyncEx(int action_id, int flag, ReaProject *proj)
