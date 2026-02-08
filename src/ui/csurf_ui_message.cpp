@@ -128,7 +128,7 @@ void ReaSonusMessage::Frame()
             ImGui::BulletText(m_ctx, "Fixed issue where the displays got weird after switching quick between different fader modes");
 
             ImGui::Separator(m_ctx);
-            ImGui::Text(m_ctx, "Message from 0.8.0, but keep it herre until the next version");
+            ImGui::Text(m_ctx, "Message from 0.8.0, but keep it here until the next version");
             ImGui::Text(m_ctx, "When creating a plugin mapping, the plugin type was not taken in account. This can potentially cause issues as the mapping between plugin types can differ");
             ImGui::Text(m_ctx, "There has been created a Plugin Type Mapping tool to help you set the type for your mappings. The possitive is you only have to do this once. Click the `Open type Mapping` button below to start the mapping.");
             ImGui::Text(m_ctx, "The tool is also available in the actions list (search for: 'plugin type`)");
