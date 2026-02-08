@@ -122,19 +122,14 @@ void ReaSonusMessage::Frame()
             ImGui::GetContentRegionAvail(m_ctx, &width, &height);
             ImGui::PushTextWrapPos(m_ctx, width - 24);
 
-            ImGui::Text(m_ctx, "This ReaSonus Native version has a lot of changes for the plugin mapping. Some of the changes are:");
-            ImGui::BulletText(m_ctx, "'Unlimited' amount of groups.");
-            ImGui::BulletText(m_ctx, "Added a search in the parameter selection.");
-            ImGui::BulletText(m_ctx, "Added option to not invert the label text.");
-            ImGui::BulletText(m_ctx, "Added `next` and `previous` button to scroll through the list of groups. Using them with the left shift of your keyboard will navigate by grops of 13.");
-            ImGui::BulletText(m_ctx, "Added setting for the step size when scrolling through the groups on the device.");
-            ImGui::BulletText(m_ctx, "Added drag and drop support for groups.");
-            ImGui::BulletText(m_ctx, "Added option to add or delete a group at any point.");
-            ImGui::BulletText(m_ctx, "Added an indicator for changed groups.");
-            ImGui::BulletText(m_ctx, "The version number in ReaSonus Control Panel is now clickable and will open this window.");
-            ImGui::BulletText(m_ctx, "Fixed an issue with wrong illuminated Atomation button");
+            ImGui::Text(m_ctx, "This version fixed some bugs:");
+            ImGui::BulletText(m_ctx, "Fixed issue where the FderPort could disconnect when an action had a popup like Edit Marker");
+            ImGui::BulletText(m_ctx, "Fixed issue where the valuebar looked faded when working with plugins");
+            ImGui::BulletText(m_ctx, "Fixed issue where the displays got weird after switching quick between different fader modes");
 
-            ImGui::Text(m_ctx, "Beside all these nice improvements, some bugs were fixed as well. When creating a plugin mapping, the plugin type was not taken in account. This can potentially cause issues as the mapping between plugin types can differ");
+            ImGui::Separator(m_ctx);
+            ImGui::Text(m_ctx, "Message from 0.8.0, but keep it herre until the next version");
+            ImGui::Text(m_ctx, "When creating a plugin mapping, the plugin type was not taken in account. This can potentially cause issues as the mapping between plugin types can differ");
             ImGui::Text(m_ctx, "There has been created a Plugin Type Mapping tool to help you set the type for your mappings. The possitive is you only have to do this once. Click the `Open type Mapping` button below to start the mapping.");
             ImGui::Text(m_ctx, "The tool is also available in the actions list (search for: 'plugin type`)");
 
