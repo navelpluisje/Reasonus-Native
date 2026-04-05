@@ -100,14 +100,7 @@ namespace CSURF_FP_8_UI_INIT
             switch (LOWORD(wParam))
             {
 
-            case IDC_BUTTON_CONTROL_PANEL:
-            {
-                ToggleFP8ControlPanel(ReaSonus8ControlPanel::SETTINGS_PAGE);
-
-                break;
-            }
-
-            case IDC_BUTTON_DOCUMENTTION:
+            case IDC_BUTTON_DOCUMENTATION:
             {
                 SystemOpenURL("https://navelpluisje.github.io/reasonus/documentation/faderport8/");
                 break;
