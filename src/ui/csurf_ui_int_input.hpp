@@ -4,6 +4,7 @@
 #include <reaper_imgui_functions.h>
 #include <string>
 #include "csurf_ui_elements.hpp"
+#include "csurf_ui_tooltip.hpp"
 
 static void ReaSonusIntInput(
     ImGui_Context *m_ctx,

@@ -1,21 +1,30 @@
 target_sources(${PROJECT_NAME}
     PRIVATE
-        csurf_fp_8_main.cpp
         csurf_fp_8_automation_manager.cpp
         csurf_fp_8_channel_manager_resources.cpp
         csurf_fp_8_fader_manager.cpp
         csurf_fp_8_filter_manager.cpp
         csurf_fp_8_general_control_manager.cpp
-        csurf_fp_8_last_touched_fx_manager.cpp
-        csurf_fp_8_menu_manager.cpp
-        csurf_fp_8_mix_manager.cpp
-        csurf_fp_8_navigator_filters.cpp
-        csurf_fp_8_navigator.cpp
-        csurf_fp_8_plugin_control_manager.cpp
         csurf_fp_8_hui_plugins_manager.cpp
         csurf_fp_8_hui_receives_manager.cpp
         csurf_fp_8_hui_sends_manager.cpp
+        csurf_fp_8_last_touched_fx_manager.cpp
+        csurf_fp_8_main.cpp
+        csurf_fp_8_menu_manager.cpp
+        csurf_fp_8_mix_manager.cpp
+        csurf_fp_8_navigator.cpp
+        csurf_fp_8_navigator_filters.cpp
+        csurf_fp_8_plugin_control_manager.cpp
+        csurf_fp_8_plugin_learn_manager.cpp
+        csurf_fp_8_session_manager.cpp
         csurf_fp_8_track.cpp
+        csurf_fp_8_track_manager.cpp
+        csurf_fp_8_track_pan_manager.cpp
+        csurf_fp_8_track_plugins_manager.cpp
+        csurf_fp_8_track_receives_manager.cpp
+        csurf_fp_8_track_sends_manager.cpp
         csurf_fp_8_ui_control_panel.cpp
+        csurf_fp_8_ui_custom_filters_page.cpp
+        csurf_fp_8_ui_plugin_mapping_page.cpp
         csurf_fp_8_ui_settings_page.cpp
         )

@@ -97,8 +97,8 @@ public:
             if (DAW::HasTrackFx(media_track, plugin_index))
             {
                 track->SetDisplayLine(0, ALIGN_LEFT, DAW::GetTrackName(media_track).c_str(), NON_INVERT, force_update);
-                track->SetDisplayLine(1, ALIGN_LEFT, DAW::GetTrackFxName(media_track, plugin_index).c_str(), INVERT, force_update);
-                track->SetDisplayLine(2, ALIGN_CENTER, DAW::GetTrackFxSurfceEnabled(media_track, plugin_index).c_str(), NON_INVERT, force_update);
+                track->SetDisplayLine(1, ALIGN_LEFT, DAW::GetTrackFxName(media_track, plugin_index, false).c_str(), INVERT, force_update);
+                track->SetDisplayLine(2, ALIGN_CENTER, DAW::GetTrackFxSurfaceEnabled(media_track, plugin_index).c_str(), NON_INVERT, force_update);
                 track->SetDisplayLine(3, ALIGN_CENTER, Progress(plugin_index + 1, nb_track_plugins[i]).c_str(), NON_INVERT, force_update);
                 track->SetMuteButtonValue(
                     ButtonBlinkOnOff(

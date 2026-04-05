@@ -5,31 +5,32 @@
 #include <string>
 #include <vector>
 #include "csurf_ui_elements.hpp"
-#include "csurf_ui_icon_button.hpp"
 
-static void ReaSonusSearchComboInput(
+static void ReaSonusSearchComboInput( // NOLINT(*-function-cognitive-complexity)
     ImGui_Context *m_ctx,
     CSurf_UI_Assets *assets,
-    std::string label,
-    std::vector<std::string> list,
+    const std::string &label,
+    const std::vector<std::string> &list,
     int *value,
     std::string *search_query,
-    bool clear_param,
-    double width = 0.0)
+    const bool clear_param,
+    double width)
 {
-    int label_offset = 24;
-    double modal_x, modal_y;
+    constexpr int label_offset = 24;
+    double modal_x;
+    double modal_y;
     ImGui::GetCursorScreenPos(m_ctx, &modal_x, &modal_y);
 
-    std::string id = "##" + label;
-    double space_x, space_y;
+    // std::string const id = "##" + label;
+    double space_x;
+    double space_y;
 
     UiElements::PushReaSonusFieldGroupStyle(m_ctx);
     if (ImGui::BeginChild(m_ctx, ("container" + label).c_str(), width, 0.0, ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY))
     {
-        std::string current_value = list[*value];
-        static char text[255];
-        strcpy(text, list[*value].c_str());
+        // std::string current_value = list[*value];
+        static char text[255]; // NOLINT(*-avoid-c-arrays)
+        strncpy(text, list[*value].c_str(), sizeof(text));
 
         ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
         if (width == 0.0)
@@ -113,12 +114,12 @@ static void ReaSonusSearchComboInput(
                 UiElements::PushReaSonusListBoxStyle(m_ctx);
                 if (ImGui::BeginListBox(m_ctx, "##listbox", 0.0, -0.1))
                 {
-                    for (int i = 0; i < (int)list.size(); i++)
+                    for (int i = 0; i < static_cast<int>(list.size()); i++)
                     {
                         if (ImGui::TextFilter_PassFilter(assets->GetReaComboFilter(), list[i].c_str()))
                         {
                             bool selected = *value == i;
-                            if (ImGui::Selectable(m_ctx, list[i].c_str(), &selected, ImGui::SelectableFlags_AllowOverlap))
+                            if (ImGui::Selectable(m_ctx, (list[i] + "##" + std::to_string(i)).c_str(), &selected, ImGui::SelectableFlags_AllowOverlap))
                             {
                                 *value = i;
                                 ImGui::CloseCurrentPopup(m_ctx);
