@@ -1,7 +1,9 @@
 #include "../ui/csurf_ui_page_content.hpp"
 #include "../ui/csurf_ui_action_input_text.hpp"
 #include "../ui/csurf_ui_list_box.hpp"
+#include "../ui/csurf_ui_checkbox.hpp"
 #include "../ui/csurf_ui_filter_preview.hpp"
+#include "../csurf_faderport_8/csurf_fp_8_ui_control_panel.hpp"
 
 class CSurf_FP_8_CustomFilterstPage : public CSurf_UI_PageContent
 {

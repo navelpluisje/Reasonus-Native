@@ -192,7 +192,7 @@ public:
 
         if (context->GetShiftChannelLeft())
         {
-            DAW::ToggleSelectedTrack(media_track);
+            DAW::ToggleTrackSelected(media_track);
             return;
         }
 

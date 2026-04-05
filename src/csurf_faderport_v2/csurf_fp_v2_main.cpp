@@ -68,7 +68,7 @@ class CSurf_FaderPortV2 : public IReaperControlSurface
     /**
      * ENCODERS
      */
-    else if (evt->midi_message[0] == MIDI_MESSAGE_ENDCODER)
+    else if (evt->midi_message[0] == MIDI_MESSAGE_ENCODER)
     {
       if (evt->midi_message[1] == ENCODER_PAN)
       {
@@ -428,7 +428,7 @@ public:
 static IReaperControlSurface *createFuncV2(const char *type_string, const char *configString, int *errStats)
 {
   (void)type_string;
-  int parms[4];
+  std::array<int, 4> parms{};
   parseParms(configString, parms);
 
   return new CSurf_FaderPortV2(parms[2], parms[3], errStats);

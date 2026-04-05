@@ -6,7 +6,7 @@
 #include <reaper_plugin_functions.h>
 #include <mini/ini.h>
 
-const char PATH_SEPARATOR =
+constexpr char PATH_SEPARATOR =
 #ifdef _WIN32
     '\\';
 #else
@@ -15,22 +15,24 @@ const char PATH_SEPARATOR =
 
 const std::string PREFIX_SEPARATOR = ": ";
 
-const int TOGGLE_SPEED = 150;
-const int DOUBLE_CLICK_SPEED = 750;
+constexpr int TOGGLE_SPEED = 150;
+constexpr int DOUBLE_CLICK_SPEED = 750;
 
 const std::string FP_V2 = "FP_V2";
 const std::string FP_8 = "FP";
 
-const int AUTOMATION_OFF = -1;
-const int AUTOMATION_TRIM = 0;
-const int AUTOMATION_READ = 1;
-const int AUTOMATION_TOUCH = 2;
-const int AUTOMATION_LATCH = 4;
-const int AUTOMATION_PREVIEW = 5;
-const int AUTOMATION_WRITE = 3;
+constexpr int AUTOMATION_OFF = -1;
+constexpr int AUTOMATION_TRIM = 0;
+constexpr int AUTOMATION_READ = 1;
+constexpr int AUTOMATION_TOUCH = 2;
+constexpr int AUTOMATION_LATCH = 4;
+constexpr int AUTOMATION_PREVIEW = 5;
+constexpr int AUTOMATION_WRITE = 3;
 
-const int time_code_indexes[6] = {0, 2, 3, 4, 5, 8};
-const std::string time_code_names[6] = {"Time", "Beats", "Seconds", "Samples", "Hr:Min:Sec:Fr", "Abs. Frames"};
+const std::array<int, 6> time_code_indexes = {0, 2, 3, 4, 5, 8};
+const std::array<std::string, 6> time_code_names = {
+    "Time", "Beats", "Seconds", "Samples", "Hr:Min:Sec:Fr", "Abs. Frames"
+};
 
 const std::vector<std::vector<std::string>> shared_settings = {
     {"surface", "midiin", "0"},
@@ -414,5 +416,9 @@ bool createPathIfNotExist(std::string path);
 std::string createPathName(std::vector<std::string> path_elements);
 
 std::string toLowerCase(std::string value);
+
+double boolToDouble(bool value);
+
+bool doubleToBool(double value);
 
 #endif // CSURF_UTILS_H_

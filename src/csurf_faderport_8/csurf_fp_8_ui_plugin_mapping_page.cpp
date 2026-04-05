@@ -1,13 +1,16 @@
 #include "../ui/csurf_ui_page_content.hpp"
-#include <string.h>
 #include "../shared/csurf_utils.hpp"
+#include "../shared/csurf_daw.hpp"
 #include "../ui/csurf_ui_page_title.hpp"
 #include "../ui/csurf_ui_text_input.hpp"
 #include "../ui/csurf_ui_pagination_button.hpp"
 #include "../ui/csurf_ui_icon_button.hpp"
-#include "../ui/csurf_ui_list_box.hpp"
 #include "../ui/csurf_ui_search_combo_input.hpp"
 #include "../ui/csurf_ui_goto_input.hpp"
+#include "../ui/csurf_ui_int_input.hpp"
+#include "../ui/csurf_ui_combo_input.hpp"
+#include "../i18n/i18n.hpp"
+#include "../csurf_faderport_8/csurf_fp_8_ui_control_panel.hpp"
 
 typedef std::tuple<int, std::string, int> PluginParam;
 
@@ -903,7 +906,8 @@ public:
                     params,
                     &fader_param_index,
                     &fader_search_query,
-                    settings->ShouldClearParamInput());
+                    settings->ShouldClearParamInput(),
+                    0.0);
             }
             if (ImGui::BeginChild(m_ctx, "filter_content_input", 0.0, 0.0, ImGui::ChildFlags_AutoResizeY))
             {

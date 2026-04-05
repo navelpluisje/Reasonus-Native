@@ -24,7 +24,7 @@ protected:
         MediaTrack *media_track = context->GetPluginEditTrack();
         std::string full_name = DAW::GetTrackFxName(media_track, pluginId, true);
         std::string plugin_type = DAW::GetTrackFxType(media_track, pluginId);
-        std::string plugin_name = DAW::GetTrackFxName(media_track, pluginId);
+        std::string plugin_name = DAW::GetTrackFxName(media_track, pluginId, false);
         std::string developer_name = DAW::GetTrackFxDeveloper(media_track, pluginId);
         fileName = GetReaSonusPluginPath(developer_name, plugin_name, plugin_type, true);
 
@@ -124,7 +124,7 @@ public:
     void OpenMappingUi(int plugin_id, int channel)
     {
         MediaTrack *media_track = context->GetPluginEditTrack();
-        std::string plugin_name = DAW::GetTrackFxName(media_track, plugin_id);
+        std::string plugin_name = DAW::GetTrackFxName(media_track, plugin_id, false);
         std::string developer_name = DAW::GetTrackFxDeveloper(media_track, plugin_id);
 
         if (!ReaSonus8ControlPanel::control_panel_open)
