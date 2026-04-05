@@ -83,14 +83,7 @@ namespace CSURF_FP_V2_UI_INIT
             switch (LOWORD(wParam))
             {
 
-            case IDC_BUTTON_CONTROL_PANEL:
-            {
-                ToggleFPV2ControlPanel(ReaSonusV2ControlPanel::SETTINGS_PAGE);
-
-                break;
-            }
-
-            case IDC_BUTTON_DOCUMENTTION:
+            case IDC_BUTTON_DOCUMENTATION:
             {
                 SystemOpenURL("https://navelpluisje.github.io/reasonus/documentation/faderportv2/");
                 break;
