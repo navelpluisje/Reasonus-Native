@@ -2,11 +2,10 @@
 #define CSURF_CONTEXT_H_
 
 #include "csurf_context_resources.hpp"
-#include <cstdlib>
 #include "csurf_utils.hpp"
 #include "csurf_reasonus_settings.hpp"
 
-class CSurf_Context
+class CSurf_Context // NOLINT(*-use-internal-linkage)
 {
     /**
      * @brief Number of channels
@@ -15,20 +14,20 @@ class CSurf_Context
     std::string device = FP_8;
 
     // Shift keys
-    bool shift_left = false;
-    bool shift_left_locked = false;
-    bool shift_right = false;
-    bool shift_right_locked = false;
-    bool arm = false;
+    bool shift_left;
+    bool shift_left_locked;
+    bool shift_right;
+    bool shift_right_locked;
+    bool arm;
 
     // track mode show the time code in the displays
-    bool show_time_code = false;
+    bool show_time_code;
 
     // Last touched fx
-    bool last_touched_fx_mode = false;
+    bool last_touched_fx_mode;
 
     // Make the fader control the master track for the FaderPort V2
-    bool master_fader_mode = false;
+    bool master_fader_mode;
 
     // Set the track id that has the add send mode. -1 is unselected
     int add_send_receive_mode = -1;
@@ -36,43 +35,51 @@ class CSurf_Context
 
     // Pan encoder modes
     PanEncoderMode panEncoderMode = PanEncoderTrackPanMode;
-    bool panPushModePan = true;
+    bool panPushModePan;
 
     // Channel manager
     int channelManagerItemIndex = 0;
     int channelManagerItemsCount = 0;
 
     // Plugin Edit fields
-    MediaTrack *pluginEditTrack;
-    int pluginEditPluginId;
-    int pluginEditParamId;
+    MediaTrack *pluginEditTrack{nullptr};
+    int pluginEditPluginId{0};
+    int pluginEditParamId{0};
 
     // disable fader on v2
-    bool fader_disabled;
+    bool fader_disabled{false};
 
     ChannelMode channelMode = TrackMode;
     ChannelMode previousChannelMode = TrackMode;
     ChannelMode previousPluginChannelMode = TrackMode;
-    ChannelManagerType channelManagerType;
+    ChannelManagerType channelManagerType{};
 
     ReaSonusSettings *settings;
 
 public:
-    CSurf_Context(int nbChannels) : nbChannels(nbChannels)
-    {
-        if (nbChannels == 1)
-        {
+    explicit CSurf_Context(const int nbChannels) : nbChannels(nbChannels) {
+        if (nbChannels == 1) {
             device = FP_V2;
         }
         settings = ReaSonusSettings::GetInstance(device);
+        shift_left = false;
+        last_touched_fx_mode = false;
+        shift_left_locked = false;
+        shift_right = false;
+        shift_right_locked = false;
+        arm = false;
+        show_time_code = false;
+        master_fader_mode = false;
+        panPushModePan = true;
     }
-    ~CSurf_Context() {}
+
+    ~CSurf_Context() = default;
 
     /**************************************************************************
      * Modifiers
      **************************************************************************/
     void
-    SetShiftLeft(bool val)
+    SetShiftLeft(const bool val)
     {
         if (settings->GetSwapShiftButtons())
         {
@@ -84,7 +91,7 @@ public:
         }
     }
 
-    void SetShiftLeftLocked(bool val)
+    void SetShiftLeftLocked(const bool val)
     {
         if (settings->GetSwapShiftButtons())
         {
@@ -96,24 +103,20 @@ public:
         }
     }
 
-    bool GetShiftChannelLeft()
-    {
+    [[nodiscard]] bool GetShiftChannelLeft() const {
         if (!shift_left_locked)
         {
             return shift_left;
         }
-        else
-        {
-            return !shift_left;
-        }
+
+        return !shift_left;
     }
 
-    bool GetShiftLeft()
-    {
+    [[nodiscard]] bool GetShiftLeft() const {
         return shift_left;
     }
 
-    void SetShiftRight(bool val)
+    void SetShiftRight(const bool val)
     {
         if (settings->GetSwapShiftButtons())
         {
@@ -125,7 +128,7 @@ public:
         }
     }
 
-    void SetShiftRightLocked(bool val)
+    void SetShiftRightLocked(const bool val)
     {
         if (settings->GetSwapShiftButtons())
         {
@@ -137,50 +140,44 @@ public:
         }
     }
 
-    bool GetShiftChannelRight()
-    {
+    [[nodiscard]] bool GetShiftChannelRight() const {
         if (!shift_right_locked)
         {
             return shift_right;
         }
-        else
-        {
-            return !shift_right;
-        }
+
+        return !shift_right;
     }
 
-    bool GetShiftRight()
-    {
+    [[nodiscard]] bool GetShiftRight() const {
         return shift_right;
     }
 
-    void SetArm(bool val)
+    void SetArm(const bool val)
     {
         arm = val;
     }
 
-    bool GetArm()
-    {
+    [[nodiscard]] bool GetArm() const {
         return arm;
     }
 
     /**************************************************************************
      * Pan mode
      **************************************************************************/
-    void SetPanEncoderMode(PanEncoderMode val)
+    void SetPanEncoderMode(const PanEncoderMode val)
     {
         panEncoderMode = val;
     }
 
-    PanEncoderMode GetPanEncoderMode()
-    {
+    [[nodiscard]] PanEncoderMode GetPanEncoderMode() const {
         return panEncoderMode;
     }
 
     /**************************************************************************
      * Display the timecode
      **************************************************************************/
-    void SetShowTimeCode(bool value)
+    void SetShowTimeCode(const bool value)
     {
         show_time_code = value;
     }
@@ -190,8 +187,7 @@ public:
         show_time_code = !show_time_code;
     }
 
-    bool GetShowTimeCode()
-    {
+    [[nodiscard]] bool GetShowTimeCode() const {
         return show_time_code;
     }
 
@@ -208,7 +204,7 @@ public:
      *
      * @param value
      */
-    void SetLastTouchedFxMode(bool value)
+    void SetLastTouchedFxMode(const bool value)
     {
         if (value)
         {
@@ -217,8 +213,7 @@ public:
         last_touched_fx_mode = value;
     }
 
-    bool GetLastTouchedFxMode()
-    {
+    [[nodiscard]] bool GetLastTouchedFxMode() const {
         return last_touched_fx_mode;
     }
 
@@ -238,7 +233,7 @@ public:
      *
      * @param value
      */
-    void SetMasterFaderMode(bool value)
+    void SetMasterFaderMode(const bool value)
     {
         if (value)
         {
@@ -247,16 +242,13 @@ public:
         master_fader_mode = value;
     }
 
-    bool GetMasterFaderMode()
-    {
+    [[nodiscard]] bool GetMasterFaderMode() const {
         if (nbChannels > 1)
         {
             return master_fader_mode && settings->GetMasterFaderModeEnabled();
         }
-        else
-        {
-            return master_fader_mode;
-        }
+
+        return master_fader_mode;
     }
 
     /**************************************************************************
@@ -267,7 +259,7 @@ public:
      *
      * @param count The number of faders
      */
-    void SetNbChannels(int count)
+    void SetNbChannels(const int count)
     {
         nbChannels = count;
     }
@@ -277,8 +269,7 @@ public:
      *
      * @return int The number of faders
      */
-    int GetNbChannels()
-    {
+    [[nodiscard]] int GetNbChannels() const {
         // TODO: Should be only nbChannels
         return last_touched_fx_mode ? nbChannels - 1 : nbChannels;
     }
@@ -288,9 +279,8 @@ public:
      *
      * @return int The number of bank channels
      */
-    int GetNbBankChannels()
-    {
-        return (last_touched_fx_mode || master_fader_mode) ? nbChannels - 1 : nbChannels;
+    [[nodiscard]] int GetNbBankChannels() const {
+        return last_touched_fx_mode || master_fader_mode ? nbChannels - 1 : nbChannels;
     }
 
     void TogglePanPushMode()
@@ -303,29 +293,28 @@ public:
         panPushModePan = true;
     }
 
-    bool GetPanPushMode()
-    {
+    [[nodiscard]] bool GetPanPushMode() const {
         return panPushModePan;
     }
 
     /**************************************************************************
      * Channel manager Item
      **************************************************************************/
-    void UpdateChannelManagerItemIndex(int val)
+    void UpdateChannelManagerItemIndex(const int val)
     {
         val < 0 ? DecrementChannelManagerItemIndex(abs(val))
                 : IncrementChannelmanagerItemIndex(val);
     }
 
-    void IncrementChannelmanagerItemIndex(int val)
+    void IncrementChannelmanagerItemIndex(const int val)
     {
-        if ((channelManagerItemIndex + val + (channelManagerType == Hui ? 0 : nbChannels)) < channelManagerItemsCount)
+        if (channelManagerItemIndex + val + (channelManagerType == Hui ? 0 : nbChannels) < channelManagerItemsCount)
         {
             channelManagerItemIndex += val;
         }
     }
 
-    void DecrementChannelManagerItemIndex(int val)
+    void DecrementChannelManagerItemIndex(const int val)
     {
         if (channelManagerItemIndex - val >= 0)
         {
@@ -338,17 +327,15 @@ public:
         channelManagerItemIndex = 0;
     }
 
-    int GetChannelManagerItemIndex()
-    {
+    [[nodiscard]] int GetChannelManagerItemIndex() const {
         return channelManagerItemIndex;
     }
 
-    int GetChannelManagerItemIndex(int max)
-    {
+    [[nodiscard]] int GetChannelManagerItemIndex(const int max) const {
         return max < channelManagerItemIndex ? max : channelManagerItemIndex;
     }
 
-    void SetChannelManagerItemsCount(int count)
+    void SetChannelManagerItemsCount(const int count)
     {
         channelManagerItemsCount = count;
     }
@@ -366,83 +353,75 @@ public:
     /**************************************************************************
      * Channel modes
      **************************************************************************/
-    bool IsChannelMode(ChannelMode _channelMode)
-    {
+    [[nodiscard]] bool IsChannelMode(const ChannelMode _channelMode) const {
         return channelMode == _channelMode;
     }
 
-    void SetChannelMode(ChannelMode _channelMode)
+    void SetChannelMode(const ChannelMode _channelMode)
     {
         previousChannelMode = channelMode;
         channelMode = _channelMode;
     }
 
-    ChannelMode GetChannelMode()
-    {
+    [[nodiscard]] ChannelMode GetChannelMode() const {
         return channelMode;
     }
 
-    ChannelMode GetPreviousChannelMode()
-    {
+    [[nodiscard]] ChannelMode GetPreviousChannelMode() const {
         return previousChannelMode;
     }
 
-    void SetPreviousPluginChannelMode(ChannelMode _channelMode)
+    void SetPreviousPluginChannelMode(const ChannelMode _channelMode)
     {
         previousPluginChannelMode = _channelMode;
     }
 
-    ChannelMode GetPreviousPluginChannelMode()
-    {
+    [[nodiscard]] ChannelMode GetPreviousPluginChannelMode() const {
         return previousPluginChannelMode;
     }
 
     void SetPluginEditTrack(MediaTrack *track)
     {
         pluginEditTrack = track;
-    };
+    }
 
-    MediaTrack *GetPluginEditTrack()
-    {
+    [[nodiscard]] MediaTrack *GetPluginEditTrack() const {
         return pluginEditTrack;
-    };
+    }
 
-    void SetPluginEditPluginId(int pluginId)
+    void SetPluginEditPluginId(const int pluginId)
     {
         pluginEditPluginId = pluginId;
-    };
+    }
 
-    int GetPluginEditPluginId()
-    {
+    [[nodiscard]] int GetPluginEditPluginId() const {
         return pluginEditPluginId;
-    };
+    }
 
-    void SetPluginEditParamId(int pluginId)
+    void SetPluginEditParamId(const int pluginId)
     {
         pluginEditParamId = pluginId;
-    };
+    }
 
-    int GetPluginEditParamId()
-    {
+    [[nodiscard]] int GetPluginEditParamId() const {
         return pluginEditParamId;
-    };
+    }
 
     /**************************************************************************
      * Add Send mode
      **************************************************************************/
-    void SetAddSendReceiveMode(int value)
+    void SetAddSendReceiveMode(const int value)
     {
         add_send_receive_mode = value;
-    };
+    }
 
-    int GetAddSendReceiveMode()
-    {
+    [[nodiscard]] int GetAddSendReceiveMode() const {
         return add_send_receive_mode;
-    };
+    }
 
-    void SetCurrentSelectedSendReceive(int value)
+    void SetCurrentSelectedSendReceive(const int value)
     {
-        current_selected_send_receive = minmax(0, value, ::CountTracks(0) - 1);
+        current_selected_send_receive = minmax(0, value, CountTracks(nullptr) - 1);
     }
 
     void IncrementCurrentSelectedSendReceive()
@@ -455,26 +434,24 @@ public:
         SetCurrentSelectedSendReceive(current_selected_send_receive - 1);
     }
 
-    int GetCurrentSelectedSendReceive()
-    {
+    [[nodiscard]] int GetCurrentSelectedSendReceive() const {
         return current_selected_send_receive;
     }
 
     /**************************************************************************
      * Channel manager type
      **************************************************************************/
-    void SetChannelManagerType(ChannelManagerType type)
+    void SetChannelManagerType(const ChannelManagerType type)
     {
         channelManagerType = type;
     }
 
-    void SetFaderDisabled(bool value)
+    void SetFaderDisabled(const bool value)
     {
         fader_disabled = value;
-    };
+    }
 
-    int GetFaderDisabled()
-    {
+    [[nodiscard]] bool GetFaderDisabled() const {
         return fader_disabled;
     }
 };

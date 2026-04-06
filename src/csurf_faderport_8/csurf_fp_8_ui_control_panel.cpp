@@ -10,34 +10,13 @@
 #include "../ui/csurf_ui_message.hpp"
 #include "../ui/csurf_ui_function_keys_page.hpp"
 
-constexpr const char *g_name{"ReaSonus Native 8/16 Control Panel"};
+constexpr auto g_name{"ReaSonus Native 8/16 Control Panel"};
 
-std::unique_ptr<ReaSonus8ControlPanel> ReaSonus8ControlPanel::fp8_inst;
+std::unique_ptr<ReaSonus8ControlPanel> ReaSonus8ControlPanel::fp8_inst; // NOLINT(*-statically-constructed-objects)
 
-static void reportError_8(const ImGui_Error &e)
+static void reportError_8(const ImGui_Error &error) // NOLINT(*-use-anonymous-namespace)
 {
-    ShowMessageBox(e.what(), g_name, 0);
-}
-
-ReaSonus8ControlPanel::ReaSonus8ControlPanel()
-    : m_ctx{}
-{
-    menu_items.push_back("menu.functions");
-    menu_items.push_back("menu.filters");
-    menu_items.push_back("menu.plugin");
-    menu_items.push_back("menu.settings");
-    menu_items.push_back("menu.about");
-
-    ImGui::init(plugin_getapi);
-    m_ctx = ImGui::CreateContext(g_name);
-    assets = new CSurf_UI_Assets(m_ctx);
-
-    plugin_register("timer", reinterpret_cast<void *>(&Loop));
-}
-
-ReaSonus8ControlPanel::~ReaSonus8ControlPanel()
-{
-    plugin_register("-timer", reinterpret_cast<void *>(&Loop));
+    ShowMessageBox(error.what(), g_name, 0);
 }
 
 void ReaSonus8ControlPanel::Start()
@@ -81,7 +60,7 @@ void ReaSonus8ControlPanel::Stop()
     }
 }
 
-void ReaSonus8ControlPanel::SetCurrentPage(int page)
+void ReaSonus8ControlPanel::SetCurrentPage(const int page)
 {
     if (fp8_inst && current_page != page)
     {
@@ -90,7 +69,7 @@ void ReaSonus8ControlPanel::SetCurrentPage(int page)
     }
 }
 
-void ReaSonus8ControlPanel::SetPageProperty(int type, int value)
+void ReaSonus8ControlPanel::SetPageProperty(const int type, const int value)
 {
     if (fp8_inst && fp8_inst->page_content != nullptr)
     {
@@ -98,7 +77,7 @@ void ReaSonus8ControlPanel::SetPageProperty(int type, int value)
     }
 }
 
-void ReaSonus8ControlPanel::SetPageStringProperty(int type, std::string value)
+void ReaSonus8ControlPanel::SetPageStringProperty(const int type, const std::string &value)
 {
     if (fp8_inst && fp8_inst->page_content != nullptr)
     {
@@ -106,7 +85,7 @@ void ReaSonus8ControlPanel::SetPageStringProperty(int type, std::string value)
     }
 }
 
-int ReaSonus8ControlPanel::GetPageProperty(int type)
+int ReaSonus8ControlPanel::GetPageProperty(const int type)
 {
     if (fp8_inst && fp8_inst->page_content != nullptr)
     {
@@ -115,7 +94,20 @@ int ReaSonus8ControlPanel::GetPageProperty(int type)
     return -1;
 }
 
-std::string ReaSonus8ControlPanel::GetPageStringProperty(int type)
+void ReaSonus8ControlPanel::SetMessage(const std::string &_message)
+{
+    if (fp8_inst)
+    {
+        fp8_inst->SetLocalMessage(_message);
+    }
+}
+
+void ReaSonus8ControlPanel::SetLocalMessage(const std::string &_message)
+{
+    message = _message;
+}
+
+std::string ReaSonus8ControlPanel::GetPageStringProperty(const int type)
 {
     if (fp8_inst && fp8_inst->page_content != nullptr)
     {
@@ -124,17 +116,9 @@ std::string ReaSonus8ControlPanel::GetPageStringProperty(int type)
     return "";
 }
 
-void ReaSonus8ControlPanel::SetMessage(std::string message)
+ReaSonus8ControlPanel::~ReaSonus8ControlPanel()
 {
-    if (fp8_inst)
-    {
-        return fp8_inst->SetLocalMessage(message);
-    }
-}
-
-void ReaSonus8ControlPanel::SetLocalMessage(std::string _message)
-{
-    message = _message;
+    plugin_register("-timer", reinterpret_cast<void *>(&Loop));
 }
 
 void ReaSonus8ControlPanel::Loop()
@@ -158,45 +142,65 @@ void ReaSonus8ControlPanel::SetPageContent()
 
         switch (current_page)
         {
-        case FUNCTIONS_PAGE:
-            CSurf_UI_FunctionKeysPage::querying_actions = false;
-            CSurf_UI_FunctionKeysPage::selected_function = -1;
-            CSurf_UI_FunctionKeysPage::selected_action = -1;
+            case FUNCTIONS_PAGE:
+                CSurf_UI_FunctionKeysPage::querying_actions = false;
+                CSurf_UI_FunctionKeysPage::selected_function = -1;
+                CSurf_UI_FunctionKeysPage::selected_action = -1;
 
-            page_content = new CSurf_UI_FunctionKeysPage(m_ctx, assets, FP_8);
-            break;
+                page_content = new CSurf_UI_FunctionKeysPage(m_ctx, assets, FP_8);
+                break;
 
-        case FILTERS_PAGE:
-            page_content = new CSurf_FP_8_CustomFilterstPage(m_ctx, assets);
-            break;
+            case FILTERS_PAGE:
+                page_content = new CSurf_FP_8_CustomFilterstPage(m_ctx, assets);
+                break;
 
-        case MAPPING_PAGE:
-            page_content = new CSurf_FP_8_PluginMappingPage(m_ctx, assets);
-            break;
+            case MAPPING_PAGE:
+                page_content = new CSurf_FP_8_PluginMappingPage(m_ctx, assets);
+                break;
 
-        case SETTINGS_PAGE:
-            page_content = new CSurf_FP_8_SettingsPage(m_ctx, assets);
-            break;
+            case SETTINGS_PAGE:
+                page_content = new CSurf_FP_8_SettingsPage(m_ctx, assets);
+                break;
 
-        case ABOUT_PAGE:
-            page_content = new CSurf_UI_AboutPage(m_ctx, assets, FP_8);
-            break;
+            case ABOUT_PAGE:
+                page_content = new CSurf_UI_AboutPage(m_ctx, assets, FP_8);
+                break;
+            default: ;
         }
     }
 }
 
-void ReaSonus8ControlPanel::Frame()
+ReaSonus8ControlPanel::ReaSonus8ControlPanel()
+    : m_ctx{}
 {
-    double space_x, space_y, width, height;
+    menu_items.emplace_back("menu.functions");
+    menu_items.emplace_back("menu.filters");
+    menu_items.emplace_back("menu.plugin");
+    menu_items.emplace_back("menu.settings");
+    menu_items.emplace_back("menu.about");
+
+    ImGui::init(plugin_getapi);
+    m_ctx = ImGui::CreateContext(g_name);
+    assets = new CSurf_UI_Assets(m_ctx);
+
+    plugin_register("timer", reinterpret_cast<void *>(&Loop));
+}
+
+void ReaSonus8ControlPanel::Frame() // NOLINT(*-function-cognitive-complexity)
+{
+    double space_x;
+    double space_y;
+    double width;
+    double height;
 
     if (!message.empty())
     {
-        int now = (int)GetTickCount();
+        const int now = static_cast<int>(GetTickCount());
         if (message_timer == 0)
         {
             message_timer = now;
         }
-        else if ((message_timer + 3000) < now)
+        else if (message_timer + 3000 < now)
         {
             message = "";
             message_timer = 0;
@@ -207,7 +211,8 @@ void ReaSonus8ControlPanel::Frame()
     {
         control_panel_open = false;
         SetActionState("_REASONUS_SHOW_REASONUS_8_CONTROL_WINDOW");
-        return fp8_inst.reset();
+        fp8_inst.reset();
+        return;
     }
 
     SetPageContent();
@@ -238,7 +243,6 @@ void ReaSonus8ControlPanel::Frame()
             ImGui::CalcTextSize(m_ctx, GIT_VERSION, &width, &height);
 
             if (ImGui::BeginChild(m_ctx, "side_bar_content", 0.0, space_y - height - 10))
-                ;
             {
                 ImGui::Image(m_ctx, assets->GetReaSonusLogo(), 200, 52);
 
@@ -301,6 +305,6 @@ void ReaSonus8ControlPanel::Frame()
     {
         control_panel_open = false;
         SetActionState("_REASONUS_SHOW_REASONUS_8_CONTROL_WINDOW");
-        return fp8_inst.reset();
+        fp8_inst.reset();
     }
 }
