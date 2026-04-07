@@ -3,7 +3,7 @@
 
 #include <reaper_imgui_functions.h>
 #include <string>
-#include "csurf_ui_elements.hpp"
+#include "csurf_ui_styles_elements.hpp"
 #include "csurf_ui_tooltip.hpp"
 
 static void ReaSonusIntInput(
@@ -19,25 +19,25 @@ static void ReaSonusIntInput(
 
     std::string id = "##" + label;
 
-    UiElements::PushReaSonusFieldGroupStyle(m_ctx);
+    UiStyledElements::PushReaSonusFieldGroupStyle(m_ctx);
     if (ImGui::BeginChild(m_ctx, ("container" + label).c_str(), width, 0.0, ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY))
     {
         ImGui::Text(m_ctx, label.c_str());
 
         if (ImGui::BeginChild(m_ctx, ("input-container" + label).c_str(), width, 0.0, ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY))
         {
-            UiElements::PushReaSonusInputStyle(m_ctx);
+            UiStyledElements::PushReaSonusInputStyle(m_ctx);
             if (ImGui::SliderInt(m_ctx, ("##" + label).c_str(), &local_value, v_min, v_max, format.c_str()))
             {
                 *value = local_value;
             }
-            UiElements::PopReaSonusInputStyle(m_ctx);
+            UiStyledElements::PopReaSonusInputStyle(m_ctx);
             ImGui::EndChild(m_ctx);
         }
 
         ImGui::EndChild(m_ctx);
     }
-    UiElements::PopReaSonusFieldGroupStyle(m_ctx);
+    UiStyledElements::PopReaSonusFieldGroupStyle(m_ctx);
 }
 
 static void RenderinfoIntInput(

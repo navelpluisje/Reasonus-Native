@@ -95,13 +95,13 @@ public:
 
         int language_button_width = getButtonWidth(m_ctx, i18n->t("settings", "language.button.label"), assets->GetMainFontBold());
 
-        UiElements::PushReaSonusSettingsContentStyle(m_ctx);
+        UiStyledElements::PushReaSonusSettingsContentStyle(m_ctx);
         if (ImGui::BeginChild(m_ctx, "settings_lists_content", 0.0, 0.0, ImGui::ChildFlags_FrameStyle, ImGui::ChildFlags_AutoResizeY))
         {
-            UiElements::PushReaSonusTabBarStyle(m_ctx);
+            UiStyledElements::PushReaSonusTabBarStyle(m_ctx);
             if (ImGui::BeginTabBar(m_ctx, "SettingsTabs", ImGui::TabBarFlags_None))
             {
-                UiElements::PushReaSonusTabStyle(m_ctx, selected_tab == 0);
+                UiStyledElements::PushReaSonusTabStyle(m_ctx, selected_tab == 0);
                 if (ImGui::BeginTabItem(m_ctx, i18n->t("settings", "tab.global").c_str()))
                 {
                     selected_tab = 0;
@@ -123,12 +123,12 @@ public:
                     if (ImGui::BeginChild(m_ctx, "language-action", 0.0, 0.0, ImGui::ChildFlags_None | ImGui::ChildFlags_AutoResizeY))
                     {
                         ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 22);
-                        UiElements::PushReaSonusButtonOutlineStyle(m_ctx, assets->GetMainFontBold());
+                        UiStyledElements::PushReaSonusButtonOutlineStyle(m_ctx, assets->GetMainFontBold());
                         if (ImGui::Button(m_ctx, i18n->t("settings", "language.button.label").c_str()))
                         {
                             edit_language = true;
                         }
-                        UiElements::PopReaSonusButtonOutlineStyle(m_ctx);
+                        UiStyledElements::PopReaSonusButtonOutlineStyle(m_ctx);
 
                         ImGui::EndChild(m_ctx);
                     }
@@ -142,9 +142,9 @@ public:
 
                     ImGui::EndTabItem(m_ctx);
                 }
-                UiElements::PopReaSonusTabStyle(m_ctx);
+                UiStyledElements::PopReaSonusTabStyle(m_ctx);
 
-                UiElements::PushReaSonusTabStyle(m_ctx, selected_tab == 1);
+                UiStyledElements::PushReaSonusTabStyle(m_ctx, selected_tab == 1);
                 if (ImGui::BeginTabItem(m_ctx, i18n->t("settings", "tab.functional").c_str()))
                 {
                     selected_tab = 1;
@@ -199,9 +199,9 @@ public:
 
                     ImGui::EndTabItem(m_ctx);
                 }
-                UiElements::PopReaSonusTabStyle(m_ctx);
+                UiStyledElements::PopReaSonusTabStyle(m_ctx);
 
-                UiElements::PushReaSonusTabStyle(m_ctx, selected_tab == 2);
+                UiStyledElements::PushReaSonusTabStyle(m_ctx, selected_tab == 2);
                 if (ImGui::BeginTabItem(m_ctx, i18n->t("settings", "tab.plugins").c_str()))
                 {
                     selected_tab = 2;
@@ -252,9 +252,9 @@ public:
 
                     ImGui::EndTabItem(m_ctx);
                 }
-                UiElements::PopReaSonusTabStyle(m_ctx);
+                UiStyledElements::PopReaSonusTabStyle(m_ctx);
 
-                UiElements::PushReaSonusTabStyle(m_ctx, selected_tab == 3);
+                UiStyledElements::PushReaSonusTabStyle(m_ctx, selected_tab == 3);
                 if (ImGui::BeginTabItem(m_ctx, i18n->t("settings", "tab.display").c_str()))
                 {
                     selected_tab = 3;
@@ -312,13 +312,13 @@ public:
 
                     ImGui::EndTabItem(m_ctx);
                 }
-                UiElements::PopReaSonusTabStyle(m_ctx);
+                UiStyledElements::PopReaSonusTabStyle(m_ctx);
 
                 ImGui::EndTabBar(m_ctx);
             }
 
-            UiElements::PopReaSonusSettingsContentStyle(m_ctx);
-            UiElements::PopReaSonusTabBarStyle(m_ctx);
+            UiStyledElements::PopReaSonusSettingsContentStyle(m_ctx);
+            UiStyledElements::PopReaSonusTabBarStyle(m_ctx);
             ImGui::EndChild(m_ctx);
         }
     }

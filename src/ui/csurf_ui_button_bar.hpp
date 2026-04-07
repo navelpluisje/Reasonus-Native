@@ -3,7 +3,7 @@
 
 #include <reaper_imgui_functions.h>
 #include <string>
-#include "csurf_ui_elements.hpp"
+#include "csurf_ui_styles_elements.hpp"
 
 static void ReaSonusButtonBar(
     ImGui_Context *m_ctx,
@@ -18,18 +18,18 @@ static void ReaSonusButtonBar(
     double x_pos_1, y_pos_1, x_pos_2, y_pos_2;
     int button_padding_x = 16;
 
-    UiElements::PushReaSonusButtonBarContainerStyle(m_ctx);
+    UiStyledElements::PushReaSonusButtonBarContainerStyle(m_ctx);
     if (ImGui::BeginChild(m_ctx, "button-bar", 0.0, 36.0, ImGui::ChildFlags_FrameStyle))
     {
         if (!message->empty())
         {
-            UiElements::PushReaSonusButtonBarMessageStyle(m_ctx);
+            UiStyledElements::PushReaSonusButtonBarMessageStyle(m_ctx);
             if (ImGui::BeginChild(m_ctx, "message-box", 0, 0, ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeX | ImGui::WindowFlags_NoScrollbar | ImGui::ChildFlags_AutoResizeY))
             {
                 ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 2);
                 ImGui::Text(m_ctx, message->c_str());
 
-                UiElements::PopReaSonusButtonBarMessageStyle(m_ctx);
+                UiStyledElements::PopReaSonusButtonBarMessageStyle(m_ctx);
                 ImGui::EndChild(m_ctx);
             }
             ImGui::SameLine(m_ctx);
@@ -50,23 +50,23 @@ static void ReaSonusButtonBar(
 
         if (has_cancel)
         {
-            UiElements::PushReaSonusButtonOutlineStyle(m_ctx, assets->GetMainFontBold());
+            UiStyledElements::PushReaSonusButtonOutlineStyle(m_ctx, assets->GetMainFontBold());
             if (ImGui::Button(m_ctx, cancel_label.c_str()))
             {
                 *cancel_value = true;
             }
-            UiElements::PopReaSonusButtonOutlineStyle(m_ctx);
+            UiStyledElements::PopReaSonusButtonOutlineStyle(m_ctx);
             ImGui::SameLine(m_ctx);
         }
-        UiElements::PushReaSonusButtonStyle(m_ctx, assets->GetMainFontBold());
+        UiStyledElements::PushReaSonusButtonStyle(m_ctx, assets->GetMainFontBold());
         if (ImGui::Button(m_ctx, action_label.c_str()))
         {
             *action_value = true;
         }
-        UiElements::PopReaSonusButtonStyle(m_ctx);
+        UiStyledElements::PopReaSonusButtonStyle(m_ctx);
         ImGui::EndChild(m_ctx);
     }
-    UiElements::PopReaSonusButtonBarContainerStyle(m_ctx);
+    UiStyledElements::PopReaSonusButtonBarContainerStyle(m_ctx);
 }
 
 #endif

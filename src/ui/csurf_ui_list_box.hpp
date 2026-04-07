@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 #include <functional>
-#include "csurf_ui_elements.hpp"
+#include "csurf_ui_styles_elements.hpp"
 #include "csurf_ui_text_input.hpp"
 
 /**
@@ -34,7 +34,7 @@ static void ReaSonusExtendedListBox(
 {
     double space_x, space_y;
 
-    UiElements::PushReaSonusListBoxStyle(m_ctx);
+    UiStyledElements::PushReaSonusListBoxStyle(m_ctx);
     if (ImGui::BeginListBox(m_ctx, ("##" + id).c_str(), 0.0, -0.1))
     {
         for (int i = 0; i < (int)items.size(); i++)
@@ -77,7 +77,7 @@ static void ReaSonusExtendedListBox(
                 ImGui::PopStyleVar(m_ctx);
             }
         }
-        UiElements::PopReaSonusListBoxStyle(m_ctx);
+        UiStyledElements::PopReaSonusListBoxStyle(m_ctx);
         ImGui::EndListBox(m_ctx);
     }
 }

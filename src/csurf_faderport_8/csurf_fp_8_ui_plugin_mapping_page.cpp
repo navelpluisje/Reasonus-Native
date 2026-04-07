@@ -657,7 +657,7 @@ public:
             ImGui::Text(m_ctx, i18n->t("mapping", "list.label").c_str());
             ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 4);
 
-            UiElements::PushReaSonusGroupStyle(m_ctx);
+            UiStyledElements::PushReaSonusGroupStyle(m_ctx);
             if (ImGui::BeginChild(m_ctx, "mapping_lists_content", 0.0, 0.0, ImGui::ChildFlags_FrameStyle, ImGui::ChildFlags_AutoResizeY))
             {
                 for (int i = 0; i < (int)developers.size(); i++)
@@ -671,7 +671,7 @@ public:
                         ImGui::SetNextItemOpen(m_ctx, true);
                     }
 
-                    UiElements::PushReaSonusTreeNodeStyle(m_ctx, selected_developer == i);
+                    UiStyledElements::PushReaSonusTreeNodeStyle(m_ctx, selected_developer == i);
                     if (ImGui::TreeNode(m_ctx, developers.at(i).c_str(), ImGui::TreeNodeFlags_CollapsingHeader))
                     {
                         selected_developer = i;
@@ -686,10 +686,10 @@ public:
                             }
                         }
                     }
-                    UiElements::PopReaSonusTreeNodeStyle(m_ctx);
+                    UiStyledElements::PopReaSonusTreeNodeStyle(m_ctx);
                 }
 
-                UiElements::PopReaSonusGroupStyle(m_ctx);
+                UiStyledElements::PopReaSonusGroupStyle(m_ctx);
                 ImGui::EndChild(m_ctx);
             }
 
@@ -772,7 +772,7 @@ public:
     {
         double space_x, space_y;
 
-        UiElements::PushReaSonusGroupStyle(m_ctx);
+        UiStyledElements::PushReaSonusGroupStyle(m_ctx);
         if (ImGui::BeginChild(m_ctx, "mapping_content_select", 0.0, 54.0, ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY))
         {
             ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
@@ -829,14 +829,14 @@ public:
 
             ImGui::EndChild(m_ctx);
         }
-        UiElements::PopReaSonusGroupStyle(m_ctx);
+        UiStyledElements::PopReaSonusGroupStyle(m_ctx);
     }
 
     void RenderMappingSelect(double height)
     {
         double space_x, space_y;
 
-        UiElements::PushReaSonusGroupStyle(m_ctx);
+        UiStyledElements::PushReaSonusGroupStyle(m_ctx);
         if (ImGui::BeginChild(m_ctx, "mapping_content_select", 0.0, height, ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY))
         {
             ReaSonusPageTitle(m_ctx, assets, i18n->t("mapping", "edit.select.label").c_str(), true);
@@ -884,7 +884,7 @@ public:
 
                 ImGui::EndChild(m_ctx);
             }
-            UiElements::PopReaSonusGroupStyle(m_ctx);
+            UiStyledElements::PopReaSonusGroupStyle(m_ctx);
             ImGui::EndChild(m_ctx);
         }
     }
@@ -893,7 +893,7 @@ public:
     {
         double space_x, space_y;
 
-        UiElements::PushReaSonusGroupStyle(m_ctx);
+        UiStyledElements::PushReaSonusGroupStyle(m_ctx);
         if (ImGui::BeginChild(m_ctx, "mapping_content_fader", 0.0, height, ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY))
         {
             ReaSonusPageTitle(m_ctx, assets, i18n->t("mapping", "edit.fader.label"), true);
@@ -1043,7 +1043,7 @@ public:
 
                             RenderMappingFader(height);
 
-                            UiElements::PopReaSonusGroupStyle(m_ctx);
+                            UiStyledElements::PopReaSonusGroupStyle(m_ctx);
 
                             ImGui::EndChild(m_ctx);
                         }

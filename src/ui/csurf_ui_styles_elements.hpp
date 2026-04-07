@@ -4,7 +4,7 @@
 #include <reaper_imgui_functions.h>
 #include "csurf_ui_assets.hpp"
 
-class UiElements
+class UiStyledElements
 {
 public:
     static void PushReaSonusWindowStyle(ImGui_Context *m_ctx);

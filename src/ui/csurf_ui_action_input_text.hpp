@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 #include <functional>
-#include "csurf_ui_elements.hpp"
+#include "csurf_ui_styles_elements.hpp"
 #include "csurf_ui_text_input.hpp"
 
 /**
@@ -42,7 +42,7 @@ static void ReaSonusActionInputText(
         ImGui::SameLine(m_ctx);
         ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 25);
 
-        UiElements::PushReaSonusIconButtonStyle(m_ctx, assets);
+        UiStyledElements::PushReaSonusIconButtonStyle(m_ctx, assets);
         if (ImGui::Button(m_ctx, std::string(1, IconAddList).c_str()))
         {
             if ((*value).compare("") != 0)
@@ -50,7 +50,7 @@ static void ReaSonusActionInputText(
                 callback();
             }
         }
-        UiElements::PopReaSonusIconButtonStyle(m_ctx);
+        UiStyledElements::PopReaSonusIconButtonStyle(m_ctx);
 
         ImGui::EndChild(m_ctx);
     }

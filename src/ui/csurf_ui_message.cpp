@@ -103,7 +103,7 @@ void ReaSonusMessage::Frame()
     ImGui::PushFont(m_ctx, assets->GetMainFont(), FontSizeDefault);
     bool open{true};
 
-    UiElements::PushReaSonusWindowStyle(m_ctx);
+    UiStyledElements::PushReaSonusWindowStyle(m_ctx);
     if (ImGui::Begin(m_ctx, g_name, &open, ImGui::WindowFlags_NoCollapse | ImGui::WindowFlags_AlwaysAutoResize))
     {
         if (ImGui::BeginChild(m_ctx, "logo", 640.0, 52.0, ImGui::ChildFlags_None))
@@ -114,7 +114,7 @@ void ReaSonusMessage::Frame()
             ImGui::EndChild(m_ctx); // logo
         }
 
-        UiElements::PushReaSonusGroupStyle(m_ctx);
+        UiStyledElements::PushReaSonusGroupStyle(m_ctx);
         if (ImGui::BeginChild(m_ctx, "actions_container", 0.0, 0.0, ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY))
         {
 
@@ -134,7 +134,7 @@ void ReaSonusMessage::Frame()
             ImGui::Text(m_ctx, "The tool is also available in the actions list (search for: 'plugin type`)");
 
             ImGui::PopTextWrapPos(m_ctx);
-            UiElements::PopReaSonusGroupStyle(m_ctx);
+            UiStyledElements::PopReaSonusGroupStyle(m_ctx);
             ImGui::EndChild(m_ctx);
         }
 
@@ -148,7 +148,7 @@ void ReaSonusMessage::Frame()
             "Close",
             &save_message);
 
-        UiElements::PopReaSonusWindowStyle(m_ctx);
+        UiStyledElements::PopReaSonusWindowStyle(m_ctx);
 
         ImGui::End(m_ctx); // window
     }

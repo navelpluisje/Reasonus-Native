@@ -4,7 +4,7 @@
 #include <reaper_imgui_functions.h>
 #include <string>
 #include <vector>
-#include "csurf_ui_elements.hpp"
+#include "csurf_ui_styles_elements.hpp"
 
 static void ReaSonusSearchComboInput( // NOLINT(*-function-cognitive-complexity)
     ImGui_Context *m_ctx,
@@ -25,7 +25,7 @@ static void ReaSonusSearchComboInput( // NOLINT(*-function-cognitive-complexity)
     double space_x;
     double space_y;
 
-    UiElements::PushReaSonusFieldGroupStyle(m_ctx);
+    UiStyledElements::PushReaSonusFieldGroupStyle(m_ctx);
     if (ImGui::BeginChild(m_ctx, ("container" + label).c_str(), width, 0.0, ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY))
     {
         // std::string current_value = list[*value];
@@ -44,14 +44,14 @@ static void ReaSonusSearchComboInput( // NOLINT(*-function-cognitive-complexity)
         ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_DisabledAlpha, 1);
         ImGui::Text(m_ctx, label.c_str());
 
-        UiElements::PushReaSonusInputStyle(m_ctx);
+        UiStyledElements::PushReaSonusInputStyle(m_ctx);
         ImGui::SetNextItemWidth(m_ctx, width - 39);
         ImGui::InputTextWithHint(m_ctx, ("##" + label).c_str(), "Hint", text, sizeof(text));
         if (ImGui::IsItemClicked(m_ctx))
         {
             ImGui::OpenPopup(m_ctx, "search-combo-modal");
         }
-        UiElements::PopReaSonusInputStyle(m_ctx);
+        UiStyledElements::PopReaSonusInputStyle(m_ctx);
         ImGui::PopStyleVar(m_ctx);
 
         /**
@@ -59,12 +59,12 @@ static void ReaSonusSearchComboInput( // NOLINT(*-function-cognitive-complexity)
          *
          */
         ImGui::SameLine(m_ctx);
-        UiElements::PushReaSonusIconButtonStyle(m_ctx, assets);
+        UiStyledElements::PushReaSonusIconButtonStyle(m_ctx, assets);
         if (ImGui::Button(m_ctx, std::string(1, IconSearch).c_str(), 31, 31))
         {
             ImGui::OpenPopup(m_ctx, "search-combo-modal");
         }
-        UiElements::PopReaSonusIconButtonStyle(m_ctx);
+        UiStyledElements::PopReaSonusIconButtonStyle(m_ctx);
 
         /**
          * Create the modal
@@ -72,7 +72,7 @@ static void ReaSonusSearchComboInput( // NOLINT(*-function-cognitive-complexity)
         ImGui::SetNextWindowPos(m_ctx, modal_x - 8, modal_y - 8);
         ImGui::SetNextWindowSize(m_ctx, width + 16, 370);
 
-        UiElements::PushReaSonusModalStyle(m_ctx);
+        UiStyledElements::PushReaSonusModalStyle(m_ctx);
         if (ImGui::BeginPopup(m_ctx, "search-combo-modal", ImGui::WindowFlags_TopMost | ImGui::WindowFlags_NoTitleBar | ImGui::WindowFlags_NoResize | ImGui::WindowFlags_NoMove))
         {
             if (ImGui::IsPopupOpen(m_ctx, "", ImGui::PopupFlags_AnyPopup) &&
@@ -94,7 +94,7 @@ static void ReaSonusSearchComboInput( // NOLINT(*-function-cognitive-complexity)
                 ImGui::SameLine(m_ctx);
                 ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + label_offset);
 
-                UiElements::PushReaSonusIconButtonStyle(m_ctx, assets);
+                UiStyledElements::PushReaSonusIconButtonStyle(m_ctx, assets);
                 if (ImGui::Button(m_ctx, std::string(1, IconRemove).c_str(), 31, 31))
                 {
                     if (clear_param)
@@ -106,12 +106,12 @@ static void ReaSonusSearchComboInput( // NOLINT(*-function-cognitive-complexity)
                         ImGui::CloseCurrentPopup(m_ctx);
                     }
                 }
-                UiElements::PopReaSonusIconButtonStyle(m_ctx);
+                UiStyledElements::PopReaSonusIconButtonStyle(m_ctx);
 
                 /**
                  * Start the list
                  */
-                UiElements::PushReaSonusListBoxStyle(m_ctx);
+                UiStyledElements::PushReaSonusListBoxStyle(m_ctx);
                 if (ImGui::BeginListBox(m_ctx, "##listbox", 0.0, -0.1))
                 {
                     for (int i = 0; i < static_cast<int>(list.size()); i++)
@@ -126,7 +126,7 @@ static void ReaSonusSearchComboInput( // NOLINT(*-function-cognitive-complexity)
                             }
                         }
                     }
-                    UiElements::PopReaSonusListBoxStyle(m_ctx);
+                    UiStyledElements::PopReaSonusListBoxStyle(m_ctx);
                     ImGui::EndListBox(m_ctx);
                 }
                 ImGui::EndChild(m_ctx);
@@ -134,11 +134,11 @@ static void ReaSonusSearchComboInput( // NOLINT(*-function-cognitive-complexity)
 
             ImGui::EndPopup(m_ctx);
         }
-        UiElements::PopReaSonusModalStyle(m_ctx);
+        UiStyledElements::PopReaSonusModalStyle(m_ctx);
 
         ImGui::EndChild(m_ctx);
     }
-    UiElements::PopReaSonusFieldGroupStyle(m_ctx);
+    UiStyledElements::PopReaSonusFieldGroupStyle(m_ctx);
 }
 
 #endif

@@ -1,7 +1,6 @@
 #include "csurf_ui_page_content.hpp"
-#include <string.h>
 #include <reaper_imgui_functions.h>
-#include "csurf_ui_elements.hpp"
+#include "csurf_ui_styles_elements.hpp"
 #include "csurf_ui_page_title.hpp"
 #include "../i18n/i18n.hpp"
 
@@ -26,7 +25,7 @@ public:
         ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_ItemSpacing, 12.0, 12.0);
         if (ImGui::BeginChild(m_ctx, "main_about_page", 0.0, 0.0, ImGui::ChildFlags_None))
         {
-            UiElements::PushReaSonusGroupStyle(m_ctx);
+            UiStyledElements::PushReaSonusGroupStyle(m_ctx);
             if (ImGui::BeginChild(m_ctx, "about", 256.0, 0.0, ImGui::ChildFlags_FrameStyle))
             {
                 ImGui::GetContentRegionAvail(m_ctx, &available_width, &available_height);
@@ -40,7 +39,7 @@ public:
                 ImGui::BulletText(m_ctx, i18n->t("about", "about.list.3").c_str());
                 ImGui::BulletText(m_ctx, i18n->t("about", "about.list.4").c_str());
 
-                UiElements::PopReaSonusGroupStyle(m_ctx);
+                UiStyledElements::PopReaSonusGroupStyle(m_ctx);
                 ImGui::PopTextWrapPos(m_ctx);
                 ImGui::EndChild(m_ctx);
             }
@@ -48,7 +47,7 @@ public:
 
             if (ImGui::BeginChild(m_ctx, "filter_content", 0.0, 0.0))
             {
-                UiElements::PushReaSonusGroupStyle(m_ctx);
+                UiStyledElements::PushReaSonusGroupStyle(m_ctx);
                 if (ImGui::BeginChild(m_ctx, "Contribute & Links", 0.0, device != FP_V2 ? 292.0 : 0.0, ImGui::ChildFlags_FrameStyle))
                 {
                     ImGui::GetContentRegionAvail(m_ctx, &available_width, &available_height);
@@ -76,14 +75,14 @@ public:
                     ImGui::SameLine(m_ctx);
                     ImGui::TextLinkOpenURL(m_ctx, i18n->t("about", "contribute.link.question").c_str(), "https://forum.cockos.com/showthread.php?t=267116");
 
-                    UiElements::PopReaSonusGroupStyle(m_ctx);
+                    UiStyledElements::PopReaSonusGroupStyle(m_ctx);
                     ImGui::PopTextWrapPos(m_ctx);
                     ImGui::EndChild(m_ctx);
                 }
 
                 if (device != FP_V2)
                 {
-                    UiElements::PushReaSonusGroupStyle(m_ctx);
+                    UiStyledElements::PushReaSonusGroupStyle(m_ctx);
                     if (ImGui::BeginChild(m_ctx, "Thanks", 0.0, 0.0, ImGui::ChildFlags_FrameStyle))
                     {
                         ImGui::GetContentRegionAvail(m_ctx, &available_width, &available_height);
@@ -95,7 +94,7 @@ public:
                         ImGui::BulletText(m_ctx, i18n->t("about", "thanks.list.2").c_str());
                         ImGui::BulletText(m_ctx, i18n->t("about", "thanks.list.3").c_str());
 
-                        UiElements::PopReaSonusGroupStyle(m_ctx);
+                        UiStyledElements::PopReaSonusGroupStyle(m_ctx);
                         ImGui::PopTextWrapPos(m_ctx);
                         ImGui::EndChild(m_ctx);
                     }

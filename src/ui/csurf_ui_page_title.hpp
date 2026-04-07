@@ -4,13 +4,13 @@
 #include <reaper_imgui_functions.h>
 #include <string>
 #include <vector>
-#include "csurf_ui_elements.hpp"
+#include "csurf_ui_styles_elements.hpp"
 #include "csurf_ui_assets.hpp"
 
 static void ReaSonusPageTitle(ImGui_Context *m_ctx, CSurf_UI_Assets *assets, std::string label, bool sub_title = false)
 {
     std::string id = "##" + label;
-    UiElements::PushReaSonusPageTitleStyle(m_ctx);
+    UiStyledElements::PushReaSonusPageTitleStyle(m_ctx);
     if (ImGui::BeginChild(m_ctx, ("container" + label).c_str(), 0.0, 32.0, ImGui::ChildFlags_FrameStyle))
     {
         ImGui::PushFont(m_ctx, assets->GetMainFontBold(), sub_title ? FontSizeLarge : FontSizePageTitle);
@@ -21,7 +21,7 @@ static void ReaSonusPageTitle(ImGui_Context *m_ctx, CSurf_UI_Assets *assets, std
 
         ImGui::EndChild(m_ctx);
     }
-    UiElements::PopReaSonusPageTitleStyle(m_ctx);
+    UiStyledElements::PopReaSonusPageTitleStyle(m_ctx);
 }
 
 #endif

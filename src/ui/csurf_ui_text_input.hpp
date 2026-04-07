@@ -3,7 +3,7 @@
 
 #include <reaper_imgui_functions.h>
 #include <string>
-#include "csurf_ui_elements.hpp"
+#include "csurf_ui_styles_elements.hpp"
 
 static void ReaSonusTextInput(ImGui_Context *m_ctx, std::string label, std::string *value, std::string hint, double width = 0.0, bool select = false)
 {
@@ -12,12 +12,12 @@ static void ReaSonusTextInput(ImGui_Context *m_ctx, std::string label, std::stri
 
     std::string id = "##" + label;
 
-    UiElements::PushReaSonusFieldGroupStyle(m_ctx);
+    UiStyledElements::PushReaSonusFieldGroupStyle(m_ctx);
     if (ImGui::BeginChild(m_ctx, ("container" + label).c_str(), width, 0.0, ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY))
     {
         ImGui::Text(m_ctx, label.c_str());
 
-        UiElements::PushReaSonusInputStyle(m_ctx);
+        UiStyledElements::PushReaSonusInputStyle(m_ctx);
         if (select)
         {
             ImGui::SetKeyboardFocusHere(m_ctx);
@@ -27,10 +27,10 @@ static void ReaSonusTextInput(ImGui_Context *m_ctx, std::string label, std::stri
             *value = std::string(text);
         }
 
-        UiElements::PopReaSonusInputStyle(m_ctx);
+        UiStyledElements::PopReaSonusInputStyle(m_ctx);
         ImGui::EndChild(m_ctx);
     }
-    UiElements::PopReaSonusFieldGroupStyle(m_ctx);
+    UiStyledElements::PopReaSonusFieldGroupStyle(m_ctx);
 }
 
 #endif

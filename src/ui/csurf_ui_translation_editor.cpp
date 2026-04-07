@@ -235,7 +235,7 @@ void ReaSonusTranslationEditor::RenderTranslation(std::string section, std::stri
 
     if (ImGui::BeginChild(m_ctx, (section + key + "-container").c_str(), 0.0, 0.0, ImGui::ChildFlags_AlwaysAutoResize | ImGui::ChildFlags_AutoResizeY | ImGui::ChildFlags_None))
     {
-        UiElements::PushReaSonusTranslationItemStyle(m_ctx);
+        UiStyledElements::PushReaSonusTranslationItemStyle(m_ctx);
         if (ImGui::BeginChild(m_ctx, (section + key + "-label").c_str(), 0.0, 0.0, ImGui::ChildFlags_AlwaysAutoResize | ImGui::ChildFlags_AutoResizeY | ImGui::ChildFlags_FrameStyle))
         {
             ImGui::GetContentRegionAvail(m_ctx, &width, &height);
@@ -252,7 +252,7 @@ void ReaSonusTranslationEditor::RenderTranslation(std::string section, std::stri
 
             ImGui::PopTextWrapPos(m_ctx);
 
-            UiElements::PopReaSonusTranslationItemStyle(m_ctx);
+            UiStyledElements::PopReaSonusTranslationItemStyle(m_ctx);
             ImGui::EndChild(m_ctx);
         }
 
@@ -260,7 +260,7 @@ void ReaSonusTranslationEditor::RenderTranslation(std::string section, std::stri
         ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 33);
         ImGui::PushTextWrapPos(m_ctx, width - 18);
 
-        UiElements::PushReaSonusInputStyle(m_ctx);
+        UiStyledElements::PushReaSonusInputStyle(m_ctx);
         if (ImGui::InputTextMultiline(m_ctx, ("##" + section + key).c_str(), value, 512, width, text_height + 16, ImGui::InputTextFlags_AlwaysOverwrite))
         {
             std::string new_value = removeNewLines(value);
@@ -271,7 +271,7 @@ void ReaSonusTranslationEditor::RenderTranslation(std::string section, std::stri
             }
         }
         ImGui::PopTextWrapPos(m_ctx);
-        UiElements::PopReaSonusInputStyle(m_ctx);
+        UiStyledElements::PopReaSonusInputStyle(m_ctx);
 
         ImGui::EndChild(m_ctx);
     }
@@ -322,7 +322,7 @@ void ReaSonusTranslationEditor::Frame()
     ImGui::SetNextWindowSize(m_ctx, 640, 612, ImGui::Cond_Once);
     bool open{true};
 
-    UiElements::PushReaSonusWindowStyle(m_ctx);
+    UiStyledElements::PushReaSonusWindowStyle(m_ctx);
     if (ImGui::Begin(m_ctx, g_name, &open, ImGui::WindowFlags_NoCollapse))
     {
         if (ImGui::BeginChild(m_ctx, "logo", 0.0, 52.0, ImGui::ChildFlags_None))
@@ -338,7 +338,7 @@ void ReaSonusTranslationEditor::Frame()
 
             if (ImGui::BeginChild(m_ctx, "actions_info", 220.0, 0.0, ImGui::ChildFlags_None))
             {
-                UiElements::PushReaSonusGroupStyle(m_ctx);
+                UiStyledElements::PushReaSonusGroupStyle(m_ctx);
                 if (ImGui::BeginChild(m_ctx, "actions_convert_info", 0.0, 0.0, ImGui::ChildFlags_FrameStyle))
                 {
                     ReaSonusPageTitle(m_ctx, assets, "Languages");
@@ -367,7 +367,7 @@ void ReaSonusTranslationEditor::Frame()
                     // Explanation of the language code
                     // Language Code: https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes
                     // Country Code: https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes
-                    UiElements::PopReaSonusGroupStyle(m_ctx);
+                    UiStyledElements::PopReaSonusGroupStyle(m_ctx);
                     ImGui::EndChild(m_ctx); // actions_convert_info
                 }
 
@@ -376,7 +376,7 @@ void ReaSonusTranslationEditor::Frame()
 
             ImGui::SameLine(m_ctx);
 
-            UiElements::PushReaSonusGroupStyle(m_ctx);
+            UiStyledElements::PushReaSonusGroupStyle(m_ctx);
             if (ImGui::BeginChild(m_ctx, "main_content_area", 0.0, 0.0, ImGui::ChildFlags_FrameStyle))
             {
                 for (auto const &sections : base_file)
@@ -397,7 +397,7 @@ void ReaSonusTranslationEditor::Frame()
                     }
                 }
 
-                UiElements::PopReaSonusGroupStyle(m_ctx);
+                UiStyledElements::PopReaSonusGroupStyle(m_ctx);
                 ImGui::EndChild(m_ctx); // main_content_area
             }
 
@@ -414,7 +414,7 @@ void ReaSonusTranslationEditor::Frame()
             "Close",
             &save_message);
 
-        UiElements::PopReaSonusWindowStyle(m_ctx);
+        UiStyledElements::PopReaSonusWindowStyle(m_ctx);
 
         ImGui::End(m_ctx); // window
     }

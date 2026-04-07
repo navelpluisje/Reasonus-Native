@@ -62,7 +62,7 @@ public:
 
         int language_button_width = getButtonWidth(m_ctx, i18n->t("settings", "language.button.label"), assets->GetMainFontBold());
 
-        UiElements::PushReaSonusSettingsContentStyle(m_ctx);
+        UiStyledElements::PushReaSonusSettingsContentStyle(m_ctx);
         if (ImGui::BeginChild(m_ctx, "mapping_lists_content", 0.0, 0.0, ImGui::ChildFlags_FrameStyle, ImGui::ChildFlags_AutoResizeY))
         {
             if (ImGui::BeginChild(m_ctx, "language-select", -1 * language_button_width, 0.0, ImGui::ChildFlags_None | ImGui::ChildFlags_AutoResizeY))
@@ -81,12 +81,12 @@ public:
             if (ImGui::BeginChild(m_ctx, "language-action", 0.0, 0.0, ImGui::ChildFlags_None | ImGui::ChildFlags_AutoResizeY))
             {
                 ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 22);
-                UiElements::PushReaSonusButtonOutlineStyle(m_ctx, assets->GetMainFontBold());
+                UiStyledElements::PushReaSonusButtonOutlineStyle(m_ctx, assets->GetMainFontBold());
                 if (ImGui::Button(m_ctx, i18n->t("settings", "language.button.label").c_str()))
                 {
                     edit_language = true;
                 }
-                UiElements::PopReaSonusButtonOutlineStyle(m_ctx);
+                UiStyledElements::PopReaSonusButtonOutlineStyle(m_ctx);
 
                 ImGui::EndChild(m_ctx);
             }
@@ -138,7 +138,7 @@ public:
                     i18n->t("settings", "latch-preview-action.tooltip"));
             }
 
-            UiElements::PopReaSonusSettingsContentStyle(m_ctx);
+            UiStyledElements::PopReaSonusSettingsContentStyle(m_ctx);
             ImGui::EndChild(m_ctx);
         }
     }

@@ -3,19 +3,19 @@
 
 #include <reaper_imgui_functions.h>
 #include <string>
-#include "csurf_ui_elements.hpp"
+#include "csurf_ui_styles_elements.hpp"
 #include "csurf_ui_tooltip.hpp"
 
 static void ReaSonusCheckBox(ImGui_Context *m_ctx, const std::string &label, bool *value)
 {
     bool _value = *value;
 
-    UiElements::PushReaSonusCheckboxStyle(m_ctx);
+    UiStyledElements::PushReaSonusCheckboxStyle(m_ctx);
     if (ImGui::Checkbox(m_ctx, label.c_str(), &_value))
     {
         *value = !*value;
     }
-    UiElements::PopReaSonusCheckboxStyle(m_ctx);
+    UiStyledElements::PopReaSonusCheckboxStyle(m_ctx);
 }
 
 static void RenderInfoCheckbox(

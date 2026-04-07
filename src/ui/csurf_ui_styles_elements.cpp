@@ -1,20 +1,20 @@
-#include "csurf_ui_elements.hpp"
+#include "csurf_ui_styles_elements.hpp"
 #include "csurf_ui_colors.hpp"
 #include "csurf_ui_assets.hpp"
 
-void UiElements::PushReaSonusWindowStyle(ImGui_Context *m_ctx)
+void UiStyledElements::PushReaSonusWindowStyle(ImGui_Context *m_ctx)
 {
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_WindowPadding, 16, 16);
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_ItemSpacing, 16, 16);
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameRounding, 0);
 }
 
-void UiElements::PopReaSonusWindowStyle(ImGui_Context *m_ctx)
+void UiStyledElements::PopReaSonusWindowStyle(ImGui_Context *m_ctx)
 {
     ImGui::PopStyleVar(m_ctx, 3);
 }
 
-void UiElements::PushReaSonusSidebarStyle(ImGui_Context *m_ctx)
+void UiStyledElements::PushReaSonusSidebarStyle(ImGui_Context *m_ctx)
 {
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 12, 12);
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_ItemSpacing, 10, 10);
@@ -26,13 +26,13 @@ void UiElements::PushReaSonusSidebarStyle(ImGui_Context *m_ctx)
     ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBgHovered, UI_COLORS::Main_18);
 }
 
-void UiElements::PopReaSonusSidebarStyle(ImGui_Context *m_ctx)
+void UiStyledElements::PopReaSonusSidebarStyle(ImGui_Context *m_ctx)
 {
     ImGui::PopStyleVar(m_ctx, 4);
     ImGui::PopStyleColor(m_ctx, 3);
 }
 
-void UiElements::PushReaSonusContentStyle(ImGui_Context *m_ctx)
+void UiStyledElements::PushReaSonusContentStyle(ImGui_Context *m_ctx)
 {
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 12, 12);
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_ItemSpacing, 8, 8);
@@ -44,13 +44,13 @@ void UiElements::PushReaSonusContentStyle(ImGui_Context *m_ctx)
     ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBgHovered, UI_COLORS::Main_15);
 }
 
-void UiElements::PopReaSonusContentStyle(ImGui_Context *m_ctx)
+void UiStyledElements::PopReaSonusContentStyle(ImGui_Context *m_ctx)
 {
     ImGui::PopStyleVar(m_ctx, 4);
     ImGui::PopStyleColor(m_ctx, 3);
 }
 
-void UiElements::PushReaSonusSettingsContentStyle(ImGui_Context *m_ctx)
+void UiStyledElements::PushReaSonusSettingsContentStyle(ImGui_Context *m_ctx)
 {
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 0, 0);
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_ItemSpacing, 8, 4);
@@ -62,13 +62,13 @@ void UiElements::PushReaSonusSettingsContentStyle(ImGui_Context *m_ctx)
     ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBgHovered, UI_COLORS::Transparent);
 }
 
-void UiElements::PopReaSonusSettingsContentStyle(ImGui_Context *m_ctx)
+void UiStyledElements::PopReaSonusSettingsContentStyle(ImGui_Context *m_ctx)
 {
     ImGui::PopStyleVar(m_ctx, 4);
     ImGui::PopStyleColor(m_ctx, 3);
 }
 
-void UiElements::PushReaSonusGroupStyle(ImGui_Context *m_ctx)
+void UiStyledElements::PushReaSonusGroupStyle(ImGui_Context *m_ctx)
 {
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 12, 12);
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_ItemSpacing, 8, 8);
@@ -81,13 +81,13 @@ void UiElements::PushReaSonusGroupStyle(ImGui_Context *m_ctx)
     ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBgHovered, UI_COLORS::Main_18);
 }
 
-void UiElements::PopReaSonusGroupStyle(ImGui_Context *m_ctx)
+void UiStyledElements::PopReaSonusGroupStyle(ImGui_Context *m_ctx)
 {
     ImGui::PopStyleVar(m_ctx, 4);
     ImGui::PopStyleColor(m_ctx, 4);
 }
 
-void UiElements::PushReaSonusFieldGroupStyle(ImGui_Context *m_ctx)
+void UiStyledElements::PushReaSonusFieldGroupStyle(ImGui_Context *m_ctx)
 {
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 0, 0);
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_ItemSpacing, 8, 8);
@@ -99,13 +99,13 @@ void UiElements::PushReaSonusFieldGroupStyle(ImGui_Context *m_ctx)
     ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBgHovered, UI_COLORS::Transparent);
 }
 
-void UiElements::PopReaSonusFieldGroupStyle(ImGui_Context *m_ctx)
+void UiStyledElements::PopReaSonusFieldGroupStyle(ImGui_Context *m_ctx)
 {
     ImGui::PopStyleVar(m_ctx, 4);
     ImGui::PopStyleColor(m_ctx, 3);
 }
 
-void UiElements::PushReaSonusButtonStyle(ImGui_Context *m_ctx, ImGui_Font *button_font)
+void UiStyledElements::PushReaSonusButtonStyle(ImGui_Context *m_ctx, ImGui_Font *button_font)
 {
     ImGui::PushFont(m_ctx, button_font, FontSizeDefault);
 
@@ -121,14 +121,14 @@ void UiElements::PushReaSonusButtonStyle(ImGui_Context *m_ctx, ImGui_Font *butto
     ImGui::PushStyleColor(m_ctx, ImGui::Col_ButtonHovered, 0xF7CB15dF);
 }
 
-void UiElements::PopReaSonusButtonStyle(ImGui_Context *m_ctx)
+void UiStyledElements::PopReaSonusButtonStyle(ImGui_Context *m_ctx)
 {
     ImGui::PopFont(m_ctx);
     ImGui::PopStyleVar(m_ctx, 4);
     ImGui::PopStyleColor(m_ctx, 5);
 }
 
-void UiElements::PushReaSonusButtonOutlineStyle(ImGui_Context *m_ctx, ImGui_Font *button_font)
+void UiStyledElements::PushReaSonusButtonOutlineStyle(ImGui_Context *m_ctx, ImGui_Font *button_font)
 {
     ImGui::PushFont(m_ctx, button_font, FontSizeDefault);
 
@@ -144,14 +144,14 @@ void UiElements::PushReaSonusButtonOutlineStyle(ImGui_Context *m_ctx, ImGui_Font
     ImGui::PushStyleColor(m_ctx, ImGui::Col_ButtonHovered, UI_COLORS::Accent_14);
 }
 
-void UiElements::PopReaSonusButtonOutlineStyle(ImGui_Context *m_ctx)
+void UiStyledElements::PopReaSonusButtonOutlineStyle(ImGui_Context *m_ctx)
 {
     ImGui::PopFont(m_ctx);
     ImGui::PopStyleVar(m_ctx, 4);
     ImGui::PopStyleColor(m_ctx, 5);
 }
 
-void UiElements::PushReaSonusInputStyle(ImGui_Context *m_ctx)
+void UiStyledElements::PushReaSonusInputStyle(ImGui_Context *m_ctx)
 {
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 8, 8);
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameRounding, 4);
@@ -165,13 +165,13 @@ void UiElements::PushReaSonusInputStyle(ImGui_Context *m_ctx)
     ImGui::PushItemWidth(m_ctx, -1);
 }
 
-void UiElements::PopReaSonusInputStyle(ImGui_Context *m_ctx)
+void UiStyledElements::PopReaSonusInputStyle(ImGui_Context *m_ctx)
 {
     ImGui::PopStyleVar(m_ctx, 3);
     ImGui::PopStyleColor(m_ctx, 4);
 }
 
-void UiElements::PushReaSonusButtonBarMessageStyle(ImGui_Context *m_ctx)
+void UiStyledElements::PushReaSonusButtonBarMessageStyle(ImGui_Context *m_ctx)
 {
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 16, 8);
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameRounding, 4);
@@ -185,13 +185,13 @@ void UiElements::PushReaSonusButtonBarMessageStyle(ImGui_Context *m_ctx)
     ImGui::PushItemWidth(m_ctx, -1);
 }
 
-void UiElements::PopReaSonusButtonBarMessageStyle(ImGui_Context *m_ctx)
+void UiStyledElements::PopReaSonusButtonBarMessageStyle(ImGui_Context *m_ctx)
 {
     ImGui::PopStyleVar(m_ctx, 3);
     ImGui::PopStyleColor(m_ctx, 4);
 }
 
-void UiElements::PushReaSonusComboStyle(ImGui_Context *m_ctx)
+void UiStyledElements::PushReaSonusComboStyle(ImGui_Context *m_ctx)
 {
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 8, 8);
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameRounding, 4);
@@ -212,13 +212,13 @@ void UiElements::PushReaSonusComboStyle(ImGui_Context *m_ctx)
     ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBgHovered, UI_COLORS::FormFieldBgHover);
 }
 
-void UiElements::PopReaSonusComboStyle(ImGui_Context *m_ctx)
+void UiStyledElements::PopReaSonusComboStyle(ImGui_Context *m_ctx)
 {
     ImGui::PopStyleVar(m_ctx, 8);
     ImGui::PopStyleColor(m_ctx, 7);
 }
 
-void UiElements::PushReaSonusListBoxStyle(ImGui_Context *m_ctx)
+void UiStyledElements::PushReaSonusListBoxStyle(ImGui_Context *m_ctx)
 {
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 8, 8);
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameRounding, 4);
@@ -232,13 +232,13 @@ void UiElements::PushReaSonusListBoxStyle(ImGui_Context *m_ctx)
     ImGui::PushItemWidth(m_ctx, -1);
 }
 
-void UiElements::PopReaSonusListBoxStyle(ImGui_Context *m_ctx)
+void UiStyledElements::PopReaSonusListBoxStyle(ImGui_Context *m_ctx)
 {
     ImGui::PopStyleVar(m_ctx, 3);
     ImGui::PopStyleColor(m_ctx, 4);
 }
 
-void UiElements::PushReaSonusCheckboxStyle(ImGui_Context *m_ctx)
+void UiStyledElements::PushReaSonusCheckboxStyle(ImGui_Context *m_ctx)
 {
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 2, 2);
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameRounding, 4);
@@ -252,13 +252,13 @@ void UiElements::PushReaSonusCheckboxStyle(ImGui_Context *m_ctx)
     ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBgHovered, UI_COLORS::Main_28);
 }
 
-void UiElements::PopReaSonusCheckboxStyle(ImGui_Context *m_ctx)
+void UiStyledElements::PopReaSonusCheckboxStyle(ImGui_Context *m_ctx)
 {
     ImGui::PopStyleVar(m_ctx, 5);
     ImGui::PopStyleColor(m_ctx, 4);
 }
 
-void UiElements::PushReaSonusRadioButtonStyle(ImGui_Context *m_ctx)
+void UiStyledElements::PushReaSonusRadioButtonStyle(ImGui_Context *m_ctx)
 {
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 2, 2);
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameBorderSize, 2);
@@ -271,13 +271,13 @@ void UiElements::PushReaSonusRadioButtonStyle(ImGui_Context *m_ctx)
     ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBgHovered, UI_COLORS::Main_28);
 }
 
-void UiElements::PopReaSonusRadioButtonStyle(ImGui_Context *m_ctx)
+void UiStyledElements::PopReaSonusRadioButtonStyle(ImGui_Context *m_ctx)
 {
     ImGui::PopStyleVar(m_ctx, 4);
     ImGui::PopStyleColor(m_ctx, 4);
 }
 
-void UiElements::PushReaSonusPageTitleStyle(ImGui_Context *m_ctx)
+void UiStyledElements::PushReaSonusPageTitleStyle(ImGui_Context *m_ctx)
 {
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 0, 0);
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameBorderSize, 0);
@@ -290,13 +290,13 @@ void UiElements::PushReaSonusPageTitleStyle(ImGui_Context *m_ctx)
     ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBgHovered, UI_COLORS::Transparent);
 }
 
-void UiElements::PopReaSonusPageTitleStyle(ImGui_Context *m_ctx)
+void UiStyledElements::PopReaSonusPageTitleStyle(ImGui_Context *m_ctx)
 {
     ImGui::PopStyleVar(m_ctx, 4);
     ImGui::PopStyleColor(m_ctx, 4);
 }
 
-void UiElements::PushReaSonusButtonBarContainerStyle(ImGui_Context *m_ctx)
+void UiStyledElements::PushReaSonusButtonBarContainerStyle(ImGui_Context *m_ctx)
 {
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 0, 0);
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameBorderSize, 0);
@@ -307,13 +307,13 @@ void UiElements::PushReaSonusButtonBarContainerStyle(ImGui_Context *m_ctx)
     ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBgHovered, UI_COLORS::Transparent);
 }
 
-void UiElements::PopReaSonusButtonBarContainerStyle(ImGui_Context *m_ctx)
+void UiStyledElements::PopReaSonusButtonBarContainerStyle(ImGui_Context *m_ctx)
 {
     ImGui::PopStyleVar(m_ctx, 3);
     ImGui::PopStyleColor(m_ctx, 3);
 }
 
-void UiElements::PushReaSonusFunctionActionStyle(ImGui_Context *m_ctx)
+void UiStyledElements::PushReaSonusFunctionActionStyle(ImGui_Context *m_ctx)
 {
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 12, 12);
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameRounding, 4);
@@ -326,15 +326,15 @@ void UiElements::PushReaSonusFunctionActionStyle(ImGui_Context *m_ctx)
     ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBgHovered, UI_COLORS::Main_28);
 
     ImGui::PushItemWidth(m_ctx, -1);
-};
+}
 
-void UiElements::PopReaSonusFunctionActionStyle(ImGui_Context *m_ctx)
+void UiStyledElements::PopReaSonusFunctionActionStyle(ImGui_Context *m_ctx)
 {
     ImGui::PopStyleVar(m_ctx, 4);
     ImGui::PopStyleColor(m_ctx, 4);
-};
+}
 
-void UiElements::PushReaSonusFunctionButtonStyle(ImGui_Context *m_ctx)
+void UiStyledElements::PushReaSonusFunctionButtonStyle(ImGui_Context *m_ctx)
 {
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 8, 8);
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameRounding, 4);
@@ -347,15 +347,15 @@ void UiElements::PushReaSonusFunctionButtonStyle(ImGui_Context *m_ctx)
     ImGui::PushStyleColor(m_ctx, ImGui::Col_ButtonHovered, UI_COLORS::Main_28);
 
     ImGui::PushItemWidth(m_ctx, -1);
-};
+}
 
-void UiElements::PopReaSonusFunctionButtonStyle(ImGui_Context *m_ctx)
+void UiStyledElements::PopReaSonusFunctionButtonStyle(ImGui_Context *m_ctx)
 {
     ImGui::PopStyleVar(m_ctx, 3);
     ImGui::PopStyleColor(m_ctx, 5);
-};
+}
 
-void UiElements::PushReaSonusIconButtonStyle(ImGui_Context *m_ctx, CSurf_UI_Assets *assets)
+void UiStyledElements::PushReaSonusIconButtonStyle(ImGui_Context *m_ctx, CSurf_UI_Assets *assets)
 {
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 4, 4);
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameRounding, 4);
@@ -370,16 +370,16 @@ void UiElements::PushReaSonusIconButtonStyle(ImGui_Context *m_ctx, CSurf_UI_Asse
     ImGui::PushItemWidth(m_ctx, -1);
 
     ImGui::PushFont(m_ctx, assets->GetIconFont(), 20);
-};
+}
 
-void UiElements::PopReaSonusIconButtonStyle(ImGui_Context *m_ctx)
+void UiStyledElements::PopReaSonusIconButtonStyle(ImGui_Context *m_ctx)
 {
     ImGui::PopStyleVar(m_ctx, 3);
     ImGui::PopStyleColor(m_ctx, 5);
     ImGui::PopFont(m_ctx);
-};
+}
 
-void UiElements::PushReaSonusTooltipStyle(ImGui_Context *m_ctx)
+void UiStyledElements::PushReaSonusTooltipStyle(ImGui_Context *m_ctx)
 {
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 12, 12);
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameBorderSize, 2);
@@ -392,13 +392,13 @@ void UiElements::PushReaSonusTooltipStyle(ImGui_Context *m_ctx)
     ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBgHovered, UI_COLORS::Main_15);
 }
 
-void UiElements::PopReaSonusTooltipStyle(ImGui_Context *m_ctx)
+void UiStyledElements::PopReaSonusTooltipStyle(ImGui_Context *m_ctx)
 {
     ImGui::PopStyleVar(m_ctx, 3);
     ImGui::PopStyleColor(m_ctx, 5);
 }
 
-void UiElements::PushReaSonusTreeNodeStyle(ImGui_Context *m_ctx, bool active)
+void UiStyledElements::PushReaSonusTreeNodeStyle(ImGui_Context *m_ctx, const bool active)
 {
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 4, 8);
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameBorderSize, 1);
@@ -419,13 +419,13 @@ void UiElements::PushReaSonusTreeNodeStyle(ImGui_Context *m_ctx, bool active)
     ImGui::PushItemWidth(m_ctx, -1);
 }
 
-void UiElements::PopReaSonusTreeNodeStyle(ImGui_Context *m_ctx)
+void UiStyledElements::PopReaSonusTreeNodeStyle(ImGui_Context *m_ctx)
 {
     ImGui::PopStyleVar(m_ctx, 4);
     ImGui::PopStyleColor(m_ctx, 2);
 }
 
-void UiElements::PushReaSonusChannelTabStyle(ImGui_Context *m_ctx, bool active)
+void UiStyledElements::PushReaSonusChannelTabStyle(ImGui_Context *m_ctx, const bool active)
 {
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameBorderSize, 1);
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameRounding, 4);
@@ -447,24 +447,24 @@ void UiElements::PushReaSonusChannelTabStyle(ImGui_Context *m_ctx, bool active)
     ImGui::PushItemWidth(m_ctx, -1);
 }
 
-void UiElements::PopReaSonusChannelTabStyle(ImGui_Context *m_ctx)
+void UiStyledElements::PopReaSonusChannelTabStyle(ImGui_Context *m_ctx)
 {
     ImGui::PopStyleVar(m_ctx, 3);
     ImGui::PopStyleColor(m_ctx, 4);
 }
 
-void UiElements::PushReaSonusTabBarStyle(ImGui_Context *m_ctx)
+void UiStyledElements::PushReaSonusTabBarStyle(ImGui_Context *m_ctx)
 {
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_TabRounding, 4);
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 16, 8);
 }
 
-void UiElements::PopReaSonusTabBarStyle(ImGui_Context *m_ctx)
+void UiStyledElements::PopReaSonusTabBarStyle(ImGui_Context *m_ctx)
 {
     ImGui::PopStyleVar(m_ctx, 2);
 }
 
-void UiElements::PushReaSonusTabStyle(ImGui_Context *m_ctx, bool selected)
+void UiStyledElements::PushReaSonusTabStyle(ImGui_Context *m_ctx, const bool selected)
 {
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_TabBorderSize, selected ? 2 : 1);
 
@@ -483,13 +483,13 @@ void UiElements::PushReaSonusTabStyle(ImGui_Context *m_ctx, bool selected)
     }
 }
 
-void UiElements::PopReaSonusTabStyle(ImGui_Context *m_ctx)
+void UiStyledElements::PopReaSonusTabStyle(ImGui_Context *m_ctx)
 {
     ImGui::PopStyleVar(m_ctx, 1);
     ImGui::PopStyleColor(m_ctx, 4);
 }
 
-void UiElements::PushReaSonusTranslationItemStyle(ImGui_Context *m_ctx)
+void UiStyledElements::PushReaSonusTranslationItemStyle(ImGui_Context *m_ctx)
 {
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameBorderSize, 1);
 
@@ -497,13 +497,13 @@ void UiElements::PushReaSonusTranslationItemStyle(ImGui_Context *m_ctx)
     ImGui::PushStyleColor(m_ctx, ImGui::Col_Border, UI_COLORS::FormFieldBorder);
 }
 
-void UiElements::PopReaSonusTranslationItemStyle(ImGui_Context *m_ctx)
+void UiStyledElements::PopReaSonusTranslationItemStyle(ImGui_Context *m_ctx)
 {
     ImGui::PopStyleVar(m_ctx, 1);
     ImGui::PopStyleColor(m_ctx, 2);
 }
 
-void UiElements::PushReaSonusModalStyle(ImGui_Context *m_ctx)
+void UiStyledElements::PushReaSonusModalStyle(ImGui_Context *m_ctx)
 {
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 8, 8);
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameRounding, 8);
@@ -517,7 +517,7 @@ void UiElements::PushReaSonusModalStyle(ImGui_Context *m_ctx)
     ImGui::PushStyleColor(m_ctx, ImGui::Col_ModalWindowDimBg, UI_COLORS::Transparent);
 }
 
-void UiElements::PopReaSonusModalStyle(ImGui_Context *m_ctx)
+void UiStyledElements::PopReaSonusModalStyle(ImGui_Context *m_ctx)
 {
     ImGui::PopStyleVar(m_ctx, 5);
     ImGui::PopStyleColor(m_ctx, 4);

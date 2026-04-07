@@ -1,7 +1,7 @@
 #include "csurf_ui_function_keys_page.hpp"
 #include "../csurf_faderport_8/csurf_fp_8_ui_control_panel.hpp"
 #include "../csurf_faderport_v2/csurf_fp_v2_ui_control_panel.hpp"
-#include "csurf_ui_elements.hpp"
+#include "csurf_ui_styles_elements.hpp"
 #include "csurf_ui_tooltip.hpp"
 #include "csurf_ui_colors.hpp"
 
@@ -166,7 +166,7 @@ void CSurf_UI_FunctionKeysPage::RenderFunction(ImGui_Context *m_ctx, int index, 
         ImGui::SetCursorPosX(m_ctx, x_width - 55.0);
         ImGui::SetCursorPosY(m_ctx, 0);
 
-        UiElements::PushReaSonusFunctionButtonStyle(m_ctx);
+        UiStyledElements::PushReaSonusFunctionButtonStyle(m_ctx);
         ImGui::PushFont(m_ctx, assets->GetIconFont(), 24);
         if (ImGui::Button(m_ctx, std::string(1, IconRestore).c_str()))
         {
@@ -187,14 +187,14 @@ void CSurf_UI_FunctionKeysPage::RenderFunction(ImGui_Context *m_ctx, int index, 
 
         ReaSonusSimpleTooltip(m_ctx, page.i18n->t("functions", type_name + ".button.tooltip"), "add-function-tooltip" + std::to_string(index));
 
-        UiElements::PopReaSonusFunctionButtonStyle(m_ctx);
+        UiStyledElements::PopReaSonusFunctionButtonStyle(m_ctx);
         ImGui::EndChild(m_ctx);
     }
 }
 
 void CSurf_UI_FunctionKeysPage::RenderFunctionTab(std::string tab_label, FunctionTypes type, int tab_index, int start_index, int count, CSurf_UI_Assets *assets)
 {
-    UiElements::PushReaSonusTabStyle(m_ctx, selected_tab == tab_index);
+    UiStyledElements::PushReaSonusTabStyle(m_ctx, selected_tab == tab_index);
     if (ImGui::BeginTabItem(m_ctx, tab_label.c_str()))
     {
         selected_tab = tab_index;
@@ -208,9 +208,9 @@ void CSurf_UI_FunctionKeysPage::RenderFunctionTab(std::string tab_label, Functio
                 {
                     if (ImGui::TableNextColumn(m_ctx))
                     {
-                        UiElements::PushReaSonusFunctionActionStyle(m_ctx);
+                        UiStyledElements::PushReaSonusFunctionActionStyle(m_ctx);
                         RenderFunction(m_ctx, i, *this, assets, type);
-                        UiElements::PopReaSonusFunctionActionStyle(m_ctx);
+                        UiStyledElements::PopReaSonusFunctionActionStyle(m_ctx);
                     }
                 }
                 ImGui::PopStyleVar(m_ctx);
@@ -220,20 +220,20 @@ void CSurf_UI_FunctionKeysPage::RenderFunctionTab(std::string tab_label, Functio
         }
         ImGui::EndTabItem(m_ctx);
     }
-    UiElements::PopReaSonusTabStyle(m_ctx);
+    UiStyledElements::PopReaSonusTabStyle(m_ctx);
 }
 
 void CSurf_UI_FunctionKeysPage::RenderFPV2FunctionGroup()
 {
     if (ImGui::BeginChild(m_ctx, "settings-group", 0, 0, ImGui::ChildFlags_None))
     {
-        UiElements::PushReaSonusTabBarStyle(m_ctx);
+        UiStyledElements::PushReaSonusTabBarStyle(m_ctx);
         if (ImGui::BeginTabBar(m_ctx, "FunctionsTabs", ImGui::TabBarFlags_None))
         {
             RenderFunctionTab(i18n->t("functions", "tab.v2-functions"), TypeFunction, 0, 0, 4, assets);
             RenderFunctionTab(i18n->t("functions", "tab.footswitch"), TypeFootSwitch, 1, 0, 3, assets);
 
-            UiElements::PopReaSonusTabBarStyle(m_ctx);
+            UiStyledElements::PopReaSonusTabBarStyle(m_ctx);
             ImGui::EndTabBar(m_ctx);
         }
         ImGui::EndChild(m_ctx);
@@ -244,14 +244,14 @@ void CSurf_UI_FunctionKeysPage::RenderFP8FunctionGroup()
 {
     if (ImGui::BeginChild(m_ctx, "settings-group", 0, 0, ImGui::ChildFlags_None))
     {
-        UiElements::PushReaSonusTabBarStyle(m_ctx);
+        UiStyledElements::PushReaSonusTabBarStyle(m_ctx);
         if (ImGui::BeginTabBar(m_ctx, "FunctionsTabs", ImGui::TabBarFlags_None))
         {
             RenderFunctionTab(i18n->t("functions", "tab.left-shift"), TypeFunction, 0, 0, 8, assets);
             RenderFunctionTab(i18n->t("functions", "tab.right-shift"), TypeFunction, 1, 8, 8, assets);
             RenderFunctionTab(i18n->t("functions", "tab.footswitch"), TypeFootSwitch, 2, 0, 3, assets);
 
-            UiElements::PopReaSonusTabBarStyle(m_ctx);
+            UiStyledElements::PopReaSonusTabBarStyle(m_ctx);
             ImGui::EndTabBar(m_ctx);
         }
         ImGui::EndChild(m_ctx);

@@ -236,7 +236,7 @@ void ReaSonus8ControlPanel::Frame() // NOLINT(*-function-cognitive-complexity)
     bool open{true};
     if (ImGui::Begin(m_ctx, g_name, &open, ImGui::WindowFlags_NoCollapse | ImGui::WindowFlags_NoResize | ImGui::WindowFlags_NoScrollbar))
     {
-        UiElements::PushReaSonusSidebarStyle(m_ctx);
+        UiStyledElements::PushReaSonusSidebarStyle(m_ctx);
         if (ImGui::BeginChild(m_ctx, "side_bar", 224.0, 0.0, ImGui::ChildFlags_FrameStyle))
         {
             ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
@@ -261,13 +261,13 @@ void ReaSonus8ControlPanel::Frame() // NOLINT(*-function-cognitive-complexity)
             }
 
             ImGui::EndChild(m_ctx);
-            UiElements::PopReaSonusSidebarStyle(m_ctx);
+            UiStyledElements::PopReaSonusSidebarStyle(m_ctx);
         }
         ImGui::SameLine(m_ctx);
-        UiElements::PushReaSonusContentStyle(m_ctx);
+        UiStyledElements::PushReaSonusContentStyle(m_ctx);
         if (ImGui::BeginChild(m_ctx, "main_content", 0.0, 0.0, ImGui::ChildFlags_FrameStyle))
         {
-            UiElements::PopReaSonusContentStyle(m_ctx);
+            UiStyledElements::PopReaSonusContentStyle(m_ctx);
             if (ImGui::BeginChild(m_ctx, "main_content_area", 0.0, current_page != 4 ? -36.0 : 0, ImGui::ChildFlags_None))
             {
                 ReaSonusPageTitle(m_ctx, assets, i18n->t("control-panel", menu_items[current_page]), false);

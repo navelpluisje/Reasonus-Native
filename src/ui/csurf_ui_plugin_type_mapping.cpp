@@ -199,7 +199,7 @@ void ReaSonusPluginTypeMapping::RenderMappingsList()
 {
     if (ImGui::BeginChild(m_ctx, "mapping_lists", 240.0, 0.0))
     {
-        UiElements::PushReaSonusGroupStyle(m_ctx);
+        UiStyledElements::PushReaSonusGroupStyle(m_ctx);
         if (ImGui::BeginChild(m_ctx, "mapping_lists_content", 0.0, 0.0, ImGui::ChildFlags_FrameStyle, ImGui::ChildFlags_AutoResizeY))
         {
             for (int i = 0; i < (int)developers.size(); i++)
@@ -213,7 +213,7 @@ void ReaSonusPluginTypeMapping::RenderMappingsList()
                     ImGui::SetNextItemOpen(m_ctx, true);
                 }
 
-                UiElements::PushReaSonusTreeNodeStyle(m_ctx, selected_developer == i);
+                UiStyledElements::PushReaSonusTreeNodeStyle(m_ctx, selected_developer == i);
                 if (ImGui::TreeNode(m_ctx, developers.at(i).c_str(), ImGui::TreeNodeFlags_CollapsingHeader))
                 {
                     selected_developer = i;
@@ -228,10 +228,10 @@ void ReaSonusPluginTypeMapping::RenderMappingsList()
                         }
                     }
                 }
-                UiElements::PopReaSonusTreeNodeStyle(m_ctx);
+                UiStyledElements::PopReaSonusTreeNodeStyle(m_ctx);
             }
 
-            UiElements::PopReaSonusGroupStyle(m_ctx);
+            UiStyledElements::PopReaSonusGroupStyle(m_ctx);
             ImGui::EndChild(m_ctx);
         }
 
@@ -259,7 +259,7 @@ void ReaSonusPluginTypeMapping::Frame()
     ImGui::SetNextWindowSize(m_ctx, 640, 682, ImGui::Cond_Once);
     bool open{true};
 
-    UiElements::PushReaSonusWindowStyle(m_ctx);
+    UiStyledElements::PushReaSonusWindowStyle(m_ctx);
     if (ImGui::Begin(m_ctx, g_name, &open, ImGui::WindowFlags_NoCollapse | ImGui::WindowFlags_NoResize))
     {
         if (ImGui::BeginChild(m_ctx, "logo", 0.0, 52.0, ImGui::ChildFlags_None))
@@ -284,12 +284,12 @@ void ReaSonusPluginTypeMapping::Frame()
 
             if (ImGui::BeginChild(m_ctx, "actions", 0.0, 0.0, ImGui::ChildFlags_None))
             {
-                UiElements::PushReaSonusGroupStyle(m_ctx);
+                UiStyledElements::PushReaSonusGroupStyle(m_ctx);
                 if (ImGui::BeginChild(m_ctx, "main_content_area", 0.0, 0.0, ImGui::ChildFlags_FrameStyle))
                 {
                     ReaSonusPageTitle(m_ctx, assets, "Select Plugin type");
 
-                    UiElements::PushReaSonusListBoxStyle(m_ctx);
+                    UiStyledElements::PushReaSonusListBoxStyle(m_ctx);
                     if (ImGui::BeginListBox(m_ctx, "##converted_files", 0.0, 250))
                     {
                         for (int i = 0; i < (int)plugin_types.size(); i++)
@@ -300,14 +300,14 @@ void ReaSonusPluginTypeMapping::Frame()
                                 selected_plugin_type = i;
                             }
                         }
-                        UiElements::PopReaSonusListBoxStyle(m_ctx);
+                        UiStyledElements::PopReaSonusListBoxStyle(m_ctx);
                         ImGui::EndListBox(m_ctx); // converted_files
                     }
 
                     ImGui::Text(m_ctx, ("Set type: " + ((selected_plugin_type > -1) ? plugin_types[selected_plugin_type] : "-")).c_str());
                     ImGui::Text(m_ctx, ("To: " + ((selected_plugin > -1) ? plugins[selected_developer][selected_plugin] : "-")).c_str());
 
-                    UiElements::PopReaSonusGroupStyle(m_ctx);
+                    UiStyledElements::PopReaSonusGroupStyle(m_ctx);
                     ImGui::EndChild(m_ctx); // main_content_area
                 }
 
@@ -327,7 +327,7 @@ void ReaSonusPluginTypeMapping::Frame()
             "Cancel",
             &save_message);
 
-        UiElements::PopReaSonusWindowStyle(m_ctx);
+        UiStyledElements::PopReaSonusWindowStyle(m_ctx);
 
         ImGui::End(m_ctx); // window
     }

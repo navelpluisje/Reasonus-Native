@@ -234,7 +234,7 @@ void ReaSonusPluginMappingConverter::Frame()
     ImGui::SetNextWindowSize(m_ctx, 640, 632, ImGui::Cond_Once);
     bool open{true};
 
-    UiElements::PushReaSonusWindowStyle(m_ctx);
+    UiStyledElements::PushReaSonusWindowStyle(m_ctx);
     if (ImGui::Begin(m_ctx, g_name, &open, ImGui::WindowFlags_NoCollapse | ImGui::WindowFlags_NoResize))
     {
         if (ImGui::BeginChild(m_ctx, "logo", 0.0, 52.0, ImGui::ChildFlags_None))
@@ -249,7 +249,7 @@ void ReaSonusPluginMappingConverter::Frame()
 
             if (ImGui::BeginChild(m_ctx, "actions_info", 300.0, 0.0, ImGui::ChildFlags_None))
             {
-                UiElements::PushReaSonusGroupStyle(m_ctx);
+                UiStyledElements::PushReaSonusGroupStyle(m_ctx);
                 if (ImGui::BeginChild(m_ctx, "actions_convert_info", 0.0, 0.0, ImGui::ChildFlags_FrameStyle))
                 {
                     ReaSonusPageTitle(m_ctx, assets, "Convert");
@@ -262,7 +262,7 @@ void ReaSonusPluginMappingConverter::Frame()
                     ImGui::Text(m_ctx, "Do you want to convert the old files?");
                     ImGui::PopTextWrapPos(m_ctx);
 
-                    UiElements::PopReaSonusGroupStyle(m_ctx);
+                    UiStyledElements::PopReaSonusGroupStyle(m_ctx);
                     ImGui::EndChild(m_ctx); // actions_convert_info
                 }
 
@@ -273,12 +273,12 @@ void ReaSonusPluginMappingConverter::Frame()
 
             if (ImGui::BeginChild(m_ctx, "report", 0.0, 0.0, ImGui::ChildFlags_None))
             {
-                UiElements::PushReaSonusGroupStyle(m_ctx);
+                UiStyledElements::PushReaSonusGroupStyle(m_ctx);
                 if (ImGui::BeginChild(m_ctx, "main_content_area", 0.0, 0.0, ImGui::ChildFlags_FrameStyle))
                 {
                     ReaSonusPageTitle(m_ctx, assets, "Converted files");
 
-                    UiElements::PushReaSonusListBoxStyle(m_ctx);
+                    UiStyledElements::PushReaSonusListBoxStyle(m_ctx);
                     if (ImGui::BeginListBox(m_ctx, "##converted_files", 0.0, 110))
                     {
                         bool selected = false;
@@ -286,13 +286,13 @@ void ReaSonusPluginMappingConverter::Frame()
                         {
                             ImGui::Selectable(m_ctx, converted_files[i].c_str(), &selected, ImGui::SelectableFlags_AllowOverlap);
                         }
-                        UiElements::PopReaSonusListBoxStyle(m_ctx);
+                        UiStyledElements::PopReaSonusListBoxStyle(m_ctx);
                         ImGui::EndListBox(m_ctx); // converted_files
                     }
 
                     ReaSonusPageTitle(m_ctx, assets, "Unconverted files");
 
-                    UiElements::PushReaSonusListBoxStyle(m_ctx);
+                    UiStyledElements::PushReaSonusListBoxStyle(m_ctx);
                     if (ImGui::BeginListBox(m_ctx, "##unconverted_files", 0.0, 110))
                     {
                         bool selected = false;
@@ -301,11 +301,11 @@ void ReaSonusPluginMappingConverter::Frame()
                             ImGui::Selectable(m_ctx, unconverted_files[i].c_str(), &selected, ImGui::SelectableFlags_AllowOverlap);
                         }
 
-                        UiElements::PopReaSonusListBoxStyle(m_ctx);
+                        UiStyledElements::PopReaSonusListBoxStyle(m_ctx);
                         ImGui::EndListBox(m_ctx); // unconverted_files
                     }
 
-                    UiElements::PopReaSonusGroupStyle(m_ctx);
+                    UiStyledElements::PopReaSonusGroupStyle(m_ctx);
                     ImGui::EndChild(m_ctx); // main_content_area
                 }
 
@@ -315,12 +315,12 @@ void ReaSonusPluginMappingConverter::Frame()
             ImGui::EndChild(m_ctx); // actions_container
         }
 
-        UiElements::PushReaSonusGroupStyle(m_ctx);
+        UiStyledElements::PushReaSonusGroupStyle(m_ctx);
         if (ImGui::BeginChild(m_ctx, "path_info", 0.0, 80.0, ImGui::ChildFlags_FrameStyle))
         {
             ReaSonusTextInput(m_ctx, "Path to the zon mapping files", &path_name, "");
 
-            UiElements::PopReaSonusGroupStyle(m_ctx);
+            UiStyledElements::PopReaSonusGroupStyle(m_ctx);
             ImGui::EndChild(m_ctx); // path_info
         }
 
@@ -334,7 +334,7 @@ void ReaSonusPluginMappingConverter::Frame()
             "Close",
             &save_message);
 
-        UiElements::PopReaSonusWindowStyle(m_ctx);
+        UiStyledElements::PopReaSonusWindowStyle(m_ctx);
 
         ImGui::End(m_ctx); // window
     }
