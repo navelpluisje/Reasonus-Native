@@ -2,7 +2,7 @@
 #define CSURF_FP_8_FILTER_MANAGER_C_
 
 #include "csurf_fp_8_channel_manager.hpp"
-#include "csurf_fp_8_ui_control_panel.hpp"
+#include "../ui/windows/csurf_ui_fp_8_control_panel.hpp"
 #include "../shared/csurf_faderport_ui_imgui_utils.hpp"
 
 struct Filter

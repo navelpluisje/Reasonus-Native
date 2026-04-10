@@ -613,9 +613,9 @@ void GetLanguages(std::vector<std::string> &language_names)
  *
  * @return boolean value
  */
-double between(int min, int val, int max)
+bool between(const int min, const int val, const int max)
 {
-    double diff = max - min;
+    const double diff = max - min;
     return diff > 0 && diff < val;
 }
 

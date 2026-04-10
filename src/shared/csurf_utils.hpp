@@ -409,7 +409,7 @@ bool setWindowScrollPos(void *windowHWND, const char *scrollbar, int position);
  */
 void GetLanguages(std::vector<std::string> &language_names);
 
-double between(int min, int val, int max);
+bool between(int min, int val, int max);
 
 bool createPathIfNotExist(std::string path);
 

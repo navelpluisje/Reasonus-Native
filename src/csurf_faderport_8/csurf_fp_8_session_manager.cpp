@@ -1,7 +1,7 @@
 #ifndef CSURF_FP_8_SESSION_MANAGER_C_
 #define CSURF_FP_8_SESSION_MANAGER_C_
 
-#include "csurf_fp_8_ui_control_panel.hpp"
+#include "../ui/windows/csurf_ui_fp_8_control_panel.hpp"
 #include "csurf_fp_8_navigator.hpp"
 #include "../controls/csurf_button.hpp"
 #include "../shared/csurf_reasonus_settings.hpp"

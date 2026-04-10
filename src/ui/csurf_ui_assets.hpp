@@ -2,9 +2,6 @@
 #define CSURF_UI_ASSETS_HPP_
 
 #include <reaper_imgui_functions.h>
-#include <WDL/wdltypes.h> // might be unnecessary in future
-#include <reaper_plugin_functions.h>
-#include "../shared/csurf_utils.hpp"
 
 enum IconFont
 {
@@ -40,7 +37,6 @@ enum FonSize
 
 class CSurf_UI_Assets
 {
-private:
     ImGui_Context *m_ctx;
 
     // Fonts
@@ -50,6 +46,15 @@ private:
 
     // Images
     ImGui_Image *reasonus_logo;
+    ImGui_Image *display_mode_0;
+    ImGui_Image *display_mode_1;
+    ImGui_Image *display_mode_2;
+    ImGui_Image *display_mode_3;
+    ImGui_Image *display_mode_4;
+    ImGui_Image *display_mode_5;
+    ImGui_Image *display_mode_6;
+    ImGui_Image *display_mode_7;
+    ImGui_Image *display_mode_8;
 
     // Filters
     ImGui_TextFilter *combo_filter;
@@ -58,17 +63,18 @@ private:
     ImGui_Function *onlyDigitsFilter;
 
 public:
-    CSurf_UI_Assets(ImGui_Context *m_ctx);
+    explicit CSurf_UI_Assets(ImGui_Context *m_ctx);
 
-    ImGui_Font *GetMainFont();
-    ImGui_Font *GetMainFontBold();
-    ImGui_Font *GetIconFont();
+    [[nodiscard]] ImGui_Font *GetMainFont() const;
+    [[nodiscard]] ImGui_Font *GetMainFontBold() const;
+    [[nodiscard]] ImGui_Font *GetIconFont() const;
 
-    ImGui_Image *GetReaSonusLogo();
+    [[nodiscard]] ImGui_Image *GetReaSonusLogo() const;
+    [[nodiscard]] ImGui_Image *GetDisplayMode(int display_mode) const;
 
-    ImGui_TextFilter *GetReaComboFilter();
+    [[nodiscard]] ImGui_TextFilter *GetReaComboFilter() const;
 
-    ImGui_Function *GetOnlyDigetsFilter();
+    [[nodiscard]] ImGui_Function *GetOnlyDigitsFilter() const;
 };
 
 #endif

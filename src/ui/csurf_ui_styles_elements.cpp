@@ -355,7 +355,7 @@ void UiStyledElements::PopReaSonusFunctionButtonStyle(ImGui_Context *m_ctx)
     ImGui::PopStyleColor(m_ctx, 5);
 }
 
-void UiStyledElements::PushReaSonusIconButtonStyle(ImGui_Context *m_ctx, CSurf_UI_Assets *assets)
+void UiStyledElements::PushReaSonusIconButtonStyle(ImGui_Context *m_ctx, const CSurf_UI_Assets *assets)
 {
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 4, 4);
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameRounding, 4);
@@ -522,3 +522,19 @@ void UiStyledElements::PopReaSonusModalStyle(ImGui_Context *m_ctx)
     ImGui::PopStyleVar(m_ctx, 5);
     ImGui::PopStyleColor(m_ctx, 4);
 }
+
+void UiStyledElements::PushReaSonusImageButtonStyle(ImGui_Context *m_ctx, const bool selected) {
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameBorderSize, 1);
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 8, 8);
+
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_Border, selected ? UI_COLORS::Accent : UI_COLORS::Main_28);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_Button, selected ? UI_COLORS::Accent_25 : UI_COLORS::Main_38);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_ButtonActive, UI_COLORS::Accent);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_ButtonHovered, selected ? UI_COLORS::Accent_50 : UI_COLORS::Main_48);
+}
+
+void UiStyledElements::PopReaSonusImageButtonStyle(ImGui_Context *m_ctx) {
+    ImGui::PopStyleVar(m_ctx, 2);
+    ImGui::PopStyleColor(m_ctx, 4);
+}
+

@@ -7,7 +7,7 @@
 #include "../shared/csurf_session_manager_actions.hpp"
 #include "csurf_fp_v2_navigator.hpp"
 #include "../shared/csurf_daw.hpp"
-#include "csurf_fp_v2_ui_control_panel.hpp"
+#include "../ui/pages/csurf_ui_fp_v2_control_panel.hpp"
 #include "../shared/csurf_faderport_ui_imgui_utils.hpp"
 
 enum SessionTypes // NOLINT(*-use-internal-linkage)

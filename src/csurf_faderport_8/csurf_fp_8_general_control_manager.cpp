@@ -3,7 +3,7 @@
 
 #include "../shared/csurf_reasonus_settings.hpp"
 #include "csurf_fp_8_fader_manager.hpp"
-#include "csurf_fp_8_ui_control_panel.hpp"
+#include "../ui/windows/csurf_ui_fp_8_control_panel.hpp"
 
 class CSurf_FP_8_GeneralControlManager
 {

@@ -8,7 +8,7 @@
 #include "../shared/csurf_utils.hpp"
 #include "../shared/csurf_faderport_ui_utils.hpp"
 #include "../resource.h"
-#include "csurf_fp_v2_ui_control_panel.hpp"
+#include "../ui/pages/csurf_ui_fp_v2_control_panel.hpp"
 
 extern HWND g_hwnd;
 extern REAPER_PLUGIN_HINSTANCE g_hInst;

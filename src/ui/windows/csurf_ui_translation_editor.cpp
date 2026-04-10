@@ -1,0 +1,366 @@
+#include <filesystem>
+#include <fstream>
+#include <regex>
+#include "csurf_ui_translation_editor.hpp"
+#include "../csurf_ui_colors.hpp"
+#include "../csurf_ui_vars.hpp"
+#include "../components/csurf_ui_page_title.hpp"
+#include "../components/csurf_ui_button_bar.hpp"
+#include "../components/csurf_ui_list_box.hpp"
+#include "../components/csurf_ui_action_text_input.hpp"
+#include "../components/csurf_ui_checkbox.hpp"
+#include "../../shared/csurf_utils.hpp"
+
+constexpr const char *g_name{"ReaSonus Native Translaions Editor"};
+
+std::unique_ptr<ReaSonusTranslationEditor> ReaSonusTranslationEditor::s_inst;
+
+static void reportError(const ImGui_Error &e) {
+    ShowMessageBox(e.what(), g_name, 0);
+}
+
+ReaSonusTranslationEditor::ReaSonusTranslationEditor()
+    : m_ctx{} {
+    ImGui::init(plugin_getapi);
+    m_ctx = ImGui::CreateContext(g_name);
+    assets = new CSurf_UI_Assets(m_ctx);
+
+    GetBaseLanguage();
+    GetLanguageList();
+
+    plugin_register("timer", reinterpret_cast<void *>(&Loop));
+}
+
+ReaSonusTranslationEditor::~ReaSonusTranslationEditor() {
+    plugin_register("-timer", reinterpret_cast<void *>(&Loop));
+}
+
+void ReaSonusTranslationEditor::Start() {
+    try {
+        window_open = true;
+        if (s_inst) {
+            ImGui::SetNextWindowFocus(s_inst->m_ctx);
+        } else {
+            s_inst.reset(new ReaSonusTranslationEditor);
+        }
+    } catch (const ImGui_Error &e) {
+        reportError(e);
+        s_inst.reset();
+    }
+}
+
+void ReaSonusTranslationEditor::Stop() {
+    try {
+        window_open = false;
+        if (s_inst) {
+            s_inst.reset();
+        }
+    } catch (const ImGui_Error &e) {
+        reportError(e);
+        s_inst.reset();
+    }
+}
+
+void ReaSonusTranslationEditor::Loop() {
+    try {
+        s_inst->Frame();
+    } catch (const ImGui_Error &e) {
+        reportError(e);
+        s_inst.reset();
+    }
+}
+
+void ReaSonusTranslationEditor::GetLanguageList() {
+    std::string path = GetReaSonusLocalesFolderPath();
+    language_list.clear();
+
+    for (const auto &entry: std::filesystem::recursive_directory_iterator(path)) {
+        if (entry.is_regular_file() && !entry.is_symlink()) {
+            std::filesystem::path path(entry.path());
+            if (path.has_extension() && path.extension() == ".ini") {
+                language_list.push_back((split(path.filename().u8string(), ".").at(0)));
+            }
+        }
+    }
+
+    if (language_list.size() > 0) {
+        selected_language = 0;
+    }
+}
+
+void ReaSonusTranslationEditor::GetBaseLanguage() {
+    mINI::INIFile file(GetReaSonusLocalesPath("en-US"));
+    file.read(base_file);
+}
+
+void ReaSonusTranslationEditor::GetSelectedLanguage() {
+    std::string language = language_list.at(selected_language);
+    mINI::INIFile file(GetReaSonusLocalesPath(language));
+    file.read(translation_file);
+}
+
+void ReaSonusTranslationEditor::HandleAddLanguage() {
+    language_list.push_back(new_language);
+    mINI::INIFile file(GetReaSonusLocalesPath(new_language));
+    file.write(base_file);
+    new_language = "";
+    selected_language = language_list.size() - 1;
+}
+
+void ReaSonusTranslationEditor::SaveChanges() {
+    mINI::INIFile file(GetReaSonusLocalesPath(language_list.at(selected_language)));
+    if (file.write(translation_file)) {
+        save_message = "Woohoo! Changes were successfully saved";
+    }
+}
+
+void ReaSonusTranslationEditor::HandleRemoveLanguageListItem(int index) {
+    std::string language = language_list.at(index);
+    int status = std::remove(GetReaSonusLocalesPath(language).c_str());
+    if (status == 0) {
+        GetLanguageList();
+    }
+    logInteger("index", index);
+}
+
+void ReaSonusTranslationEditor::getMultilineString(std::string &value, double width, double &height) {
+    double text_width, text_height;
+    std::string tmp_str = "";
+    std::string final_str = "";
+    int curChr = 0;
+    while (curChr < (int) value.size()) {
+        if (value[curChr] == '\n') {
+            final_str += tmp_str + "\n";
+            tmp_str = "";
+        }
+
+        tmp_str += value[curChr];
+        ImGui::CalcTextSize(m_ctx, tmp_str.c_str(), &text_width, &text_height);
+
+        if (text_width > width) {
+            int lastSpace = tmp_str.size() - 1;
+            while (tmp_str[lastSpace] != ' ' && lastSpace > 0) {
+                lastSpace--;
+            }
+
+            if (lastSpace == 0) {
+                lastSpace = tmp_str.size() - 2;
+            }
+
+            final_str += tmp_str.substr(0, lastSpace + 1) + "\r\n";
+            if (lastSpace + 1 > (int) tmp_str.size()) {
+                tmp_str = "";
+            } else {
+                tmp_str = tmp_str.substr(lastSpace + 1);
+            }
+        }
+        curChr++;
+    }
+    if (tmp_str.size() > 0) {
+        final_str += tmp_str;
+    }
+
+    ImGui::CalcTextSize(m_ctx, final_str.c_str(), &text_width, &text_height);
+
+    value = final_str;
+    height = text_height;
+}
+
+std::string removeNewLines(std::string value) {
+    std::string new_string = "";
+    for (int i = 0; i < (int) value.size(); i++) {
+        if (value[i] != '\n' && value[i] != '\r') {
+            new_string += value[i];
+        }
+    }
+
+    return new_string;
+}
+
+void ReaSonusTranslationEditor::RenderTranslation(std::string section, std::string key) {
+    double width, height, text_height;
+    ImGui::GetContentRegionAvail(m_ctx, &width, &height);
+    std::string val = translation_file[section][key];
+    getMultilineString(val, width - 16, text_height);
+
+    char value[512];
+    strcpy(value, val.c_str());
+
+    if (ImGui::BeginChild(m_ctx, (section + key + "-container").c_str(), 0.0, 0.0,
+                          ImGui::ChildFlags_AlwaysAutoResize | ImGui::ChildFlags_AutoResizeY |
+                          ImGui::ChildFlags_None)) {
+        UiStyledElements::PushReaSonusTranslationItemStyle(m_ctx);
+        if (ImGui::BeginChild(m_ctx, (section + key + "-label").c_str(), 0.0, 0.0,
+                              ImGui::ChildFlags_AlwaysAutoResize | ImGui::ChildFlags_AutoResizeY |
+                              ImGui::ChildFlags_FrameStyle)) {
+            ImGui::GetContentRegionAvail(m_ctx, &width, &height);
+            ImGui::PushTextWrapPos(m_ctx, width);
+
+            if (show_translation_key) {
+                ImGui::Text(m_ctx, key.c_str());
+            }
+            ImGui::PushStyleColor(m_ctx, ImGui::Col_Text, UI_COLORS::Accent);
+            ImGui::Text(m_ctx, base_file[section][key].c_str());
+            ImGui::PopStyleColor(m_ctx);
+            ImGui::Text(m_ctx, "  ");
+
+            ImGui::PopTextWrapPos(m_ctx);
+
+            UiStyledElements::PopReaSonusTranslationItemStyle(m_ctx);
+            ImGui::EndChild(m_ctx);
+        }
+
+        ImGui::GetContentRegionAvail(m_ctx, &width, &height);
+        ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 33);
+        ImGui::PushTextWrapPos(m_ctx, width - 18);
+
+        UiStyledElements::PushReaSonusInputStyle(m_ctx);
+        if (ImGui::InputTextMultiline(m_ctx, ("##" + section + key).c_str(), value, 512, width, text_height + 16,
+                                      ImGui::InputTextFlags_AlwaysOverwrite)) {
+            std::string new_value = removeNewLines(value);
+
+            if (new_value.compare(translation_file[section][key]) != 0) {
+                translation_file[section][key] = new_value;
+            }
+        }
+        ImGui::PopTextWrapPos(m_ctx);
+        UiStyledElements::PopReaSonusInputStyle(m_ctx);
+
+        ImGui::EndChild(m_ctx);
+    }
+}
+
+void ReaSonusTranslationEditor::Frame() {
+    using namespace std::placeholders; // for `_1, _2 etc`
+
+    if (!save_message.empty()) {
+        int now = (int) GetTickCount();
+        if (save_message_timer == 0) {
+            save_message_timer = now;
+        } else if ((save_message_timer + 3000) < now) {
+            save_message = "";
+            save_message_timer = 0;
+        }
+    }
+
+    if (previous_selected_language != selected_language) {
+        previous_selected_language = selected_language;
+        GetSelectedLanguage();
+    }
+
+    if (close_clicked) {
+        close_clicked = false;
+        return Stop();
+    }
+
+    if (save_clicked) {
+        save_clicked = false;
+        if (selected_language > -1) {
+            SaveChanges();
+        }
+    }
+
+    PushReaSonusColors(m_ctx);
+    PushReaSonusStyle(m_ctx);
+    ImGui::PushFont(m_ctx, assets->GetMainFont(), FontSizeDefault);
+    ImGui::SetNextWindowSize(m_ctx, 640, 612, ImGui::Cond_Once);
+    bool open{true};
+
+    UiStyledElements::PushReaSonusWindowStyle(m_ctx);
+    if (ImGui::Begin(m_ctx, g_name, &open, ImGui::WindowFlags_NoCollapse)) {
+        if (ImGui::BeginChild(m_ctx, "logo", 0.0, 52.0, ImGui::ChildFlags_None)) {
+            ImGui::Image(m_ctx, assets->GetReaSonusLogo(), 200, 52);
+            ImGui::SameLine(m_ctx);
+
+            ImGui::EndChild(m_ctx); // logo
+        }
+
+        if (ImGui::BeginChild(m_ctx, "actions_container", 0.0, -52.0, ImGui::ChildFlags_None)) {
+            if (ImGui::BeginChild(m_ctx, "actions_info", 220.0, 0.0, ImGui::ChildFlags_None)) {
+                UiStyledElements::PushReaSonusGroupStyle(m_ctx);
+                if (ImGui::BeginChild(m_ctx, "actions_convert_info", 0.0, 0.0, ImGui::ChildFlags_FrameStyle)) {
+                    ReaSonusPageTitle(m_ctx, assets, "Languages", false);
+
+                    ReaSonusCheckBox(m_ctx, "Show untranslated only", &show_empty_only);
+                    ReaSonusCheckBox(m_ctx, "Show the actual key", &show_translation_key);
+
+                    ReaSonusActionTextInput(
+                        m_ctx,
+                        assets,
+                        "Add a new language",
+                        &new_language,
+                        "Please use ISO names",
+                        std::bind(&ReaSonusTranslationEditor::HandleAddLanguage, this));
+
+                    ReaSonusExtendedListBox(
+                        m_ctx,
+                        assets,
+                        "filters",
+                        language_list,
+                        &selected_language,
+                        false,
+                        std::bind(&ReaSonusTranslationEditor::HandleRemoveLanguageListItem, this, _1),
+                        false,
+                        nullptr);
+
+                    // Explanation of the language code
+                    // Language Code: https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes
+                    // Country Code: https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes
+                    UiStyledElements::PopReaSonusGroupStyle(m_ctx);
+                    ImGui::EndChild(m_ctx); // actions_convert_info
+                }
+
+                ImGui::EndChild(m_ctx); // actions_info
+            }
+
+            ImGui::SameLine(m_ctx);
+
+            UiStyledElements::PushReaSonusGroupStyle(m_ctx);
+            if (ImGui::BeginChild(m_ctx, "main_content_area", 0.0, 0.0, ImGui::ChildFlags_FrameStyle)) {
+                for (auto const &sections: base_file) {
+                    std::string section = sections.first;
+
+                    ReaSonusPageTitle(m_ctx, assets, section, false);
+
+                    for (auto const &pair: sections.second) {
+                        auto const &key = pair.first;
+                        if (!translation_file[section][key].empty() && show_empty_only) {
+                            continue;
+                        }
+
+                        RenderTranslation(section, key);
+                    }
+                }
+
+                UiStyledElements::PopReaSonusGroupStyle(m_ctx);
+                ImGui::EndChild(m_ctx); // main_content_area
+            }
+
+            ImGui::EndChild(m_ctx); // actions_container
+        }
+
+        ReaSonusButtonBar(
+            m_ctx,
+            assets,
+            "Save",
+            &save_clicked,
+            true,
+            &close_clicked,
+            "Close",
+            &save_message);
+
+        UiStyledElements::PopReaSonusWindowStyle(m_ctx);
+
+        ImGui::End(m_ctx); // window
+    }
+
+    ImGui::PopFont(m_ctx);
+    PopReaSonusColors(m_ctx);
+    PopReaSonusStyle(m_ctx);
+
+    if (!open) {
+        window_open = false;
+        SetActionState("_REASONUS_TRANSLATIONN_EDITOR");
+        return s_inst.reset();
+    }
+}

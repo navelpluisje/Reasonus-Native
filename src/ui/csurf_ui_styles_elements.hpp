@@ -79,7 +79,7 @@ public:
 
     static void PopReaSonusFunctionButtonStyle(ImGui_Context *m_ctx);
 
-    static void PushReaSonusIconButtonStyle(ImGui_Context *m_ctx, CSurf_UI_Assets *assets);
+    static void PushReaSonusIconButtonStyle(ImGui_Context *m_ctx, const CSurf_UI_Assets *assets);
 
     static void PopReaSonusIconButtonStyle(ImGui_Context *m_ctx);
 
@@ -110,6 +110,10 @@ public:
     static void PushReaSonusModalStyle(ImGui_Context *m_ctx);
 
     static void PopReaSonusModalStyle(ImGui_Context *m_ctx);
+
+    static void PushReaSonusImageButtonStyle(ImGui_Context *m_ctx, bool selected);
+
+    static void PopReaSonusImageButtonStyle(ImGui_Context *m_ctx);
 };
 
 #endif
