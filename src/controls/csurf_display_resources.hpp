@@ -12,14 +12,12 @@ static int SYSEX_DEVICE_FP8 = 0x02;
 static int SYSEX_DEVICE_FP16 = 0x16;
 static int SYSEX_END = 0xf7;
 
-enum DisplayActions
-{
+enum DisplayActions {
     DISPLAY_ACTION_DISPLAY = 0x12,
     DISPLAY_ACTION_MODE = 0x13,
 };
 
-enum DisplayMode
-{
+enum DisplayMode {
     /**
      * Small,
      * Small,
@@ -93,17 +91,28 @@ enum DisplayMode
     DISPLAY_MODE_9 = 0x09,
 };
 
-enum Alignment
-{
-    ALIGN_CENTER = 0,
-    ALIGN_LEFT = 1,
-    ALIGN_RIGHT = 2,
+enum Alignment {
+    ALIGN_CENTER,
+    ALIGN_LEFT,
+    ALIGN_RIGHT,
 };
 
-enum Inverted
-{
+enum Inverted {
     NON_INVERT = 0,
     INVERT = 4
 };
+
+enum DisplayValue {
+    DISPLAY_VALUE_NAME,
+    DISPLAY_VALUE_VOLUME,
+    DISPLAY_VALUE_PAN_1,
+    DISPLAY_VALUE_PAN_2,
+    DISPLAY_VALUE_TRACK_NB,
+    DISPLAY_VALUE_PHASE,
+    DISPLAY_VALUE_ARMED,
+    DISPLAY_VALUE_AUTOMATION,
+    DISPLAY_VALUE_FX_STATE,
+};
+
 
 #endif

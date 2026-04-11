@@ -164,7 +164,7 @@ bool ReaSonusPluginTypeMapping::AddPluginType() {
 
 void ReaSonusPluginTypeMapping::RenderMappingsList() {
     if (ImGui::BeginChild(m_ctx, "mapping_lists", 240.0, 0.0)) {
-        UiStyledElements::PushReaSonusGroupStyle(m_ctx);
+        UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
         if (ImGui::BeginChild(m_ctx, "mapping_lists_content", 0.0, 0.0, ImGui::ChildFlags_FrameStyle,
                               ImGui::ChildFlags_AutoResizeY)) {
             for (int i = 0; i < (int) developers.size(); i++) {
@@ -234,7 +234,7 @@ void ReaSonusPluginTypeMapping::Frame() {
             ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 26);
 
             if (ImGui::BeginChild(m_ctx, "actions", 0.0, 0.0, ImGui::ChildFlags_None)) {
-                UiStyledElements::PushReaSonusGroupStyle(m_ctx);
+                UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
                 if (ImGui::BeginChild(m_ctx, "main_content_area", 0.0, 0.0, ImGui::ChildFlags_FrameStyle)) {
                     ReaSonusPageTitle(m_ctx, assets, "Select Plugin type", false);
 

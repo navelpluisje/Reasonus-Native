@@ -277,7 +277,7 @@ void ReaSonusTranslationEditor::Frame() {
 
         if (ImGui::BeginChild(m_ctx, "actions_container", 0.0, -52.0, ImGui::ChildFlags_None)) {
             if (ImGui::BeginChild(m_ctx, "actions_info", 220.0, 0.0, ImGui::ChildFlags_None)) {
-                UiStyledElements::PushReaSonusGroupStyle(m_ctx);
+                UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
                 if (ImGui::BeginChild(m_ctx, "actions_convert_info", 0.0, 0.0, ImGui::ChildFlags_FrameStyle)) {
                     ReaSonusPageTitle(m_ctx, assets, "Languages", false);
 
@@ -315,7 +315,7 @@ void ReaSonusTranslationEditor::Frame() {
 
             ImGui::SameLine(m_ctx);
 
-            UiStyledElements::PushReaSonusGroupStyle(m_ctx);
+            UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
             if (ImGui::BeginChild(m_ctx, "main_content_area", 0.0, 0.0, ImGui::ChildFlags_FrameStyle)) {
                 for (auto const &sections: base_file) {
                     std::string section = sections.first;

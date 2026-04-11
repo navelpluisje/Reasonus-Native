@@ -586,7 +586,7 @@ public:
             ImGui::Text(m_ctx, i18n->t("mapping", "list.label").c_str());
             ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 4);
 
-            UiStyledElements::PushReaSonusGroupStyle(m_ctx);
+            UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
             if (ImGui::BeginChild(m_ctx, "mapping_lists_content", 0.0, 0.0, ImGui::ChildFlags_FrameStyle,
                                   ImGui::ChildFlags_AutoResizeY)) {
                 for (int i = 0; i < static_cast<int>(developers.size()); i++) {
@@ -671,7 +671,7 @@ public:
         double space_x;
         double space_y;
 
-        UiStyledElements::PushReaSonusGroupStyle(m_ctx);
+        UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
         if (ImGui::BeginChild(m_ctx, "mapping_content_select", 0.0, 54.0,
                               ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY)) {
             ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
@@ -735,7 +735,7 @@ public:
         double space_x;
         double space_y;
 
-        UiStyledElements::PushReaSonusGroupStyle(m_ctx);
+        UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
         if (ImGui::BeginChild(m_ctx, "mapping_content_select", 0.0, height,
                               ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY)) {
             ReaSonusPageTitle(m_ctx, assets, i18n->t("mapping", "edit.select.label"), true);
@@ -794,7 +794,7 @@ public:
         double space_x;
         double space_y;
 
-        UiStyledElements::PushReaSonusGroupStyle(m_ctx);
+        UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
         if (ImGui::BeginChild(m_ctx, "mapping_content_fader", 0.0, height,
                               ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY)) {
             ReaSonusPageTitle(m_ctx, assets, i18n->t("mapping", "edit.fader.label"), true);

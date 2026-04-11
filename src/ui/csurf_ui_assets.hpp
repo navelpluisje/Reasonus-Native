@@ -3,8 +3,7 @@
 
 #include <reaper_imgui_functions.h>
 
-enum IconFont
-{
+enum IconFont {
     IconArrowLeft = 'a',
     IconArrowRight = 'b',
     IconRestore = 'c',
@@ -28,15 +27,13 @@ enum IconFont
     IconGoTo = 'u',
 };
 
-enum FonSize
-{
+enum FonSize {
     FontSizeDefault = 14,
     FontSizeLarge = 16,
     FontSizePageTitle = 18,
 };
 
-class CSurf_UI_Assets
-{
+class CSurf_UI_Assets {
     ImGui_Context *m_ctx;
 
     // Fonts
@@ -55,6 +52,11 @@ class CSurf_UI_Assets
     ImGui_Image *display_mode_6;
     ImGui_Image *display_mode_7;
     ImGui_Image *display_mode_8;
+    ImGui_Image *valuebar_type_normal;
+    ImGui_Image *valuebar_type_bipolar;
+    ImGui_Image *valuebar_type_fill;
+    ImGui_Image *valuebar_type_spread;
+    ImGui_Image *valuebar_type_off;
 
     // Filters
     ImGui_TextFilter *combo_filter;
@@ -66,11 +68,16 @@ public:
     explicit CSurf_UI_Assets(ImGui_Context *m_ctx);
 
     [[nodiscard]] ImGui_Font *GetMainFont() const;
+
     [[nodiscard]] ImGui_Font *GetMainFontBold() const;
+
     [[nodiscard]] ImGui_Font *GetIconFont() const;
 
     [[nodiscard]] ImGui_Image *GetReaSonusLogo() const;
+
     [[nodiscard]] ImGui_Image *GetDisplayMode(int display_mode) const;
+
+    [[nodiscard]] ImGui_Image *GetValueBarType(int value_bar_type) const;
 
     [[nodiscard]] ImGui_TextFilter *GetReaComboFilter() const;
 

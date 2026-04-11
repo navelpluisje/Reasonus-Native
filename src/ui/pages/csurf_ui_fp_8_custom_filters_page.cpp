@@ -194,7 +194,7 @@ public:
                 ImGui::Text(m_ctx, i18n->t("filters", "list.label").c_str());
                 ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 4);
 
-                UiStyledElements::PushReaSonusGroupStyle(m_ctx);
+                UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
                 if (ImGui::BeginChild(m_ctx, "filter_lists_content", 0.0, 0.0, ImGui::ChildFlags_FrameStyle,
                                       ImGui::ChildFlags_AutoResizeY)) {
                     ReaSonusActionTextInput(
@@ -230,7 +230,7 @@ public:
                                        : i18n->t("filters", "content.title.edit").c_str());
                 ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 4);
 
-                UiStyledElements::PushReaSonusGroupStyle(m_ctx);
+                UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
                 if (ImGui::BeginChild(m_ctx, "filter_content_edit", 0.0, 276.0, ImGui::ChildFlags_FrameStyle)) {
                     ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
                     const double column_width = (space_x - 12) / 2;
@@ -286,7 +286,7 @@ public:
                     UiStyledElements::PopReaSonusGroupStyle(m_ctx);
                 }
 
-                UiStyledElements::PushReaSonusGroupStyle(m_ctx);
+                UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
                 if (ImGui::BeginChild(m_ctx, "filter_content_preview", 0.0, 0.0, ImGui::ChildFlags_FrameStyle)) {
                     ReaSonusFilterPreview(m_ctx, GetOptionsValue());
 

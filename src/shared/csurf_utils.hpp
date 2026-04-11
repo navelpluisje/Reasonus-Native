@@ -8,9 +8,9 @@
 
 constexpr char PATH_SEPARATOR =
 #ifdef _WIN32
-    '\\';
+        '\\';
 #else
-    '/';
+        '/';
 #endif
 
 const std::string PREFIX_SEPARATOR = ": ";
@@ -34,7 +34,7 @@ const std::array<std::string, 6> time_code_names = {
     "Time", "Beats", "Seconds", "Samples", "Hr:Min:Sec:Fr", "Abs. Frames"
 };
 
-const std::vector<std::vector<std::string>> shared_settings = {
+const std::vector<std::vector<std::string> > shared_settings = {
     {"surface", "midiin", "0"},
     {"surface", "midiout", "0"},
     {"surface", "mute-solo-momentary", "0"},
@@ -49,13 +49,13 @@ const std::vector<std::vector<std::string>> shared_settings = {
     {"footswitch", "3", "0"},
 };
 
-const std::vector<std::vector<std::string>> fp_v2_settings = {
+const std::vector<std::vector<std::string> > fp_v2_settings = {
     {"surface", "control-hidden-tracks", "0"},
     {"surface", "can-disable-fader", "0"},
     {"surface", "endless-track-scroll", "0"},
 };
 
-const std::vector<std::vector<std::string>> fp_8_settings = {
+const std::vector<std::vector<std::string> > fp_8_settings = {
     {"surface", "surface", "0"},
     {"surface", "disable-plugins", "0"},
     {"surface", "distraction-free", "0"},
@@ -69,6 +69,11 @@ const std::vector<std::vector<std::string>> fp_8_settings = {
     {"surface", "plugin-step-size", "1"},
     {"surface", "plugin-map-param-clear", "0"},
     {"displays", "track", "8"},
+    {"displays", "track-lines", "0,4,1,2"},
+    {"displays", "track-alignment", "1,0,0,0"},
+    {"displays", "track-invert", "0,0,0,0"},
+    {"displays", "track-value-bar-type", "1"},
+    {"displays", "track-value-bar-value", "0"},
     {"functions", "5", "0"},
     {"functions", "6", "0"},
     {"functions", "7", "0"},
@@ -84,67 +89,52 @@ const std::vector<std::vector<std::string>> fp_8_settings = {
     {"filters", "nb-filters", "0"},
 };
 
-struct ShiftState
-{
+struct ShiftState {
     bool active = false;
     int start = false;
     bool invert = false;
 
-    void SetValue(bool value)
-    {
+    void SetValue(bool value) {
         int time = GetTickCount();
         active = value;
 
-        if (start == 0)
-        {
+        if (start == 0) {
             start = time;
-        }
-        else
-        {
-            if (time - start < TOGGLE_SPEED)
-            {
+        } else {
+            if (time - start < TOGGLE_SPEED) {
                 ToggleInvert();
             }
             start = 0;
         }
     }
 
-    void ToggleInvert()
-    {
+    void ToggleInvert() {
         invert = !invert;
     }
 
-    bool IsActive()
-    {
+    bool IsActive() {
         return invert ? !active : active;
     }
 
-    bool IsLocked()
-    {
+    bool IsLocked() {
         return invert;
     }
 };
 
-struct DoubleClickState
-{
+struct DoubleClickState {
     bool active = false;
     int start = 0;
     int clicks = 0;
 
-    void SetValue(bool value)
-    {
+    void SetValue(bool value) {
         int time = GetTickCount();
 
-        if (value && start > 0 && clicks == 1)
-        {
-            if (time - start < DOUBLE_CLICK_SPEED)
-            {
+        if (value && start > 0 && clicks == 1) {
+            if (time - start < DOUBLE_CLICK_SPEED) {
                 active = true;
                 start = 0;
                 clicks = 0;
-            }
-            else
-            {
+            } else {
                 active = false;
                 start = time;
                 clicks = 1;
@@ -152,15 +142,13 @@ struct DoubleClickState
             return;
         }
 
-        if (!value && start > 0 && clicks == 1 && active)
-        {
+        if (!value && start > 0 && clicks == 1 && active) {
             active = false;
             start = 0;
             return;
         }
 
-        if (start == 0 && value && clicks == 0)
-        {
+        if (start == 0 && value && clicks == 0) {
             clicks += 1;
             start = time;
             active = false;
@@ -168,8 +156,7 @@ struct DoubleClickState
         }
     }
 
-    bool IsActive()
-    {
+    bool IsActive() {
         return active;
     }
 };
@@ -299,20 +286,25 @@ std::string GetSendModeString(int sendMode);
 std::string GetAutomationString(int automationMode);
 
 std::string GetReaSonusFolderPath();
+
 std::string GetReaSonusIniPath(std::string device);
 
 std::string GetReaSonusZonesPath();
 
-std::string GetReaSonusPluginPath(std::string developer, std::string plugin_name, std::string plugin_type, bool create = false);
+std::string GetReaSonusPluginPath(std::string developer, std::string plugin_name, std::string plugin_type,
+                                  bool create = false);
 
 std::string GetReaSonusLocalesFolderPath();
+
 std::string GetReaSonusLocalesPath(std::string language);
 
 std::string GetReaSonusLocalesRootFile();
 
 bool isInteger(std::string value);
 
-std::vector<std::string> split(std::string str, std::string delimiter);
+// int *splitIntArray(std::string value, std::string delimiter);
+
+std::vector<std::string> split(std::string str, const std::string &delimiter);
 
 std::vector<std::string> cutString(std::string str, size_t size);
 
@@ -357,12 +349,15 @@ std::string GenerateUniqueKey(std::string prefix);
 bool IsWantedParam(std::string param_name);
 
 int minmax(int min, int value, int max);
+
 double minmax(double min, double value, double max);
 
 int min(int value_1, int value_2);
+
 double min(double value_1, double value_2);
 
 int max(int value_1, int value_2);
+
 double max(double value_1, double value_2);
 
 /**
@@ -389,7 +384,8 @@ HWND findWindowChildByID(HWND parentHWND, int ID);
  * @return true
  * @return false
  */
-bool getWindowScrollInfo(void *windowHWND, const char *scrollbar, int *positionOut, int *pageSizeOut, int *minOut, int *maxOut, int *trackPosOut);
+bool getWindowScrollInfo(void *windowHWND, const char *scrollbar, int *positionOut, int *pageSizeOut, int *minOut,
+                         int *maxOut, int *trackPosOut);
 
 /**
  * @brief Set the window scroll position

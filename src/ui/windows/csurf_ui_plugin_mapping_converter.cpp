@@ -200,7 +200,7 @@ void ReaSonusPluginMappingConverter::Frame() {
 
         if (ImGui::BeginChild(m_ctx, "actions_container", 0.0, -148.0, ImGui::ChildFlags_None)) {
             if (ImGui::BeginChild(m_ctx, "actions_info", 300.0, 0.0, ImGui::ChildFlags_None)) {
-                UiStyledElements::PushReaSonusGroupStyle(m_ctx);
+                UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
                 if (ImGui::BeginChild(m_ctx, "actions_convert_info", 0.0, 0.0, ImGui::ChildFlags_FrameStyle)) {
                     ReaSonusPageTitle(m_ctx, assets, "Convert", false);
                     ImGui::PushTextWrapPos(m_ctx, 260);
@@ -226,7 +226,7 @@ void ReaSonusPluginMappingConverter::Frame() {
             ImGui::SameLine(m_ctx);
 
             if (ImGui::BeginChild(m_ctx, "report", 0.0, 0.0, ImGui::ChildFlags_None)) {
-                UiStyledElements::PushReaSonusGroupStyle(m_ctx);
+                UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
                 if (ImGui::BeginChild(m_ctx, "main_content_area", 0.0, 0.0, ImGui::ChildFlags_FrameStyle)) {
                     ReaSonusPageTitle(m_ctx, assets, "Converted files", false);
 
@@ -265,7 +265,7 @@ void ReaSonusPluginMappingConverter::Frame() {
             ImGui::EndChild(m_ctx); // actions_container
         }
 
-        UiStyledElements::PushReaSonusGroupStyle(m_ctx);
+        UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
         if (ImGui::BeginChild(m_ctx, "path_info", 0.0, 80.0, ImGui::ChildFlags_FrameStyle)) {
             ReaSonusTextInput(m_ctx, "Path to the zon mapping files", &path_name, "", 0.0, false);
 

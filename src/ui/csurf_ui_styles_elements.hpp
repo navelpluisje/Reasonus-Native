@@ -4,8 +4,7 @@
 #include <reaper_imgui_functions.h>
 #include "csurf_ui_assets.hpp"
 
-class UiStyledElements
-{
+class UiStyledElements {
 public:
     static void PushReaSonusWindowStyle(ImGui_Context *m_ctx);
 
@@ -23,7 +22,7 @@ public:
 
     static void PopReaSonusSettingsContentStyle(ImGui_Context *m_ctx);
 
-    static void PushReaSonusGroupStyle(ImGui_Context *m_ctx);
+    static void PushReaSonusGroupStyle(ImGui_Context *m_ctx, bool in_group);
 
     static void PopReaSonusGroupStyle(ImGui_Context *m_ctx);
 

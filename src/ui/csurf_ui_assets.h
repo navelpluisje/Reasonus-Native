@@ -53,4 +53,24 @@ constexpr unsigned char reasonus_display_mode_8_file[] = {
 #include "../../lib/assets/display-mode-8.ipp"
 };
 
+constexpr unsigned char reasonus_valuebar_normal_file[] = {
+#include "../../lib/assets/value-bar-normal.ipp"
+};
+
+constexpr unsigned char reasonus_valuebar_bipolar_file[] = {
+#include "../../lib/assets/value-bar-bipolar.ipp"
+};
+
+constexpr unsigned char reasonus_valuebar_fill_file[] = {
+#include "../../lib/assets/value-bar-fill.ipp"
+};
+
+constexpr unsigned char reasonus_valuebar_spread_file[] = {
+#include "../../lib/assets/value-bar-spread.ipp"
+};
+
+constexpr unsigned char reasonus_valuebar_off_file[] = {
+#include "../../lib/assets/value-bar-off.ipp"
+};
+
 #endif

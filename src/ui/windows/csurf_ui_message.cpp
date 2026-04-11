@@ -92,7 +92,7 @@ void ReaSonusMessage::Frame() {
             ImGui::EndChild(m_ctx); // logo
         }
 
-        UiStyledElements::PushReaSonusGroupStyle(m_ctx);
+        UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
         if (ImGui::BeginChild(m_ctx, "actions_container", 0.0, 0.0,
                               ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY)) {
             ReaSonusPageTitle(m_ctx, assets, "ReaSonus Native New Version: " + std::string(GIT_VERSION), false);
