@@ -1,5 +1,4 @@
 #include "../csurf_ui_page_content.hpp"
-#include "../../controls/csurf_display_resources.hpp"
 #include "../components/csurf_ui_checkbox.hpp"
 #include "../components/csurf_ui_int_input.hpp"
 #include "../components/csurf_ui_combo_input.hpp"
@@ -39,8 +38,8 @@ class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-in
     std::array<int, 4> setting_track_value_line_value;
     std::array<int, 4> setting_track_value_line_align;
     std::array<int, 4> setting_track_value_line_invert;
-    int setting_track_value_bar_type;
-    int setting_track_value_bar_value;
+    int setting_track_valuebar_mode;
+    int setting_track_valuebar_value;
     int *index;
 
     std::vector<std::string> language_names;
@@ -103,7 +102,7 @@ class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-in
         i18n->t("settings", "display-track.option.display-invert-yes"),
     };
 
-    std::vector<std::string> track_value_bar_types = {
+    std::vector<std::string> track_valuebar_modees = {
         i18n->t("settings", "display-track.option.value-bar-normal"),
         i18n->t("settings", "display-track.option.value-bar-bipolar"),
         i18n->t("settings", "display-track.option.value-bar-fill"),
@@ -111,7 +110,7 @@ class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-in
         i18n->t("settings", "display-track.option.value-bar-off"),
     };
 
-    std::vector<std::string> track_value_bar_values = {
+    std::vector<std::string> track_valuebar_values = {
         i18n->t("settings", "display-track.option.display-value-volume"),
         i18n->t("settings", "display-track.option.display-value-pan-1"),
         i18n->t("settings", "display-track.option.display-value-pan-2"),
@@ -291,10 +290,12 @@ public:
         UiStyledElements::PopReaSonusTabStyle(m_ctx);
     }
 
-    void RenderDisplayLineTab(const int index) {
-        UiStyledElements::PushReaSonusTabStyle(m_ctx, selected_display_line == index);
-        if (ImGui::BeginTabItem(m_ctx, std::to_string(index + 1).c_str())) {
-            selected_display_line = index;
+    void RenderDisplayLineTab(const int tab_index) {
+        UiStyledElements::PushReaSonusTabStyle(m_ctx, selected_display_line == tab_index);
+        const std::string tab_id = std::to_string(tab_index + 1);
+
+        if (ImGui::BeginTabItem(m_ctx, tab_id.c_str())) {
+            selected_display_line = tab_index;
             ImGui::Image(m_ctx, assets->GetDisplayMode(setting_track_display), 76, 100);
 
             ImGui::SameLine(m_ctx);
@@ -312,7 +313,7 @@ public:
                     m_ctx,
                     i18n->t("settings", "display-track.value.label"),
                     track_display_values,
-                    &setting_track_value_line_value[index],
+                    &setting_track_value_line_value[tab_index],
                     70.0
                 );
 
@@ -320,7 +321,7 @@ public:
                     m_ctx,
                     i18n->t("settings", "display-track.alignment.label"),
                     track_display_alignments,
-                    &setting_track_value_line_align[index],
+                    &setting_track_value_line_align[tab_index],
                     70.0
                 );
 
@@ -328,17 +329,19 @@ public:
                     m_ctx,
                     i18n->t("settings", "display-track.invert.label"),
                     track_display_invert,
-                    &setting_track_value_line_invert[index],
+                    &setting_track_value_line_invert[tab_index],
                     70.0
                 );
 
+                UiStyledElements::PopReaSonusGroupStyle(m_ctx);
                 ImGui::EndChild(m_ctx);
             }
 
-            UiStyledElements::PopReaSonusGroupStyle(m_ctx);
+            UiStyledElements::PopReaSonusTabStyle(m_ctx);
             ImGui::EndTabItem(m_ctx);
+        } else {
+            UiStyledElements::PopReaSonusTabStyle(m_ctx);
         }
-        UiStyledElements::PopReaSonusTabStyle(m_ctx);
     }
 
     void RenderDisplayTab() {
@@ -390,12 +393,12 @@ public:
                                 RenderDisplayLineTab(i);
                             }
 
+                            UiStyledElements::PopReaSonusTabBarStyle(m_ctx);
                             ImGui::EndTabBar(m_ctx);
                         }
-                        UiStyledElements::PopReaSonusTabBarStyle(m_ctx);
                         ImGui::EndChild(m_ctx);
                     }
-                    ImGui::Image(m_ctx, assets->GetValueBarType(setting_track_value_bar_type), 76, 76);
+                    ImGui::Image(m_ctx, assets->GetValueBarType(setting_track_valuebar_mode), 76, 23);
 
                     ImGui::SameLine(m_ctx);
 
@@ -405,38 +408,33 @@ public:
                         "settings-value-bar",
                         0.0,
                         0.0,
-                        ImGui::ChildFlags_None | ImGui::ChildFlags_AutoResizeY
+                        ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
                     )) {
-                        if (ImGui::BeginChild(
+                        ReaSonusComboInputRow(
                             m_ctx,
-                            "settings-display-value-bar",
-                            0.0,
-                            0.0,
-                            ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY | ImGui::ChildFlags_ResizeY
-                        )) {
-                            ReaSonusComboInputRow(
-                                m_ctx,
-                                i18n->t("settings", "display-track.value-bar-type.label"),
-                                track_value_bar_types,
-                                &setting_track_value_bar_type,
-                                70.0
-                            );
-                            ReaSonusComboInputRow(
-                                m_ctx,
-                                i18n->t("settings", "display-track.value-bar-value.label"),
-                                track_value_bar_values,
-                                &setting_track_value_bar_value,
-                                70.0
-                            );
-                            ImGui::EndChild(m_ctx);
-                        }
+                            i18n->t("settings", "display-track.value-bar-type.label"),
+                            track_valuebar_modees,
+                            &setting_track_valuebar_mode,
+                            70.0
+                        );
+                        ReaSonusComboInputRow(
+                            m_ctx,
+                            i18n->t("settings", "display-track.value-bar-value.label"),
+                            track_valuebar_values,
+                            &setting_track_valuebar_value,
+                            70.0
+                        );
 
                         UiStyledElements::PopReaSonusGroupStyle(m_ctx);
                         ImGui::EndChild(m_ctx);
+                    } else {
+                        UiStyledElements::PopReaSonusGroupStyle(m_ctx);
                     }
 
                     UiStyledElements::PopReaSonusGroupStyle(m_ctx);
                     ImGui::EndChild(m_ctx);
+                } else {
+                    UiStyledElements::PopReaSonusGroupStyle(m_ctx);
                 }
 
                 ImGui::EndChild(m_ctx);
@@ -492,7 +490,7 @@ public:
     void Render() override {
         if (edit_language != previous_edit_language) {
             previous_edit_language = edit_language;
-            Main_OnCommandStringEx("_REASONUS_TRANSLATIONN_EDITOR");
+            Main_OnCommandStringEx("_REASONUS_TRANSLATIONN_EDITOR", 0, nullptr);
         }
 
         UiStyledElements::PushReaSonusSettingsContentStyle(m_ctx);
@@ -511,11 +509,11 @@ public:
                 RenderPluginsTab();
                 RenderDisplayTab();
 
+                UiStyledElements::PopReaSonusTabBarStyle(m_ctx);
                 ImGui::EndTabBar(m_ctx);
             }
 
             UiStyledElements::PopReaSonusSettingsContentStyle(m_ctx);
-            UiStyledElements::PopReaSonusTabBarStyle(m_ctx);
             ImGui::EndChild(m_ctx);
         }
     }
@@ -543,8 +541,8 @@ public:
         settings->SetSetting("displays", "track-lines", joinDisplayValues(setting_track_value_line_value, ","));
         settings->SetSetting("displays", "track-alignment", joinDisplayValues(setting_track_value_line_align, ","));
         settings->SetSetting("displays", "track-invert", joinDisplayValues(setting_track_value_line_invert, ","));
-        settings->SetSetting("displays", "track-value-bar-type", setting_track_value_bar_type);
-        settings->SetSetting("displays", "track-value-bar-value", setting_track_value_bar_value);
+        settings->SetSetting("displays", "track-value-bar-mode", setting_track_valuebar_mode);
+        settings->SetSetting("displays", "track-value-bar-value", setting_track_valuebar_value);
 
         if (settings->StoreSettings()) {
             DAW::SetExtState(EXT_STATE_KEY_SAVED_SETTINGS, EXT_STATE_VALUE_TRUE, false);
@@ -582,8 +580,8 @@ public:
         setting_track_value_line_value = settings->GetTrackDisplayLineValues();
         setting_track_value_line_align = settings->GetTrackDisplayAlignValues();
         setting_track_value_line_invert = settings->GetTrackDisplayInvertValues();
-        setting_track_value_bar_type = settings->GetTrackValueBarType();
-        setting_track_value_bar_value = settings->GetTrackValueBarValue();
+        setting_track_valuebar_mode = settings->GetTrackValueBarMode();
+        setting_track_valuebar_value = settings->GetTrackValueBarValue();
 
         index = std::find(
             latch_preview_action_indexes.begin(),

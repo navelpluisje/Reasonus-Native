@@ -6,11 +6,72 @@
 ReaSonusSettings::ReaSonusSettings(std::string _device) {
     device = std::move(_device);
     const mINI::INIFile file(GetReaSonusIniPath(device));
-    readAndCreateIni(settings, device);
+    ReadAndCreateIni(settings);
 }
 
 void ReaSonusSettings::UpdateSettings() {
-    readAndCreateIni(settings, device);
+    ReadAndCreateIni(settings);
+}
+
+void ReaSonusSettings::ReadAndCreateIni(mINI::INIStructure &data) const {
+    const mINI::INIFile file(GetReaSonusIniPath(device));
+
+    if (!file.read(data)) {
+        RecursiveCreateDirectory(createPathName({std::string(GetResourcePath()), "ReaSonus", "Plugins"}).c_str(), 0);
+        for (auto setting: shared_settings) {
+            data[setting.at(0)][setting.at(1)] = setting.at(2);
+        }
+
+        if (device == FP_V2) {
+            for (auto setting: fp_v2_settings) {
+                data[setting.at(0)][setting.at(1)] = setting.at(2);
+            }
+        }
+        if (device == FP_8) {
+            for (auto setting: fp_8_settings) {
+                data[setting.at(0)][setting.at(1)] = setting.at(2);
+            }
+        }
+        if (!file.generate(data, true)) {
+            MB("Error while creating the ini file. Please contact via the forum", "ReaSonus Error", 0);
+        }
+    } else {
+        ValidateReaSonusIni(file, data);
+    }
+    file.read(data);
+}
+
+void ReaSonusSettings::ValidateReaSonusIni(const mINI::INIFile &file, mINI::INIStructure &data) const {
+    bool has_missing_settings = false;
+
+    for (auto setting: shared_settings) {
+        if (!data[setting.at(0)].has(setting.at(1))) {
+            data[setting.at(0)][setting.at(1)] = setting.at(2);
+            has_missing_settings = true;
+        }
+    }
+
+    if (device == FP_V2) {
+        for (auto setting: fp_v2_settings) {
+            if (!data[setting.at(0)].has(setting.at(1))) {
+                data[setting.at(0)][setting.at(1)] = setting.at(2);
+                has_missing_settings = true;
+            }
+        }
+    }
+
+    if (device == FP_8) {
+        for (auto setting: fp_8_settings) {
+            if (!data[setting.at(0)].has(setting.at(1))) {
+                data[setting.at(0)][setting.at(1)] = setting.at(2);
+                has_missing_settings = true;
+            }
+        }
+    }
+
+    if (has_missing_settings) {
+        file.write(data, true);
+    }
 }
 
 void ReaSonusSettings::SetSetting(const std::string &group, const std::string &key, const std::string &value) {
@@ -143,8 +204,8 @@ std::array<int, 4> ReaSonusSettings::GetTrackDisplayInvertValues() {
     return ConvertDisplayValues(settings["displays"]["track-invert"]);
 }
 
-int ReaSonusSettings::GetTrackValueBarType() {
-    return stoi(settings["displays"]["track-value-bar-type"]);
+int ReaSonusSettings::GetTrackValueBarMode() {
+    return stoi(settings["displays"]["track-value-bar-mode"]);
 }
 
 int ReaSonusSettings::GetTrackValueBarValue() {

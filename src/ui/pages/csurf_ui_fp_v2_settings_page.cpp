@@ -53,7 +53,7 @@ public:
     void Render() override {
         if (edit_language != previous_edit_language) {
             previous_edit_language = edit_language;
-            Main_OnCommandStringEx("_REASONUS_TRANSLATIONN_EDITOR");
+            Main_OnCommandStringEx("_REASONUS_TRANSLATIONN_EDITOR", 0, nullptr);
         }
 
         const int language_button_width = getButtonWidth(

@@ -97,6 +97,13 @@ enum Alignment {
     ALIGN_RIGHT,
 };
 
+enum DisplayLines {
+    DISPLAY_LINE_1,
+    DISPLAY_LINE_2,
+    DISPLAY_LINE_3,
+    DISPLAY_LINE_4,
+};
+
 enum Inverted {
     NON_INVERT = 0,
     INVERT = 4

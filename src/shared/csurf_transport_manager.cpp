@@ -6,8 +6,7 @@
 #include "csurf_faderport_ui_imgui_utils.hpp"
 #include "../ui/pages/csurf_ui_fp_v2_control_panel.hpp"
 
-void CSurf_TransportManager::SetButtonValues(bool force)
-{
+void CSurf_TransportManager::SetButtonValues(bool force) {
     playButton->SetValue(ButtonBlinkOnOff(isPaused, isPlaying), force);
     stopButton->SetValue(isStopped ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
     recordButton->SetValue(isRecording ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
@@ -16,49 +15,40 @@ void CSurf_TransportManager::SetButtonValues(bool force)
     forwardButton->SetValue(ButtonBlinkOnOff(isForwarding && isFastFwdRwd, isForwarding), force);
 };
 
-void CSurf_TransportManager::StopRewindOrForward()
-{
+void CSurf_TransportManager::StopRewindOrForward() {
     isFastFwdRwd = false;
     isForwarding = false;
     isRewinding = false;
 }
 
-void CSurf_TransportManager::HandleRewind()
-{
+void CSurf_TransportManager::HandleRewind() {
     CSurf_OnRew(0);
 
-    if (isFastFwdRwd)
-    {
+    if (isFastFwdRwd) {
         CSurf_OnRew(0);
         CSurf_OnRew(0);
         CSurf_OnRew(0);
     }
 }
 
-void CSurf_TransportManager::HandleForward()
-{
+void CSurf_TransportManager::HandleForward() {
     CSurf_OnFwd(0);
 
-    if (isFastFwdRwd)
-    {
+    if (isFastFwdRwd) {
         CSurf_OnFwd(0);
         CSurf_OnFwd(0);
         CSurf_OnFwd(0);
     }
 }
 
-void CSurf_TransportManager::SetPause()
-{
-    if (isPlaying)
-    {
+void CSurf_TransportManager::SetPause() {
+    if (isPlaying) {
         CSurf_OnPlay();
     }
 }
 
-void CSurf_TransportManager::SetRewindingState()
-{
-    if (isRewinding)
-    {
+void CSurf_TransportManager::SetRewindingState() {
+    if (isRewinding) {
         isFastFwdRwd = !isFastFwdRwd;
         return;
     }
@@ -67,10 +57,8 @@ void CSurf_TransportManager::SetRewindingState()
     isRewinding = true;
 };
 
-void CSurf_TransportManager::SetForwardingState()
-{
-    if (isForwarding)
-    {
+void CSurf_TransportManager::SetForwardingState() {
+    if (isForwarding) {
         isFastFwdRwd = !isFastFwdRwd;
         return;
     }
@@ -79,27 +67,20 @@ void CSurf_TransportManager::SetForwardingState()
     isForwarding = true;
 };
 
-void CSurf_TransportManager::handleFootSwitchKey(std::string key)
-{
+void CSurf_TransportManager::handleFootSwitchKey(std::string key) {
     std::string device = context->GetNbChannels() > 1 ? FP_8 : FP_V2;
     std::string actionId = settings->GetFunction(key, true);
 
-    if (actionId == "0")
-    {
-        int result = MB("There is no action assigned to this function.\nDo you want to assign an action?", "No action assigned", 1);
-        if (result == 1)
-        {
-            if (device == FP_8)
-            {
-                if (!ReaSonus8ControlPanel::control_panel_open)
-                {
+    if (actionId == "0") {
+        int result = MB("There is no action assigned to this function.\nDo you want to assign an action?",
+                        "No action assigned", 1);
+        if (result == 1) {
+            if (device == FP_8) {
+                if (!ReaSonus8ControlPanel::control_panel_open) {
                     ToggleFP8ControlPanel(ReaSonus8ControlPanel::FUNCTIONS_PAGE);
                 }
-            }
-            else if (device == FP_V2)
-            {
-                if (!ReaSonusV2ControlPanel::control_panel_open)
-                {
+            } else if (device == FP_V2) {
+                if (!ReaSonusV2ControlPanel::control_panel_open) {
                     ToggleFPV2ControlPanel(ReaSonusV2ControlPanel::FUNCTIONS_PAGE);
                 }
             }
@@ -107,18 +88,14 @@ void CSurf_TransportManager::handleFootSwitchKey(std::string key)
         return;
     }
 
-    if (isInteger(actionId))
-    {
-        Main_OnCommandAsyncEx(stoi(actionId), 0, 0);
-    }
-    else
-    {
-        Main_OnCommandStringEx(actionId);
+    if (isInteger(actionId)) {
+        Main_OnCommandAsyncEx(stoi(actionId), 0, nullptr);
+    } else {
+        Main_OnCommandStringEx(actionId, 0, nullptr);
     }
 }
 
-CSurf_TransportManager::CSurf_TransportManager(CSurf_Context *context, midi_Output *m_midiout) : context(context)
-{
+CSurf_TransportManager::CSurf_TransportManager(CSurf_Context *context, midi_Output *m_midiout) : context(context) {
     playButton = new CSurf_Button(BTN_PLAY, BTN_VALUE_OFF, m_midiout);
     stopButton = new CSurf_Button(BTN_STOP, BTN_VALUE_OFF, m_midiout);
     recordButton = new CSurf_Button(BTN_RECORD, BTN_VALUE_OFF, m_midiout);
@@ -131,8 +108,7 @@ CSurf_TransportManager::CSurf_TransportManager(CSurf_Context *context, midi_Outp
     Update();
 };
 
-void CSurf_TransportManager::Update(bool force_update)
-{
+void CSurf_TransportManager::Update(bool force_update) {
     int playState = GetPlayStateEx(0);
     isPlaying = hasBit(playState, 0);
     isPaused = hasBit(playState, 1);
@@ -140,28 +116,23 @@ void CSurf_TransportManager::Update(bool force_update)
     isStopped = !isPlaying && !isPaused;
     isRepeat = GetSetRepeatEx(0, -1) > 0;
 
-    if (isRewinding)
-    {
+    if (isRewinding) {
         HandleRewind();
     }
 
-    if (isForwarding)
-    {
+    if (isForwarding) {
         HandleForward();
     }
 
     SetButtonValues(force_update);
 }
 
-void CSurf_TransportManager::Refresh(bool force)
-{
+void CSurf_TransportManager::Refresh(bool force) {
     SetButtonValues(force);
 }
 
-void CSurf_TransportManager::HandlePlayButton(int value)
-{
-    if (value == 0)
-    {
+void CSurf_TransportManager::HandlePlayButton(int value) {
+    if (value == 0) {
         return;
     }
 
@@ -169,10 +140,8 @@ void CSurf_TransportManager::HandlePlayButton(int value)
     CSurf_OnPlay();
 };
 
-void CSurf_TransportManager::HandleStopButton(int value)
-{
-    if (value == 0)
-    {
+void CSurf_TransportManager::HandleStopButton(int value) {
+    if (value == 0) {
         return;
     }
 
@@ -180,43 +149,33 @@ void CSurf_TransportManager::HandleStopButton(int value)
     CSurf_OnStop();
 };
 
-void CSurf_TransportManager::HandleRepeatButton(int value)
-{
-    if (value == 0)
-    {
+void CSurf_TransportManager::HandleRepeatButton(int value) {
+    if (value == 0) {
         return;
     }
 
-    if (context->GetShiftLeft())
-    {
+    if (context->GetShiftLeft()) {
         GetSetRepeatEx(0, 0);
-    }
-    else
-    {
+    } else {
         // SendMessage(g_hwnd, WM_COMMAND, IDC_REPEAT, 0);
         GetSetRepeatEx(0, 2);
     }
 };
 
-void CSurf_TransportManager::HandleRecordButton(int value)
-{
-    if (value == 0)
-    {
+void CSurf_TransportManager::HandleRecordButton(int value) {
+    if (value == 0) {
         return;
     }
 
     CSurf_OnRecord();
 };
 
-void CSurf_TransportManager::HandleRewindButton(int value)
-{
-    if (value == 0)
-    {
+void CSurf_TransportManager::HandleRewindButton(int value) {
+    if (value == 0) {
         return;
     }
 
-    if (context->GetShiftLeft())
-    {
+    if (context->GetShiftLeft()) {
         CSurf_GoStart();
         return;
     }
@@ -224,15 +183,12 @@ void CSurf_TransportManager::HandleRewindButton(int value)
     SetRewindingState();
 };
 
-void CSurf_TransportManager::HandleForwardButton(int value)
-{
-    if (value == 0)
-    {
+void CSurf_TransportManager::HandleForwardButton(int value) {
+    if (value == 0) {
         return;
     }
 
-    if (context->GetShiftLeft())
-    {
+    if (context->GetShiftLeft()) {
         CSurf_GoEnd();
         return;
     }
@@ -241,23 +197,16 @@ void CSurf_TransportManager::HandleForwardButton(int value)
     SetForwardingState();
 };
 
-void CSurf_TransportManager::HandleFootSwitchClick(int value)
-{
-    if (value == 0)
-    {
+void CSurf_TransportManager::HandleFootSwitchClick(int value) {
+    if (value == 0) {
         return;
     }
 
-    if (context->GetShiftChannelRight())
-    {
+    if (context->GetShiftChannelRight()) {
         handleFootSwitchKey("3");
-    }
-    else if (context->GetShiftChannelLeft())
-    {
+    } else if (context->GetShiftChannelLeft()) {
         handleFootSwitchKey("2");
-    }
-    else
-    {
+    } else {
         handleFootSwitchKey("1");
     }
 };

@@ -15,6 +15,61 @@ class ReaSonusSettings {
     static ReaSonusSettings *instance8Ptr;
     static ReaSonusSettings *instanceV2Ptr;
 
+    const std::vector<std::vector<std::string> > shared_settings = {
+        {"surface", "midiin", "0"},
+        {"surface", "midiout", "0"},
+        {"surface", "mute-solo-momentary", "0"},
+        {"surface", "latch-preview-action", "0"},
+        {"surface", "latch-preview-action-code", "42013"},
+        {"functions", "1", "0"},
+        {"functions", "2", "0"},
+        {"functions", "3", "0"},
+        {"functions", "4", "0"},
+        {"footswitch", "1", "0"},
+        {"footswitch", "2", "0"},
+        {"footswitch", "3", "0"},
+    };
+
+    const std::vector<std::vector<std::string> > fp_v2_settings = {
+        {"surface", "control-hidden-tracks", "0"},
+        {"surface", "can-disable-fader", "0"},
+        {"surface", "endless-track-scroll", "0"},
+    };
+
+    const std::vector<std::vector<std::string> > fp_8_settings = {
+        {"surface", "surface", "0"},
+        {"surface", "disable-plugins", "0"},
+        {"surface", "distraction-free", "0"},
+        {"surface", "erase-last-param-after-learn", "0"},
+        {"surface", "master-fader-mode", "0"},
+        {"surface", "swap-shift-buttons", "0"},
+        {"surface", "fader-reset", "0"},
+        {"surface", "overwrite-time-code", "1"},
+        {"surface", "time-code", "2"},
+        {"surface", "track-color-brightness", "25"},
+        {"surface", "plugin-step-size", "1"},
+        {"surface", "plugin-map-param-clear", "0"},
+        {"displays", "track", "8"},
+        {"displays", "track-lines", "0,4,1,2"},
+        {"displays", "track-alignment", "1,0,0,0"},
+        {"displays", "track-invert", "0,0,0,0"},
+        {"displays", "track-value-bar-mode", "1"},
+        {"displays", "track-value-bar-value", "0"},
+        {"functions", "5", "0"},
+        {"functions", "6", "0"},
+        {"functions", "7", "0"},
+        {"functions", "8", "0"},
+        {"functions", "9", "0"},
+        {"functions", "10", "0"},
+        {"functions", "11", "0"},
+        {"functions", "12", "0"},
+        {"functions", "13", "0"},
+        {"functions", "14", "0"},
+        {"functions", "15", "0"},
+        {"functions", "16", "0"},
+        {"filters", "nb-filters", "0"},
+    };
+
 public:
     ReaSonusSettings(const ReaSonusSettings &obj) = delete;
 
@@ -37,6 +92,10 @@ public:
      *
      */
     void UpdateSettings();
+
+    void ReadAndCreateIni(mINI::INIStructure &data) const;
+
+    void ValidateReaSonusIni(const mINI::INIFile &file, mINI::INIStructure &data) const;
 
     /**
      * @brief Set a Setting without saving to file
@@ -143,7 +202,7 @@ public:
 
     std::array<int, 4> GetTrackDisplayInvertValues();
 
-    int GetTrackValueBarType();
+    int GetTrackValueBarMode();
 
     int GetTrackValueBarValue();
 

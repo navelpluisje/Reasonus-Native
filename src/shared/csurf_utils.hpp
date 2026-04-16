@@ -29,73 +29,13 @@ constexpr int AUTOMATION_LATCH = 4;
 constexpr int AUTOMATION_PREVIEW = 5;
 constexpr int AUTOMATION_WRITE = 3;
 
-const std::array<int, 6> time_code_indexes = {0, 2, 3, 4, 5, 8};
-const std::array<std::string, 6> time_code_names = {
-    "Time", "Beats", "Seconds", "Samples", "Hr:Min:Sec:Fr", "Abs. Frames"
-};
-
-const std::vector<std::vector<std::string> > shared_settings = {
-    {"surface", "midiin", "0"},
-    {"surface", "midiout", "0"},
-    {"surface", "mute-solo-momentary", "0"},
-    {"surface", "latch-preview-action", "0"},
-    {"surface", "latch-preview-action-code", "42013"},
-    {"functions", "1", "0"},
-    {"functions", "2", "0"},
-    {"functions", "3", "0"},
-    {"functions", "4", "0"},
-    {"footswitch", "1", "0"},
-    {"footswitch", "2", "0"},
-    {"footswitch", "3", "0"},
-};
-
-const std::vector<std::vector<std::string> > fp_v2_settings = {
-    {"surface", "control-hidden-tracks", "0"},
-    {"surface", "can-disable-fader", "0"},
-    {"surface", "endless-track-scroll", "0"},
-};
-
-const std::vector<std::vector<std::string> > fp_8_settings = {
-    {"surface", "surface", "0"},
-    {"surface", "disable-plugins", "0"},
-    {"surface", "distraction-free", "0"},
-    {"surface", "erase-last-param-after-learn", "0"},
-    {"surface", "master-fader-mode", "0"},
-    {"surface", "swap-shift-buttons", "0"},
-    {"surface", "fader-reset", "0"},
-    {"surface", "overwrite-time-code", "1"},
-    {"surface", "time-code", "2"},
-    {"surface", "track-color-brightness", "25"},
-    {"surface", "plugin-step-size", "1"},
-    {"surface", "plugin-map-param-clear", "0"},
-    {"displays", "track", "8"},
-    {"displays", "track-lines", "0,4,1,2"},
-    {"displays", "track-alignment", "1,0,0,0"},
-    {"displays", "track-invert", "0,0,0,0"},
-    {"displays", "track-value-bar-type", "1"},
-    {"displays", "track-value-bar-value", "0"},
-    {"functions", "5", "0"},
-    {"functions", "6", "0"},
-    {"functions", "7", "0"},
-    {"functions", "8", "0"},
-    {"functions", "9", "0"},
-    {"functions", "10", "0"},
-    {"functions", "11", "0"},
-    {"functions", "12", "0"},
-    {"functions", "13", "0"},
-    {"functions", "14", "0"},
-    {"functions", "15", "0"},
-    {"functions", "16", "0"},
-    {"filters", "nb-filters", "0"},
-};
-
 struct ShiftState {
-    bool active = false;
-    int start = false;
-    bool invert = false;
+    bool active = false; // NOLINT(*-non-private-member-variables-in-classes)
+    int start = 0; // NOLINT(*-non-private-member-variables-in-classes)
+    bool invert = false; // NOLINT(*-non-private-member-variables-in-classes)
 
-    void SetValue(bool value) {
-        int time = GetTickCount();
+    void SetValue(const bool value) {
+        const int time = GetTickCount();
         active = value;
 
         if (start == 0) {
@@ -112,22 +52,22 @@ struct ShiftState {
         invert = !invert;
     }
 
-    bool IsActive() {
+    [[nodiscard]] bool IsActive() const {
         return invert ? !active : active;
     }
 
-    bool IsLocked() {
+    [[nodiscard]] bool IsLocked() const {
         return invert;
     }
 };
 
 struct DoubleClickState {
-    bool active = false;
-    int start = 0;
-    int clicks = 0;
+    bool active = false; // NOLINT(*-non-private-member-variables-in-classes)
+    int start = 0; // NOLINT(*-non-private-member-variables-in-classes)
+    int clicks = 0; // NOLINT(*-non-private-member-variables-in-classes)
 
-    void SetValue(bool value) {
-        int time = GetTickCount();
+    void SetValue(const bool value) {
+        const int time = GetTickCount();
 
         if (value && start > 0 && clicks == 1) {
             if (time - start < DOUBLE_CLICK_SPEED) {
@@ -152,28 +92,27 @@ struct DoubleClickState {
             clicks += 1;
             start = time;
             active = false;
-            return;
         }
     }
 
-    bool IsActive() {
+    [[nodiscard]] bool IsActive() const {
         return active;
     }
 };
 
-void Main_OnCommandStringEx(std::string action_name, int flag = 0, ReaProject *proj = 0);
+void Main_OnCommandStringEx(const std::string &action_name, int flag, ReaProject *proj);
 
-void Main_OnCommandAsyncEx(int action_id, int flag = 0, ReaProject *proj = 0);
+void Main_OnCommandAsyncEx(int action_id, int flag, const ReaProject *proj);
 
 void SetActionState(int actionId);
 
-void SetActionState(std::string action_name);
+void SetActionState(const std::string &action_name);
 
-void SetActionState(int actionId, int state);
+void SetActionState(int actionId, int new_state);
 
-void SetActionState(std::string action_name, int state);
+void SetActionState(const std::string &action_name, int new_state);
 
-bool GetToggleCommandStringState(std::string action_name);
+bool GetToggleCommandStringState(const std::string &action_name);
 
 /**
  * @brief Check if the bit with index key is set in val
@@ -228,20 +167,20 @@ double panToNormalized(double val);
 double int14ToVol(unsigned char msb, unsigned char lsb);
 
 /**
- * @brief Strip the plugin name from its pre and post fixes
+ * @brief Strip the plugin name from its pre- and post-fixes
  *
- * @param name The full plugin name
+ * @param plugin_name The full plugin name
  * @return The stripped down name
  */
-std::string StripPluginName(std::string pluginName);
+std::string StripPluginName(std::string plugin_name);
 
 /**
- * @brief Strip the plugin developer from its pre and post fixes
+ * @brief Strip the plugin developer from its pre- and post-fixes
  *
- * @param name The full plugin name
+ * @param plugin_name The full plugin name
  * @return The stripped down name
  */
-std::string StripPluginDeveloper(std::string pluginName);
+std::string StripPluginDeveloper(std::string plugin_name);
 
 /**
  * @brief Strip the type from the plugin name
@@ -249,7 +188,7 @@ std::string StripPluginDeveloper(std::string pluginName);
  * @param name The full plugin name
  * @return std::string
  */
-std::string StripPluginNamePrefixes(char *name);
+std::string StripPluginNamePrefixes(char const *name);
 
 /**
  * @brief Strip the final out info when applicable
@@ -260,7 +199,7 @@ std::string StripPluginNamePrefixes(char *name);
 std::string StripPluginChannelPostfix(char *name);
 
 /**
- * @brief Check if the prefix of the fx tells it is actuielly an fx and not an instrument
+ * @brief Check if the prefix of the fx tells it is actually a fx and not an instrument
  *
  * @param name
  * @return bool
@@ -287,50 +226,36 @@ std::string GetAutomationString(int automationMode);
 
 std::string GetReaSonusFolderPath();
 
-std::string GetReaSonusIniPath(std::string device);
+std::string GetReaSonusIniPath(const std::string &device);
 
 std::string GetReaSonusZonesPath();
 
-std::string GetReaSonusPluginPath(std::string developer, std::string plugin_name, std::string plugin_type,
-                                  bool create = false);
+std::string GetReaSonusPluginPath(
+    std::string developer,
+    const std::string &plugin_name,
+    const std::string &plugin_type,
+    bool create
+);
 
 std::string GetReaSonusLocalesFolderPath();
 
-std::string GetReaSonusLocalesPath(std::string language);
+std::string GetReaSonusLocalesPath(const std::string &language);
 
 std::string GetReaSonusLocalesRootFile();
 
-bool isInteger(std::string value);
-
-// int *splitIntArray(std::string value, std::string delimiter);
+bool isInteger(const std::string &value);
 
 std::vector<std::string> split(std::string str, const std::string &delimiter);
 
-std::vector<std::string> cutString(std::string str, size_t size);
+std::vector<std::string> cutString(const std::string &str, size_t size);
 
-std::string join(std::vector<std::string> list, std::string delimiter);
+std::string join(const std::vector<std::string> &list, std::string delimiter);
 
 bool hasPluginConfigFile(MediaTrack *media_track, int pluginId);
 
 void logInteger(const char *key, int value);
 
 void logDouble(const char *key, double value);
-
-/**
- * @brief Check if we have the FP.ini available. If not, we create it
- *
- * @param data The data object to write the ini data to
- * @param device Wether its a Faderport 8/16 or V2
- */
-void readAndCreateIni(mINI::INIStructure &data, std::string device);
-
-/**
- * @brief Validate if the current ini still is valid. If not create a backup and update the current
- *
- * @param data The data object to write the ini data to
- * @param device Wether its a Faderport 8/16 or V2
- */
-void validateReaSonusIni(mINI::INIFile file, mINI::INIStructure &data, std::string device);
 
 /**
  * @brief Create a unique key
@@ -348,26 +273,68 @@ std::string GenerateUniqueKey(std::string prefix);
  */
 bool IsWantedParam(std::string param_name);
 
+/**
+ * Return the value when it is between min or max.
+ * Return the min value as val is smaller than min
+ * Return the max value as val is larger than max
+ * @param min The minmal value to return
+ * @param value The value to chack against
+ * @param max The maximaum value to return
+ * @return
+ */
 int minmax(int min, int value, int max);
 
+/**
+ * Return the value when it is between min or max.
+ * Return the min value as val is smaller than min
+ * Return the max value as val is larger than max
+ * @param min The minmal value to return
+ * @param value The value to chack against
+ * @param max The maximaum value to return
+ * @return
+ */
 double minmax(double min, double value, double max);
 
+/**
+ * Get the lowest value of the 2 given values
+ * @param value_1
+ * @param value_2
+ * @return
+ */
 int min(int value_1, int value_2);
 
+/**
+ * Get the lowest value of the 2 given values
+ * @param value_1
+ * @param value_2
+ * @return
+ */
 double min(double value_1, double value_2);
 
+/**
+ * Get the highest value of the 2 given values
+ * @param value_1
+ * @param value_2
+ * @return
+ */
 int max(int value_1, int value_2);
 
+/**
+ * Get the highest value of the 2 given values
+ * @param value_1
+ * @param value_2
+ * @return
+ */
 double max(double value_1, double value_2);
 
 /**
  * @brief borrowed from https://github.com/juliansader/ReaExtensions
  *
  * @param parentHWND
- * @param ID
+ * @param window_child_id
  * @return HWND
  */
-HWND findWindowChildByID(HWND parentHWND, int ID);
+HWND findWindowChildByID(HWND parentHWND, int window_child_id);
 
 /**
  * @brief Get the Window Scroll Info object
@@ -405,16 +372,38 @@ bool setWindowScrollPos(void *windowHWND, const char *scrollbar, int position);
  */
 void GetLanguages(std::vector<std::string> &language_names);
 
+/**
+ * Chack if a value is between the min and max value given
+ * @param min The lowest value for val
+ * @param val The value that has to be between min and max
+ * @param max The max value for val
+ * @return Wether the value is between min and max
+ */
 bool between(int min, int val, int max);
 
-bool createPathIfNotExist(std::string path);
+bool createPathIfNotExist(const std::string &path);
 
-std::string createPathName(std::vector<std::string> path_elements);
+std::string createPathName(const std::vector<std::string> &path_elements);
 
+/**
+ * Convert a string to all lowercase
+ * @param value Value to convert
+ * @return
+ */
 std::string toLowerCase(std::string value);
 
+/**
+ * Convert a boolean value to a double
+ * @param value Value to convert
+ * @return
+ */
 double boolToDouble(bool value);
 
+/**
+ * Convert a double value to a boolean
+ * @param value value to convert
+ * @return
+ */
 bool doubleToBool(double value);
 
 #endif // CSURF_UTILS_H_

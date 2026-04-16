@@ -72,30 +72,30 @@ CSurf_UI_Assets::CSurf_UI_Assets(ImGui_Context *m_ctx)
                                                sizeof(reasonus_display_mode_8_file));
     ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(display_mode_8));
 
-    valuebar_type_normal = ImGui::CreateImageFromMem(reinterpret_cast<const char *>(
+    valuebar_mode_normal = ImGui::CreateImageFromMem(reinterpret_cast<const char *>(
                                                          reasonus_valuebar_normal_file),
                                                      sizeof(reasonus_valuebar_normal_file));
-    ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(valuebar_type_normal));
+    ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(valuebar_mode_normal));
 
-    valuebar_type_bipolar = ImGui::CreateImageFromMem(reinterpret_cast<const char *>(
+    valuebar_mode_bipolar = ImGui::CreateImageFromMem(reinterpret_cast<const char *>(
                                                           reasonus_valuebar_bipolar_file),
                                                       sizeof(reasonus_valuebar_bipolar_file));
-    ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(valuebar_type_bipolar));
+    ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(valuebar_mode_bipolar));
 
-    valuebar_type_fill = ImGui::CreateImageFromMem(reinterpret_cast<const char *>(
+    valuebar_mode_fill = ImGui::CreateImageFromMem(reinterpret_cast<const char *>(
                                                        reasonus_valuebar_fill_file),
                                                    sizeof(reasonus_valuebar_fill_file));
-    ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(valuebar_type_fill));
+    ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(valuebar_mode_fill));
 
-    valuebar_type_spread = ImGui::CreateImageFromMem(reinterpret_cast<const char *>(
+    valuebar_mode_spread = ImGui::CreateImageFromMem(reinterpret_cast<const char *>(
                                                          reasonus_valuebar_spread_file),
                                                      sizeof(reasonus_valuebar_spread_file));
-    ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(valuebar_type_spread));
+    ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(valuebar_mode_spread));
 
-    valuebar_type_off = ImGui::CreateImageFromMem(reinterpret_cast<const char *>(
+    valuebar_mode_off = ImGui::CreateImageFromMem(reinterpret_cast<const char *>(
                                                       reasonus_valuebar_off_file),
                                                   sizeof(reasonus_valuebar_off_file));
-    ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(valuebar_type_off));
+    ImGui::Attach(m_ctx, reinterpret_cast<ImGui_Resource *>(valuebar_mode_off));
 
 
     combo_filter = ImGui::CreateTextFilter("");
@@ -156,25 +156,25 @@ ImGui_Image *CSurf_UI_Assets::GetDisplayMode(const int display_mode) const {
     }
 }
 
-ImGui_Image *CSurf_UI_Assets::GetValueBarType(const int value_bar_type) const {
-    switch (value_bar_type) {
+ImGui_Image *CSurf_UI_Assets::GetValueBarType(const int valuebar_mode) const {
+    switch (valuebar_mode) {
         case VALUEBAR_MODE_NORMAL:
-            return valuebar_type_normal;
+            return valuebar_mode_normal;
 
         case VALUEBAR_MODE_BIPOLAR:
-            return valuebar_type_bipolar;
+            return valuebar_mode_bipolar;
 
         case VALUEBAR_MODE_FILL:
-            return valuebar_type_fill;
+            return valuebar_mode_fill;
 
         case VALUEBAR_MODE_SPREAD:
-            return valuebar_type_spread;
+            return valuebar_mode_spread;
 
         case VALUEBAR_MODE_OFF:
-            return valuebar_type_off;
+            return valuebar_mode_off;
 
         default:
-            return valuebar_type_fill;
+            return valuebar_mode_fill;
     }
 }
 

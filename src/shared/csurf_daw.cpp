@@ -29,7 +29,7 @@ bool DAW::IsTrackArmed(MediaTrack *media_track) {
 
 void DAW::ToggleTrackArmed(MediaTrack *media_track) {
     CSurf_SetSurfaceRecArm(media_track,
-                             CSurf_OnRecArmChange(media_track, static_cast<int>(!IsTrackArmed(media_track))), nullptr);
+                           CSurf_OnRecArmChange(media_track, static_cast<int>(!IsTrackArmed(media_track))), nullptr);
 }
 
 bool DAW::IsTrackMuted(MediaTrack *media_track) {
@@ -41,7 +41,7 @@ bool DAW::IsTrackMuted(MediaTrack *media_track) {
 
 void DAW::ToggleTrackMuted(MediaTrack *media_track) {
     CSurf_SetSurfaceMute(media_track, CSurf_OnMuteChange(media_track, static_cast<int>(!IsTrackMuted(media_track))),
-                           nullptr);
+                         nullptr);
 }
 
 bool DAW::IsTrackSoloed(MediaTrack *media_track) {
@@ -53,7 +53,7 @@ bool DAW::IsTrackSoloed(MediaTrack *media_track) {
 
 void DAW::ToggleTrackSoloed(MediaTrack *media_track) {
     CSurf_SetSurfaceSolo(media_track, CSurf_OnSoloChange(media_track, static_cast<int>(!IsTrackSoloed(media_track))),
-                           nullptr);
+                         nullptr);
 }
 
 bool DAW::IsTrackSelected(MediaTrack *media_track) {
@@ -180,6 +180,14 @@ std::string DAW::GetTrackRecordingMode(MediaTrack *media_track) {
     }
 }
 
+bool DAW::GetTrackPhase(MediaTrack *media_track) {
+    return static_cast<bool>(GetMediaTrackInfo_Value(media_track, "B_PHASE"));
+}
+
+int DAW::GetTrackAutomationMode(MediaTrack *media_track) {
+    return static_cast<int>(GetMediaTrackInfo_Value(media_track, "I_AUTOMODE"));
+}
+
 ButtonColor DAW::GetTrackColor(MediaTrack *media_track) {
     ButtonColor color{};
     int red = 0x7f;
@@ -216,12 +224,13 @@ void DAW::SetSelectedTracksRange(MediaTrack *media_track) {
     int const index = static_cast<int>(GetMediaTrackInfo_Value(media_track, "IP_TRACKNUMBER"));
     const int selected_track_count = CountSelectedTracks(nullptr);
     const int first_index = static_cast<int>(GetMediaTrackInfo_Value(GetSelectedTrack(nullptr, 0), "IP_TRACKNUMBER"));
-    const int last_index = static_cast<int>(GetMediaTrackInfo_Value(GetSelectedTrack(nullptr, selected_track_count - 1), "IP_TRACKNUMBER"));
+    const int last_index = static_cast<int>(GetMediaTrackInfo_Value(GetSelectedTrack(nullptr, selected_track_count - 1),
+                                                                    "IP_TRACKNUMBER"));
     const int start_index = index < first_index
-                          ? index
-                          : index < last_index // NOLINT(*-avoid-nested-conditional-operator)
-                                ? last_index
-                                : first_index;
+                                ? index
+                                : index < last_index // NOLINT(*-avoid-nested-conditional-operator)
+                                      ? last_index
+                                      : first_index;
     const int end_index = index < first_index ? first_index : index;
 
     for (int i = start_index - 1; i < end_index; i++) {
@@ -408,7 +417,8 @@ bool DAW::HasTrackReceive(MediaTrack *media_track, const int receive) {
 }
 
 std::string DAW::GetTrackReceiveSrcName(MediaTrack *media_track, const int receive) {
-    auto *src_track = static_cast<MediaTrack *>(GetSetTrackSendInfo(media_track, SEND_MODE_RECEIVE, receive, "P_SRCTRACK", nullptr));
+    auto *src_track = static_cast<MediaTrack *>(GetSetTrackSendInfo(media_track, SEND_MODE_RECEIVE, receive,
+                                                                    "P_SRCTRACK", nullptr));
 
     if (src_track != nullptr) {
         return GetTrackName(src_track);
@@ -469,17 +479,17 @@ int DAW::GetNextTrackReceiveMode(MediaTrack *media_track, const int receive) {
 
 void DAW::SetNextTrackReceiveMode(MediaTrack *media_track, const int receive) {
     SetTrackSendInfo_Value(media_track, SEND_MODE_RECEIVE, receive, "I_SENDMODE",
-                             GetNextTrackReceiveMode(media_track, receive));
+                           GetNextTrackReceiveMode(media_track, receive));
 }
 
 void DAW::SetTrackReceiveVolume(MediaTrack *media_track, const int receive, const double volume) {
     SetTrackSendInfo_Value(media_track, SEND_MODE_RECEIVE, receive, "D_VOL",
-                             CSurf_OnRecvVolumeChange(media_track, receive, volume, false));
+                           CSurf_OnRecvVolumeChange(media_track, receive, volume, false));
 }
 
 void DAW::SetTrackReceivePan(MediaTrack *media_track, const int receive, const double pan) {
     SetTrackSendInfo_Value(media_track, SEND_MODE_RECEIVE, receive, "D_PAN",
-                             CSurf_OnRecvPanChange(media_track, receive, pan, false));
+                           CSurf_OnRecvPanChange(media_track, receive, pan, false));
 }
 
 bool DAW::HasTrackSend(MediaTrack *media_track, const int send) {
@@ -520,7 +530,8 @@ bool DAW::GetTrackSendMute(MediaTrack *media_track, const int send) {
 }
 
 void DAW::ToggleTrackSendMute(MediaTrack *media_track, const int send) {
-    SetTrackSendInfo_Value(media_track, SEND_MODE_SEND, send, "B_MUTE", boolToDouble(!GetTrackSendMute(media_track, send)));
+    SetTrackSendInfo_Value(media_track, SEND_MODE_SEND, send, "B_MUTE",
+                           boolToDouble(!GetTrackSendMute(media_track, send)));
 }
 
 bool DAW::GetTrackSendPhase(MediaTrack *media_track, const int send) {
@@ -528,7 +539,8 @@ bool DAW::GetTrackSendPhase(MediaTrack *media_track, const int send) {
 }
 
 void DAW::ToggleTrackSendPhase(MediaTrack *media_track, const int send) {
-    SetTrackSendInfo_Value(media_track, SEND_MODE_SEND, send, "B_PHASE", boolToDouble(!GetTrackSendPhase(media_track, send)));
+    SetTrackSendInfo_Value(media_track, SEND_MODE_SEND, send, "B_PHASE",
+                           boolToDouble(!GetTrackSendPhase(media_track, send)));
 }
 
 bool DAW::GetTrackSendMono(MediaTrack *media_track, const int send) {
@@ -536,7 +548,8 @@ bool DAW::GetTrackSendMono(MediaTrack *media_track, const int send) {
 }
 
 void DAW::ToggleTrackSendMono(MediaTrack *media_track, const int send) {
-    SetTrackSendInfo_Value(media_track, SEND_MODE_SEND, send, "B_MONO", boolToDouble(!GetTrackSendMono(media_track, send)));
+    SetTrackSendInfo_Value(media_track, SEND_MODE_SEND, send, "B_MONO",
+                           boolToDouble(!GetTrackSendMono(media_track, send)));
 }
 
 int DAW::GetNextTrackSendMode(MediaTrack *media_track, const int send) {
@@ -545,17 +558,17 @@ int DAW::GetNextTrackSendMode(MediaTrack *media_track, const int send) {
 
 void DAW::SetNextTrackSendMode(MediaTrack *media_track, const int send) {
     SetTrackSendInfo_Value(media_track, SEND_MODE_SEND, send, "I_SENDMODE",
-                             GetNextTrackSendMode(media_track, send));
+                           GetNextTrackSendMode(media_track, send));
 }
 
 void DAW::SetTrackSendVolume(MediaTrack *media_track, const int send, const double volume) {
     SetTrackSendInfo_Value(media_track, SEND_MODE_SEND, send, "D_VOL",
-                             CSurf_OnSendVolumeChange(media_track, send, volume, false));
+                           CSurf_OnSendVolumeChange(media_track, send, volume, false));
 }
 
 void DAW::SetTrackSendPan(MediaTrack *media_track, const int send, const double pan) {
     SetTrackSendInfo_Value(media_track, SEND_MODE_SEND, send, "D_PAN",
-                             CSurf_OnSendPanChange(media_track, send, pan, false));
+                           CSurf_OnSendPanChange(media_track, send, pan, false));
 }
 
 bool DAW::MediaItemHasMidi(MediaItem *media_item) {
@@ -616,7 +629,7 @@ int DAW::GetProjectMeasureOffset() {
 
 double DAW::GetProjectTimeOffset() {
     int const time_mode_index = projectconfig_var_getoffs("projtimeoffs", nullptr);
-    double  const*timeMode2Ptr_ = static_cast<double *>(projectconfig_var_addr(nullptr, time_mode_index));
+    double const *timeMode2Ptr_ = static_cast<double *>(projectconfig_var_addr(nullptr, time_mode_index));
     double const val = *timeMode2Ptr_;
 
     return val;
@@ -695,7 +708,8 @@ std::vector<std::string> DAW::GetProjectTime(const bool overwrite_time_code, con
         case 1:
         case 2:
             TimeMap_GetMeasureInfo(nullptr, 0, &_dummy2, &beat_length, _dummy, _dummy, &_dummy2);
-            play_offset = TimeMap2_beatsToTime(nullptr, static_cast<int>(beat_length) * GetProjectMeasureOffset(), _dummy);
+            play_offset = TimeMap2_beatsToTime(nullptr, static_cast<int>(beat_length) * GetProjectMeasureOffset(),
+                                               _dummy);
             break;
 
         default:
@@ -735,8 +749,9 @@ void DAW::SetTcpScroll(MediaTrack *media_track) {
     int scroll_track_pos;
 
     int const pinned_tracks_height = VersionHasFeature(FEATURE_PINNED_TRACKS) ? GetPinnedTracksHeight() : 0;
-    const bool done = getWindowScrollInfo(arrangeHWND, "v", &scroll_position, &scroll_pageSize, &scroll_min, &scroll_max,
-                                    &scroll_track_pos);
+    const bool done = getWindowScrollInfo(arrangeHWND, "v", &scroll_position, &scroll_pageSize, &scroll_min,
+                                          &scroll_max,
+                                          &scroll_track_pos);
 
     if (done) {
         // Set the new Arrange scroll position

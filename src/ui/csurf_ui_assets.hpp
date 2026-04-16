@@ -52,11 +52,11 @@ class CSurf_UI_Assets {
     ImGui_Image *display_mode_6;
     ImGui_Image *display_mode_7;
     ImGui_Image *display_mode_8;
-    ImGui_Image *valuebar_type_normal;
-    ImGui_Image *valuebar_type_bipolar;
-    ImGui_Image *valuebar_type_fill;
-    ImGui_Image *valuebar_type_spread;
-    ImGui_Image *valuebar_type_off;
+    ImGui_Image *valuebar_mode_normal;
+    ImGui_Image *valuebar_mode_bipolar;
+    ImGui_Image *valuebar_mode_fill;
+    ImGui_Image *valuebar_mode_spread;
+    ImGui_Image *valuebar_mode_off;
 
     // Filters
     ImGui_TextFilter *combo_filter;
@@ -77,7 +77,7 @@ public:
 
     [[nodiscard]] ImGui_Image *GetDisplayMode(int display_mode) const;
 
-    [[nodiscard]] ImGui_Image *GetValueBarType(int value_bar_type) const;
+    [[nodiscard]] ImGui_Image *GetValueBarType(int valuebar_mode) const;
 
     [[nodiscard]] ImGui_TextFilter *GetReaComboFilter() const;
 
