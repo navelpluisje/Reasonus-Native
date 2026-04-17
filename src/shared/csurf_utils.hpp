@@ -29,8 +29,8 @@ constexpr int AUTOMATION_LATCH = 4;
 constexpr int AUTOMATION_PREVIEW = 5;
 constexpr int AUTOMATION_WRITE = 3;
 
-const std::array<int, 6> time_code_indexes = {0, 2, 3, 4, 5, 8};
-const std::array<std::string, 6> time_code_names = {
+const int time_code_indexes[6] = {0, 2, 3, 4, 5, 8};
+const std::string time_code_names[6] = {
     "Time", "Beats", "Seconds", "Samples", "Hr:Min:Sec:Fr", "Abs. Frames"
 };
 

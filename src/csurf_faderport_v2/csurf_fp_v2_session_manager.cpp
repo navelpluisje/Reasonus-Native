@@ -237,7 +237,7 @@ public:
 
         if (context->GetShiftLeft() && settings->GetCanDisableFader())
         {
-            context->SetFaderDisabled(context->GetFaderDisabled());
+            context->SetFaderDisabled(!context->GetFaderDisabled());
             return;
         }
 
