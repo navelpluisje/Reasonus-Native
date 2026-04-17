@@ -6,7 +6,7 @@
 #include "csurf_ui_elements.hpp"
 #include "csurf_ui_tooltip.hpp"
 
-static void ReaSonusCheckBox(ImGui_Context *m_ctx, std::string label, bool *value)
+static void ReaSonusCheckBox(ImGui_Context *m_ctx, const std::string &label, bool *value)
 {
     bool _value = *value;
 
@@ -21,17 +21,17 @@ static void ReaSonusCheckBox(ImGui_Context *m_ctx, std::string label, bool *valu
 static void RenderInfoCheckbox(
     ImGui_Context *m_ctx,
     CSurf_UI_Assets *assets,
-    std::string label,
+    const std::string& label,
     bool *value,
-    std::string tooltip)
+    const std::string &tooltip)
 {
-    double x_pos = ImGui::GetCursorPosX(m_ctx);
-    double y_pos = ImGui::GetCursorPosY(m_ctx);
-    std::string id = std::to_string(x_pos) + "-" + std::to_string(y_pos);
+    const double x_pos = ImGui::GetCursorPosX(m_ctx);
+    const double y_pos = ImGui::GetCursorPosY(m_ctx);
+    const std::string tooltip_id = std::to_string(x_pos) + "-" + std::to_string(y_pos);
 
-    ReaSonusCheckBox(m_ctx, label.c_str(), value);
+    ReaSonusCheckBox(m_ctx, label, value);
     ImGui::SameLine(m_ctx);
-    ReaSonusTooltip(m_ctx, assets, tooltip.c_str(), id.c_str());
+    ReaSonusTooltip(m_ctx, assets, tooltip, tooltip_id, 0, -3);
     ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 4);
     ImGui::Dummy(m_ctx, 0, 0);
 }

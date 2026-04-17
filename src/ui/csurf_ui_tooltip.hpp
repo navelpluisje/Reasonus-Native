@@ -1,3 +1,4 @@
+// ReSharper disable CppDFAUnreachableFunctionCall
 #ifndef CSURF_FP_UI_TOOLTIP_H_
 #define CSURF_FP_UI_TOOLTIP_H_
 
@@ -8,13 +9,13 @@
 
 static void ReaSonusSimpleTooltip(
     ImGui_Context *m_ctx,
-    std::string label,
-    std::string id)
+    const std::string &label,
+    const std::string &tooltip_id)
 {
     if (ImGui::BeginItemTooltip(m_ctx))
     {
         UiElements::PushReaSonusTooltipStyle(m_ctx);
-        if (ImGui::BeginChild(m_ctx, id.c_str(), 0.0, 0.0, ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY | ImGui::ChildFlags_AutoResizeX))
+        if (ImGui::BeginChild(m_ctx, tooltip_id.c_str(), 0.0, 0.0, ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY | ImGui::ChildFlags_AutoResizeX))
         {
             ImGui::PushTextWrapPos(m_ctx, 350);
             ImGui::Text(m_ctx, label.c_str());
@@ -30,10 +31,10 @@ static void ReaSonusSimpleTooltip(
 static void ReaSonusTooltip(
     ImGui_Context *m_ctx,
     CSurf_UI_Assets *assets,
-    std::string label,
-    std::string id,
-    double icon_offset_x = 0,
-    double icon_offset_y = -3)
+    const std::string &label,
+    const std::string &tooltip_id,
+    const double icon_offset_x,
+    const double icon_offset_y)
 {
     ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + icon_offset_y);
     ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + icon_offset_x);
@@ -44,7 +45,7 @@ static void ReaSonusTooltip(
     ImGui::PopStyleColor(m_ctx);
     ImGui::PopFont(m_ctx);
 
-    ReaSonusSimpleTooltip(m_ctx, label, id);
+    ReaSonusSimpleTooltip(m_ctx, label, tooltip_id);
 }
 
 #endif

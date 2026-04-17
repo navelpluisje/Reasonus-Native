@@ -6,7 +6,6 @@
 
 class CSurf_FP_V2_TrackManager
 {
-protected:
     CSurf_FP_V2_Navigator *navigator;
     CSurf_Context *context;
     midi_Output *m_midiout;
@@ -22,7 +21,9 @@ protected:
 
     bool forceUpdate = false;
 
-    void GetFaderValue(MediaTrack *media_track, int *faderValue);
+protected:
+
+    void GetFaderValue(MediaTrack *media_track, int *faderValue) const;
 
 public:
     CSurf_FP_V2_TrackManager(
@@ -39,22 +40,21 @@ public:
 
     void UpdateTrack();
 
-    void ClearTrack();
+    void ClearTrack() const;
 
     void HandleMuteClick(int index, int value);
 
     void HandleSoloClick(int index, int value);
 
-    void HandleArmClick(int index, int value);
+    void HandleArmClick(int index, int value) const;
 
-    void HandleBypassClick(int index, int value);
+    void HandleBypassClick(int index, int value) const;
 
-    void HandleFaderTouch(int value)
-    {
+    static void HandleFaderTouch(const int value) {
         (void)value;
     }
 
-    void HandleFaderMove(int msb, int lsb);
+    void HandleFaderMove(int msb, int lsb) const;
 };
 
 #endif

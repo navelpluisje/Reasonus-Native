@@ -24,10 +24,10 @@ public:
 
     static void SetCurrentPage(int page);
     static void SetPageProperty(int type, int value = 0);
-    static void SetPageStringProperty(int type, std::string value = "");
+    static void SetPageStringProperty(int type, const std::string &value = "");
     static int GetPageProperty(int type);
-    static void SetMessage(std::string message);
-    void SetLocalMessage(std::string message);
+    static void SetMessage(const std::string &_message);
+    void SetLocalMessage(const std::string &_message);
     static std::string GetPageStringProperty(int type);
     ~ReaSonus8ControlPanel();
 

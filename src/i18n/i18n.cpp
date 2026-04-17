@@ -4,7 +4,9 @@
 #include "../i18n/i18n.hpp"
 #include "../shared/csurf_utils.hpp"
 
-I18n::I18n() {}
+I18n::I18n() {
+    checkLocalesFiles();
+}
 
 void I18n::SetLanguage(std::string lang)
 {

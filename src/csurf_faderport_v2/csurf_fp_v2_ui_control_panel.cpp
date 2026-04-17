@@ -9,34 +9,16 @@
 #include "../ui/csurf_ui_button_bar.hpp"
 #include "../ui/csurf_ui_assets.hpp"
 
-constexpr const char *g_name{"ReaSonus Native V2 Control Panel"};
+constexpr auto g_name{"ReaSonus Native V2 Control Panel"};
 
-std::unique_ptr<ReaSonusV2ControlPanel> ReaSonusV2ControlPanel::s_inst;
+std::unique_ptr<ReaSonusV2ControlPanel> ReaSonusV2ControlPanel::s_inst; // NOLINT(*-statically-constructed-objects)
 
-static void reportError(const ImGui_Error &e)
+static void reportError(const ImGui_Error &error) // NOLINT(*-use-anonymous-namespace)
 {
-    ShowMessageBox(e.what(), g_name, 0);
+    ShowMessageBox(error.what(), g_name, 0);
 }
 
-ReaSonusV2ControlPanel::ReaSonusV2ControlPanel() : m_ctx{}
-{
-    menu_items.push_back("menu.functions");
-    menu_items.push_back("menu.settings");
-    menu_items.push_back("menu.about");
-
-    ImGui::init(plugin_getapi);
-    m_ctx = ImGui::CreateContext(g_name);
-    assets = new CSurf_UI_Assets(m_ctx);
-
-    plugin_register("timer", reinterpret_cast<void *>(&Loop));
-}
-
-ReaSonusV2ControlPanel::~ReaSonusV2ControlPanel()
-{
-    plugin_register("-timer", reinterpret_cast<void *>(&Loop));
-}
-
-void ReaSonusV2ControlPanel::Start(int page)
+void ReaSonusV2ControlPanel::Start(const int page)
 {
     SetActionState("_REASONUS_SHOW_REASONUS_V2_CONTROL_WINDOW", 1);
     current_page = page;
@@ -76,7 +58,7 @@ void ReaSonusV2ControlPanel::Stop()
     }
 }
 
-void ReaSonusV2ControlPanel::SetCurrentPage(int page)
+void ReaSonusV2ControlPanel::SetCurrentPage(const int page)
 {
     if (s_inst && current_page != page)
     {
@@ -85,17 +67,22 @@ void ReaSonusV2ControlPanel::SetCurrentPage(int page)
     }
 }
 
-void ReaSonusV2ControlPanel::SetMessage(std::string message)
+void ReaSonusV2ControlPanel::SetMessage(const std::string &_message)
 {
     if (s_inst)
     {
-        return s_inst->SetLocalMessage(message);
+        s_inst->SetLocalMessage(_message);
     }
 }
 
-void ReaSonusV2ControlPanel::SetLocalMessage(std::string _message)
+void ReaSonusV2ControlPanel::SetLocalMessage(const std::string &_message)
 {
     message = _message;
+}
+
+ReaSonusV2ControlPanel::~ReaSonusV2ControlPanel()
+{
+    plugin_register("-timer", reinterpret_cast<void *>(&Loop));
 }
 
 void ReaSonusV2ControlPanel::Loop()
@@ -119,35 +106,49 @@ void ReaSonusV2ControlPanel::SetPageContent()
 
         switch (current_page)
         {
-        case FUNCTIONS_PAGE:
-            CSurf_UI_FunctionKeysPage::querying_actions = false;
-            CSurf_UI_FunctionKeysPage::selected_function = -1;
-            CSurf_UI_FunctionKeysPage::selected_action = -1;
+            case FUNCTIONS_PAGE:
+                CSurf_UI_FunctionKeysPage::querying_actions = false;
+                CSurf_UI_FunctionKeysPage::selected_function = -1;
+                CSurf_UI_FunctionKeysPage::selected_action = -1;
 
-            page_content = new CSurf_UI_FunctionKeysPage(m_ctx, assets, FP_V2);
-            break;
+                page_content = new CSurf_UI_FunctionKeysPage(m_ctx, assets, FP_V2);
+                break;
 
-        case SETTINGS_PAGE:
-            page_content = new CSurf_FP_V2_SettingsPage(m_ctx, assets);
-            break;
+            case SETTINGS_PAGE:
+                page_content = new CSurf_FP_V2_SettingsPage(m_ctx, assets);
+                break;
 
-        case ABOUT_PAGE:
-            page_content = new CSurf_UI_AboutPage(m_ctx, assets, FP_V2);
-            break;
+            case ABOUT_PAGE:
+                page_content = new CSurf_UI_AboutPage(m_ctx, assets, FP_V2);
+                break;
+            default: ;
         }
     }
 }
 
-void ReaSonusV2ControlPanel::Frame()
+ReaSonusV2ControlPanel::ReaSonusV2ControlPanel() : m_ctx{}
+{
+    menu_items.emplace_back("menu.functions");
+    menu_items.emplace_back("menu.settings");
+    menu_items.emplace_back("menu.about");
+
+    ImGui::init(plugin_getapi);
+    m_ctx = ImGui::CreateContext(g_name);
+    assets = new CSurf_UI_Assets(m_ctx);
+
+    plugin_register("timer", reinterpret_cast<void *>(&Loop));
+}
+
+void ReaSonusV2ControlPanel::Frame() // NOLINT(*-function-cognitive-complexity)
 {
     if (!message.empty())
     {
-        int now = (int)GetTickCount();
+        const int now = static_cast<int>(GetTickCount());
         if (message_timer == 0)
         {
             message_timer = now;
         }
-        else if ((message_timer + 3000) < now)
+        else if (message_timer + 3000 < now)
         {
             message = "";
             message_timer = 0;
@@ -158,7 +159,8 @@ void ReaSonusV2ControlPanel::Frame()
     {
         control_panel_open = false;
         SetActionState("_REASONUS_SHOW_REASONUS_V2_CONTROL_WINDOW");
-        return s_inst.reset();
+        s_inst.reset();
+        return;
     }
 
     SetPageContent();
@@ -236,7 +238,6 @@ void ReaSonusV2ControlPanel::Frame()
     if (!open)
     {
         control_panel_open = false;
-        SetActionState("_REASONUS_SHOW_REASONUS_V2_CONTROL_WINDOW");
-        return s_inst.reset();
+        s_inst.reset();
     }
 }

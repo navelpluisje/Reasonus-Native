@@ -24,7 +24,7 @@ protected:
         MediaTrack *media_track = context->GetPluginEditTrack();
         int plugin_id = context->GetPluginEditPluginId();
         std::string plugin_type = DAW::GetTrackFxType(media_track, plugin_id);
-        std::string plugin_name = DAW::GetTrackFxName(media_track, plugin_id);
+        std::string plugin_name = DAW::GetTrackFxName(media_track, plugin_id, false);
         std::string developer_name = DAW::GetTrackFxDeveloper(media_track, plugin_id);
         fileName = GetReaSonusPluginPath(developer_name, plugin_name, plugin_type);
 

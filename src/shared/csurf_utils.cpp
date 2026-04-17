@@ -155,7 +155,7 @@ std::string StripPluginChannelPostfix(char *name)
 
 bool IsPluginFX(std::string name)
 {
-    int pos = (int)name.find(PREFIX_SEPARATOR);
+    const int pos = static_cast<int>(name.find(PREFIX_SEPARATOR));
     // If we can not find the delimiter, we can not determine the type of plugin, so asume it's an effect
     if (pos < 0)
     {
@@ -322,7 +322,7 @@ std::string join(std::vector<std::string> list, std::string delimiter)
 
 bool hasPluginConfigFile(MediaTrack *media_track, int pluginId)
 {
-    std::string plugin_name = DAW::GetTrackFxName(media_track, pluginId);
+    std::string plugin_name = DAW::GetTrackFxName(media_track, pluginId, false);
     std::string developer_name = DAW::GetTrackFxDeveloper(media_track, pluginId);
     std::string plugin_type = DAW::GetTrackFxType(media_track, pluginId);
 
@@ -650,3 +650,14 @@ std::string toLowerCase(std::string value)
     std::transform(value.begin(), value.end(), value.begin(), ::tolower);
     return value;
 }
+
+double boolToDouble(const bool value)
+{
+    return value ? 1.0 : 0.0;
+}
+
+bool doubleToBool(const double value)
+{
+    return value > 0.0;
+}
+
