@@ -196,11 +196,11 @@ public:
 
     int GetTrackDisplay();
 
-    std::array<int, 4> GetTrackDisplayLineValues();
+    int *GetTrackDisplayLineValues();
 
-    std::array<int, 4> GetTrackDisplayAlignValues();
+    int *GetTrackDisplayAlignValues();
 
-    std::array<int, 4> GetTrackDisplayInvertValues();
+    int *GetTrackDisplayInvertValues();
 
     int GetTrackValueBarMode();
 
@@ -246,7 +246,7 @@ public:
 
     mINI::INIMap<std::string> GetFilter(int index);
 
-    static std::array<int, 4> ConvertDisplayValues(const std::string &settings_value);
+    static int *ConvertDisplayValues(const std::string &settings_value);
 };
 
 #endif

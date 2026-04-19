@@ -411,15 +411,15 @@ public:
         return settings->GetSetting(group, key);
     }
 
-    [[nodiscard]] std::array<int, 4> GetDisplayLineValues() const {
+    [[nodiscard]] auto GetDisplayLineValues() const {
         return settings->GetTrackDisplayLineValues();
     }
 
-    [[nodiscard]] std::array<int, 4> GetDisplayAlignValues() const {
+    [[nodiscard]] auto GetDisplayAlignValues() const {
         return settings->GetTrackDisplayAlignValues();
     }
 
-    [[nodiscard]] std::array<int, 4> GetDisplayInvertValues() const {
+    [[nodiscard]] auto GetDisplayInvertValues() const {
         return settings->GetTrackDisplayInvertValues();
     }
 };

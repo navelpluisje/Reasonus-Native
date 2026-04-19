@@ -6,9 +6,9 @@
 extern const int MOMENTARY_TIMEOUT;
 
 class CSurf_FP_8_TrackManager : public CSurf_FP_8_ChannelManager {
-    std::array<int, 16> mute_start = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    std::array<int, 16> solo_start = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    std::array<int, 16> touch_start = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    int mute_start[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    int solo_start[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    int touch_start[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     bool has_last_touched_fx_enabled = false;
     bool has_touch_mode = false;
@@ -117,9 +117,9 @@ public:
         const auto valuebar_mode = static_cast<ValuebarMode>(
             stoi(context->GetSetting("displays", "track-value-bar-mode"))
         );
-        const std::array<int, 4> display_line_values = context->GetDisplayLineValues();
-        const std::array<int, 4> display_align_values = context->GetDisplayAlignValues();
-        const std::array<int, 4> display_invert_values = context->GetDisplayInvertValues();
+        const int display_line_values[4] = context->GetDisplayLineValues();
+        const int display_align_values[4] = context->GetDisplayAlignValues();
+        const int display_invert_values[4] = context->GetDisplayInvertValues();
 
         if (has_last_touched_fx_enabled != context->GetLastTouchedFxMode()) {
             force_update = true;

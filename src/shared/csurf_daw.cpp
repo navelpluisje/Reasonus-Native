@@ -6,7 +6,7 @@
 #include "../shared/csurf_utils.hpp"
 #include "csurf.h"
 
-std::array<int, 3> DAW::sendModes = {0, 1, 3};
+int DAW::sendModes[3] = {0, 1, 3};
 
 /************************************************************************
  * Track

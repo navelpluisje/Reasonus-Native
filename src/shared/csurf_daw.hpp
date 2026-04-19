@@ -38,7 +38,7 @@ static std::map<Features, double> feature_versions = { // NOLINT(*-statically-co
 
 class DAW {
 public:
-    static std::array<int, 3> sendModes;
+    static int sendModes[3];
 
     /**************************************************************************************************************
      *  Track related methods

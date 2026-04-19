@@ -35,16 +35,16 @@ class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-in
     int setting_track_color_brightness = 25;
     int setting_time_code;
     int setting_track_display;
-    std::array<int, 4> setting_track_value_line_value;
-    std::array<int, 4> setting_track_value_line_align;
-    std::array<int, 4> setting_track_value_line_invert;
+    int setting_track_value_line_value[4];
+    int setting_track_value_line_align[4];
+    int setting_track_value_line_invert[4];
     int setting_track_valuebar_mode;
     int setting_track_valuebar_value;
     int *index;
 
     std::vector<std::string> language_names;
 
-    std::array<int, 8> latch_preview_action_indexes = {42013, 42014, 42015, 42016, 42017, 41160, 41161, 41162};
+    int latch_preview_action_indexes[8] = {42013, 42014, 42015, 42016, 42017, 41160, 41161, 41162};
     std::vector<std::string> latch_preview_action_names = {
         "Write current values for actively-writing envelopes to time selection",
         "Write current values for actively-writing envelopes from cursor to start of project",
@@ -56,7 +56,7 @@ class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-in
         "Write current values for all writing envelopes from cursor to end of project",
     };
 
-    std::array<int, 6> time_code_indexes = {0, 2, 3, 4, 5, 8};
+    int time_code_indexes[6] = {0, 2, 3, 4, 5, 8};
     std::vector<std::string> time_code_names = {
         i18n->t("settings", "timecode-list.option.time"), // Time
         i18n->t("settings", "timecode-list.option.beats"), // "Beats",
@@ -66,7 +66,7 @@ class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-in
         i18n->t("settings", "timecode-list.option.frames"), // "Abs. Frames"
     };
 
-    std::array<int, 9> track_display_lines = {3, 3, 4, 2, 2, 3, 3, 3, 3};
+    int track_display_lines[9] = {3, 3, 4, 2, 2, 3, 3, 3, 3};
     std::vector<std::string> track_display_names = {
         i18n->t("settings", "display-track.option.display-mode-0"), // "Small, Small, Large (No VU)"
         i18n->t("settings", "display-track.option.display-mode-1"), // "Large, Small, Small (No VU)"
@@ -596,7 +596,7 @@ public:
         setting_time_code = index - time_code_indexes.begin();
     }
 
-    static std::string joinDisplayValues(const std::array<int, 4> list, const std::string &delimiter) {
+    static std::string joinDisplayValues(const int list[4], const std::string &delimiter) {
         std::string result;
 
         for (int i = 0; i < static_cast<int>(sizeof(list) / sizeof(list[0])); i++) {
