@@ -15,8 +15,7 @@
 #include "csurf_fp_8_track_receives_manager.cpp"
 #include "csurf_fp_8_track_pan_manager.cpp"
 
-class CSurf_FP_8_FaderManager
-{
+class CSurf_FP_8_FaderManager {
     CSurf_FP_8_ChannelManager *channelManager = NULL;
     std::vector<CSurf_FP_8_Track *> tracks;
 
@@ -35,6 +34,8 @@ class CSurf_FP_8_FaderManager
     void SetButtonValues(bool force = false) const;
 
     void SetChannelMode(ChannelMode channelMode, bool updateButtons);
+
+    void SetTracks();
 
 public:
     CSurf_FP_8_FaderManager(
@@ -72,10 +73,15 @@ public:
 
     // ADD ALL THE TRACKMANAGERS METHODS HERE TO PROXY THEM
     void UpdateTracks(bool force_update = false) const;
+
     void HandleMuteClick(int index, int value) const;
+
     void HandleSoloClick(int index, int value);
+
     void HandleSelectClick(int index, int value);
+
     void HandleFaderMove(int index, int msb, int lsb) const;
+
     void HandleFaderTouch(int index, int value = 0) const;
 };
 
