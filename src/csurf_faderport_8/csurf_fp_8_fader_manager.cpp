@@ -31,72 +31,91 @@ void CSurf_FP_8_FaderManager::SetChannelMode(const ChannelMode channelMode, cons
 
     switch (channelMode) {
         case TrackMode:
-            channelManager = new CSurf_FP_8_TrackManager(tracks, navigator, context, m_midiout);
             context->SetPanEncoderMode(PanEncoderTrackPanMode);
             context->ResetPanPushMode();
             context->SetShowTimeCode(false);
+            SetTracks();
+            channelManager = new CSurf_FP_8_TrackManager(tracks, navigator, context, m_midiout);
             break;
 
         case PluginMode:
-            channelManager = new CSurf_FP_8_PluginsManager(tracks, navigator, context, m_midiout);
             context->SetPanEncoderMode(PanEncoderPluginMode);
             context->ResetPanPushMode();
             context->SetLastTouchedFxMode(false);
+            SetTracks();
+            channelManager = new CSurf_FP_8_PluginsManager(tracks, navigator, context, m_midiout);
             break;
 
         case TrackPluginMode:
-            channelManager = new CSurf_FP_8_TrackPluginsManager(tracks, navigator, context, m_midiout);
             context->SetPanEncoderMode(PanEncoderPluginMode);
             context->ResetPanPushMode();
+            SetTracks();
+            channelManager = new CSurf_FP_8_TrackPluginsManager(tracks, navigator, context, m_midiout);
             break;
 
         case SendMode:
-            channelManager = new CSurf_FP_8_SendsManager(tracks, navigator, context, m_midiout);
             context->SetPanEncoderMode(PanEncoderSendMode);
+            SetTracks();
+            channelManager = new CSurf_FP_8_SendsManager(tracks, navigator, context, m_midiout);
             break;
 
         case TrackSendMode:
-            channelManager = new CSurf_FP_8_TrackSendsManager(tracks, navigator, context, m_midiout);
             context->SetPanEncoderMode(PanEncoderSendMode);
+            SetTracks();
+            channelManager = new CSurf_FP_8_TrackSendsManager(tracks, navigator, context, m_midiout);
             break;
 
         case ReceiveMode:
-            channelManager = new CSurf_FP_8_ReceivesManager(tracks, navigator, context, m_midiout);
             context->SetPanEncoderMode(PanEncoderReceiveMode);
+            SetTracks();
+            channelManager = new CSurf_FP_8_ReceivesManager(tracks, navigator, context, m_midiout);
             break;
 
         case TrackReceiveMode:
-            channelManager = new CSurf_FP_8_TrackReceivesManager(tracks, navigator, context, m_midiout);
             context->SetPanEncoderMode(PanEncoderReceiveMode);
+            SetTracks();
+            channelManager = new CSurf_FP_8_TrackReceivesManager(tracks, navigator, context, m_midiout);
             break;
 
         case PanMode1:
         case PanMode2:
-            channelManager = new CSurf_FP_8_PanManager(tracks, navigator, context, m_midiout);
             context->SetPanEncoderMode(PanEncoderPanMode);
+            SetTracks();
+            channelManager = new CSurf_FP_8_PanManager(tracks, navigator, context, m_midiout);
             break;
 
         case MixMode:
-            channelManager = new CSurf_FP_8_FilterManager(tracks, navigator, context, m_midiout);
             context->SetPanEncoderMode(PanEncoderMixMode);
+            SetTracks();
+            channelManager = new CSurf_FP_8_FilterManager(tracks, navigator, context, m_midiout);
             break;
 
         case PluginControlMode:
-            channelManager = new CSurf_FP_8_PluginControlManager(tracks, navigator, context, m_midiout);
             context->SetPanEncoderMode(PanEncoderPluginControlMode);
             context->SetLastTouchedFxMode(false);
+            SetTracks();
+            channelManager = new CSurf_FP_8_PluginControlManager(tracks, navigator, context, m_midiout);
             break;
 
         case PluginEditMode:
-            channelManager = new CSurf_FP_8_PluginLearnManager(tracks, navigator, context, m_midiout);
             context->SetPanEncoderMode(PanEncoderPluginEditMode);
             context->SetLastTouchedFxMode(false);
+            SetTracks();
+            channelManager = new CSurf_FP_8_PluginLearnManager(tracks, navigator, context, m_midiout);
             break;
 
         case MenuMode:
-            channelManager = new CSurf_FP_8_Menu_Manager(tracks, navigator, context, m_midiout);
             context->SetPanEncoderMode(PanEncoderMenuMode);
+            SetTracks();
+            channelManager = new CSurf_FP_8_Menu_Manager(tracks, navigator, context, m_midiout);
             break;
+    }
+}
+
+void CSurf_FP_8_FaderManager::SetTracks() {
+    for (int i = 0; i < context->GetNbChannels(); i++) {
+        auto track = new CSurf_FP_8_Track(i, context, m_midiout);
+        tracks.push_back(track);
     }
 }
 
@@ -109,10 +128,7 @@ CSurf_FP_8_FaderManager::CSurf_FP_8_FaderManager(
     sendButton = new CSurf_Button(BTN_SEND, BTN_VALUE_OFF, m_midiout);
     panButton = new CSurf_Button(BTN_PAN, BTN_VALUE_OFF, m_midiout);
 
-    for (int i = 0; i < context->GetNbChannels(); i++) {
-        auto track = new CSurf_FP_8_Track(i, context, m_midiout);
-        tracks.push_back(track);
-    }
+    SetTracks();
 
     channelManager = new CSurf_FP_8_TrackManager(tracks, navigator, context, m_midiout);
 }
