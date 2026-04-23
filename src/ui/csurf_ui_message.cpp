@@ -103,6 +103,7 @@ void ReaSonusMessage::Frame() {
             ImGui::BulletText(m_ctx, "Some code cleanup");
             ImGui::BulletText(
                 m_ctx, "(FP 16) Disable the last touched fader mode when switching to any plugin related channel mode");
+            ImGui::BulletText(m_ctx, "(FP 16) Improved/Fixed last touched param implementation");
             ImGui::BulletText(m_ctx, "(FP V2) Fixed issue where disabled fader was not working");
 
             ImGui::Separator(m_ctx);
