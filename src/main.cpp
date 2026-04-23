@@ -19,6 +19,7 @@
 #include "actions/action_fp_v2_setting_disable_fader_move.hpp"
 #include "actions/action_fp_v2_setting_endless_track_scroll.hpp"
 #include "actions/action_fp_v2_setting_momentary_mute_solo.hpp"
+#include "actions/action_ui_plugin_type_mapping.hpp"
 #include "ui/csurf_ui_function_keys_page.hpp"
 #include "resource.h"
 #include "shared/csurf.h"
@@ -47,15 +48,10 @@ extern "C"
   {
     g_hInst = hInstance;
 
-    if (!reaper_plugin_info || reaper_plugin_info->caller_version != REAPER_PLUGIN_VERSION || !reaper_plugin_info->GetFunc)
-    {
-      return 0;
-    }
-
     /**
      * reaper_plugin_info is not available, so no need to run.
      */
-    if (reaper_plugin_info == nullptr)
+    if (reaper_plugin_info == nullptr || reaper_plugin_info->caller_version != REAPER_PLUGIN_VERSION || !reaper_plugin_info->GetFunc)
     {
       ACTION_CLOSE_ALL_FLOATING_FX_WINDOWS::Unregister();
       ACTION_FP_8_SETTING_DISABLE_PLUGINS::Unregister();
@@ -74,6 +70,7 @@ extern "C"
       ACTION_UI_CONVERT_PLUGIN_ZON_TO_INI::Unregister();
       ACTION_UI_FP_8_CONTROL_PANEL::Unregister();
       ACTION_UI_FP_V2_CONTROL_PANEL::Unregister();
+      ACTION_UI_PLUGIN_TYPE_MAPPING::Unregister();
       ACTION_UI_TRANSLATIONS_EDITOR::Unregister();
 
       return 0;
@@ -82,7 +79,7 @@ extern "C"
     g_hwnd = reaper_plugin_info->hwnd_main;
     g_reaper_plugin_info = reaper_plugin_info;
 
-    if (reaper_plugin_info)
+    if (reaper_plugin_info != nullptr)
     {
       // First, import REAPER's C++ API functions for use in this extension.
       //		Load all listed API functions at once.
@@ -90,18 +87,18 @@ extern "C"
       {
         // This is the WIN32 / swell MessageBox, not REAPER's API MB.  This should create a separate window that is listed in the taskbar,
         //		and more easily visible behind REAPER's splash screen.
-        MessageBox(NULL, "Unable to import default API functions.\n\nNOTE:\nThis extension requires REAPER v7.40 or higher.", "ERROR: ReaSonus Native", 0);
+        MessageBox(nullptr, "Unable to import default API functions.\n\nNOTE:\nThis extension requires REAPER v7.40 or higher.", "ERROR: ReaSonus Native", 0);
         return 0;
       }
       //		Load each of the undocumented functions.
       if (!((*(void **)&CoolSB_GetScrollInfo) = (void *)reaper_plugin_info->GetFunc("CoolSB_GetScrollInfo")))
       {
-        MessageBox(NULL, "Unable to import CoolSB_GetScrollInfo function.", "ERROR: ReaSonus Native", 0);
+        MessageBox(nullptr, "Unable to import CoolSB_GetScrollInfo function.", "ERROR: ReaSonus Native", 0);
         return 0;
       }
       if (!((*(void **)&CoolSB_SetScrollPos) = (void *)reaper_plugin_info->GetFunc("CoolSB_SetScrollPos")))
       {
-        MessageBox(NULL, "Unable to import CoolSB_SetScrollPos function.", "ERROR: ReaSonus Native", 0);
+        MessageBox(nullptr, "Unable to import CoolSB_SetScrollPos function.", "ERROR: ReaSonus Native", 0);
         return 0;
       }
     }
@@ -130,6 +127,7 @@ extern "C"
     ACTION_UI_CONVERT_PLUGIN_ZON_TO_INI::Register();
     ACTION_UI_FP_8_CONTROL_PANEL::Register();
     ACTION_UI_FP_V2_CONTROL_PANEL::Register();
+    ACTION_UI_PLUGIN_TYPE_MAPPING::Register();
     ACTION_UI_TRANSLATIONS_EDITOR::Register();
 
     reaper_plugin_info->Register("csurf", &csurf_faderport_8_reg);

@@ -128,7 +128,7 @@ public:
         {
             if (::GetTrackAutomationMode(media_track) == AUTOMATION_PREVIEW && settings->GetLatchPreviewActionEnabled())
             {
-                ::Main_OnCommandEx(settings->GetLatchPreviewActionCode(), 0, 0);
+                ::Main_OnCommandAsyncEx(settings->GetLatchPreviewActionCode(), 0, 0);
             }
             else
             {

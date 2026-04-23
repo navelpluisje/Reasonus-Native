@@ -48,18 +48,18 @@ public:
         CSurf_Context *context,
         midi_Output *m_midiout) : CSurf_FP_8_ChannelManager(tracks, navigator, context, m_midiout)
     {
-        UpdateTracks();
+        UpdateTracks(true);
     }
     ~CSurf_FP_8_TrackManager() {}
 
-    void UpdateTracks() override
+    void UpdateTracks(bool force_update) override
     {
         WDL_PtrList<MediaTrack> media_tracks = navigator->GetBankTracks();
         std::vector<std::string> time_code;
 
         if (has_last_touched_fx_enabled != context->GetLastTouchedFxMode())
         {
-            forceUpdate = true;
+            force_update = true;
         }
 
         if (context->GetShowTimeCode())
@@ -91,14 +91,14 @@ public:
                 if (index < 1)
                 {
                     track->ClearTrack(false);
-                    track->SetDisplayMode(DISPLAY_MODE_0, forceUpdate);
-                    track->SetDisplayLine(0, ALIGN_LEFT, "", NON_INVERT, forceUpdate);
-                    track->SetDisplayLine(1, ALIGN_CENTER, "", NON_INVERT, forceUpdate);
-                    track->SetDisplayLine(2, ALIGN_CENTER, time_code.at(abs(index)).c_str(), INVERT, forceUpdate);
+                    track->SetDisplayMode(DISPLAY_MODE_0, force_update);
+                    track->SetDisplayLine(0, ALIGN_LEFT, "", NON_INVERT, force_update);
+                    track->SetDisplayLine(1, ALIGN_CENTER, "", NON_INVERT, force_update);
+                    track->SetDisplayLine(2, ALIGN_CENTER, time_code.at(abs(index)).c_str(), INVERT, force_update);
                 }
                 else
                 {
-                    track->ClearTrack(true, forceUpdate);
+                    track->ClearTrack(true, force_update);
                 }
                 continue;
             }
@@ -115,29 +115,29 @@ public:
             track->SetSelectButtonValue((!context->GetArm() && is_armed && !settings->GetDistractionFreeMode())
                                             ? BTN_VALUE_BLINK
                                             : BTN_VALUE_ON,
-                                        forceUpdate);
-            track->SetMuteButtonValue(DAW::IsTrackMuted(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
-            track->SetSoloButtonValue(DAW::IsTrackSoloed(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
+                                        force_update);
+            track->SetMuteButtonValue(DAW::IsTrackMuted(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, force_update);
+            track->SetSoloButtonValue(DAW::IsTrackSoloed(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, force_update);
 
-            track->SetFaderValue(fader_value, forceUpdate || has_touch_mode);
+            track->SetFaderValue(fader_value, force_update || has_touch_mode);
             track->SetValueBarMode(context->GetArm() ? VALUEBAR_MODE_FILL : VALUEBAR_MODE_BIPOLAR);
             track->SetValueBarValue(value_bar_value);
 
             if (is_master_track)
             {
-                track->SetDisplayMode(DISPLAY_MODE_2, forceUpdate);
-                track->SetDisplayLine(0, ALIGN_CENTER, DAW::GetTrackName(media_track).c_str(), NON_INVERT, forceUpdate);
-                track->SetDisplayLine(1, ALIGN_CENTER, DAW::GetTrackIndex(media_track).c_str(), NON_INVERT, forceUpdate);
-                track->SetDisplayLine(2, ALIGN_CENTER, strPan1.c_str(), NON_INVERT, forceUpdate);
-                track->SetDisplayLine(3, ALIGN_CENTER, strPan2.c_str(), NON_INVERT, forceUpdate);
+                track->SetDisplayMode(DISPLAY_MODE_2, force_update);
+                track->SetDisplayLine(0, ALIGN_CENTER, DAW::GetTrackName(media_track).c_str(), NON_INVERT, force_update);
+                track->SetDisplayLine(1, ALIGN_CENTER, DAW::GetTrackIndex(media_track).c_str(), NON_INVERT, force_update);
+                track->SetDisplayLine(2, ALIGN_CENTER, strPan1.c_str(), NON_INVERT, force_update);
+                track->SetDisplayLine(3, ALIGN_CENTER, strPan2.c_str(), NON_INVERT, force_update);
             }
             else if (context->GetArm() && is_armed)
             {
-                track->SetDisplayMode(DISPLAY_MODE_2, forceUpdate);
-                track->SetDisplayLine(0, ALIGN_CENTER, DAW::GetTrackName(media_track).c_str(), NON_INVERT, forceUpdate);
-                track->SetDisplayLine(1, ALIGN_CENTER, DAW::GetTrackInputName(media_track).c_str(), NON_INVERT, forceUpdate);
-                track->SetDisplayLine(2, ALIGN_CENTER, DAW::GetTrackMonitorMode(media_track).c_str(), NON_INVERT, forceUpdate);
-                track->SetDisplayLine(3, ALIGN_CENTER, DAW::GetTrackRecordingMode(media_track).c_str(), NON_INVERT, forceUpdate);
+                track->SetDisplayMode(DISPLAY_MODE_2, force_update);
+                track->SetDisplayLine(0, ALIGN_CENTER, DAW::GetTrackName(media_track).c_str(), NON_INVERT, force_update);
+                track->SetDisplayLine(1, ALIGN_CENTER, DAW::GetTrackInputName(media_track).c_str(), NON_INVERT, force_update);
+                track->SetDisplayLine(2, ALIGN_CENTER, DAW::GetTrackMonitorMode(media_track).c_str(), NON_INVERT, force_update);
+                track->SetDisplayLine(3, ALIGN_CENTER, DAW::GetTrackRecordingMode(media_track).c_str(), NON_INVERT, force_update);
             }
             else
             {
@@ -146,24 +146,24 @@ public:
 
                 if (index < 1)
                 {
-                    track->SetDisplayMode(DISPLAY_MODE_0, forceUpdate);
-                    track->SetDisplayLine(0, ALIGN_LEFT, DAW::GetTrackName(media_track).c_str(), NON_INVERT, forceUpdate);
-                    track->SetDisplayLine(1, ALIGN_CENTER, DAW::GetTrackIndex(media_track).c_str(), NON_INVERT, forceUpdate);
-                    track->SetDisplayLine(2, ALIGN_CENTER, time_code.at(abs(index)).c_str(), INVERT, forceUpdate);
+                    track->SetDisplayMode(DISPLAY_MODE_0, force_update);
+                    track->SetDisplayLine(0, ALIGN_LEFT, DAW::GetTrackName(media_track).c_str(), NON_INVERT, force_update);
+                    track->SetDisplayLine(1, ALIGN_CENTER, DAW::GetTrackIndex(media_track).c_str(), NON_INVERT, force_update);
+                    track->SetDisplayLine(2, ALIGN_CENTER, time_code.at(abs(index)).c_str(), INVERT, force_update);
                 }
                 else
                 {
-                    track->SetDisplayMode((DisplayMode)settings->GetTrackDisplay(), forceUpdate);
-                    track->SetDisplayLine(0, ALIGN_LEFT, DAW::GetTrackName(media_track).c_str(), NON_INVERT, forceUpdate);
-                    track->SetDisplayLine(1, ALIGN_CENTER, DAW::GetTrackIndex(media_track).c_str(), NON_INVERT, forceUpdate);
-                    track->SetDisplayLine(2, ALIGN_CENTER, context->GetPanPushMode() ? strPan1.c_str() : strPan2.c_str(), NON_INVERT, forceUpdate);
-                    track->SetDisplayLine(3, ALIGN_CENTER, std::string("").c_str(), NON_INVERT, forceUpdate);
+                    track->SetDisplayMode((DisplayMode)settings->GetTrackDisplay(), force_update);
+                    track->SetDisplayLine(0, ALIGN_LEFT, DAW::GetTrackName(media_track).c_str(), NON_INVERT, force_update);
+                    track->SetDisplayLine(1, ALIGN_CENTER, DAW::GetTrackIndex(media_track).c_str(), NON_INVERT, force_update);
+                    track->SetDisplayLine(2, ALIGN_CENTER, context->GetPanPushMode() ? strPan1.c_str() : strPan2.c_str(), NON_INVERT, force_update);
+                    track->SetDisplayLine(3, ALIGN_CENTER, std::string("").c_str(), NON_INVERT, force_update);
                 }
             }
         }
 
         has_last_touched_fx_enabled = context->GetLastTouchedFxMode();
-        forceUpdate = false;
+        force_update = false;
     }
 
     void HandleSelectClick(int index, int value) override
@@ -192,7 +192,7 @@ public:
 
         if (context->GetShiftChannelLeft())
         {
-            DAW::ToggleSelectedTrack(media_track);
+            DAW::ToggleTrackSelected(media_track);
             return;
         }
 

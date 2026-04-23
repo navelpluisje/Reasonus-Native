@@ -68,7 +68,7 @@ class CSurf_FaderPortV2 : public IReaperControlSurface
     /**
      * ENCODERS
      */
-    else if (evt->midi_message[0] == MIDI_MESSAGE_ENDCODER)
+    else if (evt->midi_message[0] == MIDI_MESSAGE_ENCODER)
     {
       if (evt->midi_message[1] == ENCODER_PAN)
       {
@@ -230,6 +230,7 @@ class CSurf_FaderPortV2 : public IReaperControlSurface
 
   void updateSettings()
   {
+    i18n->SetLanguage(DAW::GetExtState(EXT_STATE_KEY_UI_LANGUAGE, "en-US"));
     settings->UpdateSettings();
   }
 

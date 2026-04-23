@@ -109,7 +109,7 @@ void CSurf_TransportManager::handleFootSwitchKey(std::string key)
 
     if (isInteger(actionId))
     {
-        Main_OnCommandEx(stoi(actionId), 0, 0);
+        Main_OnCommandAsyncEx(stoi(actionId), 0, 0);
     }
     else
     {
@@ -131,7 +131,7 @@ CSurf_TransportManager::CSurf_TransportManager(CSurf_Context *context, midi_Outp
     Update();
 };
 
-void CSurf_TransportManager::Update()
+void CSurf_TransportManager::Update(bool force_update)
 {
     int playState = GetPlayStateEx(0);
     isPlaying = hasBit(playState, 0);
@@ -150,7 +150,7 @@ void CSurf_TransportManager::Update()
         HandleForward();
     }
 
-    SetButtonValues(false);
+    SetButtonValues(force_update);
 }
 
 void CSurf_TransportManager::Refresh(bool force)

@@ -22,18 +22,20 @@ protected:
     void GetCurrentPlugin()
     {
         MediaTrack *media_track = context->GetPluginEditTrack();
-        int pluginId = context->GetPluginEditPluginId();
-        std::string pluginName = DAW::GetTrackFxName(media_track, pluginId);
-        std::string developerName = DAW::GetTrackFxDeveloper(media_track, pluginId);
-        fileName = GetReaSonusPluginPath(developerName, pluginName);
+        int plugin_id = context->GetPluginEditPluginId();
+        std::string plugin_type = DAW::GetTrackFxType(media_track, plugin_id);
+        std::string plugin_name = DAW::GetTrackFxName(media_track, plugin_id, false);
+        std::string developer_name = DAW::GetTrackFxDeveloper(media_track, plugin_id);
+        fileName = GetReaSonusPluginPath(developer_name, plugin_name, plugin_type);
 
         mINI::INIFile file(fileName);
         if (!file.read(ini))
         {
             ini["Global"];
-            ini["Global"]["origName"] = pluginName;
-            ini["Global"]["name"] = pluginName;
-            ini["Global"]["developer"] = developerName;
+            ini["Global"]["origName"] = plugin_name;
+            ini["Global"]["name"] = plugin_name;
+            ini["Global"]["type"] = plugin_type;
+            ini["Global"]["developer"] = developer_name;
             (void)file.generate(ini, true);
         }
     }
@@ -52,19 +54,19 @@ public:
         midi_Output *m_midiout) : CSurf_FP_8_ChannelManager(tracks, navigator, context, m_midiout)
     {
         context->ResetChannelManagerItemIndex();
-        context->SetChannelManagerItemsCount(127);
+        context->SetChannelManagerItemsCount(CSurf_Context::GetPluginMaxGroupCount());
         GetCurrentPlugin();
-        UpdateTracks();
+        UpdateTracks(true);
         color = ButtonColorWhiteDim;
         editStepSize = false;
     }
 
     ~CSurf_FP_8_PluginControlManager() {};
 
-    void UpdateTracks() override
+    void UpdateTracks(bool force_update) override
     {
         std::string paramKey;
-
+        force_update = true;
         MediaTrack *media_track = context->GetPluginEditTrack();
         int pluginId = context->GetPluginEditPluginId();
 
@@ -77,25 +79,24 @@ public:
             track->SetTrackColor(color);
 
             // If the track is armed always blink as an indication it is armed
-            track->SetSelectButtonValue(BTN_VALUE_OFF, forceUpdate);
-            track->SetMuteButtonValue(BTN_VALUE_OFF, forceUpdate);
-            track->SetSoloButtonValue(BTN_VALUE_OFF, forceUpdate);
-            track->SetValueBarMode(VALUEBAR_MODE_FILL);
+            track->SetSelectButtonValue(BTN_VALUE_OFF, force_update);
+            track->SetMuteButtonValue(BTN_VALUE_OFF, force_update);
+            track->SetSoloButtonValue(BTN_VALUE_OFF, force_update);
 
-            track->SetDisplayMode(DISPLAY_MODE_2, forceUpdate);
+            track->SetDisplayMode(DISPLAY_MODE_2, force_update);
 
             paramKey = getParamKey("Select_", filterIndex);
             if (ini.has(paramKey) && ini[paramKey]["param"] != "")
             {
                 Inverted inverted = ini[paramKey].has("uninvert-label") && ini[paramKey]["uninvert-label"] == "1" ? NON_INVERT : INVERT;
 
-                track->SetDisplayLine(0, ALIGN_CENTER, ini[paramKey]["name"].c_str(), inverted, forceUpdate);
+                track->SetDisplayLine(0, ALIGN_CENTER, ini[paramKey]["name"].c_str(), inverted, force_update);
                 TrackFX_GetFormattedParamValue(media_track, pluginId, stoi(ini[paramKey]["param"]), buffer, sizeof(buffer));
-                track->SetDisplayLine(1, ALIGN_CENTER, buffer, NON_INVERT, forceUpdate);
+                track->SetDisplayLine(1, ALIGN_CENTER, buffer, NON_INVERT, force_update);
             }
             else
             {
-                track->SetDisplayLine(0, ALIGN_CENTER, "", NON_INVERT, forceUpdate);
+                track->SetDisplayLine(0, ALIGN_CENTER, "", NON_INVERT, force_update);
                 track->SetDisplayLine(1, ALIGN_CENTER, "", NON_INVERT, true);
             }
 
@@ -104,34 +105,37 @@ public:
             {
                 if (!displayStepSize)
                 {
-                    track->SetDisplayLine(2, ALIGN_CENTER, ini[paramKey]["name"].c_str(), INVERT, forceUpdate);
+                    Inverted inverted = ini[paramKey].has("uninvert-label") && ini[paramKey]["uninvert-label"] == "1" ? NON_INVERT : INVERT;
+
+                    track->SetDisplayLine(2, ALIGN_CENTER, ini[paramKey]["name"].c_str(), inverted, force_update);
                     TrackFX_GetFormattedParamValue(media_track, pluginId, stoi(ini[paramKey]["param"]), buffer, sizeof(buffer));
-                    track->SetDisplayLine(3, ALIGN_CENTER, buffer, NON_INVERT, forceUpdate);
+                    track->SetDisplayLine(3, ALIGN_CENTER, buffer, NON_INVERT, force_update);
                 }
                 double value = TrackFX_GetParamNormalized(media_track, pluginId, stoi(ini[paramKey]["param"]));
-                track->SetFaderValue((int)(value * 16383.0), forceUpdate);
+                track->SetFaderValue((int)(value * 16383.0), force_update);
+                track->SetValueBarMode(VALUEBAR_MODE_FILL);
                 track->SetValueBarValue((int)(value * 127.0));
             }
             else
             {
                 if (!displayStepSize)
                 {
-                    track->SetDisplayLine(2, ALIGN_CENTER, "", NON_INVERT, forceUpdate);
+                    track->SetDisplayLine(2, ALIGN_CENTER, "", NON_INVERT, force_update);
                     track->SetDisplayLine(3, ALIGN_CENTER, "", NON_INVERT, true);
                 }
-                track->SetFaderValue(0, forceUpdate);
+                track->SetFaderValue(0, force_update);
                 track->SetValueBarMode(VALUEBAR_MODE_OFF);
                 track->SetValueBarValue(0);
             }
 
             if (displayStepSize)
             {
-                track->SetDisplayLine(2, ALIGN_CENTER, "Step size", INVERT, forceUpdate);
-                track->SetDisplayLine(3, ALIGN_CENTER, std::to_string(stepSize).c_str(), INVERT, forceUpdate);
+                track->SetDisplayLine(2, ALIGN_CENTER, "Step size", INVERT, force_update);
+                track->SetDisplayLine(3, ALIGN_CENTER, std::to_string(stepSize).c_str(), INVERT, force_update);
             }
         }
 
-        forceUpdate = false;
+        force_update = false;
     }
 
     void HandleEndcoderPush(int value) override

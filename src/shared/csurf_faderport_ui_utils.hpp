@@ -22,10 +22,10 @@
 
 extern HWND g_hwnd;
 
-void parseParms(const char *str, int parms[4]);
+void parseParms(const char *config, int parms[4]);
 
-int AddComboEntry(HWND hwndDlg, int x, char *buf, int comboId);
+int AddComboEntry(HWND hwndDlg, int lparam, char *buf, int comboId);
 
-void AddListEntry(HWND hwndDlg, std::string buf, int listId);
+void AddListEntry(HWND hwndDlg, const std::string &buf, int listId);
 
 #endif

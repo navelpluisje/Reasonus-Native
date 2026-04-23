@@ -12,7 +12,7 @@ static int getButtonWidth(
     double x_pos_1, y_pos_1;
     int button_padding_x = 20;
 
-    ImGui::PushFont(m_ctx, font, 13);
+    ImGui::PushFont(m_ctx, font, FontSizeDefault);
     ImGui::CalcTextSize(m_ctx, label.c_str(), &x_pos_1, &y_pos_1);
     int buttonWidth = (x_pos_1 + button_padding_x * 2.f) + 1;
     ImGui::PopFont(m_ctx);

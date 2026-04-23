@@ -3,6 +3,7 @@
 
 #include <string>
 #include "../ui/csurf_ui_page_content.hpp"
+#include "../ui/csurf_ui_assets.hpp"
 #include "../i18n/i18n.hpp"
 
 class ReaSonus8ControlPanel
@@ -23,17 +24,18 @@ public:
 
     static void SetCurrentPage(int page);
     static void SetPageProperty(int type, int value = 0);
-    static void SetPageStringProperty(int type, std::string value = "");
+    static void SetPageStringProperty(int type, const std::string &value = "");
     static int GetPageProperty(int type);
-    static void SetMessage(std::string message);
-    void SetLocalMessage(std::string message);
+    static void SetMessage(const std::string &_message);
+    void SetLocalMessage(const std::string &_message);
     static std::string GetPageStringProperty(int type);
     ~ReaSonus8ControlPanel();
 
 private:
     static std::unique_ptr<ReaSonus8ControlPanel> fp8_inst;
+    CSurf_UI_Assets *assets;
+
     static void Loop();
-    void InitAssets();
     void SetPageContent();
     CSurf_UI_PageContent *page_content = NULL;
 
@@ -41,15 +43,6 @@ private:
     void Frame();
 
     ImGui_Context *m_ctx;
-    ImGui_Font *main_font;
-    ImGui_Font *main_font_bold;
-    ImGui_Image *logo;
-    ImGui_Image *icon_settings;
-    ImGui_Image *icon_function_actions;
-    ImGui_Image *icon_custom_filters;
-    ImGui_Image *icon_plugin_mapping;
-    ImGui_Image *icon_about;
-
     int previous_page = -1;
     bool save_clicked = false;
     bool cancel_clicked = false;

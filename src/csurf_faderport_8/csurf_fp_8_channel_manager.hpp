@@ -66,7 +66,10 @@ public:
         delete m_midiout;
     };
 
-    virtual void UpdateTracks() {};
+    virtual void UpdateTracks(bool force_update = false)
+    {
+        (void)force_update;
+    };
 
     virtual void HandleEndcoderPush(int value)
     {

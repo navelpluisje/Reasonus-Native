@@ -28,7 +28,7 @@ namespace ACTION_UI_FP_V2_CONTROL_PANEL
     {
         if (!ReaSonusV2ControlPanel::control_panel_open)
         {
-            ReaSonusV2ControlPanel::Start();
+            ReaSonusV2ControlPanel::Start(0);
         }
         else
         {

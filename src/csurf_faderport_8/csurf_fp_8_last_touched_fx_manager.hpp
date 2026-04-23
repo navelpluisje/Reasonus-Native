@@ -20,7 +20,7 @@ public:
     CSurf_FP_8_LastTouchedFXManager(CSurf_FP_8_Track *track, CSurf_Context *context, midi_Output *m_midiout);
     ~CSurf_FP_8_LastTouchedFXManager() {};
 
-    void UpdateTrack();
+    void UpdateTrack(bool force_update);
 
     void HandleSelectClick(int index);
 

@@ -21,13 +21,13 @@ namespace ACTION_UI_CONVERT_PLUGIN_ZON_TO_INI
     // gets called via callback or timer
     void MainFunctionOfMyPlugin()
     {
-        if (ReaSonusV2PluginMappingConverter::converter_open)
+        if (ReaSonusPluginMappingConverter::converter_open)
         {
-            ReaSonusV2PluginMappingConverter::Stop();
+            ReaSonusPluginMappingConverter::Stop();
         }
         else
         {
-            ReaSonusV2PluginMappingConverter::Start();
+            ReaSonusPluginMappingConverter::Start();
         }
     }
 

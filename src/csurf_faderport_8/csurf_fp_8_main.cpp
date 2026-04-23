@@ -1,10 +1,3 @@
-/*
-** reaper_csurf
-** FaderPort support
-** Copyright (C) 2007-2008 Cockos Incorporated
-** License: LGPL.
-*/
-
 #include <string>
 #include <vector>
 #include <reaper_plugin.h>
@@ -12,11 +5,11 @@
 #include <WDL/ptrlist.h>
 #include <reaper_plugin_functions.h>
 #include "../controls/csurf_button.hpp"
-#include "../resource.h"
 #include "../shared/csurf.h"
 #include "../shared/csurf_transport_manager.hpp"
 #include "../shared/csurf_utils.hpp"
 #include "../i18n/i18n.hpp"
+#include "../ui/csurf_ui_message.hpp"
 #include "../shared/csurf_reasonus_settings.hpp"
 #include "csurf_fp_8_session_manager.cpp"
 #include "csurf_fp_8_mix_manager.cpp"
@@ -26,9 +19,6 @@
 #include "csurf_fp_8_fader_manager.hpp"
 #include "csurf_fp_8_ui_init.hpp"
 #include "csurf_fp_8_navigator.hpp"
-
-extern HWND g_hwnd;
-extern REAPER_PLUGIN_HINSTANCE g_hInst;
 
 I18n *I18n::instancePtr = nullptr;
 ReaSonusSettings *ReaSonusSettings::instance8Ptr = nullptr;
@@ -61,11 +51,9 @@ class CSurf_FaderPort : public IReaperControlSurface
   I18n *i18n = I18n::GetInstance();
   ReaSonusSettings *settings = ReaSonusSettings::GetInstance(FP_8);
 
-  WDL_String descspace;
-  char configtmp[1024];
+  char configtmp[1024]; // NOLINT(*-avoid-c-arrays)
 
-  void OnMIDIEvent(MIDI_event_t *evt)
-  {
+  void OnMIDIEvent(const MIDI_event_t *evt) const { // NOLINT(*-function-cognitive-complexity)
 
     /**
      * Fader values
@@ -87,7 +75,7 @@ class CSurf_FaderPort : public IReaperControlSurface
     /**
      * ENCODERS
      */
-    else if (evt->midi_message[0] == MIDI_MESSAGE_ENDCODER)
+    else if (evt->midi_message[0] == MIDI_MESSAGE_ENCODER)
     {
       if (evt->midi_message[1] == ENCODER_PAN)
       {
@@ -324,10 +312,6 @@ class CSurf_FaderPort : public IReaperControlSurface
       {
         automationManager->HandleWriteButton(evt->midi_message[2]);
       }
-      else if (evt->midi_message[1] == BTN_WRITE)
-      {
-        automationManager->HandleWriteButton(evt->midi_message[2]);
-      }
       else if (evt->midi_message[1] == BTN_READ)
       {
         automationManager->HandleReadButton(evt->midi_message[2]);
@@ -383,40 +367,41 @@ class CSurf_FaderPort : public IReaperControlSurface
     }
   }
 
-  void updateSettings()
-  {
+  void updateSettings() const {
     i18n->SetLanguage(DAW::GetExtState(EXT_STATE_KEY_UI_LANGUAGE, "en-US"));
     settings->UpdateSettings();
   }
 
 public:
-  CSurf_FaderPort(int indev, int outdev, int *errStats)
+  CSurf_FaderPort(const int in_dev, const int out_dev, int *errStats) // NOLINT(*-pro-type-member-init)
   {
-    (void)indev;
-    (void)outdev;
+    (void)in_dev;
+    (void)out_dev;
 
-    if (std::string(GIT_VERSION).compare(DAW::GetExtState(EXT_STATE_KEY_VERSION, "")) != 0)
+    if (std::string(GIT_VERSION) != DAW::GetExtState(EXT_STATE_KEY_VERSION, ""))
     {
+      ReaSonusMessage::Start();
       DAW::SetExtState(EXT_STATE_KEY_VERSION, GIT_VERSION, true);
       I18n::checkLocalesFiles();
     }
 
-    errStats = 0;
+    // TODO: Need to get rid of the nullptr here as ot will never display an error this way when needed
+    // errStats = nullptr;
     m_midi_in_dev = settings->GetMidiInput();
     m_midi_out_dev = settings->GetMidiOutput();
 
     surface_update_lastrun = 0;
 
     // create midi hardware access
-    m_midiin = m_midi_in_dev >= 0 ? CreateMIDIInput(m_midi_in_dev) : NULL;
-    m_midiout = m_midi_out_dev >= 0 ? CreateMIDIOutput(m_midi_out_dev, false, NULL) : NULL;
+    m_midiin = m_midi_in_dev >= 0 ? CreateMIDIInput(m_midi_in_dev) : nullptr;
+    m_midiout = m_midi_out_dev >= 0 ? CreateMIDIOutput(m_midi_out_dev, false, nullptr) : nullptr;
 
     context = new CSurf_Context(settings->GetSurface());
     updateSettings();
 
     for (int i = 0; i < context->GetNbChannels(); i++)
     {
-      CSurf_FP_8_Track *track = new CSurf_FP_8_Track(i, context, m_midiout);
+      auto *track = new CSurf_FP_8_Track(i, context, m_midiout);
       tracks.push_back(track);
     }
     lastTouchedFxTrack = new CSurf_FP_8_Track(context->GetNbChannels() - 1, context, m_midiout);
@@ -430,129 +415,129 @@ public:
     generalControlManager = new CSurf_FP_8_GeneralControlManager(context, trackNavigator, faderManager, m_midiout);
     lastTouchedFxManager = new CSurf_FP_8_LastTouchedFXManager(lastTouchedFxTrack, context, m_midiout);
 
-    if (errStats)
+    if (errStats != nullptr && *errStats > 0)
     {
       ShowConsoleMsg("Error: ");
-      ShowConsoleMsg((char *)errStats);
-      if (m_midi_in_dev >= 0 && !m_midiin)
+      ShowConsoleMsg(reinterpret_cast<char *>(errStats));
+      if (m_midi_in_dev >= 0 && m_midiin == nullptr)
       {
         *errStats |= 1;
       }
-      if (m_midi_out_dev >= 0 && !m_midiout)
+      if (m_midi_out_dev >= 0 && m_midiout == nullptr)
       {
         *errStats |= 2;
       }
     }
 
-    if (m_midiin)
+    if (m_midiin != nullptr)
     {
       m_midiin->start();
     }
 
-    if (m_midiout)
+    if (m_midiout != nullptr)
     {
       m_midiout->Send(0xb0, 0x00, 0x06, -1);
       m_midiout->Send(0xb0, 0x20, 0x27, -1);
     }
   }
 
-  ~CSurf_FaderPort()
-  {
-    if (m_midiout)
+  ~CSurf_FaderPort() override {
+    if (m_midiout != nullptr)
     {
       // Reset all displays, faders and track buttons after closing Reaper
-      for (int i = 0; i < (int)tracks.size(); i++)
+      for (const auto & track : tracks)
       {
-        tracks.at(i)->ClearTrack(true, true);
+        track->ClearTrack(true, true);
       }
       tracks.at(0)->SetDisplayMode(DISPLAY_MODE_3);
       tracks.at(1)->SetDisplayMode(DISPLAY_MODE_3);
       tracks.at(2)->SetDisplayMode(DISPLAY_MODE_3);
       tracks.at(3)->SetDisplayMode(DISPLAY_MODE_3);
-      tracks.at((int)tracks.size() - 2)->SetDisplayMode(DISPLAY_MODE_3);
-      tracks.at((int)tracks.size() - 1)->SetDisplayMode(DISPLAY_MODE_3);
+      tracks.at(static_cast<int>(tracks.size()) - 2)->SetDisplayMode(DISPLAY_MODE_3);
+      tracks.at(static_cast<int>(tracks.size()) - 1)->SetDisplayMode(DISPLAY_MODE_3);
       tracks.at(0)->SetDisplayLine(0, ALIGN_CENTER, "Good");
       tracks.at(1)->SetDisplayLine(0, ALIGN_CENTER, "bye.");
       tracks.at(0)->SetDisplayLine(1, ALIGN_CENTER, "Have");
       tracks.at(1)->SetDisplayLine(1, ALIGN_CENTER, "a");
       tracks.at(2)->SetDisplayLine(1, ALIGN_CENTER, "nice");
       tracks.at(3)->SetDisplayLine(1, ALIGN_CENTER, "day");
-      tracks.at((int)tracks.size() - 2)->SetDisplayLine(0, ALIGN_RIGHT, "ReaS", INVERT);
-      tracks.at((int)tracks.size() - 1)->SetDisplayLine(0, ALIGN_LEFT, "onus", INVERT);
+      tracks.at(static_cast<int>(tracks.size()) - 2)->SetDisplayLine(0, ALIGN_RIGHT, "ReaS", INVERT);
+      tracks.at(static_cast<int>(tracks.size()) - 1)->SetDisplayLine(0, ALIGN_LEFT, "onus", INVERT);
     }
 
     DELETE_ASYNC(m_midiout);
     DELETE_ASYNC(m_midiin);
   }
 
-  CSurf_Context GetContext()
-  {
-    return *context;
-  }
+  // [[nodiscard]] CSurf_Context GetContext() const {
+  //   return *context;
+  // }
 
-  const char *GetTypeString()
-  {
+  const char *GetTypeString() override {
     return "REASONUS_FADERPORT_8";
   }
 
-  const char *GetDescString()
-  {
+  const char *GetDescString() override {
     snprintf(configtmp, 100, "ReaSonus FaderPort 8 & 16 (dev %d, %d)", m_midi_in_dev, m_midi_out_dev);
     return configtmp;
   }
 
-  const char *GetConfigString() // string of configuration data
+  const char *GetConfigString() override
   {
     snprintf(configtmp, 100, "0 0 %d %d", m_midi_in_dev, m_midi_out_dev);
 
     return configtmp;
   }
 
-  void CloseNoReset()
-  {
+  void CloseNoReset() override {
     DELETE_ASYNC(m_midiout);
     DELETE_ASYNC(m_midiin);
-    m_midiout = 0;
-    m_midiin = 0;
+    m_midiout = nullptr;
+    m_midiin = nullptr;
   }
 
-  bool GetTouchState(MediaTrack *media_track, int is_pan)
-  {
+  bool GetTouchState(MediaTrack *media_track, const int is_pan) override {
     return trackNavigator->IsTrackTouched(media_track, is_pan);
   }
 
-  void Run()
-  {
-    if (m_midiin)
+  void Run() override {
+    if (m_midiin != nullptr)
     {
       m_midiin->SwapBufsPrecise(GetTickCount(), 0.0);
       int l = 0;
       MIDI_eventlist *list = m_midiin->GetReadBuf();
-      MIDI_event_t *evts;
+      MIDI_event_t *midi_events;
 
-      while ((evts = list->EnumItems(&l)))
+      while ((midi_events = list->EnumItems(&l)) != nullptr)
       {
-        OnMIDIEvent(evts);
+        OnMIDIEvent(midi_events);
       }
     }
 
-    if (m_midiout)
+    if (m_midiout != nullptr)
     {
-      DWORD now = GetTickCount();
+      DWORD const now = GetTickCount();
       if ((now - surface_update_lastrun) >= 10)
       {
-        faderManager->UpdateTracks();
+        const bool force_update = (now - surface_update_lastrun) >= 2000;
+
+        faderManager->UpdateTracks(force_update);
         if (context->GetLastTouchedFxMode())
         {
-          lastTouchedFxManager->UpdateTrack();
+          lastTouchedFxManager->UpdateTrack(force_update);
         }
         else
         {
           lastTouchedFxManager->resetLastTouchedFxEnabled();
         }
-        transportManager->Update();
-        automationManager->Update();
-        generalControlManager->Update();
+        transportManager->Update(force_update);
+        automationManager->Update(force_update);
+        generalControlManager->Update(force_update);
+
+        if (force_update)
+        {
+          mixManager->Refresh(force_update);
+        }
 
         surface_update_lastrun = now;
       }
@@ -575,9 +560,9 @@ public:
       if ((now - surface_update_settings_check) >= 1500)
       {
         surface_update_settings_check = now;
-        std::string is_saved = DAW::GetExtState(EXT_STATE_KEY_SAVED_SETTINGS, "");
+        std::string const is_saved = DAW::GetExtState(EXT_STATE_KEY_SAVED_SETTINGS, "");
 
-        if (is_saved.compare(EXT_STATE_VALUE_TRUE) == 0)
+        if (is_saved == EXT_STATE_VALUE_TRUE)
         {
           updateSettings();
           DAW::SetExtState(EXT_STATE_KEY_SAVED_SETTINGS, EXT_STATE_VALUE_FALSE, false);
@@ -586,17 +571,10 @@ public:
     }
   }
 
-  // Probably not needed
-  // void SetTrackListChange()
-  // {
-  //   ShowConsoleMsg("SetTrackListChange");
-  // }
+  void OnTrackSelection(MediaTrack *media_track) override {
+    const int track_index = stoi(DAW::GetTrackIndex(media_track));
 
-  void OnTrackSelection(MediaTrack *media_track)
-  {
-    int track_index = stoi(DAW::GetTrackIndex(media_track));
-
-    // Master track returns -1. Do not a=do anyting right now
+    // Master track returns -1. Do not a=do anything right now
     if (track_index < 0)
     {
       return;
@@ -605,8 +583,7 @@ public:
     trackNavigator->SetOffsetByTrack(media_track);
   }
 
-  int Extended(int call, void *param1, void *param2, void *param3)
-  {
+  int Extended(const int call, void *param1, void *param2, void *param3) override {
     (void)param1;
     (void)param2;
     (void)param3;

@@ -6,26 +6,13 @@
 #include "csurf_ui_elements.hpp"
 #include <reaper_plugin_functions.h>
 #include "../shared/csurf_utils.hpp"
-
-/**
- * Check if the value is betweemn the min and max value
- * @property min The min value to check againt. The value should be larger the this value
- * @property val The The value to test against
- * @property max The max value to check againt. The value should be smaller the this value
- * 
- * @return boolean value
- */
-inline double between(int min, int val, int max)
-{
-    double diff = max - min;
-    return diff > 0 && diff < val;
-}
+#include "../ui/csurf_ui_assets.hpp"
 
 static void ReaSonusMenuButton(
     ImGui_Context *m_ctx,
+    CSurf_UI_Assets *assets,
     std::string action_label,
-    ImGui_Font *font,
-    ImGui_Image *icon,
+    IconFont icon,
     int value,
     int *active_item)
 {
@@ -59,13 +46,17 @@ static void ReaSonusMenuButton(
             *active_item = value;
         }
 
-        ImGui_DrawList *list = ImGui::GetForegroundDrawList(m_ctx);
+        ImGui_DrawList *list = ImGui::GetWindowDrawList(m_ctx);
 
         ImGui::DrawList_AddRectFilled(list, x_pos_1, y_pos_1, x_pos_1 + menu_button_width, y_pos_1 + menu_button_height, background_color, 4);
         ImGui::DrawList_AddRect(list, x_pos_1, y_pos_1, x_pos_1 + menu_button_width, y_pos_1 + menu_button_height, UI_COLORS::Accent, 4, ImGui::DrawFlags_None, border_width);
-        ImGui::DrawList_AddImage(list, icon, x_pos_1 + 9, y_pos_1 + 9, x_pos_1 + 33, y_pos_1 + 33);
+        ImGui::PushFont(m_ctx, assets->GetIconFont(), 24);
+        ImGui::DrawList_AddText(list, x_pos_1 + 9, y_pos_1 + 9, UI_COLORS::White, std::string(1, icon).c_str());
+        ImGui::PopFont(m_ctx);
 
-        ImGui::PushFont(m_ctx, font, 15);
+        // ImGui::DrawList_AddImage(list, icon, x_pos_1 + 9, y_pos_1 + 9, x_pos_1 + 33, y_pos_1 + 33);
+
+        ImGui::PushFont(m_ctx, assets->GetMainFontBold(), FontSizeLarge);
         double font_height = ImGui::GetTextLineHeight(m_ctx);
         ImGui::DrawList_AddText(list, x_pos_1 + 42, y_pos_1 + (menu_button_height - font_height) / 2, UI_COLORS::White, action_label.c_str());
         ImGui::PopFont(m_ctx);

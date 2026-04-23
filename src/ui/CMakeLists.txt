@@ -4,4 +4,7 @@ target_sources(${PROJECT_NAME}
     csurf_ui_function_keys_page.cpp
     csurf_ui_plugin_mapping_converter.cpp
     csurf_ui_translation_editor.cpp
+    csurf_ui_assets.cpp
+    csurf_ui_plugin_type_mapping.cpp
+    csurf_ui_message.cpp
 )

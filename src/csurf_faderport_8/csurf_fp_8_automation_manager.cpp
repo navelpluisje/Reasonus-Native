@@ -144,14 +144,12 @@ public:
     };
     ~CSurf_FP_8_AutomationManager() {};
 
-    void Update()
+    void Update(bool force_update = false)
     {
         // Get selected track and get the atomation type
-        if (context->GetShiftRight())
-        {
-            globalAutomationMode = GetGlobalAutomationOverride();
-        }
-        else if (context->GetShiftLeft())
+        globalAutomationMode = GetGlobalAutomationOverride();
+
+        if (context->GetShiftLeft())
         {
             canRedo = Undo_CanRedo2(0) != NULL;
             canUndo = Undo_CanUndo2(0) != NULL;
@@ -163,8 +161,8 @@ public:
             channelAutomationMode = GetTrackAutomationMode(media_track);
         }
 
-        SetButtonColors();
-        SetButtonValue();
+        SetButtonColors(force_update);
+        SetButtonValue(force_update);
     };
 
     void Refresh(bool force = false)
@@ -242,7 +240,7 @@ public:
         if (
             (::GetTrackAutomationMode(media_track) == AUTOMATION_PREVIEW || ::GetGlobalAutomationOverride() == AUTOMATION_PREVIEW) && settings->GetLatchPreviewActionEnabled())
         {
-            ::Main_OnCommandEx(settings->GetLatchPreviewActionCode(), 0, 0);
+            Main_OnCommandAsyncEx(settings->GetLatchPreviewActionCode(), 0, 0);
         }
         else
         {

@@ -5,8 +5,7 @@
 #include "csurf_fp_8_fader_manager.hpp"
 #include "csurf_fp_8_ui_control_panel.hpp"
 
-class CSurf_FP_8_GeneralControlManager
-{
+class CSurf_FP_8_GeneralControlManager {
 protected:
     CSurf_Button *armButton;
     CSurf_Button *soloClearButton;
@@ -34,20 +33,16 @@ protected:
 
     bool functionsDialogOpen;
 
-    void SetButtonValue(bool force = false)
-    {
+    void SetButtonValue(const bool force = false) const {
         armButton->SetValue(context->GetArm() ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
-        if (context->GetShiftLeft())
-        {
+        if (context->GetShiftLeft()) {
             bypassButton->SetValue(hasGlobalBypass
                                        ? BTN_VALUE_ON
                                        : BTN_VALUE_OFF,
                                    force);
             macroButton->SetColor(ButtonColorYellow, force);
             macroButton->SetValue(ReaSonus8ControlPanel::control_panel_open ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
-        }
-        else
-        {
+        } else {
             bypassButton->SetValue(hasSelectedBypass
                                        ? BTN_VALUE_ON
                                        : BTN_VALUE_OFF,
@@ -64,105 +59,107 @@ protected:
                 context->GetChannelMode() == PluginEditMode,
                 settings->GetDistractionFreeMode()),
             force);
-        shiftLeftButton->SetValue(((!settings->GetSwapShiftButtons() && context->GetShiftLeft()) ||
-                                   (context->GetShiftRight() && settings->GetSwapShiftButtons()))
-                                      ? BTN_VALUE_ON
-                                      : BTN_VALUE_OFF,
-                                  force);
-    };
+        shiftLeftButton->SetValue(
+            (!settings->GetSwapShiftButtons() && context->GetShiftLeft())
+            || (context->GetShiftRight() && settings->GetSwapShiftButtons())
+                ? BTN_VALUE_ON
+                : BTN_VALUE_OFF,
+            force
+        );
+    }
 
-    void UpdatePanValue(int val)
-    {
+    void UpdatePanValue(const int val) const {
         double pan1, pan2 = 0.0;
         int pan_mode;
-        MediaTrack *media_track = GetSelectedTrack(0, 0);
+        MediaTrack *media_track = GetSelectedTrack(nullptr, 0);
         GetTrackUIPan(media_track, &pan1, &pan2, &pan_mode);
-        if (pan_mode < PAN_MODE_STEREO_PAN)
-        {
+
+        if (pan_mode < PAN_MODE_STEREO_PAN) {
             pan_mode = PAN_MODE_BALANCE_PAN;
         }
 
-        if (pan_mode == PAN_MODE_BALANCE_PAN)
-        {
-            double newValue = int(panToNormalized(pan1) * 127.0) + val;
+        if (pan_mode == PAN_MODE_BALANCE_PAN) {
+            double newValue = static_cast<int>(panToNormalized(pan1) * 127.0) + val;
             newValue = minmax(0.0, newValue, 127.0);
-            SetMediaTrackInfo_Value(media_track, "D_PAN", normalizedToPan(newValue / 127));
-        }
-        else if (context->GetPanPushMode())
-        {
-            double newValue = int(panToNormalized(pan1) * 127.0) + val;
+            SetMediaTrackInfo_Value(
+                media_track,
+                "D_PAN",
+                normalizedToPan(newValue / 127)
+            );
+        } else if (context->GetPanPushMode()) {
+            double newValue = static_cast<int>(panToNormalized(pan1) * 127.0) + val;
             newValue = minmax(0.0, newValue, 127.0);
-            SetMediaTrackInfo_Value(media_track, pan_mode < 6 ? "D_PAN" : "D_DUALPANL", normalizedToPan(newValue / 127));
-        }
-        else
-        {
-            double newValue = int(panToNormalized(pan2) * 127.0) + val;
+            SetMediaTrackInfo_Value(
+                media_track,
+                pan_mode < 6 ? "D_PAN" : "D_DUALPANL",
+                normalizedToPan(newValue / 127)
+            );
+        } else {
+            double newValue = static_cast<int>(panToNormalized(pan2) * 127.0) + val;
             newValue = minmax(0.0, newValue, 127.0);
-            SetMediaTrackInfo_Value(media_track, pan_mode < 6 ? "D_WIDTH" : "D_DUALPANR", normalizedToPan(newValue / 127));
+            SetMediaTrackInfo_Value(
+                media_track,
+                pan_mode < 6 ? "D_WIDTH" : "D_DUALPANR",
+                normalizedToPan(newValue / 127)
+            );
         }
     }
 
-    void IncrementPan(int val)
-    {
+    void IncrementPan(const int val) const {
         UpdatePanValue(val);
     }
 
-    void DecrementPan(int val)
-    {
+    void DecrementPan(const int val) const {
         UpdatePanValue(val * -1);
     }
 
-    void resetPan()
-    {
-        MediaTrack *media_track = GetSelectedTrack(0, 0);
+    void resetPan() const {
+        MediaTrack *media_track = GetSelectedTrack(nullptr, 0);
 
-        switch (DAW::GetTrackPanMode(media_track))
-        {
-        case PAN_MODE_STEREO_PAN:
-        {
-            if (context->GetPanPushMode())
-            {
+        switch (DAW::GetTrackPanMode(media_track)) {
+            case PAN_MODE_STEREO_PAN: {
+                if (context->GetPanPushMode()) {
+                    SetMediaTrackInfo_Value(media_track, "D_PAN", 0);
+                } else {
+                    SetMediaTrackInfo_Value(media_track, "D_WIDTH", 1);
+                }
+                break;
+            }
+            case PAN_MODE_DUAL_PAN: {
+                if (context->GetPanPushMode()) {
+                    SetMediaTrackInfo_Value(media_track, "D_DUALPANL", -1);
+                } else {
+                    SetMediaTrackInfo_Value(media_track, "D_DUALPANR", 1);
+                }
+                break;
+            }
+            default: {
                 SetMediaTrackInfo_Value(media_track, "D_PAN", 0);
             }
-            else
-            {
-                SetMediaTrackInfo_Value(media_track, "D_WIDTH", 1);
-            }
-            break;
-        }
-        case PAN_MODE_DUAL_PAN:
-        {
-            if (context->GetPanPushMode())
-            {
-                SetMediaTrackInfo_Value(media_track, "D_DUALPANL", -1);
-            }
-            else
-            {
-                SetMediaTrackInfo_Value(media_track, "D_DUALPANR", 1);
-            }
-            break;
-        }
-        default:
-        {
-            SetMediaTrackInfo_Value(media_track, "D_PAN", 0);
-        }
         }
     }
 
-    void SetButtonColors(bool force = false)
-    {
+    void SetButtonColors(const bool force = false) const {
         bypassButton->SetColor(ButtonColorRed, force);
         macroButton->SetColor(ButtonColorWhite, force);
         linkButton->SetColor(ButtonColorGreen, force);
-    };
+    }
 
 public:
     CSurf_FP_8_GeneralControlManager(
         CSurf_Context *context,
         CSurf_FP_8_Navigator *trackNavigator,
         CSurf_FP_8_FaderManager *faderManager,
-        midi_Output *m_midiout) : context(context), trackNavigator(trackNavigator), faderManager(faderManager), m_midiout(m_midiout)
-    {
+        midi_Output *m_midiout
+    ) : context(context), trackNavigator(trackNavigator), faderManager(faderManager), m_midiout(m_midiout) {
+        hasSolo = false;
+        hasMute = false;
+        hasSelectedBypass = false;
+        hasGlobalBypass = false;
+        followCursor = false;
+        last_touched_fx_mode = false;
+        functionsDialogOpen = false;
+
         armButton = new CSurf_Button(BTN_ARM, BTN_VALUE_OFF, m_midiout);
         soloClearButton = new CSurf_Button(BTN_SOLO_CLEAR, BTN_VALUE_OFF, m_midiout);
         muteClearButton = new CSurf_Button(BTN_MUTE_CLEAR, BTN_VALUE_OFF, m_midiout);
@@ -170,126 +167,112 @@ public:
         macroButton = new CSurf_ColorButton(ButtonColorWhite, BTN_MACRO, BTN_VALUE_OFF, m_midiout);
         linkButton = new CSurf_ColorButton(ButtonColorGreen, BTN_LINK, BTN_VALUE_OFF, m_midiout);
         shiftLeftButton = new CSurf_Button(BTN_SHIFT_LEFT, BTN_VALUE_OFF, m_midiout);
-    };
+    }
 
-    ~CSurf_FP_8_GeneralControlManager() {};
+    ~CSurf_FP_8_GeneralControlManager() {
+    }
 
-    void Update()
-    {
+    void Update(const bool force_update = false) {
         hasSolo = trackNavigator->HasTracksWithSolo();
         hasMute = trackNavigator->HasTracksWithMute();
-        hasSelectedBypass = (bool)GetToggleCommandState(8);
-        hasGlobalBypass = (bool)GetToggleCommandState(40344);
+        hasSelectedBypass = static_cast<bool>(GetToggleCommandState(8));
+        hasGlobalBypass = static_cast<bool>(GetToggleCommandState(40344));
         followCursor = GetToggleCommandStringState("_REASONUS_TOGGLE_PLAY_CURSOR_COMMAND");
         last_touched_fx_mode = context->GetLastTouchedFxMode();
-        functionsDialogOpen = ReaSonus8ControlPanel::control_panel_open && ReaSonus8ControlPanel::current_page == ReaSonus8ControlPanel::FUNCTIONS_PAGE;
+        functionsDialogOpen = ReaSonus8ControlPanel::control_panel_open
+                              && ReaSonus8ControlPanel::current_page == ReaSonus8ControlPanel::FUNCTIONS_PAGE;
 
-        SetButtonValue();
-        SetButtonColors();
-    };
+        SetButtonValue(force_update);
+        SetButtonColors(force_update);
+    }
 
-    void Refresh(bool force = false)
-    {
+    void Refresh(const bool force = false) const {
         SetButtonValue(force);
         SetButtonColors(force);
     }
 
-    void HandleEncoderClick(int value)
-    {
-        if (value == 0)
-        {
+    void HandleEncoderClick(const int value) const {
+        if (value == 0) {
             return;
         }
 
-        if (context->GetAddSendReceiveMode() > -1)
-        {
-            bool is_receive_mode = context->GetChannelMode() == ReceiveMode || context->GetChannelMode() == TrackReceiveMode;
-            MediaTrack *src_track = is_receive_mode ? GetTrack(0, context->GetCurrentSelectedSendReceive()) : trackNavigator->GetTrackByIndex(context->GetAddSendReceiveMode());
-            MediaTrack *dest_track = is_receive_mode ? trackNavigator->GetTrackByIndex(context->GetAddSendReceiveMode()) : GetTrack(0, context->GetCurrentSelectedSendReceive());
+        if (context->GetAddSendReceiveMode() > -1) {
+            const bool is_receive_mode = context->GetChannelMode() == ReceiveMode
+                                         || context->GetChannelMode() == TrackReceiveMode;
+            MediaTrack *src_track = is_receive_mode
+                                        ? GetTrack(nullptr, context->GetCurrentSelectedSendReceive())
+                                        : trackNavigator->GetTrackByIndex(context->GetAddSendReceiveMode());
+            MediaTrack *dest_track = is_receive_mode
+                                         ? trackNavigator->GetTrackByIndex(context->GetAddSendReceiveMode())
+                                         : GetTrack(nullptr, context->GetCurrentSelectedSendReceive());
 
-            if (CreateTrackSend(src_track, dest_track) > -1)
-            {
+            if (CreateTrackSend(src_track, dest_track) > -1) {
                 context->SetAddSendReceiveMode(-1);
             }
             return;
         }
 
-        if (context->IsChannelMode(MenuMode))
-        {
+        if (context->IsChannelMode(MenuMode)) {
             faderManager->HandleEncoderPush();
             return;
         }
 
-        if (context->IsChannelMode(PluginControlMode))
-        {
+        if (context->IsChannelMode(PluginControlMode)) {
             faderManager->HandleEncoderPush();
             return;
         }
 
-        if (context->GetShiftLeft())
-        {
+        if (context->GetShiftLeft()) {
             resetPan();
-        }
-        else
-        {
+        } else {
             context->TogglePanPushMode();
         }
     }
 
-    void HandleEncoderChange(int value)
-    {
-        if (context->GetAddSendReceiveMode() > -1)
-        {
+    void HandleEncoderChange(const int value) const {
+        if (context->GetAddSendReceiveMode() > -1) {
             hasBit(value, 6)
                 ? context->DecrementCurrentSelectedSendReceive()
                 : context->IncrementCurrentSelectedSendReceive();
             return;
         }
 
-        switch (context->GetPanEncoderMode())
-        {
-        case PanEncoderTrackPanMode:
-            hasBit(value, 6)
-                ? DecrementPan(value - 64)
-                : IncrementPan(value);
-            break;
+        switch (context->GetPanEncoderMode()) {
+            case PanEncoderTrackPanMode:
+                hasBit(value, 6)
+                    ? DecrementPan(value - 64)
+                    : IncrementPan(value);
+                break;
 
-        case PanEncoderMenuMode:
-        case PanEncoderPluginStepSizeMode:
-            hasBit(value, 6)
-                ? faderManager->HandleEncoderDecrement()
-                : faderManager->HandleEncoderIncrement();
-            break;
+            case PanEncoderMenuMode:
+            case PanEncoderPluginStepSizeMode:
+                hasBit(value, 6)
+                    ? faderManager->HandleEncoderDecrement()
+                    : faderManager->HandleEncoderIncrement();
+                break;
 
-        case PanEncoderPluginMode:
-        case PanEncoderSendMode:
-        case PanEncoderReceiveMode:
-        case PanEncoderPanMode:
-        case PanEncoderMixMode:
-        case PanEncoderPluginEditMode:
-            context->UpdateChannelManagerItemIndex(hasBit(value, 6) ? -1 : 1);
-            break;
+            case PanEncoderPluginMode:
+            case PanEncoderSendMode:
+            case PanEncoderReceiveMode:
+            case PanEncoderPanMode:
+            case PanEncoderMixMode:
+            case PanEncoderPluginEditMode:
+                context->UpdateChannelManagerItemIndex(hasBit(value, 6) ? -1 : 1);
+                break;
 
-        case PanEncoderPluginControlMode:
-            int stepSize = stoi(settings->GetSetting("surface", "plugin-step-size", "1"));
-            context->UpdateChannelManagerItemIndex(hasBit(value, 6) ? 0 - stepSize : stepSize);
-            break;
+            case PanEncoderPluginControlMode:
+                const int stepSize = stoi(settings->GetSetting("surface", "plugin-step-size", "1"));
+                context->UpdateChannelManagerItemIndex(hasBit(value, 6) ? 0 - stepSize : stepSize);
+                break;
         }
     }
 
-    void
-    HandleArmButton(int value)
-    {
-        if (context->GetShiftChannelLeft())
-        {
-            Main_OnCommandEx(40490, 0, 0); // Track: Arm all tracks for recording
-        }
-        else if (context->GetShiftChannelRight())
-        {
-            Main_OnCommandEx(40491, 0, 0); // Track: Unarm all tracks for recording
-        }
-        else
-        {
+    void HandleArmButton(const int value) {
+        if (context->GetShiftChannelLeft()) {
+            Main_OnCommandAsyncEx(40490, 0, nullptr); // Track: Arm all tracks for recording
+        } else if (context->GetShiftChannelRight()) {
+            Main_OnCommandAsyncEx(40491, 0, nullptr); // Track: Unarm all tracks for recording
+        } else {
             armState.SetValue(value > 0);
             context->SetArm(armState.IsActive());
         }
@@ -297,86 +280,75 @@ public:
         SetButtonValue();
     }
 
-    void HandleSoloClearButton(int value)
-    {
-        if (value == 0)
-        {
+    void HandleSoloClearButton(const int value) const {
+        if (value == 0) {
             return;
         }
 
-        Main_OnCommandEx(40340, 0, 0); // Track: Unsolo all tracks
-    };
+        Main_OnCommandAsyncEx(40340, 0, nullptr); // Track: Unsolo all tracks
+    }
 
-    void HandleMuteClearButton(int value)
-    {
-        if (value == 0)
-        {
+    void HandleMuteClearButton(const int value) const {
+        if (value == 0) {
             return;
         }
 
-        Main_OnCommandEx(40339, 0, 0); // Track: Unmute all tracks
-    };
+        Main_OnCommandAsyncEx(40339, 0, nullptr); // Track: Unmute all tracks
+    }
 
-    void HandleBypassButton(int value)
-    {
-        if (value == 0)
-        {
+    void HandleBypassButton(const int value) const {
+        if (value == 0) {
             return;
         }
 
-        context->GetShiftLeft() ? Main_OnCommandEx(40344, 0, 0) // Track: Toggle FX bypass on all tracks
-                                : Main_OnCommandEx(8, 0, 0);    // Track: Toggle FX bypass for selected tracks
-    };
+        context->GetShiftLeft()
+            ? Main_OnCommandAsyncEx(40344, 0, nullptr) // Track: Toggle FX bypass on all tracks
+            : Main_OnCommandAsyncEx(8, 0, nullptr); // Track: Toggle FX bypass for selected tracks
+    }
 
-    void HandleMacroButton(int value)
-    {
-        if (value == 0)
-        {
+    void HandleMacroButton(const int value) const {
+        if (value == 0) {
             return;
         }
 
-        int current_page = context->GetShiftLeft() ? ReaSonus8ControlPanel::FUNCTIONS_PAGE : ReaSonus8ControlPanel::FILTERS_PAGE;
+        const int current_page = context->GetShiftLeft()
+                                     ? ReaSonus8ControlPanel::FUNCTIONS_PAGE
+                                     : ReaSonus8ControlPanel::FILTERS_PAGE;
 
         ToggleFP8ControlPanel(current_page);
-    };
+    }
 
-    void HandleLinkButton(int value)
-    {
-        if (value == 0)
-        {
+    void HandleLinkButton(const int value) const {
+        if (value == 0) {
             return;
         }
 
-        if (context->GetShiftLeft())
-        {
+        if (context->GetShiftLeft()) {
             Main_OnCommandStringEx("_REASONUS_TOGGLE_PLAY_CURSOR_COMMAND");
-        }
-        else
-        {
-            if (::CountTracks(0) == 0)
-            {
+        } else {
+            if (CountTracks(nullptr) == 0) {
                 return;
             }
 
-            if (!settings->GetDisablePluginControl() &&
-                (context->IsChannelMode(PluginMode) ||
-                 context->IsChannelMode(TrackPluginMode) ||
-                 context->IsChannelMode(PluginControlMode) ||
-                 context->IsChannelMode(PluginEditMode)) &&
-
-                (context->GetPluginEditPluginId() > -1))
-            {
+            if (!settings->GetDisablePluginControl() && (
+                    context->IsChannelMode(PluginMode) ||
+                    context->IsChannelMode(TrackPluginMode) ||
+                    context->IsChannelMode(PluginControlMode) ||
+                    context->IsChannelMode(PluginEditMode)
+                ) &&
+                context->GetPluginEditPluginId() > -1
+            ) {
                 faderManager->HandleLinkButtonClick();
-            }
-            else
-            {
+            } else if (
+                !context->IsChannelMode(PluginMode) &&
+                !context->IsChannelMode(TrackPluginMode)
+            ) {
                 context->ToggleLastTouchedFxMode();
             }
         }
-    };
+    }
 
-    void HandleShiftButton(int value)
-    {
+    void HandleShiftButton(const int value) {
         shiftState.SetValue(value > 0);
         context->SetShiftLeft(shiftState.IsActive());
         context->SetShiftLeftLocked(shiftState.IsLocked());

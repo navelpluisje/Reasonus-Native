@@ -22,18 +22,20 @@ protected:
     {
         int pluginId = context->GetPluginEditPluginId();
         MediaTrack *media_track = context->GetPluginEditTrack();
-        std::string fullName = DAW::GetTrackFxName(media_track, pluginId, true);
-        std::string pluginName = DAW::GetTrackFxName(media_track, pluginId);
-        std::string developerName = DAW::GetTrackFxDeveloper(media_track, pluginId);
-        fileName = GetReaSonusPluginPath(developerName, pluginName, true);
+        std::string full_name = DAW::GetTrackFxName(media_track, pluginId, true);
+        std::string plugin_type = DAW::GetTrackFxType(media_track, pluginId);
+        std::string plugin_name = DAW::GetTrackFxName(media_track, pluginId, false);
+        std::string developer_name = DAW::GetTrackFxDeveloper(media_track, pluginId);
+        fileName = GetReaSonusPluginPath(developer_name, plugin_name, plugin_type, true);
 
         mINI::INIFile file(fileName);
         if (!file.read(ini))
         {
             ini["Global"];
-            ini["Global"]["origName"] = fullName;
-            ini["Global"]["name"] = pluginName;
-            ini["Global"]["developer"] = pluginName;
+            ini["Global"]["origName"] = full_name;
+            ini["Global"]["name"] = plugin_name;
+            ini["Global"]["type"] = plugin_type;
+            ini["Global"]["developer"] = developer_name;
             (void)file.generate(ini, true);
         }
     }
@@ -52,15 +54,15 @@ public:
         midi_Output *m_midiout) : CSurf_FP_8_ChannelManager(tracks, navigator, context, m_midiout)
     {
         context->ResetChannelManagerItemIndex();
-        context->SetChannelManagerItemsCount(127);
+        context->SetChannelManagerItemsCount(CSurf_Context::GetPluginMaxGroupCount());
         GetCurrentPlugin();
-        UpdateTracks();
+        UpdateTracks(true);
         color = ButtonColorWhiteDim;
     }
 
     ~CSurf_FP_8_PluginLearnManager() {};
 
-    void UpdateTracks() override
+    void UpdateTracks(bool force_update) override
     {
         std::string paramKey;
         int trackId, itemNumber, takeId, pluginId, paramId;
@@ -83,46 +85,46 @@ public:
             track->SetTrackColor(color);
 
             // If the track is armed always blink as an indication it is armed
-            track->SetSelectButtonValue(BTN_VALUE_OFF, forceUpdate);
-            track->SetMuteButtonValue(BTN_VALUE_OFF, forceUpdate);
-            track->SetSoloButtonValue(BTN_VALUE_OFF, forceUpdate);
-            track->SetFaderValue(0, forceUpdate);
+            track->SetSelectButtonValue(BTN_VALUE_OFF, force_update);
+            track->SetMuteButtonValue(BTN_VALUE_OFF, force_update);
+            track->SetSoloButtonValue(BTN_VALUE_OFF, force_update);
+            track->SetFaderValue(0, force_update);
             track->SetValueBarMode(VALUEBAR_MODE_NORMAL);
             track->SetValueBarValue(0);
 
-            track->SetDisplayMode(DISPLAY_MODE_2, forceUpdate);
+            track->SetDisplayMode(DISPLAY_MODE_2, force_update);
 
             paramKey = getParamKey("Select_", paramIndex);
             if (ini.has(paramKey))
             {
-                track->SetDisplayLine(0, ALIGN_CENTER, ini[paramKey]["name"].c_str(), INVERT, forceUpdate);
+                track->SetDisplayLine(0, ALIGN_CENTER, ini[paramKey]["name"].c_str(), INVERT, force_update);
             }
             else
             {
-                track->SetDisplayLine(0, ALIGN_CENTER, "Free", INVERT, forceUpdate);
+                track->SetDisplayLine(0, ALIGN_CENTER, "Free", INVERT, force_update);
             }
 
             paramKey = getParamKey("Fader_", paramIndex);
             if (ini.has(paramKey))
             {
-                track->SetDisplayLine(2, ALIGN_CENTER, ini[paramKey]["name"].c_str(), INVERT, forceUpdate);
+                track->SetDisplayLine(2, ALIGN_CENTER, ini[paramKey]["name"].c_str(), INVERT, force_update);
             }
             else
             {
-                track->SetDisplayLine(2, ALIGN_CENTER, "Free", INVERT, forceUpdate);
+                track->SetDisplayLine(2, ALIGN_CENTER, "Free", INVERT, force_update);
             }
 
             track->SetDisplayLine(1, ALIGN_CENTER, "", NON_INVERT, true);
             track->SetDisplayLine(3, ALIGN_CENTER, "", NON_INVERT, true);
         }
 
-        forceUpdate = false;
+        force_update = false;
     }
 
     void OpenMappingUi(int plugin_id, int channel)
     {
         MediaTrack *media_track = context->GetPluginEditTrack();
-        std::string plugin_name = DAW::GetTrackFxName(media_track, plugin_id);
+        std::string plugin_name = DAW::GetTrackFxName(media_track, plugin_id, false);
         std::string developer_name = DAW::GetTrackFxDeveloper(media_track, plugin_id);
 
         if (!ReaSonus8ControlPanel::control_panel_open)
