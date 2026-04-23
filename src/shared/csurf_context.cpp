@@ -4,7 +4,6 @@
 #include "csurf_context_resources.hpp"
 #include "csurf_utils.hpp"
 #include "csurf_reasonus_settings.hpp"
-#include "../controls/csurf_display_resources.hpp"
 
 class CSurf_Context // NOLINT(*-use-internal-linkage)
 {
@@ -44,11 +43,11 @@ class CSurf_Context // NOLINT(*-use-internal-linkage)
 
     // Plugin Edit fields
     MediaTrack *pluginEditTrack{nullptr};
-    int pluginEditPluginId{0};
-    int pluginEditParamId{0};
+    int pluginEditPluginId;
+    int pluginEditParamId;
 
     // disable fader on v2
-    bool fader_disabled{false};
+    bool fader_disabled;
 
     ChannelMode channelMode = TrackMode;
     ChannelMode previousChannelMode = TrackMode;
@@ -72,6 +71,9 @@ public:
         show_time_code = false;
         master_fader_mode = false;
         panPushModePan = true;
+        fader_disabled = false;
+        pluginEditPluginId = 0;
+        pluginEditParamId = 0;
     }
 
     ~CSurf_Context() = default;
@@ -79,7 +81,8 @@ public:
     /**************************************************************************
      * Modifiers
      **************************************************************************/
-    void SetShiftLeft(const bool val) {
+    void
+    SetShiftLeft(const bool val) {
         if (settings->GetSwapShiftButtons()) {
             shift_right = val;
         } else {
@@ -411,15 +414,15 @@ public:
         return settings->GetSetting(group, key);
     }
 
-    [[nodiscard]] auto GetDisplayLineValues() const {
+    [[nodiscard]] std::array<int, 4> GetDisplayLineValues() const {
         return settings->GetTrackDisplayLineValues();
     }
 
-    [[nodiscard]] auto GetDisplayAlignValues() const {
+    [[nodiscard]] std::array<int, 4> GetDisplayAlignValues() const {
         return settings->GetTrackDisplayAlignValues();
     }
 
-    [[nodiscard]] auto GetDisplayInvertValues() const {
+    [[nodiscard]] std::array<int, 4> GetDisplayInvertValues() const {
         return settings->GetTrackDisplayInvertValues();
     }
 };

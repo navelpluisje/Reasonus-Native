@@ -192,15 +192,15 @@ int ReaSonusSettings::GetTrackDisplay() {
     return stoi(settings["displays"]["track"]);
 }
 
-int *ReaSonusSettings::GetTrackDisplayLineValues() {
+std::array<int, 4> ReaSonusSettings::GetTrackDisplayLineValues() {
     return ConvertDisplayValues(settings["displays"]["track-lines"]);
 }
 
-int *ReaSonusSettings::GetTrackDisplayAlignValues() {
+std::array<int, 4> ReaSonusSettings::GetTrackDisplayAlignValues() {
     return ConvertDisplayValues(settings["displays"]["track-alignment"]);
 }
 
-int *ReaSonusSettings::GetTrackDisplayInvertValues() {
+std::array<int, 4> ReaSonusSettings::GetTrackDisplayInvertValues() {
     return ConvertDisplayValues(settings["displays"]["track-invert"]);
 }
 
@@ -338,9 +338,9 @@ mINI::INIMap<std::string> ReaSonusSettings::GetFilter(const int index) {
     return GetFilter(GetFilterKeyByIndex(index));
 }
 
-int *ReaSonusSettings::ConvertDisplayValues(const std::string &settings_value) {
+std::array<int, 4> ReaSonusSettings::ConvertDisplayValues(const std::string &settings_value) {
     const std::string delimiter = ",";
-    int value[4] = {};
+    std::array<int, 4> value;
 
     if (!settings_value.empty()) {
         int start = 0;

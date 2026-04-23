@@ -117,9 +117,9 @@ public:
         const auto valuebar_mode = static_cast<ValuebarMode>(
             stoi(context->GetSetting("displays", "track-value-bar-mode"))
         );
-        const int display_line_values[4] = context->GetDisplayLineValues();
-        const int display_align_values[4] = context->GetDisplayAlignValues();
-        const int display_invert_values[4] = context->GetDisplayInvertValues();
+        const std::array<int, 4> display_line_values = context->GetDisplayLineValues();
+        const std::array<int, 4> display_align_values = context->GetDisplayAlignValues();
+        const std::array<int, 4> display_invert_values = context->GetDisplayInvertValues();
 
         if (has_last_touched_fx_enabled != context->GetLastTouchedFxMode()) {
             force_update = true;
@@ -138,7 +138,7 @@ public:
             std::string strPan2;
 
             CSurf_FP_8_Track *track = tracks.at(i);
-            if (context->GetMasterFaderMode() && i == (context->GetNbChannels() - 1)) {
+            if (context->GetMasterFaderMode() && i == context->GetNbChannels() - 1) {
                 media_track = GetMasterTrack(nullptr);
                 is_master_track = true;
             } else {

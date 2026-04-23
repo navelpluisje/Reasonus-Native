@@ -212,6 +212,9 @@ void DAW::SetUniqueSelectedTrack(MediaTrack *media_track) {
         UnSelectAllTracks();
         SetTrackSelected(media_track, true);
         CSurf_OnSelectedChange(media_track, 1); // this will automatically update the surface
+        if (!::IsTrackVisible(media_track, true)) {
+            SetMixerScroll(media_track);
+        }
     }
 }
 

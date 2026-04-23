@@ -24,7 +24,7 @@ class CSurf_FP_V2_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-i
     std::vector<std::string> language_names;
     ReaSonusSettings *settings = ReaSonusSettings::GetInstance(FP_V2);
 
-    int *latch_preview_action_indexes[8] = {42013, 42014, 42015, 42016, 42017, 41160, 41161, 41162};
+    std::array<int, 8> latch_preview_action_indexes = {42013, 42014, 42015, 42016, 42017, 41160, 41161, 41162};
     std::vector<std::string> latch_preview_action_names = {
         "Write current values for actively-writing envelopes to time selection",
         "Write current values for actively-writing envelopes from cursor to start of project",

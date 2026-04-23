@@ -8,7 +8,7 @@
 #endif
 
 
-void parseParms(const char *config, int parms[4]) {
+void parseParms(const char *config, std::array<int, 4> parms) {
     parms[0] = 0;
     parms[1] = 9;
     parms[2] = parms[3] = -1;

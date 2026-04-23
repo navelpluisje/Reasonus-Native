@@ -1,10 +1,10 @@
 #ifndef CSURF_FADERPORT_UI_UTILS_H_
 #define CSURF_FADERPORT_UI_UTILS_H_
 
-#include <cstdio>
+// #include <cstdio>
 #include <string>
-#include <WDL/wdltypes.h> // might be unnecessary in future
-#include <WDL/win32_utf8.h>
+// #include <WDL/wdltypes.h> // might be unnecessary in future
+// #include <WDL/win32_utf8.h>
 
 #if __APPLE__ || __linux__
 #include <WDL/swell/swell-types.h>
@@ -22,7 +22,7 @@
 
 extern HWND g_hwnd;
 
-void parseParms(const char *config, int parms[4]);
+void parseParms(const char *config, std::array<int, 4> parms);
 
 int AddComboEntry(HWND hwndDlg, int lparam, char *buf, int comboId);
 

@@ -41,6 +41,7 @@ class CSurf_FP_V2_SessionManager // NOLINT(*-use-internal-linkage)
     CSurf_Button *nextButton;
 
 protected:
+
     void SetButtonValues() const {
         // With shift engaged, blink the selected button
         const Btn_Value valueOn = context->GetShiftLeft() && !settings->GetDistractionFreeMode()

@@ -8,11 +8,10 @@
 #include <string>
 #include <vector>
 #include <reaper_plugin.h>
+// ReSharper disable once CppUnusedIncludeDirective
 #include <WDL/wdltypes.h> // might be unnecessary in future
-#include <WDL/ptrlist.h>
 #include <reaper_plugin_functions.h>
 #include "../controls/csurf_button.hpp"
-#include "../resource.h"
 #include "../shared/csurf.h"
 #include "../shared/csurf_transport_manager.hpp"
 #include "../shared/csurf_utils.hpp"
@@ -50,10 +49,9 @@ class CSurf_FaderPortV2 : public IReaperControlSurface {
   I18n *i18n = I18n::GetInstance();
   ReaSonusSettings *settings = ReaSonusSettings::GetInstance(FP_V2);
 
-  WDL_String descspace;
   char configtmp[1024];
 
-  void OnMIDIEvent(MIDI_event_t *evt) {
+  void OnMIDIEvent(const MIDI_event_t *evt) const {
     /**
      * Fader values
      */
@@ -173,13 +171,13 @@ class CSurf_FaderPortV2 : public IReaperControlSurface {
     }
   }
 
-  void updateSettings() {
+  void updateSettings() const {
     i18n->SetLanguage(DAW::GetExtState(EXT_STATE_KEY_UI_LANGUAGE, "en-US"));
     settings->UpdateSettings();
   }
 
 public:
-  CSurf_FaderPortV2(int indev, int outdev, int *errStats) {
+  CSurf_FaderPortV2(const int indev, const int outdev, int *errStats) {
     (void) indev;
     (void) outdev;
 
@@ -191,15 +189,14 @@ public:
       I18n::checkLocalesFiles();
     }
 
-    errStats = 0;
     m_midi_in_dev = settings->GetMidiInput();
     m_midi_out_dev = settings->GetMidiOutput();
 
     surface_update_lastrun = 0;
 
     // create midi hardware access
-    m_midiin = m_midi_in_dev >= 0 ? CreateMIDIInput(m_midi_in_dev) : NULL;
-    m_midiout = m_midi_out_dev >= 0 ? CreateMIDIOutput(m_midi_out_dev, false, NULL) : NULL;
+    m_midiin = m_midi_in_dev >= 0 ? CreateMIDIInput(m_midi_in_dev) : nullptr;
+    m_midiout = m_midi_out_dev >= 0 ? CreateMIDIOutput(m_midi_out_dev, false, nullptr) : nullptr;
 
     context = new CSurf_Context(1);
     updateSettings();
@@ -213,10 +210,12 @@ public:
 
     if (errStats) {
       ShowConsoleMsg("Error: ");
-      ShowConsoleMsg((char *) errStats);
+      ShowConsoleMsg(reinterpret_cast<char *>(errStats));
+
       if (m_midi_in_dev >= 0 && !m_midiin) {
         *errStats |= 1;
       }
+
       if (m_midi_out_dev >= 0 && !m_midiout) {
         *errStats |= 2;
       }
@@ -232,11 +231,11 @@ public:
     }
   }
 
-  ~CSurf_FaderPortV2() {
+  ~CSurf_FaderPortV2() override {
     if (m_midiout) {
-      int x;
-      for (x = 0; x < 0x30; x++) // lights out§
+      for (int x = 0; x < 0x30; x++) // lights out§
         m_midiout->Send(0xa0, x, 0x00, -1);
+
       Sleep(5);
     }
 
@@ -244,38 +243,34 @@ public:
     DELETE_ASYNC(m_midiin);
   }
 
-  CSurf_Context GetContext() {
-    return *context;
-  }
-
-  const char *GetTypeString() {
+  const char *GetTypeString() override {
     return "REASONUS_FADERPORT_V2";
   }
 
-  const char *GetDescString() {
+  const char *GetDescString() override {
     snprintf(configtmp, 100, "ReaSonus FaderPort V2 (dev %d, %d)", m_midi_in_dev, m_midi_out_dev);
     return configtmp;
   }
 
-  const char *GetConfigString() // string of configuration data
-  {
+  // string of configuration data
+  const char *GetConfigString() override {
     snprintf(configtmp, 100, "0 0 %d %d", m_midi_in_dev, m_midi_out_dev);
 
     return configtmp;
   }
 
-  void CloseNoReset() {
+  void CloseNoReset() override {
     DELETE_ASYNC(m_midiout);
     DELETE_ASYNC(m_midiin);
-    m_midiout = 0;
-    m_midiin = 0;
+    m_midiout = nullptr;
+    m_midiin = nullptr;
   }
 
-  bool GetTouchState(MediaTrack *media_track, int is_pan) {
+  bool GetTouchState(MediaTrack *media_track, const int is_pan) override {
     return trackNavigator->IsTrackTouched(media_track, is_pan);
   }
 
-  void Run() {
+  void Run() override {
     if (m_midiin) {
       m_midiin->SwapBufsPrecise(GetTickCount(), 0.0);
       int l = 0;
@@ -288,8 +283,8 @@ public:
     }
 
     if (m_midiout) {
-      DWORD now = GetTickCount();
-      if ((now - surface_update_lastrun) >= 10) {
+      const DWORD now = GetTickCount();
+      if (now - surface_update_lastrun >= 10) {
         trackManager->UpdateTrack();
         generalControlManager->Update();
         sessionManager->Update();
@@ -299,7 +294,7 @@ public:
         surface_update_lastrun = now;
       }
 
-      if ((now - surface_update_keepalive) >= 990) {
+      if (now - surface_update_keepalive >= 990) {
         surface_update_keepalive = now;
         m_midiout->Send(0xa0, 0x00, 0x00, -1);
       }
@@ -309,9 +304,9 @@ public:
        * If so, we updet the settings in the context
        *
        */
-      if ((now - surface_update_settings_check) >= 1500) {
+      if (now - surface_update_settings_check >= 1500) {
         surface_update_settings_check = now;
-        std::string is_saved = DAW::GetExtState(EXT_STATE_KEY_SAVED_SETTINGS, "");
+        const std::string is_saved = DAW::GetExtState(EXT_STATE_KEY_SAVED_SETTINGS, "");
 
         if (is_saved.compare(EXT_STATE_VALUE_TRUE) == 0) {
           updateSettings();
@@ -321,12 +316,12 @@ public:
     }
   }
 
-  void SetTrackListChange() {
+  void SetTrackListChange() override {
     trackNavigator->UpdateOffset();
   }
 
-  void OnTrackSelection(MediaTrack *media_track) {
-    int track_index = stoi(DAW::GetTrackIndex(media_track));
+  void OnTrackSelection(MediaTrack *media_track) override {
+    const int track_index = stoi(DAW::GetTrackIndex(media_track));
 
     // Master track returns -1. Do not do anyting right now
     if (track_index < 0) {
@@ -343,7 +338,7 @@ public:
 
 static IReaperControlSurface *createFuncV2(const char *type_string, const char *configString, int *errStats) {
   (void) type_string;
-  int parms[4];
+  std::array<int, 4> parms;
   parseParms(configString, parms);
 
   return new CSurf_FaderPortV2(parms[2], parms[3], errStats);

@@ -464,7 +464,7 @@ public:
 
 static IReaperControlSurface *createFunc(const char *type_string, const char *configString, int *errStats) {
   (void) type_string;
-  int parms[4];
+  constexpr std::array<int, 4> parms{};
   parseParms(configString, parms);
 
   return new CSurf_FaderPort(parms[2], parms[3], errStats);

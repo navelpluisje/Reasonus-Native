@@ -15,9 +15,8 @@
 #include "csurf_fp_8_track_receives_manager.cpp"
 #include "csurf_fp_8_track_pan_manager.cpp"
 
-class CSurf_FP_8_FaderManager
-{
-    CSurf_FP_8_ChannelManager *channelManager = NULL;
+class CSurf_FP_8_FaderManager {
+    CSurf_FP_8_ChannelManager *channelManager = nullptr;
     std::vector<CSurf_FP_8_Track *> tracks;
 
     ChannelMode prevChannelMode = TrackMode;
@@ -32,9 +31,11 @@ class CSurf_FP_8_FaderManager
     CSurf_Button *sendButton;
     CSurf_Button *panButton;
 
-    void SetButtonValues(bool force = false);
+    void SetButtonValues(bool force = false) const;
 
-    void SetChannelMode(ChannelMode mode, bool updateButtons);
+    void SetChannelMode(ChannelMode channelMode, bool updateButtons);
+
+    void SetTracks();
 
 public:
     CSurf_FP_8_FaderManager(
@@ -64,19 +65,24 @@ public:
 
     void SetPluginControlMode();
 
-    void HandleEncoderIncrement();
+    void HandleEncoderIncrement() const;
 
-    void HandleEncoderDecrement();
+    void HandleEncoderDecrement() const;
 
-    void HandleEncoderPush();
+    void HandleEncoderPush() const;
 
     // ADD ALL THE TRACKMANAGERS METHODS HERE TO PROXY THEM
-    void UpdateTracks(bool force_update = false);
-    void HandleMuteClick(int index, int value);
+    void UpdateTracks(bool force_update = false) const;
+
+    void HandleMuteClick(int index, int value) const;
+
     void HandleSoloClick(int index, int value);
+
     void HandleSelectClick(int index, int value);
-    void HandleFaderMove(int index, int msb, int lsb);
-    void HandleFaderTouch(int index, int value = 0);
+
+    void HandleFaderMove(int index, int msb, int lsb) const;
+
+    void HandleFaderTouch(int index, int value = 0) const;
 };
 
 #endif
