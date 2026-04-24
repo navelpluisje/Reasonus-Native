@@ -100,11 +100,13 @@ void ReaSonusMessage::Frame() {
             ImGui::PushTextWrapPos(m_ctx, width - 24);
 
             ImGui::Text(m_ctx, "This version fixed some bugs:");
+            ImGui::BulletText(m_ctx, "Fixed issue where the selected track was not visible in the mixer");
+            ImGui::BulletText(m_ctx, "Fixed issue where REAPER could crash when no translation file was loaded yet");
+            ImGui::BulletText(m_ctx, "Some code cleanup");
             ImGui::BulletText(
-                m_ctx, "Fixed issue where the FderPort could disconnect when an action had a popup like Edit Marker");
-            ImGui::BulletText(m_ctx, "Fixed issue where the valuebar looked faded when working with plugins");
-            ImGui::BulletText(
-                m_ctx, "Fixed issue where the displays got weird after switching quick between different fader modes");
+                m_ctx, "(FP 16) Disable the last touched fader mode when switching to any plugin related channel mode");
+            ImGui::BulletText(m_ctx, "(FP 16) Improved/Fixed last touched param implementation");
+            ImGui::BulletText(m_ctx, "(FP V2) Fixed issue where disabled fader was not working");
 
             ImGui::Separator(m_ctx);
             ImGui::Text(m_ctx, "Message from 0.8.0, but keep it here until the next version");
