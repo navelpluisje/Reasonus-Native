@@ -3,9 +3,7 @@
 
 #include "csurf_fp_8_fader_manager.hpp"
 
-class CSurf_FP_8_MixManager
-{
-protected:
+class CSurf_FP_8_MixManager {
     CSurf_Context *context;
     CSurf_FP_8_Navigator *trackNavigator;
     CSurf_FP_8_FaderManager *faderManager;
@@ -23,22 +21,60 @@ protected:
 
     ShiftState shiftState;
 
-    void SetButtonValue(bool force = false)
-    {
-        mixAudioButton->SetValue((trackFilter == TrackWithAudioFilter || trackFilter == TrackSendsFilter || trackFilter == TrackReceivesFilter) ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
-        mixViButton->SetValue((trackFilter == TrackInstrumentsFilter || trackFilter == TrackWithMidiFilter) ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
-        mixBusButton->SetValue((trackFilter == TrackTopFoldersFilter || trackFilter == TrackAllFoldersFilter || trackFilter == TrackHarwareOutputFilter) ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
-        mixVcaButton->SetValue((trackFilter == TrackIsVcaFilter || trackFilter == TrackEffectsFilter) ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
-        mixAllButton->SetValue((trackFilter == TrackAllFilter || trackFilter == TrackCustomFilter || trackFilter == TrackCustomMultiSelectFilter) ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
-        shiftRightButton->SetValue(((!settings->GetSwapShiftButtons() && context->GetShiftRight()) ||
-                                    (context->GetShiftLeft() && settings->GetSwapShiftButtons()))
-                                       ? BTN_VALUE_ON
-                                       : BTN_VALUE_OFF,
-                                   force);
+protected:
+    void SetButtonValue(const bool force = false) const {
+        mixAudioButton->SetValue(
+            trackFilter == TrackWithAudioFilter
+            || trackFilter == TrackSendsFilter
+            || trackFilter == TrackReceivesFilter
+                ? BTN_VALUE_ON
+                : BTN_VALUE_OFF, force
+        );
+
+        mixViButton->SetValue(
+            trackFilter == TrackInstrumentsFilter
+            || trackFilter == TrackWithMidiFilter
+                ? BTN_VALUE_ON
+                : BTN_VALUE_OFF,
+            force
+        );
+
+        mixBusButton->SetValue(
+            trackFilter == TrackTopFoldersFilter
+            || trackFilter == TrackAllFoldersFilter
+            || trackFilter == TrackHarwareOutputFilter
+                ? BTN_VALUE_ON
+                : BTN_VALUE_OFF,
+            force
+        );
+
+        mixVcaButton->SetValue(
+            trackFilter == TrackIsVcaFilter
+            || trackFilter == TrackEffectsFilter
+                ? BTN_VALUE_ON
+                : BTN_VALUE_OFF,
+            force
+        );
+
+        mixAllButton->SetValue(
+            trackFilter == TrackAllFilter
+            || trackFilter == TrackCustomFilter
+            || trackFilter == TrackCustomMultiSelectFilter
+                ? BTN_VALUE_ON
+                : BTN_VALUE_OFF,
+            force
+        );
+
+        shiftRightButton->SetValue(
+            (!settings->GetSwapShiftButtons() && context->GetShiftRight())
+            || (context->GetShiftLeft() && settings->GetSwapShiftButtons())
+                ? BTN_VALUE_ON
+                : BTN_VALUE_OFF,
+            force
+        );
     }
 
-    void SetButtonColor(bool force = false)
-    {
+    void SetButtonColor(const bool force = false) const {
         mixAudioButton->SetColor(ButtonColorWhite, force);
         mixViButton->SetColor(ButtonColorWhite, force);
         mixBusButton->SetColor(ButtonColorWhite, force);
@@ -46,8 +82,7 @@ protected:
         mixAllButton->SetColor(ButtonColorWhite, force);
     }
 
-    void SetTrackFilter(NavigatorFilter filter)
-    {
+    void SetTrackFilter(const NavigatorFilter filter) {
         trackFilter = filter;
         trackNavigator->SetMultiSelectFilter(filter == TrackCustomMultiSelectFilter);
     }
@@ -57,46 +92,40 @@ public:
         CSurf_Context *context,
         CSurf_FP_8_Navigator *trackNavigator,
         CSurf_FP_8_FaderManager *faderManager,
-        midi_Output *m_midiout) : context(context), trackNavigator(trackNavigator), faderManager(faderManager), m_midiout(m_midiout)
-    {
-        mixAudioButton = new CSurf_ColorButton(ButtonColorWhite, BTN_AUDIO, BTN_VALUE_OFF, m_midiout);
-        mixViButton = new CSurf_ColorButton(ButtonColorWhite, BTN_VI, BTN_VALUE_OFF, m_midiout);
-        mixBusButton = new CSurf_ColorButton(ButtonColorWhite, BTN_BUS, BTN_VALUE_OFF, m_midiout);
-        mixVcaButton = new CSurf_ColorButton(ButtonColorWhite, BTN_VCA, BTN_VALUE_OFF, m_midiout);
-        mixAllButton = new CSurf_ColorButton(ButtonColorWhite, BTN_ALL, BTN_VALUE_ON, m_midiout);
-        shiftRightButton = new CSurf_Button(BTN_SHIFT_RIGHT, BTN_VALUE_OFF, m_midiout);
+        midi_Output *m_midiout
+    ) : context(context), trackNavigator(trackNavigator), faderManager(faderManager), m_midiout(m_midiout) {
+        mixAudioButton = new CSurf_ColorButton(ButtonColorWhite, BTN_AUDIO, BTN_VALUE_OFF, this->m_midiout);
+        mixViButton = new CSurf_ColorButton(ButtonColorWhite, BTN_VI, BTN_VALUE_OFF, this->m_midiout);
+        mixBusButton = new CSurf_ColorButton(ButtonColorWhite, BTN_BUS, BTN_VALUE_OFF, this->m_midiout);
+        mixVcaButton = new CSurf_ColorButton(ButtonColorWhite, BTN_VCA, BTN_VALUE_OFF, this->m_midiout);
+        mixAllButton = new CSurf_ColorButton(ButtonColorWhite, BTN_ALL, BTN_VALUE_ON, this->m_midiout);
+        shiftRightButton = new CSurf_Button(BTN_SHIFT_RIGHT, BTN_VALUE_OFF, this->m_midiout);
 
         HandleMixAllButton(BTN_VALUE_ON);
     }
-    ~CSurf_FP_8_MixManager() {};
 
-    void Refresh(bool force = false)
-    {
+    ~CSurf_FP_8_MixManager() = default;
+
+    void Refresh(const bool force = false) const {
         SetButtonValue(force);
         SetButtonColor(force);
     }
 
-    void HandleMixAudioButton(int value)
-    {
-        if (value == 0)
-        {
+    void HandleMixAudioButton(const int value) {
+        if (value == 0) {
             return;
         }
-        if (context->GetShiftRight())
-        {
+
+        if (context->GetShiftRight()) {
             mixAudioButton->SetColor(ButtonColorGreen);
             SetTrackFilter(TrackReceivesFilter);
             trackNavigator->HandleFilter(TrackReceivesFilter);
-        }
-        else if (context->GetShiftLeft())
-        {
+        } else if (context->GetShiftLeft()) {
             mixAllButton->SetColor(ButtonColorYellow);
             SetTrackFilter(TrackSendsFilter);
             trackNavigator->HandleFilter(TrackSendsFilter);
             faderManager->ResetMixButtonClick();
-        }
-        else
-        {
+        } else {
             mixAudioButton->SetColor(ButtonColorWhite);
             SetTrackFilter(TrackWithAudioFilter);
             trackNavigator->HandleFilter(TrackWithAudioFilter);
@@ -106,21 +135,16 @@ public:
         SetButtonValue();
     }
 
-    void HandleMixViButton(int value)
-    {
-        if (value == 0)
-        {
+    void HandleMixViButton(const int value) {
+        if (value == 0) {
             return;
         }
 
-        if (context->GetShiftLeft())
-        {
+        if (context->GetShiftLeft()) {
             mixViButton->SetColor(ButtonColorYellow);
             SetTrackFilter(TrackWithMidiFilter);
             trackNavigator->HandleFilter(TrackWithMidiFilter);
-        }
-        else
-        {
+        } else {
             mixViButton->SetColor(ButtonColorWhite);
             SetTrackFilter(TrackInstrumentsFilter);
             trackNavigator->HandleFilter(TrackInstrumentsFilter);
@@ -130,27 +154,20 @@ public:
         SetButtonValue();
     }
 
-    void HandleMixBusButton(int value)
-    {
-        if (value == 0)
-        {
+    void HandleMixBusButton(const int value) {
+        if (value == 0) {
             return;
         }
 
-        if (context->GetShiftRight())
-        {
+        if (context->GetShiftRight()) {
             mixBusButton->SetColor(ButtonColorGreen);
             SetTrackFilter(TrackAllFoldersFilter);
             trackNavigator->HandleFilter(TrackAllFoldersFilter);
-        }
-        else if (context->GetShiftLeft())
-        {
+        } else if (context->GetShiftLeft()) {
             mixBusButton->SetColor(ButtonColorYellow);
             SetTrackFilter(TrackHarwareOutputFilter);
             trackNavigator->HandleFilter(TrackHarwareOutputFilter);
-        }
-        else
-        {
+        } else {
             mixBusButton->SetColor(ButtonColorWhite);
             SetTrackFilter(TrackTopFoldersFilter);
             trackNavigator->HandleFilter(TrackTopFoldersFilter);
@@ -160,21 +177,16 @@ public:
         SetButtonValue();
     }
 
-    void HandleMixVcaButton(int value)
-    {
-        if (value == 0)
-        {
+    void HandleMixVcaButton(const int value) {
+        if (value == 0) {
             return;
         }
 
-        if (context->GetShiftLeft())
-        {
+        if (context->GetShiftLeft()) {
             mixVcaButton->SetColor(ButtonColorYellow);
             SetTrackFilter(TrackEffectsFilter);
             trackNavigator->HandleFilter(TrackEffectsFilter);
-        }
-        else
-        {
+        } else {
             mixVcaButton->SetColor(ButtonColorWhite);
             SetTrackFilter(TrackIsVcaFilter);
             trackNavigator->HandleFilter(TrackIsVcaFilter);
@@ -183,36 +195,26 @@ public:
         SetButtonValue();
     }
 
-    void HandleMixAllButton(int value)
-    {
-        if (value == 0)
-        {
+    void HandleMixAllButton(const int value) {
+        if (value == 0) {
             return;
         }
 
-        if (context->GetShiftRight())
-        {
+        if (context->GetShiftRight()) {
             // We do not have multi select enabled yet, so lets go
-            if (trackFilter != TrackCustomMultiSelectFilter || context->GetChannelMode() != MixMode)
-            {
+            if (trackFilter != TrackCustomMultiSelectFilter || context->GetChannelMode() != MixMode) {
                 mixAllButton->SetColor(ButtonColorGreen);
                 faderManager->HandleMixAllButtonClick();
-            }
-            else
-            {
+            } else {
                 trackNavigator->HandleFilter(TrackCustomMultiSelectFilter);
                 faderManager->ResetMixButtonClick();
             }
             SetTrackFilter(TrackCustomMultiSelectFilter);
-        }
-        else if (context->GetShiftLeft())
-        {
+        } else if (context->GetShiftLeft()) {
             mixAllButton->SetColor(ButtonColorYellow);
             SetTrackFilter(TrackCustomFilter);
             faderManager->HandleMixAllButtonClick();
-        }
-        else
-        {
+        } else {
             mixAllButton->SetColor(ButtonColorWhite);
             SetTrackFilter(TrackAllFilter);
             trackNavigator->HandleFilter(TrackAllFilter);
@@ -222,19 +224,14 @@ public:
         SetButtonValue();
     }
 
-    void HandleShiftButton(int value)
-    {
-        int time = GetTickCount();
+    void HandleShiftButton(const int value) {
+        const int time = GetTickCount();
         shiftState.active = value > 0;
 
-        if (shiftState.start == 0)
-        {
+        if (shiftState.start == 0) {
             shiftState.start = time;
-        }
-        else
-        {
-            if (time - shiftState.start < TOGGLE_SPEED)
-            {
+        } else {
+            if (time - shiftState.start < TOGGLE_SPEED) {
                 shiftState.ToggleInvert();
             }
             shiftState.start = 0;

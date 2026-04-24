@@ -49,6 +49,7 @@ class ReaSonusSettings {
         {"surface", "track-color-brightness", "25"},
         {"surface", "plugin-step-size", "1"},
         {"surface", "plugin-map-param-clear", "0"},
+        {"surface", "instant-multi-select-filter", "0"},
         {"displays", "track", "8"},
         {"displays", "track-lines", "0,4,1,2"},
         {"displays", "track-alignment", "1,0,0,0"},
@@ -213,6 +214,8 @@ public:
     int GetMidiOutput();
 
     bool ShouldClearParamInput();
+
+    bool ShouldMultiFilterApplyInstant();
 
     /**
      * Settings for the FaderPort 2

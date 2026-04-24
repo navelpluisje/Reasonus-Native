@@ -49,7 +49,7 @@ class CSurf_Context // NOLINT(*-use-internal-linkage)
     // disable fader on v2
     bool fader_disabled;
 
-    ChannelMode channelMode = TrackMode;
+    ChannelMode channelMode;
     ChannelMode previousChannelMode = TrackMode;
     ChannelMode previousPluginChannelMode = TrackMode;
     ChannelManagerType channelManagerType{};
@@ -74,6 +74,8 @@ public:
         fader_disabled = false;
         pluginEditPluginId = 0;
         pluginEditParamId = 0;
+
+        channelMode = TrackMode;
     }
 
     ~CSurf_Context() = default;

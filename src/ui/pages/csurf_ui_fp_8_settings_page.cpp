@@ -30,6 +30,7 @@ class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-in
     bool setting_latch_preview_action_enable;
     bool setting_overwrite_time_code;
     bool setting_plugin_map_param_clear;
+    bool setting_instant_multi_select_filter;
     int setting_plugin_step_size;
     int setting_latch_preview_action;
     int setting_track_color_brightness = 25;
@@ -218,6 +219,13 @@ public:
                 i18n->t("settings", "latch-preview-action-enable.label"),
                 &setting_latch_preview_action_enable,
                 i18n->t("settings", "latch-preview-action-enable.tooltip"));
+
+            RenderInfoCheckbox(
+                m_ctx,
+                assets,
+                i18n->t("settings", "instant-multi-select-filter.label"),
+                &setting_instant_multi_select_filter,
+                i18n->t("settings", "instant-multi-select-filter.tooltip"));
 
             if (setting_latch_preview_action_enable) {
                 ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + 26);
@@ -537,6 +545,7 @@ public:
         settings->SetSetting("surface", "time-code", time_code_indexes[setting_time_code]);
         settings->SetSetting("surface", "plugin-step-size", setting_plugin_step_size);
         settings->SetSetting("surface", "plugin-map-param-clear", setting_plugin_map_param_clear);
+        settings->SetSetting("surface", "instant-multi-select-filter", setting_instant_multi_select_filter);
         settings->SetSetting("displays", "track", setting_track_display);
         settings->SetSetting("displays", "track-lines", joinDisplayValues(setting_track_value_line_value, ","));
         settings->SetSetting("displays", "track-alignment", joinDisplayValues(setting_track_value_line_align, ","));
@@ -582,6 +591,7 @@ public:
         setting_track_value_line_invert = settings->GetTrackDisplayInvertValues();
         setting_track_valuebar_mode = settings->GetTrackValueBarMode();
         setting_track_valuebar_value = settings->GetTrackValueBarValue();
+        setting_instant_multi_select_filter = settings->ShouldMultiFilterApplyInstant();
 
         index = std::find(
             latch_preview_action_indexes.begin(),

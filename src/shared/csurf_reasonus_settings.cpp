@@ -228,6 +228,10 @@ bool ReaSonusSettings::ShouldClearParamInput() {
     return stoi(settings["surface"]["plugin-map-param-clear"]) > 0;
 }
 
+bool ReaSonusSettings::ShouldMultiFilterApplyInstant() {
+    return stoi(settings["surface"]["instant-multi-select-filter"]) > 0;
+}
+
 /**
  * Settings for the FaderPort 2
  */
