@@ -3,7 +3,7 @@
 
 #include "../shared/csurf_reasonus_settings.hpp"
 #include "csurf_fp_8_fader_manager.hpp"
-#include "csurf_fp_8_ui_control_panel.hpp"
+#include "../ui/windows/csurf_ui_fp_8_control_panel.hpp"
 
 class CSurf_FP_8_GeneralControlManager {
 protected:
@@ -64,8 +64,7 @@ protected:
             || (context->GetShiftRight() && settings->GetSwapShiftButtons())
                 ? BTN_VALUE_ON
                 : BTN_VALUE_OFF,
-            force
-        );
+            force);
     }
 
     void UpdatePanValue(const int val) const {
@@ -81,27 +80,17 @@ protected:
         if (pan_mode == PAN_MODE_BALANCE_PAN) {
             double newValue = static_cast<int>(panToNormalized(pan1) * 127.0) + val;
             newValue = minmax(0.0, newValue, 127.0);
-            SetMediaTrackInfo_Value(
-                media_track,
-                "D_PAN",
-                normalizedToPan(newValue / 127)
-            );
+            SetMediaTrackInfo_Value(media_track, "D_PAN", normalizedToPan(newValue / 127));
         } else if (context->GetPanPushMode()) {
             double newValue = static_cast<int>(panToNormalized(pan1) * 127.0) + val;
             newValue = minmax(0.0, newValue, 127.0);
-            SetMediaTrackInfo_Value(
-                media_track,
-                pan_mode < 6 ? "D_PAN" : "D_DUALPANL",
-                normalizedToPan(newValue / 127)
-            );
+            SetMediaTrackInfo_Value(media_track, pan_mode < 6 ? "D_PAN" : "D_DUALPANL",
+                                    normalizedToPan(newValue / 127));
         } else {
             double newValue = static_cast<int>(panToNormalized(pan2) * 127.0) + val;
             newValue = minmax(0.0, newValue, 127.0);
-            SetMediaTrackInfo_Value(
-                media_track,
-                pan_mode < 6 ? "D_WIDTH" : "D_DUALPANR",
-                normalizedToPan(newValue / 127)
-            );
+            SetMediaTrackInfo_Value(media_track, pan_mode < 6 ? "D_WIDTH" : "D_DUALPANR",
+                                    normalizedToPan(newValue / 127));
         }
     }
 
@@ -159,7 +148,7 @@ public:
         followCursor = false;
         last_touched_fx_mode = false;
         functionsDialogOpen = false;
-
+        
         armButton = new CSurf_Button(BTN_ARM, BTN_VALUE_OFF, m_midiout);
         soloClearButton = new CSurf_Button(BTN_SOLO_CLEAR, BTN_VALUE_OFF, m_midiout);
         muteClearButton = new CSurf_Button(BTN_MUTE_CLEAR, BTN_VALUE_OFF, m_midiout);
@@ -179,8 +168,8 @@ public:
         hasGlobalBypass = static_cast<bool>(GetToggleCommandState(40344));
         followCursor = GetToggleCommandStringState("_REASONUS_TOGGLE_PLAY_CURSOR_COMMAND");
         last_touched_fx_mode = context->GetLastTouchedFxMode();
-        functionsDialogOpen = ReaSonus8ControlPanel::control_panel_open
-                              && ReaSonus8ControlPanel::current_page == ReaSonus8ControlPanel::FUNCTIONS_PAGE;
+        functionsDialogOpen = ReaSonus8ControlPanel::control_panel_open && ReaSonus8ControlPanel::current_page ==
+                              ReaSonus8ControlPanel::FUNCTIONS_PAGE;
 
         SetButtonValue(force_update);
         SetButtonColors(force_update);
@@ -324,25 +313,23 @@ public:
         }
 
         if (context->GetShiftLeft()) {
-            Main_OnCommandStringEx("_REASONUS_TOGGLE_PLAY_CURSOR_COMMAND");
+            Main_OnCommandStringEx("_REASONUS_TOGGLE_PLAY_CURSOR_COMMAND", 0, nullptr);
         } else {
             if (CountTracks(nullptr) == 0) {
                 return;
             }
 
-            if (!settings->GetDisablePluginControl() && (
-                    context->IsChannelMode(PluginMode) ||
-                    context->IsChannelMode(TrackPluginMode) ||
-                    context->IsChannelMode(PluginControlMode) ||
-                    context->IsChannelMode(PluginEditMode)
-                ) &&
-                context->GetPluginEditPluginId() > -1
+            if (!settings->GetDisablePluginControl()
+                && (
+                    context->IsChannelMode(PluginMode)
+                    || context->IsChannelMode(TrackPluginMode)
+                    || context->IsChannelMode(PluginControlMode)
+                    || context->IsChannelMode(PluginEditMode)
+                )
+                && context->GetPluginEditPluginId() > -1
             ) {
                 faderManager->HandleLinkButtonClick();
-            } else if (
-                !context->IsChannelMode(PluginMode) &&
-                !context->IsChannelMode(TrackPluginMode)
-            ) {
+            } else {
                 context->ToggleLastTouchedFxMode();
             }
         }

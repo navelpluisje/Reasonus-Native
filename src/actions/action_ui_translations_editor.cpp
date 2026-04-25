@@ -1,6 +1,6 @@
 #include "action_ui_translations_editor.hpp"
 #include "../shared/csurf_utils.hpp"
-#include "../ui/csurf_ui_translation_editor.hpp"
+#include "../ui/windows/csurf_ui_translation_editor.hpp"
 
 #define STRINGIZE_DEF(x) #x
 #define STRINGIZE(x) STRINGIZE_DEF(x)

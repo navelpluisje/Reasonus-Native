@@ -1,5 +1,5 @@
 target_sources(${PROJECT_NAME}
-    PRIVATE
+        PRIVATE
         csurf_fp_v2_main.cpp
         csurf_fp_v2_automation_manager.cpp
         csurf_fp_v2_general_control_manager.cpp
@@ -7,7 +7,7 @@ target_sources(${PROJECT_NAME}
         csurf_fp_v2_session_manager.cpp
         csurf_fp_v2_track_manager.cpp
         csurf_fp_v2_track.cpp
-        csurf_fp_v2_ui_control_panel.cpp
-        csurf_fp_v2_ui_settings_page.cpp
-        )
+        ../ui/windows/csurf_ui_fp_v2_control_panel.cpp
+        ../ui/pages/csurf_ui_fp_v2_settings_page.cpp
+)
         

@@ -1,6 +1,7 @@
 #ifndef CSURF_CONTEXT_H_
 #define CSURF_CONTEXT_H_
 
+#include <array>
 #include "csurf_context_resources.hpp"
 #include "csurf_utils.hpp"
 #include "csurf_reasonus_settings.hpp"
@@ -49,7 +50,7 @@ class CSurf_Context // NOLINT(*-use-internal-linkage)
     // disable fader on v2
     bool fader_disabled;
 
-    ChannelMode channelMode = TrackMode;
+    ChannelMode channelMode;
     ChannelMode previousChannelMode = TrackMode;
     ChannelMode previousPluginChannelMode = TrackMode;
     ChannelManagerType channelManagerType{};
@@ -74,6 +75,8 @@ public:
         fader_disabled = false;
         pluginEditPluginId = 0;
         pluginEditParamId = 0;
+
+        channelMode = TrackMode;
     }
 
     ~CSurf_Context() = default;
@@ -405,6 +408,25 @@ public:
 
     [[nodiscard]] bool GetFaderDisabled() const {
         return fader_disabled;
+    }
+
+    /**************************************************************************
+     * Settings
+     **************************************************************************/
+    [[nodiscard]] std::string GetSetting(const std::string &group, const std::string &key) const {
+        return settings->GetSetting(group, key);
+    }
+
+    [[nodiscard]] std::array<int, 4> GetDisplayLineValues() const {
+        return settings->GetTrackDisplayLineValues();
+    }
+
+    [[nodiscard]] std::array<int, 4> GetDisplayAlignValues() const {
+        return settings->GetTrackDisplayAlignValues();
+    }
+
+    [[nodiscard]] std::array<int, 4> GetDisplayInvertValues() const {
+        return settings->GetTrackDisplayInvertValues();
     }
 };
 

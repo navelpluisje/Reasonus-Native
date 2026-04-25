@@ -4,7 +4,7 @@
 
 #include "action_ui_fp_v2_control_panel.hpp"
 #include "reaper_plugin_functions.h"
-#include "../csurf_faderport_v2/csurf_fp_v2_ui_control_panel.hpp"
+#include "../ui/pages/csurf_ui_fp_v2_control_panel.hpp"
 
 #define STRINGIZE_DEF(x) #x
 #define STRINGIZE(x) STRINGIZE_DEF(x)

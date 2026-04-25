@@ -180,6 +180,14 @@ std::string DAW::GetTrackRecordingMode(MediaTrack *media_track) {
     }
 }
 
+bool DAW::GetTrackPhase(MediaTrack *media_track) {
+    return static_cast<bool>(GetMediaTrackInfo_Value(media_track, "B_PHASE"));
+}
+
+int DAW::GetTrackAutomationMode(MediaTrack *media_track) {
+    return static_cast<int>(GetMediaTrackInfo_Value(media_track, "I_AUTOMODE"));
+}
+
 ButtonColor DAW::GetTrackColor(MediaTrack *media_track) {
     ButtonColor color{};
     int red = 0x7f;

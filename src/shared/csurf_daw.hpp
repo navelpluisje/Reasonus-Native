@@ -200,6 +200,20 @@ public:
     static std::string GetTrackRecordingMode(MediaTrack *media_track);
 
     /**
+     * Get the recording mode for the given track
+     * @param media_track The track to get the recording mode for
+     * @return The track recording mode
+     */
+    static bool GetTrackPhase(MediaTrack *media_track);
+
+    /**
+     * Get the automation mode for the given track
+     * @param media_track The track to get the recording mode for
+     * @return The Automation Mode mode
+     */
+    static int GetTrackAutomationMode(MediaTrack *media_track);
+
+    /**
      * Get the track color for the given track
      * @param media_track The track to get the track color for
      * @return The track color

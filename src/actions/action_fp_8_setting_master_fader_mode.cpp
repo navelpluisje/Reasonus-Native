@@ -1,5 +1,7 @@
 #include "action_fp_8_setting_master_fader_mode.hpp"
 #include <mini/ini.h>
+
+#include "../shared/csurf_reasonus_settings.hpp"
 #include "../shared/csurf_utils.hpp"
 
 #define STRINGIZE_DEF(x) #x
@@ -8,8 +10,7 @@
 #define max(a, b) ((a) > (b) ? (a) : (b))
 
 // confine my plugin to namespace
-namespace ACTION_FP_8_SETTING_MASTER_FADER_MODE
-{
+namespace ACTION_FP_8_SETTING_MASTER_FADER_MODE {
     // some global non-const variables
     // the necessary 'evil'
     int command_id{0};
@@ -18,43 +19,28 @@ namespace ACTION_FP_8_SETTING_MASTER_FADER_MODE
     constexpr auto action_name = "Reasonus: Toggle master fader mode setting";
     custom_action_register_t action = {0, command_name, action_name, nullptr};
 
-    std::string ReadIniValue(std::string group, std::string item)
-    {
-        mINI::INIStructure ini;
-        mINI::INIFile file(GetReaSonusIniPath(FP_8));
-        readAndCreateIni(ini, FP_8);
-        return ini[group][item];
+    std::string ReadIniValue(std::string group, std::string item) {
+        return ReaSonusSettings::GetInstance(FP_8)->GetSetting(group, item);
     }
 
-    void WriteIniValue(std::string group, std::string item, std::string value)
-    {
-        mINI::INIStructure ini;
-        mINI::INIFile file(GetReaSonusIniPath(FP_8));
-        readAndCreateIni(ini, FP_8);
-        ini[group][item] = value;
-        file.write(ini);
+    void WriteIniValue(std::string group, std::string item, std::string value) {
+        ReaSonusSettings::GetInstance(FP_8)->SetAndSaveSetting(group, item, value);
     }
+
     // the main function of my plugin
     // gets called via callback or timer
-    void MainFunctionOfMyPlugin()
-    {
-
-        if (toggle_action_state)
-        {
+    void MainFunctionOfMyPlugin() {
+        if (toggle_action_state) {
             WriteIniValue("surface", "master-fader-mode", "0");
-        }
-        else
-        {
+        } else {
             WriteIniValue("surface", "master-fader-mode", "1");
         }
     }
 
     // c++11 trailing return type syntax
     // REAPER calls this to check this action it's toggle state
-    auto ToggleActionCallback(int command) -> int
-    {
-        if (command != command_id)
-        {
+    auto ToggleActionCallback(int command) -> int {
+        if (command != command_id) {
             // not quite our command_id
             return -1;
         }
@@ -66,18 +52,16 @@ namespace ACTION_FP_8_SETTING_MASTER_FADER_MODE
     }
 
     // this gets called when my plugin action is run (e.g. from action list)
-    bool OnAction(KbdSectionInfo *sec, int command, int val, int valhw, int relmode, HWND hwnd)
-    {
+    bool OnAction(KbdSectionInfo *sec, int command, int val, int valhw, int relmode, HWND hwnd) {
         // treat unused variables 'pedantically'
-        (void)sec;
-        (void)val;
-        (void)valhw;
-        (void)relmode;
-        (void)hwnd;
+        (void) sec;
+        (void) val;
+        (void) valhw;
+        (void) relmode;
+        (void) hwnd;
 
         // check command
-        if (command != command_id)
-        {
+        if (command != command_id) {
             return false;
         }
 
@@ -88,8 +72,7 @@ namespace ACTION_FP_8_SETTING_MASTER_FADER_MODE
         return true;
     }
 
-    void GetVersion(int *majorOut, int *minorOut, int *patchOut, int *tweakOut, char *commitOut, int commitOut_sz)
-    {
+    void GetVersion(int *majorOut, int *minorOut, int *patchOut, int *tweakOut, char *commitOut, int commitOut_sz) {
         *majorOut = PROJECT_VERSION_MAJOR;
         *minorOut = PROJECT_VERSION_MINOR;
         *patchOut = PROJECT_VERSION_PATCH;
@@ -101,23 +84,20 @@ namespace ACTION_FP_8_SETTING_MASTER_FADER_MODE
 
     // when my plugin gets loaded
     // function to register my plugins 'stuff' with REAPER
-    void Register()
-    {
+    void Register() {
         // register action name and get command_id
         command_id = plugin_register("custom_action", &action);
-        plugin_register("toggleaction", (void *)ToggleActionCallback);
+        plugin_register("toggleaction", (void *) ToggleActionCallback);
 
         // register run action/command
-        plugin_register("hookcommand2", (void *)OnAction);
+        plugin_register("hookcommand2", (void *) OnAction);
     }
 
     // shutdown, time to exit
     // modern C++11 syntax
-    auto Unregister() -> void
-    {
+    auto Unregister() -> void {
         plugin_register("-custom_action", &action);
-        plugin_register("-toggleaction", (void *)ToggleActionCallback);
-        plugin_register("-hookcommand2", (void *)OnAction);
+        plugin_register("-toggleaction", (void *) ToggleActionCallback);
+        plugin_register("-hookcommand2", (void *) OnAction);
     }
-
 } // namespace ACTION_FP_8_SETTING_MASTER_FADER_MODE

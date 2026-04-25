@@ -1,8 +1,7 @@
 #ifndef CSURF_VALUEBAR_RESOURCES_H_
 #define CSURF_VALUEBAR_RESOURCES_H_
 
-enum ChannelValueBar
-{
+enum ChannelValueBar {
     VALUEBAR_1 = 0x30,
     VALUEBAR_2 = 0x31,
     VALUEBAR_3 = 0x32,
@@ -21,8 +20,7 @@ enum ChannelValueBar
     VALUEBAR_16 = 0x47,
 };
 
-enum ChannelValueBarMode
-{
+enum ChannelValueBarMode {
     VALUEBAR_MODE_1 = 0x38,
     VALUEBAR_MODE_2 = 0x39,
     VALUEBAR_MODE_3 = 0x3a,
@@ -41,13 +39,18 @@ enum ChannelValueBarMode
     VALUEBAR_MODE_16 = 0x4f,
 };
 
-enum ValuebarMode
-{
-    VALUEBAR_MODE_NORMAL = 0,
-    VALUEBAR_MODE_BIPOLAR = 1,
-    VALUEBAR_MODE_FILL = 2,
-    VALUEBAR_MODE_SPREAD = 3,
-    VALUEBAR_MODE_OFF = 4,
+enum ValuebarMode {
+    VALUEBAR_MODE_NORMAL,
+    VALUEBAR_MODE_BIPOLAR,
+    VALUEBAR_MODE_FILL,
+    VALUEBAR_MODE_SPREAD,
+    VALUEBAR_MODE_OFF,
+};
+
+enum ValuebarValue {
+    VALUEBAR_VALUE_VOLUME = 0,
+    VALUEBAR_VALUE_PAN_1 = 1,
+    VALUEBAR_VALUE_PAN_2 = 2,
 };
 
 #endif

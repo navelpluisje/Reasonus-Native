@@ -1,6 +1,6 @@
 #include "action_ui_convert_plugin_zon_to_ini.hpp"
 #include "../shared/csurf_utils.hpp"
-#include "../ui/csurf_ui_plugin_mapping_converter.hpp"
+#include "../ui/windows/csurf_ui_plugin_mapping_converter.hpp"
 
 #define STRINGIZE_DEF(x) #x
 #define STRINGIZE(x) STRINGIZE_DEF(x)
