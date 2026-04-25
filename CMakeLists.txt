@@ -184,12 +184,12 @@ endif ()
 # Generate ipp image files
 # ------------------------------------------------------------------------------
 
-# Check if teh destination directory exists
+# Check if the destination directory exists
 if (NOT EXISTS ${PROJECT_LIB_DIR}/assets)
     file(MAKE_DIRECTORY ${PROJECT_LIB_DIR}/assets)
 endif ()
 
-# Create al ist of files we need to process
+# Create a list of files we need to process
 file(GLOB_RECURSE COMPILED_RESOURCES ${PROJECT_SOURCE_DIR}/src/assets/*.png ${PROJECT_SOURCE_DIR}/src/assets/*.ttf)
 
 # Loop through the files and create an add_custom_command

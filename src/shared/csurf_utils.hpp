@@ -113,6 +113,8 @@ void SetActionState(int actionId, int new_state);
 
 void SetActionState(const std::string &action_name, int new_state);
 
+bool GetToggleCommandIdState(int action_id);
+
 bool GetToggleCommandStringState(const std::string &action_name);
 
 /**
@@ -173,7 +175,7 @@ double int14ToVol(unsigned char msb, unsigned char lsb);
  * @param plugin_name The full plugin name
  * @return The stripped down name
  */
-std::string StripPluginName(std::string plugin_name);
+std::string StripPluginName(const std::string &plugin_name);
 
 /**
  * @brief Strip the plugin developer from its pre- and post-fixes
@@ -181,7 +183,7 @@ std::string StripPluginName(std::string plugin_name);
  * @param plugin_name The full plugin name
  * @return The stripped down name
  */
-std::string StripPluginDeveloper(std::string plugin_name);
+std::string StripPluginDeveloper(const std::string &plugin_name);
 
 /**
  * @brief Strip the type from the plugin name
@@ -197,7 +199,7 @@ std::string StripPluginNamePrefixes(char const *name);
  * @param name
  * @return std::string
  */
-std::string StripPluginChannelPostfix(char *name);
+std::string StripPluginChannelPostfix(char const *name);
 
 /**
  * @brief Check if the prefix of the fx tells it is actually a fx and not an instrument
@@ -246,11 +248,11 @@ std::string GetReaSonusLocalesRootFile();
 
 bool isInteger(const std::string &value);
 
-std::vector<std::string> split(std::string str, const std::string &delimiter);
+std::vector<std::string> split(const std::string &str, const std::string &delimiter);
 
 std::vector<std::string> cutString(const std::string &str, size_t size);
 
-std::string join(const std::vector<std::string> &list, std::string delimiter);
+std::string join(const std::vector<std::string> &list, const std::string &delimiter);
 
 bool hasPluginConfigFile(MediaTrack *media_track, int pluginId);
 
@@ -272,7 +274,7 @@ std::string GenerateUniqueKey(std::string prefix);
  * @return true
  * @return false
  */
-bool IsWantedParam(std::string param_name);
+bool IsWantedParam(const std::string &param_name);
 
 /**
  * Return the value when it is between min or max.

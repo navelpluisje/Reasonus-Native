@@ -51,7 +51,7 @@ REAPER_PLUGIN_DLL_EXPORT auto REAPER_PLUGIN_ENTRYPOINT(
    * reaper_plugin_info is not available, so no need to run.
    */
   if (
-    reaper_plugin_info == nullptr    || reaper_plugin_info->caller_version != REAPER_PLUGIN_VERSION
+    reaper_plugin_info == nullptr || reaper_plugin_info->caller_version != REAPER_PLUGIN_VERSION
     || !reaper_plugin_info->GetFunc
   ) {
     ACTION_CLOSE_ALL_FLOATING_FX_WINDOWS::Unregister();
@@ -92,12 +92,20 @@ REAPER_PLUGIN_DLL_EXPORT auto REAPER_PLUGIN_ENTRYPOINT(
       return 0;
     }
     //		Load each of the undocumented functions.
-    if (!((*(void **) &CoolSB_GetScrollInfo) = (void *) reaper_plugin_info->GetFunc("CoolSB_GetScrollInfo"))) {
+    if (!(*reinterpret_cast<void **>(&CoolSB_GetScrollInfo) = reaper_plugin_info->GetFunc("CoolSB_GetScrollInfo"))) {
       MessageBox(nullptr, "Unable to import CoolSB_GetScrollInfo function.", "ERROR: ReaSonus Native", 0);
       return 0;
     }
-    if (!((*(void **) &CoolSB_SetScrollPos) = (void *) reaper_plugin_info->GetFunc("CoolSB_SetScrollPos"))) {
+    if (!(*reinterpret_cast<void **>(&CoolSB_SetScrollPos) = reaper_plugin_info->GetFunc("CoolSB_SetScrollPos"))) {
       MessageBox(nullptr, "Unable to import CoolSB_SetScrollPos function.", "ERROR: ReaSonus Native", 0);
+      return 0;
+    }
+    if (!(*reinterpret_cast<void **>(&SNM_GetIntConfigVar) = reaper_plugin_info->GetFunc("SNM_GetIntConfigVar"))) {
+      MessageBox(nullptr, "Unable to import SNM_GetIntConfigVar function.", "ERROR: ReaSonus Native", 0);
+      return 0;
+    }
+    if (!(*reinterpret_cast<void **>(&SNM_SetIntConfigVar) = reaper_plugin_info->GetFunc("SNM_SetIntConfigVar"))) {
+      MessageBox(nullptr, "Unable to import SNM_GetIntConfigVar function.", "ERROR: ReaSonus Native", 0);
       return 0;
     }
   }

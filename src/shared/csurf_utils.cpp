@@ -46,9 +46,13 @@ void SetActionState(const std::string &action_name, const int new_state) {
     SetActionState(actionId, new_state);
 }
 
+bool GetToggleCommandIdState(const int action_id) {
+    return GetToggleCommandState(action_id) != 0;
+}
+
 bool GetToggleCommandStringState(const std::string &action_name) {
-    const int actionId = NamedCommandLookup(action_name.c_str());
-    return GetToggleCommandState(actionId) != 0;
+    const int action_id = NamedCommandLookup(action_name.c_str());
+    return GetToggleCommandState(action_id) != 0;
 }
 
 bool hasBit(const int val, const int key) {
@@ -94,7 +98,7 @@ double int14ToVol(const unsigned char msb, const unsigned char lsb) {
     return DB2VAL(pos);
 }
 
-std::string StripPluginName(std::string plugin_name) {
+std::string StripPluginName(const std::string &plugin_name) {
     std::vector<std::string> pluginNameParts = split(
         StripPluginNamePrefixes(StripPluginChannelPostfix(plugin_name.data()).data()), " ("
     );
@@ -106,7 +110,7 @@ std::string StripPluginName(std::string plugin_name) {
     return join(pluginNameParts, " (");
 }
 
-std::string StripPluginDeveloper(std::string plugin_name) {
+std::string StripPluginDeveloper(const std::string &plugin_name) {
     const std::vector<std::string> pluginNameParts = split(
         StripPluginNamePrefixes(StripPluginChannelPostfix(plugin_name.data()).data()), " ("
     );
@@ -122,14 +126,14 @@ std::string StripPluginDeveloper(std::string plugin_name) {
 std::string StripPluginNamePrefixes(char const *name) {
     std::vector<std::string> splitted_name = split(std::string(name), PREFIX_SEPARATOR);
 
-    if (splitted_name.size() == 0) {
-        return std::string(name);
+    if (splitted_name.empty()) {
+        return {name};
     }
 
     return splitted_name[splitted_name.size() - 1];
 }
 
-std::string StripPluginChannelPostfix(char *name) {
+std::string StripPluginChannelPostfix(char const *name) {
     std::vector<std::string> splitted_name = split(std::string(name), " (");
     splitted_name.pop_back();
 
@@ -151,7 +155,7 @@ bool IsPluginFX(std::string name) {
 std::string Progress(const int current, const int total) {
     char buffer[127];
     snprintf(buffer, sizeof(buffer), "%d/%d", current, total);
-    return std::string(buffer);
+    return {buffer};
 }
 
 std::string GetSendModeString(const int sendMode) {
@@ -236,7 +240,7 @@ bool isInteger(const std::string &value) {
     return *p == 0;
 }
 
-std::vector<std::string> split(std::string str, const std::string &delimiter) {
+std::vector<std::string> split(const std::string &str, const std::string &delimiter) {
     std::vector<std::string> value;
 
     if (!str.empty()) {
@@ -261,28 +265,30 @@ std::vector<std::string> split(std::string str, const std::string &delimiter) {
 }
 
 std::vector<std::string> cutString(const std::string &str, const size_t size) {
-    std::vector<std::string> v;
+    std::vector<std::string> result;
     std::string value = str;
 
     while (value.length() > size) {
-        auto pos = v.begin();
-        v.insert(pos, value.substr(value.length() - size, value.length() - 1));
+        auto pos = result.begin();
+        result.insert(pos, value.substr(value.length() - size, value.length() - 1));
         value = value.substr(0, value.length() - size);
     }
 
-    const auto pos = v.begin();
-    v.insert(pos, value);
+    const auto pos = result.begin();
+    result.insert(pos, value);
 
-    return v;
+    return result;
 }
 
-std::string join(const std::vector<std::string> &list, std::string delimiter) {
-    std::string result = "";
+std::string join(const std::vector<std::string> &list, const std::string &delimiter) {
+    std::string result;
     int count = 0;
+
     for (const std::string &key: list) {
         result += (count > 0 ? delimiter : "") + key;
         count++;
     }
+
     return result;
 }
 
@@ -337,11 +343,12 @@ std::vector<std::string> unwanted_param_names = {
     "undefined",
 };
 
-bool IsWantedParam(std::string param_name) {
+bool IsWantedParam(const std::string &param_name) {
     bool result = true;
 
-    for (std::string unwanted_name: unwanted_param_names) {
+    for (std::string const &unwanted_name: unwanted_param_names) {
         const int res = param_name.find(unwanted_name);
+
         // We found the string. Set result to false and break;
         if (res != static_cast<int>(std::string::npos)) {
             result = false;
@@ -353,19 +360,23 @@ bool IsWantedParam(std::string param_name) {
 }
 
 int minmax(const int min, const int value, const int max) {
-    return value < min
-               ? min
-               : value > max
-                     ? max
-                     : value;
+    if (value < min) {
+        return min;
+    }
+    if (value > max) {
+        return max;
+    }
+    return value;
 }
 
 double minmax(const double min, const double value, const double max) {
-    return value < min
-               ? min
-               : value > max
-                     ? max
-                     : value;
+    if (value < min) {
+        return min;
+    }
+    if (value > max) {
+        return max;
+    }
+    return value;
 }
 
 int min(const int value_1, const int value_2) {
@@ -469,7 +480,7 @@ void GetLanguages(std::vector<std::string> &language_names) {
 
     for (const auto &entry: std::filesystem::recursive_directory_iterator(locale_path)) {
         if (entry.is_regular_file() && !entry.is_symlink()) {
-            std::filesystem::path path(entry.path());
+            const std::filesystem::path &path(entry.path());
             if (path.has_extension() && path.extension() == ".ini") {
                 language_names.push_back(split(path.filename().u8string(), ".").at(0));
             }
