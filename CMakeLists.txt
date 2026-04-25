@@ -186,7 +186,7 @@ endif ()
 
 # Check if teh destination directory exists
 if (NOT EXISTS ${PROJECT_LIB_DIR}/assets)
-    make_directory(${PROJECT_LIB_DIR}/assets)
+    file(MAKE_DIRECTORY ${PROJECT_LIB_DIR}/assets)
 endif ()
 
 # Create al ist of files we need to process
