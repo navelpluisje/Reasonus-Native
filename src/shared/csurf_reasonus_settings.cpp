@@ -1,5 +1,5 @@
 #include "csurf_reasonus_settings.hpp"
-
+#include <array>
 #include <utility>
 #include "../shared/csurf_utils.hpp"
 

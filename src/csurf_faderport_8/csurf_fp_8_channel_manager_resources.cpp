@@ -1,8 +1,8 @@
 #include <string>
-#include "csurf_fp_8_channel_manager_resources.hpp"
 #include <fmt/format.h>
+#include <WDL/db2val.h>
 
-#include "db2val.h"
+#include "csurf_fp_8_channel_manager_resources.hpp"
 #include "../shared/csurf_daw.hpp"
 #include "../shared/csurf_utils.hpp"
 

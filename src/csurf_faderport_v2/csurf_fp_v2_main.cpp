@@ -7,6 +7,7 @@
 
 #include <string>
 #include <vector>
+#include <array>
 #include <reaper_plugin.h>
 // ReSharper disable once CppUnusedIncludeDirective
 #include <WDL/wdltypes.h> // might be unnecessary in future
@@ -338,7 +339,7 @@ public:
 
 static IReaperControlSurface *createFuncV2(const char *type_string, const char *configString, int *errStats) {
   (void) type_string;
-  std::array<int, 4> parms;
+  std::array<int, 4> parms = {};
   parseParms(configString, parms);
 
   return new CSurf_FaderPortV2(parms[2], parms[3], errStats);

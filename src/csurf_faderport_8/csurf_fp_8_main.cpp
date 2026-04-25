@@ -1,5 +1,6 @@
 #include <string>
 #include <vector>
+#include <array>
 #include <reaper_plugin.h>
 #include <WDL/wdltypes.h> // might be unnecessary in future
 #include <WDL/ptrlist.h>

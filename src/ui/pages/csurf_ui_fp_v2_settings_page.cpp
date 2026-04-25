@@ -1,3 +1,4 @@
+#include <array>
 #include "../csurf_ui_page_content.hpp"
 #include "../components/csurf_ui_checkbox.hpp"
 #include "../../shared/csurf.h"
@@ -168,8 +169,11 @@ public:
         endless_track_scroll = settings->GetEndlessTrackScroll();
         setting_latch_preview_action_enable = settings->GetLatchPreviewActionEnabled();
 
-        index = std::find(latch_preview_action_indexes.begin(), latch_preview_action_indexes.end(),
+        auto iterator = std::find(latch_preview_action_indexes.begin(), latch_preview_action_indexes.end(),
                           settings->GetLatchPreviewActionCode());
-        setting_latch_preview_action = index - latch_preview_action_indexes.begin();
+
+        if (iterator != latch_preview_action_indexes.end()) {
+            setting_latch_preview_action = static_cast<int>(std::distance(latch_preview_action_indexes.begin(), iterator));   
+        }
     }
 };

@@ -1,6 +1,7 @@
 #ifndef CSURF_CONTEXT_H_
 #define CSURF_CONTEXT_H_
 
+#include <array>
 #include "csurf_context_resources.hpp"
 #include "csurf_utils.hpp"
 #include "csurf_reasonus_settings.hpp"
