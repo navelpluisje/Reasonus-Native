@@ -6,8 +6,7 @@
 #include "../shared/csurf_context.cpp"
 #include "../shared/csurf_reasonus_settings.hpp"
 
-class CSurf_TransportManager
-{
+class CSurf_TransportManager {
     bool isPlaying = false;
     bool isPaused = false;
     bool isRecording = false;
@@ -28,34 +27,34 @@ class CSurf_TransportManager
 
     ReaSonusSettings *settings;
 
-    void SetButtonValues(bool force);
+    void SetButtonValues(bool force) const;
 
     void StopRewindOrForward();
 
-    void HandleRewind();
+    void HandleRewind() const;
 
-    void HandleForward();
+    void HandleForward() const;
 
-    void SetPause();
+    void SetPause() const;
 
     void SetRewindingState();
 
     void SetForwardingState();
 
-    void handleFootSwitchKey(std::string key);
+    void handleFootSwitchKey(const std::string &key) const;
 
 public:
     CSurf_TransportManager(CSurf_Context *context, midi_Output *m_midiout);
 
     void Update(bool force_update = false);
 
-    void Refresh(bool force);
+    void Refresh(bool force) const;
 
     void HandlePlayButton(int value);
 
     void HandleStopButton(int value);
 
-    void HandleRepeatButton(int value);
+    void HandleRepeatButton(int value) const;
 
     void HandleRecordButton(int value);
 
@@ -63,7 +62,9 @@ public:
 
     void HandleForwardButton(int value);
 
-    void HandleFootSwitchClick(int value);
+    void HandleFootSwitchClick(int value) const;
+
+    void HandlePlayStateChange();
 };
 
 #endif

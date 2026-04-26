@@ -450,6 +450,14 @@ public:
     trackNavigator->SetOffsetByTrack(media_track);
   }
 
+  void SetPlayState(const bool play, const bool pause, const bool rec) override {
+    (void) play;
+    (void) pause;
+    (void) rec;
+    
+    transportManager->HandlePlayStateChange();
+  }
+
   int Extended(const int call, void *param1, void *param2, void *param3) override {
     (void) param1;
     (void) param2;

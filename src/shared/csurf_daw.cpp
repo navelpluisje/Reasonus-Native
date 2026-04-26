@@ -28,8 +28,11 @@ bool DAW::IsTrackArmed(MediaTrack *media_track) {
 }
 
 void DAW::ToggleTrackArmed(MediaTrack *media_track) {
-    CSurf_SetSurfaceRecArm(media_track,
-                           CSurf_OnRecArmChange(media_track, static_cast<int>(!IsTrackArmed(media_track))), nullptr);
+    CSurf_SetSurfaceRecArm(
+        media_track,
+        CSurf_OnRecArmChange(media_track, static_cast<int>(!IsTrackArmed(media_track))),
+        nullptr
+    );
 }
 
 bool DAW::IsTrackMuted(MediaTrack *media_track) {
@@ -40,8 +43,19 @@ bool DAW::IsTrackMuted(MediaTrack *media_track) {
 }
 
 void DAW::ToggleTrackMuted(MediaTrack *media_track) {
-    CSurf_SetSurfaceMute(media_track, CSurf_OnMuteChange(media_track, static_cast<int>(!IsTrackMuted(media_track))),
-                         nullptr);
+    CSurf_SetSurfaceMute(
+        media_track,
+        CSurf_OnMuteChange(media_track, static_cast<int>(!IsTrackMuted(media_track))),
+        nullptr
+    );
+}
+
+void DAW::SetTrackMuted(MediaTrack *media_track, const bool mute) {
+    CSurf_SetSurfaceMute(
+        media_track,
+        CSurf_OnMuteChange(media_track, static_cast<int>(mute)),
+        nullptr
+    );
 }
 
 bool DAW::IsTrackSoloed(MediaTrack *media_track) {
@@ -52,8 +66,11 @@ bool DAW::IsTrackSoloed(MediaTrack *media_track) {
 }
 
 void DAW::ToggleTrackSoloed(MediaTrack *media_track) {
-    CSurf_SetSurfaceSolo(media_track, CSurf_OnSoloChange(media_track, static_cast<int>(!IsTrackSoloed(media_track))),
-                         nullptr);
+    CSurf_SetSurfaceSolo(
+        media_track,
+        CSurf_OnSoloChange(media_track, static_cast<int>(!IsTrackSoloed(media_track))),
+        nullptr
+    );
 }
 
 bool DAW::IsTrackSelected(MediaTrack *media_track) {
@@ -226,9 +243,12 @@ void DAW::SetTrackSoloUnique(MediaTrack *media_track) {
 void DAW::SetSelectedTracksRange(MediaTrack *media_track) {
     int const index = static_cast<int>(GetMediaTrackInfo_Value(media_track, "IP_TRACKNUMBER"));
     const int selected_track_count = CountSelectedTracks(nullptr);
-    const int first_index = static_cast<int>(GetMediaTrackInfo_Value(GetSelectedTrack(nullptr, 0), "IP_TRACKNUMBER"));
-    const int last_index = static_cast<int>(GetMediaTrackInfo_Value(GetSelectedTrack(nullptr, selected_track_count - 1),
-                                                                    "IP_TRACKNUMBER"));
+    const int first_index = static_cast<int>(
+        GetMediaTrackInfo_Value(GetSelectedTrack(nullptr, 0), "IP_TRACKNUMBER")
+    );
+    const int last_index = static_cast<int>(
+        GetMediaTrackInfo_Value(GetSelectedTrack(nullptr, selected_track_count - 1), "IP_TRACKNUMBER")
+    );
     const int start_index = index < first_index
                                 ? index
                                 : index < last_index // NOLINT(*-avoid-nested-conditional-operator)

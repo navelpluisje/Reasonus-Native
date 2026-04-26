@@ -76,6 +76,13 @@ public:
     static void ToggleTrackMuted(MediaTrack *media_track);
 
     /**
+     * Set the mute state for the given track
+     * @param media_track The track to set the muted state
+     * @param mute
+     */
+    static void SetTrackMuted(MediaTrack *media_track, bool mute);
+
+    /**
      * Check if the given track is soloed
      * @param media_track The track to check for the soloed state
      * @return Whether if the given track is soloed

@@ -50,6 +50,7 @@ class ReaSonusSettings {
         {"surface", "plugin-step-size", "1"},
         {"surface", "plugin-map-param-clear", "0"},
         {"surface", "instant-multi-select-filter", "0"},
+        {"surface", "mute-master-on-fwd-rwd", "0"},
         {"displays", "track", "8"},
         {"displays", "track-lines", "0,4,1,2"},
         {"displays", "track-alignment", "1,0,0,0"},
@@ -216,6 +217,8 @@ public:
     bool ShouldClearParamInput();
 
     bool ShouldMultiFilterApplyInstant();
+
+    bool ShouldMuteMasterOnFwdRwd();
 
     /**
      * Settings for the FaderPort 2
