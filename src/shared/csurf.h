@@ -8,7 +8,12 @@
 
 // WARNING: REAPER has a handful of UNDOCUMENTED API functions that are not declared in reaper_plugin_functions.h, so must declare here:
 inline bool (*CoolSB_GetScrollInfo)(HWND hwnd, int nBar, LPSCROLLINFO lpsi);
+
 inline int (*CoolSB_SetScrollPos)(HWND hwnd, int nBar, int nPos, BOOL fRedraw);
+
+inline int (*SNM_GetIntConfigVar)(const char *varname, int errvalue);
+
+inline bool (*SNM_SetIntConfigVar)(const char *varname, int newvalue);
 
 extern REAPER_PLUGIN_HINSTANCE g_hInst; // used for dialogs
 extern HWND g_hwnd;

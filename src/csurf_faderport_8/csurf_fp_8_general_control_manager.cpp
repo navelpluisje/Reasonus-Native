@@ -1,12 +1,11 @@
 #ifndef CSURF_FP_8_GENERAL_CONTROL_MANAGER_C_
 #define CSURF_FP_8_GENERAL_CONTROL_MANAGER_C_
 
-#include "../shared/csurf_reasonus_settings.hpp"
 #include "csurf_fp_8_fader_manager.hpp"
+#include "../shared/csurf_reasonus_settings.hpp"
 #include "../ui/windows/csurf_ui_fp_8_control_panel.hpp"
 
 class CSurf_FP_8_GeneralControlManager {
-protected:
     CSurf_Button *armButton;
     CSurf_Button *soloClearButton;
     CSurf_Button *muteClearButton;
@@ -33,42 +32,69 @@ protected:
 
     bool functionsDialogOpen;
 
+protected:
     void SetButtonValue(const bool force = false) const {
         armButton->SetValue(context->GetArm() ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
         if (context->GetShiftLeft()) {
-            bypassButton->SetValue(hasGlobalBypass
-                                       ? BTN_VALUE_ON
-                                       : BTN_VALUE_OFF,
-                                   force);
+            bypassButton->SetValue(
+                hasGlobalBypass
+                    ? BTN_VALUE_ON
+                    : BTN_VALUE_OFF,
+                force
+            );
+
             macroButton->SetColor(ButtonColorYellow, force);
+
             macroButton->SetValue(ReaSonus8ControlPanel::control_panel_open ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+
+            soloClearButton->SetValue(
+                GetToggleCommandIdState(40745)
+                    ? BTN_VALUE_ON
+                    : BTN_VALUE_OFF,
+                force
+            );
         } else {
-            bypassButton->SetValue(hasSelectedBypass
-                                       ? BTN_VALUE_ON
-                                       : BTN_VALUE_OFF,
-                                   force);
+            bypassButton->SetValue(
+                hasSelectedBypass
+                    ? BTN_VALUE_ON
+                    : BTN_VALUE_OFF,
+                force
+            );
+
             macroButton->SetColor(ButtonColorWhite, force);
+
             macroButton->SetValue(ReaSonus8ControlPanel::control_panel_open ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+
+            soloClearButton->SetValue(
+                hasSolo && !settings->GetDistractionFreeMode()
+                    ? BTN_VALUE_ON
+                    : BTN_VALUE_OFF,
+                force
+            );
         }
 
-        soloClearButton->SetValue(hasSolo && !settings->GetDistractionFreeMode() ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
         muteClearButton->SetValue(hasMute && !settings->GetDistractionFreeMode() ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+
         linkButton->SetValue(
             ButtonOnBlinkOff(
                 context->GetLastTouchedFxMode(),
                 context->GetChannelMode() == PluginEditMode,
                 settings->GetDistractionFreeMode()),
-            force);
+            force
+        );
+
         shiftLeftButton->SetValue(
             (!settings->GetSwapShiftButtons() && context->GetShiftLeft())
             || (context->GetShiftRight() && settings->GetSwapShiftButtons())
                 ? BTN_VALUE_ON
                 : BTN_VALUE_OFF,
-            force);
+            force
+        );
     }
 
     void UpdatePanValue(const int val) const {
-        double pan1, pan2 = 0.0;
+        double pan1 = 0.0;
+        double pan2 = 0.0;
         int pan_mode;
         MediaTrack *media_track = GetSelectedTrack(nullptr, 0);
         GetTrackUIPan(media_track, &pan1, &pan2, &pan_mode);
@@ -100,6 +126,21 @@ protected:
 
     void DecrementPan(const int val) const {
         UpdatePanValue(val * -1);
+    }
+
+    static void UpdateSoloInFrontVolume(const int val) {
+        const int current_value = SNM_GetIntConfigVar("solodimdb10", 999);
+        if (current_value < 999) {
+            SNM_SetIntConfigVar("solodimdb10", minmax(-1500, current_value + val, 0));
+        }
+    }
+
+    static void IncrementSoloInFrontVolume(const int val) {
+        UpdateSoloInFrontVolume(val);
+    }
+
+    static void DecrementSoloInFrontVolume(const int val) {
+        UpdateSoloInFrontVolume(val);
     }
 
     void resetPan() const {
@@ -148,18 +189,17 @@ public:
         followCursor = false;
         last_touched_fx_mode = false;
         functionsDialogOpen = false;
-        
-        armButton = new CSurf_Button(BTN_ARM, BTN_VALUE_OFF, m_midiout);
-        soloClearButton = new CSurf_Button(BTN_SOLO_CLEAR, BTN_VALUE_OFF, m_midiout);
-        muteClearButton = new CSurf_Button(BTN_MUTE_CLEAR, BTN_VALUE_OFF, m_midiout);
-        bypassButton = new CSurf_ColorButton(ButtonColorRed, BTN_BYPASS, BTN_VALUE_OFF, m_midiout);
-        macroButton = new CSurf_ColorButton(ButtonColorWhite, BTN_MACRO, BTN_VALUE_OFF, m_midiout);
-        linkButton = new CSurf_ColorButton(ButtonColorGreen, BTN_LINK, BTN_VALUE_OFF, m_midiout);
-        shiftLeftButton = new CSurf_Button(BTN_SHIFT_LEFT, BTN_VALUE_OFF, m_midiout);
+
+        armButton = new CSurf_Button(BTN_ARM, BTN_VALUE_OFF, this->m_midiout);
+        soloClearButton = new CSurf_Button(BTN_SOLO_CLEAR, BTN_VALUE_OFF, this->m_midiout);
+        muteClearButton = new CSurf_Button(BTN_MUTE_CLEAR, BTN_VALUE_OFF, this->m_midiout);
+        bypassButton = new CSurf_ColorButton(ButtonColorRed, BTN_BYPASS, BTN_VALUE_OFF, this->m_midiout);
+        macroButton = new CSurf_ColorButton(ButtonColorWhite, BTN_MACRO, BTN_VALUE_OFF, this->m_midiout);
+        linkButton = new CSurf_ColorButton(ButtonColorGreen, BTN_LINK, BTN_VALUE_OFF, this->m_midiout);
+        shiftLeftButton = new CSurf_Button(BTN_SHIFT_LEFT, BTN_VALUE_OFF, this->m_midiout);
     }
 
-    ~CSurf_FP_8_GeneralControlManager() {
-    }
+    ~CSurf_FP_8_GeneralControlManager() = default;
 
     void Update(const bool force_update = false) {
         hasSolo = trackNavigator->HasTracksWithSolo();
@@ -227,11 +267,18 @@ public:
         }
 
         switch (context->GetPanEncoderMode()) {
-            case PanEncoderTrackPanMode:
-                hasBit(value, 6)
-                    ? DecrementPan(value - 64)
-                    : IncrementPan(value);
+            case PanEncoderTrackPanMode: {
+                if (context->GetShiftLeft() && GetToggleCommandIdState(40745)) {
+                    hasBit(value, 6)
+                        ? DecrementSoloInFrontVolume(-10)
+                        : IncrementSoloInFrontVolume(10);
+                } else {
+                    hasBit(value, 6)
+                        ? DecrementPan(value - 64)
+                        : IncrementPan(value);
+                }
                 break;
+            }
 
             case PanEncoderMenuMode:
             case PanEncoderPluginStepSizeMode:
@@ -274,10 +321,14 @@ public:
             return;
         }
 
-        Main_OnCommandAsyncEx(40340, 0, nullptr); // Track: Unsolo all tracks
+        if (context->GetShiftLeft()) {
+            Main_OnCommandAsyncEx(40745, 0, nullptr); // Options: Solo in front
+        } else {
+            Main_OnCommandAsyncEx(40340, 0, nullptr); // Track: Unsolo all tracks
+        }
     }
 
-    void HandleMuteClearButton(const int value) const {
+    static void HandleMuteClearButton(const int value) {
         if (value == 0) {
             return;
         }
