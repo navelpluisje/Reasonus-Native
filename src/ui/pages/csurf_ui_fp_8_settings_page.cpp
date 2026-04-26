@@ -32,6 +32,7 @@ class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-in
     bool setting_overwrite_time_code;
     bool setting_plugin_map_param_clear;
     bool setting_instant_multi_select_filter;
+    bool setting_mute_master_on_fwd_rwd;
     int setting_plugin_step_size;
     int setting_latch_preview_action;
     int setting_track_color_brightness = 25;
@@ -227,6 +228,13 @@ public:
                 i18n->t("settings", "instant-multi-select-filter.label"),
                 &setting_instant_multi_select_filter,
                 i18n->t("settings", "instant-multi-select-filter.tooltip"));
+
+            RenderInfoCheckbox(
+                m_ctx,
+                assets,
+                i18n->t("settings", "mute-master-on-fwd-rwd.label"),
+                &setting_mute_master_on_fwd_rwd,
+                i18n->t("settings", "mute-master-on-fwd-rwd.tooltip"));
 
             if (setting_latch_preview_action_enable) {
                 ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + 26);
@@ -547,6 +555,7 @@ public:
         settings->SetSetting("surface", "plugin-step-size", setting_plugin_step_size);
         settings->SetSetting("surface", "plugin-map-param-clear", setting_plugin_map_param_clear);
         settings->SetSetting("surface", "instant-multi-select-filter", setting_instant_multi_select_filter);
+        settings->SetSetting("surface", "mute-master-on-fwd-rwd", setting_mute_master_on_fwd_rwd);
         settings->SetSetting("displays", "track", setting_track_display);
         settings->SetSetting("displays", "track-lines", joinDisplayValues(setting_track_value_line_value, ","));
         settings->SetSetting("displays", "track-alignment", joinDisplayValues(setting_track_value_line_align, ","));
@@ -593,6 +602,7 @@ public:
         setting_track_valuebar_mode = settings->GetTrackValueBarMode();
         setting_track_valuebar_value = settings->GetTrackValueBarValue();
         setting_instant_multi_select_filter = settings->ShouldMultiFilterApplyInstant();
+        setting_mute_master_on_fwd_rwd = settings->ShouldMuteMasterOnFwdRwd();
 
         auto iterator = std::find(
             latch_preview_action_indexes.begin(),
@@ -600,7 +610,8 @@ public:
             settings->GetLatchPreviewActionCode());
 
         if (iterator != latch_preview_action_indexes.end()) {
-            setting_latch_preview_action = static_cast<int>(std::distance(latch_preview_action_indexes.begin(), iterator));   
+            setting_latch_preview_action = static_cast<int>(std::distance(
+                latch_preview_action_indexes.begin(), iterator));
         }
 
         auto time_code_iterator = std::find(
@@ -609,7 +620,7 @@ public:
             settings->GetSurfaceTimeCode());
 
         if (time_code_iterator != time_code_indexes.end()) {
-            setting_time_code = static_cast<int>(std::distance(time_code_indexes.begin(), time_code_iterator));   
+            setting_time_code = static_cast<int>(std::distance(time_code_indexes.begin(), time_code_iterator));
         }
     }
 
