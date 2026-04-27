@@ -360,7 +360,17 @@ std::string DAW::GetTrackFxDeveloper(MediaTrack *media_track, const int fxIndex)
     }
 
     const std::vector<std::string> plugin_name_parts = split(plugin_name, " (");
-    std::string developer = plugin_name_parts.at(plugin_name_parts.size() - 1);
+	std::string developer;
+	int max = pluginNameParts.size() - 1;
+	
+    for (int i = max; i > 0; i--)
+    {
+        if (pluginNameParts.at(i).find(" out)") == std::string::npos)
+        {
+            developer = pluginNameParts.at(i);
+            break;
+        }
+    }
 
     if (!developer.empty()) {
         developer.pop_back();
