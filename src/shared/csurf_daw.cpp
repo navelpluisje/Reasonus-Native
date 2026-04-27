@@ -2,6 +2,7 @@
 #include "../shared/csurf_daw.hpp"
 #include <utility>
 #include <vector>
+#include <regex>
 #include <string>
 #include "../shared/csurf_utils.hpp"
 #include "csurf.h"
@@ -360,14 +361,13 @@ std::string DAW::GetTrackFxDeveloper(MediaTrack *media_track, const int fxIndex)
     }
 
     const std::vector<std::string> plugin_name_parts = split(plugin_name, " (");
-	std::string developer;
-	int max = pluginNameParts.size() - 1;
-	
-    for (int i = max; i > 0; i--)
-    {
-        if (pluginNameParts.at(i).find(" out)") == std::string::npos)
-        {
-            developer = pluginNameParts.at(i);
+    std::string developer;
+    const int max_index = plugin_name_parts.size() - 1;
+    const std::regex regex(".*(ch|out|mono)\\)");
+
+    for (int i = max_index; i > 0; i--) {
+        if (!std::regex_match(plugin_name_parts.at(i), regex)) {
+            developer = plugin_name_parts.at(i);
             break;
         }
     }
