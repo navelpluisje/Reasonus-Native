@@ -282,8 +282,7 @@ public:
                             media_track,
                             static_cast<DisplayValue>(display_line_values[DISPLAY_LINE_1])
                         ).c_str(),
-                        // DAW::GetTrackName(media_track).c_str(),
-                        static_cast<Inverted>(display_invert_values[DISPLAY_LINE_1]),
+                        display_invert_values[DISPLAY_LINE_1] > 0 ? INVERT : NON_INVERT,
                         force_update
                     );
                     track->SetDisplayLine(
@@ -293,7 +292,7 @@ public:
                             media_track,
                             static_cast<DisplayValue>(display_line_values[DISPLAY_LINE_2])
                         ).c_str(),
-                        static_cast<Inverted>(display_invert_values[DISPLAY_LINE_2]),
+                        display_invert_values[DISPLAY_LINE_2] > 0 ? INVERT : NON_INVERT,
                         force_update
                     );
                     track->SetDisplayLine(
@@ -303,7 +302,7 @@ public:
                             media_track,
                             static_cast<DisplayValue>(display_line_values[DISPLAY_LINE_3])
                         ).c_str(),
-                        static_cast<Inverted>(display_invert_values[DISPLAY_LINE_3]),
+                        display_invert_values[DISPLAY_LINE_3] > 0 ? INVERT : NON_INVERT,
                         force_update
                     );
                     track->SetDisplayLine(
@@ -313,7 +312,7 @@ public:
                             media_track,
                             static_cast<DisplayValue>(display_line_values[DISPLAY_LINE_4])
                         ).c_str(),
-                        static_cast<Inverted>(display_invert_values[DISPLAY_LINE_4]),
+                        display_invert_values[DISPLAY_LINE_4] > 0 ? INVERT : NON_INVERT,
                         force_update
                     );
                 }
