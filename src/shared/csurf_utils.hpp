@@ -396,6 +396,13 @@ std::string createPathName(const std::vector<std::string> &path_elements);
 std::string toLowerCase(std::string value);
 
 /**
+ * Convert a string to all uppercase
+ * @param value Value to convert
+ * @return
+ */
+std::string toUpperCase(std::string value);
+
+/**
  * Convert a boolean value to a double
  * @param value Value to convert
  * @return
@@ -408,5 +415,28 @@ double boolToDouble(bool value);
  * @return
  */
 bool doubleToBool(double value);
+
+/**
+ * Fetch a list of plugin types allowed in the plugin mapping
+ * @return
+ */
+std::vector<std::string> GetPluginTypes();
+
+/**
+ * Convert the plugin type to uppercase and if it's an instrument, make sure the i is lowercase
+ * @param value Plugin type to format
+ * @return
+ */
+std::string FormatPluginType(std::string value);
+
+/**
+ * Check the plugin is one of the allowed types and prefix the "name (developer)" string with the type
+ * 
+ * Also change VST to VST2, assuming it would be v2.x and not the older v1.x which is obsolete
+ * @param plugin_origname Original name of the plugin from TrackFX_GetFXName
+ * @param plugin_type Identifier to determine which plugin package to load
+ * @return
+ */
+std::string GetPluginRequestString(std::string plugin_origname, std::string plugin_type);
 
 #endif // CSURF_UTILS_H_
