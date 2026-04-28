@@ -175,7 +175,9 @@ protected:
         // Create a track, add the plugin and start reading the params
         InsertTrackAtIndex(0, false);
         MediaTrack *media_track = GetTrack(nullptr, 0);
-        const int exist = TrackFX_AddByName(media_track, plugin_params["global"]["origname"].c_str(), false, -1);
+
+        std::string plugin_request_string = GetPluginRequestString(plugin_params["global"]["origname"], plugin_params["global"]["type"]);
+        const int exist = TrackFX_AddByName(media_track, plugin_request_string.c_str(), false, -1);
         DeleteTrack(media_track);
 
         return exist > -1;
@@ -192,7 +194,9 @@ protected:
         InsertTrackAtIndex(0, false);
         MediaTrack *media_track = GetTrack(nullptr, 0);
 
-        TrackFX_AddByName(media_track, plugin_params["global"]["origname"].c_str(), false, -1);
+        // Placeholder until first iteration of plugin caching is implemented
+        std::string plugin_request_string = GetPluginRequestString(plugin_params["global"]["origname"], plugin_params["global"]["type"]);
+        TrackFX_AddByName(media_track, plugin_request_string.c_str(), false, -1);
 
         for (int i = 0; i < TrackFX_GetNumParams(media_track, 0); i++) {
             const std::string param_name = DAW::GetTrackFxParamName(media_track, 0, i);

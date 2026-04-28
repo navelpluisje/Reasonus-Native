@@ -37,17 +37,7 @@ private:
     std::vector<std::vector<std::string>> plugins;
     int selected_plugin = -1;
 
-    std::vector<std::string> plugin_types = {
-        "vst",
-        "vsti",
-        "vst3",
-        "vst3i",
-        "au",
-        "aui",
-        "clap",
-        "clapi",
-        "lv2",
-        "lv2i"};
+    std::vector<std::string> plugin_types = GetPluginTypes();
     int selected_plugin_type = -1;
 
     bool add_type_clicked = false;
