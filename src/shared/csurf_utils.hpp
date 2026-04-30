@@ -1,3 +1,5 @@
+// ReSharper disable CppNonExplicitConversionOperator
+// ReSharper disable CppNonExplicitConvertingConstructor
 #ifndef CSURF_UTILS_H_
 #define CSURF_UTILS_H_
 
@@ -62,6 +64,40 @@ struct ShiftState {
     }
 };
 
+template<typename T>
+struct ConfigVar {
+    ConfigVar(const std::string &var_name) {
+        int size = 0;
+        void *addr;
+
+        if (const int offset = projectconfig_var_getoffs(var_name.c_str(), &size)) {
+            addr = projectconfig_var_addr(nullptr, offset);
+        } else {
+            addr = get_config_var(var_name.c_str(), &size);
+        }
+
+        if (size == sizeof(T)) {
+            m_addr = static_cast<T *>(addr);
+        }
+    }
+
+    bool SetValue(T value) {
+        if (m_addr == nullptr) {
+            return false;
+        }
+
+        *m_addr = value;
+        return true;
+    }
+
+    operator T() {
+        return *m_addr;
+    }
+
+private:
+    T *m_addr;
+};
+
 struct DoubleClickState {
     bool active = false; // NOLINT(*-non-private-member-variables-in-classes)
     int start = 0; // NOLINT(*-non-private-member-variables-in-classes)
@@ -116,6 +152,10 @@ void SetActionState(const std::string &action_name, int new_state);
 bool GetToggleCommandIdState(int action_id);
 
 bool GetToggleCommandStringState(const std::string &action_name);
+
+int GetIntConfigVar(const std::string &var_name);
+
+bool SetIntConfigVar(const std::string &var_name, int value);
 
 /**
  * @brief Check if the bit with index key is set in val

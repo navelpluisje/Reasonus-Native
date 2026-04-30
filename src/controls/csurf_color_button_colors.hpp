@@ -1,28 +1,24 @@
 #ifndef CSURF_COLOR_BUTTON_COLORS_H_
 #define CSURF_COLOR_BUTTON_COLORS_H_
 
-struct ButtonColor
-{
+struct ButtonColor {
     int red;
     int green;
     int blue;
 
-    void SetColor(int _red, int _green, int _blue)
-    {
+    void SetColor(int _red, int _green, int _blue) {
         red = _red;
         green = _green;
         blue = _blue;
     }
 
-    void SetColor(ButtonColor color)
-    {
+    void SetColor(ButtonColor color) {
         red = color.red;
         green = color.green;
         blue = color.blue;
     }
 
-    bool IsColor(ButtonColor color)
-    {
+    [[nodiscard]] bool IsColor(const ButtonColor color) const {
         return color.blue == blue && color.red == red && color.green == green;
     }
 };
