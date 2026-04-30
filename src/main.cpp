@@ -100,23 +100,8 @@ REAPER_PLUGIN_DLL_EXPORT auto REAPER_PLUGIN_ENTRYPOINT(
       MessageBox(nullptr, "Unable to import CoolSB_SetScrollPos function.", "ERROR: ReaSonus Native", 0);
       return 0;
     }
-    if (!(*reinterpret_cast<void **>(&SNM_GetIntConfigVar) = reaper_plugin_info->GetFunc("SNM_GetIntConfigVar"))) {
-      MessageBox(nullptr, "Unable to import SNM_GetIntConfigVar function.", "ERROR: ReaSonus Native", 0);
-      return 0;
-    }
-    if (!(*reinterpret_cast<void **>(&SNM_SetIntConfigVar) = reaper_plugin_info->GetFunc("SNM_SetIntConfigVar"))) {
-      MessageBox(nullptr, "Unable to import SNM_GetIntConfigVar function.", "ERROR: ReaSonus Native", 0);
-      return 0;
-    }
   }
-
-  // load Reaper API functions
-  // check that our plugin hasn't been already loaded
-  if (REAPERAPI_LoadAPI(reaper_plugin_info->GetFunc) > 0 || reaper_plugin_info->
-      GetFunc("ReaScriptAPIFunctionExample")) {
-    return 0;
-  }
-
+  
   ACTION_CLOSE_ALL_FLOATING_FX_WINDOWS::Register();
   ACTION_FP_8_SETTING_DISABLE_PLUGINS::Register();
   ACTION_FP_8_SETTING_DISTRACTION_FREE_MODE::Register();

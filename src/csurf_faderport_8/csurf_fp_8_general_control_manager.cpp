@@ -129,9 +129,10 @@ protected:
     }
 
     static void UpdateSoloInFrontVolume(const int val) {
-        const int current_value = SNM_GetIntConfigVar("solodimdb10", 999);
+        const int current_value = GetIntConfigVar("solodimdb10");
+
         if (current_value < 999) {
-            SNM_SetIntConfigVar("solodimdb10", minmax(-1500, current_value + val, 0));
+            SetIntConfigVar("solodimdb10", minmax(-1500, current_value + val, 0));
         }
     }
 
