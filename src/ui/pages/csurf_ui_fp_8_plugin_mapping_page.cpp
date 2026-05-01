@@ -11,6 +11,7 @@
 #include "../components/csurf_ui_goto_input.hpp"
 #include "../components/csurf_ui_int_input.hpp"
 #include "../components/csurf_ui_combo_input.hpp"
+#include "../components/csurf_ui_button_bar.hpp"
 #include "../../i18n/i18n.hpp"
 #include "../windows/csurf_ui_fp_8_control_panel.hpp"
 
@@ -28,6 +29,11 @@ class CSurf_FP_8_PluginMappingPage : public CSurf_UI_PageContent // NOLINT(*-use
     bool render_started = false;
     std::string plugin_folder_path = createPathName({std::string(GetResourcePath()), "ReaSonus", "Plugins"});
     std::vector<std::string> developers;
+    std::vector<std::string> plugin_types = GetPluginTypes();
+    int newly_selected_plugin_type = 0;
+    bool save_selected_plugin_type = false;
+    bool cancel_selected_plugin_type = false;
+    std::string dummy;
     int selected_developer = -1;
     int previous_selected_developer = -1;
 
@@ -35,6 +41,7 @@ class CSurf_FP_8_PluginMappingPage : public CSurf_UI_PageContent // NOLINT(*-use
     int selected_plugin = -1;
     int previous_selected_plugin = -1;
     bool selected_plugin_exists = false;
+    bool selected_plugin_has_type = false;
 
     int nb_channels = 0;
     int selected_channel = 0;
@@ -65,6 +72,8 @@ class CSurf_FP_8_PluginMappingPage : public CSurf_UI_PageContent // NOLINT(*-use
 
 protected:
     void SetPluginFolders() {
+        developers.clear();
+        plugins.clear();
         bool has_next = true;
         int index = 0;
 
@@ -76,8 +85,12 @@ protected:
                 index++;
                 const std::vector<std::string> splitted_name = split(name, ".");
                 developers.emplace_back(name);
-                plugins.push_back(SetDeveloperPlugins(name));
             }
+        }
+        std::sort(developers.begin(), developers.end());
+
+        for (const auto &developer: developers) {
+            plugins.push_back(SetDeveloperPlugins(developer));
         }
     }
 
@@ -101,6 +114,7 @@ protected:
             }
         }
 
+        std::sort(developer_plugins.begin(), developer_plugins.end());
         return developer_plugins;
     }
 
@@ -150,6 +164,9 @@ protected:
 
         if (!PluginExists()) {
             selected_plugin_exists = false;
+            selected_plugin_has_type = !plugin_params["global"]["type"].empty();
+            newly_selected_plugin_type = 0;
+
             return false;
         }
 
@@ -175,8 +192,13 @@ protected:
         // Create a track, add the plugin and start reading the params
         InsertTrackAtIndex(0, false);
         MediaTrack *media_track = GetTrack(nullptr, 0);
+        DAW::SetMixerTrackVisible(media_track, false);
+        DAW::SetTCPTrackVisible(media_track, false);
 
-        std::string plugin_request_string = GetPluginRequestString(plugin_params["global"]["origname"], plugin_params["global"]["type"]);
+        const std::string plugin_request_string = GetPluginRequestString(
+            plugin_params["global"]["origname"],
+            plugin_params["global"]["type"]
+        );
         const int exist = TrackFX_AddByName(media_track, plugin_request_string.c_str(), false, -1);
         DeleteTrack(media_track);
 
@@ -195,7 +217,10 @@ protected:
         MediaTrack *media_track = GetTrack(nullptr, 0);
 
         // Placeholder until first iteration of plugin caching is implemented
-        std::string plugin_request_string = GetPluginRequestString(plugin_params["global"]["origname"], plugin_params["global"]["type"]);
+        const std::string plugin_request_string = GetPluginRequestString(
+            plugin_params["global"]["origname"],
+            plugin_params["global"]["type"]
+        );
         TrackFX_AddByName(media_track, plugin_request_string.c_str(), false, -1);
 
         for (int i = 0; i < TrackFX_GetNumParams(media_track, 0); i++) {
@@ -863,6 +888,79 @@ public:
         ImGui::PopFont(m_ctx);
     }
 
+    void RenderPluginTypeSelect() {
+        ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 22);
+        UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
+        if (
+            ImGui::BeginChild(
+                m_ctx, "type_select_content",
+                0.0,
+                0.0,
+                ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
+            )
+        ) {
+            ReaSonusPageTitle(m_ctx, assets, i18n->t("mapping", "edit.typeselect.label"), true);
+            ImGui::TextWrapped(
+                m_ctx,
+                i18n->t("mapping", "edit.typeselect.description").c_str()
+            );
+
+            ReaSonusComboInput(
+                m_ctx,
+                "",
+                plugin_types,
+                &newly_selected_plugin_type);
+
+            ReaSonusButtonBar(
+                m_ctx,
+                assets,
+                i18n->t("mapping", "edit.typeselect.button.save"),
+                &save_selected_plugin_type,
+                false,
+                &cancel_selected_plugin_type,
+                dummy,
+                &dummy
+            );
+
+            UiStyledElements::PopReaSonusGroupStyle(m_ctx);
+            ImGui::EndChild(m_ctx);
+        }
+    }
+
+    void PluginTypeSelectedCheck() {
+        if (!save_selected_plugin_type) {
+            return;
+        }
+        save_selected_plugin_type = false;
+
+        // Create the current plugin path
+        const std::string old_plugin_path = createPathName({
+            plugin_folder_path,
+            developers[selected_developer],
+            plugins[selected_developer][selected_plugin]
+        });
+        const mINI::INIFile file(old_plugin_path);
+        // Set the plgin type and store the data
+        plugin_params["global"]["type"] = plugin_types[newly_selected_plugin_type];
+
+        if (!file.write(plugin_params, true)) {
+            return;
+        }
+
+        // Create the new file name and rename the file
+        std::vector<std::string> splitted_name = split(plugins[selected_developer][selected_plugin], ".");
+        splitted_name.insert(splitted_name.begin() + 1, plugin_types[newly_selected_plugin_type]);
+        const std::string path_name = createPathName({
+            plugin_folder_path, developers[selected_developer], join(splitted_name, ".")
+        });
+
+        std::rename(old_plugin_path.c_str(), path_name.c_str());
+
+        // Now we can rebuild the plugins list and reset the previous selected plugin to trigger the plugin selection flow
+        SetPluginFolders();
+        previous_selected_plugin = -1;
+    }
+
     void DeveloperCheck() {
         if (selected_developer != previous_selected_developer) {
             channel_offset = 0;
@@ -940,6 +1038,15 @@ public:
 
                 ImGui::EndChild(m_ctx);
             }
+        } else if (!selected_plugin_exists && selected_plugin > -1 && !selected_plugin_has_type) {
+            /*
+             * TODO: Add option where plugin not found and no plugin type available in the ini file.
+             * - We show The plugin type selector,
+             * - message something like: Looks like this plugin has not set a type. Please select a type and save the change
+             * - After selecting and saving, reload the folder with the plugins and reselect the plugin
+             *
+             */
+            RenderPluginTypeSelect();
         } else if (!selected_plugin_exists && selected_plugin > -1) {
             RenderCenteredText(i18n->t("mapping", "message.not-available"), IconRemove);
         } else if (selected_developer > -1 && selected_plugin == -1) {
@@ -953,6 +1060,7 @@ public:
         if (!render_started) {
             render_started = true;
 
+            PluginTypeSelectedCheck();
             DeveloperCheck();
             PluginCheck();
             ChannelCheck();

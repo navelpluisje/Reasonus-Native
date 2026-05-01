@@ -579,29 +579,30 @@ std::string FormatPluginType(std::string value) {
     return plugin_type;
 }
 
-std::string GetPluginRequestString(std::string plugin_origname, std::string plugin_type) {
+std::string GetPluginRequestString(const std::string &plugin_origname, std::string plugin_type) {
     std::vector<std::string> allowed_plugin_types = GetPluginTypes();
-    auto it_type = std::find(allowed_plugin_types.begin(), allowed_plugin_types.end(), plugin_type);
+    const auto it_type = std::find(allowed_plugin_types.begin(), allowed_plugin_types.end(), plugin_type);
+
     if (it_type == allowed_plugin_types.end()) {
         // ------------------------------------------------------------------------
         // Not found, the plugin type has either not been set or is invalid!
         // ------------------------------------------------------------------------
-        MessageBox(
-            NULL,
-            "Unable to determine plugin type!\n\nRun this action and see if the plugin is listed:\n\n\"Reasonus: Set the correct plugin type for the already created plugins\"\n\nIf it is listed, set the plugin type and try again.\n\n",
-            "ERROR: ReaSonus Native", 0);
+        // MessageBox(
+        //     nullptr,
+        //     "Unable to determine plugin type!\n\nRun this action and see if the plugin is listed:\n\n\"Reasonus: Set the correct plugin type for the already created plugins\"\n\nIf it is listed, set the plugin type and try again.\n\n",
+        //     "ERROR: ReaSonus Native", 0);
         return "";
-    } else {
-        // ------------------------------------------------------------------------
-        // VST actually means version 1 of the VST spec. Most plugins nowadays are
-        // using version 2.x of the VST spec. VST2 is what needs to be used during
-        // plugin insertion, otherwise no plugin will be found unless there is an
-        // alternate version also installed.
-        // ------------------------------------------------------------------------
-        if (plugin_type == "vst" || plugin_type == "vsti") {
-            plugin_type.replace(0, 3, "VST2");
-        }
     }
+    // ------------------------------------------------------------------------
+    // VST actually means version 1 of the VST spec. Most plugins nowadays are
+    // using version 2.x of the VST spec. VST2 is what needs to be used during
+    // plugin insertion, otherwise no plugin will be found unless there is an
+    // alternate version also installed.
+    // ------------------------------------------------------------------------
+    if (plugin_type == "vst" || plugin_type == "vsti") {
+        plugin_type.replace(0, 3, "VST2");
+    }
+
 
     // Make sure the properly formatted type is included when adding a plugin!
     std::string plugin_name_with_type = FormatPluginType(plugin_type) + ": " + plugin_origname;

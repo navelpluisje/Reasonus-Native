@@ -90,6 +90,14 @@ bool DAW::IsTrackVisible(MediaTrack *media_track) {
     return doubleToBool(GetMediaTrackInfo_Value(media_track, "B_SHOWINMIXER"));
 }
 
+void DAW::SetMixerTrackVisible(MediaTrack *media_track, const bool visible) {
+    SetMediaTrackInfo_Value(media_track, "B_SHOWINMIXER", boolToDouble(visible));
+}
+
+void DAW::SetTCPTrackVisible(MediaTrack *media_track, const bool visible) {
+    SetMediaTrackInfo_Value(media_track, "B_SHOWINTCP", boolToDouble(visible));
+}
+
 int DAW::GetTrackPanMode(MediaTrack *media_track) {
     int panMode = 0;
     double pan1 = 0.0;
