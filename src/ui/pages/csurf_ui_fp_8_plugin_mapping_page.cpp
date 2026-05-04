@@ -42,6 +42,9 @@ class CSurf_FP_8_PluginMappingPage : public CSurf_UI_PageContent // NOLINT(*-use
     int previous_selected_plugin = -1;
     bool selected_plugin_exists = false;
     bool selected_plugin_has_type = false;
+    bool selected_plugin_filename_has_type = false;
+    bool selected_plugin_type_mismatch = false;
+    std::string selected_plugin_filename_type;
 
     int nb_channels = 0;
     int selected_channel = 0;
@@ -154,23 +157,60 @@ protected:
         }
     }
 
+    bool CheckPathForPluginType(std::string plugin_path) {
+        selected_plugin_filename_type = "";
+
+        for (int i = 0; i < plugin_types.size(); i++) {
+            std::string type_ini = plugin_types[i] + ".ini";
+            size_t position = plugin_path.find(type_ini);
+            if (position == std::string::npos) { continue; }
+            if (position == (plugin_path.length() - type_ini.length())) {
+                selected_plugin_filename_type = plugin_types[i];
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     bool SetPluginData() {
         plugin_dirty = false;
-        const mINI::INIFile file(GetPluginPath());
+        bool plugin_type_error = false;
+
+        std::string plugin_path = GetPluginPath();
+        const mINI::INIFile file(plugin_path);
         file.read(plugin_params);
         ValidatePluginData();
         file.read(previous_plugin_params);
         nb_channels = 0;
 
-        if (!PluginExists()) {
-            selected_plugin_exists = false;
-            selected_plugin_has_type = !plugin_params["global"]["type"].empty();
-            newly_selected_plugin_type = 0;
+        // Type not present in filename
+        if (!CheckPathForPluginType(plugin_path)) {
+            selected_plugin_filename_has_type = false;
+            plugin_type_error = true;
+        }
 
+        // Type not present in data
+        if (!PluginExists()) {
+            selected_plugin_has_type = !plugin_params["global"]["type"].empty();
+            plugin_type_error = true;
+        }
+
+        // Type in filename and data do not match
+        if (selected_plugin_filename_type != plugin_params["global"]["type"]) {
+            selected_plugin_type_mismatch = true;
+            plugin_type_error = true;
+        }
+
+        if (plugin_type_error) {
+            selected_plugin_exists = false;
+            newly_selected_plugin_type = 0;
             return false;
         }
 
         selected_plugin_exists = true;
+        selected_plugin_filename_has_type = true;
+        selected_plugin_type_mismatch = false;
 
         for (const auto &[fst, snd]: plugin_params) {
             const std::string section = fst;
@@ -940,21 +980,32 @@ public:
             plugins[selected_developer][selected_plugin]
         });
         const mINI::INIFile file(old_plugin_path);
-        // Set the plgin type and store the data
+        // Set the plugin type and store the data
         plugin_params["global"]["type"] = plugin_types[newly_selected_plugin_type];
 
+        // File was moved after the list was refreshed?
+        if (!file_exists(old_plugin_path.c_str())) {
+            // TODO: Replace message box with something nicer?
+            MessageBox(
+                nullptr,
+                "The file containing this plugin mapping was not found!\n\nHas the file been moved since the last time this list updated?",
+                "ERROR: ReaSonus Native", 0);
+            // This function can't continue because otherwise a ghost INI would be written alongside the old INI!
+            return;
+        }
+
+        // Save plugin type to INI
         if (!file.write(plugin_params, true)) {
             return;
         }
 
-        // Create the new file name and rename the file
-        std::vector<std::string> splitted_name = split(plugins[selected_developer][selected_plugin], ".");
-        splitted_name.insert(splitted_name.begin() + 1, plugin_types[newly_selected_plugin_type]);
-        const std::string path_name = createPathName({
-            plugin_folder_path, developers[selected_developer], join(splitted_name, ".")
+        // Create the new filename and rename the file. Use name and type from INI data to prevent duplicate types in filename
+        std::vector<std::string> plugin_filename = { plugin_params["global"]["name"], plugin_params["global"]["type"], "ini" };
+        const std::string new_plugin_path = createPathName({
+            plugin_folder_path, developers[selected_developer], join(plugin_filename, ".")
         });
 
-        std::rename(old_plugin_path.c_str(), path_name.c_str());
+        std::rename(old_plugin_path.c_str(), new_plugin_path.c_str());
 
         // Now we can rebuild the plugins list and reset the previous selected plugin to trigger the plugin selection flow
         SetPluginFolders();
@@ -1038,14 +1089,7 @@ public:
 
                 ImGui::EndChild(m_ctx);
             }
-        } else if (!selected_plugin_exists && selected_plugin > -1 && !selected_plugin_has_type) {
-            /*
-             * TODO: Add option where plugin not found and no plugin type available in the ini file.
-             * - We show The plugin type selector,
-             * - message something like: Looks like this plugin has not set a type. Please select a type and save the change
-             * - After selecting and saving, reload the folder with the plugins and reselect the plugin
-             *
-             */
+        } else if (!selected_plugin_exists && selected_plugin > -1 && (!selected_plugin_has_type || !selected_plugin_filename_has_type || selected_plugin_type_mismatch)) {
             RenderPluginTypeSelect();
         } else if (!selected_plugin_exists && selected_plugin > -1) {
             RenderCenteredText(i18n->t("mapping", "message.not-available"), IconRemove);
