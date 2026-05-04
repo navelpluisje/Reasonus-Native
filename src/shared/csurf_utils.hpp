@@ -477,6 +477,6 @@ std::string FormatPluginType(std::string value);
  * @param plugin_type Identifier to determine which plugin package to load
  * @return
  */
-std::string GetPluginRequestString(std::string plugin_origname, std::string plugin_type);
+std::string GetPluginRequestString(const std::string &plugin_origname, std::string plugin_type);
 
 #endif // CSURF_UTILS_H_

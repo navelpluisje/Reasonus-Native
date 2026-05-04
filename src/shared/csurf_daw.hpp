@@ -147,6 +147,10 @@ public:
      */
     static bool IsTrackVisible(MediaTrack *media_track);
 
+    static void SetMixerTrackVisible(MediaTrack *media_track, bool visible);
+
+    static void SetTCPTrackVisible(MediaTrack *media_track, bool visible);
+
     /**
      * Get the pan mode for the given track
      * @param media_track The track to get the pan mode for
