@@ -82,6 +82,7 @@ protected:
 
         while (has_next) {
             const char *name = EnumerateSubdirectories(plugin_folder_path.c_str(), index);
+            
             if (name == nullptr) {
                 has_next = false;
             } else {
@@ -157,15 +158,19 @@ protected:
         }
     }
 
-    bool CheckPathForPluginType(std::string plugin_path) {
+    bool CheckPathForPluginType(const std::string &plugin_path) {
         selected_plugin_filename_type = "";
 
-        for (int i = 0; i < plugin_types.size(); i++) {
-            std::string type_ini = plugin_types[i] + ".ini";
-            size_t position = plugin_path.find(type_ini);
-            if (position == std::string::npos) { continue; }
-            if (position == (plugin_path.length() - type_ini.length())) {
-                selected_plugin_filename_type = plugin_types[i];
+        for (const auto &plugin_type: plugin_types) { // NOLINT(*-use-anyofallof)
+            const std::string type_ini = plugin_type + ".ini";
+            const size_t position = plugin_path.find(type_ini);
+
+            if (position == std::string::npos) {
+                continue;
+            }
+
+            if (position == plugin_path.length() - type_ini.length()) {
+                selected_plugin_filename_type = plugin_type;
                 return true;
             }
         }
@@ -177,7 +182,7 @@ protected:
         plugin_dirty = false;
         bool plugin_type_error = false;
 
-        std::string plugin_path = GetPluginPath();
+        const std::string plugin_path = GetPluginPath();
         const mINI::INIFile file(plugin_path);
         file.read(plugin_params);
         ValidatePluginData();
@@ -1000,7 +1005,9 @@ public:
         }
 
         // Create the new filename and rename the file. Use name and type from INI data to prevent duplicate types in filename
-        std::vector<std::string> plugin_filename = { plugin_params["global"]["name"], plugin_params["global"]["type"], "ini" };
+        const std::vector<std::string> plugin_filename = {
+            plugin_params["global"]["name"], plugin_params["global"]["type"], "ini"
+        };
         const std::string new_plugin_path = createPathName({
             plugin_folder_path, developers[selected_developer], join(plugin_filename, ".")
         });
@@ -1089,7 +1096,9 @@ public:
 
                 ImGui::EndChild(m_ctx);
             }
-        } else if (!selected_plugin_exists && selected_plugin > -1 && (!selected_plugin_has_type || !selected_plugin_filename_has_type || selected_plugin_type_mismatch)) {
+        } else if (!selected_plugin_exists && selected_plugin > -1 && (
+                       !selected_plugin_has_type || !selected_plugin_filename_has_type ||
+                       selected_plugin_type_mismatch)) {
             RenderPluginTypeSelect();
         } else if (!selected_plugin_exists && selected_plugin > -1) {
             RenderCenteredText(i18n->t("mapping", "message.not-available"), IconRemove);
