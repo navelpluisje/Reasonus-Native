@@ -368,15 +368,10 @@ std::string DAW::GetTrackFxDeveloper(MediaTrack *media_track, const int fxIndex)
         return "No Dev";
     }
 
-    /*
-    TODO: Some minor issues with the developer parsing. Read comment on this commit:
-    https://github.com/navelpluisje/Reasonus-Native/commit/7da2b27b7db4d433f98d442665868b8b1460609c#commitcomment-183629378
-    */
-
     const std::vector<std::string> plugin_name_parts = split(plugin_name, " (");
     std::string developer;
     const int max_index = plugin_name_parts.size() - 1;
-    const std::regex regex(".*(ch|out|mono)\\)");
+    const std::regex regex(".*(^[0-9->]{1,}ch|^[0-9]{1,3}[\\s]out|^mono)\\)");
 
     for (int i = max_index; i > 0; i--) {
         if (!std::regex_match(plugin_name_parts.at(i), regex)) {
