@@ -262,6 +262,8 @@ std::vector<std::string> cutString(const std::string &str, size_t size);
 
 std::string join(const std::vector<std::string> &list, const std::string &delimiter);
 
+std::string replace(std::string &str, const std::string &search, const std::string &replace);
+
 bool hasPluginConfigFile(MediaTrack *media_track, int pluginId);
 
 void logInteger(const char *key, int value);

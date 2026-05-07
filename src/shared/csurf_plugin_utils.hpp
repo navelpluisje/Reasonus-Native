@@ -96,6 +96,8 @@ public:
 
     static std::vector<std::string> GetInstalledPlugins();
 
+    static std::string createCategoryname(std::string plugin_name, std::string plugin_type);
+
     static std::vector<PluginMeta> ExtractInstalledPluginMeta(std::set<std::string> &developers);
 
     /**

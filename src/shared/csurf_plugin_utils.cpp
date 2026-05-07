@@ -149,6 +149,14 @@ std::vector<std::string> PluginUtils::GetInstalledPlugins() {
     return installed_plugins;
 }
 
+std::string PluginUtils::createCategoryname(std::string plugin_name, std::string plugin_type) {
+    plugin_type = toLowerCase(plugin_type);
+    const std::vector<std::string> name_parts = split(
+        PluginUtils::StripPluginName(plugin_name), " "
+    );
+    return join(name_parts, "_") + "." + replace(plugin_type, "i", "");
+}
+
 std::vector<PluginMeta> PluginUtils::ExtractInstalledPluginMeta(std::set<std::string> &developers) {
     const std::vector<std::string> installed_plugins = GetInstalledPlugins();
     std::vector<PluginMeta> plugin_meta;
@@ -160,11 +168,12 @@ std::vector<PluginMeta> PluginUtils::ExtractInstalledPluginMeta(std::set<std::st
         PluginMeta meta(plugin_name);
         const std::string developer = ExtractDeveloperName(plugin_name);
         const std::string plugin_type = ExtractPluginType(plugin_name);
-        const std::string plugin_name = PluginN
+        const std::string cat_name = createCategoryname(plugin_name, plugin_type);
 
         developers.emplace(developer);
         meta.SetDeveloper(developer);
-        meta.SetCategory(category_file.get("category").get());
+        meta.SetFullName(plugin_name);
+        meta.SetCategory(category_file.get("category").get(cat_name));
         meta.SetPluginType(toLowerCase(plugin_type));
 
         plugin_meta.emplace_back(meta);

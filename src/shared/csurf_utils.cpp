@@ -261,6 +261,17 @@ std::string join(const std::vector<std::string> &list, const std::string &delimi
     return result;
 }
 
+std::string replace(std::string &str, const std::string &search, const std::string &replace) {
+    const size_t start_pos = str.find(search);
+
+    if (start_pos == std::string::npos) {
+        return str;
+    }
+
+    str.replace(start_pos, search.length(), replace);
+    return str;
+}
+
 bool hasPluginConfigFile(MediaTrack *media_track, const int pluginId) {
     const std::string plugin_name = DAW::GetTrackFxName(media_track, pluginId, false);
     const std::string developer_name = DAW::GetTrackFxDeveloper(media_track, pluginId);
