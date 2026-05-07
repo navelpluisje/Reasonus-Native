@@ -132,7 +132,7 @@ protected:
         const int current_value = GetIntConfigVar("solodimdb10");
 
         if (current_value < 999) {
-            SetIntConfigVar("solodimdb10", minmax(-1500, current_value + val, 0));
+            SetIntConfigVar("solodimdb10", minmax(-1500, current_value + val, -10));
         }
     }
 
