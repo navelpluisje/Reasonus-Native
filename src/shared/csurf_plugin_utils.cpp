@@ -149,10 +149,10 @@ std::vector<std::string> PluginUtils::GetInstalledPlugins() {
     return installed_plugins;
 }
 
-std::string PluginUtils::createCategoryname(std::string plugin_name, std::string plugin_type) {
+std::string PluginUtils::createCategoryName(const std::string &plugin_name, std::string plugin_type) {
     plugin_type = toLowerCase(plugin_type);
     const std::vector<std::string> name_parts = split(
-        PluginUtils::StripPluginName(plugin_name), " "
+        StripPluginName(plugin_name), " "
     );
     return join(name_parts, "_") + "." + replace(plugin_type, "i", "");
 }

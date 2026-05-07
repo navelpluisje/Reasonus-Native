@@ -84,20 +84,59 @@ public:
      */
     static std::string StripPluginChannelPostfix(char const *name);
 
+    /**
+     * Extract the developer name from REAPer's plugin name
+     * @param plugin_name The name of the plugin to extract the developer name from
+     * @return The developer name
+     */
     static std::string ExtractDeveloperName(const std::string &plugin_name);
 
+    /**
+     * Extract the plugin type from REAPer's plugin name
+     * @param plugin_name The name of the plugin to extract the type name from
+     * @return The plugin type
+     */
     static std::string ExtractPluginType(const std::string &plugin_name);
 
+    /**
+     * Get the path of the folder where ReaSonus is storing all the plugin mappings
+     * @return
+     */
     static std::string GetPluginsPath();
 
+    /**
+     * Get a list of all the developers with mapped plugins
+     * @param sorted Whether to sort the result
+     * @return
+     */
     static std::vector<std::string> GetpluginDevelopers(bool sorted);
 
+    /**
+     * Get a list of all the mapped plugins by developer
+     * @param sorted Whether to sort the result
+     * @return
+     */
     static std::vector<std::string> GetDeveloperPlugins(std::string developer, bool sorted);
 
+    /**
+     * Get a list with all the installed plugins according to REAPER
+     * @return
+     */
     static std::vector<std::string> GetInstalledPlugins();
 
-    static std::string createCategoryname(std::string plugin_name, std::string plugin_type);
+    /**
+     * Create a composed plugin name as it is used for storing the categories in REAPER
+     * @param plugin_name The stripped name of the plugin
+     * @param plugin_type The extension of the plugin
+     * @return
+     */
+    static std::string createCategoryName(const std::string &plugin_name, std::string plugin_type);
 
+    /**
+     * Create a list with objects containing meta data per plugin which can be used for plugin selection
+     * @param developers
+     * @return
+     */
     static std::vector<PluginMeta> ExtractInstalledPluginMeta(std::set<std::string> &developers);
 
     /**
