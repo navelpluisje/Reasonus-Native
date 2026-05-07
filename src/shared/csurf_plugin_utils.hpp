@@ -5,6 +5,8 @@
 #include <vector>
 #include <set>
 
+class MediaTrack;
+
 struct PluginMeta {
 private:
     std::string developer;
@@ -103,6 +105,17 @@ public:
      * @return
      */
     static std::string GetPluginsPath();
+
+    static bool hasPluginConfigFile(MediaTrack *media_track, int pluginId);
+
+    /**
+     * @brief Check if the prefix of the fx tells it is actually a fx and not an instrument
+     *
+     * @param plugin_name
+     * @return bool
+     */
+    static bool IsPluginFX(std::string plugin_name);
+
 
     /**
      * Get a list of all the developers with mapped plugins

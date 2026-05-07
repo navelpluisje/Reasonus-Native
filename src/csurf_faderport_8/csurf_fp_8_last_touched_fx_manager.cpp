@@ -47,13 +47,34 @@ void CSurf_FP_8_LastTouchedFXManager::UpdateTrack(bool force_update) {
     }
 
     track->SetDisplayMode(DISPLAY_MODE_2, force_update);
-    track->SetDisplayLine(0, ALIGN_LEFT, track_name, NON_INVERT, force_update);
-    track->SetDisplayLine(1, ALIGN_LEFT,
-                          param_number < 0 ? "No Param" : PluginUtils::StripPluginNamePrefixes(fxName).c_str(), INVERT,
-                          force_update);
-    track->SetDisplayLine(2, ALIGN_LEFT, param_number < 0 ? "  " : std::string(paramName).c_str(), NON_INVERT,
-                          force_update);
-    track->SetDisplayLine(3, ALIGN_CENTER, param_number < 0 ? "  " : paramValueString, NON_INVERT, force_update);
+    track->SetDisplayLine(
+        0,
+        ALIGN_LEFT,
+        track_name,
+        NON_INVERT,
+        force_update
+    );
+    track->SetDisplayLine(
+        1,
+        ALIGN_LEFT,
+        param_number < 0 ? "No Param" : PluginUtils::StripPluginNamePrefixes(fxName).c_str(),
+        INVERT,
+        force_update
+    );
+    track->SetDisplayLine(
+        2,
+        ALIGN_LEFT,
+        param_number < 0 ? "  " : std::string(paramName).c_str(),
+        NON_INVERT,
+        force_update
+    );
+    track->SetDisplayLine(
+        3,
+        ALIGN_CENTER,
+        param_number < 0 ? "  " : paramValueString,
+        NON_INVERT,
+        force_update
+    );
     track->SetFaderValue(static_cast<int>(paramValue * 16383.0), force_update);
 
     track->SetMuteButtonValue(BTN_VALUE_OFF, force_update);

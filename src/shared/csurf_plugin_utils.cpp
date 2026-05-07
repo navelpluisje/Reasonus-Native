@@ -2,6 +2,8 @@
 
 #include <regex>
 #include <WDL/wdltypes.h> // might be unnecessary in future
+
+#include "csurf_daw.hpp"
 #include "reaper_plugin_functions.h"
 #include "csurf_utils.hpp"
 
@@ -76,6 +78,27 @@ std::string PluginUtils::ExtractPluginType(const std::string &plugin_name) {
 
 std::string PluginUtils::GetPluginsPath() {
     return createPathName({std::string(GetResourcePath()), "ReaSonus", "Plugins"});
+}
+
+bool PluginUtils::hasPluginConfigFile(MediaTrack *media_track, const int pluginId) {
+    const std::string plugin_name = DAW::GetTrackFxName(media_track, pluginId, false);
+    const std::string developer_name = DAW::GetTrackFxDeveloper(media_track, pluginId);
+    const std::string plugin_type = DAW::GetTrackFxType(media_track, pluginId);
+
+    return file_exists(GetReaSonusPluginPath(developer_name, plugin_name, plugin_type, false).c_str());
+}
+
+bool PluginUtils::IsPluginFX(std::string plugin_name) {
+    const int pos = static_cast<int>(plugin_name.find(PREFIX_SEPARATOR));
+    // If we can not find the delimiter, we can not determine the type of plugin, so asume it's an effect
+    if (pos < 0) {
+        return true;
+    }
+    
+    plugin_name.erase(pos, plugin_name.length());
+    plugin_name.erase(0, plugin_name.length() - 1);
+
+    return plugin_name != "i";
 }
 
 std::vector<std::string> PluginUtils::GetpluginDevelopers(const bool sorted) {
@@ -168,7 +191,7 @@ std::vector<PluginMeta> PluginUtils::ExtractInstalledPluginMeta(std::set<std::st
         PluginMeta meta(plugin_name);
         const std::string developer = ExtractDeveloperName(plugin_name);
         const std::string plugin_type = ExtractPluginType(plugin_name);
-        const std::string cat_name = createCategoryname(plugin_name, plugin_type);
+        const std::string cat_name = createCategoryName(plugin_name, plugin_type);
 
         developers.emplace(developer);
         meta.SetDeveloper(developer);

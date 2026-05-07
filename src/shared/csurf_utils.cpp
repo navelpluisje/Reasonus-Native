@@ -108,19 +108,6 @@ double int14ToVol(const unsigned char msb, const unsigned char lsb) {
     return DB2VAL(pos);
 }
 
-
-bool IsPluginFX(std::string name) {
-    const int pos = static_cast<int>(name.find(PREFIX_SEPARATOR));
-    // If we can not find the delimiter, we can not determine the type of plugin, so asume it's an effect
-    if (pos < 0) {
-        return true;
-    }
-    name.erase(pos, name.length());
-    name.erase(0, name.length() - 1);
-
-    return name != "i";
-}
-
 std::string Progress(const int current, const int total) {
     char buffer[127];
     snprintf(buffer, sizeof(buffer), "%d/%d", current, total);
@@ -270,14 +257,6 @@ std::string replace(std::string &str, const std::string &search, const std::stri
 
     str.replace(start_pos, search.length(), replace);
     return str;
-}
-
-bool hasPluginConfigFile(MediaTrack *media_track, const int pluginId) {
-    const std::string plugin_name = DAW::GetTrackFxName(media_track, pluginId, false);
-    const std::string developer_name = DAW::GetTrackFxDeveloper(media_track, pluginId);
-    const std::string plugin_type = DAW::GetTrackFxType(media_track, pluginId);
-
-    return file_exists(GetReaSonusPluginPath(developer_name, plugin_name, plugin_type, false).c_str());
 }
 
 void logInteger(const char *key, const int value) {
@@ -461,6 +440,7 @@ void GetLanguages(std::vector<std::string> &language_names) {
     for (const auto &entry: std::filesystem::recursive_directory_iterator(locale_path)) {
         if (entry.is_regular_file() && !entry.is_symlink()) {
             const std::filesystem::path &path(entry.path());
+            
             if (path.has_extension() && path.extension() == ".ini") {
                 language_names.push_back(split(path.filename().u8string(), ".").at(0));
             }
@@ -510,7 +490,7 @@ std::string toLowerCase(std::string value) {
 }
 
 std::string toUpperCase(std::string value) {
-    std::transform(value.begin(), value.end(), value.begin(), ::toupper);
+    std::transform(value.begin(), value.end(), value.begin(), toupper);
     return value;
 }
 

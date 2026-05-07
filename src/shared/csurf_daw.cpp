@@ -312,7 +312,7 @@ bool DAW::TrackHasFx(MediaTrack *media_track) {
 
     for (int i = 0; i < TrackFX_GetCount(media_track); i++) {
         TrackFX_GetFXName(media_track, i, plugin_name, std::size(plugin_name));
-        has_fx = IsPluginFX(plugin_name);
+        has_fx = PluginUtils::IsPluginFX(plugin_name);
         if (has_fx) {
             break;
         }
