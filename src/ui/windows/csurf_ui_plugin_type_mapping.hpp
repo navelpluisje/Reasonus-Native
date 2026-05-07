@@ -11,19 +11,25 @@
 #include <regex>
 #include "../csurf_ui_assets.hpp"
 #include "../../shared/csurf_utils.hpp"
+#include "../../shared/csurf_plugin_utils.hpp"
 
-class ReaSonusPluginTypeMapping
-{
+class ReaSonusPluginTypeMapping {
 private:
     static void Loop();
+
     static std::unique_ptr<ReaSonusPluginTypeMapping> s_inst;
     CSurf_UI_Assets *assets;
+
     void SetPluginFolders();
+
     std::vector<std::string> SetDeveloperPlugins(std::string developer);
+
     bool AddPluginType();
+
     void RenderMappingsList();
 
     ReaSonusPluginTypeMapping();
+
     void Frame();
 
     ImGui_Context *m_ctx;
@@ -34,10 +40,10 @@ private:
     std::vector<std::string> developers;
     int selected_developer = -1;
 
-    std::vector<std::vector<std::string>> plugins;
+    std::vector<std::vector<std::string> > plugins;
     int selected_plugin = -1;
 
-    std::vector<std::string> plugin_types = GetPluginTypes();
+    std::vector<std::string> plugin_types = PluginUtils::GetPluginTypes();
     int selected_plugin_type = -1;
 
     bool add_type_clicked = false;
@@ -47,6 +53,7 @@ public:
     inline static bool window_open = false;
 
     static void Start();
+
     static void Stop();
 
     ~ReaSonusPluginTypeMapping();
