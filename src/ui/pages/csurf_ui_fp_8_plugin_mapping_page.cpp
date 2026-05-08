@@ -2,6 +2,7 @@
 
 #include "../csurf_ui_page_content.hpp"
 #include "../../shared/csurf_utils.hpp"
+#include "../../shared/csurf_plugin_utils.hpp"
 #include "../../shared/csurf_daw.hpp"
 #include "../components/csurf_ui_page_title.hpp"
 #include "../components/csurf_ui_text_input.hpp"
@@ -29,7 +30,7 @@ class CSurf_FP_8_PluginMappingPage : public CSurf_UI_PageContent // NOLINT(*-use
     bool render_started = false;
     std::string plugin_folder_path = createPathName({std::string(GetResourcePath()), "ReaSonus", "Plugins"});
     std::vector<std::string> developers;
-    std::vector<std::string> plugin_types = GetPluginTypes();
+    std::vector<std::string> plugin_types = PluginUtils::GetPluginTypes();
     int newly_selected_plugin_type = 0;
     bool save_selected_plugin_type = false;
     bool cancel_selected_plugin_type = false;
@@ -77,49 +78,12 @@ protected:
     void SetPluginFolders() {
         developers.clear();
         plugins.clear();
-        bool has_next = true;
-        int index = 0;
 
-        while (has_next) {
-            const char *name = EnumerateSubdirectories(plugin_folder_path.c_str(), index);
-            
-            if (name == nullptr) {
-                has_next = false;
-            } else {
-                index++;
-                const std::vector<std::string> splitted_name = split(name, ".");
-                developers.emplace_back(name);
-            }
-        }
-        std::sort(developers.begin(), developers.end());
+        developers = PluginUtils::GetpluginDevelopers(true);
 
         for (const auto &developer: developers) {
-            plugins.push_back(SetDeveloperPlugins(developer));
+            plugins.push_back(PluginUtils::GetDeveloperPlugins(developer, true));
         }
-    }
-
-    std::vector<std::string> SetDeveloperPlugins(std::string developer) {
-        bool has_next = true;
-        int index = 0;
-        const std::string path = createPathName({plugin_folder_path, std::move(developer)});
-        std::vector<std::string> developer_plugins;
-
-        while (has_next) {
-            const char *name = EnumerateFiles(path.c_str(), index);
-            if (name == nullptr) {
-                has_next = false;
-            } else {
-                index++;
-                std::vector<std::string> splitted_name = split(std::string(name), ".");
-
-                if (splitted_name[splitted_name.size() - 1] == "ini") {
-                    developer_plugins.emplace_back(name);
-                }
-            }
-        }
-
-        std::sort(developer_plugins.begin(), developer_plugins.end());
-        return developer_plugins;
     }
 
     std::string GetPluginPath() {
@@ -240,7 +204,7 @@ protected:
         DAW::SetMixerTrackVisible(media_track, false);
         DAW::SetTCPTrackVisible(media_track, false);
 
-        const std::string plugin_request_string = GetPluginRequestString(
+        const std::string plugin_request_string = PluginUtils::GetPluginRequestString(
             plugin_params["global"]["origname"],
             plugin_params["global"]["type"]
         );
@@ -262,7 +226,7 @@ protected:
         MediaTrack *media_track = GetTrack(nullptr, 0);
 
         // Placeholder until first iteration of plugin caching is implemented
-        const std::string plugin_request_string = GetPluginRequestString(
+        const std::string plugin_request_string = PluginUtils::GetPluginRequestString(
             plugin_params["global"]["origname"],
             plugin_params["global"]["type"]
         );

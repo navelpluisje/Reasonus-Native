@@ -6,6 +6,7 @@
 #include <string>
 #include "../shared/csurf_utils.hpp"
 #include "csurf.h"
+#include "csurf_plugin_utils.hpp"
 
 int DAW::sendModes[3] = {0, 1, 3};
 
@@ -311,7 +312,7 @@ bool DAW::TrackHasFx(MediaTrack *media_track) {
 
     for (int i = 0; i < TrackFX_GetCount(media_track); i++) {
         TrackFX_GetFXName(media_track, i, plugin_name, std::size(plugin_name));
-        has_fx = IsPluginFX(plugin_name);
+        has_fx = PluginUtils::IsPluginFX(plugin_name);
         if (has_fx) {
             break;
         }
@@ -332,11 +333,11 @@ std::string DAW::GetTrackFxName(MediaTrack *media_track, const int fxIndex, cons
     }
 
     if (full) {
-        return StripPluginNamePrefixes(plugin_name);
+        return PluginUtils::StripPluginNamePrefixes(plugin_name);
     }
 
     std::vector<std::string> plugin_name_parts = split(
-        StripPluginNamePrefixes(StripPluginChannelPostfix(plugin_name).data()), " (");
+        PluginUtils::StripPluginNamePrefixes(PluginUtils::StripPluginChannelPostfix(plugin_name).data()), " (");
 
     if (plugin_name_parts.size() > 1) {
         plugin_name_parts.pop_back();
@@ -368,23 +369,7 @@ std::string DAW::GetTrackFxDeveloper(MediaTrack *media_track, const int fxIndex)
         return "No Dev";
     }
 
-    const std::vector<std::string> plugin_name_parts = split(plugin_name, " (");
-    std::string developer;
-    const int max_index = plugin_name_parts.size() - 1;
-    const std::regex regex(".*(^[0-9->]{1,}ch|^[0-9]{1,3}[\\s]out|^mono)\\)");
-
-    for (int i = max_index; i > 0; i--) {
-        if (!std::regex_match(plugin_name_parts.at(i), regex)) {
-            developer = plugin_name_parts.at(i);
-            break;
-        }
-    }
-
-    if (!developer.empty()) {
-        developer.pop_back();
-    }
-
-    return developer;
+    return PluginUtils::ExtractDeveloperName(plugin_name);
 }
 
 bool DAW::GetTrackFxEnabled(MediaTrack *media_track, const int fxIndex) {

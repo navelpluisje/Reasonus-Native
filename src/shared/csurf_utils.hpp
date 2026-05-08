@@ -209,46 +209,6 @@ double panToNormalized(double val);
  */
 double int14ToVol(unsigned char msb, unsigned char lsb);
 
-/**
- * @brief Strip the plugin name from its pre- and post-fixes
- *
- * @param plugin_name The full plugin name
- * @return The stripped down name
- */
-std::string StripPluginName(const std::string &plugin_name);
-
-/**
- * @brief Strip the plugin developer from its pre- and post-fixes
- *
- * @param plugin_name The full plugin name
- * @return The stripped down name
- */
-std::string StripPluginDeveloper(const std::string &plugin_name);
-
-/**
- * @brief Strip the type from the plugin name
- *
- * @param name The full plugin name
- * @return std::string
- */
-std::string StripPluginNamePrefixes(char const *name);
-
-/**
- * @brief Strip the final out info when applicable
- *
- * @param name
- * @return std::string
- */
-std::string StripPluginChannelPostfix(char const *name);
-
-/**
- * @brief Check if the prefix of the fx tells it is actually a fx and not an instrument
- *
- * @param name
- * @return bool
- */
-bool IsPluginFX(std::string name);
-
 std::string Progress(int current, int total);
 
 /**
@@ -294,7 +254,7 @@ std::vector<std::string> cutString(const std::string &str, size_t size);
 
 std::string join(const std::vector<std::string> &list, const std::string &delimiter);
 
-bool hasPluginConfigFile(MediaTrack *media_track, int pluginId);
+std::string replace(std::string &str, const std::string &search, const std::string &replace);
 
 void logInteger(const char *key, int value);
 
@@ -455,28 +415,5 @@ double boolToDouble(bool value);
  * @return
  */
 bool doubleToBool(double value);
-
-/**
- * Fetch a list of plugin types allowed in the plugin mapping
- * @return
- */
-std::vector<std::string> GetPluginTypes();
-
-/**
- * Convert the plugin type to uppercase and if it's an instrument, make sure the i is lowercase
- * @param value Plugin type to format
- * @return
- */
-std::string FormatPluginType(std::string value);
-
-/**
- * Check the plugin is one of the allowed types and prefix the "name (developer)" string with the type
- * 
- * Also change VST to VST2, assuming it would be v2.x and not the older v1.x which is obsolete
- * @param plugin_origname Original name of the plugin from TrackFX_GetFXName
- * @param plugin_type Identifier to determine which plugin package to load
- * @return
- */
-std::string GetPluginRequestString(const std::string &plugin_origname, std::string plugin_type);
 
 #endif // CSURF_UTILS_H_

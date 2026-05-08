@@ -8,6 +8,7 @@
 #include "../components/csurf_ui_button_bar.hpp"
 #include "../components/csurf_ui_text_input.hpp"
 #include "../../shared/csurf_utils.hpp"
+#include "../../shared/csurf_plugin_utils.hpp"
 
 constexpr auto g_name{"ReaSonus Native V2 Control Panel"};
 
@@ -106,8 +107,8 @@ void ReaSonusPluginMappingConverter::ConvertFile(const std::string &file_path) {
                 plugin_name = matches[1];
 
                 ini["global"]["origname"] = plugin_name;
-                ini["global"]["name"] = StripPluginName(matches[1]);
-                ini["global"]["developer"] = StripPluginDeveloper(matches[1]);
+                ini["global"]["name"] = PluginUtils::StripPluginName(matches[1]);
+                ini["global"]["developer"] = PluginUtils::StripPluginDeveloper(matches[1]);
                 has_plugin = true;
             }
         } else if ((line.find("Fader") - std::string::npos > 0)) {

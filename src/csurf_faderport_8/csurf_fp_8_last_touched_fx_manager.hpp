@@ -22,15 +22,15 @@ public:
 
     void UpdateTrack(bool force_update);
 
-    void HandleSelectClick(int index);
+    void HandleSelectClick(int index) const;
 
-    void HandleMuteClick(int index);
+    void HandleMuteClick(int index) const;
 
-    void HandleSoloClick(int index);
+    void HandleSoloClick(int index) const;
 
-    void HandleFaderTouch();
+    void HandleFaderTouch() const;
 
-    void HandleFaderMove(int msb, int lsb);
+    void HandleFaderMove(int msb, int lsb) const;
 
     void resetLastTouchedFxEnabled()
     {
