@@ -1,5 +1,5 @@
 #include <utility>
-
+#include <filesystem>
 #include "../csurf_ui_page_content.hpp"
 #include "../../shared/csurf_utils.hpp"
 #include "../../shared/csurf_plugin_utils.hpp"
@@ -371,12 +371,41 @@ protected:
             const int res = MB(i18n->t("mapping", "popup.unsaved.message").c_str(),
                                i18n->t("mapping", "popup.unsaved.title").c_str(), 3);
             if (res == 6) {
-                ShowConsoleMsg("SAVE!1");
                 Save();
             }
             return res != 2;
         }
         return true;
+    }
+
+    void HandleRemoveMappingClick(const int plugin_index) {
+        const std::string mapping_path = createPathName({
+            plugin_folder_path, developers[selected_developer], plugins[selected_developer][plugin_index]
+        });
+        const std::filesystem::path mapping_folder = createPathName({
+            plugin_folder_path, developers[selected_developer]
+        });
+
+        std::string message = i18n->t(
+            "mapping",
+            "confirm.remove-mapping.message",
+            plugins[selected_developer][plugin_index]
+        );
+
+        if (MB(
+                replaceAll(message, "\\n", "\n").c_str(),
+                i18n->t("mapping", "confirm.remove-mapping.title").c_str(),
+                1
+            ) == 1
+        ) {
+            std::remove(mapping_path.c_str());
+
+            if (std::filesystem::is_empty(mapping_folder)) {
+                std::filesystem::remove(mapping_folder);
+            }
+
+            SetPluginFolders();
+        }
     }
 
     void HandlePreviousClick() {
@@ -593,10 +622,31 @@ public:
     ~CSurf_FP_8_PluginMappingPage() override = default;
 
     void RenderMappingListPlugin(const int index, const std::string &plugin_name, const int developer_index) {
+        double space_x;
+        double space_y;
+
         bool selected = selected_developer == developer_index && selected_plugin == index;
 
-        if (ImGui::Selectable(m_ctx, formatPluginName(plugin_name).c_str(), &selected)) {
+        if (ImGui::Selectable(m_ctx, formatPluginName(plugin_name).c_str(), &selected,
+                              ImGui::SelectableFlags_AllowOverlap)) {
             selected_plugin = index;
+        }
+        if (selected) {
+            ImGui::SameLine(m_ctx);
+            ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
+            ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + space_x - 18);
+            ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 1);
+
+            ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 1.0, 1.0);
+            ImGui::PushFont(m_ctx, assets->GetIconFont(), 16);
+            ImGui::PushStyleColor(m_ctx, ImGui::Col_Button, UI_COLORS::Main_18);
+
+            if (ImGui::Button(m_ctx, std::string(1, IconRemove).c_str())) {
+                HandleRemoveMappingClick(index);
+            }
+            ImGui::PopFont(m_ctx);
+            ImGui::PopStyleVar(m_ctx);
+            ImGui::PopStyleColor(m_ctx);
         }
     }
 

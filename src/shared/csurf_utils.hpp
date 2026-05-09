@@ -256,6 +256,8 @@ std::string join(const std::vector<std::string> &list, const std::string &delimi
 
 std::string replace(std::string &str, const std::string &search, const std::string &replace);
 
+std::string replaceAll(std::string &str, const std::string &search, const std::string &replace);
+
 void logInteger(const char *key, int value);
 
 void logDouble(const char *key, double value);
