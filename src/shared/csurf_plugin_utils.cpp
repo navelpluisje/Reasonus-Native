@@ -8,6 +8,44 @@
 #include "csurf_utils.hpp"
 
 
+std::string PluginUtils::GetPluginFolderPath() {
+    return createPathName({std::string(GetResourcePath()), "ReaSonus", "Plugins"});
+}
+
+std::string PluginUtils::GetPluginCacheFolderPath() {
+    return createPathName({std::string(GetResourcePath()), "ReaSonus", "PluginsCache"});
+}
+
+std::string PluginUtils::GetReaSonusPluginPath(
+    std::string developer,
+    const std::string &plugin_name,
+    const std::string &plugin_type,
+    const bool create
+) {
+    const std::string path = createPathName({GetPluginFolderPath(), std::move(developer)});
+
+    if (create) {
+        createPathIfNotExist(path);
+    }
+
+    return createPathName({path, plugin_name + "." + plugin_type + ".ini"});
+}
+
+std::string PluginUtils::GetReaSonusPluginCachePath(
+    std::string developer,
+    const std::string &plugin_name,
+    const std::string &plugin_type,
+    const bool create
+) {
+    const std::string path = createPathName({GetPluginCacheFolderPath(), std::move(developer)});
+
+    if (create) {
+        createPathIfNotExist(path);
+    }
+
+    return createPathName({path, plugin_name + "." + plugin_type + ".ini"});
+}
+
 std::string PluginUtils::StripPluginName(const std::string &plugin_name) {
     std::vector<std::string> pluginNameParts = split(
         StripPluginNamePrefixes(StripPluginChannelPostfix(plugin_name.data()).data()), " ("
@@ -70,10 +108,23 @@ std::string PluginUtils::ExtractDeveloperName(const std::string &plugin_name) {
     return developer;
 }
 
+std::string PluginUtils::ExtractPluginName(const std::string &plugin_name) {
+    std::vector<std::string> plugin_name_parts = split(
+        StripPluginNamePrefixes(StripPluginChannelPostfix(plugin_name.c_str()).data()),
+        " ("
+    );
+
+    if (plugin_name_parts.size() > 1) {
+        plugin_name_parts.pop_back();
+    }
+
+    return join(plugin_name_parts, " (");
+}
+
 std::string PluginUtils::ExtractPluginType(const std::string &plugin_name) {
     const std::vector<std::string> plugin_name_parts = split(plugin_name, ": ");
 
-    return plugin_name_parts.at(0);
+    return toLowerCase(plugin_name_parts.at(0));
 }
 
 std::string PluginUtils::GetPluginsPath() {
@@ -94,7 +145,7 @@ bool PluginUtils::IsPluginFX(std::string plugin_name) {
     if (pos < 0) {
         return true;
     }
-    
+
     plugin_name.erase(pos, plugin_name.length());
     plugin_name.erase(0, plugin_name.length() - 1);
 
@@ -237,8 +288,8 @@ std::string PluginUtils::GetPluginRequestString(const std::string &plugin_origna
     std::vector<std::string> allowed_plugin_types = GetPluginTypes();
     const auto it_type = std::find(allowed_plugin_types.begin(), allowed_plugin_types.end(), plugin_type);
 
+    // Not found, the plugin type has either not been set or is invalid!
     if (it_type == allowed_plugin_types.end()) {
-        // Not found, the plugin type has either not been set or is invalid!
         return "";
     }
 
@@ -256,4 +307,87 @@ std::string PluginUtils::GetPluginRequestString(const std::string &plugin_origna
     std::string plugin_name_with_type = FormatPluginType(plugin_type) + ": " + plugin_origname;
 
     return plugin_name_with_type;
+}
+
+bool PluginUtils::CreatePluginMappingCacheFile(MediaTrack *media_track, int plugin_id, bool update) {
+    char plugin_name[256] = ""; // NOLINT(*-avoid-c-arrays)
+    int param_index = 0;
+    mINI::INIStructure cache;
+
+    if (!TrackFX_GetFXName(media_track, plugin_id, plugin_name, std::size(plugin_name))) {
+        return false;
+    }
+
+    const int nb_params = TrackFX_GetNumParams(media_track, plugin_id);
+    const std::string developer = ExtractDeveloperName(plugin_name);
+    const std::string short_name = ExtractPluginName(plugin_name);
+    const std::string plugin_type = ExtractPluginType(plugin_name);
+    const std::string cache_path = GetReaSonusPluginCachePath(developer, short_name, plugin_type, true);
+
+    cache["Global"];
+    cache["Global"]["origName"] = StripPluginNamePrefixes(plugin_name);
+    cache["Global"]["name"] = short_name;
+    cache["Global"]["type"] = plugin_type;
+    cache["Global"]["developer"] = developer;
+
+    for (int i = 0; i < nb_params; i++) {
+        const std::string param_name = DAW::GetTrackFxParamName(media_track, 0, i);
+
+        if (IsWantedParam(std::string(param_name))) {
+            const std::string param_idx = "param_" + std::to_string(param_index);
+
+            cache[param_idx];
+            cache[param_idx]["id"] = std::to_string(i);
+            cache[param_idx]["name"] = DAW::GetTrackFxParamName(media_track, plugin_id, i);
+            cache[param_idx]["steps"] = std::to_string(DAW::GetTrackFxParamNbSteps(media_track, plugin_id, i));
+
+            param_index++;
+        }
+    }
+
+    cache["Global"]["nb_params"] = std::to_string(param_index - 1);
+
+
+    const mINI::INIFile file(cache_path);
+
+    if (update) {
+        return file.write(cache, true);
+    }
+
+    return file.generate(cache, true);
+}
+
+bool PluginUtils::UpdatePluginMappingCacheFile(const std::string &full_plugin_name) {
+    InsertTrackAtIndex(0, false);
+    MediaTrack *media_track = GetTrack(nullptr, 0);
+    TrackFX_AddByName(media_track, full_plugin_name.c_str(), false, -1);
+
+    const bool success = CreatePluginMappingCacheFile(media_track, 0, true);
+    DeleteTrack(media_track);
+
+    return success;
+}
+
+mINI::INIStructure PluginUtils::GetPluginMappingCacheStructure(
+    const std::string &developer,
+    const std::string &plugin_name,
+    const std::string &plugin_type
+) {
+    mINI::INIStructure plugin_cache;
+    const mINI::INIFile file(GetReaSonusPluginCachePath(developer, plugin_name, plugin_type, false));
+    file.read(plugin_cache);
+
+    return plugin_cache;
+}
+
+bool PluginUtils::HasPluginMappingCache(
+    const std::string &developer,
+    const std::string &plugin_name,
+    const std::string &plugin_type
+) {
+    return file_exists(GetReaSonusPluginCachePath(developer, plugin_name, plugin_type, false).c_str());
+}
+
+bool PluginUtils::HasPluginMappingCache(const std::string &cache_path) {
+    return file_exists(cache_path.c_str());
 }

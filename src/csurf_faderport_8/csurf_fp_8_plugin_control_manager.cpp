@@ -2,6 +2,7 @@
 #define CSURF_FP_8_PLUGIN_CONTROL_MANAGER_C_
 
 #include "csurf_fp_8_channel_manager.hpp"
+#include "../shared/csurf_plugin_utils.hpp"
 
 class CSurf_FP_8_PluginControlManager : public CSurf_FP_8_ChannelManager {
 protected:
@@ -23,7 +24,7 @@ protected:
         std::string plugin_type = DAW::GetTrackFxType(media_track, plugin_id);
         std::string plugin_name = DAW::GetTrackFxName(media_track, plugin_id, false);
         std::string developer_name = DAW::GetTrackFxDeveloper(media_track, plugin_id);
-        fileName = GetReaSonusPluginPath(developer_name, plugin_name, plugin_type, false);
+        fileName = PluginUtils::GetReaSonusPluginPath(developer_name, plugin_name, plugin_type, false);
 
         mINI::INIFile file(fileName);
         if (!file.read(ini)) {

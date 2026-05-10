@@ -28,7 +28,7 @@ class CSurf_FP_8_PluginMappingPage : public CSurf_UI_PageContent // NOLINT(*-use
     int changed_items = 0;
 
     bool render_started = false;
-    std::string plugin_folder_path = createPathName({std::string(GetResourcePath()), "ReaSonus", "Plugins"});
+    std::string plugin_folder_path = PluginUtils::GetPluginFolderPath();
     std::vector<std::string> developers;
     std::vector<std::string> plugin_types = PluginUtils::GetPluginTypes();
     int newly_selected_plugin_type = 0;

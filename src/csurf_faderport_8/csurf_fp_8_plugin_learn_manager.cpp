@@ -4,44 +4,44 @@
 #include "csurf_fp_8_channel_manager.hpp"
 #include "../ui/windows/csurf_ui_fp_8_control_panel.hpp"
 #include "../shared/csurf_faderport_ui_imgui_utils.hpp"
+#include "../shared/csurf_plugin_utils.hpp"
 
-class CSurf_FP_8_PluginLearnManager : public CSurf_FP_8_ChannelManager
-{
+class CSurf_FP_8_PluginLearnManager : public CSurf_FP_8_ChannelManager {
 protected:
     mINI::INIStructure ini;
     std::string fileName;
     int updateCount;
 
-    std::string getParamKey(std::string prefix, int index)
-    {
+    std::string getParamKey(std::string prefix, int index) {
         std::string controlIndex = std::to_string(context->GetChannelManagerItemIndex() + index);
         return prefix + controlIndex;
     }
 
-    void GetCurrentPlugin()
-    {
+    void GetCurrentPlugin() {
         int pluginId = context->GetPluginEditPluginId();
         MediaTrack *media_track = context->GetPluginEditTrack();
         std::string full_name = DAW::GetTrackFxName(media_track, pluginId, true);
         std::string plugin_type = DAW::GetTrackFxType(media_track, pluginId);
         std::string plugin_name = DAW::GetTrackFxName(media_track, pluginId, false);
         std::string developer_name = DAW::GetTrackFxDeveloper(media_track, pluginId);
-        fileName = GetReaSonusPluginPath(developer_name, plugin_name, plugin_type, true);
+        fileName = PluginUtils::GetReaSonusPluginPath(developer_name, plugin_name, plugin_type, true);
 
         mINI::INIFile file(fileName);
-        if (!file.read(ini))
-        {
+        if (!file.read(ini)) {
             ini["Global"];
             ini["Global"]["origName"] = full_name;
             ini["Global"]["name"] = plugin_name;
             ini["Global"]["type"] = plugin_type;
             ini["Global"]["developer"] = developer_name;
-            (void)file.generate(ini, true);
+            (void) file.generate(ini, true);
+        }
+
+        if (!PluginUtils::HasPluginMappingCache(developer_name, full_name, plugin_type)) {
+            PluginUtils::CreatePluginMappingCacheFile(media_track, pluginId, false);
         }
     }
 
-    void SaveIniFile()
-    {
+    void SaveIniFile() {
         mINI::INIFile file(fileName);
         file.write(ini, true);
     }
@@ -51,8 +51,7 @@ public:
         std::vector<CSurf_FP_8_Track *> tracks,
         CSurf_FP_8_Navigator *navigator,
         CSurf_Context *context,
-        midi_Output *m_midiout) : CSurf_FP_8_ChannelManager(tracks, navigator, context, m_midiout)
-    {
+        midi_Output *m_midiout) : CSurf_FP_8_ChannelManager(tracks, navigator, context, m_midiout) {
         context->ResetChannelManagerItemIndex();
         context->SetChannelManagerItemsCount(CSurf_Context::GetPluginMaxGroupCount());
         GetCurrentPlugin();
@@ -60,26 +59,23 @@ public:
         color = ButtonColorWhiteDim;
     }
 
-    ~CSurf_FP_8_PluginLearnManager() {};
+    ~CSurf_FP_8_PluginLearnManager() {
+    };
 
-    void UpdateTracks(bool force_update) override
-    {
+    void UpdateTracks(bool force_update) override {
         std::string paramKey;
         int trackId, itemNumber, takeId, pluginId, paramId;
-        if (GetTouchedOrFocusedFX(0, &trackId, &itemNumber, &takeId, &pluginId, &paramId))
-        {
+        if (GetTouchedOrFocusedFX(0, &trackId, &itemNumber, &takeId, &pluginId, &paramId)) {
             context->SetPluginEditParamId(paramId);
         }
 
-        if (updateCount > 100)
-        {
+        if (updateCount > 100) {
             mINI::INIFile file(fileName);
             file.read(ini);
         }
         updateCount += 1;
 
-        for (int i = 0; i < context->GetNbChannels(); i++)
-        {
+        for (int i = 0; i < context->GetNbChannels(); i++) {
             int paramIndex = context->GetChannelManagerItemIndex() + i;
             CSurf_FP_8_Track *track = tracks.at(i);
             track->SetTrackColor(color);
@@ -95,22 +91,16 @@ public:
             track->SetDisplayMode(DISPLAY_MODE_2, force_update);
 
             paramKey = getParamKey("Select_", paramIndex);
-            if (ini.has(paramKey))
-            {
+            if (ini.has(paramKey)) {
                 track->SetDisplayLine(0, ALIGN_CENTER, ini[paramKey]["name"].c_str(), INVERT, force_update);
-            }
-            else
-            {
+            } else {
                 track->SetDisplayLine(0, ALIGN_CENTER, "Free", INVERT, force_update);
             }
 
             paramKey = getParamKey("Fader_", paramIndex);
-            if (ini.has(paramKey))
-            {
+            if (ini.has(paramKey)) {
                 track->SetDisplayLine(2, ALIGN_CENTER, ini[paramKey]["name"].c_str(), INVERT, force_update);
-            }
-            else
-            {
+            } else {
                 track->SetDisplayLine(2, ALIGN_CENTER, "Free", INVERT, force_update);
             }
 
@@ -121,40 +111,31 @@ public:
         force_update = false;
     }
 
-    void OpenMappingUi(int plugin_id, int channel)
-    {
+    void OpenMappingUi(int plugin_id, int channel) {
         MediaTrack *media_track = context->GetPluginEditTrack();
         std::string plugin_name = DAW::GetTrackFxName(media_track, plugin_id, false);
         std::string developer_name = DAW::GetTrackFxDeveloper(media_track, plugin_id);
 
-        if (!ReaSonus8ControlPanel::control_panel_open)
-        {
+        if (!ReaSonus8ControlPanel::control_panel_open) {
             ToggleFP8ControlPanel(ReaSonus8ControlPanel::MAPPING_PAGE);
-        }
-        else if (ReaSonus8ControlPanel::current_page != ReaSonus8ControlPanel::MAPPING_PAGE)
-        {
+        } else if (ReaSonus8ControlPanel::current_page != ReaSonus8ControlPanel::MAPPING_PAGE) {
             ReaSonus8ControlPanel::SetCurrentPage(ReaSonus8ControlPanel::MAPPING_PAGE);
-        }
-        else if (
+        } else if (
             ReaSonus8ControlPanel::GetPageStringProperty(0).compare(developer_name) == 0 &&
             ReaSonus8ControlPanel::GetPageStringProperty(1).compare(plugin_name + ".ini") == 0 &&
-            ReaSonus8ControlPanel::GetPageProperty(0) == channel)
-        {
+            ReaSonus8ControlPanel::GetPageProperty(0) == channel) {
             ToggleFP8ControlPanel(ReaSonus8ControlPanel::MAPPING_PAGE);
         }
 
-        if (ReaSonus8ControlPanel::control_panel_open)
-        {
+        if (ReaSonus8ControlPanel::control_panel_open) {
             ReaSonus8ControlPanel::SetPageStringProperty(0, developer_name);
             ReaSonus8ControlPanel::SetPageStringProperty(1, plugin_name + ".ini");
             ReaSonus8ControlPanel::SetPageProperty(0, channel);
         }
     }
 
-    void HandleSelectClick(int index, int value) override
-    {
-        if (value == 0)
-        {
+    void HandleSelectClick(int index, int value) override {
+        if (value == 0) {
             return;
         }
         int controlIndex = context->GetChannelManagerItemIndex() + index;
@@ -163,22 +144,15 @@ public:
 
         std::string paramKey = getParamKey("Select_", controlIndex);
 
-        if (context->GetShiftLeft())
-        {
+        if (context->GetShiftLeft()) {
             OpenMappingUi(pluginId, controlIndex);
-        }
-        else if (context->GetShiftRight())
-        {
-            if (ini.has(paramKey))
-            {
+        } else if (context->GetShiftRight()) {
+            if (ini.has(paramKey)) {
                 ini.remove(paramKey);
                 SaveIniFile();
             }
-        }
-        else
-        {
-            if (!GetTouchedOrFocusedFX(0, &trackId, &itemNumber, &takeId, &_pluginId, &paramId))
-            {
+        } else {
+            if (!GetTouchedOrFocusedFX(0, &trackId, &itemNumber, &takeId, &_pluginId, &paramId)) {
                 return;
             }
 
@@ -188,8 +162,7 @@ public:
             std::string paramName = DAW::GetTrackFxParamName(media_track, pluginId, paramId);
             int nbSteps = DAW::GetTrackFxParamNbSteps(media_track, pluginId, paramId);
 
-            if (!ini.has(paramKey))
-            {
+            if (!ini.has(paramKey)) {
                 ini[paramKey];
             }
             ini[paramKey]["origName"] = paramName;
@@ -198,54 +171,43 @@ public:
             ini[paramKey]["steps"] = std::to_string(nbSteps);
 
             SaveIniFile();
-            if (settings->GetUntouchAfterLearn())
-            {
+            if (settings->GetUntouchAfterLearn()) {
                 DAW::SetTrackFXParamUntouched(media_track, pluginId);
             }
         }
         // Open the dialog
     }
 
-    void HandleMuteClick(int index, int value) override
-    {
-        (void)index;
-        (void)value;
+    void HandleMuteClick(int index, int value) override {
+        (void) index;
+        (void) value;
         // If in edit mode
         // Edit the current assignment
         // Else do nothing
     }
 
-    void HandleSoloClick(int index, int value) override
-    {
-        (void)index;
-        (void)value;
+    void HandleSoloClick(int index, int value) override {
+        (void) index;
+        (void) value;
     }
 
-    void HandleFaderTouch(int index, int value) override
-    {
-        (void)value;
+    void HandleFaderTouch(int index, int value) override {
+        (void) value;
         int controlIndex = context->GetChannelManagerItemIndex() + index;
         int pluginId = context->GetPluginEditPluginId();
         int trackId, itemNumber, takeId, _pluginId, paramId;
 
         std::string paramKey = getParamKey("Fader_", controlIndex);
 
-        if (context->GetShiftLeft())
-        {
+        if (context->GetShiftLeft()) {
             OpenMappingUi(pluginId, controlIndex);
-        }
-        else if (context->GetShiftRight())
-        {
-            if (ini.has(paramKey))
-            {
+        } else if (context->GetShiftRight()) {
+            if (ini.has(paramKey)) {
                 ini.remove(paramKey);
                 SaveIniFile();
             }
-        }
-        else
-        {
-            if (!GetTouchedOrFocusedFX(0, &trackId, &itemNumber, &takeId, &_pluginId, &paramId))
-            {
+        } else {
+            if (!GetTouchedOrFocusedFX(0, &trackId, &itemNumber, &takeId, &_pluginId, &paramId)) {
                 return;
             }
 
@@ -254,8 +216,7 @@ public:
             MediaTrack *media_track = context->GetPluginEditTrack();
             std::string paramName = DAW::GetTrackFxParamName(media_track, pluginId, paramId);
 
-            if (!ini.has(paramKey))
-            {
+            if (!ini.has(paramKey)) {
                 ini[paramKey];
             }
 
@@ -264,8 +225,7 @@ public:
             ini[paramKey]["param"] = std::to_string(paramId);
 
             SaveIniFile();
-            if (settings->GetUntouchAfterLearn())
-            {
+            if (settings->GetUntouchAfterLearn()) {
                 DAW::SetTrackFXParamUntouched(media_track, pluginId);
             }
         }

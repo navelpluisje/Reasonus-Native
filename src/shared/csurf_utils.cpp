@@ -162,22 +162,6 @@ std::string GetReaSonusZonesPath() {
     return createPathName({std::string(GetResourcePath()), "CSI", "Zones", "ReasonusFaderPort", "_ReaSonusEffects"});
 }
 
-std::string GetReaSonusPluginPath(
-    std::string developer,
-    const std::string &plugin_name,
-    const std::string &plugin_type,
-    const bool create
-) {
-    const std::string path = createPathName({
-        std::string(GetResourcePath()), "ReaSonus", "Plugins", std::move(developer)
-    });
-
-    if (create) {
-        createPathIfNotExist(path);
-    }
-    return createPathName({path, plugin_name + "." + plugin_type + ".ini"});
-}
-
 std::string GetReaSonusLocalesFolderPath() {
     return createPathName({GetReaSonusFolderPath(), "Locales"});
 }
@@ -256,6 +240,17 @@ std::string replace(std::string &str, const std::string &search, const std::stri
     }
 
     str.replace(start_pos, search.length(), replace);
+    return str;
+}
+
+std::string replaceAll(std::string &str, const std::string &search, const std::string &replace) {
+    size_t start_pos = str.find(search);
+
+    while (start_pos != std::string::npos) {
+        str.replace(start_pos, search.length(), replace);
+        start_pos = str.find(search);
+    }
+
     return str;
 }
 
@@ -440,7 +435,7 @@ void GetLanguages(std::vector<std::string> &language_names) {
     for (const auto &entry: std::filesystem::recursive_directory_iterator(locale_path)) {
         if (entry.is_regular_file() && !entry.is_symlink()) {
             const std::filesystem::path &path(entry.path());
-            
+
             if (path.has_extension() && path.extension() == ".ini") {
                 language_names.push_back(split(path.filename().u8string(), ".").at(0));
             }

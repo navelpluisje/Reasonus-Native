@@ -233,13 +233,6 @@ std::string GetReaSonusIniPath(const std::string &device);
 
 std::string GetReaSonusZonesPath();
 
-std::string GetReaSonusPluginPath(
-    std::string developer,
-    const std::string &plugin_name,
-    const std::string &plugin_type,
-    bool create
-);
-
 std::string GetReaSonusLocalesFolderPath();
 
 std::string GetReaSonusLocalesPath(const std::string &language);

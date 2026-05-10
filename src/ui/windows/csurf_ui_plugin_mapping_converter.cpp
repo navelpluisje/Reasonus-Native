@@ -147,8 +147,12 @@ void ReaSonusPluginMappingConverter::ConvertFile(const std::string &file_path) {
     }
 
     if (has_plugin) {
-        const std::string fileName = GetReaSonusPluginPath(ini["global"]["developer"], ini["global"]["name"],
-                                                           ini["global"]["type"], true);
+        const std::string fileName = PluginUtils::GetReaSonusPluginPath(
+            ini["global"]["developer"],
+            ini["global"]["name"],
+            ini["global"]["type"],
+            true
+        );
         const mINI::INIFile file(fileName);
         if (!file_exists(fileName.c_str()) && file.write(ini, true)) {
             converted_files.insert(converted_files.begin() + converted_files.size(), plugin_name);

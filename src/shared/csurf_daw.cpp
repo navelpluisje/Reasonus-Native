@@ -336,14 +336,7 @@ std::string DAW::GetTrackFxName(MediaTrack *media_track, const int fxIndex, cons
         return PluginUtils::StripPluginNamePrefixes(plugin_name);
     }
 
-    std::vector<std::string> plugin_name_parts = split(
-        PluginUtils::StripPluginNamePrefixes(PluginUtils::StripPluginChannelPostfix(plugin_name).data()), " (");
-
-    if (plugin_name_parts.size() > 1) {
-        plugin_name_parts.pop_back();
-    }
-
-    return join(plugin_name_parts, " (");
+    return PluginUtils::ExtractPluginName(plugin_name);
 }
 
 std::string DAW::GetTrackFxType(MediaTrack *media_track, const int fxIndex) {
