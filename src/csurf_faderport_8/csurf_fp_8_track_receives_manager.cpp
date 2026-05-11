@@ -143,7 +143,7 @@ public:
                 track->SetValueBarValue(0);
             }
 
-            track->SetTrackColor(color);
+            track->SetTrackColor(color, force_update);
             track->SetSelectButtonValue(BTN_VALUE_ON, force_update);
             track->SetMuteButtonValue(
                 ButtonBlinkOnOff(

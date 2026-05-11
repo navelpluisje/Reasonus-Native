@@ -7,6 +7,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <regex>
 
 #ifdef _WIN32
 #include <ShlObj_core.h>
@@ -327,6 +328,16 @@ bool IsWantedParam(const std::string &param_name) {
     }
 
     return result;
+}
+
+std::string ltrim(const std::string &value) {
+    const std::regex leading_space("^\\s+");
+    return std::regex_replace(value, leading_space, "");
+}
+
+std::string rtrim(const std::string &value) {
+    const std::regex trailing_whitespaces("\\s+$");
+    return std::regex_replace(value, trailing_whitespaces, "");
 }
 
 int minmax(const int min, const int value, const int max) {
