@@ -4,6 +4,7 @@
 #include <reaper_imgui_functions.h>
 #include <string>
 #include <functional>
+#include "../../shared/csurf_utils.hpp"
 #include "../csurf_ui_styles_elements.hpp"
 #include "csurf_ui_text_input.hpp"
 
@@ -32,8 +33,14 @@ static void ReaSonusActionTextInput(
         ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
 
         ReaSonusTextInput(m_ctx, label, value, hint, space_x - 38, false);
+
         if (ImGui::IsKeyPressed(m_ctx, ImGui::Key_Enter) && !value->empty()) {
-            callback();
+            const std::string trimmer_value = ltrim(rtrim(*value));
+            *value = trimmer_value;
+
+            if (!trimmer_value.empty()) {
+                callback();
+            }
         }
 
         ImGui::SameLine(m_ctx);
@@ -42,7 +49,12 @@ static void ReaSonusActionTextInput(
         UiStyledElements::PushReaSonusIconButtonStyle(m_ctx, assets);
         if (ImGui::Button(m_ctx, std::string(1, IconAddList).c_str())) {
             if (!value->empty()) {
-                callback();
+                const std::string trimmer_value = ltrim(rtrim(*value));
+                *value = trimmer_value;
+
+                if (!trimmer_value.empty()) {
+                    callback();
+                }
             }
         }
         UiStyledElements::PopReaSonusIconButtonStyle(m_ctx);

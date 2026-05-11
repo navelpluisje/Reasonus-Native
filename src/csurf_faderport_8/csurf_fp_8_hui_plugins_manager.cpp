@@ -132,7 +132,7 @@ public:
                 track->SetSoloButtonValue(BTN_VALUE_OFF, force_update);
             }
 
-            track->SetTrackColor(color);
+            track->SetTrackColor(color, force_update);
             track->SetSelectButtonValue(BTN_VALUE_ON, force_update);
             track->SetFaderValue(fader_value, force_update);
             track->SetValueBarMode(VALUEBAR_MODE_BIPOLAR);
