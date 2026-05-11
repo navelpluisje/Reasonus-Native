@@ -13,6 +13,7 @@
 #include "../components/csurf_ui_int_input.hpp"
 #include "../components/csurf_ui_combo_input.hpp"
 #include "../components/csurf_ui_button_bar.hpp"
+#include "../components/csurf_ui_plugin_type_button.hpp"
 #include "../../i18n/i18n.hpp"
 #include "../windows/csurf_ui_fp_8_control_panel.hpp"
 
@@ -624,14 +625,32 @@ public:
     void RenderMappingListPlugin(const int index, const std::string &plugin_name, const int developer_index) {
         double space_x;
         double space_y;
+        double x_pos;
+        double y_pos;
+        double x_mouse_pos;
+        double y_mouse_pos;
+        double width;
+        double height;
+
+        ImGui::GetCursorScreenPos(m_ctx, &x_pos, &y_pos);
+        ImGui::GetMousePos(m_ctx, &x_mouse_pos, &y_mouse_pos);
 
         bool selected = selected_developer == developer_index && selected_plugin == index;
 
-        if (ImGui::Selectable(m_ctx, formatPluginName(plugin_name).c_str(), &selected,
-                              ImGui::SelectableFlags_AllowOverlap)) {
+        if (ImGui::Selectable(
+            m_ctx,
+            formatPluginName(plugin_name).c_str(),
+            &selected,
+            ImGui::SelectableFlags_AllowOverlap
+        )) {
             selected_plugin = index;
         }
-        if (selected) {
+        ImGui::GetItemRectSize(m_ctx, &width, &height);
+
+        const bool mouse_over = between(static_cast<int>(x_pos), width, static_cast<int>(x_mouse_pos))
+                                && between(static_cast<int>(y_pos), height, static_cast<int>(y_mouse_pos));
+
+        if (mouse_over) {
             ImGui::SameLine(m_ctx);
             ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
             ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + space_x - 18);
@@ -1135,6 +1154,7 @@ public:
 
             ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_ItemSpacing, 12.0, 12.0);
             if (ImGui::BeginChild(m_ctx, "main_mapping_content", 0.0, 0.0, ImGui::ChildFlags_None)) {
+                ReaSonusPluginTypeButton(m_ctx, assets, "A");
                 RenderMappingsList();
                 ImGui::SameLine(m_ctx);
 
