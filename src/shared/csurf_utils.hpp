@@ -277,6 +277,27 @@ std::string GenerateUniqueKey(std::string prefix);
 bool IsWantedParam(const std::string &param_name);
 
 /**
+ * Left trim the givven string. This will remove all spaces at the start of a string
+ * @param value The value to trim
+ * @return
+ */
+std::string ltrim(const std::string &value);
+
+/**
+ * Left trim the givven string. This will remove all spaces at the end of a string
+ * @param value The value to trim
+ * @return
+ */
+std::string rtrim(const std::string &value);
+
+/**
+ * Left trim the givven string. This will remove all spaces at the end and start of a string
+ * @param value The value to trim
+ * @return
+ */
+std::string trim(std::string value);
+
+/**
  * Return the value when it is between min or max.
  * Return the min value as val is smaller than min
  * Return the max value as val is larger than max
