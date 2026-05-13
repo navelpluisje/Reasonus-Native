@@ -14,6 +14,7 @@
 #include "../components/csurf_ui_combo_input.hpp"
 #include "../components/csurf_ui_button_bar.hpp"
 #include "../components/csurf_ui_plugin_type_button.hpp"
+#include "../utils/csurf_ui_text_overflow.hpp"
 #include "../../i18n/i18n.hpp"
 #include "../windows/csurf_ui_fp_8_control_panel.hpp"
 
@@ -74,6 +75,8 @@ class CSurf_FP_8_PluginMappingPage : public CSurf_UI_PageContent // NOLINT(*-use
     std::vector<int> dirty_groups;
 
     bool plugin_dirty = false;
+
+    int mouse_over_delay = 0;
 
 protected:
     void SetPluginFolders() {
@@ -600,16 +603,23 @@ protected:
         HandleDeleteChannelById(from_id);
     }
 
-    static std::string formatPluginName(const std::string &plugin_name) {
+    static std::string ExtractPluginNameFromFile(const std::string &plugin_name) {
         std::vector<std::string> splitted_plugin_name = split(plugin_name, ".");
 
+        return splitted_plugin_name.at(0);
+    }
+
+    static std::string ExtractPluginTypeFromFile(const std::string &plugin_name) {
+        std::vector<std::string> splitted_plugin_name = split(plugin_name, ".");
+
+        // Remove the ini part. If the vector length is longer the1 we have a plugin type available
         splitted_plugin_name.pop_back();
 
         if (splitted_plugin_name.size() > 1) {
-            return splitted_plugin_name.at(0) + " (" + splitted_plugin_name.at(1) + ")";
+            return splitted_plugin_name.at(1);
         }
 
-        return splitted_plugin_name.at(0);
+        return "";
     }
 
 public:
@@ -625,36 +635,53 @@ public:
     void RenderMappingListPlugin(const int index, const std::string &plugin_name, const int developer_index) {
         double space_x;
         double space_y;
-        double x_pos;
-        double y_pos;
-        double x_mouse_pos;
-        double y_mouse_pos;
+        double pos_window_x;
+        double pos_window_y;
+        double pos_screen_x;
+        double pos_screen_y;
+        double mouse_pos_x;
+        double mouse_pos_y;
         double width;
         double height;
+        double avaiable_width;
+        double avaiable_height;
 
-        ImGui::GetCursorScreenPos(m_ctx, &x_pos, &y_pos);
-        ImGui::GetMousePos(m_ctx, &x_mouse_pos, &y_mouse_pos);
+        ImGui::GetCursorScreenPos(m_ctx, &pos_screen_x, &pos_screen_y);
+        ImGui::GetCursorPos(m_ctx, &pos_window_x, &pos_window_y);
+        ImGui::GetMousePos(m_ctx, &mouse_pos_x, &mouse_pos_y);
 
         bool selected = selected_developer == developer_index && selected_plugin == index;
 
+        ImGui::GetContentRegionAvail(m_ctx, &avaiable_width, &avaiable_height);
+        std::string new_label = "      " + ExtractPluginNameFromFile(plugin_name);
+
         if (ImGui::Selectable(
-            m_ctx,
-            formatPluginName(plugin_name).c_str(),
-            &selected,
-            ImGui::SelectableFlags_AllowOverlap
-        )) {
+                m_ctx,
+                getTextOverflow(m_ctx, new_label, avaiable_width - 20).c_str(),
+                &selected,
+                ImGui::SelectableFlags_AllowOverlap
+            )
+
+        ) {
             selected_plugin = index;
         }
         ImGui::GetItemRectSize(m_ctx, &width, &height);
 
-        const bool mouse_over = between(static_cast<int>(x_pos), width, static_cast<int>(x_mouse_pos))
-                                && between(static_cast<int>(y_pos), height, static_cast<int>(y_mouse_pos));
+        const bool mouse_over = between(static_cast<int>(pos_screen_x), width, static_cast<int>(mouse_pos_x))
+                                && between(static_cast<int>(pos_screen_y), height, static_cast<int>(mouse_pos_y));
+
+        ReaSonusPluginTypeButton(
+            m_ctx,
+            assets,
+            pos_screen_x,
+            pos_screen_y - 2,
+            ExtractPluginTypeFromFile(plugin_name),
+            plugin_name
+        );
 
         if (mouse_over) {
-            ImGui::SameLine(m_ctx);
             ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
-            ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + space_x - 18);
-            ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 1);
+            ImGui::SetCursorPos(m_ctx, pos_window_x + width - 24, pos_window_y - 1);
 
             ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 1.0, 1.0);
             ImGui::PushFont(m_ctx, assets->GetIconFont(), 16);
@@ -667,6 +694,7 @@ public:
             ImGui::PopStyleVar(m_ctx);
             ImGui::PopStyleColor(m_ctx);
         }
+        ImGui::SetCursorPos(m_ctx, pos_window_x, pos_window_y + height);
     }
 
     void RenderMappingListDeveloper(const int index) {
@@ -677,7 +705,10 @@ public:
         }
 
         UiStyledElements::PushReaSonusTreeNodeStyle(m_ctx, selected_developer == index);
-        if (ImGui::TreeNode(m_ctx, developers.at(index).c_str(), ImGui::TreeNodeFlags_CollapsingHeader)) {
+        if (ImGui::TreeNode(
+            m_ctx, developers.at(index).c_str(),
+            ImGui::TreeNodeFlags_CollapsingHeader
+        )) {
             selected_developer = index;
             const std::vector<std::string> developer_plugins = plugins.at(index);
 
@@ -689,13 +720,17 @@ public:
     }
 
     void RenderMappingsList() {
-        if (ImGui::BeginChild(m_ctx, "mapping_lists", 240.0, 0.0)) {
+        if (ImGui::BeginChild(m_ctx, "mapping_lists", 280.0, 0.0)) {
             ImGui::Text(m_ctx, i18n->t("mapping", "list.label").c_str());
             ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 4);
 
             UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
-            if (ImGui::BeginChild(m_ctx, "mapping_lists_content", 0.0, 0.0, ImGui::ChildFlags_FrameStyle,
-                                  ImGui::ChildFlags_AutoResizeY)) {
+            if (ImGui::BeginChild(
+                m_ctx,
+                "mapping_lists_content", 0.0,
+                0.0,
+                ImGui::ChildFlags_FrameStyle
+            )) {
                 for (int i = 0; i < static_cast<int>(developers.size()); i++) {
                     RenderMappingListDeveloper(i);
                 }
@@ -703,7 +738,6 @@ public:
                 UiStyledElements::PopReaSonusGroupStyle(m_ctx);
                 ImGui::EndChild(m_ctx);
             }
-
             ImGui::EndChild(m_ctx);
         }
     }
@@ -1108,11 +1142,12 @@ public:
 
         if (selected_plugin > -1 && selected_plugin_exists) {
             ImGui::Text(
-                m_ctx, selected_plugin < 0 || selected_plugin >= static_cast<int>(plugins[selected_developer].size())
-                           ? "Groups"
-                           : std::string(
-                               developers[selected_developer] + " :: " + plugins[selected_developer][selected_plugin]).
-                           c_str());
+                m_ctx,
+                selected_plugin < 0 || selected_plugin >= static_cast<int>(plugins[selected_developer].size())
+                    ? "Groups"
+                    : std::string(
+                        developers[selected_developer] + " :: " + plugins[selected_developer][selected_plugin]).
+                    c_str());
             ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 4);
             RenderInformationBar();
             RenderChannelsList();
@@ -1154,7 +1189,6 @@ public:
 
             ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_ItemSpacing, 12.0, 12.0);
             if (ImGui::BeginChild(m_ctx, "main_mapping_content", 0.0, 0.0, ImGui::ChildFlags_None)) {
-                ReaSonusPluginTypeButton(m_ctx, assets, "A");
                 RenderMappingsList();
                 ImGui::SameLine(m_ctx);
 

@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 #include <set>
 
 class MediaTrack;
@@ -158,12 +159,20 @@ public:
      */
     static std::vector<std::string> GetPluginTypes();
 
+    static std::map<std::string, std::string> GetPluginTypesMap();
+
+    static std::string GetShortPluginType(const std::string &plugin_type);
+
+    static int GetPluginTypeBgColors(const std::string &plugin_type);
+
+    static int GetPluginTypeFgColors(const std::string &plugin_type);
+
     /**
      * Convert the plugin type to uppercase and if it's an instrument, make sure the `i` is lowercase
      * @param value Plugin type to format
      * @return
      */
-    static std::string FormatPluginType(std::string value);
+    static std::string FormatPluginType(const std::string &value);
 
     /**
      * Check the plugin is one of the allowed types and prefix the "name (developer)" string with the type
