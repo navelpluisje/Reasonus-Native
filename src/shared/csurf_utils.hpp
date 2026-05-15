@@ -249,6 +249,8 @@ std::string join(const std::vector<std::string> &list, const std::string &delimi
 
 std::string replace(std::string &str, const std::string &search, const std::string &replace);
 
+std::string replaceAll(std::string &str, const std::string &search, const std::string &replace);
+
 void logInteger(const char *key, int value);
 
 void logDouble(const char *key, double value);
@@ -268,6 +270,27 @@ std::string GenerateUniqueKey(std::string prefix);
  * @return false
  */
 bool IsWantedParam(const std::string &param_name);
+
+/**
+ * Left trim the givven string. This will remove all spaces at the start of a string
+ * @param value The value to trim
+ * @return
+ */
+std::string ltrim(const std::string &value);
+
+/**
+ * Left trim the givven string. This will remove all spaces at the end of a string
+ * @param value The value to trim
+ * @return
+ */
+std::string rtrim(const std::string &value);
+
+/**
+ * Left trim the givven string. This will remove all spaces at the end and start of a string
+ * @param value The value to trim
+ * @return
+ */
+std::string trim(std::string value);
 
 /**
  * Return the value when it is between min or max.

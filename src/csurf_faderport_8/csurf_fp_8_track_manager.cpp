@@ -168,7 +168,7 @@ public:
             const bool is_selected = (context->GetArm() && is_armed) || (!context->GetArm() && track_selected);
 
             SetTrackColors(media_track, is_selected, true);
-            track->SetTrackColor(color);
+            track->SetTrackColor(color, force_update);
             // If the track is armed always blink as an indication it is armed
             track->SetSelectButtonValue(
                 !context->GetArm() && is_armed && !settings->GetDistractionFreeMode()
