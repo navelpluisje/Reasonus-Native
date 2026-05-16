@@ -14,6 +14,7 @@
 #include "../components/csurf_ui_combo_input.hpp"
 #include "../components/csurf_ui_button_bar.hpp"
 #include "../components/csurf_ui_plugin_type_button.hpp"
+#include "../components/csurf_ui_plugin_selectable.hpp"
 #include "../utils/csurf_ui_text_overflow.hpp"
 #include "../../i18n/i18n.hpp"
 #include "../windows/csurf_ui_fp_8_control_panel.hpp"
@@ -633,89 +634,49 @@ public:
     ~CSurf_FP_8_PluginMappingPage() override = default;
 
     void RenderMappingListPlugin(const int index, const std::string &plugin_name, const int developer_index) {
-        double space_x;
-        double space_y;
-        double pos_window_x;
-        double pos_window_y;
-        double pos_screen_x;
-        double pos_screen_y;
-        double mouse_pos_x;
-        double mouse_pos_y;
-        double width;
-        double height;
-        double avaiable_width;
-        double avaiable_height;
+        using namespace std::placeholders; // for `_1, _2 etc`
 
-        ImGui::GetCursorScreenPos(m_ctx, &pos_screen_x, &pos_screen_y);
-        ImGui::GetCursorPos(m_ctx, &pos_window_x, &pos_window_y);
-        ImGui::GetMousePos(m_ctx, &mouse_pos_x, &mouse_pos_y);
-
-        bool selected = selected_developer == developer_index && selected_plugin == index;
-
-        ImGui::GetContentRegionAvail(m_ctx, &avaiable_width, &avaiable_height);
-        std::string new_label = "      " + ExtractPluginNameFromFile(plugin_name);
-
-        if (ImGui::Selectable(
-                m_ctx,
-                getTextOverflow(m_ctx, new_label, avaiable_width - 20).c_str(),
-                &selected,
-                ImGui::SelectableFlags_AllowOverlap
-            )
-
-        ) {
-            selected_plugin = index;
-        }
-        ImGui::GetItemRectSize(m_ctx, &width, &height);
-
-        const bool mouse_over = between(static_cast<int>(pos_screen_x), width, static_cast<int>(mouse_pos_x))
-                                && between(static_cast<int>(pos_screen_y), height, static_cast<int>(mouse_pos_y));
-
-        ReaSonusPluginTypeButton(
+        ReaSonusPluginSelectable(
             m_ctx,
             assets,
-            pos_screen_x,
-            pos_screen_y - 2,
+            ExtractPluginNameFromFile(plugin_name),
             ExtractPluginTypeFromFile(plugin_name),
-            plugin_name
+            index,
+            &selected_plugin,
+            std::bind(&CSurf_FP_8_PluginMappingPage::HandleRemoveMappingClick, this, _1)
         );
-
-        if (mouse_over) {
-            ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
-            ImGui::SetCursorPos(m_ctx, pos_window_x + width - 24, pos_window_y - 1);
-
-            ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 1.0, 1.0);
-            ImGui::PushFont(m_ctx, assets->GetIconFont(), 16);
-            ImGui::PushStyleColor(m_ctx, ImGui::Col_Button, UI_COLORS::Main_18);
-
-            if (ImGui::Button(m_ctx, std::string(1, IconRemove).c_str())) {
-                HandleRemoveMappingClick(index);
-            }
-            ImGui::PopFont(m_ctx);
-            ImGui::PopStyleVar(m_ctx);
-            ImGui::PopStyleColor(m_ctx);
-        }
-        ImGui::SetCursorPos(m_ctx, pos_window_x, pos_window_y + height);
     }
 
     void RenderMappingListDeveloper(const int index) {
+        bool opened = false;
+
         if (index != selected_developer || selected_developer == -1) {
             ImGui::SetNextItemOpen(m_ctx, false);
         } else {
             ImGui::SetNextItemOpen(m_ctx, true);
+            opened = true;
         }
 
         UiStyledElements::PushReaSonusTreeNodeStyle(m_ctx, selected_developer == index);
+        // When opened we want to use reduced/custom spacing
+        ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_ItemSpacing, 0.0, opened ? 0.0 : 8.0);
         if (ImGui::TreeNode(
             m_ctx, developers.at(index).c_str(),
             ImGui::TreeNodeFlags_CollapsingHeader
         )) {
+            ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 4);
             selected_developer = index;
             const std::vector<std::string> developer_plugins = plugins.at(index);
 
             for (int j = 0; j < static_cast<int>(developer_plugins.size()); j++) {
                 RenderMappingListPlugin(j, developer_plugins.at(j), index);
             }
+
+            ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 4);
+            ImGui::Dummy(m_ctx, 0, 0);
         }
+
+        ImGui::PopStyleVar(m_ctx, 1);
         UiStyledElements::PopReaSonusTreeNodeStyle(m_ctx);
     }
 
