@@ -38,7 +38,7 @@ static void ReaSonusPluginTypeButton(
     ImGui::DrawList_AddText(
         list,
         x_pos + size / 2 - text_width / 2,
-        y_pos + size / 2 - text_height / 2,
+        y_pos + size / 2 - text_height / 2 + 2,
         fg_color,
         plugin_type.c_str()
     );
