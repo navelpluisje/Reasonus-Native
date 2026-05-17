@@ -286,7 +286,7 @@ int PluginUtils::GetPluginTypeFgColors(const std::string &plugin_type) {
     };
 
     if (fg_colors.find(plugin_type) == fg_colors.end()) {
-        return UI_COLORS::White;
+        return UI_COLORS::Main_18;
     }
 
     return fg_colors[plugin_type];
