@@ -14,7 +14,7 @@ static void ReaSonusPluginTypeButton(
 ) {
     double text_width;
     double text_height;
-    constexpr double size = 19.0;
+    constexpr double size = 20.0;
     constexpr int border_width = 1;
 
     const std::string plugin_type = PluginUtils::GetShortPluginType(label);
@@ -33,7 +33,7 @@ static void ReaSonusPluginTypeButton(
         3
     );
 
-    ImGui::PushFont(m_ctx, assets->GetMainFontBold(), 13);
+    ImGui::PushFont(m_ctx, assets->GetMainFontBold(), 14);
     ImGui::CalcTextSize(m_ctx, plugin_type.c_str(), &text_width, &text_height);
     ImGui::DrawList_AddText(
         list,

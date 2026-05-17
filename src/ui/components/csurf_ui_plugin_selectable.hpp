@@ -70,8 +70,8 @@ static void ReaSonusPluginSelectable(
         ReaSonusPluginTypeButton(
             m_ctx,
             assets,
-            pos_screen_x + 5,
-            pos_screen_y + 4,
+            pos_screen_x + 4,
+            pos_screen_y + 3,
             plugin_type
         );
 
