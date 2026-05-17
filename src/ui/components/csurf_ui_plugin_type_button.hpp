@@ -26,9 +26,9 @@ static void ReaSonusPluginTypeButton(
     ImGui::DrawList_AddRectFilled(
         list,
         x_pos,
-        y_pos + 2,
-        x_pos + size - 1,
-        y_pos + size,
+        y_pos,
+        x_pos + size,
+        y_pos + size + 2,
         bg_color,
         3
     );
