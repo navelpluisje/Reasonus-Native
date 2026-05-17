@@ -6,6 +6,7 @@
 #include "csurf_daw.hpp"
 #include "reaper_plugin_functions.h"
 #include "csurf_utils.hpp"
+#include "../ui/csurf_ui_colors.hpp"
 
 
 std::string PluginUtils::StripPluginName(const std::string &plugin_name) {
@@ -94,7 +95,7 @@ bool PluginUtils::IsPluginFX(std::string plugin_name) {
     if (pos < 0) {
         return true;
     }
-    
+
     plugin_name.erase(pos, plugin_name.length());
     plugin_name.erase(0, plugin_name.length() - 1);
 
@@ -222,7 +223,76 @@ std::vector<std::string> PluginUtils::GetPluginTypes() {
     return plugin_types;
 }
 
-std::string PluginUtils::FormatPluginType(std::string value) {
+std::map<std::string, std::string> PluginUtils::GetPluginTypesMap() {
+    std::map<std::string, std::string> plugin_types_map = {
+        {"vst", "V"},
+        {"vsti", "Vi"},
+        {"vst3", "3"},
+        {"vst3i", "3i"},
+        {"au", "A"},
+        {"aui", "Ai"},
+        {"clap", "C"},
+        {"clapi", "Ci"},
+        {"lv2", "L"},
+        {"lv2i", "Li"}
+    };
+
+    return plugin_types_map;
+}
+
+std::string PluginUtils::GetShortPluginType(const std::string &plugin_type) {
+    std::map<std::string, std::string> type_map = GetPluginTypesMap();
+
+    if (type_map.find(plugin_type) == type_map.end()) {
+        return "X";
+    }
+
+    return type_map[plugin_type];
+}
+
+int PluginUtils::GetPluginTypeBgColors(const std::string &plugin_type) {
+    std::map<std::string, int> bg_colors = {
+        {"vst", UI_COLORS::Accent},
+        {"vsti", UI_COLORS::Accent},
+        {"vst3", UI_COLORS::Tomato},
+        {"vst3i", UI_COLORS::Tomato},
+        {"au", UI_COLORS::Blue},
+        {"aui", UI_COLORS::Blue},
+        {"clap", UI_COLORS::Grey},
+        {"clapi", UI_COLORS::Grey},
+        {"lv2", UI_COLORS::Olive},
+        {"lv2i", UI_COLORS::Olive}
+    };
+
+    if (bg_colors.find(plugin_type) == bg_colors.end()) {
+        return UI_COLORS::White;
+    }
+
+    return bg_colors[plugin_type];
+}
+
+int PluginUtils::GetPluginTypeFgColors(const std::string &plugin_type) {
+    std::map<std::string, int> fg_colors = {
+        {"vst", UI_COLORS::Main_18},
+        {"vsti", UI_COLORS::Main_18},
+        {"vst3", UI_COLORS::White},
+        {"vst3i", UI_COLORS::White},
+        {"au", UI_COLORS::Main_18},
+        {"aui", UI_COLORS::Main_18},
+        {"clap", UI_COLORS::White},
+        {"clapi", UI_COLORS::White},
+        {"lv2", UI_COLORS::Main_18},
+        {"lv2i", UI_COLORS::Main_18}
+    };
+
+    if (fg_colors.find(plugin_type) == fg_colors.end()) {
+        return UI_COLORS::White;
+    }
+
+    return fg_colors[plugin_type];
+}
+
+std::string PluginUtils::FormatPluginType(const std::string &value) {
     std::string plugin_type = toUpperCase(value);
 
     if (value.back() == 'i') {
