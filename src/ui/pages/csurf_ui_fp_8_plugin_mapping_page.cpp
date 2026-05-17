@@ -24,7 +24,7 @@ class CSurf_FP_8_PluginMappingPage : public CSurf_UI_PageContent // NOLINT(*-use
     mINI::INIStructure plugin_params;
     mINI::INIStructure previous_plugin_params;
 
-    const int max_items = 13;
+    const int max_items = 12;
     int channel_offset = 0;
     int changed_items = 0;
 
@@ -413,7 +413,7 @@ protected:
         int step_size = 1;
 
         if (ImGui::IsKeyDown(m_ctx, ImGui::Key_LeftShift)) {
-            step_size = 13;
+            step_size = max_items;
         }
 
         selected_channel = max(selected_channel - step_size, 0);
@@ -434,7 +434,7 @@ protected:
         int step_size = 1;
 
         if (ImGui::IsKeyDown(m_ctx, ImGui::Key_LeftShift)) {
-            step_size = 13;
+            step_size = max_items;
         }
 
         selected_channel = min(selected_channel + step_size, nb_channels - 1);
