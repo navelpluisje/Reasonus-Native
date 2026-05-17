@@ -7,6 +7,7 @@
 #include "reaper_plugin_functions.h"
 #include "csurf_utils.hpp"
 #include "../ui/csurf_ui_colors.hpp"
+#include "../i18n/i18n.hpp"
 
 
 std::string PluginUtils::GetPluginFolderPath() {
@@ -110,16 +111,18 @@ std::string PluginUtils::ExtractDeveloperName(const std::string &plugin_name) {
 }
 
 std::string PluginUtils::ExtractPluginName(const std::string &plugin_name) {
+    const std::string developer = ExtractDeveloperName(plugin_name);
+
     std::vector<std::string> plugin_name_parts = split(
         StripPluginNamePrefixes(StripPluginChannelPostfix(plugin_name.c_str()).data()),
-        " ("
+        " (" + developer
     );
 
     if (plugin_name_parts.size() > 1) {
         plugin_name_parts.pop_back();
     }
 
-    return join(plugin_name_parts, " (");
+    return join(plugin_name_parts, " (" + developer);
 }
 
 std::string PluginUtils::ExtractPluginType(const std::string &plugin_name) {
@@ -379,6 +382,41 @@ std::string PluginUtils::GetPluginRequestString(const std::string &plugin_origna
     return plugin_name_with_type;
 }
 
+bool PluginUtils::DeletePluginMappingFile(
+    const std::string &developer,
+    const std::string &plugin_name,
+    const std::string &plugin_type
+) {
+    const std::string mapping_path = GetReaSonusPluginPath(developer, plugin_name, plugin_type, true);
+    const std::filesystem::path mapping_folder = createPathName({GetPluginFolderPath(), developer});
+
+    std::string message = I18n::GetInstance()->t(
+        "mapping",
+        "confirm.remove-mapping.message",
+        plugin_name
+    );
+
+    if (MB(
+            replaceAll(message, "\\n", "\n").c_str(),
+            I18n::GetInstance()->t("mapping", "confirm.remove-mapping.title").c_str(),
+            1) == 1
+    ) {
+        std::remove(mapping_path.c_str());
+
+        if (std::filesystem::is_empty(mapping_folder)) {
+            std::filesystem::remove(mapping_folder);
+        }
+
+        if (HasPluginMappingCache(developer, plugin_name, plugin_type)) {
+            DeletePluginMappingCacheFile(developer, plugin_name, plugin_type);
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
 bool PluginUtils::CreatePluginMappingCacheFile(MediaTrack *media_track, int plugin_id, bool update) {
     char plugin_name[256] = ""; // NOLINT(*-avoid-c-arrays)
     int param_index = 0;
@@ -415,7 +453,7 @@ bool PluginUtils::CreatePluginMappingCacheFile(MediaTrack *media_track, int plug
         }
     }
 
-    cache["Global"]["nb_params"] = std::to_string(param_index - 1);
+    cache["Global"]["nb_params"] = std::to_string(param_index);
 
 
     const mINI::INIFile file(cache_path);
@@ -438,15 +476,19 @@ bool PluginUtils::UpdatePluginMappingCacheFile(const std::string &full_plugin_na
     return success;
 }
 
-bool PluginUtils::DeletePluginMappingCacheFile(const std::string &full_plugin_name) {
-    InsertTrackAtIndex(0, false);
-    MediaTrack *media_track = GetTrack(nullptr, 0);
-    TrackFX_AddByName(media_track, full_plugin_name.c_str(), false, -1);
+void PluginUtils::DeletePluginMappingCacheFile(
+    const std::string &developer,
+    const std::string &plugin_name,
+    const std::string &plugin_type
+) {
+    const std::string cache_path = GetReaSonusPluginCachePath(developer, plugin_name, plugin_type, true);
+    const std::filesystem::path cache_folder = createPathName({GetPluginCacheFolderPath(), developer});
 
-    const bool success = CreatePluginMappingCacheFile(media_track, 0, true);
-    DeleteTrack(media_track);
+    std::remove(cache_path.c_str());
 
-    return success;
+    if (std::filesystem::is_empty(cache_folder)) {
+        std::filesystem::remove(cache_folder);
+    }
 }
 
 mINI::INIStructure PluginUtils::GetPluginMappingCacheStructure(

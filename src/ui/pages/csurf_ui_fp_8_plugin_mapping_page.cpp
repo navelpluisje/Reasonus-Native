@@ -1,5 +1,4 @@
 #include <utility>
-#include <filesystem>
 #include "../csurf_ui_page_content.hpp"
 #include "../../shared/csurf_utils.hpp"
 #include "../../shared/csurf_plugin_utils.hpp"
@@ -369,42 +368,27 @@ protected:
 
     bool DirtyCheck() {
         if (changed_items > 0) {
-            const int res = MB(i18n->t("mapping", "popup.unsaved.message").c_str(),
-                               i18n->t("mapping", "popup.unsaved.title").c_str(), 3);
+            const int res = MB(
+                i18n->t("mapping", "popup.unsaved.message").c_str(),
+                i18n->t("mapping", "popup.unsaved.title").c_str(),
+                3
+            );
+
             if (res == 6) {
                 Save();
             }
+
             return res != 2;
         }
         return true;
     }
 
     void HandleRemoveMappingClick(const int plugin_index) {
-        const std::string mapping_path = createPathName({
-            plugin_folder_path, developers[selected_developer], plugins[selected_developer][plugin_index]
-        });
-        const std::filesystem::path mapping_folder = createPathName({
-            plugin_folder_path, developers[selected_developer]
-        });
-
-        std::string message = i18n->t(
-            "mapping",
-            "confirm.remove-mapping.message",
-            plugins[selected_developer][plugin_index]
-        );
-
-        if (MB(
-                replaceAll(message, "\\n", "\n").c_str(),
-                i18n->t("mapping", "confirm.remove-mapping.title").c_str(),
-                1
-            ) == 1
-        ) {
-            std::remove(mapping_path.c_str());
-
-            if (std::filesystem::is_empty(mapping_folder)) {
-                std::filesystem::remove(mapping_folder);
-            }
-
+        if (PluginUtils::DeletePluginMappingFile(
+            developers[selected_developer],
+            ExtractPluginNameFromFile(plugins[selected_developer][plugin_index]),
+            ExtractPluginTypeFromFile(plugins[selected_developer][plugin_index])
+        )) {
             SetPluginFolders();
         }
     }
@@ -1085,24 +1069,45 @@ public:
         }
     }
 
+    /**
+     * Check if the selected plugin hsa changed.
+     */
     void PluginCheck() {
-        if (selected_plugin != previous_selected_plugin) {
-            channel_offset = 0;
-            if (DirtyCheck()) {
-                selected_channel = 0;
-
-                if (SetPluginData()) {
-                    PopulateFields();
-                } else {
-                    select_key = "";
-                    fader_key = "";
-                }
-                previous_selected_plugin = selected_plugin;
-            } else {
-                selected_plugin = previous_selected_plugin;
-            }
+        if (selected_plugin == previous_selected_plugin) {
+            return;
         }
+
+        // If data is dirty and user does not want to save or clear the changes, we do not change plugins
+        if (!DirtyCheck()) {
+            selected_plugin = previous_selected_plugin;
+            return;
+        }
+
+        channel_offset = 0;
+        selected_channel = 0;
+
+
+        if (SetPluginData()) {
+            // Check if we have a cahe file available. If not, create one
+            if (!PluginUtils::HasPluginMappingCache(
+                developers[selected_developer],
+                ExtractPluginNameFromFile(plugins[selected_developer][selected_plugin]),
+                ExtractPluginTypeFromFile(plugins[selected_developer][selected_plugin])
+            )) {
+                PluginUtils::UpdatePluginMappingCacheFile(PluginUtils::GetPluginRequestString(
+                    plugin_params["global"]["origname"],
+                    plugin_params["global"]["type"]
+                ));
+                ReaSonus8ControlPanel::SetMessage("Cache created");
+            }
+            PopulateFields();
+        } else {
+            select_key = "";
+            fader_key = "";
+        }
+        previous_selected_plugin = selected_plugin;
     }
+
 
     void ChannelCheck() {
         if (selected_channel != previous_selected_channel && selected_plugin_exists) {

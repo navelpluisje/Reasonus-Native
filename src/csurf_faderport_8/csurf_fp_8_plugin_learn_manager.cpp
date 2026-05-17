@@ -33,6 +33,7 @@ protected:
             ini["Global"]["name"] = plugin_name;
             ini["Global"]["type"] = plugin_type;
             ini["Global"]["developer"] = developer_name;
+            
             (void) file.generate(ini, true);
         }
 

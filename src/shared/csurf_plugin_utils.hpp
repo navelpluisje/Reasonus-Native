@@ -5,7 +5,6 @@
 #include <vector>
 #include <map>
 #include <set>
-
 #include "csurf_utils.hpp"
 #include "reaper_plugin_functions.h"
 
@@ -57,6 +56,7 @@ public:
 };
 
 class PluginUtils {
+
 public:
     /**
      * Get the folder path for the reasonus plugins
@@ -242,9 +242,24 @@ public:
      */
     static std::string GetPluginRequestString(const std::string &plugin_origname, std::string plugin_type);
 
+    /**
+     * Delete the plugin mapping file from the file system
+     * @param developer Developername used as the folder name
+     * @param plugin_name Plugin name without the path part
+     * @param plugin_type
+     * @return Wether the file successfull has been deleted
+     */
+    static bool DeletePluginMappingFile(
+        const std::string &developer,
+        const std::string &plugin_name, const std::string &plugin_type
+    );
+
     static bool CreatePluginMappingCacheFile(MediaTrack *media_track, int plugin_id, bool update);
 
     static bool UpdatePluginMappingCacheFile(const std::string &full_plugin_name);
+
+    static void DeletePluginMappingCacheFile(const std::string &developer, const std::string &plugin_name,
+                                             const std::string &plugin_type);
 
     static mINI::INIStructure GetPluginMappingCacheStructure(
         const std::string &developer,

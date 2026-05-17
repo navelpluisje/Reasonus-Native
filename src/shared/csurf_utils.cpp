@@ -5,7 +5,6 @@
 #include <WDL/wdltypes.h> // might be unnecessary in future
 #include <reaper_plugin_functions.h>
 #include <string>
-#include <utility>
 #include <vector>
 #include <regex>
 
