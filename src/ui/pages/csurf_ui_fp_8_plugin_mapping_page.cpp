@@ -13,9 +13,7 @@
 #include "../components/csurf_ui_int_input.hpp"
 #include "../components/csurf_ui_combo_input.hpp"
 #include "../components/csurf_ui_button_bar.hpp"
-#include "../components/csurf_ui_plugin_type_button.hpp"
 #include "../components/csurf_ui_plugin_selectable.hpp"
-#include "../utils/csurf_ui_text_overflow.hpp"
 #include "../../i18n/i18n.hpp"
 #include "../windows/csurf_ui_fp_8_control_panel.hpp"
 
@@ -76,8 +74,6 @@ class CSurf_FP_8_PluginMappingPage : public CSurf_UI_PageContent // NOLINT(*-use
     std::vector<int> dirty_groups;
 
     bool plugin_dirty = false;
-
-    int mouse_over_delay = 0;
 
 protected:
     void SetPluginFolders() {
@@ -604,20 +600,45 @@ protected:
         HandleDeleteChannelById(from_id);
     }
 
-    static std::string ExtractPluginNameFromFile(const std::string &plugin_name) {
-        std::vector<std::string> splitted_plugin_name = split(plugin_name, ".");
+    static int CheckPluginTypeFromFile(const std::string &plugin) {
+        const std::vector<std::string> plugin_types = PluginUtils::GetPluginTypes();
 
-        return splitted_plugin_name.at(0);
+        for (const auto &plugin_type: plugin_types) {
+            const std::string type_ini = "." + plugin_type + ".ini";
+            const size_t position = plugin.find(type_ini);
+
+            if (position == std::string::npos) {
+                continue;
+            }
+
+            if (position == plugin.length() - type_ini.length()) {
+                return position;
+            }
+        }
+
+        return -1;
+    }
+
+    static std::string ExtractPluginNameFromFile(const std::string &plugin_name) {
+        const int type_location = CheckPluginTypeFromFile(plugin_name);
+
+        if (type_location > -1) {
+            return plugin_name.substr(0, type_location);
+        }
+
+        return plugin_name;
     }
 
     static std::string ExtractPluginTypeFromFile(const std::string &plugin_name) {
-        std::vector<std::string> splitted_plugin_name = split(plugin_name, ".");
+        if (CheckPluginTypeFromFile(plugin_name) > -1) {
+            std::vector<std::string> splitted_plugin_name = split(plugin_name, ".");
 
-        // Remove the ini part. If the vector length is longer the1 we have a plugin type available
-        splitted_plugin_name.pop_back();
+            // Remove the ini part. If the vector length is longer then we have a plugin type available
+            splitted_plugin_name.pop_back();
 
-        if (splitted_plugin_name.size() > 1) {
-            return splitted_plugin_name.at(1);
+            if (splitted_plugin_name.size() > 1) {
+                return splitted_plugin_name.at(splitted_plugin_name.size() - 1);
+            }
         }
 
         return "";
@@ -633,7 +654,7 @@ public:
 
     ~CSurf_FP_8_PluginMappingPage() override = default;
 
-    void RenderMappingListPlugin(const int index, const std::string &plugin_name, const int developer_index) {
+    void RenderMappingListPlugin(const int index, const std::string &plugin_name) {
         using namespace std::placeholders; // for `_1, _2 etc`
 
         ReaSonusPluginSelectable(
@@ -669,7 +690,7 @@ public:
             const std::vector<std::string> developer_plugins = plugins.at(index);
 
             for (int j = 0; j < static_cast<int>(developer_plugins.size()); j++) {
-                RenderMappingListPlugin(j, developer_plugins.at(j), index);
+                RenderMappingListPlugin(j, developer_plugins.at(j));
             }
 
             ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 4);
