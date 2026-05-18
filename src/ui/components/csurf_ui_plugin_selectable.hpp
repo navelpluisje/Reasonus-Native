@@ -70,18 +70,18 @@ static void ReaSonusPluginSelectable(
         ReaSonusPluginTypeButton(
             m_ctx,
             assets,
-            pos_screen_x + 5,
-            pos_screen_y + 4,
+            pos_screen_x + 4,
+            pos_screen_y + 3,
             plugin_type
         );
 
         ImGui::PushFont(m_ctx, assets->GetMainFont(), 13);
         ImGui::DrawList_AddText(
             list,
-            pos_screen_x + 28,
+            pos_screen_x + 30,
             pos_screen_y + 6,
             UI_COLORS::White,
-            getTextOverflow(m_ctx, plugin_name, width - (mouse_over ? 63 : 40)).c_str()
+            getTextOverflow(m_ctx, plugin_name, width - (mouse_over ? 66 : 40)).c_str()
         );
         ImGui::PopFont(m_ctx);
 
