@@ -48,7 +48,7 @@ class CSurf_FP_8_PluginMappingPage : public CSurf_UI_PageContent // NOLINT(*-use
     std::string selected_plugin_filename_type;
 
     int nb_channels = 0;
-    int selected_channel = 0;
+    int selected_channel = -1;
     int previous_selected_channel = 0;
 
     std::vector<PluginParam> paramIds;
@@ -221,29 +221,30 @@ protected:
         params.push_back(i18n->t("mapping", "edit.select.param.first-item"));
         paramIds.emplace_back(-1, i18n->t("mapping", "edit.select.param.first-item"), 0);
 
-        // Create a track, add the plugin and start reading the params
-        InsertTrackAtIndex(0, false);
-        MediaTrack *media_track = GetTrack(nullptr, 0);
-
-        // Placeholder until first iteration of plugin caching is implemented
-        const std::string plugin_request_string = PluginUtils::GetPluginRequestString(
-            plugin_params["global"]["origname"],
+        if (!PluginUtils::HasPluginMappingCache(
+            PluginUtils::ExtractDeveloperName(plugin_params["global"]["origname"]),
+            PluginUtils::ExtractPluginName(plugin_params["global"]["origname"]),
             plugin_params["global"]["type"]
-        );
-        TrackFX_AddByName(media_track, plugin_request_string.c_str(), false, -1);
-
-        for (int i = 0; i < TrackFX_GetNumParams(media_track, 0); i++) {
-            const std::string param_name = DAW::GetTrackFxParamName(media_track, 0, i);
-
-            if (IsWantedParam(std::string(param_name))) {
-                const int steps = DAW::GetTrackFxParamNbSteps(media_track, 0, i);
-                params.emplace_back(param_name);
-                paramIds.emplace_back(i, std::string(param_name), steps);
-            }
+        )) {
+            PluginUtils::UpdatePluginMappingCacheFile(PluginUtils::GetPluginRequestString(
+                plugin_params["global"]["origname"],
+                plugin_params["global"]["type"]
+            ));
         }
 
-        // We're done, now delete the newly added track
-        DeleteTrack(media_track);
+        mINI::INIStructure cache = PluginUtils::GetPluginMappingCacheStructure(
+            PluginUtils::ExtractDeveloperName(plugin_params["global"]["origname"]),
+            PluginUtils::ExtractPluginName(plugin_params["global"]["origname"]),
+            plugin_params["global"]["type"]
+        );
+
+        for (int i = 0; i < stoi(cache["global"]["nb_params"]); i++) {
+            const std::string param_name = cache["params"][std::to_string(i)];
+
+            params.emplace_back(param_name);
+            paramIds.emplace_back(stoi(cache["id"][std::to_string(i)]), param_name,
+                                  stoi(cache["steps"][std::to_string(i)]));
+        }
     }
 
     void PopulateFields() {
@@ -260,6 +261,7 @@ protected:
             select_name = plugin_params[select_key]["name"];
             select_nb_steps = stoi(plugin_params[select_key]["steps"]);
             select_uninvert_label = stoi(plugin_params[select_key]["uninvert-label"]);
+
             const int param_id = stoi(plugin_params[select_key]["param"]);
             const auto iterator = std::find_if(
                 paramIds.begin(),
@@ -466,6 +468,10 @@ protected:
     }
 
     void HandleAddChannelAfterSelected() {
+        // We only have global and no other mapping items, so the selected plugin has to be -1
+        if (plugin_params.size() == 1) {
+            selected_channel = -1;
+        }
         HandleAddChannelAfter(selected_channel);
     }
 
@@ -676,6 +682,7 @@ public:
             for (int j = 0; j < static_cast<int>(developer_plugins.size()); j++) {
                 RenderMappingListPlugin(j, developer_plugins.at(j));
             }
+
 
             ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 4);
             ImGui::Dummy(m_ctx, 0, 0);
@@ -1056,6 +1063,7 @@ public:
         if (selected_developer != previous_selected_developer) {
             channel_offset = 0;
             selected_plugin_exists = false;
+
             if (DirtyCheck()) {
                 selected_plugin = -1;
                 previous_selected_plugin = -1;

@@ -437,24 +437,25 @@ bool PluginUtils::CreatePluginMappingCacheFile(MediaTrack *media_track, int plug
     cache["Global"]["name"] = short_name;
     cache["Global"]["type"] = plugin_type;
     cache["Global"]["developer"] = developer;
+    cache["id"];
+    cache["params"];
+    cache["steps"];
 
     for (int i = 0; i < nb_params; i++) {
         const std::string param_name = DAW::GetTrackFxParamName(media_track, 0, i);
 
         if (IsWantedParam(std::string(param_name))) {
-            const std::string param_idx = "param_" + std::to_string(param_index);
-
-            cache[param_idx];
-            cache[param_idx]["id"] = std::to_string(i);
-            cache[param_idx]["name"] = DAW::GetTrackFxParamName(media_track, plugin_id, i);
-            cache[param_idx]["steps"] = std::to_string(DAW::GetTrackFxParamNbSteps(media_track, plugin_id, i));
+            cache["id"][std::to_string(param_index)] = std::to_string(i);
+            cache["params"][std::to_string(param_index)] = DAW::GetTrackFxParamName(media_track, plugin_id, i);
+            cache["steps"][std::to_string(param_index)] = std::to_string(
+                DAW::GetTrackFxParamNbSteps(media_track, plugin_id, i)
+            );
 
             param_index++;
         }
     }
 
     cache["Global"]["nb_params"] = std::to_string(param_index);
-
 
     const mINI::INIFile file(cache_path);
 
