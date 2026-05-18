@@ -210,9 +210,6 @@ public:
     automationManager = new CSurf_FP_V2_AutomationManager(context, trackNavigator, m_midiout);
 
     if (errStats) {
-      ShowConsoleMsg("Error: ");
-      ShowConsoleMsg(reinterpret_cast<char *>(errStats));
-
       if (m_midi_in_dev >= 0 && !m_midiin) {
         *errStats |= 1;
       }

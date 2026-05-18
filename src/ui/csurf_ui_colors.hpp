@@ -3,8 +3,7 @@
 
 #include <reaper_imgui_functions.h>
 
-namespace UI_COLORS
-{
+namespace UI_COLORS {
     constexpr int White = 0xffffffff;
     constexpr int White_50 = 0xffffff7f;
     constexpr int White_25 = 0xffffff3f;
@@ -25,6 +24,10 @@ namespace UI_COLORS
     constexpr int Transparent_25 = 0x2727273f;
     constexpr int Transparent_50 = 0x2727277f;
     constexpr int Transparent_75 = 0x272727Bf;
+    constexpr int Tomato = 0xF55D3Eff;
+    constexpr int Grey = 0x878E88ff;
+    constexpr int Olive = 0x81BA75ff;
+    constexpr int Blue = 0x6DA9CDff;
 
     constexpr int FormFieldBorder = Main_38;
     constexpr int FormFieldBg = Main_23;
@@ -37,8 +40,7 @@ namespace UI_COLORS
  *
  * @param m_ctx
  */
-static void PushReaSonusColors(ImGui_Context *m_ctx)
-{
+static void PushReaSonusColors(ImGui_Context *m_ctx) {
     ImGui::PushStyleColor(m_ctx, ImGui::Col_Text, UI_COLORS::White);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_TextDisabled, 0x808080FF);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_WindowBg, UI_COLORS::Main_15);
@@ -116,8 +118,7 @@ static void PushReaSonusColors(ImGui_Context *m_ctx)
     ImGui::PushStyleColor(m_ctx, ImGui::Col_InputTextCursor, UI_COLORS::Accent);
 }
 
-static void PopReaSonusColors(ImGui_Context *m_ctx)
-{
+static void PopReaSonusColors(ImGui_Context *m_ctx) {
     ImGui::PopStyleColor(m_ctx, 58);
 }
 

@@ -1,5 +1,5 @@
 #include <utility>
-
+#include <filesystem>
 #include "../csurf_ui_page_content.hpp"
 #include "../../shared/csurf_utils.hpp"
 #include "../../shared/csurf_plugin_utils.hpp"
@@ -13,6 +13,7 @@
 #include "../components/csurf_ui_int_input.hpp"
 #include "../components/csurf_ui_combo_input.hpp"
 #include "../components/csurf_ui_button_bar.hpp"
+#include "../components/csurf_ui_plugin_selectable.hpp"
 #include "../../i18n/i18n.hpp"
 #include "../windows/csurf_ui_fp_8_control_panel.hpp"
 
@@ -23,7 +24,7 @@ class CSurf_FP_8_PluginMappingPage : public CSurf_UI_PageContent // NOLINT(*-use
     mINI::INIStructure plugin_params;
     mINI::INIStructure previous_plugin_params;
 
-    const int max_items = 13;
+    const int max_items = 12;
     int channel_offset = 0;
     int changed_items = 0;
 
@@ -371,7 +372,6 @@ protected:
             const int res = MB(i18n->t("mapping", "popup.unsaved.message").c_str(),
                                i18n->t("mapping", "popup.unsaved.title").c_str(), 3);
             if (res == 6) {
-                ShowConsoleMsg("SAVE!1");
                 Save();
             }
             return res != 2;
@@ -379,11 +379,41 @@ protected:
         return true;
     }
 
+    void HandleRemoveMappingClick(const int plugin_index) {
+        const std::string mapping_path = createPathName({
+            plugin_folder_path, developers[selected_developer], plugins[selected_developer][plugin_index]
+        });
+        const std::filesystem::path mapping_folder = createPathName({
+            plugin_folder_path, developers[selected_developer]
+        });
+
+        std::string message = i18n->t(
+            "mapping",
+            "confirm.remove-mapping.message",
+            plugins[selected_developer][plugin_index]
+        );
+
+        if (MB(
+                replaceAll(message, "\\n", "\n").c_str(),
+                i18n->t("mapping", "confirm.remove-mapping.title").c_str(),
+                1
+            ) == 1
+        ) {
+            std::remove(mapping_path.c_str());
+
+            if (std::filesystem::is_empty(mapping_folder)) {
+                std::filesystem::remove(mapping_folder);
+            }
+
+            SetPluginFolders();
+        }
+    }
+
     void HandlePreviousClick() {
         int step_size = 1;
 
         if (ImGui::IsKeyDown(m_ctx, ImGui::Key_LeftShift)) {
-            step_size = 13;
+            step_size = max_items;
         }
 
         selected_channel = max(selected_channel - step_size, 0);
@@ -404,7 +434,7 @@ protected:
         int step_size = 1;
 
         if (ImGui::IsKeyDown(m_ctx, ImGui::Key_LeftShift)) {
-            step_size = 13;
+            step_size = max_items;
         }
 
         selected_channel = min(selected_channel + step_size, nb_channels - 1);
@@ -570,16 +600,48 @@ protected:
         HandleDeleteChannelById(from_id);
     }
 
-    static std::string formatPluginName(const std::string &plugin_name) {
-        std::vector<std::string> splitted_plugin_name = split(plugin_name, ".");
+    static int CheckPluginTypeFromFile(const std::string &plugin) {
+        const std::vector<std::string> plugin_types = PluginUtils::GetPluginTypes();
 
-        splitted_plugin_name.pop_back();
+        for (const auto &plugin_type: plugin_types) {
+            const std::string type_ini = "." + plugin_type + ".ini";
+            const size_t position = plugin.find(type_ini);
 
-        if (splitted_plugin_name.size() > 1) {
-            return splitted_plugin_name.at(0) + " (" + splitted_plugin_name.at(1) + ")";
+            if (position == std::string::npos) {
+                continue;
+            }
+
+            if (position == plugin.length() - type_ini.length()) {
+                return position;
+            }
         }
 
-        return splitted_plugin_name.at(0);
+        return -1;
+    }
+
+    static std::string ExtractPluginNameFromFile(const std::string &plugin_name) {
+        const int type_location = CheckPluginTypeFromFile(plugin_name);
+
+        if (type_location > -1) {
+            return plugin_name.substr(0, type_location);
+        }
+
+        return plugin_name;
+    }
+
+    static std::string ExtractPluginTypeFromFile(const std::string &plugin_name) {
+        if (CheckPluginTypeFromFile(plugin_name) > -1) {
+            std::vector<std::string> splitted_plugin_name = split(plugin_name, ".");
+
+            // Remove the ini part. If the vector length is longer then we have a plugin type available
+            splitted_plugin_name.pop_back();
+
+            if (splitted_plugin_name.size() > 1) {
+                return splitted_plugin_name.at(splitted_plugin_name.size() - 1);
+            }
+        }
+
+        return "";
     }
 
 public:
@@ -592,41 +654,65 @@ public:
 
     ~CSurf_FP_8_PluginMappingPage() override = default;
 
-    void RenderMappingListPlugin(const int index, const std::string &plugin_name, const int developer_index) {
-        bool selected = selected_developer == developer_index && selected_plugin == index;
+    void RenderMappingListPlugin(const int index, const std::string &plugin_name) {
+        using namespace std::placeholders; // for `_1, _2 etc`
 
-        if (ImGui::Selectable(m_ctx, formatPluginName(plugin_name).c_str(), &selected)) {
-            selected_plugin = index;
-        }
+        ReaSonusPluginSelectable(
+            m_ctx,
+            assets,
+            ExtractPluginNameFromFile(plugin_name),
+            ExtractPluginTypeFromFile(plugin_name),
+            index,
+            &selected_plugin,
+            std::bind(&CSurf_FP_8_PluginMappingPage::HandleRemoveMappingClick, this, _1)
+        );
     }
 
     void RenderMappingListDeveloper(const int index) {
+        bool opened = false;
+
         if (index != selected_developer || selected_developer == -1) {
             ImGui::SetNextItemOpen(m_ctx, false);
         } else {
             ImGui::SetNextItemOpen(m_ctx, true);
+            opened = true;
         }
 
         UiStyledElements::PushReaSonusTreeNodeStyle(m_ctx, selected_developer == index);
-        if (ImGui::TreeNode(m_ctx, developers.at(index).c_str(), ImGui::TreeNodeFlags_CollapsingHeader)) {
+        // When opened we want to use reduced/custom spacing
+        ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_ItemSpacing, 0.0, opened ? 0.0 : 8.0);
+        if (ImGui::TreeNode(
+            m_ctx, developers.at(index).c_str(),
+            ImGui::TreeNodeFlags_CollapsingHeader
+        )) {
+            ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 4);
             selected_developer = index;
             const std::vector<std::string> developer_plugins = plugins.at(index);
 
             for (int j = 0; j < static_cast<int>(developer_plugins.size()); j++) {
-                RenderMappingListPlugin(j, developer_plugins.at(j), index);
+                RenderMappingListPlugin(j, developer_plugins.at(j));
             }
+
+            ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 4);
+            ImGui::Dummy(m_ctx, 0, 0);
         }
+
+        ImGui::PopStyleVar(m_ctx, 1);
         UiStyledElements::PopReaSonusTreeNodeStyle(m_ctx);
     }
 
     void RenderMappingsList() {
-        if (ImGui::BeginChild(m_ctx, "mapping_lists", 240.0, 0.0)) {
+        if (ImGui::BeginChild(m_ctx, "mapping_lists", 280.0, 0.0)) {
             ImGui::Text(m_ctx, i18n->t("mapping", "list.label").c_str());
             ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 4);
 
             UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
-            if (ImGui::BeginChild(m_ctx, "mapping_lists_content", 0.0, 0.0, ImGui::ChildFlags_FrameStyle,
-                                  ImGui::ChildFlags_AutoResizeY)) {
+            if (ImGui::BeginChild(
+                m_ctx,
+                "mapping_lists_content", 0.0,
+                0.0,
+                ImGui::ChildFlags_FrameStyle
+            )) {
                 for (int i = 0; i < static_cast<int>(developers.size()); i++) {
                     RenderMappingListDeveloper(i);
                 }
@@ -634,7 +720,6 @@ public:
                 UiStyledElements::PopReaSonusGroupStyle(m_ctx);
                 ImGui::EndChild(m_ctx);
             }
-
             ImGui::EndChild(m_ctx);
         }
     }
@@ -1039,11 +1124,12 @@ public:
 
         if (selected_plugin > -1 && selected_plugin_exists) {
             ImGui::Text(
-                m_ctx, selected_plugin < 0 || selected_plugin >= static_cast<int>(plugins[selected_developer].size())
-                           ? "Groups"
-                           : std::string(
-                               developers[selected_developer] + " :: " + plugins[selected_developer][selected_plugin]).
-                           c_str());
+                m_ctx,
+                selected_plugin < 0 || selected_plugin >= static_cast<int>(plugins[selected_developer].size())
+                    ? "Groups"
+                    : std::string(
+                        developers[selected_developer] + " :: " + plugins[selected_developer][selected_plugin]).
+                    c_str());
             ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 4);
             RenderInformationBar();
             RenderChannelsList();
