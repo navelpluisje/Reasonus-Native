@@ -13,11 +13,8 @@ static void ReaSonusSimpleTooltip(
     const std::string &label,
     const std::string &tooltip_id
 ) {
+    UiStyledElements::PushReaSonusTooltipStyle(m_ctx);
     if (ImGui::BeginItemTooltip(m_ctx)) {
-        UiStyledElements::PushReaSonusTooltipStyle(m_ctx);
-        ImGui::PushFont(m_ctx, assets->GetMainFont(), 13);
-        ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameBorderSize, 0);
-
         if (ImGui::BeginChild(
             m_ctx,
             tooltip_id.c_str(),
@@ -27,16 +24,16 @@ static void ReaSonusSimpleTooltip(
             ImGui::ChildFlags_AutoResizeX
         )) {
             ImGui::PushTextWrapPos(m_ctx, 350);
+            ImGui::PushFont(m_ctx, assets->GetMainFont(), 13);
             ImGui::Text(m_ctx, label.c_str());
+            ImGui::PopFont(m_ctx);
             ImGui::PopTextWrapPos(m_ctx);
 
-            UiStyledElements::PopReaSonusTooltipStyle(m_ctx);
             ImGui::EndChild(m_ctx);
         }
-        ImGui::PopFont(m_ctx);
-        ImGui::PopStyleVar(m_ctx);
         ImGui::EndTooltip(m_ctx);
     }
+    UiStyledElements::PopReaSonusTooltipStyle(m_ctx);
 }
 
 static void ReaSonusTooltip(
