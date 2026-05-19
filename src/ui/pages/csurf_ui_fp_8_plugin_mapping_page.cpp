@@ -809,6 +809,8 @@ public:
             ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + space_x - 144);
 
             ReaSonusGoToInput(m_ctx, assets, &selected_channel, nb_channels);
+            ReaSonusSimpleTooltip(m_ctx, assets, "Go to the group with a given number",
+                                  "plugin-mapping-tooltip-undo-group");
 
             ImGui::SameLine(m_ctx);
 
@@ -818,7 +820,10 @@ public:
                 IconUndo,
                 "mapping-reset-group",
                 ButtonThemeAccent,
-                std::bind(&CSurf_FP_8_PluginMappingPage::HandleResetChannel, this));
+                std::bind(&CSurf_FP_8_PluginMappingPage::HandleResetChannel, this)
+            );
+            ReaSonusSimpleTooltip(m_ctx, assets, "Undo all changes for this group",
+                                  "plugin-mapping-tooltip-undo-group");
 
             ImGui::SameLine(m_ctx);
 
@@ -828,7 +833,10 @@ public:
                 IconAdd,
                 "mapping-add",
                 ButtonThemeAccent,
-                std::bind(&CSurf_FP_8_PluginMappingPage::HandleAddChannelAfterSelected, this));
+                std::bind(&CSurf_FP_8_PluginMappingPage::HandleAddChannelAfterSelected, this)
+            );
+            ReaSonusSimpleTooltip(m_ctx, assets, "Add a channel after the current selected group",
+                                  "plugin-mapping-tooltip-add-group");
 
             ImGui::SameLine(m_ctx);
 
@@ -838,7 +846,9 @@ public:
                 IconDelete,
                 "mapping-delete",
                 ButtonThemeAccent,
-                std::bind(&CSurf_FP_8_PluginMappingPage::HandleDeleteChannel, this));
+                std::bind(&CSurf_FP_8_PluginMappingPage::HandleDeleteChannel, this)
+            );
+            ReaSonusSimpleTooltip(m_ctx, assets, "Delete the current group", "plugin-mapping-tooltip-delete-group");
 
             ImGui::EndChild(m_ctx);
         }

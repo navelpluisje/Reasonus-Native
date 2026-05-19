@@ -9,14 +9,23 @@
 
 static void ReaSonusSimpleTooltip(
     ImGui_Context *m_ctx,
+    const CSurf_UI_Assets *assets,
     const std::string &label,
     const std::string &tooltip_id
 ) {
     if (ImGui::BeginItemTooltip(m_ctx)) {
         UiStyledElements::PushReaSonusTooltipStyle(m_ctx);
-        if (ImGui::BeginChild(m_ctx, tooltip_id.c_str(), 0.0, 0.0,
-                              ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY |
-                              ImGui::ChildFlags_AutoResizeX)) {
+        ImGui::PushFont(m_ctx, assets->GetMainFont(), 13);
+        ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameBorderSize, 0);
+
+        if (ImGui::BeginChild(
+            m_ctx,
+            tooltip_id.c_str(),
+            0.0,
+            0.0,
+            ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY |
+            ImGui::ChildFlags_AutoResizeX
+        )) {
             ImGui::PushTextWrapPos(m_ctx, 350);
             ImGui::Text(m_ctx, label.c_str());
             ImGui::PopTextWrapPos(m_ctx);
@@ -24,6 +33,8 @@ static void ReaSonusSimpleTooltip(
             UiStyledElements::PopReaSonusTooltipStyle(m_ctx);
             ImGui::EndChild(m_ctx);
         }
+        ImGui::PopFont(m_ctx);
+        ImGui::PopStyleVar(m_ctx);
         ImGui::EndTooltip(m_ctx);
     }
 }
@@ -45,7 +56,7 @@ static void ReaSonusTooltip(
     ImGui::PopStyleColor(m_ctx);
     ImGui::PopFont(m_ctx);
 
-    ReaSonusSimpleTooltip(m_ctx, label, tooltip_id);
+    ReaSonusSimpleTooltip(m_ctx, assets, label, tooltip_id);
 }
 
 #endif

@@ -342,20 +342,22 @@ void UiStyledElements::PopReaSonusIconButtonStyle(ImGui_Context *m_ctx) {
 }
 
 void UiStyledElements::PushReaSonusTooltipStyle(ImGui_Context *m_ctx) {
-    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 12, 12);
-    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameBorderSize, 2);
-    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameRounding, 8);
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 8, 8);
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameBorderSize, 1);
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_PopupRounding, 4);
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_PopupBorderSize, 2);
 
     ImGui::PushStyleColor(m_ctx, ImGui::Col_Text, UI_COLORS::White);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_Border, UI_COLORS::Main_38);
-    ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBg, UI_COLORS::Main_23);
-    ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBgActive, UI_COLORS::Main_15);
-    ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBgHovered, UI_COLORS::Main_15);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_PopupBg, UI_COLORS::Main_23);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBg, UI_COLORS::Transparent);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBgActive, UI_COLORS::Transparent);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBgHovered, UI_COLORS::Transparent);
 }
 
 void UiStyledElements::PopReaSonusTooltipStyle(ImGui_Context *m_ctx) {
-    ImGui::PopStyleVar(m_ctx, 3);
-    ImGui::PopStyleColor(m_ctx, 5);
+    ImGui::PopStyleVar(m_ctx, 4);
+    ImGui::PopStyleColor(m_ctx, 6);
 }
 
 void UiStyledElements::PushReaSonusTreeNodeStyle(ImGui_Context *m_ctx, const bool active) {
