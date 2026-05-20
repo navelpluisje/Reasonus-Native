@@ -56,7 +56,6 @@ public:
 };
 
 class PluginUtils {
-
 public:
     /**
      * Get the folder path for the reasonus plugins
@@ -241,6 +240,12 @@ public:
      * @return
      */
     static std::string GetPluginRequestString(const std::string &plugin_origname, std::string plugin_type);
+
+    static std::string GetPluginRequestString(
+        const std::string &developer,
+        const std::string &plugin_name,
+        const std::string &plugin_type
+    );
 
     /**
      * Delete the plugin mapping file from the file system

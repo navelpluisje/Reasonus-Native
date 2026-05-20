@@ -382,6 +382,21 @@ std::string PluginUtils::GetPluginRequestString(const std::string &plugin_origna
     return plugin_name_with_type;
 }
 
+std::string PluginUtils::GetPluginRequestString(
+    const std::string &developer,
+    const std::string &plugin_name,
+    const std::string &plugin_type
+) {
+    mINI::INIStructure plugin_params;
+    const mINI::INIFile file(GetReaSonusPluginPath(developer, plugin_name, plugin_type, false));
+    file.read(plugin_params);
+
+    return GetPluginRequestString(
+        plugin_params["global"]["origname"],
+        plugin_params["global"]["type"]
+    );
+}
+
 bool PluginUtils::DeletePluginMappingFile(
     const std::string &developer,
     const std::string &plugin_name,

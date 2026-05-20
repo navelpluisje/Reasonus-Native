@@ -39,6 +39,7 @@ class CSurf_FP_8_PluginMappingPage : public CSurf_UI_PageContent // NOLINT(*-use
     int previous_selected_developer = -1;
 
     std::vector<std::vector<std::string> > plugins;
+    int hovered_plugin = -1;
     int selected_plugin = -1;
     int previous_selected_plugin = -1;
     bool selected_plugin_exists = false;
@@ -395,6 +396,16 @@ protected:
         }
     }
 
+    void HandleRebuildPluginCacheClick(const int plugin_index) const {
+        if (PluginUtils::UpdatePluginMappingCacheFile(PluginUtils::GetPluginRequestString(
+            developers[selected_developer],
+            ExtractPluginNameFromFile(plugins[selected_developer][plugin_index]),
+            ExtractPluginTypeFromFile(plugins[selected_developer][plugin_index])
+        ))) {
+            ReaSonus8ControlPanel::SetMessage(i18n->t("mapping", "action.rebuild-cache.success.message"));
+        }
+    }
+
     void HandlePreviousClick() {
         int step_size = 1;
 
@@ -654,7 +665,9 @@ public:
             ExtractPluginTypeFromFile(plugin_name),
             index,
             &selected_plugin,
-            std::bind(&CSurf_FP_8_PluginMappingPage::HandleRemoveMappingClick, this, _1)
+            &hovered_plugin,
+            std::bind(&CSurf_FP_8_PluginMappingPage::HandleRemoveMappingClick, this, _1),
+            std::bind(&CSurf_FP_8_PluginMappingPage::HandleRebuildPluginCacheClick, this, _1)
         );
     }
 
@@ -822,8 +835,12 @@ public:
                 ButtonThemeAccent,
                 std::bind(&CSurf_FP_8_PluginMappingPage::HandleResetChannel, this)
             );
-            ReaSonusSimpleTooltip(m_ctx, assets, "Undo all changes for this group",
-                                  "plugin-mapping-tooltip-undo-group");
+            ReaSonusSimpleTooltip(
+                m_ctx,
+                assets,
+                i18n->t("mapping", "tooltip.infobar.button.undo"),
+                "plugin-mapping-tooltip-undo-group"
+            );
 
             ImGui::SameLine(m_ctx);
 
@@ -835,8 +852,12 @@ public:
                 ButtonThemeAccent,
                 std::bind(&CSurf_FP_8_PluginMappingPage::HandleAddChannelAfterSelected, this)
             );
-            ReaSonusSimpleTooltip(m_ctx, assets, "Add a channel after the current selected group",
-                                  "plugin-mapping-tooltip-add-group");
+            ReaSonusSimpleTooltip(
+                m_ctx,
+                assets,
+                i18n->t("mapping", "tooltip.infobar.button.add"),
+                "plugin-mapping-tooltip-add-group"
+            );
 
             ImGui::SameLine(m_ctx);
 
@@ -848,7 +869,12 @@ public:
                 ButtonThemeAccent,
                 std::bind(&CSurf_FP_8_PluginMappingPage::HandleDeleteChannel, this)
             );
-            ReaSonusSimpleTooltip(m_ctx, assets, "Delete the current group", "plugin-mapping-tooltip-delete-group");
+            ReaSonusSimpleTooltip(
+                m_ctx,
+                assets,
+                i18n->t("mapping", "tooltip.infobar.button.delete"),
+                "plugin-mapping-tooltip-delete-group"
+            );
 
             ImGui::EndChild(m_ctx);
         }
@@ -1116,7 +1142,7 @@ public:
                     plugin_params["global"]["origname"],
                     plugin_params["global"]["type"]
                 ));
-                ReaSonus8ControlPanel::SetMessage("Cache created");
+                ReaSonus8ControlPanel::SetMessage(i18n->t("mapping", "action.cache-created.success.message"));
             }
             PopulateFields();
         } else {

@@ -54,6 +54,10 @@ public:
 
     static void PopReaSonusListBoxStyle(ImGui_Context *m_ctx);
 
+    static void PushReaSonusContextMenuStyle(ImGui_Context *m_ctx);
+
+    static void PopReaSonusContextMenuStyle(ImGui_Context *m_ctx);
+
     static void PushReaSonusCheckboxStyle(ImGui_Context *m_ctx);
 
     static void PopReaSonusCheckboxStyle(ImGui_Context *m_ctx);
