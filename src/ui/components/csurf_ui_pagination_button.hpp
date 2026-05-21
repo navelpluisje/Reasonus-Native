@@ -32,6 +32,7 @@ static void ReaSonusPaginationButton( // NOLINT(*-function-cognitive-complexity)
     double text_height;
     double text_width;
 
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameBorderSize, 0.0);
     if (ImGui::BeginChild(m_ctx, ("##" + action_label).c_str(), menu_button_width, menu_button_height,
                           ImGui::ChildFlags_FrameStyle)) {
         ImGui::GetMousePos(m_ctx, &x_mouse_pos, &y_mouse_pos);
@@ -54,7 +55,7 @@ static void ReaSonusPaginationButton( // NOLINT(*-function-cognitive-complexity)
             on_click(value);
         }
 
-        ImGui_DrawList *list = ImGui::GetForegroundDrawList(m_ctx);
+        ImGui_DrawList *list = ImGui::GetWindowDrawList(m_ctx);
 
         ImGui::DrawList_AddRectFilled(list, x_pos_1, y_pos_1, x_pos_1 + menu_button_width, y_pos_1 + menu_button_height,
                                       background_color, 4);
@@ -106,6 +107,7 @@ static void ReaSonusPaginationButton( // NOLINT(*-function-cognitive-complexity)
         }
         ImGui::EndChild(m_ctx);
     }
+    ImGui::PopStyleVar(m_ctx);
     /**
      * Instantiate the drag and drop target
      */
