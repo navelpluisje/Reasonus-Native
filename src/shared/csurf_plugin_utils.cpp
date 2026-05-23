@@ -535,75 +535,69 @@ std::vector<std::string> PluginUtils::GetParamFilters(
     std::vector<std::string> param_filters;
 
     // Plugin filters
-    mINI::INIStructure ini_filter_plugin;
-    const std::string params_filter_plugin = createPathName({
-        std::string(GetResourcePath()),
-        "ReaSonus",
-        "FilterPlugin.ini"
-        });
+    mINI::INIStructure plugin_filter_ini;
+    const std::string plugin_filter_path = createPathName({ GetReaSonusFolderPath(), "FilterPlugin.ini" });
 
-    mINI::INIFile file_filter_plugin(params_filter_plugin);
-    if (!std::filesystem::exists(params_filter_plugin)) {
+    mINI::INIFile plugin_filter_file(plugin_filter_path);
+    if (!std::filesystem::exists(plugin_filter_path)) {
         // File not found, create default
-        ini_filter_plugin["global"];
+        plugin_filter_ini["global"];
         // Add an example entry so user has an idea of how to add their own plugins
         std::string default_plugin_section = "developer\\plugin.type";
-        ini_filter_plugin[default_plugin_section];
-        ini_filter_plugin[default_plugin_section]["enabled"] = "True";
-        ini_filter_plugin[default_plugin_section]["override"] = "False";
-        ini_filter_plugin[default_plugin_section]["0"] = "MIDI CC *";
-        (void)file_filter_plugin.generate(ini_filter_plugin, true);
+        plugin_filter_ini[default_plugin_section];
+        plugin_filter_ini[default_plugin_section]["enabled"] = "True";
+        plugin_filter_ini[default_plugin_section]["override"] = "False";
+        plugin_filter_ini[default_plugin_section]["0"] = "MIDI CC";
+        plugin_filter_ini[default_plugin_section]["1"] = "MIDI *";
+        plugin_filter_ini[default_plugin_section]["2"] = "* CC";
+        (void)plugin_filter_file.generate(plugin_filter_ini, true);
     }
 
-    bool filter_plugin_enabled = true;
-    bool filter_plugin_override = false;
-    std::string developer_plugin_string = developer_name + "\\" + plugin_name + "." + plugin_type;
+    bool plugin_filter_enabled = true;
+    bool plugin_filter_override = false;
+    std::string plugin_filter_section_string = developer_name + "\\" + plugin_name + "." + plugin_type;
 
     // Check plugin filter status
-    if (file_filter_plugin.read(ini_filter_plugin)) {
-        if (ini_filter_plugin.has(developer_plugin_string)) {
-            if (ini_filter_plugin[developer_plugin_string].has("enabled")) {
+    if (plugin_filter_file.read(plugin_filter_ini)) {
+        if (plugin_filter_ini.has(plugin_filter_section_string)) {
+            if (plugin_filter_ini[plugin_filter_section_string].has("enabled")) {
                 // When this is true, the plugin filter values will be parsed
-                filter_plugin_enabled = toBool(ini_filter_plugin[developer_plugin_string]["enabled"]);
+                plugin_filter_enabled = toBool(plugin_filter_ini[plugin_filter_section_string]["enabled"]);
             }
 
-            if (filter_plugin_enabled) {
-                if (ini_filter_plugin[developer_plugin_string].has("override")) {
+            if (plugin_filter_enabled) {
+                if (plugin_filter_ini[plugin_filter_section_string].has("override")) {
                     // When this is true, FilterDeveloper.ini will be ignored
-                    filter_plugin_override = toBool(ini_filter_plugin[developer_plugin_string]["override"]);
+                    plugin_filter_override = toBool(plugin_filter_ini[plugin_filter_section_string]["override"]);
                 }
             }
         } else {
-            filter_plugin_enabled = false;
+            plugin_filter_enabled = false;
         }
     } else {
-        filter_plugin_enabled = false;
+        plugin_filter_enabled = false;
     }
 
     // ------------------------------------------------------------------------
 
     // Developer filters added first
-    if (!filter_plugin_override) {
-        mINI::INIStructure ini_filter_developer;
-        const std::string params_filter_developer = createPathName({
-            std::string(GetResourcePath()),
-            "ReaSonus",
-            "FilterDeveloper.ini"
-            });
+    if (!plugin_filter_override) {
+        mINI::INIStructure developer_filter_ini;
+        const std::string developer_filter_path = createPathName({ GetReaSonusFolderPath(), "FilterDeveloper.ini" });
 
-        mINI::INIFile file_filter_developer(params_filter_developer);
-        if (!std::filesystem::exists(params_filter_developer)) {
+        mINI::INIFile developer_filter_file(developer_filter_path);
+        if (!std::filesystem::exists(developer_filter_path)) {
             // File not found, create default
-            ini_filter_developer["global"];
-            (void)file_filter_developer.generate(ini_filter_developer, true);
+            developer_filter_ini["global"];
+            (void)developer_filter_file.generate(developer_filter_ini, true);
         }
 
-        if (file_filter_developer.read(ini_filter_developer)) {
-            if (ini_filter_developer.has(developer_name)) {
-                for (int i = 0; i < ini_filter_developer[developer_name].size(); i++) {
+        if (developer_filter_file.read(developer_filter_ini)) {
+            if (developer_filter_ini.has(developer_name)) {
+                for (int i = 0; i < developer_filter_ini[developer_name].size(); i++) {
                     std::string index = std::to_string(i);
-                    if (ini_filter_developer[developer_name].has(index)) {
-                        param_filters.push_back(ini_filter_developer[developer_name][index]);
+                    if (developer_filter_ini[developer_name].has(index)) {
+                        param_filters.push_back(developer_filter_ini[developer_name][index]);
                     }
                 }
             }
@@ -613,11 +607,11 @@ std::vector<std::string> PluginUtils::GetParamFilters(
     // ------------------------------------------------------------------------
 
     // Plugin filters added second
-    if (filter_plugin_enabled) {
-        for (int i = 0; i < ini_filter_plugin[developer_plugin_string].size(); i++) {
+    if (plugin_filter_enabled) {
+        for (int i = 0; i < plugin_filter_ini[plugin_filter_section_string].size(); i++) {
             std::string index = std::to_string(i);
-            if (ini_filter_plugin[developer_plugin_string].has(index)) {
-                param_filters.push_back(ini_filter_plugin[developer_plugin_string][index]);
+            if (plugin_filter_ini[plugin_filter_section_string].has(index)) {
+                param_filters.push_back(plugin_filter_ini[plugin_filter_section_string][index]);
             }
         }
     }
