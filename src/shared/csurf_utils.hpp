@@ -137,6 +137,8 @@ struct DoubleClickState {
     }
 };
 
+using PluginParam = std::tuple<int, std::string, int>;
+
 void Main_OnCommandStringEx(const std::string &action_name, int flag, ReaProject *proj);
 
 void Main_OnCommandAsyncEx(int action_id, int flag, const ReaProject *proj);
@@ -261,15 +263,6 @@ void logDouble(const char *key, double value);
  * @param prefix The prefix used for the key
  */
 std::string GenerateUniqueKey(std::string prefix);
-
-/**
- * @brief Chack if a plugin param name is wanted. therre is a list of values that shoould NOT be in a param name
- *
- * @param param_name
- * @return true
- * @return false
- */
-bool IsWantedParam(const std::string &param_name);
 
 /**
  * Left trim the givven string. This will remove all spaces at the start of a string
@@ -431,5 +424,12 @@ double boolToDouble(bool value);
  * @return
  */
 bool doubleToBool(double value);
+
+/**
+ * Convert a string value to a boolean
+ * @param value value to convert
+ * @return
+ */
+bool toBool(std::string value);
 
 #endif // CSURF_UTILS_H_
