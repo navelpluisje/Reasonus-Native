@@ -14,6 +14,7 @@
 #include "../components/csurf_ui_combo_input.hpp"
 #include "../components/csurf_ui_button_bar.hpp"
 #include "../components/csurf_ui_plugin_selectable.hpp"
+#include "../components/csurf_ui_plugin_select_modal.hpp"
 #include "../../i18n/i18n.hpp"
 #include "../windows/csurf_ui_fp_8_control_panel.hpp"
 
@@ -32,6 +33,9 @@ class CSurf_FP_8_PluginMappingPage : public CSurf_UI_PageContent // NOLINT(*-use
     std::string plugin_folder_path = createPathName({std::string(GetResourcePath()), "ReaSonus", "Plugins"});
     std::vector<std::string> developers;
     std::vector<std::string> plugin_types = PluginUtils::GetPluginTypes();
+    std::set<std::string> installed_developers;
+    std::vector<PluginMeta> installed_plugins = PluginUtils::ExtractInstalledPluginMeta(installed_developers);
+
     int newly_selected_plugin_type = 0;
     bool save_selected_plugin_type = false;
     bool cancel_selected_plugin_type = false;
@@ -705,6 +709,8 @@ public:
         if (ImGui::BeginChild(m_ctx, "mapping_lists", 280.0, 0.0)) {
             ImGui::Text(m_ctx, i18n->t("mapping", "list.label").c_str());
             ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 4);
+
+            ReaSonusPluginSelectModal(m_ctx, assets, "Test label", installed_plugins);
 
             UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
             if (ImGui::BeginChild(

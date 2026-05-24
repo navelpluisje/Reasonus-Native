@@ -13,6 +13,7 @@ private:
     std::string developer;
     std::string category;
     std::string full_name;
+    std::string short_name;
     std::string plugin_type;
 
 public:
@@ -42,6 +43,14 @@ public:
 
     void SetFullName(const std::string &_full_name) {
         full_name = _full_name;
+    }
+
+    [[nodiscard]] std::string GetShortName() const {
+        return short_name;
+    }
+
+    void SetShortName(const std::string &_short_name) {
+        short_name = _short_name;
     }
 
     [[nodiscard]] std::string GetPluginType() const {

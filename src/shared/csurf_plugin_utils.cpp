@@ -191,12 +191,17 @@ std::vector<PluginMeta> PluginUtils::ExtractInstalledPluginMeta(std::set<std::st
     for (const auto &plugin_name: installed_plugins) {
         PluginMeta meta(plugin_name);
         const std::string developer = ExtractDeveloperName(plugin_name);
+        if (developer.empty()) {
+            continue;
+        }
         const std::string plugin_type = ExtractPluginType(plugin_name);
+        const std::string short_name = StripPluginName(plugin_name);
         const std::string cat_name = createCategoryName(plugin_name, plugin_type);
 
         developers.emplace(developer);
         meta.SetDeveloper(developer);
         meta.SetFullName(plugin_name);
+        meta.SetShortName(short_name);
         meta.SetCategory(category_file.get("category").get(cat_name));
         meta.SetPluginType(toLowerCase(plugin_type));
 
