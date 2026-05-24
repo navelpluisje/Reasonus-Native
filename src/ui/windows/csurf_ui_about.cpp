@@ -89,6 +89,7 @@ public:
 
                         ReaSonusPageTitle(m_ctx, assets, i18n->t("about", "thanks.title").c_str(), true);
                         ImGui::Text(m_ctx, i18n->t("about", "thanks.bottom").c_str());
+                        ImGui::BulletText(m_ctx, i18n->t("about", "thanks.list.0").c_str());
                         ImGui::BulletText(m_ctx, i18n->t("about", "thanks.list.1").c_str());
                         ImGui::BulletText(m_ctx, i18n->t("about", "thanks.list.2").c_str());
                         ImGui::BulletText(m_ctx, i18n->t("about", "thanks.list.3").c_str());
