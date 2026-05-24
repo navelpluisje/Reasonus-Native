@@ -23,8 +23,8 @@ target_sources(${PROJECT_NAME}
         csurf_fp_8_track_plugins_manager.cpp
         csurf_fp_8_track_receives_manager.cpp
         csurf_fp_8_track_sends_manager.cpp
-        csurf_fp_8_ui_control_panel.cpp
-        csurf_fp_8_ui_custom_filters_page.cpp
-        csurf_fp_8_ui_plugin_mapping_page.cpp
-        csurf_fp_8_ui_settings_page.cpp
+        ../ui/windows/csurf_ui_fp_8_control_panel.cpp
+        ../ui/pages/csurf_ui_fp_8_custom_filters_page.cpp
+        ../ui/pages/csurf_ui_fp_8_plugin_mapping_page.cpp
+        ../ui/pages/csurf_ui_fp_8_settings_page.cpp
         )

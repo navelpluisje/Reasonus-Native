@@ -3,9 +3,13 @@
 
 #include "csurf_fp_8_track.hpp"
 
-CSurf_FP_8_Track::CSurf_FP_8_Track(int index, CSurf_Context *context, midi_Output *m_midiout) : context(context)
-{
-    int device_id = context->GetNbChannels() == 8 ? SYSEX_DEVICE_FP8 : SYSEX_DEVICE_FP16;
+CSurf_FP_8_Track::CSurf_FP_8_Track(
+    const int index,
+    CSurf_Context *_context,
+    midi_Output *m_midiout
+) : context(_context) {
+    const int device_id = _context->GetNbChannels() == 8 ? SYSEX_DEVICE_FP8 : SYSEX_DEVICE_FP16;
+
     selectButton = new CSurf_ColorButton(ButtonColorWhite, SelectButtons[index], BTN_VALUE_OFF, m_midiout);
     soloButton = new CSurf_Button(SoloButtons[index], BTN_VALUE_OFF, m_midiout);
     muteButton = new CSurf_Button(MuteButtons[index], BTN_VALUE_OFF, m_midiout);
@@ -14,24 +18,24 @@ CSurf_FP_8_Track::CSurf_FP_8_Track(int index, CSurf_Context *context, midi_Outpu
     display = new CSurf_Display(index, m_midiout, device_id);
     vuMeter = new CSurf_VuMeter(index, m_midiout);
 }
-CSurf_FP_8_Track::~CSurf_FP_8_Track()
-{
+
+CSurf_FP_8_Track::~CSurf_FP_8_Track() {
     delete fader;
     delete valueBar;
     delete display;
     delete vuMeter;
-};
+}
 
-void CSurf_FP_8_Track::ClearTrack(bool display, bool forceUpdate)
-{
+void CSurf_FP_8_Track::ClearTrack(const bool display, const bool forceUpdate) const {
     this->SetTrackColor(ButtonColorWhite);
-    if (display)
-    {
+
+    if (display) {
         this->SetDisplayLine(0, ALIGN_LEFT, "", NON_INVERT, forceUpdate);
         this->SetDisplayLine(1, ALIGN_LEFT, "", NON_INVERT, forceUpdate);
         this->SetDisplayLine(2, ALIGN_CENTER, "", NON_INVERT, forceUpdate);
         this->SetDisplayLine(3, ALIGN_CENTER, "", NON_INVERT, forceUpdate);
     }
+
     this->SetMuteButtonValue(BTN_VALUE_OFF);
     this->SetSoloButtonValue(BTN_VALUE_OFF);
     this->SetSelectButtonValue(BTN_VALUE_OFF);
@@ -41,61 +45,54 @@ void CSurf_FP_8_Track::ClearTrack(bool display, bool forceUpdate)
     this->SetValueBarMode(VALUEBAR_MODE_OFF);
 }
 
-void CSurf_FP_8_Track::SetTrackColor(ButtonColor color)
-{
-    selectButton->SetColor(color);
+void CSurf_FP_8_Track::SetTrackColor(const ButtonColor color, const bool force) const {
+    selectButton->SetColor(color, force);
 }
 
-void CSurf_FP_8_Track::SetSelectButtonValue(Btn_Value value, bool force)
-{
+void CSurf_FP_8_Track::SetSelectButtonValue(const Btn_Value value, const bool force) const {
     selectButton->SetValue(value, force);
 }
 
-void CSurf_FP_8_Track::SetSoloButtonValue(Btn_Value value, bool force)
-{
+void CSurf_FP_8_Track::SetSoloButtonValue(const Btn_Value value, const bool force) const {
     soloButton->SetValue(value, force);
 }
 
-void CSurf_FP_8_Track::SetMuteButtonValue(Btn_Value value, bool force)
-{
+void CSurf_FP_8_Track::SetMuteButtonValue(const Btn_Value value, const bool force) const {
     muteButton->SetValue(value, force);
 }
 
-void CSurf_FP_8_Track::SetFaderValue(int value, bool force)
-{
+void CSurf_FP_8_Track::SetFaderValue(const int value, const bool force) const {
     fader->SetValue(value, force);
 }
 
-void CSurf_FP_8_Track::SetValueBarMode(ValuebarMode mode)
-{
+void CSurf_FP_8_Track::SetValueBarMode(const ValuebarMode mode) const {
     valueBar->SetMode(mode);
 }
 
-void CSurf_FP_8_Track::SetValueBarValue(int value)
-{
+void CSurf_FP_8_Track::SetValueBarValue(const int value) const {
     valueBar->SetValue(value);
 }
 
-void CSurf_FP_8_Track::SetDisplayMode(DisplayMode mode, bool force)
-{
+void CSurf_FP_8_Track::SetDisplayMode(const DisplayMode mode, const bool force) const {
     display->SetMode(mode, force);
-};
+}
 
-void CSurf_FP_8_Track::SetDisplayLine(int line, Alignment alignment, const char *value, Inverted invert, bool force)
-{
-    try
-    {
+void CSurf_FP_8_Track::SetDisplayLine(
+    const int line,
+    const Alignment alignment,
+    const char *value,
+    const Inverted invert,
+    const bool force
+) const {
+    try {
         display->SetValue(line, alignment, value, invert, force);
-    }
-    catch (...)
-    {
+    } catch (...) {
         ShowConsoleMsg("Huh?");
     }
-};
+}
 
-void CSurf_FP_8_Track::SetVuMeterValue(int value, bool force)
-{
+void CSurf_FP_8_Track::SetVuMeterValue(const int value, const bool force) const {
     vuMeter->SetValue(value, force);
-};
+}
 
 #endif

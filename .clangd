@@ -1,0 +1,5 @@
+If:
+  PathMatch: .*\.hpp
+
+CompileFlags:
+  Add: [-Wno-unused-function]

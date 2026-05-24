@@ -5,34 +5,35 @@
 
 namespace UI_COLORS
 {
-    const int White = 0xffffffff;
-    const int White_50 = 0xffffff7f;
-    const int White_25 = 0xffffff3f;
-    const int Main_15 = 0x272727ff;
-    const int Main_18 = 0x2e2e2eff;
-    const int Main_23 = 0x383A3CFF;
-    const int Main_28 = 0x45474Aff;
-    const int Main_38 = 0x5C6164ff;
-    const int Accent = 0xf7cb15ff;
-    const int Accent_07 = 0xF7CB1512;
-    const int Accent_14 = 0xF7CB1523;
-    const int Accent_25 = 0xF7CB153f;
-    const int Accent_50 = 0xF7CB157F;
-    const int Success = 0x58D23AFF;
-    const int Success_50 = 0x58D23A7F;
-    const int Transparent = 0x00000000;
-    const int Transparent_25 = 0x2727273f;
-    const int Transparent_50 = 0x2727277f;
-    const int Transparent_75 = 0x272727Bf;
+    constexpr int White = 0xffffffff;
+    constexpr int White_50 = 0xffffff7f;
+    constexpr int White_25 = 0xffffff3f;
+    constexpr int Main_15 = 0x272727ff;
+    constexpr int Main_18 = 0x2e2e2eff;
+    constexpr int Main_23 = 0x383A3CFF;
+    constexpr int Main_28 = 0x45474Aff;
+    constexpr int Main_38 = 0x5C6164ff;
+    constexpr int Main_48 = 0x757C80ff;
+    constexpr int Accent = 0xf7cb15ff;
+    constexpr int Accent_07 = 0xF7CB1512;
+    constexpr int Accent_14 = 0xF7CB1523;
+    constexpr int Accent_25 = 0xF7CB153f;
+    constexpr int Accent_50 = 0xF7CB157F;
+    constexpr int Success = 0x58D23AFF;
+    constexpr int Success_50 = 0x58D23A7F;
+    constexpr int Transparent = 0x00000000;
+    constexpr int Transparent_25 = 0x2727273f;
+    constexpr int Transparent_50 = 0x2727277f;
+    constexpr int Transparent_75 = 0x272727Bf;
 
-    const int FormFieldBorder = UI_COLORS::Main_38;
-    const int FormFieldBg = UI_COLORS::Main_23;
-    const int FormFieldBgHover = UI_COLORS::Main_28;
-    const int FormFieldBgActive = UI_COLORS::Main_28;
+    constexpr int FormFieldBorder = Main_38;
+    constexpr int FormFieldBg = Main_23;
+    constexpr int FormFieldBgHover = Main_28;
+    constexpr int FormFieldBgActive = Main_28;
 }
 
 /**
- * @brief When using the mac colour picker use Generic RGB
+ * @brief When using the Mac color picker use Generic RGB
  *
  * @param m_ctx
  */

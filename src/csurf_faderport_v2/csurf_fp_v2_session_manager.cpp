@@ -7,7 +7,7 @@
 #include "../shared/csurf_session_manager_actions.hpp"
 #include "csurf_fp_v2_navigator.hpp"
 #include "../shared/csurf_daw.hpp"
-#include "csurf_fp_v2_ui_control_panel.hpp"
+#include "../ui/pages/csurf_ui_fp_v2_control_panel.hpp"
 #include "../shared/csurf_faderport_ui_imgui_utils.hpp"
 
 enum SessionTypes // NOLINT(*-use-internal-linkage)
@@ -41,6 +41,7 @@ class CSurf_FP_V2_SessionManager // NOLINT(*-use-internal-linkage)
     CSurf_Button *nextButton;
 
 protected:
+
     void SetButtonValues() const {
         // With shift engaged, blink the selected button
         const Btn_Value valueOn = context->GetShiftLeft() && !settings->GetDistractionFreeMode()
@@ -102,7 +103,7 @@ protected:
         if (isInteger(actionId)) {
             Main_OnCommandAsyncEx(stoi(actionId), 0, nullptr);
         } else {
-            Main_OnCommandStringEx(actionId);
+            Main_OnCommandStringEx(actionId, 0, nullptr);
         }
     }
 
@@ -195,7 +196,7 @@ public:
         }
 
         if (context->GetShiftLeft()) {
-            Main_OnCommandStringEx("_REASONUS_TOGGLE_PLAY_CURSOR_COMMAND");
+            Main_OnCommandStringEx("_REASONUS_TOGGLE_PLAY_CURSOR_COMMAND", 0, nullptr);
         } else {
             context->ToggleLastTouchedFxMode();
         }
@@ -219,7 +220,7 @@ public:
         }
 
         if (context->GetShiftLeft() && settings->GetCanDisableFader()) {
-            context->SetFaderDisabled(!context->GetFaderDisabled());
+            context->SetFaderDisabled(context->GetFaderDisabled());
             return;
         }
 
@@ -326,12 +327,12 @@ public:
             case Section:
                 context->GetShiftLeft()
                     ? Main_OnCommandAsyncEx(40625, 0, nullptr) // Time selection: Set start point
-                    : Main_OnCommandStringEx("_SWS_SELPREVMORR"); // SWS: Goto/select previous marker/region
+                    : Main_OnCommandStringEx("_SWS_SELPREVMORR", 0, nullptr); // SWS: Goto/select previous marker/region
                 break;
             case Marker:
                 context->GetShiftLeft()
                     ? Main_OnCommandAsyncEx(40029, 0, nullptr) // Edit: Undo
-                    : Main_OnCommandStringEx("_SWS_SELPREVMORR"); // SWS: Goto/select previous marker/region
+                    : Main_OnCommandStringEx("_SWS_SELPREVMORR", 0, nullptr); // SWS: Goto/select previous marker/region
                 break;
         }
     }
@@ -366,13 +367,13 @@ public:
             case Section:
                 context->GetShiftLeft()
                     ? Main_OnCommandAsyncEx(40626, 0, nullptr) // Time selection: Set end point
-                    : Main_OnCommandStringEx("_SWS_SELNEXTMORR"); // SWS: Goto/select next marker/region
+                    : Main_OnCommandStringEx("_SWS_SELNEXTMORR", 0, nullptr); // SWS: Goto/select next marker/region
 
                 break;
             case Marker:
                 context->GetShiftLeft()
                     ? DAW::EditRedo()
-                    : Main_OnCommandStringEx("_SWS_SELNEXTMORR"); // SWS: Goto/select next marker/region
+                    : Main_OnCommandStringEx("_SWS_SELNEXTMORR", 0, nullptr); // SWS: Goto/select next marker/region
                 break;
         }
     }
@@ -465,7 +466,7 @@ public:
                 break;
             case Scroll:
                 context->GetShiftLeft()
-                    ? Main_OnCommandStringEx("_SWS_HSCROLLPLAY50") // SWS: Horizontal scroll to put play cursor at 50%
+                    ? Main_OnCommandStringEx("_SWS_HSCROLLPLAY50", 0, nullptr) // SWS: Horizontal scroll to put play cursor at 50%
                     : Main_OnCommandAsyncEx(40913, 0, nullptr); // Track: Vertical scroll selected tracks into view
                 break;
             case Master:

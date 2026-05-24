@@ -76,6 +76,13 @@ public:
     static void ToggleTrackMuted(MediaTrack *media_track);
 
     /**
+     * Set the mute state for the given track
+     * @param media_track The track to set the muted state
+     * @param mute
+     */
+    static void SetTrackMuted(MediaTrack *media_track, bool mute);
+
+    /**
      * Check if the given track is soloed
      * @param media_track The track to check for the soloed state
      * @return Whether if the given track is soloed
@@ -140,6 +147,10 @@ public:
      */
     static bool IsTrackVisible(MediaTrack *media_track);
 
+    static void SetMixerTrackVisible(MediaTrack *media_track, bool visible);
+
+    static void SetTCPTrackVisible(MediaTrack *media_track, bool visible);
+
     /**
      * Get the pan mode for the given track
      * @param media_track The track to get the pan mode for
@@ -198,6 +209,20 @@ public:
      * @return The track recording mode
      */
     static std::string GetTrackRecordingMode(MediaTrack *media_track);
+
+    /**
+     * Get the recording mode for the given track
+     * @param media_track The track to get the recording mode for
+     * @return The track recording mode
+     */
+    static bool GetTrackPhase(MediaTrack *media_track);
+
+    /**
+     * Get the automation mode for the given track
+     * @param media_track The track to get the recording mode for
+     * @return The Automation Mode mode
+     */
+    static int GetTrackAutomationMode(MediaTrack *media_track);
 
     /**
      * Get the track color for the given track

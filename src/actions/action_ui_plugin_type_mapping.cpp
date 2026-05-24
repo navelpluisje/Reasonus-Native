@@ -1,6 +1,6 @@
 #include "action_ui_plugin_type_mapping.hpp"
 #include "../shared/csurf_utils.hpp"
-#include "../ui/csurf_ui_plugin_type_mapping.hpp"
+#include "../ui/windows/csurf_ui_plugin_type_mapping.hpp"
 
 #define STRINGIZE_DEF(x) #x
 #define STRINGIZE(x) STRINGIZE_DEF(x)

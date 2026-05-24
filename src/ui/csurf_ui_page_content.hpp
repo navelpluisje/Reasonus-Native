@@ -10,8 +10,7 @@
 #include "../shared/csurf_utils.hpp"
 #include "../shared/csurf_reasonus_settings.hpp"
 
-class CSurf_UI_PageContent
-{
+class CSurf_UI_PageContent {
 protected:
     ImGui_Context *m_ctx;
     mINI::INIStructure ini;
@@ -20,41 +19,44 @@ protected:
     I18n *i18n;
 
 public:
-    CSurf_UI_PageContent(ImGui_Context *m_ctx, CSurf_UI_Assets *assets) : m_ctx(m_ctx), assets(assets) {};
-
-    virtual ~CSurf_UI_PageContent() {};
-
-    virtual void Start() {};
-
-    virtual void Render() {};
-
-    virtual void Save() {};
-
-    virtual void Reset() {};
-
-    virtual void SetPageProperty(int type, int value)
-    {
-        (void)type;
-        (void)value;
+    CSurf_UI_PageContent(ImGui_Context *m_ctx, CSurf_UI_Assets *assets) : m_ctx(m_ctx), assets(assets) {
     };
 
-    virtual void SetPageProperty(int type, std::string value)
-    {
-        (void)type;
-        (void)value;
+    virtual ~CSurf_UI_PageContent() = default;
+
+    virtual void Start() {
     };
 
-    virtual int GetPageProperty(int type)
-    {
-        (void)type;
+    virtual void Render() {
+    };
+
+    virtual void Save() {
+    };
+
+    virtual void Reset() {
+    };
+
+    virtual void SetPageProperty(const int type, const int value) {
+        (void) type;
+        (void) value;
+    };
+
+    virtual void SetPageProperty(int type, std::string value);
+
+    virtual int GetPageProperty(const int type) {
+        (void) type;
         return -1;
     };
 
-    virtual std::string GetPageStringProperty(int type)
-    {
-        (void)type;
+    virtual std::string GetPageStringProperty(const int type) {
+        (void) type;
         return "";
     };
 };
+
+inline void CSurf_UI_PageContent::SetPageProperty(const int type, const std::string value) {
+    (void) type;
+    (void) value;
+}
 
 #endif

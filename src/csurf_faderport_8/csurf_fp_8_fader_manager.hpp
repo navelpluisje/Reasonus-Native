@@ -16,7 +16,7 @@
 #include "csurf_fp_8_track_pan_manager.cpp"
 
 class CSurf_FP_8_FaderManager {
-    CSurf_FP_8_ChannelManager *channelManager = NULL;
+    CSurf_FP_8_ChannelManager *channelManager = nullptr;
     std::vector<CSurf_FP_8_Track *> tracks;
 
     ChannelMode prevChannelMode = TrackMode;
