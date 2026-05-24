@@ -280,39 +280,6 @@ std::string GenerateUniqueKey(std::string prefix) {
     return prefix;
 }
 
-std::vector<std::string> unwanted_param_names = {
-    "MIDI CC", // Decomposer, Arturia
-    "reserved", // Decomposer, Valhalla
-    // Blue Cat
-    "MIDI Program Change",
-    "MIDI Controller",
-    // Arturia
-    "unassigned",
-    "VST_ProgramChange_",
-    "HardwareDisplayControl",
-    "MPE_",
-    // SPITFIRE
-    "general purpose",
-    // global
-    "undefined",
-};
-
-bool IsWantedParam(const std::string &param_name) {
-    bool result = true;
-
-    for (std::string const &unwanted_name: unwanted_param_names) {
-        const int res = param_name.find(unwanted_name);
-
-        // We found the string. Set result to false and break;
-        if (res != static_cast<int>(std::string::npos)) {
-            result = false;
-            break;
-        }
-    }
-
-    return result;
-}
-
 std::string ltrim(const std::string &value) {
     const std::regex leading_space("^\\s+");
     return std::regex_replace(value, leading_space, "");
@@ -505,4 +472,12 @@ double boolToDouble(const bool value) {
 
 bool doubleToBool(const double value) {
     return value > 0.0;
+}
+
+bool toBool(std::string value) {
+    std::string bool_value = toLowerCase(value);
+    std::istringstream is(bool_value);
+    bool b;
+    is >> std::boolalpha >> b;
+    return b;
 }

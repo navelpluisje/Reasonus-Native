@@ -16,8 +16,6 @@
 #include "../../i18n/i18n.hpp"
 #include "../windows/csurf_ui_fp_8_control_panel.hpp"
 
-using PluginParam = std::tuple<int, std::string, int>;
-
 class CSurf_FP_8_PluginMappingPage : public CSurf_UI_PageContent // NOLINT(*-use-internal-linkage)
 {
     mINI::INIStructure plugin_params;
@@ -39,21 +37,22 @@ class CSurf_FP_8_PluginMappingPage : public CSurf_UI_PageContent // NOLINT(*-use
     int previous_selected_developer = -1;
 
     std::vector<std::vector<std::string> > plugins;
-    int hovered_plugin = -1;
+	int hovered_plugin = -1;
     int selected_plugin = -1;
     int previous_selected_plugin = -1;
     bool selected_plugin_exists = false;
     bool selected_plugin_has_type = false;
     bool selected_plugin_filename_has_type = false;
     bool selected_plugin_type_mismatch = false;
+    bool selected_plugin_params_error = false;
     std::string selected_plugin_filename_type;
 
     int nb_channels = 0;
     int selected_channel = -1;
     int previous_selected_channel = 0;
 
-    std::vector<PluginParam> paramIds;
-    std::vector<std::string> params;
+    std::vector<std::string> param_names;
+    std::vector<PluginParam> param_data;
     std::string select_search_query;
     std::string fader_search_query;
 
@@ -161,8 +160,8 @@ protected:
         }
 
         // Type not present in data
-        if (!PluginExists()) {
-            selected_plugin_has_type = !plugin_params["global"]["type"].empty();
+        selected_plugin_has_type = !plugin_params["global"]["type"].empty();
+        if (!selected_plugin_has_type) {
             plugin_type_error = true;
         }
 
@@ -193,7 +192,11 @@ protected:
             nb_channels = max(std::stoi(group_id) + 1, nb_channels);
         }
 
-        GetPluginParams();
+        selected_plugin_params_error = false;
+        if (!GetPluginParams()) {
+            selected_plugin_params_error = true;
+            return false;
+        }
 
         return true;
     }
@@ -215,37 +218,45 @@ protected:
         return exist > -1;
     }
 
-    void GetPluginParams() {
+    bool GetPluginParams() {
         // Prepare the vectors
-        params.clear();
-        paramIds.clear();
-        params.push_back(i18n->t("mapping", "edit.select.param.first-item"));
-        paramIds.emplace_back(-1, i18n->t("mapping", "edit.select.param.first-item"), 0);
+        param_names.clear();
+        param_data.clear();
+        param_names.push_back(i18n->t("mapping", "edit.select.param.first-item"));
+        param_data.emplace_back(-1, i18n->t("mapping", "edit.select.param.first-item"), 0);
+
+        std::string developer_name = PluginUtils::ExtractDeveloperName(plugin_params["global"]["origname"]);
+        std::string plugin_name = PluginUtils::ExtractPluginName(plugin_params["global"]["origname"]);
 
         if (!PluginUtils::HasPluginMappingCache(
-            PluginUtils::ExtractDeveloperName(plugin_params["global"]["origname"]),
-            PluginUtils::ExtractPluginName(plugin_params["global"]["origname"]),
-            plugin_params["global"]["type"]
+            developer_name, plugin_name, plugin_params["global"]["type"]
         )) {
+            if (!PluginExists()) {
+                return false;
+            }
             PluginUtils::UpdatePluginMappingCacheFile(PluginUtils::GetPluginRequestString(
                 plugin_params["global"]["origname"],
                 plugin_params["global"]["type"]
             ));
+            ReaSonus8ControlPanel::SetMessage(i18n->t("mapping", "action.cache-created.success.message"));
         }
 
         mINI::INIStructure cache = PluginUtils::GetPluginMappingCacheStructure(
-            PluginUtils::ExtractDeveloperName(plugin_params["global"]["origname"]),
-            PluginUtils::ExtractPluginName(plugin_params["global"]["origname"]),
-            plugin_params["global"]["type"]
+            developer_name, plugin_name, plugin_params["global"]["type"]
         );
 
-        for (int i = 0; i < stoi(cache["global"]["nb_params"]); i++) {
+        size_t num_params = cache["id"].size();
+        if (num_params < 1) { return false; }
+
+        for (int i = 0; i < num_params; i++) {
             const std::string param_name = cache["params"][std::to_string(i)];
 
-            params.emplace_back(param_name);
-            paramIds.emplace_back(stoi(cache["id"][std::to_string(i)]), param_name,
-                                  stoi(cache["steps"][std::to_string(i)]));
+            param_names.emplace_back(param_name);
+            param_data.emplace_back(stoi(cache["id"][std::to_string(i)]), param_name,
+                stoi(cache["steps"][std::to_string(i)]));
         }
+
+        return true;
     }
 
     void PopulateFields() {
@@ -265,14 +276,14 @@ protected:
 
             const int param_id = stoi(plugin_params[select_key]["param"]);
             const auto iterator = std::find_if(
-                paramIds.begin(),
-                paramIds.end(),
+                param_data.begin(),
+                param_data.end(),
                 [param_id](const PluginParam &param) {
                     return param_id == std::get<0>(param);
                 });
 
-            if (iterator != paramIds.end()) {
-                select_param_index = iterator - paramIds.begin();
+            if (iterator != param_data.end()) {
+                select_param_index = iterator - param_data.begin();
                 previous_select_param_index = select_param_index;
             }
         } else {
@@ -295,13 +306,13 @@ protected:
                                             : "0");
 
             const auto iterator = std::find_if(
-                paramIds.begin(),
-                paramIds.end(),
+                param_data.begin(),
+                param_data.end(),
                 [param_id](const PluginParam &param) {
                     return param_id == std::get<0>(param);
                 });
-            if (iterator != paramIds.end()) {
-                fader_param_index = iterator - paramIds.begin();
+            if (iterator != param_data.end()) {
+                fader_param_index = iterator - param_data.begin();
             }
         } else {
             fader_name = "";
@@ -314,13 +325,13 @@ protected:
         if (select_param_index > 0) {
             plugin_params[select_key]["name"] = select_name;
             plugin_params[select_key]["steps"] = std::to_string(select_nb_steps);
-            plugin_params[select_key]["param"] = std::to_string(std::get<0>(paramIds[select_param_index]));
+            plugin_params[select_key]["param"] = std::to_string(std::get<0>(param_data[select_param_index]));
             plugin_params[select_key]["uninvert-label"] = std::to_string(select_uninvert_label);
         }
 
         if (fader_param_index > 0) {
             plugin_params[fader_key]["name"] = fader_name;
-            plugin_params[fader_key]["param"] = std::to_string(std::get<0>(paramIds[fader_param_index]));
+            plugin_params[fader_key]["param"] = std::to_string(std::get<0>(param_data[fader_param_index]));
             plugin_params[fader_key]["uninvert-label"] = std::to_string(fader_uninvert_label);
         }
     }
@@ -395,7 +406,7 @@ protected:
             SetPluginFolders();
         }
     }
-
+	
     void HandleRebuildPluginCacheClick(const int plugin_index) const {
         if (PluginUtils::UpdatePluginMappingCacheFile(PluginUtils::GetPluginRequestString(
             developers[selected_developer],
@@ -889,14 +900,14 @@ public:
         if (ImGui::BeginChild(m_ctx, "mapping_content_select", 0.0, height,
                               ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY)) {
             ReaSonusPageTitle(m_ctx, assets, i18n->t("mapping", "edit.select.label"), true);
-            if (!params.empty()) {
+            if (!param_names.empty()) {
                 ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
 
                 ReaSonusSearchComboInput(
                     m_ctx,
                     assets,
                     i18n->t("mapping", "edit.select.param.label"),
-                    params,
+                    param_names,
                     &select_param_index,
                     &select_search_query,
                     settings->ShouldClearParamInput(),
@@ -948,12 +959,12 @@ public:
         if (ImGui::BeginChild(m_ctx, "mapping_content_fader", 0.0, height,
                               ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY)) {
             ReaSonusPageTitle(m_ctx, assets, i18n->t("mapping", "edit.fader.label"), true);
-            if (!params.empty()) {
+            if (!param_names.empty()) {
                 ReaSonusSearchComboInput(
                     m_ctx,
                     assets,
                     i18n->t("mapping", "edit.fader.param.label"),
-                    params,
+                    param_names,
                     &fader_param_index,
                     &fader_search_query,
                     settings->ShouldClearParamInput(),
@@ -1114,7 +1125,7 @@ public:
     }
 
     /**
-     * Check if the selected plugin hsa changed.
+     * Check if the selected plugin has changed.
      */
     void PluginCheck() {
         if (selected_plugin == previous_selected_plugin) {
@@ -1130,20 +1141,7 @@ public:
         channel_offset = 0;
         selected_channel = 0;
 
-
         if (SetPluginData()) {
-            // Check if we have a cahe file available. If not, create one
-            if (!PluginUtils::HasPluginMappingCache(
-                developers[selected_developer],
-                ExtractPluginNameFromFile(plugins[selected_developer][selected_plugin]),
-                ExtractPluginTypeFromFile(plugins[selected_developer][selected_plugin])
-            )) {
-                PluginUtils::UpdatePluginMappingCacheFile(PluginUtils::GetPluginRequestString(
-                    plugin_params["global"]["origname"],
-                    plugin_params["global"]["type"]
-                ));
-                ReaSonus8ControlPanel::SetMessage(i18n->t("mapping", "action.cache-created.success.message"));
-            }
             PopulateFields();
         } else {
             select_key = "";
@@ -1163,7 +1161,7 @@ public:
     void ParamIndexCheck() {
         if (select_param_index != previous_select_param_index) {
             previous_select_param_index = select_param_index;
-            select_nb_steps = std::get<2>(paramIds[select_param_index]);
+            select_nb_steps = std::get<2>(param_data[select_param_index]);
         }
     }
 
@@ -1171,7 +1169,7 @@ public:
         double space_x;
         double space_y;
 
-        if (selected_plugin > -1 && selected_plugin_exists) {
+        if (selected_plugin > -1 && selected_plugin_exists && !selected_plugin_params_error) {
             ImGui::Text(
                 m_ctx,
                 selected_plugin < 0 || selected_plugin >= static_cast<int>(plugins[selected_developer].size())
