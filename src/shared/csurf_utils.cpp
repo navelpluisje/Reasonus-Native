@@ -466,18 +466,19 @@ std::string toUpperCase(std::string value) {
     return value;
 }
 
-double boolToDouble(const bool value) {
+double toDouble(const bool value) {
     return value ? 1.0 : 0.0;
 }
 
-bool doubleToBool(const double value) {
+bool toBool(const double value) {
     return value > 0.0;
 }
 
-bool toBool(std::string value) {
-    std::string bool_value = toLowerCase(value);
-    std::istringstream is(bool_value);
-    bool b;
-    is >> std::boolalpha >> b;
-    return b;
+bool toBool(const std::string &value) {
+    const std::string bool_value = toLowerCase(value);
+    std::istringstream iss(bool_value);
+    bool result;
+    iss >> std::boolalpha >> result;
+
+    return result;
 }

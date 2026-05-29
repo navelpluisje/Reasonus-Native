@@ -5,19 +5,20 @@
 #include <WDL/wdltypes.h> // might be unnecessary in future
 #include "csurf_fader_resources.hpp"
 
-class CSurf_Fader
-{
-protected:
+class CSurf_Fader {
     int value;
     int channel;
     midi_Output *m_midiout;
 
-    void SendValue();
+protected:
+    void SendValue() const;
 
 public:
-    CSurf_Fader(int channel, int value, midi_Output *m_midiout) : value(value), channel(channel), m_midiout(m_midiout) {};
+    CSurf_Fader(const int channel, const int value, midi_Output *m_midiout) : value(value), channel(channel),
+                                                                              m_midiout(m_midiout) {
+    };
 
-    ~CSurf_Fader() {};
+    ~CSurf_Fader() = default;
 
     void SetValue(int _value, bool force = false);
 };

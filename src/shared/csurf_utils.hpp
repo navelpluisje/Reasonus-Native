@@ -416,20 +416,20 @@ std::string toUpperCase(std::string value);
  * @param value Value to convert
  * @return
  */
-double boolToDouble(bool value);
+double toDouble(bool value);
 
 /**
  * Convert a double value to a boolean
  * @param value value to convert
  * @return
  */
-bool doubleToBool(double value);
+bool toBool(double value);
 
 /**
  * Convert a string value to a boolean
  * @param value value to convert
  * @return
  */
-bool toBool(std::string value);
+bool toBool(const std::string &value);
 
 #endif // CSURF_UTILS_H_

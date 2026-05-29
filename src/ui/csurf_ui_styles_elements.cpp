@@ -200,6 +200,7 @@ void UiStyledElements::PushReaSonusListBoxStyle(ImGui_Context *m_ctx) {
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 8, 8);
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameRounding, 4);
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameBorderSize, 1);
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_ItemSpacing, 0.0, 0.0);
 
     ImGui::PushStyleColor(m_ctx, ImGui::Col_Border, UI_COLORS::Main_38);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBg, UI_COLORS::Main_23);
@@ -210,7 +211,7 @@ void UiStyledElements::PushReaSonusListBoxStyle(ImGui_Context *m_ctx) {
 }
 
 void UiStyledElements::PopReaSonusListBoxStyle(ImGui_Context *m_ctx) {
-    ImGui::PopStyleVar(m_ctx, 3);
+    ImGui::PopStyleVar(m_ctx, 4);
     ImGui::PopStyleColor(m_ctx, 4);
 }
 

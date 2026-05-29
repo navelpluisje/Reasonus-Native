@@ -56,7 +56,6 @@ public:
 };
 
 class PluginUtils {
-
 public:
     /**
      * Get the folder path for the reasonus plugins
@@ -241,7 +240,7 @@ public:
      * @return
      */
     static std::string GetPluginRequestString(const std::string &plugin_origname, std::string plugin_type);
-    
+
     static std::string GetPluginRequestString(
         const std::string &developer,
         const std::string &plugin_name,
@@ -283,18 +282,18 @@ public:
         const std::string &cache_path
     );
 
-    static std::vector<std::string> PluginUtils::GetParamFilters(
-        const std::string developer_name,
-        const std::string plugin_name,
-        const std::string plugin_type
+    static std::vector<std::string> GetParamFilters(
+        const std::string &developer_name,
+        const std::string &plugin_name,
+        const std::string &plugin_type
     );
 
-    static void PluginUtils::FilterParams(
-        std::vector<std::string>& param_filters,
-        std::vector<int>& param_id,
-        std::vector<std::string>& param_name,
-        std::vector<int>& param_steps,
-        mINI::INIStructure& ini_cache
+    static void WriteFilterParams(
+        const std::vector<std::string> &param_filters,
+        const std::vector<int> &param_id,
+        const std::vector<std::string> &param_name,
+        const std::vector<int> &param_steps,
+        mINI::INIStructure &cache
     );
 };
 

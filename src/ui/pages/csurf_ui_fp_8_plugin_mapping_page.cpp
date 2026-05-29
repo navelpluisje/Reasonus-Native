@@ -36,8 +36,8 @@ class CSurf_FP_8_PluginMappingPage : public CSurf_UI_PageContent // NOLINT(*-use
     int selected_developer = -1;
     int previous_selected_developer = -1;
 
-    std::vector<std::vector<std::string> > plugins;
-	int hovered_plugin = -1;
+    std::vector<std::vector<std::string>> plugins;
+    int hovered_plugin = -1;
     int selected_plugin = -1;
     int previous_selected_plugin = -1;
     bool selected_plugin_exists = false;
@@ -53,8 +53,6 @@ class CSurf_FP_8_PluginMappingPage : public CSurf_UI_PageContent // NOLINT(*-use
 
     std::vector<std::string> param_names;
     std::vector<PluginParam> param_data;
-    std::string select_search_query;
-    std::string fader_search_query;
 
     std::string select_key;
     std::string select_name;
@@ -71,6 +69,9 @@ class CSurf_FP_8_PluginMappingPage : public CSurf_UI_PageContent // NOLINT(*-use
     std::vector<std::string> invert_labels = {"Inverted", "Not inverted"};
 
     std::vector<int> dirty_groups;
+
+    ReaSonusSearchComboInput *SelectParamList;
+    ReaSonusSearchComboInput *FaderParamList;
 
     bool plugin_dirty = false;
 
@@ -225,8 +226,8 @@ protected:
         param_names.push_back(i18n->t("mapping", "edit.select.param.first-item"));
         param_data.emplace_back(-1, i18n->t("mapping", "edit.select.param.first-item"), 0);
 
-        std::string developer_name = PluginUtils::ExtractDeveloperName(plugin_params["global"]["origname"]);
-        std::string plugin_name = PluginUtils::ExtractPluginName(plugin_params["global"]["origname"]);
+        const std::string developer_name = PluginUtils::ExtractDeveloperName(plugin_params["global"]["origname"]);
+        const std::string plugin_name = PluginUtils::ExtractPluginName(plugin_params["global"]["origname"]);
 
         if (!PluginUtils::HasPluginMappingCache(
             developer_name, plugin_name, plugin_params["global"]["type"]
@@ -245,17 +246,20 @@ protected:
             developer_name, plugin_name, plugin_params["global"]["type"]
         );
 
-        size_t num_params = cache["id"].size();
-        if (num_params < 1) { return false; }
+        const int num_params = static_cast<int>(cache["id"].size());
+        if (num_params < 1) {
+            return false;
+        }
 
         for (int i = 0; i < num_params; i++) {
             const std::string param_name = cache["params"][std::to_string(i)];
 
             param_names.emplace_back(param_name);
             param_data.emplace_back(stoi(cache["id"][std::to_string(i)]), param_name,
-                stoi(cache["steps"][std::to_string(i)]));
+                                    stoi(cache["steps"][std::to_string(i)]));
         }
 
+        // SelectParamList->SetListItems(&param_names);
         return true;
     }
 
@@ -406,7 +410,7 @@ protected:
             SetPluginFolders();
         }
     }
-	
+
     void HandleRebuildPluginCacheClick(const int plugin_index) const {
         if (PluginUtils::UpdatePluginMappingCacheFile(PluginUtils::GetPluginRequestString(
             developers[selected_developer],
@@ -415,6 +419,10 @@ protected:
         ))) {
             ReaSonus8ControlPanel::SetMessage(i18n->t("mapping", "action.rebuild-cache.success.message"));
         }
+    }
+
+    void HandleManageIgnoreListClick() const {
+        ShowConsoleMsg("Do something for the current developer");
     }
 
     void HandlePreviousClick() {
@@ -434,8 +442,8 @@ protected:
         } else {
             channel_offset = minmax(0, selected_channel - 6, max(nb_channels - max_items, 0));
         }
-        select_search_query.clear();
-        fader_search_query.clear();
+        SelectParamList->ClearSearchQuery();
+        FaderParamList->ClearSearchQuery();
     }
 
     void HandleNextClick() {
@@ -455,8 +463,8 @@ protected:
         } else {
             channel_offset = minmax(0, selected_channel - 6, max(nb_channels - max_items, 0));
         }
-        select_search_query.clear();
-        fader_search_query.clear();
+        SelectParamList->ClearSearchQuery();
+        FaderParamList->ClearSearchQuery();
     }
 
     void HandleChannelClick(const int index) {
@@ -466,8 +474,8 @@ protected:
 
         channel_offset = minmax(0, index - 6, max(nb_channels - max_items, 0));
 
-        select_search_query.clear();
-        fader_search_query.clear();
+        SelectParamList->ClearSearchQuery();
+        FaderParamList->ClearSearchQuery();
     }
 
     void HandleResetChannel() {
@@ -656,15 +664,84 @@ protected:
         return "";
     }
 
+    void RenderParamListContextMenu(int param_index) const {
+        ShowConsoleMsg("RenderParamListContextMenu");
+        ImGui::PushFont(m_ctx, assets->GetMainFont(), 13);
+        if (ImGui::BeginChild(m_ctx, "plugin-mapping-context", 0.0, 0.0,
+                              ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY |
+                              ImGui::ChildFlags_AutoResizeX
+        )) {
+            if (ImGui::Selectable(
+                m_ctx, I18n::GetInstance()->t("mapping", "list.param.item.context-menu.add-ignore").c_str())) {
+                ImGui::CloseCurrentPopup(m_ctx);
+                HandleManageIgnoreListClick();
+            }
+            if (ImGui::Selectable(m_ctx, I18n::GetInstance()->t("mapping", "list.item.context-menu.close").c_str())) {
+                ImGui::CloseCurrentPopup(m_ctx);
+            }
+            ImGui::EndChild(m_ctx);
+        }
+        ImGui::PopFont(m_ctx);
+    }
+
 public:
     CSurf_FP_8_PluginMappingPage(ImGui_Context *m_ctx, CSurf_UI_Assets *assets) : CSurf_UI_PageContent(m_ctx, assets) {
+        using namespace std::placeholders; // for `_1, _2 etc`
+
         i18n = I18n::GetInstance();
         settings = ReaSonusSettings::GetInstance(FP_8);
+
+        SelectParamList = new ReaSonusSearchComboInput(
+            m_ctx,
+            assets,
+            i18n->t("mapping", "edit.select.param.label"),
+            &param_names,
+            &select_param_index,
+            settings->ShouldClearParamInput(),
+            std::bind(&CSurf_FP_8_PluginMappingPage::RenderParamListContextMenu, this, _1)
+        );
+
+        FaderParamList = new ReaSonusSearchComboInput(
+            m_ctx,
+            assets,
+            i18n->t("mapping", "edit.fader.param.label"),
+            &param_names,
+            &fader_param_index,
+            settings->ShouldClearParamInput(),
+            std::bind(&CSurf_FP_8_PluginMappingPage::RenderParamListContextMenu, this, _1)
+        );
 
         SetPluginFolders();
     }
 
     ~CSurf_FP_8_PluginMappingPage() override = default;
+
+    void RenderPluginListContectMenuItems(const int plugin_index) {
+        ImGui::PushFont(m_ctx, assets->GetMainFont(), 13);
+        if (ImGui::BeginChild(m_ctx, "plugin-mapping-context", 0.0, 0.0,
+                              ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY |
+                              ImGui::ChildFlags_AutoResizeX
+        )) {
+            if (ImGui::Selectable(m_ctx, I18n::GetInstance()->t("mapping", "list.item.context-menu.rebuild").c_str())) {
+                ImGui::CloseCurrentPopup(m_ctx);
+                HandleRebuildPluginCacheClick(plugin_index);
+            }
+            if (ImGui::Selectable(m_ctx, I18n::GetInstance()->t("mapping", "list.item.context-menu.delete").c_str())) {
+                ImGui::CloseCurrentPopup(m_ctx);
+                HandleRemoveMappingClick(plugin_index);
+            }
+            if (ImGui::Selectable(
+                m_ctx, I18n::GetInstance()->t("mapping", "list.item.context-menu.manage-ignore").c_str())) {
+                ImGui::CloseCurrentPopup(m_ctx);
+                HandleManageIgnoreListClick();
+            }
+            if (ImGui::Selectable(m_ctx, I18n::GetInstance()->t("mapping", "list.item.context-menu.close").c_str())) {
+                ImGui::CloseCurrentPopup(m_ctx);
+            }
+            ImGui::EndChild(m_ctx);
+        }
+        ImGui::PopFont(m_ctx);
+    }
 
     void RenderMappingListPlugin(const int index, const std::string &plugin_name) {
         using namespace std::placeholders; // for `_1, _2 etc`
@@ -677,8 +754,8 @@ public:
             index,
             &selected_plugin,
             &hovered_plugin,
-            std::bind(&CSurf_FP_8_PluginMappingPage::HandleRemoveMappingClick, this, _1),
-            std::bind(&CSurf_FP_8_PluginMappingPage::HandleRebuildPluginCacheClick, this, _1)
+            std::bind(&CSurf_FP_8_PluginMappingPage::RenderPluginListContectMenuItems, this, _1),
+            std::bind(&CSurf_FP_8_PluginMappingPage::HandleRemoveMappingClick, this, _1)
         );
     }
 
@@ -706,7 +783,6 @@ public:
             for (int j = 0; j < static_cast<int>(developer_plugins.size()); j++) {
                 RenderMappingListPlugin(j, developer_plugins.at(j));
             }
-
 
             ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 4);
             ImGui::Dummy(m_ctx, 0, 0);
@@ -893,6 +969,7 @@ public:
     }
 
     void RenderMappingSelect(double height) {
+        using namespace std::placeholders; // for `_1, _2 etc`
         double space_x;
         double space_y;
 
@@ -902,16 +979,7 @@ public:
             ReaSonusPageTitle(m_ctx, assets, i18n->t("mapping", "edit.select.label"), true);
             if (!param_names.empty()) {
                 ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
-
-                ReaSonusSearchComboInput(
-                    m_ctx,
-                    assets,
-                    i18n->t("mapping", "edit.select.param.label"),
-                    param_names,
-                    &select_param_index,
-                    &select_search_query,
-                    settings->ShouldClearParamInput(),
-                    space_x * 0.7);
+                SelectParamList->Render(space_x * 0.7);
 
                 ImGui::SameLine(m_ctx);
 
@@ -952,6 +1020,7 @@ public:
     }
 
     void RenderMappingFader(double height) {
+        using namespace std::placeholders; // for `_1, _2 etc`
         double space_x;
         double space_y;
 
@@ -960,15 +1029,7 @@ public:
                               ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY)) {
             ReaSonusPageTitle(m_ctx, assets, i18n->t("mapping", "edit.fader.label"), true);
             if (!param_names.empty()) {
-                ReaSonusSearchComboInput(
-                    m_ctx,
-                    assets,
-                    i18n->t("mapping", "edit.fader.param.label"),
-                    param_names,
-                    &fader_param_index,
-                    &fader_search_query,
-                    settings->ShouldClearParamInput(),
-                    0.0);
+                FaderParamList->Render(0.0);
             }
             if (ImGui::BeginChild(m_ctx, "filter_content_input", 0.0, 0.0, ImGui::ChildFlags_AutoResizeY)) {
                 ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
@@ -1149,7 +1210,6 @@ public:
         }
         previous_selected_plugin = selected_plugin;
     }
-
 
     void ChannelCheck() {
         if (selected_channel != previous_selected_channel && selected_plugin_exists) {
