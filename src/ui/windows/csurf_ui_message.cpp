@@ -99,7 +99,10 @@ void ReaSonusMessage::Frame() {
             ImGui::GetContentRegionAvail(m_ctx, &width, &height);
             ImGui::PushTextWrapPos(m_ctx, width - 24);
 
-            ImGui::Text(m_ctx, "This release has the following fixes and improvements:");
+            ImGui::Text(m_ctx, "This release has the following fix:");
+            ImGui::BulletText(m_ctx, "Fixed issue with wrond display of value bar values");
+            ImGui::Separator(m_ctx);
+            ImGui::Text(m_ctx, "Release 0.9.0 has the following fixes and improvements:");
             ImGui::BulletText(m_ctx, "Fixed issue with message popping up on start");
             ImGui::BulletText(m_ctx, "(FP 8/16) Instant applying filters in multi select mode (Setting)");
             ImGui::BulletText(
