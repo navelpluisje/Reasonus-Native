@@ -41,7 +41,7 @@ protected:
         }
 
         // get the valuebar value to determine the value to display
-        int valuebar_value;
+        double valuebar_value;
         switch (stoi(context->GetSetting("displays", "track-value-bar-value"))) {
             case VALUEBAR_VALUE_VOLUME:
                 valuebar_value = volToNormalized(volume);
@@ -110,7 +110,6 @@ public:
     }
 
     ~CSurf_FP_8_TrackManager() override = default;
-
 
     void UpdateTracks(bool force_update) override {
         const WDL_PtrList<MediaTrack> media_tracks = navigator->GetBankTracks();
