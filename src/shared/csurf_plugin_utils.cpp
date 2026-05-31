@@ -8,7 +8,6 @@
 #include "../ui/csurf_ui_colors.hpp"
 #include "../i18n/i18n.hpp"
 
-
 std::string PluginUtils::GetPluginFolderPath() {
     return createPathName({std::string(GetResourcePath()), "ReaSonus", "Plugins"});
 }
@@ -487,6 +486,26 @@ bool PluginUtils::UpdatePluginMappingCacheFile(const std::string &full_plugin_na
     return success;
 }
 
+bool PluginUtils::UpdatePluginMappingCacheFileByDeveloper(const std::string &developer) {
+    const std::vector<std::string> plugins = GetDeveloperPlugins(developer, false);
+    mINI::INIStructure plugin_mapping_ini;
+    std::string file_name;
+
+    for (int i = 0; i < static_cast<int>(plugins.size()); i++) {
+        mINI::INIFile file(createPathName({GetPluginFolderPath(), developer, plugins[i]}));
+        if (!file.read(plugin_mapping_ini)) {
+            continue;
+        }
+
+        UpdatePluginMappingCacheFile(PluginUtils::GetPluginRequestString(
+            plugin_mapping_ini["global"]["origname"],
+            plugin_mapping_ini["global"]["type"]
+        ));
+    }
+
+    return true;
+}
+
 void PluginUtils::DeletePluginMappingCacheFile(
     const std::string &developer,
     const std::string &plugin_name,
@@ -526,6 +545,28 @@ bool PluginUtils::HasPluginMappingCache(const std::string &cache_path) {
     return file_exists(cache_path.c_str());
 }
 
+bool PluginUtils::AddDeveloperParamFilter(std::string developer_name, std::string fiter_name) {
+    mINI::INIStructure developer_filter_ini;
+    const std::string developer_filter_path = createPathName({
+        GetPluginCacheFolderPath(),
+        "FilterDeveloper.ini"
+    });
+
+    const mINI::INIFile developer_filter_file(developer_filter_path);
+
+    if (developer_filter_file.read(developer_filter_ini)) {
+        if (!developer_filter_ini.has(developer_name)) {
+            developer_filter_ini[developer_name];
+        }
+        const int size = developer_filter_ini[developer_name].size();
+        developer_filter_ini[developer_name][std::to_string(size)] = fiter_name;
+
+        developer_filter_file.write(developer_filter_ini, true);
+        return true;
+    }
+    return false;
+}
+
 std::vector<std::string> PluginUtils::GetParamFilters(
     const std::string &developer_name,
     const std::string &plugin_name,
@@ -536,7 +577,6 @@ std::vector<std::string> PluginUtils::GetParamFilters(
     // Plugin filters
     mINI::INIStructure plugin_filter_ini;
     const std::string plugin_filter_path = createPathName({GetPluginCacheFolderPath(), "FilterPlugin.ini"});
-    ShowConsoleMsg(plugin_filter_path.c_str());
     const mINI::INIFile plugin_filter_file(plugin_filter_path);
 
     if (!std::filesystem::exists(plugin_filter_path)) {
@@ -598,7 +638,7 @@ std::vector<std::string> PluginUtils::GetParamFilters(
 
         if (developer_filter_file.read(developer_filter_ini)) {
             if (developer_filter_ini.has(developer_name)) {
-                for (int i = 0; i < developer_filter_ini[developer_name].size(); i++) {
+                for (int i = 0; i < static_cast<int>(developer_filter_ini[developer_name].size()); i++) {
                     const std::string index = std::to_string(i);
 
                     if (developer_filter_ini[developer_name].has(index)) {
@@ -622,6 +662,53 @@ std::vector<std::string> PluginUtils::GetParamFilters(
     }
 
     return param_filters;
+}
+
+mINI::INIMap<std::string> PluginUtils::GetFilterListByDeveloper(const std::string developer) {
+    mINI::INIStructure developer_filter_ini;
+    const std::string developer_filter_path = createPathName({
+        GetPluginCacheFolderPath(),
+        "FilterDeveloper.ini"
+    });
+
+    const mINI::INIFile developer_filter_file(developer_filter_path);
+    if (!developer_filter_file.read(developer_filter_ini)) {
+        return {};
+    }
+
+    if (!developer_filter_ini.has(developer)) {
+        return {};
+    }
+
+    return developer_filter_ini[developer];
+}
+
+bool PluginUtils::SetFilterListByDeveloper(
+    const std::string &developer,
+    const std::vector<std::string> &developer_ignore_list
+) {
+    mINI::INIStructure developer_filter_ini;
+    const std::string developer_filter_path = createPathName({
+        GetPluginCacheFolderPath(),
+        "FilterDeveloper.ini"
+    });
+
+    const mINI::INIFile developer_filter_file(developer_filter_path);
+    if (!developer_filter_file.read(developer_filter_ini)) {
+        return false;
+    }
+
+    if (!developer_filter_ini.has(developer)) {
+        developer_filter_ini[developer];
+    } else {
+        developer_filter_ini[developer].clear();
+    }
+
+    for (int i = 0; i < static_cast<int>(developer_ignore_list.size()); i++) {
+        developer_filter_ini[developer][std::to_string(i)] = developer_ignore_list[i];
+    }
+
+    return developer_filter_file.write(developer_filter_ini, true);
 }
 
 void PluginUtils::WriteFilterParams(

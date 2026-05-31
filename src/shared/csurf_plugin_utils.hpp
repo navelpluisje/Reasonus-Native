@@ -174,7 +174,6 @@ public:
      */
     static bool IsPluginFX(std::string plugin_name);
 
-
     /**
      * Get a list of all the developers with mapped plugins
      * @param sorted Whether to sort the result
@@ -263,6 +262,8 @@ public:
 
     static bool UpdatePluginMappingCacheFile(const std::string &full_plugin_name);
 
+    static bool UpdatePluginMappingCacheFileByDeveloper(const std::string &developer);
+
     static void DeletePluginMappingCacheFile(const std::string &developer, const std::string &plugin_name,
                                              const std::string &plugin_type);
 
@@ -282,12 +283,45 @@ public:
         const std::string &cache_path
     );
 
+    /**
+     * Add a filter to the developers filter list
+     * @param developer_name The developer for the filter list
+     * @param fiter_name The name of the filter item
+     * @return
+     */
+    static bool AddDeveloperParamFilter(std::string developer_name, std::string fiter_name);
+
+    /**
+     * Get the param filter for the given arguments
+     * @param developer_name
+     * @param plugin_name
+     * @param plugin_type
+     * @return List with the params to filter
+     */
     static std::vector<std::string> GetParamFilters(
         const std::string &developer_name,
         const std::string &plugin_name,
         const std::string &plugin_type
     );
 
+    /**
+     * Get a list with all the ignore-params per developer
+     * @param developer the developer we need the ignore-params from
+     * @return the list of ignore items
+     */
+    static mINI::INIMap<std::string> GetFilterListByDeveloper(const std::string developer);
+
+    static bool SetFilterListByDeveloper(const std::string &developer,
+                                         const std::vector<std::string> &developer_ignore_list);
+
+    /**
+     * Add a param with th egoven info to the list. Of it is in the list of filters, we do not add it
+     * @param param_filters List of filters for the given developer
+     * @param param_id Tha parameter id to add
+     * @param param_name The param name to add
+     * @param param_steps The number of steps for the param
+     * @param cache The cahe to add the values to
+     */
     static void WriteFilterParams(
         const std::vector<std::string> &param_filters,
         const std::vector<int> &param_id,

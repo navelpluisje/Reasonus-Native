@@ -9,31 +9,42 @@
 #include <vector>
 #include <mini/ini.h>
 #include "../csurf_ui_assets.hpp"
+#include "../components/csurf_ui_list_box.hpp"
 
-class ReaSonusTranslationEditor
-{
+class ReaSonusTranslationEditor {
 public:
     inline static bool window_open = false;
 
     static void Start();
+
     static void Stop();
 
     ~ReaSonusTranslationEditor();
 
 private:
     static void Loop();
+
     CSurf_UI_Assets *assets;
     static std::unique_ptr<ReaSonusTranslationEditor> s_inst;
+
     void GetBaseLanguage();
+
     void GetSelectedLanguage();
+
     void GetLanguageList();
+
     void HandleAddLanguage();
+
     void getMultilineString(std::string &value, double width, double &height);
+
     void RenderTranslation(std::string section, std::string key);
+
     void HandleRemoveLanguageListItem(int index);
+
     void SaveChanges();
 
     ReaSonusTranslationEditor();
+
     void Frame();
 
     ImGui_Context *m_ctx;
@@ -42,9 +53,11 @@ private:
     std::vector<std::string> language_list;
     mINI::INIStructure base_file;
     mINI::INIStructure translation_file;
+    ReaSonusExtendedListBox *TranslationsList;
 
     std::string new_language;
     int selected_language = -1;
+    int hovered_language = -1;
     int previous_selected_language = -1;
 
     bool show_empty_only = false;

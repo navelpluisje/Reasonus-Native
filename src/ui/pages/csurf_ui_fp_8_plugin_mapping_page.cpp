@@ -13,6 +13,7 @@
 #include "../components/csurf_ui_combo_input.hpp"
 #include "../components/csurf_ui_button_bar.hpp"
 #include "../components/csurf_ui_plugin_selectable.hpp"
+#include "../components/csurf_ui_developer_filter_form.hpp"
 #include "../../i18n/i18n.hpp"
 #include "../windows/csurf_ui_fp_8_control_panel.hpp"
 
@@ -61,6 +62,8 @@ class CSurf_FP_8_PluginMappingPage : public CSurf_UI_PageContent // NOLINT(*-use
     int previous_select_param_index = -1;
     int select_uninvert_label = 0;
 
+    bool show_developer_filters = false;
+
     std::string fader_key;
     std::string fader_name;
     int fader_param_index{};
@@ -72,6 +75,7 @@ class CSurf_FP_8_PluginMappingPage : public CSurf_UI_PageContent // NOLINT(*-use
 
     ReaSonusSearchComboInput *SelectParamList;
     ReaSonusSearchComboInput *FaderParamList;
+    ReaSonusDeveloperFilterForm *DevelopersFilterForm;
 
     bool plugin_dirty = false;
 
@@ -235,10 +239,12 @@ protected:
             if (!PluginExists()) {
                 return false;
             }
+
             PluginUtils::UpdatePluginMappingCacheFile(PluginUtils::GetPluginRequestString(
                 plugin_params["global"]["origname"],
                 plugin_params["global"]["type"]
             ));
+
             ReaSonus8ControlPanel::SetMessage(i18n->t("mapping", "action.cache-created.success.message"));
         }
 
@@ -411,6 +417,12 @@ protected:
         }
     }
 
+    void HandlePluginListItemClick(const int plugin_index) {
+        (void) plugin_index;
+
+        show_developer_filters = false;
+    }
+
     void HandleRebuildPluginCacheClick(const int plugin_index) const {
         if (PluginUtils::UpdatePluginMappingCacheFile(PluginUtils::GetPluginRequestString(
             developers[selected_developer],
@@ -421,8 +433,34 @@ protected:
         }
     }
 
-    void HandleManageIgnoreListClick() const {
-        ShowConsoleMsg("Do something for the current developer");
+    void HandleAddToFilterListClick(const int param_index) {
+        if (!PluginUtils::AddDeveloperParamFilter(developers[selected_developer], param_names[param_index])) {
+            return;
+        }
+
+        if (PluginUtils::UpdatePluginMappingCacheFileByDeveloper(developers[selected_developer])) {
+            GetPluginParams();
+        }
+    }
+
+    /**
+     * Callback function for the developers filter form.
+     * This will trigger the rebuild of the params and show a friendly message
+     */
+    void HandleFilterChangesSaved() {
+        GetPluginParams();
+        ReaSonus8ControlPanel::SetMessage(i18n->t("mapping", "action.save.filters.message"));
+    }
+
+    void HandleManageFilterListClick() {
+        show_developer_filters = true;
+        DevelopersFilterForm = new ReaSonusDeveloperFilterForm(
+            m_ctx,
+            assets,
+            &developers,
+            std::bind(&CSurf_FP_8_PluginMappingPage::HandleFilterChangesSaved, this)
+        );
+        DevelopersFilterForm->SetSelectedDeveloper(selected_developer);
     }
 
     void HandlePreviousClick() {
@@ -589,7 +627,7 @@ protected:
         PopulateFields();
     }
 
-    void handleGroupDrop(const int from, const int to) // NOLINT(*-identifier-length)
+    void HandleGroupDrop(const int from, const int to) // NOLINT(*-identifier-length)
     {
         if (from == to) {
             return;
@@ -664,17 +702,44 @@ protected:
         return "";
     }
 
-    void RenderParamListContextMenu(int param_index) const {
-        ShowConsoleMsg("RenderParamListContextMenu");
+    void RenderParamListContextMenu(int param_index) {
         ImGui::PushFont(m_ctx, assets->GetMainFont(), 13);
         if (ImGui::BeginChild(m_ctx, "plugin-mapping-context", 0.0, 0.0,
                               ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY |
                               ImGui::ChildFlags_AutoResizeX
         )) {
             if (ImGui::Selectable(
-                m_ctx, I18n::GetInstance()->t("mapping", "list.param.item.context-menu.add-ignore").c_str())) {
+                m_ctx, I18n::GetInstance()->t(
+                    "mapping", "list.param.item.context-menu.add-filter").c_str())) {
                 ImGui::CloseCurrentPopup(m_ctx);
-                HandleManageIgnoreListClick();
+                HandleAddToFilterListClick(param_index);
+            }
+            if (ImGui::Selectable(m_ctx, I18n::GetInstance()->t("mapping", "list.item.context-menu.close").c_str())) {
+                ImGui::CloseCurrentPopup(m_ctx);
+            }
+            ImGui::EndChild(m_ctx);
+        }
+        ImGui::PopFont(m_ctx);
+    }
+
+    void RenderPluginListContextMenuItems(const int plugin_index) {
+        ImGui::PushFont(m_ctx, assets->GetMainFont(), 13);
+        if (ImGui::BeginChild(m_ctx, "plugin-mapping-context", 0.0, 0.0,
+                              ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY |
+                              ImGui::ChildFlags_AutoResizeX
+        )) {
+            if (ImGui::Selectable(m_ctx, I18n::GetInstance()->t("mapping", "list.item.context-menu.rebuild").c_str())) {
+                ImGui::CloseCurrentPopup(m_ctx);
+                HandleRebuildPluginCacheClick(plugin_index);
+            }
+            if (ImGui::Selectable(m_ctx, I18n::GetInstance()->t("mapping", "list.item.context-menu.delete").c_str())) {
+                ImGui::CloseCurrentPopup(m_ctx);
+                HandleRemoveMappingClick(plugin_index);
+            }
+            if (ImGui::Selectable(
+                m_ctx, I18n::GetInstance()->t("mapping", "list.item.context-menu.manage-filter").c_str())) {
+                ImGui::CloseCurrentPopup(m_ctx);
+                HandleManageFilterListClick();
             }
             if (ImGui::Selectable(m_ctx, I18n::GetInstance()->t("mapping", "list.item.context-menu.close").c_str())) {
                 ImGui::CloseCurrentPopup(m_ctx);
@@ -697,8 +762,7 @@ public:
             i18n->t("mapping", "edit.select.param.label"),
             &param_names,
             &select_param_index,
-            settings->ShouldClearParamInput(),
-            std::bind(&CSurf_FP_8_PluginMappingPage::RenderParamListContextMenu, this, _1)
+            settings->ShouldClearParamInput()
         );
 
         FaderParamList = new ReaSonusSearchComboInput(
@@ -707,41 +771,13 @@ public:
             i18n->t("mapping", "edit.fader.param.label"),
             &param_names,
             &fader_param_index,
-            settings->ShouldClearParamInput(),
-            std::bind(&CSurf_FP_8_PluginMappingPage::RenderParamListContextMenu, this, _1)
+            settings->ShouldClearParamInput()
         );
 
         SetPluginFolders();
     }
 
     ~CSurf_FP_8_PluginMappingPage() override = default;
-
-    void RenderPluginListContectMenuItems(const int plugin_index) {
-        ImGui::PushFont(m_ctx, assets->GetMainFont(), 13);
-        if (ImGui::BeginChild(m_ctx, "plugin-mapping-context", 0.0, 0.0,
-                              ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY |
-                              ImGui::ChildFlags_AutoResizeX
-        )) {
-            if (ImGui::Selectable(m_ctx, I18n::GetInstance()->t("mapping", "list.item.context-menu.rebuild").c_str())) {
-                ImGui::CloseCurrentPopup(m_ctx);
-                HandleRebuildPluginCacheClick(plugin_index);
-            }
-            if (ImGui::Selectable(m_ctx, I18n::GetInstance()->t("mapping", "list.item.context-menu.delete").c_str())) {
-                ImGui::CloseCurrentPopup(m_ctx);
-                HandleRemoveMappingClick(plugin_index);
-            }
-            if (ImGui::Selectable(
-                m_ctx, I18n::GetInstance()->t("mapping", "list.item.context-menu.manage-ignore").c_str())) {
-                ImGui::CloseCurrentPopup(m_ctx);
-                HandleManageIgnoreListClick();
-            }
-            if (ImGui::Selectable(m_ctx, I18n::GetInstance()->t("mapping", "list.item.context-menu.close").c_str())) {
-                ImGui::CloseCurrentPopup(m_ctx);
-            }
-            ImGui::EndChild(m_ctx);
-        }
-        ImGui::PopFont(m_ctx);
-    }
 
     void RenderMappingListPlugin(const int index, const std::string &plugin_name) {
         using namespace std::placeholders; // for `_1, _2 etc`
@@ -754,8 +790,9 @@ public:
             index,
             &selected_plugin,
             &hovered_plugin,
-            std::bind(&CSurf_FP_8_PluginMappingPage::RenderPluginListContectMenuItems, this, _1),
-            std::bind(&CSurf_FP_8_PluginMappingPage::HandleRemoveMappingClick, this, _1)
+            std::bind(&CSurf_FP_8_PluginMappingPage::RenderPluginListContextMenuItems, this, _1),
+            std::bind(&CSurf_FP_8_PluginMappingPage::HandleRemoveMappingClick, this, _1),
+            std::bind(&CSurf_FP_8_PluginMappingPage::HandlePluginListItemClick, this, _1)
         );
     }
 
@@ -856,7 +893,7 @@ public:
                     dirty,
                     selected_channel == i,
                     std::bind(&CSurf_FP_8_PluginMappingPage::HandleChannelClick, this, _1),
-                    std::bind(&CSurf_FP_8_PluginMappingPage::handleGroupDrop, this, _1, _2));
+                    std::bind(&CSurf_FP_8_PluginMappingPage::HandleGroupDrop, this, _1, _2));
 
                 if (has_style_var) {
                     ImGui::PopStyleVar(m_ctx);
@@ -979,7 +1016,10 @@ public:
             ReaSonusPageTitle(m_ctx, assets, i18n->t("mapping", "edit.select.label"), true);
             if (!param_names.empty()) {
                 ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
-                SelectParamList->Render(space_x * 0.7);
+                SelectParamList->Render(
+                    std::bind(&CSurf_FP_8_PluginMappingPage::RenderParamListContextMenu, this, _1),
+                    space_x * 0.7
+                );
 
                 ImGui::SameLine(m_ctx);
 
@@ -1029,7 +1069,10 @@ public:
                               ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY)) {
             ReaSonusPageTitle(m_ctx, assets, i18n->t("mapping", "edit.fader.label"), true);
             if (!param_names.empty()) {
-                FaderParamList->Render(0.0);
+                FaderParamList->Render(
+                    std::bind(&CSurf_FP_8_PluginMappingPage::RenderParamListContextMenu, this, _1),
+                    0.0
+                );
             }
             if (ImGui::BeginChild(m_ctx, "filter_content_input", 0.0, 0.0, ImGui::ChildFlags_AutoResizeY)) {
                 ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
@@ -1120,6 +1163,24 @@ public:
         }
     }
 
+    void RenderDevelopersFilterList() {
+        ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 22);
+        UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
+        if (
+            ImGui::BeginChild(
+                m_ctx, "type_select_content",
+                0.0,
+                0.0,
+                ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
+            )
+        ) {
+            DevelopersFilterForm->Render();
+
+            ImGui::EndChild(m_ctx);
+        }
+        UiStyledElements::PopReaSonusGroupStyle(m_ctx);
+    }
+
     void PluginTypeSelectedCheck() {
         if (!save_selected_plugin_type) {
             return;
@@ -1169,6 +1230,7 @@ public:
 
     void DeveloperCheck() {
         if (selected_developer != previous_selected_developer) {
+            show_developer_filters = false;
             channel_offset = 0;
             selected_plugin_exists = false;
 
@@ -1192,6 +1254,8 @@ public:
         if (selected_plugin == previous_selected_plugin) {
             return;
         }
+
+        show_developer_filters = false;
 
         // If data is dirty and user does not want to save or clear the changes, we do not change plugins
         if (!DirtyCheck()) {
@@ -1229,7 +1293,9 @@ public:
         double space_x;
         double space_y;
 
-        if (selected_plugin > -1 && selected_plugin_exists && !selected_plugin_params_error) {
+        if (show_developer_filters) {
+            RenderDevelopersFilterList();
+        } else if (selected_plugin > -1 && selected_plugin_exists && !selected_plugin_params_error) {
             ImGui::Text(
                 m_ctx,
                 selected_plugin < 0 || selected_plugin >= static_cast<int>(plugins[selected_developer].size())

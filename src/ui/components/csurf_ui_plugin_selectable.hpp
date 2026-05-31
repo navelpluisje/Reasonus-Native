@@ -18,7 +18,8 @@ static void ReaSonusPluginSelectable(
     int *selected_plugin,
     int *hovered_plugin,
     const std::function<void(int index)> &render_context_menu,
-    const std::function<void(int index)> &delete_callback
+    const std::function<void(int index)> &delete_callback,
+    const std::function<void(int index)> &select_callbask
 ) {
     /**
      * Handle positioning and sizing
@@ -41,7 +42,7 @@ static void ReaSonusPluginSelectable(
     /**
      * Setting some flags here
      */
-    const bool popup_open = ImGui::IsPopupOpen(m_ctx, "plugin-mapping-context",
+    const bool popup_open = ImGui::IsPopupOpen(m_ctx, "t",
                                                ImGui::PopupFlags_AnyPopupId | ImGui::PopupFlags_AnyPopupLevel);
     const bool selected = plugin_index == *selected_plugin;
     const bool mouse_over = (!popup_open
@@ -143,12 +144,11 @@ static void ReaSonusPluginSelectable(
 
     if (ImGui::IsItemClicked(m_ctx, ImGui::MouseButton_Left)) {
         *selected_plugin = plugin_index;
-    }
 
-    // ImGui::OpenPopupOnItemClick(
-    //     m_ctx, ("context-" + std::to_string(plugin_index)).c_str(),
-    //     ImGui::PopupFlags_MouseButtonRight
-    // );
+        if (select_callbask != nullptr) {
+            select_callbask(plugin_index);
+        }
+    }
 }
 
 #endif
