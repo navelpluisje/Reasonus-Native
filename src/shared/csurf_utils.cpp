@@ -5,7 +5,6 @@
 #include <WDL/wdltypes.h> // might be unnecessary in future
 #include <reaper_plugin_functions.h>
 #include <string>
-#include <utility>
 #include <vector>
 #include <regex>
 
@@ -163,22 +162,6 @@ std::string GetReaSonusZonesPath() {
     return createPathName({std::string(GetResourcePath()), "CSI", "Zones", "ReasonusFaderPort", "_ReaSonusEffects"});
 }
 
-std::string GetReaSonusPluginPath(
-    std::string developer,
-    const std::string &plugin_name,
-    const std::string &plugin_type,
-    const bool create
-) {
-    const std::string path = createPathName({
-        std::string(GetResourcePath()), "ReaSonus", "Plugins", std::move(developer)
-    });
-
-    if (create) {
-        createPathIfNotExist(path);
-    }
-    return createPathName({path, plugin_name + "." + plugin_type + ".ini"});
-}
-
 std::string GetReaSonusLocalesFolderPath() {
     return createPathName({GetReaSonusFolderPath(), "Locales"});
 }
@@ -267,7 +250,7 @@ std::string replaceAll(std::string &str, const std::string &search, const std::s
         str.replace(start_pos, search.length(), replace);
         start_pos = str.find(search);
     }
-    
+
     return str;
 }
 
@@ -295,39 +278,6 @@ std::string GenerateUniqueKey(std::string prefix) {
     prefix += std::to_string(now);
 
     return prefix;
-}
-
-std::vector<std::string> unwanted_param_names = {
-    "MIDI CC", // Decomposer, Arturia
-    "reserved", // Decomposer, Valhalla
-    // Blue Cat
-    "MIDI Program Change",
-    "MIDI Controller",
-    // Arturia
-    "unassigned",
-    "VST_ProgramChange_",
-    "HardwareDisplayControl",
-    "MPE_",
-    // SPITFIRE
-    "general purpose",
-    // global
-    "undefined",
-};
-
-bool IsWantedParam(const std::string &param_name) {
-    bool result = true;
-
-    for (std::string const &unwanted_name: unwanted_param_names) {
-        const int res = param_name.find(unwanted_name);
-
-        // We found the string. Set result to false and break;
-        if (res != static_cast<int>(std::string::npos)) {
-            result = false;
-            break;
-        }
-    }
-
-    return result;
 }
 
 std::string ltrim(const std::string &value) {
@@ -516,10 +466,19 @@ std::string toUpperCase(std::string value) {
     return value;
 }
 
-double boolToDouble(const bool value) {
+double toDouble(const bool value) {
     return value ? 1.0 : 0.0;
 }
 
-bool doubleToBool(const double value) {
+bool toBool(const double value) {
     return value > 0.0;
+}
+
+bool toBool(const std::string &value) {
+    const std::string bool_value = toLowerCase(value);
+    std::istringstream iss(bool_value);
+    bool result;
+    iss >> std::boolalpha >> result;
+
+    return result;
 }

@@ -137,6 +137,8 @@ struct DoubleClickState {
     }
 };
 
+using PluginParam = std::tuple<int, std::string, int>;
+
 void Main_OnCommandStringEx(const std::string &action_name, int flag, ReaProject *proj);
 
 void Main_OnCommandAsyncEx(int action_id, int flag, const ReaProject *proj);
@@ -233,13 +235,6 @@ std::string GetReaSonusIniPath(const std::string &device);
 
 std::string GetReaSonusZonesPath();
 
-std::string GetReaSonusPluginPath(
-    std::string developer,
-    const std::string &plugin_name,
-    const std::string &plugin_type,
-    bool create
-);
-
 std::string GetReaSonusLocalesFolderPath();
 
 std::string GetReaSonusLocalesPath(const std::string &language);
@@ -268,15 +263,6 @@ void logDouble(const char *key, double value);
  * @param prefix The prefix used for the key
  */
 std::string GenerateUniqueKey(std::string prefix);
-
-/**
- * @brief Chack if a plugin param name is wanted. therre is a list of values that shoould NOT be in a param name
- *
- * @param param_name
- * @return true
- * @return false
- */
-bool IsWantedParam(const std::string &param_name);
 
 /**
  * Left trim the givven string. This will remove all spaces at the start of a string
@@ -430,13 +416,20 @@ std::string toUpperCase(std::string value);
  * @param value Value to convert
  * @return
  */
-double boolToDouble(bool value);
+double toDouble(bool value);
 
 /**
  * Convert a double value to a boolean
  * @param value value to convert
  * @return
  */
-bool doubleToBool(double value);
+bool toBool(double value);
+
+/**
+ * Convert a string value to a boolean
+ * @param value value to convert
+ * @return
+ */
+bool toBool(const std::string &value);
 
 #endif // CSURF_UTILS_H_

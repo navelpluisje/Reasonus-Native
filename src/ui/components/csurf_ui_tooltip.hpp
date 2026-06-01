@@ -9,23 +9,31 @@
 
 static void ReaSonusSimpleTooltip(
     ImGui_Context *m_ctx,
+    const CSurf_UI_Assets *assets,
     const std::string &label,
     const std::string &tooltip_id
 ) {
+    UiStyledElements::PushReaSonusTooltipStyle(m_ctx);
     if (ImGui::BeginItemTooltip(m_ctx)) {
-        UiStyledElements::PushReaSonusTooltipStyle(m_ctx);
-        if (ImGui::BeginChild(m_ctx, tooltip_id.c_str(), 0.0, 0.0,
-                              ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY |
-                              ImGui::ChildFlags_AutoResizeX)) {
+        if (ImGui::BeginChild(
+            m_ctx,
+            tooltip_id.c_str(),
+            0.0,
+            0.0,
+            ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY |
+            ImGui::ChildFlags_AutoResizeX
+        )) {
             ImGui::PushTextWrapPos(m_ctx, 350);
+            ImGui::PushFont(m_ctx, assets->GetMainFont(), 13);
             ImGui::Text(m_ctx, label.c_str());
+            ImGui::PopFont(m_ctx);
             ImGui::PopTextWrapPos(m_ctx);
 
-            UiStyledElements::PopReaSonusTooltipStyle(m_ctx);
             ImGui::EndChild(m_ctx);
         }
         ImGui::EndTooltip(m_ctx);
     }
+    UiStyledElements::PopReaSonusTooltipStyle(m_ctx);
 }
 
 static void ReaSonusTooltip(
@@ -45,7 +53,7 @@ static void ReaSonusTooltip(
     ImGui::PopStyleColor(m_ctx);
     ImGui::PopFont(m_ctx);
 
-    ReaSonusSimpleTooltip(m_ctx, label, tooltip_id);
+    ReaSonusSimpleTooltip(m_ctx, assets, label, tooltip_id);
 }
 
 #endif

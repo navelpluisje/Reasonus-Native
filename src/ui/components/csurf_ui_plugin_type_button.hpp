@@ -15,7 +15,6 @@ static void ReaSonusPluginTypeButton(
     double text_width;
     double text_height;
     constexpr double size = 20.0;
-    constexpr int border_width = 1;
 
     const std::string plugin_type = PluginUtils::GetShortPluginType(label);
     const int bg_color = PluginUtils::GetPluginTypeBgColors(label);
@@ -44,6 +43,5 @@ static void ReaSonusPluginTypeButton(
     );
     ImGui::PopFont(m_ctx);
 }
-
 
 #endif

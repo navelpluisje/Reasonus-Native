@@ -74,7 +74,7 @@ static bool ReaSonusIconButton(
             }
         }
 
-        ImGui_DrawList *list = ImGui::GetForegroundDrawList(m_ctx);
+        ImGui_DrawList *list = ImGui::GetWindowDrawList(m_ctx);
 
         ImGui::DrawList_AddRectFilled(list, x_pos_1, y_pos_1, x_pos_1 + menu_button_width, y_pos_1 + menu_button_height,
                                       background_color, 4);

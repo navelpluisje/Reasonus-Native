@@ -99,24 +99,20 @@ void ReaSonusMessage::Frame() {
             ImGui::GetContentRegionAvail(m_ctx, &width, &height);
             ImGui::PushTextWrapPos(m_ctx, width - 24);
 
-            ImGui::Text(m_ctx, "This version fixed some bugs:");
-            ImGui::BulletText(m_ctx, "Fixed issue where the selected track was not visible in the mixer");
-            ImGui::BulletText(m_ctx, "Fixed issue where REAPER could crash when no translation file was loaded yet");
-            ImGui::BulletText(m_ctx, "Some code cleanup");
-            ImGui::BulletText(
-                m_ctx, "(FP 16) Disable the last touched fader mode when switching to any plugin related channel mode");
-            ImGui::BulletText(m_ctx, "(FP 16) Improved/Fixed last touched param implementation");
-            ImGui::BulletText(m_ctx, "(FP V2) Fixed issue where disabled fader was not working");
-
+            ImGui::Text(m_ctx, "This release has the following fix:");
+            ImGui::BulletText(m_ctx, "Fixed issue with wrond display of value bar values");
             ImGui::Separator(m_ctx);
-            ImGui::Text(m_ctx, "Message from 0.8.0, but keep it here until the next version");
-            ImGui::Text(
+            ImGui::Text(m_ctx, "Release 0.9.0 has the following fixes and improvements:");
+
+            ImGui::BulletText(m_ctx, "Fixed issue with message popping up on start");
+            ImGui::BulletText(m_ctx, "(FP 8/16) Instant applying filters in multi select mode (Setting)");
+            ImGui::BulletText(
                 m_ctx,
-                "When creating a plugin mapping, the plugin type was not taken in account. This can potentially cause issues as the mapping between plugin types can differ");
-            ImGui::Text(
-                m_ctx,
-                "There has been created a Plugin Type Mapping tool to help you set the type for your mappings. The possitive is you only have to do this once. Click the `Open type Mapping` button below to start the mapping.");
-            ImGui::Text(m_ctx, "The tool is also available in the actions list (search for: 'plugin type`)");
+                "(FP 8/16) Displays are fully configurable. You can select all display modes, value-bar modes and assign values and settings to every line");
+            ImGui::BulletText(
+                m_ctx, "(FP 8/16) Option to Fast forward and rewind without sound (muting the master track) (Setting)");
+            ImGui::BulletText(m_ctx, "(FP 8/16) Solo in Front, with option to set the dim value with the pan-encoder");
+            ImGui::BulletText(m_ctx, "(FP 8/16) Improvements for plugin type checks in the plugin mapper");
 
             ImGui::PopTextWrapPos(m_ctx);
             UiStyledElements::PopReaSonusGroupStyle(m_ctx);
@@ -126,9 +122,9 @@ void ReaSonusMessage::Frame() {
         ReaSonusButtonBar(
             m_ctx,
             assets,
-            "Open Type Mapping",
-            &save_clicked,
-            true,
+            "Close",
+            &close_clicked,
+            false,
             &close_clicked,
             "Close",
             &save_message);

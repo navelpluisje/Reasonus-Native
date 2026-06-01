@@ -5,6 +5,8 @@
 #include <vector>
 #include <map>
 #include <set>
+#include "csurf_utils.hpp"
+#include "reaper_plugin_functions.h"
 
 class MediaTrack;
 
@@ -65,6 +67,48 @@ public:
 class PluginUtils {
 public:
     /**
+     * Get the folder path for the reasonus plugins
+     * @return
+     */
+    static std::string GetPluginFolderPath();
+
+    /**
+     * Get the folder path for the reasonus plugin cache files
+     * @return
+     */
+    static std::string GetPluginCacheFolderPath();
+
+    /**
+     * Get the patgh to the plugin file with the given parguments
+     * @param developer The developer folder
+     * @param plugin_name The plugin name to use for creating the file nmame
+     * @param plugin_type The plugin type to use for creating the file nmame
+     * @param create Wether to create the path if it not exists
+     * @return
+     */
+    static std::string GetReaSonusPluginPath(
+        std::string developer,
+        const std::string &plugin_name,
+        const std::string &plugin_type,
+        bool create
+    );
+
+    /**
+     * Get the patgh to the plugin file with the given parguments
+     * @param developer The developer folder
+     * @param plugin_name The plugin name to use for creating the file nmame
+     * @param plugin_type The plugin type to use for creating the file nmame
+     * @param create Wether to create the path if it not exists
+     * @return
+     */
+    static std::string GetReaSonusPluginCachePath(
+        std::string developer,
+        const std::string &plugin_name,
+        const std::string &plugin_type,
+        bool create
+    );
+
+    /**
      * @brief Strip the plugin name from its pre- and post-fixes
      *
      * @param plugin_name The full plugin name
@@ -97,11 +141,18 @@ public:
     static std::string StripPluginChannelPostfix(char const *name);
 
     /**
-     * Extract the developer name from REAPer's plugin name
+     * Extract the developer name from REAPER's plugin name
      * @param plugin_name The name of the plugin to extract the developer name from
      * @return The developer name
      */
     static std::string ExtractDeveloperName(const std::string &plugin_name);
+
+    /**
+     * Extract the plugin name from REAPER's plugin name
+     * @param plugin_name The name of the plugin to extract the developer name from
+     * @return The plugin name
+     */
+    static std::string ExtractPluginName(const std::string &plugin_name);
 
     /**
      * Extract the plugin type from REAPer's plugin name
@@ -116,6 +167,12 @@ public:
      */
     static std::string GetPluginsPath();
 
+    /**
+     * Check if the plugin has a mapping file
+     * @param media_track The media track where th eplugin is added
+     * @param pluginId The plugin index
+     * @return Wether the plugin has a mapping file
+     */
     static bool hasPluginConfigFile(MediaTrack *media_track, int pluginId);
 
     /**
@@ -125,7 +182,6 @@ public:
      * @return bool
      */
     static bool IsPluginFX(std::string plugin_name);
-
 
     /**
      * Get a list of all the developers with mapped plugins
@@ -192,6 +248,96 @@ public:
      * @return
      */
     static std::string GetPluginRequestString(const std::string &plugin_origname, std::string plugin_type);
+
+    static std::string GetPluginRequestString(
+        const std::string &developer,
+        const std::string &plugin_name,
+        const std::string &plugin_type
+    );
+
+    /**
+     * Delete the plugin mapping file from the file system
+     * @param developer Developername used as the folder name
+     * @param plugin_name Plugin name without the path part
+     * @param plugin_type
+     * @return Wether the file successfull has been deleted
+     */
+    static bool DeletePluginMappingFile(
+        const std::string &developer,
+        const std::string &plugin_name, const std::string &plugin_type
+    );
+
+    static bool CreatePluginMappingCacheFile(MediaTrack *media_track, int plugin_id, bool update);
+
+    static bool UpdatePluginMappingCacheFile(const std::string &full_plugin_name);
+
+    static bool UpdatePluginMappingCacheFileByDeveloper(const std::string &developer);
+
+    static void DeletePluginMappingCacheFile(const std::string &developer, const std::string &plugin_name,
+                                             const std::string &plugin_type);
+
+    static mINI::INIStructure GetPluginMappingCacheStructure(
+        const std::string &developer,
+        const std::string &plugin_name,
+        const std::string &plugin_type
+    );
+
+    static bool HasPluginMappingCache(
+        const std::string &developer,
+        const std::string &plugin_name,
+        const std::string &plugin_type
+    );
+
+    static bool HasPluginMappingCache(
+        const std::string &cache_path
+    );
+
+    /**
+     * Add a filter to the developers filter list
+     * @param developer_name The developer for the filter list
+     * @param fiter_name The name of the filter item
+     * @return
+     */
+    static bool AddDeveloperParamFilter(std::string developer_name, std::string fiter_name);
+
+    /**
+     * Get the param filter for the given arguments
+     * @param developer_name
+     * @param plugin_name
+     * @param plugin_type
+     * @return List with the params to filter
+     */
+    static std::vector<std::string> GetParamFilters(
+        const std::string &developer_name,
+        const std::string &plugin_name,
+        const std::string &plugin_type
+    );
+
+    /**
+     * Get a list with all the ignore-params per developer
+     * @param developer the developer we need the ignore-params from
+     * @return the list of ignore items
+     */
+    static mINI::INIMap<std::string> GetFilterListByDeveloper(const std::string developer);
+
+    static bool SetFilterListByDeveloper(const std::string &developer,
+                                         const std::vector<std::string> &developer_ignore_list);
+
+    /**
+     * Add a param with th egoven info to the list. Of it is in the list of filters, we do not add it
+     * @param param_filters List of filters for the given developer
+     * @param param_id Tha parameter id to add
+     * @param param_name The param name to add
+     * @param param_steps The number of steps for the param
+     * @param cache The cahe to add the values to
+     */
+    static void WriteFilterParams(
+        const std::vector<std::string> &param_filters,
+        const std::vector<int> &param_id,
+        const std::vector<std::string> &param_name,
+        const std::vector<int> &param_steps,
+        mINI::INIStructure &cache
+    );
 };
 
 #endif
