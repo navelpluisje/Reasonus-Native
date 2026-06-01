@@ -14,8 +14,6 @@ class ReaSonusDeveloperFilterForm {
     ImGui_Context *m_ctx;
     CSurf_UI_Assets *assets;
     I18n *i18n;
-    bool save_changes = false;
-    std::string dummy;
 
     std::vector<std::string> &developers;
     int selected_developer;
@@ -26,7 +24,6 @@ class ReaSonusDeveloperFilterForm {
     std::string new_item_name;
     std::vector<std::string> filter_item_list;
     ReaSonusExtendedListBox *filter_list;
-    const std::function<void()> save_callback;
 
 protected:
     void GetSelectedDeveloperFilterList() {
@@ -50,21 +47,12 @@ protected:
         previous_selected_filter_item = selected_filter_item;
     }
 
-    void SaveDeveloperFilterChanges() const {
-        if (PluginUtils::SetFilterListByDeveloper(developers[selected_developer], filter_item_list)) {
-            // Changes saved. Now we have to rebuild all the cache
-            PluginUtils::UpdatePluginMappingCacheFileByDeveloper(developers[selected_developer]);
-            save_callback();
-        }
-    }
-
 public:
     ReaSonusDeveloperFilterForm(
         ImGui_Context *m_ctx,
         CSurf_UI_Assets *assets,
-        std::vector<std::string> *developers,
-        const std::function<void()> &save_callback
-    ) : m_ctx(m_ctx), assets(assets), developers(*developers), save_callback(save_callback) {
+        std::vector<std::string> *developers
+    ) : m_ctx(m_ctx), assets(assets), developers(*developers) {
         using namespace std::placeholders; // for `_1, _2 etc`
 
         filter_list = new ReaSonusExtendedListBox(
@@ -87,6 +75,14 @@ public:
         GetSelectedDeveloperFilterList();
     }
 
+    bool Save() const {
+        if (PluginUtils::SetFilterListByDeveloper(developers[selected_developer], filter_item_list)) {
+            // Changes saved. Now we have to rebuild all the cache
+            return PluginUtils::UpdatePluginMappingCacheFileByDeveloper(developers[selected_developer]);
+        }
+        return false;
+    }
+
     void Render() {
         using namespace std::placeholders; // for `_1, _2 etc`
 
@@ -100,11 +96,6 @@ public:
                 filter_item_list[selected_filter_item] = selected_filter_item_name;
                 previous_filter_item_name = selected_filter_item_name;
             }
-        }
-
-        if (save_changes) {
-            SaveDeveloperFilterChanges();
-            save_changes = false;
         }
 
         ReaSonusPageTitle(
@@ -165,7 +156,6 @@ public:
             }
             UiStyledElements::PopReaSonusGroupStyle(m_ctx);
 
-            ReaSonusButtonBar(m_ctx, assets, "Save", &save_changes, false, &save_changes, dummy, &dummy);
             ImGui::EndChild(m_ctx);
         }
     }

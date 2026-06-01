@@ -457,8 +457,7 @@ protected:
         DevelopersFilterForm = new ReaSonusDeveloperFilterForm(
             m_ctx,
             assets,
-            &developers,
-            std::bind(&CSurf_FP_8_PluginMappingPage::HandleFilterChangesSaved, this)
+            &developers
         );
         DevelopersFilterForm->SetSelectedDeveloper(selected_developer);
     }
@@ -1371,6 +1370,19 @@ public:
     }
 
     void Save() override {
+        // We do not need a selected plugin to handle the developer filters
+        if (show_developer_filters) {
+            if (DevelopersFilterForm->Save()) {
+                // Only re-get the params when we have a plugin selected
+                if (selected_plugin > -1) {
+                    GetPluginParams();
+                }
+                ReaSonus8ControlPanel::SetMessage(i18n->t("mapping", "action.save.filters.message"));
+                show_developer_filters = false;
+            }
+            return;
+        }
+
         if (selected_plugin < 0) {
             return;
         }
