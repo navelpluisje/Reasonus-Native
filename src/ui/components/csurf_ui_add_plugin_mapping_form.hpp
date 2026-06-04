@@ -20,6 +20,8 @@ class ReaSonusAddPluginMappingForm {
     int filter_developer;
     int filter_plugin_type;
 
+    const std::function<void(std::string developer, std::string plugin_name, std::string plugin_type)> save_callback;
+
     std::vector<std::string> plugin_developers;
     std::vector<std::string> plugin_types;
     std::set<std::string> installed_developers;
@@ -57,13 +59,18 @@ protected:
                 PluginUtils::UpdatePluginMappingCacheFile(name);
             }
         }
+        if (save_callback != nullptr) {
+            save_callback(developer_name, name, plugin_type);
+        }
     }
 
 public:
     ReaSonusAddPluginMappingForm(
         ImGui_Context *m_ctx,
-        CSurf_UI_Assets *assets
-    ) : m_ctx(m_ctx), assets(assets) {
+        CSurf_UI_Assets *assets,
+        const std::function<void(std::string developer, std::string plugin_name, std::string plugin_type)> &
+        save_callback
+    ) : m_ctx(m_ctx), assets(assets), save_callback(save_callback) {
         i18n = I18n::GetInstance();
         installed_plugins = PluginUtils::ExtractInstalledPluginMeta(
             installed_developers, installed_plugin_types, plugin_categories
@@ -97,14 +104,6 @@ public:
     }
 
     ~ReaSonusAddPluginMappingForm() = default;
-
-    bool Save() const {
-        // if (PluginUtils::SetFilterListByDevel2oper(developers[selected_developer], filter_item_list)) {
-        //     // Changes saved. Now we have to rebuild all the cache
-        //     return PluginUtils::UpdatePluginMappingCacheFileByDeveloper(developers[selected_developer]);
-        // }
-        return false;
-    }
 
     void RenderFilterBar() {
         double space_x;
@@ -221,7 +220,8 @@ public:
                     UiStyledElements::PushReaSonusIconButtonStyle(m_ctx, assets, 16);
                     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 0, 0);
                     if (ImGui::Button(
-                        m_ctx, (std::string(1, IconAdd) + "##" + installed_plugin.GetFullName()).c_str(), 20, 20)) {
+                        m_ctx, (std::string(1, IconAdd) + "##" + installed_plugin.GetFullName()).c_str(), 20, 20
+                    )) {
                         CreateMappingFile(installed_plugin.GetFullName());
                     }
                     if (ImGui::IsItemHovered(m_ctx)) {

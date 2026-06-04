@@ -56,14 +56,12 @@ public:
     ~ReaSonusExtendedListBox() = default;
 
     void HandleRemoveClick(const int index) const {
-        ShowConsoleMsg("remove\n");
         if (remove_callback != nullptr) {
             remove_callback(index);
         }
     }
 
     void HandleItemSelect(const int index) const {
-        ShowConsoleMsg("remove\n");
         if (remove_callback != nullptr) {
             remove_callback(index);
         }

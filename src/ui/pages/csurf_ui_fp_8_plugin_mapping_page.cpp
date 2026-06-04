@@ -757,6 +757,46 @@ protected:
         ImGui::PopFont(m_ctx);
     }
 
+    /**
+     * Select the newly created developer and plugin
+     * @param developer
+     * @param plugin_name
+     * @param plugin_type
+     */
+    void HandlePluginMappingAdded(
+        const std::string &developer,
+        const std::string &plugin_name,
+        const std::string &plugin_type
+    ) {
+        // First we're updating the
+        SetPluginFolders();
+        int developer_index = selected_developer;
+        int plugin_index = selected_plugin;
+        const auto developer_it = std::find(developers.begin(), developers.end(), developer);
+
+        if (developer_it < developers.end()) {
+            developer_index = developer_it - developers.begin();
+        }
+        selected_developer = developer_index;
+        previous_selected_developer = developer_index;
+
+        std::vector<std::string> developer_plugins = plugins.at(developer_index);
+        const auto plugin_it = std::find(
+            developer_plugins.begin(),
+            developer_plugins.end(),
+            plugin_name + "." + plugin_type + ".ini"
+        );
+
+        if (plugin_it < developer_plugins.end()) {
+            plugin_index = plugin_it - developer_plugins.begin();
+        }
+
+        selected_plugin = plugin_index;
+        PluginCheck(true);
+
+        ReaSonus8ControlPanel::SetMessage(i18n->t("mapping", "add.mapping.success.message"));
+    }
+
 public:
     CSurf_FP_8_PluginMappingPage(ImGui_Context *m_ctx, CSurf_UI_Assets *assets) : CSurf_UI_PageContent(m_ctx, assets) {
         using namespace std::placeholders; // for `_1, _2 etc`
@@ -784,7 +824,9 @@ public:
 
         AddPluginMappingForm = new ReaSonusAddPluginMappingForm(
             m_ctx,
-            assets
+            assets,
+            std::bind(&CSurf_FP_8_PluginMappingPage::HandlePluginMappingAdded, this, _1, _2, _3)
+
         );
 
         SelectLabelInvertCombo = new ReaSonusComboInput(
@@ -882,12 +924,15 @@ public:
 
             UiStyledElements::PushReaSonusIconButtonStyle(m_ctx, assets, 16);
             ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 0, 0);
+
             if (ImGui::SmallButton(m_ctx, std::string(1, show_add_plugin_mapping ? IconRemove : IconAdd).c_str())) {
                 show_add_plugin_mapping = !show_add_plugin_mapping;
             }
+
             if (ImGui::IsItemHovered(m_ctx)) {
                 ImGui::SetMouseCursor(m_ctx, ImGui::MouseCursor_Hand);
             }
+
             ReaSonusSimpleTooltip(
                 m_ctx, assets,
                 show_add_plugin_mapping
@@ -1305,15 +1350,17 @@ public:
     /**
      * Check if the selected plugin has changed.
      */
-    void PluginCheck() {
-        if (selected_plugin == previous_selected_plugin) {
+    void PluginCheck(bool force = false) {
+        if (selected_plugin == previous_selected_plugin && !force) {
             return;
         }
 
         show_developer_filters = false;
 
+        show_add_plugin_mapping = false;
+
         // If data is dirty and user does not want to save or clear the changes, we do not change plugins
-        if (!DirtyCheck()) {
+        if (!DirtyCheck() && !force) {
             selected_plugin = previous_selected_plugin;
             return;
         }
