@@ -3,6 +3,7 @@
 
 #include <reaper_imgui_functions.h>
 #include <string>
+#include <functional>
 #include "../utils/csurf_ui_text_overflow.hpp"
 #include "../csurf_ui_assets.hpp"
 #include "../csurf_ui_colors.hpp"
