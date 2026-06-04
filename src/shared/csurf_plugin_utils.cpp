@@ -570,6 +570,51 @@ bool PluginUtils::HasPluginMappingCache(const std::string &cache_path) {
 
 bool PluginUtils::AddDeveloperParamFilter(std::string developer_name, std::string fiter_name) {
     mINI::INIStructure developer_filter_ini;
+
+    if (ReadDevelopersFilterData(developer_filter_ini)) {
+        if (!developer_filter_ini.has(developer_name)) {
+            developer_filter_ini[developer_name];
+        }
+        const int size = developer_filter_ini[developer_name].size();
+        developer_filter_ini[developer_name][std::to_string(size)] = fiter_name;
+
+        WriteDevelopersFilterData(developer_filter_ini);
+        return true;
+    }
+    return false;
+}
+
+bool PluginUtils::ReadDevelopersFilterData(mINI::INIStructure &developer_filter_ini) {
+    const std::string developer_filter_path = createPathName({
+        GetPluginCacheFolderPath(),
+        "FilterDeveloper.ini"
+    });
+
+    const mINI::INIFile developer_filter_file(developer_filter_path);
+    if (!std::filesystem::exists(developer_filter_path)) {
+        developer_filter_ini["Arturia"];
+        developer_filter_ini["Arturia"]["MIDI CC"];
+        developer_filter_ini["Arturia"]["reserved"];
+        developer_filter_ini["Arturia"]["unassigned"];
+        developer_filter_ini["Arturia"]["VST_ProgramChange_*"];
+        developer_filter_ini["Arturia"]["HardwareDisplayControl"];
+        developer_filter_ini["Arturia"]["MPE_*"];
+        developer_filter_ini["Decomposer"];
+        developer_filter_ini["Decomposer"]["MIDI CC"];
+        developer_filter_ini["Decomposer"]["reserved"];
+        developer_filter_ini["Blue Cat"];
+        developer_filter_ini["Blue Cat"]["MIDI Program Change"];
+        developer_filter_ini["Blue Cat"]["MIDI Controller"];
+        developer_filter_ini["Spitfire Audio"];
+        developer_filter_ini["Spitfire Audio"]["general purpose"];
+
+        (void) developer_filter_file.generate(developer_filter_ini, true);
+    }
+
+    return developer_filter_file.read(developer_filter_ini);
+}
+
+bool PluginUtils::WriteDevelopersFilterData(mINI::INIStructure developer_filter_ini) {
     const std::string developer_filter_path = createPathName({
         GetPluginCacheFolderPath(),
         "FilterDeveloper.ini"
@@ -577,17 +622,7 @@ bool PluginUtils::AddDeveloperParamFilter(std::string developer_name, std::strin
 
     const mINI::INIFile developer_filter_file(developer_filter_path);
 
-    if (developer_filter_file.read(developer_filter_ini)) {
-        if (!developer_filter_ini.has(developer_name)) {
-            developer_filter_ini[developer_name];
-        }
-        const int size = developer_filter_ini[developer_name].size();
-        developer_filter_ini[developer_name][std::to_string(size)] = fiter_name;
-
-        developer_filter_file.write(developer_filter_ini, true);
-        return true;
-    }
-    return false;
+    return developer_filter_file.write(developer_filter_ini, true);
 }
 
 std::vector<std::string> PluginUtils::GetParamFilters(
@@ -647,19 +682,8 @@ std::vector<std::string> PluginUtils::GetParamFilters(
     // Developer filters added first
     if (!plugin_filter_override) {
         mINI::INIStructure developer_filter_ini;
-        const std::string developer_filter_path = createPathName({
-            GetPluginCacheFolderPath(),
-            "FilterDeveloper.ini"
-        });
 
-        const mINI::INIFile developer_filter_file(developer_filter_path);
-        if (!std::filesystem::exists(developer_filter_path)) {
-            // File not found, create default
-            developer_filter_ini["global"];
-            (void) developer_filter_file.generate(developer_filter_ini, true);
-        }
-
-        if (developer_filter_file.read(developer_filter_ini)) {
+        if (ReadDevelopersFilterData(developer_filter_ini)) {
             if (developer_filter_ini.has(developer_name)) {
                 for (int i = 0; i < static_cast<int>(developer_filter_ini[developer_name].size()); i++) {
                     const std::string index = std::to_string(i);
@@ -689,13 +713,8 @@ std::vector<std::string> PluginUtils::GetParamFilters(
 
 mINI::INIMap<std::string> PluginUtils::GetFilterListByDeveloper(const std::string developer) {
     mINI::INIStructure developer_filter_ini;
-    const std::string developer_filter_path = createPathName({
-        GetPluginCacheFolderPath(),
-        "FilterDeveloper.ini"
-    });
 
-    const mINI::INIFile developer_filter_file(developer_filter_path);
-    if (!developer_filter_file.read(developer_filter_ini)) {
+    if (!ReadDevelopersFilterData(developer_filter_ini)) {
         return {};
     }
 
@@ -711,13 +730,8 @@ bool PluginUtils::SetFilterListByDeveloper(
     const std::vector<std::string> &developer_ignore_list
 ) {
     mINI::INIStructure developer_filter_ini;
-    const std::string developer_filter_path = createPathName({
-        GetPluginCacheFolderPath(),
-        "FilterDeveloper.ini"
-    });
 
-    const mINI::INIFile developer_filter_file(developer_filter_path);
-    if (!developer_filter_file.read(developer_filter_ini)) {
+    if (!ReadDevelopersFilterData(developer_filter_ini)) {
         return false;
     }
 
@@ -731,7 +745,7 @@ bool PluginUtils::SetFilterListByDeveloper(
         developer_filter_ini[developer][std::to_string(i)] = developer_ignore_list[i];
     }
 
-    return developer_filter_file.write(developer_filter_ini, true);
+    return WriteDevelopersFilterData(developer_filter_ini);
 }
 
 void PluginUtils::WriteFilterParams(

@@ -309,6 +309,20 @@ public:
     static bool AddDeveloperParamFilter(std::string developer_name, std::string fiter_name);
 
     /**
+     * Read the content of the developers filter file.
+     * If the fie not exists it will be created with some defaults
+     * @return true if read with succes
+     */
+    static bool ReadDevelopersFilterData(mINI::INIStructure &developer_filter_ini);
+
+    /**
+     * Write data to the developers filter file
+     * @param developer_filter_ini
+     * @return
+     */
+    static bool WriteDevelopersFilterData(mINI::INIStructure developer_filter_ini);
+
+    /**
      * Get the param filter for the given arguments
      * @param developer_name
      * @param plugin_name
