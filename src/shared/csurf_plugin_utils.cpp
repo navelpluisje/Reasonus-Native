@@ -1,13 +1,50 @@
 #include "csurf_plugin_utils.hpp"
 
 #include <regex>
-#include <WDL/wdltypes.h> // might be unnecessary in future
 
 #include "csurf_daw.hpp"
 #include "reaper_plugin_functions.h"
 #include "csurf_utils.hpp"
 #include "../ui/csurf_ui_colors.hpp"
+#include "../i18n/i18n.hpp"
 
+std::string PluginUtils::GetPluginFolderPath() {
+    return createPathName({std::string(GetResourcePath()), "ReaSonus", "Plugins"});
+}
+
+std::string PluginUtils::GetPluginCacheFolderPath() {
+    return createPathName({std::string(GetResourcePath()), "ReaSonus", "PluginsCache"});
+}
+
+std::string PluginUtils::GetReaSonusPluginPath(
+    std::string developer,
+    const std::string &plugin_name,
+    const std::string &plugin_type,
+    const bool create
+) {
+    const std::string path = createPathName({GetPluginFolderPath(), std::move(developer)});
+
+    if (create) {
+        createPathIfNotExist(path);
+    }
+
+    return createPathName({path, plugin_name + "." + plugin_type + ".ini"});
+}
+
+std::string PluginUtils::GetReaSonusPluginCachePath(
+    std::string developer,
+    const std::string &plugin_name,
+    const std::string &plugin_type,
+    const bool create
+) {
+    const std::string path = createPathName({GetPluginCacheFolderPath(), std::move(developer)});
+
+    if (create) {
+        createPathIfNotExist(path);
+    }
+
+    return createPathName({path, plugin_name + "." + plugin_type + ".ini"});
+}
 
 std::string PluginUtils::StripPluginName(const std::string &plugin_name) {
     std::vector<std::string> pluginNameParts = split(
@@ -71,10 +108,25 @@ std::string PluginUtils::ExtractDeveloperName(const std::string &plugin_name) {
     return developer;
 }
 
+std::string PluginUtils::ExtractPluginName(const std::string &plugin_name) {
+    const std::string developer = ExtractDeveloperName(plugin_name);
+
+    std::vector<std::string> plugin_name_parts = split(
+        StripPluginNamePrefixes(StripPluginChannelPostfix(plugin_name.c_str()).data()),
+        " (" + developer
+    );
+
+    if (plugin_name_parts.size() > 1) {
+        plugin_name_parts.pop_back();
+    }
+
+    return join(plugin_name_parts, " (" + developer);
+}
+
 std::string PluginUtils::ExtractPluginType(const std::string &plugin_name) {
     const std::vector<std::string> plugin_name_parts = split(plugin_name, ": ");
 
-    return plugin_name_parts.at(0);
+    return toLowerCase(plugin_name_parts.at(0));
 }
 
 std::string PluginUtils::GetPluginsPath() {
@@ -307,8 +359,8 @@ std::string PluginUtils::GetPluginRequestString(const std::string &plugin_origna
     std::vector<std::string> allowed_plugin_types = GetPluginTypes();
     const auto it_type = std::find(allowed_plugin_types.begin(), allowed_plugin_types.end(), plugin_type);
 
+    // Not found, the plugin type has either not been set or is invalid!
     if (it_type == allowed_plugin_types.end()) {
-        // Not found, the plugin type has either not been set or is invalid!
         return "";
     }
 
@@ -326,4 +378,410 @@ std::string PluginUtils::GetPluginRequestString(const std::string &plugin_origna
     std::string plugin_name_with_type = FormatPluginType(plugin_type) + ": " + plugin_origname;
 
     return plugin_name_with_type;
+}
+
+std::string PluginUtils::GetPluginRequestString(
+    const std::string &developer,
+    const std::string &plugin_name,
+    const std::string &plugin_type
+) {
+    mINI::INIStructure plugin_params;
+    const mINI::INIFile file(GetReaSonusPluginPath(developer, plugin_name, plugin_type, false));
+    file.read(plugin_params);
+
+    return GetPluginRequestString(
+        plugin_params["global"]["origname"],
+        plugin_params["global"]["type"]
+    );
+}
+
+bool PluginUtils::DeletePluginMappingFile(
+    const std::string &developer,
+    const std::string &plugin_name,
+    const std::string &plugin_type
+) {
+    const std::string mapping_path = GetReaSonusPluginPath(developer, plugin_name, plugin_type, true);
+    const std::filesystem::path mapping_folder = createPathName({GetPluginFolderPath(), developer});
+
+    std::string message = I18n::GetInstance()->t(
+        "mapping",
+        "confirm.remove-mapping.message",
+        plugin_name
+    );
+
+    if (MB(
+            replaceAll(message, "\\n", "\n").c_str(),
+            I18n::GetInstance()->t("mapping", "confirm.remove-mapping.title").c_str(),
+            1) == 1
+    ) {
+        std::remove(mapping_path.c_str());
+
+        if (std::filesystem::is_empty(mapping_folder)) {
+            std::filesystem::remove(mapping_folder);
+        }
+
+        if (HasPluginMappingCache(developer, plugin_name, plugin_type)) {
+            DeletePluginMappingCacheFile(developer, plugin_name, plugin_type);
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
+bool PluginUtils::CreatePluginMappingCacheFile(MediaTrack *media_track, int plugin_id, bool update) {
+    char plugin_name[256] = ""; // NOLINT(*-avoid-c-arrays)
+    mINI::INIStructure cache;
+
+    if (!TrackFX_GetFXName(media_track, plugin_id, plugin_name, std::size(plugin_name))) {
+        return false;
+    }
+
+    const int num_params = TrackFX_GetNumParams(media_track, plugin_id);
+    const std::string developer = ExtractDeveloperName(plugin_name);
+    const std::string short_name = ExtractPluginName(plugin_name);
+    const std::string plugin_type = ExtractPluginType(plugin_name);
+    const std::string cache_path = GetReaSonusPluginCachePath(developer, short_name, plugin_type, true);
+
+    cache["global"];
+    cache["global"]["origname"] = StripPluginNamePrefixes(plugin_name);
+    cache["global"]["name"] = short_name;
+    cache["global"]["type"] = plugin_type;
+    cache["global"]["developer"] = developer;
+    cache["id"];
+    cache["params"];
+    cache["steps"];
+
+    std::vector<int> param_id;
+    std::vector<std::string> param_name;
+    std::vector<int> param_steps;
+
+    for (int i = 0; i < num_params; i++) {
+        param_id.push_back(i);
+        param_name.push_back(DAW::GetTrackFxParamName(media_track, plugin_id, i));
+        param_steps.push_back(DAW::GetTrackFxParamNbSteps(media_track, plugin_id, i));
+    }
+
+    const std::vector<std::string> param_filters = GetParamFilters(developer, short_name, plugin_type);
+    WriteFilterParams(param_filters, param_id, param_name, param_steps, cache);
+
+    const mINI::INIFile file(cache_path);
+
+    if (update) {
+        return file.write(cache, true);
+    }
+
+    return file.generate(cache, true);
+}
+
+bool PluginUtils::UpdatePluginMappingCacheFile(const std::string &full_plugin_name) {
+    InsertTrackAtIndex(0, false);
+    MediaTrack *media_track = GetTrack(nullptr, 0);
+    TrackFX_AddByName(media_track, full_plugin_name.c_str(), false, -1);
+
+    const bool success = CreatePluginMappingCacheFile(media_track, 0, true);
+    DeleteTrack(media_track);
+
+    return success;
+}
+
+bool PluginUtils::UpdatePluginMappingCacheFileByDeveloper(const std::string &developer) {
+    const std::vector<std::string> plugins = GetDeveloperPlugins(developer, false);
+    mINI::INIStructure plugin_mapping_ini;
+    std::string file_name;
+
+    for (int i = 0; i < static_cast<int>(plugins.size()); i++) {
+        mINI::INIFile file(createPathName({GetPluginFolderPath(), developer, plugins[i]}));
+        if (!file.read(plugin_mapping_ini)) {
+            continue;
+        }
+
+        UpdatePluginMappingCacheFile(PluginUtils::GetPluginRequestString(
+            plugin_mapping_ini["global"]["origname"],
+            plugin_mapping_ini["global"]["type"]
+        ));
+    }
+
+    return true;
+}
+
+void PluginUtils::DeletePluginMappingCacheFile(
+    const std::string &developer,
+    const std::string &plugin_name,
+    const std::string &plugin_type
+) {
+    const std::string cache_path = GetReaSonusPluginCachePath(developer, plugin_name, plugin_type, true);
+    const std::filesystem::path cache_folder = createPathName({GetPluginCacheFolderPath(), developer});
+
+    std::remove(cache_path.c_str());
+
+    if (std::filesystem::is_empty(cache_folder)) {
+        std::filesystem::remove(cache_folder);
+    }
+}
+
+mINI::INIStructure PluginUtils::GetPluginMappingCacheStructure(
+    const std::string &developer,
+    const std::string &plugin_name,
+    const std::string &plugin_type
+) {
+    mINI::INIStructure plugin_cache;
+    const mINI::INIFile file(GetReaSonusPluginCachePath(developer, plugin_name, plugin_type, false));
+    file.read(plugin_cache);
+
+    return plugin_cache;
+}
+
+bool PluginUtils::HasPluginMappingCache(
+    const std::string &developer,
+    const std::string &plugin_name,
+    const std::string &plugin_type
+) {
+    return file_exists(GetReaSonusPluginCachePath(developer, plugin_name, plugin_type, false).c_str());
+}
+
+bool PluginUtils::HasPluginMappingCache(const std::string &cache_path) {
+    return file_exists(cache_path.c_str());
+}
+
+bool PluginUtils::AddDeveloperParamFilter(std::string developer_name, std::string fiter_name) {
+    mINI::INIStructure developer_filter_ini;
+
+    if (ReadDevelopersFilterData(developer_filter_ini)) {
+        if (!developer_filter_ini.has(developer_name)) {
+            developer_filter_ini[developer_name];
+        }
+        const int size = developer_filter_ini[developer_name].size();
+        developer_filter_ini[developer_name][std::to_string(size)] = fiter_name;
+
+        WriteDevelopersFilterData(developer_filter_ini);
+        return true;
+    }
+    return false;
+}
+
+bool PluginUtils::ReadDevelopersFilterData(mINI::INIStructure &developer_filter_ini) {
+    const std::string developer_filter_path = createPathName({
+        GetPluginCacheFolderPath(),
+        "FilterDeveloper.ini"
+    });
+
+    const mINI::INIFile developer_filter_file(developer_filter_path);
+    if (!std::filesystem::exists(developer_filter_path)) {
+        developer_filter_ini["Arturia"];
+        developer_filter_ini["Arturia"]["MIDI CC"];
+        developer_filter_ini["Arturia"]["reserved"];
+        developer_filter_ini["Arturia"]["unassigned"];
+        developer_filter_ini["Arturia"]["VST_ProgramChange_*"];
+        developer_filter_ini["Arturia"]["HardwareDisplayControl"];
+        developer_filter_ini["Arturia"]["MPE_*"];
+        developer_filter_ini["Decomposer"];
+        developer_filter_ini["Decomposer"]["MIDI CC"];
+        developer_filter_ini["Decomposer"]["reserved"];
+        developer_filter_ini["Blue Cat"];
+        developer_filter_ini["Blue Cat"]["MIDI Program Change"];
+        developer_filter_ini["Blue Cat"]["MIDI Controller"];
+        developer_filter_ini["Spitfire Audio"];
+        developer_filter_ini["Spitfire Audio"]["general purpose"];
+
+        (void) developer_filter_file.generate(developer_filter_ini, true);
+    }
+
+    return developer_filter_file.read(developer_filter_ini);
+}
+
+bool PluginUtils::WriteDevelopersFilterData(mINI::INIStructure developer_filter_ini) {
+    const std::string developer_filter_path = createPathName({
+        GetPluginCacheFolderPath(),
+        "FilterDeveloper.ini"
+    });
+
+    const mINI::INIFile developer_filter_file(developer_filter_path);
+
+    return developer_filter_file.write(developer_filter_ini, true);
+}
+
+std::vector<std::string> PluginUtils::GetParamFilters(
+    const std::string &developer_name,
+    const std::string &plugin_name,
+    const std::string &plugin_type
+) {
+    std::vector<std::string> param_filters;
+
+    // Plugin filters
+    mINI::INIStructure plugin_filter_ini;
+    const std::string plugin_filter_path = createPathName({GetPluginCacheFolderPath(), "FilterPlugin.ini"});
+    const mINI::INIFile plugin_filter_file(plugin_filter_path);
+
+    if (!std::filesystem::exists(plugin_filter_path)) {
+        // File not found, create default
+        plugin_filter_ini["global"];
+        // Add an example entry so user has an idea of how to add their own plugins
+        const std::string default_plugin_section = "developer\\plugin.type";
+
+        plugin_filter_ini[default_plugin_section];
+        plugin_filter_ini[default_plugin_section]["enabled"] = "True";
+        plugin_filter_ini[default_plugin_section]["override"] = "False";
+        plugin_filter_ini[default_plugin_section]["0"] = "MIDI CC";
+        plugin_filter_ini[default_plugin_section]["1"] = "MIDI *";
+        plugin_filter_ini[default_plugin_section]["2"] = "* CC";
+        (void) plugin_filter_file.generate(plugin_filter_ini, true);
+    }
+
+    bool plugin_filter_enabled = true;
+    bool plugin_filter_override = false;
+    const std::string plugin_filter_section_string = developer_name + "\\" + plugin_name + "." + plugin_type;
+
+    // Check plugin filter status
+    if (plugin_filter_file.read(plugin_filter_ini)) {
+        if (plugin_filter_ini.has(plugin_filter_section_string)) {
+            if (plugin_filter_ini[plugin_filter_section_string].has("enabled")) {
+                // When this is true, the plugin filter values will be parsed
+                plugin_filter_enabled = toBool(plugin_filter_ini[plugin_filter_section_string]["enabled"]);
+            }
+
+            if (plugin_filter_enabled) {
+                if (plugin_filter_ini[plugin_filter_section_string].has("override")) {
+                    // When this is true, FilterDeveloper.ini will be ignored
+                    plugin_filter_override = toBool(plugin_filter_ini[plugin_filter_section_string]["override"]);
+                }
+            }
+        } else {
+            plugin_filter_enabled = false;
+        }
+    } else {
+        plugin_filter_enabled = false;
+    }
+
+    // ------------------------------------------------------------------------
+
+    // Developer filters added first
+    if (!plugin_filter_override) {
+        mINI::INIStructure developer_filter_ini;
+
+        if (ReadDevelopersFilterData(developer_filter_ini)) {
+            if (developer_filter_ini.has(developer_name)) {
+                for (int i = 0; i < static_cast<int>(developer_filter_ini[developer_name].size()); i++) {
+                    const std::string index = std::to_string(i);
+
+                    if (developer_filter_ini[developer_name].has(index)) {
+                        param_filters.push_back(developer_filter_ini[developer_name][index]);
+                    }
+                }
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------------
+
+    // Plugin filters added second
+    if (plugin_filter_enabled) {
+        for (int i = 0; i < plugin_filter_ini[plugin_filter_section_string].size(); i++) {
+            const std::string index = std::to_string(i);
+            if (plugin_filter_ini[plugin_filter_section_string].has(index)) {
+                param_filters.push_back(plugin_filter_ini[plugin_filter_section_string][index]);
+            }
+        }
+    }
+
+    return param_filters;
+}
+
+mINI::INIMap<std::string> PluginUtils::GetFilterListByDeveloper(const std::string developer) {
+    mINI::INIStructure developer_filter_ini;
+
+    if (!ReadDevelopersFilterData(developer_filter_ini)) {
+        return {};
+    }
+
+    if (!developer_filter_ini.has(developer)) {
+        return {};
+    }
+
+    return developer_filter_ini[developer];
+}
+
+bool PluginUtils::SetFilterListByDeveloper(
+    const std::string &developer,
+    const std::vector<std::string> &developer_ignore_list
+) {
+    mINI::INIStructure developer_filter_ini;
+
+    if (!ReadDevelopersFilterData(developer_filter_ini)) {
+        return false;
+    }
+
+    if (!developer_filter_ini.has(developer)) {
+        developer_filter_ini[developer];
+    } else {
+        developer_filter_ini[developer].clear();
+    }
+
+    for (int i = 0; i < static_cast<int>(developer_ignore_list.size()); i++) {
+        developer_filter_ini[developer][std::to_string(i)] = developer_ignore_list[i];
+    }
+
+    return WriteDevelopersFilterData(developer_filter_ini);
+}
+
+void PluginUtils::WriteFilterParams(
+    const std::vector<std::string> &param_filters,
+    const std::vector<int> &param_id,
+    const std::vector<std::string> &param_name,
+    const std::vector<int> &param_steps,
+    mINI::INIStructure &cache
+) {
+    int param_index = 0;
+
+    for (int i = 0; i < param_id.size(); i++) {
+        std::string name = param_name[i];
+
+        // Don't allow empty parameter names
+        if (name.empty()) {
+            name = "???";
+        }
+
+        bool found_filtered_param = false;
+        for (const std::string &filter: param_filters) {
+            int filtered_length = filter.length();
+
+            // Starts with * (search term at end)
+            if (filter.find("*", 0, 1) != std::string::npos) {
+                const std::string filtered_param = filter.substr(1, filtered_length - 1);
+                filtered_length--;
+
+                if (name.find(filtered_param.c_str(), name.length() - filtered_length, filtered_length) !=
+                    std::string::npos) {
+                    found_filtered_param = true;
+                    break;
+                }
+            }
+
+            // Ends with * (search term at start)
+            filtered_length = filter.length();
+            if (filter.find("*", filtered_length - 1, 1) != std::string::npos) {
+                const std::string filtered_param = filter.substr(0, filtered_length - 1);
+                filtered_length--;
+
+                if (name.find(filtered_param.c_str(), 0, filtered_length) != std::string::npos) {
+                    found_filtered_param = true;
+                    break;
+                }
+            }
+
+            // Partial match
+            if (name.find(filter) != std::string::npos) {
+                found_filtered_param = true;
+                break;
+            }
+        }
+
+        if (!found_filtered_param) {
+            cache["id"][std::to_string(param_index)] = std::to_string(param_id[i]);
+            cache["params"][std::to_string(param_index)] = name;
+            cache["steps"][std::to_string(param_index)] = std::to_string(param_steps[i]);
+            param_index++;
+        }
+    }
 }
