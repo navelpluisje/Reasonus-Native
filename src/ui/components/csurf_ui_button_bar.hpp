@@ -3,6 +3,7 @@
 
 #include <reaper_imgui_functions.h>
 #include <string>
+#include <functional>
 #include "../csurf_ui_styles_elements.hpp"
 
 static void ReaSonusButtonBar(
@@ -24,9 +25,14 @@ static void ReaSonusButtonBar(
     if (ImGui::BeginChild(m_ctx, "button-bar", 0.0, 36.0, ImGui::ChildFlags_FrameStyle)) {
         if (!message->empty()) {
             UiStyledElements::PushReaSonusButtonBarMessageStyle(m_ctx);
-            if (ImGui::BeginChild(m_ctx, "message-box", 0, 0,
-                                  ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeX |
-                                  ImGui::WindowFlags_NoScrollbar | ImGui::ChildFlags_AutoResizeY)) {
+            if (ImGui::BeginChild(
+                m_ctx,
+                "message-box",
+                0,
+                0,
+                ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeX |
+                ImGui::WindowFlags_NoScrollbar | ImGui::ChildFlags_AutoResizeY
+            )) {
                 ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 2);
                 ImGui::Text(m_ctx, message->c_str());
 

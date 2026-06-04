@@ -99,7 +99,7 @@ static void ReaSonusListSelectable(
     ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBg, selectable_bg);
     if (ImGui::BeginChild(
             m_ctx,
-            ("item" + label).c_str(),
+            ("item" + std::to_string(item_index)).c_str(),
             0.0,
             selectable_height,
             ImGui::ChildFlags_FrameStyle
