@@ -214,8 +214,16 @@ public:
     /**
      * Create a list with objects containing meta data per plugin which can be used for plugin selection
      * @param developers
+     * @param plugin_types
+     * @param plugin_categories
      * @return
      */
+    static std::vector<PluginMeta> ExtractInstalledPluginMeta(
+        std::set<std::string> &developers,
+        std::set<std::string> &plugin_types,
+        std::set<std::string> &plugin_categories
+    );
+
     static std::vector<PluginMeta> ExtractInstalledPluginMeta(std::set<std::string> &developers);
 
     /**

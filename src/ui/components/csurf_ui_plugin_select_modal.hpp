@@ -23,7 +23,6 @@ static void ReaSonusPluginSelectModal( // NOLINT(*-function-cognitive-complexity
     double modal_y;
     ImGui::GetCursorScreenPos(m_ctx, &modal_x, &modal_y);
 
-
     double space_x;
     double space_y;
 
@@ -54,7 +53,6 @@ static void ReaSonusPluginSelectModal( // NOLINT(*-function-cognitive-complexity
             nullptr,
             ImGui::WindowFlags_TopMost | ImGui::WindowFlags_NoResize
         )) {
-            ShowConsoleMsg("");
             if (ImGui::BeginTable(m_ctx, "installed-plugins-table", 5,
                                   ImGui::TableFlags_BordersV | ImGui::TableFlags_RowBg |
                                   ImGui::TableFlags_SizingStretchProp | ImGui::TableFlags_ScrollY, 0.0, -30.0)) {

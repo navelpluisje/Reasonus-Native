@@ -91,7 +91,6 @@ public:
                     // When the active item is not the hovered item, we are dragging. Call the sort_callback in that case
                     if (sortable && active_item > -1 && active_item != hovered_item
                     ) {
-                        ShowConsoleMsg("Sort");
                         sort_callback(active_item, hovered_item);
                     }
                 }

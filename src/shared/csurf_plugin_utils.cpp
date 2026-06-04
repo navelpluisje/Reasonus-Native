@@ -233,7 +233,11 @@ std::string PluginUtils::createCategoryName(const std::string &plugin_name, std:
     return join(name_parts, "_") + "." + replace(plugin_type, "i", "");
 }
 
-std::vector<PluginMeta> PluginUtils::ExtractInstalledPluginMeta(std::set<std::string> &developers) {
+std::vector<PluginMeta> PluginUtils::ExtractInstalledPluginMeta(
+    std::set<std::string> &developers,
+    std::set<std::string> &plugin_types,
+    std::set<std::string> &plugin_categories
+) {
     const std::vector<std::string> installed_plugins = GetInstalledPlugins();
     std::vector<PluginMeta> plugin_meta;
     mINI::INIStructure category_file;
@@ -242,7 +246,7 @@ std::vector<PluginMeta> PluginUtils::ExtractInstalledPluginMeta(std::set<std::st
 
     for (const auto &plugin_name: installed_plugins) {
         PluginMeta meta(plugin_name);
-        const std::string developer = ExtractDeveloperName(plugin_name);
+        std::string developer = ExtractDeveloperName(plugin_name);
         if (developer.empty()) {
             continue;
         }
@@ -250,7 +254,13 @@ std::vector<PluginMeta> PluginUtils::ExtractInstalledPluginMeta(std::set<std::st
         const std::string short_name = StripPluginName(plugin_name);
         const std::string cat_name = createCategoryName(plugin_name, plugin_type);
 
+        if (plugin_type == "js") {
+            developer = "js";
+        }
+
         developers.emplace(developer);
+        plugin_types.emplace(plugin_type);
+        plugin_categories.emplace(cat_name);
         meta.SetDeveloper(developer);
         meta.SetFullName(plugin_name);
         meta.SetShortName(short_name);
@@ -261,6 +271,14 @@ std::vector<PluginMeta> PluginUtils::ExtractInstalledPluginMeta(std::set<std::st
     }
 
     return plugin_meta;
+}
+
+std::vector<PluginMeta> PluginUtils::ExtractInstalledPluginMeta(
+    std::set<std::string> &developers
+) {
+    std::set<std::string> plugin_types;
+    std::set<std::string> plugin_categories;
+    return ExtractInstalledPluginMeta(developers, plugin_types, plugin_categories);
 }
 
 std::vector<std::string> PluginUtils::GetPluginTypes() {
@@ -502,7 +520,7 @@ bool PluginUtils::UpdatePluginMappingCacheFileByDeveloper(const std::string &dev
             continue;
         }
 
-        UpdatePluginMappingCacheFile(PluginUtils::GetPluginRequestString(
+        UpdatePluginMappingCacheFile(GetPluginRequestString(
             plugin_mapping_ini["global"]["origname"],
             plugin_mapping_ini["global"]["type"]
         ));
