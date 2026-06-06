@@ -24,7 +24,7 @@ protected:
         std::string plugin_type = DAW::GetTrackFxType(media_track, plugin_id);
         std::string plugin_name = DAW::GetTrackFxName(media_track, plugin_id, false);
         std::string developer_name = DAW::GetTrackFxDeveloper(media_track, plugin_id);
-        fileName = PluginUtils::GetReaSonusPluginPath(developer_name, plugin_name, plugin_type, false);
+        fileName = PluginUtils::GetReaSonusPluginMappingFilePath(developer_name, plugin_name, plugin_type, false);
 
         mINI::INIFile file(fileName);
         if (!file.read(ini)) {

@@ -147,7 +147,7 @@ void ReaSonusPluginMappingConverter::ConvertFile(const std::string &file_path) {
     }
 
     if (has_plugin) {
-        const std::string fileName = PluginUtils::GetReaSonusPluginPath(
+        const std::string fileName = PluginUtils::GetReaSonusPluginMappingFilePath(
             ini["global"]["developer"],
             ini["global"]["name"],
             ini["global"]["type"],

@@ -27,8 +27,8 @@ enum PAN_MODES {
 };
 
 enum SEND_MODES {
-    SEND_MODE_RECEIVE = -1,
-    SEND_MODE_SEND = 0,
+    SEND_MODE_RECEIVE  = -1,
+    SEND_MODE_SEND     = 0,
     SEND_MODE_HARDWARE = 1,
 };
 
@@ -276,6 +276,14 @@ public:
      * @return Whether the track has an FX plugin at the given index
      */
     static bool HasTrackFx(MediaTrack *media_track, int fxIndex);
+
+    /**
+     * Gat the full original name of the plugin at the given index
+     * @param media_track The track to check for the plugin
+     * @param fxIndex Index of the plugin
+     * @return The name of the plugin
+     */
+    static std::string GetOrigTrackFxName(MediaTrack *media_track, int fxIndex);
 
     /**
      * Gat the name of the plugin at the given index

@@ -7,8 +7,8 @@
 #include "../shared/csurf_plugin_utils.hpp"
 
 class CSurf_FP_8_PluginLearnManager : public CSurf_FP_8_ChannelManager {
-    mINI::INIStructure ini;
-    std::string fileName;
+    mINI::INIStructure plugin_mapping_ini;
+    std::string file_name;
     int updateCount;
 
 protected:
@@ -20,31 +20,21 @@ protected:
     void GetCurrentPlugin() {
         const int pluginId = context->GetPluginEditPluginId();
         MediaTrack *media_track = context->GetPluginEditTrack();
-        const std::string full_name = DAW::GetTrackFxName(media_track, pluginId, true);
-        const std::string plugin_type = DAW::GetTrackFxType(media_track, pluginId);
-        const std::string plugin_name = DAW::GetTrackFxName(media_track, pluginId, false);
-        const std::string developer_name = DAW::GetTrackFxDeveloper(media_track, pluginId);
-        fileName = PluginUtils::GetReaSonusPluginPath(developer_name, plugin_name, plugin_type, true);
 
-        const mINI::INIFile file(fileName);
-        if (!file.read(ini)) {
-            ini["Global"];
-            ini["Global"]["origName"] = full_name;
-            ini["Global"]["name"] = plugin_name;
-            ini["Global"]["type"] = plugin_type;
-            ini["Global"]["developer"] = developer_name;
-            
-            (void) file.generate(ini, true);
-        }
+        const std::string orig_plugin_name = DAW::GetOrigTrackFxName(media_track, pluginId);
+        PluginUtils::ReadCreatePluginMappingFileByOrigPluginName(orig_plugin_name, plugin_mapping_ini);
 
-        if (!PluginUtils::HasPluginMappingCache(developer_name, full_name, plugin_type)) {
-            PluginUtils::CreatePluginMappingCacheFile(media_track, pluginId, false);
-        }
+        file_name = PluginUtils::GetReaSonusPluginMappingFilePath(
+            plugin_mapping_ini["Global"]["developer"],
+            plugin_mapping_ini["Global"]["name"],
+            plugin_mapping_ini["Global"]["type"],
+            true
+        );
     }
 
     void SaveIniFile() {
-        const mINI::INIFile file(fileName);
-        file.write(ini, true);
+        const mINI::INIFile file(file_name);
+        file.write(plugin_mapping_ini, true);
     }
 
 public:
@@ -70,8 +60,8 @@ public:
         }
 
         if (updateCount > 100) {
-            const mINI::INIFile file(fileName);
-            file.read(ini);
+            const mINI::INIFile file(file_name);
+            file.read(plugin_mapping_ini);
         }
         updateCount += 1;
 
@@ -92,15 +82,17 @@ public:
 
             std::string paramKey = getParamKey("Select_", paramIndex);
 
-            if (ini.has(paramKey)) {
-                track->SetDisplayLine(0, ALIGN_CENTER, ini[paramKey]["name"].c_str(), INVERT, force_update);
+            if (plugin_mapping_ini.has(paramKey)) {
+                track->SetDisplayLine(0, ALIGN_CENTER, plugin_mapping_ini[paramKey]["name"].c_str(), INVERT,
+                                      force_update);
             } else {
                 track->SetDisplayLine(0, ALIGN_CENTER, "Free", INVERT, force_update);
             }
 
             paramKey = getParamKey("Fader_", paramIndex);
-            if (ini.has(paramKey)) {
-                track->SetDisplayLine(2, ALIGN_CENTER, ini[paramKey]["name"].c_str(), INVERT, force_update);
+            if (plugin_mapping_ini.has(paramKey)) {
+                track->SetDisplayLine(2, ALIGN_CENTER, plugin_mapping_ini[paramKey]["name"].c_str(), INVERT,
+                                      force_update);
             } else {
                 track->SetDisplayLine(2, ALIGN_CENTER, "Free", INVERT, force_update);
             }
@@ -146,8 +138,8 @@ public:
         if (context->GetShiftLeft()) {
             OpenMappingUi(pluginId, controlIndex);
         } else if (context->GetShiftRight()) {
-            if (ini.has(paramKey)) {
-                ini.remove(paramKey);
+            if (plugin_mapping_ini.has(paramKey)) {
+                plugin_mapping_ini.remove(paramKey);
                 SaveIniFile();
             }
         } else {
@@ -161,13 +153,13 @@ public:
             const std::string paramName = DAW::GetTrackFxParamName(media_track, pluginId, paramId);
             const int nbSteps = DAW::GetTrackFxParamNbSteps(media_track, pluginId, paramId);
 
-            if (!ini.has(paramKey)) {
-                ini[paramKey];
+            if (!plugin_mapping_ini.has(paramKey)) {
+                plugin_mapping_ini[paramKey];
             }
-            ini[paramKey]["origName"] = paramName;
-            ini[paramKey]["name"] = paramName;
-            ini[paramKey]["param"] = std::to_string(paramId);
-            ini[paramKey]["steps"] = std::to_string(nbSteps);
+            plugin_mapping_ini[paramKey]["origName"] = paramName;
+            plugin_mapping_ini[paramKey]["name"] = paramName;
+            plugin_mapping_ini[paramKey]["param"] = std::to_string(paramId);
+            plugin_mapping_ini[paramKey]["steps"] = std::to_string(nbSteps);
 
             SaveIniFile();
             if (settings->GetUntouchAfterLearn()) {
@@ -201,8 +193,8 @@ public:
         if (context->GetShiftLeft()) {
             OpenMappingUi(pluginId, controlIndex);
         } else if (context->GetShiftRight()) {
-            if (ini.has(paramKey)) {
-                ini.remove(paramKey);
+            if (plugin_mapping_ini.has(paramKey)) {
+                plugin_mapping_ini.remove(paramKey);
                 SaveIniFile();
             }
         } else {
@@ -215,13 +207,13 @@ public:
             MediaTrack *media_track = context->GetPluginEditTrack();
             const std::string paramName = DAW::GetTrackFxParamName(media_track, pluginId, paramId);
 
-            if (!ini.has(paramKey)) {
-                ini[paramKey];
+            if (!plugin_mapping_ini.has(paramKey)) {
+                plugin_mapping_ini[paramKey];
             }
 
-            ini[paramKey]["origName"] = paramName;
-            ini[paramKey]["name"] = paramName;
-            ini[paramKey]["param"] = std::to_string(paramId);
+            plugin_mapping_ini[paramKey]["origName"] = paramName;
+            plugin_mapping_ini[paramKey]["name"] = paramName;
+            plugin_mapping_ini[paramKey]["param"] = std::to_string(paramId);
 
             SaveIniFile();
             if (settings->GetUntouchAfterLearn()) {

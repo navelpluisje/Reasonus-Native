@@ -326,6 +326,15 @@ bool DAW::HasTrackFx(MediaTrack *media_track, const int fxIndex) {
     return TrackFX_GetFXName(media_track, fxIndex, plugin_name, std::size(plugin_name));
 }
 
+std::string DAW::GetOrigTrackFxName(MediaTrack *media_track, const int fxIndex) {
+    char plugin_name[256] = ""; // NOLINT(*-avoid-c-arrays)
+    if (!TrackFX_GetFXName(media_track, fxIndex, plugin_name, std::size(plugin_name))) {
+        return "No FX";
+    }
+
+    return plugin_name;
+}
+
 std::string DAW::GetTrackFxName(MediaTrack *media_track, const int fxIndex, const bool full) {
     char plugin_name[256] = ""; // NOLINT(*-avoid-c-arrays)
     if (!TrackFX_GetFXName(media_track, fxIndex, plugin_name, std::size(plugin_name))) {
@@ -664,9 +673,9 @@ std::vector<std::string> DAW::GetTimeSegments(const double tpos, const int proj_
 
     switch (proj_time_mode) {
         case -1: // Ruler, will be converted to Beat
-        case 1: // Beats + Time
-        case 2: // Beats
-        case 6: // Beats Minimal
+        case 1:  // Beats + Time
+        case 2:  // Beats
+        case 6:  // Beats Minimal
         case 10: // Measure fractions
             value = split(std::string(beat_time), ".");
             // The first 2 items are 0-based so need an extra 1

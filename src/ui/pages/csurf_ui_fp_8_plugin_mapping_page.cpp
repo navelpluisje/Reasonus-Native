@@ -28,7 +28,7 @@ class CSurf_FP_8_PluginMappingPage : public CSurf_UI_PageContent // NOLINT(*-use
     int changed_items = 0;
 
     bool render_started = false;
-    std::string plugin_folder_path = PluginUtils::GetPluginFolderPath();
+    std::string plugin_folder_path = PluginUtils::GetReaSonusPluginFolderPath();
     std::vector<std::string> developers;
     std::vector<std::string> plugin_types = PluginUtils::GetPluginTypes();
     std::set<std::string> installed_developers;
@@ -96,7 +96,7 @@ protected:
         developers = PluginUtils::GetpluginDevelopers(true);
 
         for (const auto &developer: developers) {
-            plugins.push_back(PluginUtils::GetDeveloperPlugins(developer, true));
+            plugins.push_back(PluginUtils::GetDeveloperPluginMappings(developer, true));
         }
     }
 

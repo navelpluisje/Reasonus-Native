@@ -17,8 +17,8 @@ class ReaSonusAddPluginMappingForm {
     double pos_screen_y = 0;
 
     std::string search_query;
-    int filter_developer;
-    int filter_plugin_type;
+    int filter_developer = 0;
+    int filter_plugin_type = 0;
 
     const std::function<void(std::string developer, std::string plugin_name, std::string plugin_type)> save_callback;
 
@@ -28,39 +28,26 @@ class ReaSonusAddPluginMappingForm {
     std::set<std::string> installed_plugin_types;
     std::set<std::string> plugin_categories;
     std::vector<PluginMeta> installed_plugins = PluginUtils::ExtractInstalledPluginMeta(
-        installed_developers, installed_plugin_types, plugin_categories
-
+        installed_developers,
+        installed_plugin_types,
+        plugin_categories
     );
+    std::vector<PluginMeta> filtered_plugins;
     ReaSonusComboInput *developers_combo;
     ReaSonusComboInput *plugin_type_combo;
 
 protected:
-    void CreateMappingFile(std::string plugin_name) const {
-        mINI::INIStructure ini;
-        std::string plugin_type = "No FX";
-        const std::string full_name = PluginUtils::StripPluginNamePrefixes(plugin_name.c_str());
-        const std::vector<std::string> plugin_name_parts = split(plugin_name, PREFIX_SEPARATOR);
-        if (plugin_name_parts.size() > 1) {
-            plugin_type = toLowerCase(plugin_name_parts.at(0));
-        }
-        const std::string name = PluginUtils::ExtractPluginName(plugin_name);
-        const std::string developer_name = PluginUtils::ExtractDeveloperName(plugin_name);
-        std::string fileName = PluginUtils::GetReaSonusPluginPath(developer_name, name, plugin_type, true);
+    void CreateMappingFile(std::string orig_plugin_name) const {
+        mINI::INIStructure plugin_mapping_ini;
 
-        const mINI::INIFile file(fileName);
-        if (!file.read(ini)) {
-            ini["Global"];
-            ini["Global"]["origName"] = full_name;
-            ini["Global"]["name"] = name;
-            ini["Global"]["type"] = plugin_type;
-            ini["Global"]["developer"] = developer_name;
+        PluginUtils::ReadCreatePluginMappingFileByOrigPluginName(orig_plugin_name, plugin_mapping_ini);
 
-            if (file.generate(ini, true)) {
-                PluginUtils::UpdatePluginMappingCacheFile(name);
-            }
-        }
         if (save_callback != nullptr) {
-            save_callback(developer_name, name, plugin_type);
+            save_callback(
+                plugin_mapping_ini["Global"]["developer"],
+                plugin_mapping_ini["Global"]["name"],
+                plugin_mapping_ini["Global"]["type"]
+            );
         }
     }
 
@@ -152,6 +139,27 @@ public:
     }
 
     void Render() {
+        filtered_plugins.clear();
+        for (const auto &installed_plugin: installed_plugins) {
+            if (
+                ImGui::TextFilter_PassFilter(
+                    assets->GetReaComboFilter(),
+                    installed_plugin.GetShortName().c_str()
+                )
+                && (
+                    plugin_developers[filter_developer] == i18n->t("mapping", "add.developer-filter.first")
+                    || plugin_developers[filter_developer] == installed_plugin.GetDeveloper()
+                )
+                && (
+                    plugin_types[filter_plugin_type] == i18n->t("mapping", "add.plugin-type-filter.first")
+                    || plugin_types[filter_plugin_type] == installed_plugin.GetPluginType()
+
+                )
+            ) {
+                filtered_plugins.emplace_back(installed_plugin);
+            }
+        }
+
         RenderFilterBar();
 
         if (ImGui::IsWindowAppearing(m_ctx)) {
@@ -170,7 +178,10 @@ public:
         )) {
             ImGui::TableSetupColumn(
                 m_ctx,
-                i18n->t("mapping", "add.table.header.plugin").c_str(),
+                (i18n->t("mapping", "add.table.header.plugin") + " :: (" + std::to_string(filtered_plugins.size()) + "/"
+                 +
+                 std::to_string(installed_plugins.size()) + ")").
+                c_str(),
                 ImGui::TableColumnFlags_WidthStretch\
             );
             ImGui::TableSetupColumn(
@@ -184,60 +195,44 @@ public:
             ImGui::TableSetupScrollFreeze(m_ctx, 0, 1);
             ImGui::TableHeadersRow(m_ctx);
 
-            for (const auto &installed_plugin: installed_plugins) {
-                if (
-                    ImGui::TextFilter_PassFilter(
-                        assets->GetReaComboFilter(),
-                        installed_plugin.GetShortName().c_str()
-                    )
-                    && (
-                        plugin_developers[filter_developer] == i18n->t("mapping", "add.developer-filter.first")
-                        || plugin_developers[filter_developer] == installed_plugin.GetDeveloper()
-                    )
-                    && (
-                        plugin_types[filter_plugin_type] == i18n->t("mapping", "add.plugin-type-filter.first")
-                        || plugin_types[filter_plugin_type] == installed_plugin.GetPluginType()
+            for (const auto &filtered_plugin: filtered_plugins) {
+                ImGui::TableNextRow(m_ctx);
+                ImGui::TableNextColumn(m_ctx);
+                ImGui::Text(m_ctx, filtered_plugin.GetShortName().c_str());
+                ImGui::TableNextColumn(m_ctx);
+                ImGui::Text(m_ctx, filtered_plugin.GetDeveloper().c_str());
+                ImGui::TableNextColumn(m_ctx);
+                ImGui::GetCursorScreenPos(m_ctx, &pos_screen_x, &pos_screen_y);
+                ReaSonusPluginTypeButton(
+                    m_ctx,
+                    assets,
+                    pos_screen_x + 4,
+                    pos_screen_y - 3,
+                    filtered_plugin.GetPluginType()
+                );
+                ImGui::TableNextColumn(m_ctx);
 
-                    )
-                ) {
-                    ImGui::TableNextRow(m_ctx);
-                    ImGui::TableNextColumn(m_ctx);
-                    ImGui::Text(m_ctx, installed_plugin.GetShortName().c_str());
-                    ImGui::TableNextColumn(m_ctx);
-                    ImGui::Text(m_ctx, installed_plugin.GetDeveloper().c_str());
-                    ImGui::TableNextColumn(m_ctx);
-                    ImGui::GetCursorScreenPos(m_ctx, &pos_screen_x, &pos_screen_y);
-                    ReaSonusPluginTypeButton(
-                        m_ctx,
-                        assets,
-                        pos_screen_x + 4,
-                        pos_screen_y - 3,
-                        installed_plugin.GetPluginType()
-                    );
-                    ImGui::TableNextColumn(m_ctx);
-
-                    ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 2);
-                    UiStyledElements::PushReaSonusIconButtonStyle(m_ctx, assets, 16);
-                    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 0, 0);
-                    if (ImGui::Button(
-                        m_ctx, (std::string(1, IconAdd) + "##" + installed_plugin.GetFullName()).c_str(), 20, 20
-                    )) {
-                        CreateMappingFile(installed_plugin.GetFullName());
-                    }
-                    if (ImGui::IsItemHovered(m_ctx)) {
-                        ImGui::SetMouseCursor(m_ctx, ImGui::MouseCursor_Hand);
-                    }
-                    ReaSonusSimpleTooltip(
-                        m_ctx,
-                        assets,
-                        i18n->t("mapping", "add.table.button.add", installed_plugin.GetShortName()),
-                        "add-mapping"
-                    );
-
-                    UiStyledElements::PopReaSonusIconButtonStyle(m_ctx);
-
-                    ImGui::PopStyleVar(m_ctx);
+                ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 2);
+                UiStyledElements::PushReaSonusIconButtonStyle(m_ctx, assets, 16);
+                ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 0, 0);
+                if (ImGui::Button(
+                    m_ctx, (std::string(1, IconAdd) + "##" + filtered_plugin.GetFullName()).c_str(), 20, 20
+                )) {
+                    CreateMappingFile(filtered_plugin.GetFullName());
                 }
+                if (ImGui::IsItemHovered(m_ctx)) {
+                    ImGui::SetMouseCursor(m_ctx, ImGui::MouseCursor_Hand);
+                }
+                ReaSonusSimpleTooltip(
+                    m_ctx,
+                    assets,
+                    i18n->t("mapping", "add.table.button.add", filtered_plugin.GetShortName()),
+                    "add-mapping"
+                );
+
+                UiStyledElements::PopReaSonusIconButtonStyle(m_ctx);
+
+                ImGui::PopStyleVar(m_ctx);
             }
 
             ImGui::EndTable(m_ctx);

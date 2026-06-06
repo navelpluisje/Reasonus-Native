@@ -70,23 +70,23 @@ public:
      * Get the folder path for the reasonus plugins
      * @return
      */
-    static std::string GetPluginFolderPath();
+    static std::string GetReaSonusPluginFolderPath();
 
     /**
      * Get the folder path for the reasonus plugin cache files
      * @return
      */
-    static std::string GetPluginCacheFolderPath();
+    static std::string GetReaSonusPluginCacheFolderPath();
 
     /**
-     * Get the patgh to the plugin file with the given parguments
+     * Get the path to the plugin mapping file
      * @param developer The developer folder
      * @param plugin_name The plugin name to use for creating the file nmame
      * @param plugin_type The plugin type to use for creating the file nmame
      * @param create Wether to create the path if it not exists
      * @return
      */
-    static std::string GetReaSonusPluginPath(
+    static std::string GetReaSonusPluginMappingFilePath(
         std::string developer,
         const std::string &plugin_name,
         const std::string &plugin_type,
@@ -101,7 +101,7 @@ public:
      * @param create Wether to create the path if it not exists
      * @return
      */
-    static std::string GetReaSonusPluginCachePath(
+    static std::string GetReaSonusPluginCacheFilePath(
         std::string developer,
         const std::string &plugin_name,
         const std::string &plugin_type,
@@ -162,12 +162,6 @@ public:
     static std::string ExtractPluginType(const std::string &plugin_name);
 
     /**
-     * Get the path of the folder where ReaSonus is storing all the plugin mappings
-     * @return
-     */
-    static std::string GetPluginsPath();
-
-    /**
      * Check if the plugin has a mapping file
      * @param media_track The media track where th eplugin is added
      * @param pluginId The plugin index
@@ -192,10 +186,11 @@ public:
 
     /**
      * Get a list of all the mapped plugins by developer
+     * @param developer
      * @param sorted Whether to sort the result
      * @return
      */
-    static std::vector<std::string> GetDeveloperPlugins(std::string developer, bool sorted);
+    static std::vector<std::string> GetDeveloperPluginMappings(std::string developer, bool sorted);
 
     /**
      * Get a list with all the installed plugins according to REAPER
@@ -264,6 +259,18 @@ public:
     );
 
     /**
+     * Read the plugin mapping file from the file system and creates one if it does not exist
+     * Also create the plugin mapping cache file if it does not exist
+     * @param orig_plugin_name The original name of the plugin to ceate the file for
+     * @param plugin_mapping_ini The ini file structure to write to
+     * @return Wether the file successfull has been deleted
+     */
+    static bool ReadCreatePluginMappingFileByOrigPluginName(
+        const std::string &orig_plugin_name,
+        mINI::INIStructure &plugin_mapping_ini
+    );
+
+    /**
      * Delete the plugin mapping file from the file system
      * @param developer Developername used as the folder name
      * @param plugin_name Plugin name without the path part
@@ -272,7 +279,8 @@ public:
      */
     static bool DeletePluginMappingFile(
         const std::string &developer,
-        const std::string &plugin_name, const std::string &plugin_type
+        const std::string &plugin_name,
+        const std::string &plugin_type
     );
 
     static bool CreatePluginMappingCacheFile(MediaTrack *media_track, int plugin_id, bool update);
