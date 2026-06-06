@@ -32,7 +32,6 @@ class CSurf_FP_8_PluginMappingPage : public CSurf_UI_PageContent // NOLINT(*-use
     std::vector<std::string> developers;
     std::vector<std::string> plugin_types = PluginUtils::GetPluginTypes();
     std::set<std::string> installed_developers;
-    std::vector<PluginMeta> installed_plugins = PluginUtils::ExtractInstalledPluginMeta(installed_developers);
 
     int newly_selected_plugin_type = 0;
     bool save_selected_plugin_type = false;

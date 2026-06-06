@@ -1,12 +1,10 @@
 #include "csurf_plugin_utils.hpp"
-
 #include <regex>
-
 #include "csurf_daw.hpp"
-#include "reaper_plugin_functions.h"
 #include "csurf_utils.hpp"
-#include "../ui/csurf_ui_colors.hpp"
+#include "reaper_plugin_functions.h"
 #include "../i18n/i18n.hpp"
+#include "../ui/csurf_ui_colors.hpp"
 
 std::string PluginUtils::GetReaSonusPluginFolderPath() {
     return createPathName({std::string(GetResourcePath()), "ReaSonus", "Plugins"});
@@ -205,19 +203,40 @@ std::vector<std::string> PluginUtils::GetDeveloperPluginMappings(std::string dev
 }
 
 std::vector<std::string> PluginUtils::GetInstalledPlugins() {
-    bool has_next = true;
-    int index = 0;
-    const char *plugin_name;
-    const char *plugin_indent;
     std::vector<std::string> installed_plugins;
+    mINI::INIStructure installed_plugins_ini;
+    const std::string installed_plugins_path = createPathName({
+        GetReaSonusPluginCacheFolderPath(),
+        "InstalledFilters.ini"
+    });
 
-    while (has_next) {
-        if (EnumInstalledFX(index, &plugin_name, &plugin_indent)) {
-            installed_plugins.emplace_back(plugin_name);
-            index++;
-        } else {
-            has_next = false;
+    const mINI::INIFile installed_plugins_file(installed_plugins_path);
+
+    if (installed_plugins_file.read(installed_plugins_ini)) {
+        for (const auto &[key, value]: installed_plugins_ini["plugins"]) {
+            installed_plugins.emplace_back(value.c_str());
         }
+    } else {
+        bool has_next = true;
+        int index = 0;
+        const char *plugin_name;
+        const char *plugin_indent;
+
+        if (!installed_plugins_ini.has("plugins")) {
+            installed_plugins_ini["plugins"];
+        }
+
+        while (has_next) {
+            if (EnumInstalledFX(index, &plugin_name, &plugin_indent)) {
+                installed_plugins.emplace_back(plugin_name);
+                installed_plugins_ini["plugins"][std::to_string(index)] = plugin_name;
+                index++;
+            } else {
+                has_next = false;
+            }
+        }
+
+        (void) installed_plugins_file.write(installed_plugins_ini);
     }
 
     return installed_plugins;

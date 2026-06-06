@@ -27,11 +27,7 @@ class ReaSonusAddPluginMappingForm {
     std::set<std::string> installed_developers;
     std::set<std::string> installed_plugin_types;
     std::set<std::string> plugin_categories;
-    std::vector<PluginMeta> installed_plugins = PluginUtils::ExtractInstalledPluginMeta(
-        installed_developers,
-        installed_plugin_types,
-        plugin_categories
-    );
+    std::vector<PluginMeta> installed_plugins;
     std::vector<PluginMeta> filtered_plugins;
     ReaSonusComboInput *developers_combo;
     ReaSonusComboInput *plugin_type_combo;
@@ -60,7 +56,9 @@ public:
     ) : m_ctx(m_ctx), assets(assets), save_callback(save_callback) {
         i18n = I18n::GetInstance();
         installed_plugins = PluginUtils::ExtractInstalledPluginMeta(
-            installed_developers, installed_plugin_types, plugin_categories
+            installed_developers,
+            installed_plugin_types,
+            plugin_categories
         );
 
         plugin_developers.assign(installed_developers.begin(), installed_developers.end());
