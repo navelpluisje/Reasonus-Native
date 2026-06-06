@@ -443,7 +443,10 @@ bool PluginUtils::ReadCreatePluginMappingFileByOrigPluginName(
     }
 
     if (!HasPluginMappingCache(plugin_developer, full_name, plugin_type)) {
-        return UpdatePluginMappingCacheFile(orig_plugin_name);
+        return UpdatePluginMappingCacheFile(GetPluginRequestString(
+            plugin_mapping_ini["global"]["origname"],
+            plugin_mapping_ini["global"]["type"]
+        ));
     }
 
     return true;
