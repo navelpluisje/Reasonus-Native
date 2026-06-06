@@ -445,7 +445,7 @@ bool PluginUtils::ReadCreatePluginMappingFileByOrigPluginName(
     if (!HasPluginMappingCache(plugin_developer, full_name, plugin_type)) {
         return UpdatePluginMappingCacheFile(orig_plugin_name);
     }
-    
+
     return true;
 }
 
@@ -530,7 +530,6 @@ bool PluginUtils::CreatePluginMappingCacheFile(MediaTrack *media_track, int plug
 }
 
 bool PluginUtils::UpdatePluginMappingCacheFile(const std::string &full_plugin_name) {
-    ShowConsoleMsg(full_plugin_name.c_str());
     InsertTrackAtIndex(0, false);
     MediaTrack *media_track = GetTrack(nullptr, 0);
     TrackFX_AddByName(media_track, full_plugin_name.c_str(), false, -1);
