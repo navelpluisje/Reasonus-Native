@@ -10,13 +10,17 @@
 #include "../windows/csurf_ui_fp_8_control_panel.hpp"
 #include "../../shared/csurf_reasonus_settings.hpp"
 #include "../components/csurf_ui_image_combo_input.hpp"
-
+#include "../components/csurf_ui_color_picker.hpp"
 
 class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-internal-linkage)
     I18n *i18n = I18n::GetInstance();
 
     int selected_tab = -1;
     int selected_display_line = -1;
+
+    // Test Values
+    int selected_color = 0x00FF0000;
+    // End Test Values
 
     int setting_language{};
     bool edit_language = false;
@@ -61,12 +65,12 @@ class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-in
 
     std::array<int, 6> time_code_indexes = {0, 2, 3, 4, 5, 8};
     std::vector<std::string> time_code_names = {
-        i18n->t("settings", "timecode-list.option.time"), // Time
-        i18n->t("settings", "timecode-list.option.beats"), // "Beats",
-        i18n->t("settings", "timecode-list.option.seconds"), // "Seconds",
-        i18n->t("settings", "timecode-list.option.samples"), // "Samples",
+        i18n->t("settings", "timecode-list.option.time"),          // Time
+        i18n->t("settings", "timecode-list.option.beats"),         // "Beats",
+        i18n->t("settings", "timecode-list.option.seconds"),       // "Seconds",
+        i18n->t("settings", "timecode-list.option.samples"),       // "Samples",
         i18n->t("settings", "timecode-list.option.hr-min-sec-fr"), // "Hr:Min:Sec:Fr",
-        i18n->t("settings", "timecode-list.option.frames"), // "Abs. Frames"
+        i18n->t("settings", "timecode-list.option.frames"),        // "Abs. Frames"
     };
 
     int track_display_lines[9] = {3, 3, 4, 2, 2, 3, 3, 3, 3};
@@ -263,6 +267,14 @@ public:
             ImGui::GetContentRegionAvail(m_ctx, &width, &height);
 
             if (ImGui::BeginChild(m_ctx, "settings-display", width / 2 - 8, 0.0, ImGui::ChildFlags_None)) {
+                ReaSonusColorPicker(
+                    m_ctx,
+                    "Color Picker",
+                    &selected_color,
+                    0x0000FF00,
+                    {}
+
+                );
                 RenderInfoCheckbox(
                     m_ctx,
                     assets,
@@ -316,7 +328,6 @@ public:
             ImGui::Image(m_ctx, assets->GetDisplayMode(setting_track_display), 76, 100);
 
             ImGui::SameLine(m_ctx);
-
 
             UiStyledElements::PushReaSonusGroupStyle(m_ctx, true);
             if (ImGui::BeginChild(
@@ -494,7 +505,6 @@ public:
                         &setting_time_code,
                         i18n->t("settings", "timecode-list.tooltip"));
                 }
-
 
                 ImGui::EndChild(m_ctx);
             }
