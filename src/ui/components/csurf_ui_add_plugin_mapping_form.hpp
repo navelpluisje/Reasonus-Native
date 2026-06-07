@@ -259,27 +259,6 @@ public:
                 ImGui::PopStyleVar(m_ctx);
             }
 
-            UiStyledElements::PushReaSonusContextMenuStyle(m_ctx);
-            if (ImGui::BeginPopupContextWindow(m_ctx, "context-mapping")) {
-                ImGui::PushFont(m_ctx, assets->GetMainFont(), 13);
-                if (ImGui::BeginChild(
-                    m_ctx,
-                    "plugin-mapping-context",
-                    0.0,
-                    0.0,
-                    ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY | ImGui::ChildFlags_AutoResizeX
-                )) {
-                    if (ImGui::Selectable(m_ctx, i18n->t("mapping", "add.table.context.rebuild-cache").c_str())) {
-                        ImGui::CloseCurrentPopup(m_ctx);
-                        RebuildInstalledPluginCache();
-                    }
-                    ImGui::EndChild(m_ctx);
-                }
-                ImGui::PopFont(m_ctx);
-                ImGui::EndPopup(m_ctx);
-            }
-            UiStyledElements::PopReaSonusContextMenuStyle(m_ctx);
-
             ImGui::EndTable(m_ctx);
         }
         ImGui::PopStyleVar(m_ctx);
