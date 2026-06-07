@@ -149,6 +149,15 @@ public:
         }
     }
 
+    void RebuildInstalledPluginCache() {
+        installed_plugins = PluginUtils::ExtractInstalledPluginMeta(
+            installed_developers,
+            installed_plugin_types,
+            plugin_categories,
+            true
+        );
+    }
+
     void Render() {
         if (first_run) {
             return;
@@ -262,12 +271,7 @@ public:
                 )) {
                     if (ImGui::Selectable(m_ctx, i18n->t("mapping", "add.table.context.rebuild-cache").c_str())) {
                         ImGui::CloseCurrentPopup(m_ctx);
-                        installed_plugins = PluginUtils::ExtractInstalledPluginMeta(
-                            installed_developers,
-                            installed_plugin_types,
-                            plugin_categories,
-                            true
-                        );
+                        RebuildInstalledPluginCache();
                     }
                     ImGui::EndChild(m_ctx);
                 }

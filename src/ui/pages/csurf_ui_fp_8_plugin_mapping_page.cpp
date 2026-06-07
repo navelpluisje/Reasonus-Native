@@ -918,10 +918,29 @@ public:
 
             ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
             ImGui::SameLine(m_ctx);
-            ImGui::SetCursorPosX(m_ctx, space_x - 18);
+            ImGui::SetCursorPosX(m_ctx, space_x - (show_add_plugin_mapping ? 46 : 18));
 
             UiStyledElements::PushReaSonusIconButtonStyle(m_ctx, assets, 16);
             ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 0, 0);
+            if (show_add_plugin_mapping) {
+                ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameBorderSize, 0.0);
+                if (ImGui::SmallButton(m_ctx, std::string(1, IconRestore).c_str())) {
+                    AddPluginMappingForm->RebuildInstalledPluginCache();
+                }
+
+                if (ImGui::IsItemHovered(m_ctx)) {
+                    ImGui::SetMouseCursor(m_ctx, ImGui::MouseCursor_Hand);
+                }
+
+                ReaSonusSimpleTooltip(
+                    m_ctx, assets,
+                    i18n->t("mapping", "add.table.context.rebuild-cache"),
+                    "rebuild-mapping-cache"
+                );
+                ImGui::PopStyleVar(m_ctx);
+
+                ImGui::SameLine(m_ctx);
+            }
 
             if (ImGui::SmallButton(m_ctx, std::string(1, show_add_plugin_mapping ? IconRemove : IconAdd).c_str())) {
                 show_add_plugin_mapping = !show_add_plugin_mapping;
@@ -939,6 +958,7 @@ public:
                     : i18n->t("mapping", "add.button.tooltip.open"),
                 "add-mapping"
             );
+
             ImGui::PopStyleVar(m_ctx);
             UiStyledElements::PopReaSonusIconButtonStyle(m_ctx);
 
