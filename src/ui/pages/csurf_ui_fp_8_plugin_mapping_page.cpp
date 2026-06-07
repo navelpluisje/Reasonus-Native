@@ -825,7 +825,6 @@ public:
             m_ctx,
             assets,
             std::bind(&CSurf_FP_8_PluginMappingPage::HandlePluginMappingAdded, this, _1, _2, _3)
-
         );
 
         SelectLabelInvertCombo = new ReaSonusComboInput(
@@ -926,6 +925,7 @@ public:
 
             if (ImGui::SmallButton(m_ctx, std::string(1, show_add_plugin_mapping ? IconRemove : IconAdd).c_str())) {
                 show_add_plugin_mapping = !show_add_plugin_mapping;
+                AddPluginMappingForm->Show();
             }
 
             if (ImGui::IsItemHovered(m_ctx)) {

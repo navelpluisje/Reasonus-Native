@@ -32,6 +32,8 @@ class ReaSonusAddPluginMappingForm {
     ReaSonusComboInput *developers_combo;
     ReaSonusComboInput *plugin_type_combo;
 
+    bool first_run = true;
+
 protected:
     void CreateMappingFile(std::string orig_plugin_name) const {
         mINI::INIStructure plugin_mapping_ini;
@@ -54,6 +56,10 @@ public:
         const std::function<void(std::string developer, std::string plugin_name, std::string plugin_type)> &
         save_callback
     ) : m_ctx(m_ctx), assets(assets), save_callback(save_callback) {
+
+    }
+
+    void Init() {
         i18n = I18n::GetInstance();
         installed_plugins = PluginUtils::ExtractInstalledPluginMeta(
             installed_developers,
@@ -136,7 +142,16 @@ public:
         UiStyledElements::PopReaSonusGroupStyle(m_ctx);
     }
 
+    void Show() {
+        if (first_run) {
+            Init();
+            first_run = false;
+        }
+    }
+
     void Render() {
+        if (first_run) { return; }
+
         filtered_plugins.clear();
         for (const auto &installed_plugin: installed_plugins) {
             if (

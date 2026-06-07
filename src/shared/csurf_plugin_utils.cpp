@@ -203,40 +203,20 @@ std::vector<std::string> PluginUtils::GetDeveloperPluginMappings(std::string dev
 }
 
 std::vector<std::string> PluginUtils::GetInstalledPlugins() {
+    bool has_next = true;
+    int index = 0;
+    const char* plugin_name;
+    const char* plugin_indent;
     std::vector<std::string> installed_plugins;
-    mINI::INIStructure installed_plugins_ini;
-    const std::string installed_plugins_path = createPathName({
-        GetReaSonusPluginCacheFolderPath(),
-        "InstalledFilters.ini"
-    });
 
-    const mINI::INIFile installed_plugins_file(installed_plugins_path);
-
-    if (installed_plugins_file.read(installed_plugins_ini)) {
-        for (const auto &[key, value]: installed_plugins_ini["plugins"]) {
-            installed_plugins.emplace_back(value.c_str());
+    while (has_next) {
+        if (EnumInstalledFX(index, &plugin_name, &plugin_indent)) {
+            installed_plugins.emplace_back(plugin_name);
+            index++;
         }
-    } else {
-        bool has_next = true;
-        int index = 0;
-        const char *plugin_name;
-        const char *plugin_indent;
-
-        if (!installed_plugins_ini.has("plugins")) {
-            installed_plugins_ini["plugins"];
+        else {
+            has_next = false;
         }
-
-        while (has_next) {
-            if (EnumInstalledFX(index, &plugin_name, &plugin_indent)) {
-                installed_plugins.emplace_back(plugin_name);
-                installed_plugins_ini["plugins"][std::to_string(index)] = plugin_name;
-                index++;
-            } else {
-                has_next = false;
-            }
-        }
-
-        (void) installed_plugins_file.write(installed_plugins_ini);
     }
 
     return installed_plugins;
@@ -255,37 +235,87 @@ std::vector<PluginMeta> PluginUtils::ExtractInstalledPluginMeta(
     std::set<std::string> &plugin_types,
     std::set<std::string> &plugin_categories
 ) {
-    const std::vector<std::string> installed_plugins = GetInstalledPlugins();
     std::vector<PluginMeta> plugin_meta;
 
-    mINI::INIStructure category_file_ini;
-    const mINI::INIFile category_file(createPathName({GetResourcePath(), "reaper-fxtags.ini"}));
-    category_file.read(category_file_ini);
+    std::vector<std::string> installed_plugins;
+    mINI::INIStructure installed_plugins_ini;
+    const std::string installed_plugins_path = createPathName({
+        GetReaSonusPluginCacheFolderPath(),
+        "InstalledPlugins.ini"
+        });
 
-    for (const auto &orig_plugin_name: installed_plugins) {
-        PluginMeta meta(orig_plugin_name);
-        std::string developer = ExtractDeveloperName(orig_plugin_name);
-        if (developer.empty()) {
-            continue;
+    const mINI::INIFile installed_plugins_file(installed_plugins_path);
+
+    if (installed_plugins_file.read(installed_plugins_ini)) {
+        for (int i = 0; i < static_cast<int>(installed_plugins_ini.size()); i++) {
+            const std::string index = std::to_string(i);
+            if (installed_plugins_ini.has("plugin_" + index)) {
+
+                std::string developer = installed_plugins_ini["plugin_" + index]["developer"];
+                std::string orig_plugin_name = installed_plugins_ini["plugin_" + index]["orig_plugin_name"];
+                std::string short_name = installed_plugins_ini["plugin_" + index]["short_name"];
+                std::string category = installed_plugins_ini["plugin_" + index]["category"];
+                std::string type = installed_plugins_ini["plugin_" + index]["type"];
+
+                developers.emplace(developer);
+                plugin_types.emplace(type);
+                plugin_categories.emplace(category);
+
+                PluginMeta meta(orig_plugin_name);
+                meta.SetDeveloper(developer);
+                meta.SetFullName(orig_plugin_name);
+                meta.SetShortName(short_name);
+                meta.SetCategory(category);
+                meta.SetPluginType(type);
+
+                plugin_meta.emplace_back(meta);
+            }
         }
-        const std::string plugin_type = ExtractPluginType(orig_plugin_name);
-        const std::string short_name = ExtractPluginName(orig_plugin_name);
-        const std::string cat_name = createCategoryName(orig_plugin_name, plugin_type);
+    } else {
+        const std::vector<std::string> installed_plugins = GetInstalledPlugins();
 
-        if (plugin_type == "js") {
-            developer = "js";
+        mINI::INIStructure category_file_ini;
+        const mINI::INIFile category_file(createPathName({ GetResourcePath(), "reaper-fxtags.ini" }));
+        category_file.read(category_file_ini);
+
+        int index = 0;
+
+        for (const auto& orig_plugin_name : installed_plugins) {
+            PluginMeta meta(orig_plugin_name);
+            std::string developer = ExtractDeveloperName(orig_plugin_name);
+            if (developer.empty()) {
+                continue;
+            }
+            const std::string plugin_type = ExtractPluginType(orig_plugin_name);
+            const std::string short_name = ExtractPluginName(orig_plugin_name);
+            const std::string cat_name = createCategoryName(orig_plugin_name, plugin_type);
+
+            if (plugin_type == "js") {
+                developer = "js";
+            }
+
+            developers.emplace(developer);
+            plugin_types.emplace(plugin_type);
+            plugin_categories.emplace(cat_name);
+            meta.SetDeveloper(developer);
+            meta.SetFullName(orig_plugin_name);
+            meta.SetShortName(short_name);
+            meta.SetCategory(category_file_ini.get("category").get(cat_name));
+            meta.SetPluginType(toLowerCase(plugin_type));
+
+            installed_plugins_ini["plugin_" + std::to_string(index)];
+            installed_plugins_ini["plugin_" + std::to_string(index)]["developer"] = developer;
+            installed_plugins_ini["plugin_" + std::to_string(index)]["orig_plugin_name"] = orig_plugin_name;
+            installed_plugins_ini["plugin_" + std::to_string(index)]["short_name"] = short_name;
+            installed_plugins_ini["plugin_" + std::to_string(index)]["category"] = category_file_ini.get("category").get(cat_name);
+            installed_plugins_ini["plugin_" + std::to_string(index)]["type"] = toLowerCase(plugin_type);
+
+            index++;
+
+            plugin_meta.emplace_back(meta);
         }
 
-        developers.emplace(developer);
-        plugin_types.emplace(plugin_type);
-        plugin_categories.emplace(cat_name);
-        meta.SetDeveloper(developer);
-        meta.SetFullName(orig_plugin_name);
-        meta.SetShortName(short_name);
-        meta.SetCategory(category_file_ini.get("category").get(cat_name));
-        meta.SetPluginType(toLowerCase(plugin_type));
-
-        plugin_meta.emplace_back(meta);
+        (void)installed_plugins_file.write(installed_plugins_ini);
     }
 
     return plugin_meta;
