@@ -80,23 +80,23 @@ bool DAW::IsTrackSelected(MediaTrack *media_track) {
 }
 
 bool DAW::IsTrackParent(MediaTrack *media_track) {
-    return doubleToBool(GetMediaTrackInfo_Value(media_track, "I_FOLDERDEPTH"));
+    return toBool(GetMediaTrackInfo_Value(media_track, "I_FOLDERDEPTH"));
 }
 
 bool DAW::IsTrackPinned(MediaTrack *media_track) {
-    return doubleToBool(GetMediaTrackInfo_Value(media_track, "B_TCPPIN"));
+    return toBool(GetMediaTrackInfo_Value(media_track, "B_TCPPIN"));
 }
 
 bool DAW::IsTrackVisible(MediaTrack *media_track) {
-    return doubleToBool(GetMediaTrackInfo_Value(media_track, "B_SHOWINMIXER"));
+    return toBool(GetMediaTrackInfo_Value(media_track, "B_SHOWINMIXER"));
 }
 
 void DAW::SetMixerTrackVisible(MediaTrack *media_track, const bool visible) {
-    SetMediaTrackInfo_Value(media_track, "B_SHOWINMIXER", boolToDouble(visible));
+    SetMediaTrackInfo_Value(media_track, "B_SHOWINMIXER", toDouble(visible));
 }
 
 void DAW::SetTCPTrackVisible(MediaTrack *media_track, const bool visible) {
-    SetMediaTrackInfo_Value(media_track, "B_SHOWINTCP", boolToDouble(visible));
+    SetMediaTrackInfo_Value(media_track, "B_SHOWINTCP", toDouble(visible));
 }
 
 int DAW::GetTrackPanMode(MediaTrack *media_track) {
@@ -326,6 +326,15 @@ bool DAW::HasTrackFx(MediaTrack *media_track, const int fxIndex) {
     return TrackFX_GetFXName(media_track, fxIndex, plugin_name, std::size(plugin_name));
 }
 
+std::string DAW::GetOrigTrackFxName(MediaTrack *media_track, const int fxIndex) {
+    char plugin_name[256] = ""; // NOLINT(*-avoid-c-arrays)
+    if (!TrackFX_GetFXName(media_track, fxIndex, plugin_name, std::size(plugin_name))) {
+        return "No FX";
+    }
+
+    return plugin_name;
+}
+
 std::string DAW::GetTrackFxName(MediaTrack *media_track, const int fxIndex, const bool full) {
     char plugin_name[256] = ""; // NOLINT(*-avoid-c-arrays)
     if (!TrackFX_GetFXName(media_track, fxIndex, plugin_name, std::size(plugin_name))) {
@@ -336,14 +345,7 @@ std::string DAW::GetTrackFxName(MediaTrack *media_track, const int fxIndex, cons
         return PluginUtils::StripPluginNamePrefixes(plugin_name);
     }
 
-    std::vector<std::string> plugin_name_parts = split(
-        PluginUtils::StripPluginNamePrefixes(PluginUtils::StripPluginChannelPostfix(plugin_name).data()), " (");
-
-    if (plugin_name_parts.size() > 1) {
-        plugin_name_parts.pop_back();
-    }
-
-    return join(plugin_name_parts, " (");
+    return PluginUtils::ExtractPluginName(plugin_name);
 }
 
 std::string DAW::GetTrackFxType(MediaTrack *media_track, const int fxIndex) {
@@ -392,7 +394,7 @@ bool DAW::GetTrackFxPanelOpen(MediaTrack *media_track, const int fxIndex) {
 }
 
 bool DAW::GetTrackFxBypassed(MediaTrack *media_track) {
-    return !doubleToBool(GetMediaTrackInfo_Value(media_track, "I_FXEN"));
+    return !toBool(GetMediaTrackInfo_Value(media_track, "I_FXEN"));
 }
 
 void DAW::ToggleTrackFxBypass(MediaTrack *media_track) {
@@ -478,25 +480,25 @@ bool DAW::GetTrackReceiveMute(MediaTrack *media_track, const int receive) {
 
 void DAW::ToggleTrackReceiveMute(MediaTrack *media_track, const int receive) {
     SetTrackSendInfo_Value(media_track, SEND_MODE_RECEIVE, receive, "B_MUTE",
-                           boolToDouble(!GetTrackReceiveMute(media_track, receive)));
+                           toDouble(!GetTrackReceiveMute(media_track, receive)));
 }
 
 bool DAW::GetTrackReceivePhase(MediaTrack *media_track, const int receive) {
-    return doubleToBool(GetTrackSendInfo_Value(media_track, SEND_MODE_RECEIVE, receive, "B_PHASE"));
+    return toBool(GetTrackSendInfo_Value(media_track, SEND_MODE_RECEIVE, receive, "B_PHASE"));
 }
 
 void DAW::ToggleTrackReceivePhase(MediaTrack *media_track, const int receive) {
     SetTrackSendInfo_Value(media_track, SEND_MODE_RECEIVE, receive, "B_PHASE",
-                           boolToDouble(!GetTrackReceivePhase(media_track, receive)));
+                           toDouble(!GetTrackReceivePhase(media_track, receive)));
 }
 
 bool DAW::GetTrackReceiveMono(MediaTrack *media_track, const int receive) {
-    return doubleToBool(GetTrackSendInfo_Value(media_track, SEND_MODE_RECEIVE, receive, "B_MONO"));
+    return toBool(GetTrackSendInfo_Value(media_track, SEND_MODE_RECEIVE, receive, "B_MONO"));
 }
 
 void DAW::ToggleTrackReceiveMono(MediaTrack *media_track, const int receive) {
     SetTrackSendInfo_Value(media_track, SEND_MODE_RECEIVE, receive, "B_MONO",
-                           boolToDouble(!GetTrackReceiveMono(media_track, receive)));
+                           toDouble(!GetTrackReceiveMono(media_track, receive)));
 }
 
 int DAW::GetNextTrackReceiveMode(MediaTrack *media_track, const int receive) {
@@ -557,25 +559,25 @@ bool DAW::GetTrackSendMute(MediaTrack *media_track, const int send) {
 
 void DAW::ToggleTrackSendMute(MediaTrack *media_track, const int send) {
     SetTrackSendInfo_Value(media_track, SEND_MODE_SEND, send, "B_MUTE",
-                           boolToDouble(!GetTrackSendMute(media_track, send)));
+                           toDouble(!GetTrackSendMute(media_track, send)));
 }
 
 bool DAW::GetTrackSendPhase(MediaTrack *media_track, const int send) {
-    return doubleToBool(GetTrackSendInfo_Value(media_track, 0, send, "B_PHASE"));
+    return toBool(GetTrackSendInfo_Value(media_track, 0, send, "B_PHASE"));
 }
 
 void DAW::ToggleTrackSendPhase(MediaTrack *media_track, const int send) {
     SetTrackSendInfo_Value(media_track, SEND_MODE_SEND, send, "B_PHASE",
-                           boolToDouble(!GetTrackSendPhase(media_track, send)));
+                           toDouble(!GetTrackSendPhase(media_track, send)));
 }
 
 bool DAW::GetTrackSendMono(MediaTrack *media_track, const int send) {
-    return doubleToBool(GetTrackSendInfo_Value(media_track, SEND_MODE_SEND, send, "B_MONO"));
+    return toBool(GetTrackSendInfo_Value(media_track, SEND_MODE_SEND, send, "B_MONO"));
 }
 
 void DAW::ToggleTrackSendMono(MediaTrack *media_track, const int send) {
     SetTrackSendInfo_Value(media_track, SEND_MODE_SEND, send, "B_MONO",
-                           boolToDouble(!GetTrackSendMono(media_track, send)));
+                           toDouble(!GetTrackSendMono(media_track, send)));
 }
 
 int DAW::GetNextTrackSendMode(MediaTrack *media_track, const int send) {
@@ -671,9 +673,9 @@ std::vector<std::string> DAW::GetTimeSegments(const double tpos, const int proj_
 
     switch (proj_time_mode) {
         case -1: // Ruler, will be converted to Beat
-        case 1: // Beats + Time
-        case 2: // Beats
-        case 6: // Beats Minimal
+        case 1:  // Beats + Time
+        case 2:  // Beats
+        case 6:  // Beats Minimal
         case 10: // Measure fractions
             value = split(std::string(beat_time), ".");
             // The first 2 items are 0-based so need an extra 1

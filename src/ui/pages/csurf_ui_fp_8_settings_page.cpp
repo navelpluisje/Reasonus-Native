@@ -42,14 +42,22 @@ class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-in
     int setting_track_color_brightness = 25;
     int setting_time_code;
     int setting_track_display;
-    std::array<int, 4> setting_track_value_line_value;
-    std::array<int, 4> setting_track_value_line_align;
-    std::array<int, 4> setting_track_value_line_invert;
+    std::array<int, 4> setting_track_value_line_value = {-1, -1, -1, -1};
+    std::array<int, 4> setting_track_value_line_align = {-1, -1, -1, -1};
+    std::array<int, 4> setting_track_value_line_invert = {-1, -1, -1, -1};
     int setting_track_valuebar_mode;
     int setting_track_valuebar_value;
-    int *index;
 
     std::vector<std::string> language_names;
+
+    std::vector<ReaSonusComboInputRow *> display_line_value_combo;
+    std::vector<ReaSonusComboInputRow *> display_line_alignment_combo;
+    std::vector<ReaSonusComboInputRow *> display_line_invert_combo;
+    ReaSonusComboInputRow *value_bar_type_combo;
+    ReaSonusComboInputRow *value_bar_value_combo;
+    ReaSonusInfoComboInputRow *language_select_combo;
+    ReaSonusInfoComboInputRow *time_code_combo;
+    ReaSonusInfoComboInputRow *latch_preview_action_combo;
 
     std::array<int, 8> latch_preview_action_indexes = {42013, 42014, 42015, 42016, 42017, 41160, 41161, 41162};
     std::vector<std::string> latch_preview_action_names = {
@@ -133,6 +141,88 @@ public:
 
         GetLanguages(language_names);
         CSurf_FP_8_SettingsPage::Reset();
+
+        for (int i = 0; i < 4; i++) {
+            display_line_value_combo.emplace_back(new ReaSonusComboInputRow(
+                m_ctx,
+                assets,
+                i18n->t("settings", "display-track.value.label"),
+                "display-track.value",
+                track_display_values,
+                &setting_track_value_line_value[i],
+                70.0
+            ));
+
+            display_line_alignment_combo.emplace_back(new ReaSonusComboInputRow(
+                m_ctx,
+                assets,
+                i18n->t("settings", "display-track.alignment.label"),
+                "display-track.alignment",
+                track_display_alignments,
+                &setting_track_value_line_align[i],
+                70.0
+            ));
+
+            display_line_invert_combo.emplace_back(new ReaSonusComboInputRow(
+                m_ctx,
+                assets,
+                i18n->t("settings", "display-track.invert.label"),
+                "display-track.invert",
+                track_display_invert,
+                &setting_track_value_line_invert[i],
+                70.0
+            ));
+        }
+
+        value_bar_type_combo = new ReaSonusComboInputRow(
+            m_ctx,
+            assets,
+            i18n->t("settings", "display-track.value-bar-type.label"),
+            "value-bar-type",
+            track_valuebar_modees,
+            &setting_track_valuebar_mode,
+            70.0
+        );
+
+        value_bar_value_combo = new ReaSonusComboInputRow(
+            m_ctx,
+            assets,
+            i18n->t("settings", "display-track.value-bar-value.label"),
+            "value-bar-display",
+            track_valuebar_values,
+            &setting_track_valuebar_value,
+            70.0
+        );
+
+        time_code_combo = new ReaSonusInfoComboInputRow(
+            m_ctx,
+            assets,
+            i18n->t("settings", "timecode-list.label"),
+            "timecode-list",
+            time_code_names,
+            &setting_time_code,
+            i18n->t("settings", "timecode-list.tooltip")
+        );
+
+        language_select_combo = new ReaSonusInfoComboInputRow(
+            m_ctx,
+            assets,
+            i18n->t("settings", "language.label"),
+            "language-select",
+            language_names,
+            &setting_language,
+            i18n->t("settings", "language.tooltip")
+        );
+
+        latch_preview_action_combo = new ReaSonusInfoComboInputRow(
+            m_ctx,
+            assets,
+            i18n->t("settings", "latch-preview-action-list.label"),
+            "latch-preview-action-list",
+            latch_preview_action_names,
+            &setting_latch_preview_action,
+            i18n->t("settings", "latch-preview-action.tooltip")
+        );
     }
 
     ~CSurf_FP_8_SettingsPage() override = default;
@@ -148,15 +238,14 @@ public:
             selected_tab = 0;
             ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 16);
 
-            if (ImGui::BeginChild(m_ctx, "language-select", -1 * language_button_width, 0.0,
-                                  ImGui::ChildFlags_None | ImGui::ChildFlags_AutoResizeY)) {
-                RenderInfoComboInput(
-                    m_ctx,
-                    assets,
-                    i18n->t("settings", "language.label"),
-                    language_names,
-                    &setting_language,
-                    i18n->t("settings", "language.tooltip"));
+            if (ImGui::BeginChild(
+                m_ctx,
+                "language-select",
+                -1 * language_button_width,
+                0.0,
+                ImGui::ChildFlags_None | ImGui::ChildFlags_AutoResizeY
+            )) {
+                language_select_combo->Render();
 
                 ImGui::EndChild(m_ctx);
             }
@@ -242,13 +331,14 @@ public:
 
             if (setting_latch_preview_action_enable) {
                 ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + 26);
-                RenderInfoComboInput(
-                    m_ctx,
-                    assets,
-                    i18n->t("settings", "latch-preview-action-list.label"),
-                    latch_preview_action_names,
-                    &setting_latch_preview_action,
-                    i18n->t("settings", "latch-preview-action.tooltip"));
+                latch_preview_action_combo->Render();
+                // RenderInfoComboInput(
+                //     m_ctx,
+                //     assets,
+                //     i18n->t("settings", "latch-preview-action-list.label"),
+                //     latch_preview_action_names,
+                //     &setting_latch_preview_action,
+                //     i18n->t("settings", "latch-preview-action.tooltip"));
             }
 
             ImGui::EndTabItem(m_ctx);
@@ -337,29 +427,9 @@ public:
                 0.0,
                 ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY | ImGui::ChildFlags_ResizeY
             )) {
-                ReaSonusComboInputRow(
-                    m_ctx,
-                    i18n->t("settings", "display-track.value.label"),
-                    track_display_values,
-                    &setting_track_value_line_value[tab_index],
-                    70.0
-                );
-
-                ReaSonusComboInputRow(
-                    m_ctx,
-                    i18n->t("settings", "display-track.alignment.label"),
-                    track_display_alignments,
-                    &setting_track_value_line_align[tab_index],
-                    70.0
-                );
-
-                ReaSonusComboInputRow(
-                    m_ctx,
-                    i18n->t("settings", "display-track.invert.label"),
-                    track_display_invert,
-                    &setting_track_value_line_invert[tab_index],
-                    70.0
-                );
+                display_line_value_combo[tab_index]->Render();
+                display_line_alignment_combo[tab_index]->Render();
+                display_line_invert_combo[tab_index]->Render();
 
                 UiStyledElements::PopReaSonusGroupStyle(m_ctx);
                 ImGui::EndChild(m_ctx);
@@ -438,20 +508,8 @@ public:
                         0.0,
                         ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
                     )) {
-                        ReaSonusComboInputRow(
-                            m_ctx,
-                            i18n->t("settings", "display-track.value-bar-type.label"),
-                            track_valuebar_modees,
-                            &setting_track_valuebar_mode,
-                            70.0
-                        );
-                        ReaSonusComboInputRow(
-                            m_ctx,
-                            i18n->t("settings", "display-track.value-bar-value.label"),
-                            track_valuebar_values,
-                            &setting_track_valuebar_value,
-                            70.0
-                        );
+                        value_bar_type_combo->Render();
+                        value_bar_value_combo->Render();
 
                         UiStyledElements::PopReaSonusGroupStyle(m_ctx);
                         ImGui::EndChild(m_ctx);
@@ -497,13 +555,7 @@ public:
 
                 if (setting_overwrite_time_code) {
                     ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + 26);
-                    RenderInfoComboInput(
-                        m_ctx,
-                        assets,
-                        i18n->t("settings", "timecode-list.label"),
-                        time_code_names,
-                        &setting_time_code,
-                        i18n->t("settings", "timecode-list.tooltip"));
+                    time_code_combo->Render();
                 }
 
                 ImGui::EndChild(m_ctx);

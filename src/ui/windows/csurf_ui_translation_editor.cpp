@@ -21,9 +21,22 @@ static void reportError(const ImGui_Error &e) {
 
 ReaSonusTranslationEditor::ReaSonusTranslationEditor()
     : m_ctx{} {
+    using namespace std::placeholders; // for `_1, _2 etc`
+
     ImGui::init(plugin_getapi);
     m_ctx = ImGui::CreateContext(g_name);
     assets = new CSurf_UI_Assets(m_ctx);
+
+    TranslationsList = new ReaSonusExtendedListBox(
+        m_ctx,
+        assets,
+        "translations",
+        language_list,
+        &selected_language,
+        std::bind(&ReaSonusTranslationEditor::HandleRemoveLanguageListItem, this, _1),
+        false,
+        nullptr
+    );
 
     GetBaseLanguage();
     GetLanguageList();
@@ -291,18 +304,8 @@ void ReaSonusTranslationEditor::Frame() {
                         &new_language,
                         "Please use ISO names",
                         std::bind(&ReaSonusTranslationEditor::HandleAddLanguage, this));
-
-                    ReaSonusExtendedListBox(
-                        m_ctx,
-                        assets,
-                        "filters",
-                        language_list,
-                        &selected_language,
-                        false,
-                        std::bind(&ReaSonusTranslationEditor::HandleRemoveLanguageListItem, this, _1),
-                        false,
-                        nullptr);
-
+                    TranslationsList->Render();
+                    
                     // Explanation of the language code
                     // Language Code: https://en.wikipedia.org/wiki/List_of_ISO_639_language_codes
                     // Country Code: https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes

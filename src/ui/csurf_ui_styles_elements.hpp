@@ -54,6 +54,10 @@ public:
 
     static void PopReaSonusListBoxStyle(ImGui_Context *m_ctx);
 
+    static void PushReaSonusContextMenuStyle(ImGui_Context *m_ctx);
+
+    static void PopReaSonusContextMenuStyle(ImGui_Context *m_ctx);
+
     static void PushReaSonusCheckboxStyle(ImGui_Context *m_ctx);
 
     static void PopReaSonusCheckboxStyle(ImGui_Context *m_ctx);
@@ -78,7 +82,7 @@ public:
 
     static void PopReaSonusFunctionButtonStyle(ImGui_Context *m_ctx);
 
-    static void PushReaSonusIconButtonStyle(ImGui_Context *m_ctx, const CSurf_UI_Assets *assets);
+    static void PushReaSonusIconButtonStyle(ImGui_Context *m_ctx, const CSurf_UI_Assets *assets, int size = 20);
 
     static void PopReaSonusIconButtonStyle(ImGui_Context *m_ctx);
 

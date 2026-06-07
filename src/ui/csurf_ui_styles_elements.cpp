@@ -200,6 +200,7 @@ void UiStyledElements::PushReaSonusListBoxStyle(ImGui_Context *m_ctx) {
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 8, 8);
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameRounding, 4);
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameBorderSize, 1);
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_ItemSpacing, 0.0, 0.0);
 
     ImGui::PushStyleColor(m_ctx, ImGui::Col_Border, UI_COLORS::Main_38);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBg, UI_COLORS::Main_23);
@@ -210,7 +211,25 @@ void UiStyledElements::PushReaSonusListBoxStyle(ImGui_Context *m_ctx) {
 }
 
 void UiStyledElements::PopReaSonusListBoxStyle(ImGui_Context *m_ctx) {
-    ImGui::PopStyleVar(m_ctx, 3);
+    ImGui::PopStyleVar(m_ctx, 4);
+    ImGui::PopStyleColor(m_ctx, 4);
+}
+
+void UiStyledElements::PushReaSonusContextMenuStyle(ImGui_Context *m_ctx) {
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 8, 8);
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_PopupRounding, 4);
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_PopupBorderSize, 1);
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameBorderSize, 0);
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_ItemSpacing, 8, 8);
+
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_Border, UI_COLORS::Main_38);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBg, UI_COLORS::Transparent);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBgActive, UI_COLORS::Transparent);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBgHovered, UI_COLORS::Transparent);
+}
+
+void UiStyledElements::PopReaSonusContextMenuStyle(ImGui_Context *m_ctx) {
+    ImGui::PopStyleVar(m_ctx, 5);
     ImGui::PopStyleColor(m_ctx, 4);
 }
 
@@ -319,7 +338,11 @@ void UiStyledElements::PopReaSonusFunctionButtonStyle(ImGui_Context *m_ctx) {
     ImGui::PopStyleColor(m_ctx, 5);
 }
 
-void UiStyledElements::PushReaSonusIconButtonStyle(ImGui_Context *m_ctx, const CSurf_UI_Assets *assets) {
+void UiStyledElements::PushReaSonusIconButtonStyle(
+    ImGui_Context *m_ctx,
+    const CSurf_UI_Assets *assets,
+    const int size
+) {
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 4, 4);
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameRounding, 4);
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameBorderSize, 1);
@@ -332,7 +355,7 @@ void UiStyledElements::PushReaSonusIconButtonStyle(ImGui_Context *m_ctx, const C
 
     ImGui::PushItemWidth(m_ctx, -1);
 
-    ImGui::PushFont(m_ctx, assets->GetIconFont(), 20);
+    ImGui::PushFont(m_ctx, assets->GetIconFont(), size);
 }
 
 void UiStyledElements::PopReaSonusIconButtonStyle(ImGui_Context *m_ctx) {
@@ -342,20 +365,21 @@ void UiStyledElements::PopReaSonusIconButtonStyle(ImGui_Context *m_ctx) {
 }
 
 void UiStyledElements::PushReaSonusTooltipStyle(ImGui_Context *m_ctx) {
-    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 12, 12);
-    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameBorderSize, 2);
-    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameRounding, 8);
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 8, 8);
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_PopupBorderSize, 1);
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_WindowRounding, 4);
 
     ImGui::PushStyleColor(m_ctx, ImGui::Col_Text, UI_COLORS::White);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_Border, UI_COLORS::Main_38);
-    ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBg, UI_COLORS::Main_23);
-    ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBgActive, UI_COLORS::Main_15);
-    ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBgHovered, UI_COLORS::Main_15);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_PopupBg, UI_COLORS::Main_15);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBg, UI_COLORS::Transparent);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBgActive, UI_COLORS::Transparent);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBgHovered, UI_COLORS::Transparent);
 }
 
 void UiStyledElements::PopReaSonusTooltipStyle(ImGui_Context *m_ctx) {
     ImGui::PopStyleVar(m_ctx, 3);
-    ImGui::PopStyleColor(m_ctx, 5);
+    ImGui::PopStyleColor(m_ctx, 6);
 }
 
 void UiStyledElements::PushReaSonusTreeNodeStyle(ImGui_Context *m_ctx, const bool active) {

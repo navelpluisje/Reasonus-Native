@@ -344,6 +344,12 @@ install(TARGETS ${PROJECT_NAME}
         LIBRARY DESTINATION "${REAPER_USER_PLUGINS}" # Linux .so/macOS .dylib
 )
 
+# Copy the locales translation file, so we'll work with the latest every launch
+install(
+        FILES ${PROJECT_SOURCE_DIR}/src/i18n/locales/en-US.ini
+        DESTINATION "${REAPER_USER_PLUGINS}/ReaSonus"
+)
+
 # Set the component as required
 set(CPACK_COMPONENT_${PROJECT_NAME}_REQUIRED ON)
 if (WIN32)
