@@ -211,12 +211,14 @@ public:
      * @param developers
      * @param plugin_types
      * @param plugin_categories
+     * @param force_rebuild
      * @return
      */
     static std::vector<PluginMeta> ExtractInstalledPluginMeta(
         std::set<std::string> &developers,
         std::set<std::string> &plugin_types,
-        std::set<std::string> &plugin_categories
+        std::set<std::string> &plugin_categories,
+        bool force_rebuild = false
     );
 
     static std::vector<PluginMeta> ExtractInstalledPluginMeta(std::set<std::string> &developers);

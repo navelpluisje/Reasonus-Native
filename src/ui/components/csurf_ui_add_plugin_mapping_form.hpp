@@ -56,7 +56,6 @@ public:
         const std::function<void(std::string developer, std::string plugin_name, std::string plugin_type)> &
         save_callback
     ) : m_ctx(m_ctx), assets(assets), save_callback(save_callback) {
-
     }
 
     void Init() {
@@ -64,7 +63,8 @@ public:
         installed_plugins = PluginUtils::ExtractInstalledPluginMeta(
             installed_developers,
             installed_plugin_types,
-            plugin_categories
+            plugin_categories,
+            false
         );
 
         plugin_developers.assign(installed_developers.begin(), installed_developers.end());
@@ -150,7 +150,9 @@ public:
     }
 
     void Render() {
-        if (first_run) { return; }
+        if (first_run) {
+            return;
+        }
 
         filtered_plugins.clear();
         for (const auto &installed_plugin: installed_plugins) {
@@ -184,8 +186,8 @@ public:
             m_ctx,
             "installed-plugins-table",
             4,
-            ImGui::TableFlags_BordersV | ImGui::TableFlags_RowBg |
-            ImGui::TableFlags_SizingStretchProp | ImGui::TableFlags_ScrollY | ImGui::TableFlags_BordersOuterH,
+            ImGui::TableFlags_BordersV | ImGui::TableFlags_RowBg | ImGui::TableFlags_ContextMenuInBody
+            | ImGui::TableFlags_SizingStretchProp | ImGui::TableFlags_ScrollY | ImGui::TableFlags_BordersOuterH,
             0.0,
             0.0
         )) {
@@ -247,6 +249,32 @@ public:
 
                 ImGui::PopStyleVar(m_ctx);
             }
+
+            UiStyledElements::PushReaSonusContextMenuStyle(m_ctx);
+            if (ImGui::BeginPopupContextWindow(m_ctx, "context-mapping")) {
+                ImGui::PushFont(m_ctx, assets->GetMainFont(), 13);
+                if (ImGui::BeginChild(
+                    m_ctx,
+                    "plugin-mapping-context",
+                    0.0,
+                    0.0,
+                    ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY | ImGui::ChildFlags_AutoResizeX
+                )) {
+                    if (ImGui::Selectable(m_ctx, i18n->t("mapping", "add.table.context.rebuild-cache").c_str())) {
+                        ImGui::CloseCurrentPopup(m_ctx);
+                        installed_plugins = PluginUtils::ExtractInstalledPluginMeta(
+                            installed_developers,
+                            installed_plugin_types,
+                            plugin_categories,
+                            true
+                        );
+                    }
+                    ImGui::EndChild(m_ctx);
+                }
+                ImGui::PopFont(m_ctx);
+                ImGui::EndPopup(m_ctx);
+            }
+            UiStyledElements::PopReaSonusContextMenuStyle(m_ctx);
 
             ImGui::EndTable(m_ctx);
         }

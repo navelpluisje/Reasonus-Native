@@ -205,16 +205,15 @@ std::vector<std::string> PluginUtils::GetDeveloperPluginMappings(std::string dev
 std::vector<std::string> PluginUtils::GetInstalledPlugins() {
     bool has_next = true;
     int index = 0;
-    const char* plugin_name;
-    const char* plugin_indent;
+    const char *plugin_name;
+    const char *plugin_indent;
     std::vector<std::string> installed_plugins;
 
     while (has_next) {
         if (EnumInstalledFX(index, &plugin_name, &plugin_indent)) {
             installed_plugins.emplace_back(plugin_name);
             index++;
-        }
-        else {
+        } else {
             has_next = false;
         }
     }
@@ -233,7 +232,8 @@ std::string PluginUtils::createCategoryName(const std::string &plugin_name, std:
 std::vector<PluginMeta> PluginUtils::ExtractInstalledPluginMeta(
     std::set<std::string> &developers,
     std::set<std::string> &plugin_types,
-    std::set<std::string> &plugin_categories
+    std::set<std::string> &plugin_categories,
+    bool force_rebuild
 ) {
     std::vector<PluginMeta> plugin_meta;
 
@@ -242,15 +242,14 @@ std::vector<PluginMeta> PluginUtils::ExtractInstalledPluginMeta(
     const std::string installed_plugins_path = createPathName({
         GetReaSonusPluginCacheFolderPath(),
         "InstalledPlugins.ini"
-        });
+    });
 
     const mINI::INIFile installed_plugins_file(installed_plugins_path);
 
-    if (installed_plugins_file.read(installed_plugins_ini)) {
+    if (!force_rebuild && installed_plugins_file.read(installed_plugins_ini)) {
         for (int i = 0; i < static_cast<int>(installed_plugins_ini.size()); i++) {
             const std::string index = std::to_string(i);
             if (installed_plugins_ini.has("plugin_" + index)) {
-
                 std::string developer = installed_plugins_ini["plugin_" + index]["developer"];
                 std::string orig_plugin_name = installed_plugins_ini["plugin_" + index]["orig_plugin_name"];
                 std::string short_name = installed_plugins_ini["plugin_" + index]["short_name"];
@@ -272,15 +271,15 @@ std::vector<PluginMeta> PluginUtils::ExtractInstalledPluginMeta(
             }
         }
     } else {
-        const std::vector<std::string> installed_plugins = GetInstalledPlugins();
+        installed_plugins = GetInstalledPlugins();
 
         mINI::INIStructure category_file_ini;
-        const mINI::INIFile category_file(createPathName({ GetResourcePath(), "reaper-fxtags.ini" }));
+        const mINI::INIFile category_file(createPathName({GetResourcePath(), "reaper-fxtags.ini"}));
         category_file.read(category_file_ini);
 
         int index = 0;
 
-        for (const auto& orig_plugin_name : installed_plugins) {
+        for (const auto &orig_plugin_name: installed_plugins) {
             PluginMeta meta(orig_plugin_name);
             std::string developer = ExtractDeveloperName(orig_plugin_name);
             if (developer.empty()) {
@@ -291,7 +290,9 @@ std::vector<PluginMeta> PluginUtils::ExtractInstalledPluginMeta(
             const std::string cat_name = createCategoryName(orig_plugin_name, plugin_type);
 
             if (plugin_type == "js") {
-                developer = "js";
+                // TODO: We need to implement a better way of dealing with JS plugins. They diifer in some ways and need some more attention
+                continue;
+                // developer = "js";
             }
 
             developers.emplace(developer);
@@ -307,7 +308,8 @@ std::vector<PluginMeta> PluginUtils::ExtractInstalledPluginMeta(
             installed_plugins_ini["plugin_" + std::to_string(index)]["developer"] = developer;
             installed_plugins_ini["plugin_" + std::to_string(index)]["orig_plugin_name"] = orig_plugin_name;
             installed_plugins_ini["plugin_" + std::to_string(index)]["short_name"] = short_name;
-            installed_plugins_ini["plugin_" + std::to_string(index)]["category"] = category_file_ini.get("category").get(cat_name);
+            installed_plugins_ini["plugin_" + std::to_string(index)]["category"] = category_file_ini.get("category").
+                    get(cat_name);
             installed_plugins_ini["plugin_" + std::to_string(index)]["type"] = toLowerCase(plugin_type);
 
             index++;
@@ -315,7 +317,7 @@ std::vector<PluginMeta> PluginUtils::ExtractInstalledPluginMeta(
             plugin_meta.emplace_back(meta);
         }
 
-        (void)installed_plugins_file.write(installed_plugins_ini);
+        (void) installed_plugins_file.write(installed_plugins_ini, true);
     }
 
     return plugin_meta;
@@ -326,7 +328,7 @@ std::vector<PluginMeta> PluginUtils::ExtractInstalledPluginMeta(
 ) {
     std::set<std::string> plugin_types;
     std::set<std::string> plugin_categories;
-    return ExtractInstalledPluginMeta(developers, plugin_types, plugin_categories);
+    return ExtractInstalledPluginMeta(developers, plugin_types, plugin_categories, false);
 }
 
 std::vector<std::string> PluginUtils::GetPluginTypes() {
