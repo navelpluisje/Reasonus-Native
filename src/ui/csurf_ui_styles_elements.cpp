@@ -338,7 +338,11 @@ void UiStyledElements::PopReaSonusFunctionButtonStyle(ImGui_Context *m_ctx) {
     ImGui::PopStyleColor(m_ctx, 5);
 }
 
-void UiStyledElements::PushReaSonusIconButtonStyle(ImGui_Context *m_ctx, const CSurf_UI_Assets *assets) {
+void UiStyledElements::PushReaSonusIconButtonStyle(
+    ImGui_Context *m_ctx,
+    const CSurf_UI_Assets *assets,
+    const int size
+) {
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 4, 4);
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameRounding, 4);
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameBorderSize, 1);
@@ -351,7 +355,7 @@ void UiStyledElements::PushReaSonusIconButtonStyle(ImGui_Context *m_ctx, const C
 
     ImGui::PushItemWidth(m_ctx, -1);
 
-    ImGui::PushFont(m_ctx, assets->GetIconFont(), 20);
+    ImGui::PushFont(m_ctx, assets->GetIconFont(), size);
 }
 
 void UiStyledElements::PopReaSonusIconButtonStyle(ImGui_Context *m_ctx) {

@@ -14,6 +14,7 @@
 #include "../components/csurf_ui_button_bar.hpp"
 #include "../components/csurf_ui_plugin_selectable.hpp"
 #include "../components/csurf_ui_developer_filter_form.hpp"
+#include "../components/csurf_ui_add_plugin_mapping_form.hpp"
 #include "../../i18n/i18n.hpp"
 #include "../windows/csurf_ui_fp_8_control_panel.hpp"
 
@@ -27,9 +28,11 @@ class CSurf_FP_8_PluginMappingPage : public CSurf_UI_PageContent // NOLINT(*-use
     int changed_items = 0;
 
     bool render_started = false;
-    std::string plugin_folder_path = PluginUtils::GetPluginFolderPath();
+    std::string plugin_folder_path = PluginUtils::GetReaSonusPluginFolderPath();
     std::vector<std::string> developers;
     std::vector<std::string> plugin_types = PluginUtils::GetPluginTypes();
+    std::set<std::string> installed_developers;
+
     int newly_selected_plugin_type = 0;
     bool save_selected_plugin_type = false;
     bool cancel_selected_plugin_type = false;
@@ -63,6 +66,7 @@ class CSurf_FP_8_PluginMappingPage : public CSurf_UI_PageContent // NOLINT(*-use
     int select_uninvert_label = 0;
 
     bool show_developer_filters = false;
+    bool show_add_plugin_mapping = false;
 
     std::string fader_key;
     std::string fader_name;
@@ -76,6 +80,10 @@ class CSurf_FP_8_PluginMappingPage : public CSurf_UI_PageContent // NOLINT(*-use
     ReaSonusSearchComboInput *SelectParamList;
     ReaSonusSearchComboInput *FaderParamList;
     ReaSonusDeveloperFilterForm *DevelopersFilterForm;
+    ReaSonusAddPluginMappingForm *AddPluginMappingForm;
+    ReaSonusComboInput *SelectLabelInvertCombo;
+    ReaSonusComboInput *FaderLabelInvertCombo;
+    ReaSonusComboInput *PluginTypeCombo;
 
     bool plugin_dirty = false;
 
@@ -87,7 +95,7 @@ protected:
         developers = PluginUtils::GetpluginDevelopers(true);
 
         for (const auto &developer: developers) {
-            plugins.push_back(PluginUtils::GetDeveloperPlugins(developer, true));
+            plugins.push_back(PluginUtils::GetDeveloperPluginMappings(developer, true));
         }
     }
 
@@ -748,6 +756,46 @@ protected:
         ImGui::PopFont(m_ctx);
     }
 
+    /**
+     * Select the newly created developer and plugin
+     * @param developer
+     * @param plugin_name
+     * @param plugin_type
+     */
+    void HandlePluginMappingAdded(
+        const std::string &developer,
+        const std::string &plugin_name,
+        const std::string &plugin_type
+    ) {
+        // First we're updating the
+        SetPluginFolders();
+        int developer_index = selected_developer;
+        int plugin_index = selected_plugin;
+        const auto developer_it = std::find(developers.begin(), developers.end(), developer);
+
+        if (developer_it < developers.end()) {
+            developer_index = developer_it - developers.begin();
+        }
+        selected_developer = developer_index;
+        previous_selected_developer = developer_index;
+
+        std::vector<std::string> developer_plugins = plugins.at(developer_index);
+        const auto plugin_it = std::find(
+            developer_plugins.begin(),
+            developer_plugins.end(),
+            plugin_name + "." + plugin_type + ".ini"
+        );
+
+        if (plugin_it < developer_plugins.end()) {
+            plugin_index = plugin_it - developer_plugins.begin();
+        }
+
+        selected_plugin = plugin_index;
+        PluginCheck(true);
+
+        ReaSonus8ControlPanel::SetMessage(i18n->t("mapping", "add.mapping.success.message"));
+    }
+
 public:
     CSurf_FP_8_PluginMappingPage(ImGui_Context *m_ctx, CSurf_UI_Assets *assets) : CSurf_UI_PageContent(m_ctx, assets) {
         using namespace std::placeholders; // for `_1, _2 etc`
@@ -771,6 +819,39 @@ public:
             &param_names,
             &fader_param_index,
             settings->ShouldClearParamInput()
+        );
+
+        AddPluginMappingForm = new ReaSonusAddPluginMappingForm(
+            m_ctx,
+            assets,
+            std::bind(&CSurf_FP_8_PluginMappingPage::HandlePluginMappingAdded, this, _1, _2, _3)
+        );
+
+        SelectLabelInvertCombo = new ReaSonusComboInput(
+            m_ctx,
+            assets,
+            i18n->t("mapping", "edit.select.label-uninvert.label"),
+            "edit-select-label-invert",
+            invert_labels,
+            &select_uninvert_label
+        );
+
+        FaderLabelInvertCombo = new ReaSonusComboInput(
+            m_ctx,
+            assets,
+            i18n->t("mapping", "edit.fader.label-uninvert.label"),
+            "edit-fader-label-invert",
+            invert_labels,
+            &fader_uninvert_label
+        );
+
+        PluginTypeCombo = new ReaSonusComboInput(
+            m_ctx,
+            assets,
+            "",
+            "plugin-ype-select",
+            plugin_types,
+            &newly_selected_plugin_type
         );
 
         SetPluginFolders();
@@ -829,8 +910,58 @@ public:
     }
 
     void RenderMappingsList() {
+        double space_x;
+        double space_y;
+
         if (ImGui::BeginChild(m_ctx, "mapping_lists", 280.0, 0.0)) {
             ImGui::Text(m_ctx, i18n->t("mapping", "list.label").c_str());
+
+            ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
+            ImGui::SameLine(m_ctx);
+            ImGui::SetCursorPosX(m_ctx, space_x - (show_add_plugin_mapping ? 46 : 18));
+
+            UiStyledElements::PushReaSonusIconButtonStyle(m_ctx, assets, 16);
+            ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 0, 0);
+            if (show_add_plugin_mapping) {
+                ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameBorderSize, 0.0);
+                if (ImGui::SmallButton(m_ctx, std::string(1, IconRestore).c_str())) {
+                    AddPluginMappingForm->RebuildInstalledPluginCache();
+                }
+
+                if (ImGui::IsItemHovered(m_ctx)) {
+                    ImGui::SetMouseCursor(m_ctx, ImGui::MouseCursor_Hand);
+                }
+
+                ReaSonusSimpleTooltip(
+                    m_ctx, assets,
+                    i18n->t("mapping", "add.table.context.rebuild-cache"),
+                    "rebuild-mapping-cache"
+                );
+                ImGui::PopStyleVar(m_ctx);
+
+                ImGui::SameLine(m_ctx);
+            }
+
+            if (ImGui::SmallButton(m_ctx, std::string(1, show_add_plugin_mapping ? IconRemove : IconAdd).c_str())) {
+                show_add_plugin_mapping = !show_add_plugin_mapping;
+                AddPluginMappingForm->Show();
+            }
+
+            if (ImGui::IsItemHovered(m_ctx)) {
+                ImGui::SetMouseCursor(m_ctx, ImGui::MouseCursor_Hand);
+            }
+
+            ReaSonusSimpleTooltip(
+                m_ctx, assets,
+                show_add_plugin_mapping
+                    ? i18n->t("mapping", "add.button.tooltip.close")
+                    : i18n->t("mapping", "add.button.tooltip.open"),
+                "add-mapping"
+            );
+
+            ImGui::PopStyleVar(m_ctx);
+            UiStyledElements::PopReaSonusIconButtonStyle(m_ctx);
+
             ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 4);
 
             UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
@@ -1045,11 +1176,7 @@ public:
                 );
                 ImGui::SameLine(m_ctx);
 
-                ReaSonusComboInput(
-                    m_ctx,
-                    i18n->t("mapping", "edit.select.label-uninvert.label"),
-                    invert_labels,
-                    &select_uninvert_label);
+                SelectLabelInvertCombo->Render();
 
                 ImGui::EndChild(m_ctx);
             }
@@ -1087,11 +1214,7 @@ public:
 
                 ImGui::SameLine(m_ctx);
 
-                ReaSonusComboInput(
-                    m_ctx,
-                    i18n->t("mapping", "edit.fader.label-uninvert.label"),
-                    invert_labels,
-                    &fader_uninvert_label);
+                FaderLabelInvertCombo->Render();
 
                 ImGui::EndChild(m_ctx);
             }
@@ -1140,11 +1263,7 @@ public:
                 i18n->t("mapping", "edit.typeselect.description").c_str()
             );
 
-            ReaSonusComboInput(
-                m_ctx,
-                "",
-                plugin_types,
-                &newly_selected_plugin_type);
+            PluginTypeCombo->Render();
 
             ReaSonusButtonBar(
                 m_ctx,
@@ -1230,6 +1349,7 @@ public:
     void DeveloperCheck() {
         if (selected_developer != previous_selected_developer) {
             show_developer_filters = false;
+            show_add_plugin_mapping = false;
             channel_offset = 0;
             selected_plugin_exists = false;
 
@@ -1249,15 +1369,17 @@ public:
     /**
      * Check if the selected plugin has changed.
      */
-    void PluginCheck() {
-        if (selected_plugin == previous_selected_plugin) {
+    void PluginCheck(bool force = false) {
+        if (selected_plugin == previous_selected_plugin && !force) {
             return;
         }
 
         show_developer_filters = false;
 
+        show_add_plugin_mapping = false;
+
         // If data is dirty and user does not want to save or clear the changes, we do not change plugins
-        if (!DirtyCheck()) {
+        if (!DirtyCheck() && !force) {
             selected_plugin = previous_selected_plugin;
             return;
         }
@@ -1294,6 +1416,8 @@ public:
 
         if (show_developer_filters) {
             RenderDevelopersFilterList();
+        } else if (show_add_plugin_mapping) {
+            AddPluginMappingForm->Render();
         } else if (selected_plugin > -1 && selected_plugin_exists && !selected_plugin_params_error) {
             ImGui::Text(
                 m_ctx,

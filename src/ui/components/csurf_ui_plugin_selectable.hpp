@@ -133,8 +133,9 @@ static void ReaSonusPluginSelectable(
                 "plugin-mapping-tooltip-add-group"
             );
         }
-
-        ImGui::SetMouseCursor(m_ctx, ImGui::MouseCursor_Hand);
+        if (context_over) {
+            ImGui::SetMouseCursor(m_ctx, ImGui::MouseCursor_Hand);
+        }
 
         ImGui::EndChild(m_ctx);
     }

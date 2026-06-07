@@ -56,14 +56,12 @@ public:
     ~ReaSonusExtendedListBox() = default;
 
     void HandleRemoveClick(const int index) const {
-        ShowConsoleMsg("remove\n");
         if (remove_callback != nullptr) {
             remove_callback(index);
         }
     }
 
     void HandleItemSelect(const int index) const {
-        ShowConsoleMsg("remove\n");
         if (remove_callback != nullptr) {
             remove_callback(index);
         }
@@ -91,7 +89,6 @@ public:
                     // When the active item is not the hovered item, we are dragging. Call the sort_callback in that case
                     if (sortable && active_item > -1 && active_item != hovered_item
                     ) {
-                        ShowConsoleMsg("Sort");
                         sort_callback(active_item, hovered_item);
                     }
                 }

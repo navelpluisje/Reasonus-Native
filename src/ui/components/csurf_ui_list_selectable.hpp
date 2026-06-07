@@ -3,6 +3,7 @@
 
 #include <reaper_imgui_functions.h>
 #include <string>
+#include <functional>
 #include "../utils/csurf_ui_text_overflow.hpp"
 #include "../csurf_ui_assets.hpp"
 #include "../csurf_ui_colors.hpp"
@@ -99,7 +100,7 @@ static void ReaSonusListSelectable(
     ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBg, selectable_bg);
     if (ImGui::BeginChild(
             m_ctx,
-            ("item" + std::to_string(item_index)).c_str(),
+            ("item" + label + std::to_string(item_index)).c_str(),
             0.0,
             selectable_height,
             ImGui::ChildFlags_FrameStyle
@@ -110,7 +111,7 @@ static void ReaSonusListSelectable(
         // When hovered and having the remove option, reduce the witdth as the invisible button is on top of the remove button
         ImGui::InvisibleButton(
             m_ctx,
-            "invisible-button",
+            ("invisible-button" + label).c_str(),
             width - (mouse_over && delete_callback != nullptr ? 40 : 0),
             selectable_height
         );
