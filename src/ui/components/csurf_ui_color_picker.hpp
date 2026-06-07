@@ -76,22 +76,6 @@ static void ReaSonusColorPicker(
       )) {
         *selected_color = color_palette[i];
       }
-
-      // if (ImGui::BeginDragDropTarget(m_ctx)) {
-      //   local drop_color
-      //   rv, drop_color = ImGui::AcceptDragDropPayloadRGB(m_ctx);
-      //
-      //   if (rv) {
-      //     widgets.colors.saved_palette[n] = drop_color
-      //   }
-      //
-      //   rv, drop_color = ImGui::AcceptDragDropPayloadRGBA(m_ctx)
-      //   if (rv) {
-      //     widgets.colors.saved_palette[n] = drop_color >> 8
-      //   }
-      //   ImGui::EndDragDropTarget(m_ctx);
-      // }
-
       ImGui::PopID(m_ctx);
     }
 
