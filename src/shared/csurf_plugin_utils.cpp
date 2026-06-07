@@ -246,31 +246,8 @@ std::vector<PluginMeta> PluginUtils::ExtractInstalledPluginMeta(
 
     const mINI::INIFile installed_plugins_file(installed_plugins_path);
 
-    if (!force_rebuild && installed_plugins_file.read(installed_plugins_ini)) {
-        for (int i = 0; i < static_cast<int>(installed_plugins_ini.size()); i++) {
-            const std::string index = std::to_string(i);
-            if (installed_plugins_ini.has("plugin_" + index)) {
-                std::string developer = installed_plugins_ini["plugin_" + index]["developer"];
-                std::string orig_plugin_name = installed_plugins_ini["plugin_" + index]["orig_plugin_name"];
-                std::string short_name = installed_plugins_ini["plugin_" + index]["short_name"];
-                std::string category = installed_plugins_ini["plugin_" + index]["category"];
-                std::string type = installed_plugins_ini["plugin_" + index]["type"];
-
-                developers.emplace(developer);
-                plugin_types.emplace(type);
-                plugin_categories.emplace(category);
-
-                PluginMeta meta(orig_plugin_name);
-                meta.SetDeveloper(developer);
-                meta.SetFullName(orig_plugin_name);
-                meta.SetShortName(short_name);
-                meta.SetCategory(category);
-                meta.SetPluginType(type);
-
-                plugin_meta.emplace_back(meta);
-            }
-        }
-    } else {
+    // Generate installed plugins cache if requested or it does not exist
+    if (force_rebuild || !installed_plugins_file.read(installed_plugins_ini)) {
         installed_plugins = GetInstalledPlugins();
 
         mINI::INIStructure category_file_ini;
@@ -295,15 +272,6 @@ std::vector<PluginMeta> PluginUtils::ExtractInstalledPluginMeta(
                 // developer = "js";
             }
 
-            developers.emplace(developer);
-            plugin_types.emplace(plugin_type);
-            plugin_categories.emplace(cat_name);
-            meta.SetDeveloper(developer);
-            meta.SetFullName(orig_plugin_name);
-            meta.SetShortName(short_name);
-            meta.SetCategory(category_file_ini.get("category").get(cat_name));
-            meta.SetPluginType(toLowerCase(plugin_type));
-
             installed_plugins_ini["plugin_" + std::to_string(index)];
             installed_plugins_ini["plugin_" + std::to_string(index)]["developer"] = developer;
             installed_plugins_ini["plugin_" + std::to_string(index)]["orig_plugin_name"] = orig_plugin_name;
@@ -313,11 +281,34 @@ std::vector<PluginMeta> PluginUtils::ExtractInstalledPluginMeta(
             installed_plugins_ini["plugin_" + std::to_string(index)]["type"] = toLowerCase(plugin_type);
 
             index++;
-
-            plugin_meta.emplace_back(meta);
         }
 
         (void) installed_plugins_file.write(installed_plugins_ini, true);
+    }
+
+    // Read installed plugins from cache
+    for (int i = 0; i < static_cast<int>(installed_plugins_ini.size()); i++) {
+        const std::string index = std::to_string(i);
+        if (installed_plugins_ini.has("plugin_" + index)) {
+            std::string developer = installed_plugins_ini["plugin_" + index]["developer"];
+            std::string orig_plugin_name = installed_plugins_ini["plugin_" + index]["orig_plugin_name"];
+            std::string short_name = installed_plugins_ini["plugin_" + index]["short_name"];
+            std::string category = installed_plugins_ini["plugin_" + index]["category"];
+            std::string type = installed_plugins_ini["plugin_" + index]["type"];
+
+            developers.emplace(developer);
+            plugin_types.emplace(type);
+            plugin_categories.emplace(category);
+
+            PluginMeta meta(orig_plugin_name);
+            meta.SetDeveloper(developer);
+            meta.SetFullName(orig_plugin_name);
+            meta.SetShortName(short_name);
+            meta.SetCategory(category);
+            meta.SetPluginType(type);
+
+            plugin_meta.emplace_back(meta);
+        }
     }
 
     return plugin_meta;
@@ -678,20 +669,20 @@ bool PluginUtils::ReadDevelopersFilterData(mINI::INIStructure &developer_filter_
     const mINI::INIFile developer_filter_file(developer_filter_path);
     if (!std::filesystem::exists(developer_filter_path)) {
         developer_filter_ini["Arturia"];
-        developer_filter_ini["Arturia"]["MIDI CC"];
-        developer_filter_ini["Arturia"]["reserved"];
-        developer_filter_ini["Arturia"]["unassigned"];
-        developer_filter_ini["Arturia"]["VST_ProgramChange_*"];
-        developer_filter_ini["Arturia"]["HardwareDisplayControl"];
-        developer_filter_ini["Arturia"]["MPE_*"];
+        developer_filter_ini["Arturia"]["0"] = "MIDI CC";
+        developer_filter_ini["Arturia"]["1"] = "reserved";
+        developer_filter_ini["Arturia"]["2"] = "unassigned";
+        developer_filter_ini["Arturia"]["3"] = "VST_ProgramChange_*";
+        developer_filter_ini["Arturia"]["4"] = "HardwareDisplayControl";
+        developer_filter_ini["Arturia"]["5"] = "MPE_*";
         developer_filter_ini["Decomposer"];
-        developer_filter_ini["Decomposer"]["MIDI CC"];
-        developer_filter_ini["Decomposer"]["reserved"];
-        developer_filter_ini["Blue Cat"];
-        developer_filter_ini["Blue Cat"]["MIDI Program Change"];
-        developer_filter_ini["Blue Cat"]["MIDI Controller"];
+        developer_filter_ini["Decomposer"]["0"] = "MIDI CC";
+        developer_filter_ini["Decomposer"]["1"] = "reserved";
+        developer_filter_ini["Blue Cat Audio"];
+        developer_filter_ini["Blue Cat Audio"]["0"] = "MIDI Program Change";
+        developer_filter_ini["Blue Cat Audio"]["1"] = "MIDI Controller";
         developer_filter_ini["Spitfire Audio"];
-        developer_filter_ini["Spitfire Audio"]["general purpose"];
+        developer_filter_ini["Spitfire Audio"]["0"] = "general purpose";
 
         (void) developer_filter_file.generate(developer_filter_ini, true);
     }
