@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <algorithm>
 #include <mini/ini.h>
 #include "../shared/csurf_utils.hpp"
 
@@ -15,7 +16,7 @@ class ReaSonusSettings {
     static ReaSonusSettings *instance8Ptr;
     static ReaSonusSettings *instanceV2Ptr;
 
-    const std::vector<std::vector<std::string> > shared_settings = {
+    const std::vector<std::vector<std::string>> shared_settings = {
         {"surface", "midiin", "0"},
         {"surface", "midiout", "0"},
         {"surface", "mute-solo-momentary", "0"},
@@ -30,13 +31,15 @@ class ReaSonusSettings {
         {"footswitch", "3", "0"},
     };
 
-    const std::vector<std::vector<std::string> > fp_v2_settings = {
+    const std::vector<std::vector<std::string>> fp_v2_settings = {
         {"surface", "control-hidden-tracks", "0"},
         {"surface", "can-disable-fader", "0"},
         {"surface", "endless-track-scroll", "0"},
     };
 
-    const std::vector<std::vector<std::string> > fp_8_settings = {
+    std::vector<std::string> palette_colors{24, std::to_string(0x00ffffff)};
+
+    const std::vector<std::vector<std::string>> fp_8_settings = {
         {"surface", "surface", "0"},
         {"surface", "disable-plugins", "0"},
         {"surface", "distraction-free", "0"},
@@ -49,6 +52,7 @@ class ReaSonusSettings {
         {"surface", "track-color-brightness", "25"},
         {"surface", "plugin-step-size", "1"},
         {"surface", "plugin-map-param-clear", "0"},
+        {"surface", "plugin-color-palette", join(palette_colors, ",")},
         {"surface", "instant-multi-select-filter", "0"},
         {"surface", "mute-master-on-fwd-rwd", "0"},
         {"displays", "track", "8"},
@@ -217,6 +221,8 @@ public:
     bool ShouldClearParamInput();
 
     bool ShouldMultiFilterApplyInstant();
+
+    std::vector<int> GetPluginColorPalette();
 
     bool ShouldMuteMasterOnFwdRwd();
 

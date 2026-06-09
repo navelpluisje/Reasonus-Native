@@ -37,6 +37,8 @@ class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-in
     bool setting_plugin_map_param_clear;
     bool setting_instant_multi_select_filter;
     bool setting_mute_master_on_fwd_rwd;
+    std::vector<int> settings_initial_plugin_color_palette;
+    std::vector<int> settings_plugin_color_palette;
     int setting_plugin_step_size;
     int setting_latch_preview_action;
     int setting_track_color_brightness = 25;
@@ -332,13 +334,6 @@ public:
             if (setting_latch_preview_action_enable) {
                 ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + 26);
                 latch_preview_action_combo->Render();
-                // RenderInfoComboInput(
-                //     m_ctx,
-                //     assets,
-                //     i18n->t("settings", "latch-preview-action-list.label"),
-                //     latch_preview_action_names,
-                //     &setting_latch_preview_action,
-                //     i18n->t("settings", "latch-preview-action.tooltip"));
             }
 
             ImGui::EndTabItem(m_ctx);
@@ -357,14 +352,6 @@ public:
             ImGui::GetContentRegionAvail(m_ctx, &width, &height);
 
             if (ImGui::BeginChild(m_ctx, "settings-display", width / 2 - 8, 0.0, ImGui::ChildFlags_None)) {
-                ReaSonusColorPicker(
-                    m_ctx,
-                    "Color Picker",
-                    &selected_color,
-                    0x0000FF00,
-                    {}
-
-                );
                 RenderInfoCheckbox(
                     m_ctx,
                     assets,
@@ -388,6 +375,7 @@ public:
                     settings->GetSurface(),
                     i18n->t("settings", "plugin-step-size.tooltip"),
                     "%d");
+
                 ImGui::EndChild(m_ctx);
             }
 
@@ -401,6 +389,27 @@ public:
                     &setting_plugin_map_param_clear,
                     i18n->t("settings", "plugin-map-param-clear.tooltip"));
 
+                ImGui::Text(m_ctx, "Color Palette");
+                ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameRounding, 4.0);
+                ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameBorderSize, 2);
+                ImGui::PushStyleColor(m_ctx, ImGui::Col_Border, UI_COLORS::FormFieldBorder);
+                for (int i = 0; i < static_cast<int>(settings_plugin_color_palette.size()); i++) {
+                    if (i % 8 != 0) {
+                        ImGui::SameLine(m_ctx);
+                    }
+
+                    ReaSonusColorPicker(
+                        m_ctx,
+                        ("Color Picker##picker" + std::to_string(i)).c_str(),
+                        &settings_plugin_color_palette[i],
+                        settings_initial_plugin_color_palette[i],
+                        settings_plugin_color_palette,
+                        30,
+                        30
+                    );
+                }
+                ImGui::PopStyleVar(m_ctx, 2);
+                ImGui::PopStyleColor(m_ctx, 1);
                 ImGui::EndChild(m_ctx);
             }
 
@@ -624,6 +633,7 @@ public:
         settings->SetSetting("displays", "track-invert", joinDisplayValues(setting_track_value_line_invert, ","));
         settings->SetSetting("displays", "track-value-bar-mode", setting_track_valuebar_mode);
         settings->SetSetting("displays", "track-value-bar-value", setting_track_valuebar_value);
+        settings->SetSetting("surface", "plugin-color-palette", join(settings_plugin_color_palette, ","));
 
         if (settings->StoreSettings()) {
             DAW::SetExtState(EXT_STATE_KEY_SAVED_SETTINGS, EXT_STATE_VALUE_TRUE, false);
@@ -665,8 +675,10 @@ public:
         setting_track_valuebar_value = settings->GetTrackValueBarValue();
         setting_instant_multi_select_filter = settings->ShouldMultiFilterApplyInstant();
         setting_mute_master_on_fwd_rwd = settings->ShouldMuteMasterOnFwdRwd();
+        settings_initial_plugin_color_palette = settings->GetPluginColorPalette();
+        settings_plugin_color_palette = settings->GetPluginColorPalette();
 
-        auto iterator = std::find(
+        const auto iterator = std::find(
             latch_preview_action_indexes.begin(),
             latch_preview_action_indexes.end(),
             settings->GetLatchPreviewActionCode());

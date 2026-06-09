@@ -232,6 +232,10 @@ bool ReaSonusSettings::ShouldMultiFilterApplyInstant() {
     return stoi(settings["surface"]["instant-multi-select-filter"]) > 0;
 }
 
+std::vector<int> ReaSonusSettings::GetPluginColorPalette() {
+    return splitToInt(settings["surface"]["plugin-color-palette"], ",");
+}
+
 bool ReaSonusSettings::ShouldMuteMasterOnFwdRwd() {
     return stoi(settings["surface"]["mute-master-on-fwd-rwd"]) > 0;
 }

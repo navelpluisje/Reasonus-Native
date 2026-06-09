@@ -15,6 +15,7 @@
 #include "../components/csurf_ui_plugin_selectable.hpp"
 #include "../components/csurf_ui_developer_filter_form.hpp"
 #include "../components/csurf_ui_add_plugin_mapping_form.hpp"
+#include "../components/csurf_ui_color_picker.hpp"
 #include "../../i18n/i18n.hpp"
 #include "../windows/csurf_ui_fp_8_control_panel.hpp"
 
@@ -32,6 +33,7 @@ class CSurf_FP_8_PluginMappingPage : public CSurf_UI_PageContent // NOLINT(*-use
     std::vector<std::string> developers;
     std::vector<std::string> plugin_types = PluginUtils::GetPluginTypes();
     std::set<std::string> installed_developers;
+    std::vector<int> plugin_color_palette;;
 
     int newly_selected_plugin_type = 0;
     bool save_selected_plugin_type = false;
@@ -64,6 +66,8 @@ class CSurf_FP_8_PluginMappingPage : public CSurf_UI_PageContent // NOLINT(*-use
     int select_param_index = -1;
     int previous_select_param_index = -1;
     int select_uninvert_label = 0;
+    int select_color;
+    int previous_select_color;
 
     bool show_developer_filters = false;
     bool show_add_plugin_mapping = false;
@@ -126,6 +130,13 @@ protected:
             if (!plugin_params[section].has("uninvert-label") || plugin_params[section]["uninvert-label"].empty()) {
                 modified = true;
                 plugin_params[section]["uninvert-label"] = "0";
+                previous_plugin_params[section]["uninvert-label"] = "0";
+            }
+
+            if (!plugin_params[section].has("color") || plugin_params[section]["color"].empty()) {
+                modified = true;
+                plugin_params[section]["color"] = std::to_string(0x00ffffff);
+                previous_plugin_params[section]["color"] = std::to_string(0x00ffffff);
             }
         }
 
@@ -178,16 +189,16 @@ protected:
             plugin_type_error = true;
         }
 
-        // Type in filename and data do not match
-        if (selected_plugin_filename_type != plugin_params["global"]["type"]) {
-            selected_plugin_type_mismatch = true;
-            plugin_type_error = true;
-        }
-
         if (plugin_type_error) {
             selected_plugin_exists = false;
             newly_selected_plugin_type = 0;
             return false;
+        }
+
+        // Type in filename and data do not match
+        if (selected_plugin_filename_type != plugin_params["global"]["type"]) {
+            selected_plugin_type_mismatch = true;
+            plugin_type_error = true;
         }
 
         selected_plugin_exists = true;
@@ -290,6 +301,12 @@ protected:
 
             select_name = plugin_params[select_key]["name"];
             select_nb_steps = stoi(plugin_params[select_key]["steps"]);
+            select_color = plugin_params[select_key].has("color")
+                               ? stoi(plugin_params[select_key]["color"])
+                               : 0x00ffffff;
+            previous_select_color = plugin_params[select_key].has("color")
+                                        ? stoi(plugin_params[select_key]["color"])
+                                        : 0x00ffffff;
             select_uninvert_label = stoi(plugin_params[select_key]["uninvert-label"]);
 
             const int param_id = stoi(plugin_params[select_key]["param"]);
@@ -344,6 +361,7 @@ protected:
             plugin_params[select_key]["name"] = select_name;
             plugin_params[select_key]["steps"] = std::to_string(select_nb_steps);
             plugin_params[select_key]["param"] = std::to_string(std::get<0>(param_data[select_param_index]));
+            plugin_params[select_key]["color"] = std::to_string(select_color);
             plugin_params[select_key]["uninvert-label"] = std::to_string(select_uninvert_label);
         }
 
@@ -371,6 +389,7 @@ protected:
         return plugin_params[select]["name"] != previous_plugin_params[select]["name"] ||
                plugin_params[select]["steps"] != previous_plugin_params[select]["steps"] ||
                plugin_params[select]["param"] != previous_plugin_params[select]["param"] ||
+               plugin_params[select]["color"] != previous_plugin_params[select]["color"] ||
                plugin_params[select]["uninvert-label"] != previous_plugin_params[select]["uninvert-label"];
     }
 
@@ -802,6 +821,7 @@ public:
 
         i18n = I18n::GetInstance();
         settings = ReaSonusSettings::GetInstance(FP_8);
+        plugin_color_palette = settings->GetPluginColorPalette();
 
         SelectParamList = new ReaSonusSearchComboInput(
             m_ctx,
@@ -1023,7 +1043,8 @@ public:
                     dirty,
                     selected_channel == i,
                     std::bind(&CSurf_FP_8_PluginMappingPage::HandleChannelClick, this, _1),
-                    std::bind(&CSurf_FP_8_PluginMappingPage::HandleGroupDrop, this, _1, _2));
+                    std::bind(&CSurf_FP_8_PluginMappingPage::HandleGroupDrop, this, _1, _2)
+                );
 
                 if (has_style_var) {
                     ImGui::PopStyleVar(m_ctx);
@@ -1171,9 +1192,28 @@ public:
                     i18n->t("mapping", "edit.select.param-name.label"),
                     &select_name,
                     i18n->t("mapping", "edit.select.param-name.placeholder"),
-                    space_x * 0.7,
+                    space_x * 0.7 - 72,
                     false
                 );
+                ImGui::SameLine(m_ctx);
+
+                ImGui::BeginGroup(m_ctx);
+                // ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 23);
+                ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 20, 8.5);
+                ImGui::Text(m_ctx, i18n->t("mapping", "edit.select.color.label").c_str());
+                ReaSonusColorPicker(
+                    m_ctx,
+                    i18n->t("mapping", "edit.select.color-picker.label"),
+                    &select_color,
+                    previous_select_color,
+                    plugin_color_palette,
+                    64,
+                    32
+                );
+                ImGui::PopStyleVar(m_ctx);
+                // ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 20);
+                ImGui::EndGroup(m_ctx);
+
                 ImGui::SameLine(m_ctx);
 
                 SelectLabelInvertCombo->Render();

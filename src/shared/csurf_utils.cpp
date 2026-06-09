@@ -64,7 +64,6 @@ bool SetIntConfigVar(const std::string &var_name, const int value) {
     return var.SetValue(value);
 }
 
-
 bool hasBit(const int val, const int key) {
     return (val & 1 << key) != 0;
 }
@@ -204,6 +203,17 @@ std::vector<std::string> split(const std::string &str, const std::string &delimi
     return value;
 }
 
+std::vector<int> splitToInt(const std::string &str, const std::string &delimiter) {
+    std::vector<int> value;
+    std::vector<std::string> splitted_string = split(str, delimiter);
+
+    for (auto val: splitted_string) {
+        value.emplace_back(stoi(val));
+    }
+
+    return value;
+}
+
 std::vector<std::string> cutString(const std::string &str, const size_t size) {
     std::vector<std::string> result;
     std::string value = str;
@@ -226,6 +236,18 @@ std::string join(const std::vector<std::string> &list, const std::string &delimi
 
     for (const std::string &key: list) {
         result += (count > 0 ? delimiter : "") + key;
+        count++;
+    }
+
+    return result;
+}
+
+std::string join(const std::vector<int> &list, const std::string &delimiter) {
+    std::string result;
+    int count = 0;
+
+    for (const auto &key: list) {
+        result += (count > 0 ? delimiter : "") + std::to_string(key);
         count++;
     }
 
