@@ -112,6 +112,7 @@ public:
     ~CSurf_FP_8_TrackManager() override = default;
 
     void UpdateTracks(bool force_update) override {
+        ShowConsoleMsg("");
         const WDL_PtrList<MediaTrack> media_tracks = navigator->GetBankTracks();
         std::vector<std::string> time_code;
         const auto valuebar_mode = static_cast<ValuebarMode>(
@@ -138,7 +139,7 @@ public:
             std::string strPan2;
 
             const CSurf_FP_8_Track *track = tracks.at(i);
-            
+
             if (context->GetMasterFaderMode() && i == context->GetNbChannels() - 1) {
                 media_track = GetMasterTrack(nullptr);
                 is_master_track = true;
@@ -150,7 +151,7 @@ public:
                 const int index = context->GetNbChannels() - (static_cast<int>(time_code.size()) + i);
 
                 if (index < 1) {
-                    track->ClearTrack(false);
+                    track->ClearTrack(false, force_update);
                     track->SetDisplayMode(DISPLAY_MODE_0, force_update);
                     track->SetDisplayLine(0, ALIGN_LEFT, "", NON_INVERT, force_update);
                     track->SetDisplayLine(1, ALIGN_CENTER, "", NON_INVERT, force_update);
@@ -179,6 +180,8 @@ public:
             track->SetMuteButtonValue(DAW::IsTrackMuted(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, force_update);
             track->SetSoloButtonValue(DAW::IsTrackSoloed(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, force_update);
 
+            logInteger("value", fader_value);
+            logInteger("force", force_update || has_touch_mode);
             track->SetFaderValue(fader_value, force_update || has_touch_mode);
 
             // Get value bar type and value type

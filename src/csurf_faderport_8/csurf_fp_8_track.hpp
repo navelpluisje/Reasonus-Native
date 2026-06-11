@@ -85,6 +85,8 @@ public:
 
     void ClearTrack(bool display = true, bool forceUpdate = false) const;
 
+    void SetTrackColor(int color, bool force) const;
+
     void SetTrackColor(ButtonColor color, bool force = false) const;
 
     void SetSelectButtonValue(Btn_Value value, bool force = false) const;

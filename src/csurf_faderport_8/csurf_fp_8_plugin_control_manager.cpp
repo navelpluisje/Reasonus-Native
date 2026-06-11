@@ -47,30 +47,36 @@ public:
         std::vector<CSurf_FP_8_Track *> tracks,
         CSurf_FP_8_Navigator *navigator,
         CSurf_Context *context,
-        midi_Output *m_midiout) : CSurf_FP_8_ChannelManager(tracks, navigator, context, m_midiout) {
+        midi_Output *m_midiout
+    ) : CSurf_FP_8_ChannelManager(tracks, navigator, context, m_midiout) {
         context->ResetChannelManagerItemIndex();
         context->SetChannelManagerItemsCount(CSurf_Context::GetPluginMaxGroupCount());
         GetCurrentPlugin();
-        UpdateTracks(true);
+        CSurf_FP_8_PluginControlManager::UpdateTracks(true);
         color = ButtonColorWhiteDim;
         editStepSize = false;
     }
 
-    ~CSurf_FP_8_PluginControlManager() {
+    ~CSurf_FP_8_PluginControlManager() override {
     };
 
     void UpdateTracks(bool force_update) override {
-        std::string paramKey;
-        force_update = true;
+        // force_update = true;
         MediaTrack *media_track = context->GetPluginEditTrack();
-        int pluginId = context->GetPluginEditPluginId();
+        const int pluginId = context->GetPluginEditPluginId();
 
         for (int i = 0; i < context->GetNbChannels(); i++) {
-            bool displayStepSize = editStepSize && i == 0;
+            const bool displayStepSize = editStepSize && i == 0;
             char buffer[255];
-            int filterIndex = context->GetChannelManagerItemIndex() + i;
-            CSurf_FP_8_Track *track = tracks.at(i);
-            track->SetTrackColor(color);
+            const int filterIndex = context->GetChannelManagerItemIndex() + i;
+            std::string paramKey = getParamKey("Select_", filterIndex);
+            const CSurf_FP_8_Track *track = tracks.at(i);
+
+            const auto track_color = ini[paramKey].has("color")
+                                         ? stoi(ini[paramKey]["color"])
+                                         : 0x00ffffff;
+
+            track->SetTrackColor(track_color, true);
 
             // If the track is armed always blink as an indication it is armed
             track->SetSelectButtonValue(BTN_VALUE_OFF, force_update);
@@ -79,7 +85,6 @@ public:
 
             track->SetDisplayMode(DISPLAY_MODE_2, force_update);
 
-            paramKey = getParamKey("Select_", filterIndex);
             if (ini.has(paramKey) && ini[paramKey]["param"] != "") {
                 Inverted inverted = ini[paramKey].has("uninvert-label") && ini[paramKey]["uninvert-label"] == "1"
                                         ? NON_INVERT

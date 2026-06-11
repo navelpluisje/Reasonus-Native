@@ -109,6 +109,12 @@ static void ReaSonusColorPicker(
           60,
           40
         )) {
+          double r, g, b, a;
+          ImGui::ColorConvertU32ToDouble4(current_color, &r, &g, &b, &a);
+          logDouble("r", r);
+          logDouble("g", g);
+          logDouble("b", b);
+          logDouble("a", a);
           *selected_color = current_color;
         }
         ImGui::EndGroup(m_ctx);

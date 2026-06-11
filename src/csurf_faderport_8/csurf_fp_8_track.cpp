@@ -40,9 +40,15 @@ void CSurf_FP_8_Track::ClearTrack(const bool display, const bool forceUpdate) co
     this->SetSoloButtonValue(BTN_VALUE_OFF);
     this->SetSelectButtonValue(BTN_VALUE_OFF);
     this->SetValueBarValue(0);
-    this->SetFaderValue(0, true);
+    this->SetFaderValue(0, forceUpdate);
     this->SetVuMeterValue(0);
     this->SetValueBarMode(VALUEBAR_MODE_OFF);
+}
+
+void CSurf_FP_8_Track::SetTrackColor(const int color, const bool force) const {
+    ButtonColor new_color{};
+    new_color.SetColor(color, false);
+    selectButton->SetColor(new_color, force);
 }
 
 void CSurf_FP_8_Track::SetTrackColor(const ButtonColor color, const bool force) const {
