@@ -60,7 +60,6 @@ public:
 
     void UpdateTracks(bool force_update) override {
         std::string paramKey;
-        force_update = true;
         MediaTrack *media_track = context->GetPluginEditTrack();
         int pluginId = context->GetPluginEditPluginId();
 
