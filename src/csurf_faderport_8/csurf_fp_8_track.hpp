@@ -85,6 +85,11 @@ public:
 
     void ClearTrack(bool display = true, bool forceUpdate = false) const;
 
+    /**
+     * Set the color by passing an integer representation of the color
+     * @param color The integer representation of the color. This should be a color without an alpha channel (0xRRGGBB)
+     * @param force Force overwrinting the value, even when it is the same
+     */
     void SetTrackColor(int color, bool force) const;
 
     void SetTrackColor(ButtonColor color, bool force = false) const;

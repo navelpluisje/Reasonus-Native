@@ -48,6 +48,7 @@ void CSurf_FP_8_Track::ClearTrack(const bool display, const bool forceUpdate) co
 void CSurf_FP_8_Track::SetTrackColor(const int color, const bool force) const {
     ButtonColor new_color{};
     new_color.SetColor(color, false);
+
     selectButton->SetColor(new_color, force);
 }
 

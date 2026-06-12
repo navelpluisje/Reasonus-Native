@@ -408,23 +408,33 @@ void DAW::ToggleTrackFxBypass(MediaTrack *media_track) {
 /************************************************************************
  * Track FX Param
  ************************************************************************/
-std::string DAW::GetTrackFxParamName(MediaTrack *media_track, const int fxIndex, const int param) {
+std::string DAW::GetTrackFxParamName(MediaTrack *media_track, const int fx_index, const int param) {
     char param_name[256] = ""; // NOLINT(*-avoid-c-arrays)
 
-    if (TrackFX_GetParamName(media_track, fxIndex, param, param_name, std::size(param_name))) {
+    if (TrackFX_GetParamName(media_track, fx_index, param, param_name, std::size(param_name))) {
         return param_name;
     }
 
     return "No FX";
 }
 
-int DAW::GetTrackFxParamNbSteps(MediaTrack *media_track, const int fxIndex, const int param) {
+std::string DAW::GetTrackFxFormattedParamValue(MediaTrack *media_track, const int fx_index, const int param) {
+    char param_name[256] = ""; // NOLINT(*-avoid-c-arrays)
+
+    if (TrackFX_GetFormattedParamValue(media_track, fx_index, param, param_name, std::size(param_name))) {
+        return param_name;
+    }
+
+    return "No FX";
+}
+
+int DAW::GetTrackFxParamNbSteps(MediaTrack *media_track, const int fx_index, const int param) {
     int nb_steps = 1;
     double step_out;
     double _dummy;
     bool is_toggle;
 
-    if (TrackFX_GetParameterStepSizes(media_track, fxIndex, param, &step_out, &_dummy, &_dummy, &is_toggle)) {
+    if (TrackFX_GetParameterStepSizes(media_track, fx_index, param, &step_out, &_dummy, &_dummy, &is_toggle)) {
         if (step_out > 0) {
             nb_steps = static_cast<int>(std::lround(1.0 / step_out)) + 1;
         }
@@ -433,8 +443,8 @@ int DAW::GetTrackFxParamNbSteps(MediaTrack *media_track, const int fxIndex, cons
     return nb_steps;
 }
 
-void DAW::SetTrackFXParamUntouched(MediaTrack *media_track, const int fxIndex) {
-    TrackFX_SetNamedConfigParm(media_track, fxIndex, "last_touched", "-1");
+void DAW::SetTrackFXParamUntouched(MediaTrack *media_track, const int fx_index) {
+    TrackFX_SetNamedConfigParm(media_track, fx_index, "last_touched", "-1");
 }
 
 /************************************************************************

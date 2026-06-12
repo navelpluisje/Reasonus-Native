@@ -112,7 +112,6 @@ public:
     ~CSurf_FP_8_TrackManager() override = default;
 
     void UpdateTracks(bool force_update) override {
-        ShowConsoleMsg("");
         const WDL_PtrList<MediaTrack> media_tracks = navigator->GetBankTracks();
         std::vector<std::string> time_code;
         const auto valuebar_mode = static_cast<ValuebarMode>(
@@ -180,8 +179,6 @@ public:
             track->SetMuteButtonValue(DAW::IsTrackMuted(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, force_update);
             track->SetSoloButtonValue(DAW::IsTrackSoloed(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, force_update);
 
-            logInteger("value", fader_value);
-            logInteger("force", force_update || has_touch_mode);
             track->SetFaderValue(fader_value, force_update || has_touch_mode);
 
             // Get value bar type and value type

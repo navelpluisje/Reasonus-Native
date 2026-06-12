@@ -26,18 +26,15 @@ struct ButtonColor {
      * @param has_alpha Whter the value has alpha in it
      */
     void SetColor(const int color, const bool has_alpha) {
-        // As the colors in the federport are 0x7f7f7f, we have to divide the ImGui color by 2
-        logInteger("COLOR", color);
         if (has_alpha) {
-            red = color & 0xff000000;
-            green = color & 0x00ff0000;
-            blue = color & 0x0000ff00;
+            red = (color & 0xff000000) >> 24;
+            green = (color & 0x00ff0000) >> 16;
+            blue = (color & 0x0000ff00) >> 8;
         } else {
-            red = color & 0x00ff0000;
-            green = color & 0x0000ff00;
+            red = (color & 0x00ff0000) >> 16;
+            green = (color & 0x0000ff00) >> 8;
             blue = color & 0x000000ff;
         }
-        logInteger("COLOR 2", red + green + blue);
     }
 
     [[nodiscard]] bool IsColor(const ButtonColor color) const {
