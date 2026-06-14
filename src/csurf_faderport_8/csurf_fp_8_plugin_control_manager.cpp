@@ -93,10 +93,12 @@ public:
                     plugin_id,
                     stoi(ini[param_key]["param"])
                 );
+                track->SetSelectButtonValue(BTN_VALUE_ON, force_update);
                 track->SetDisplayLine(1, ALIGN_CENTER, formatted_param_value.c_str(), NON_INVERT, force_update);
             } else {
                 track->SetDisplayLine(0, ALIGN_CENTER, "", NON_INVERT, force_update);
                 track->SetDisplayLine(1, ALIGN_CENTER, "", NON_INVERT, true);
+                track->SetSelectButtonValue(BTN_VALUE_OFF, force_update);
             }
 
             param_key = getParamKey("Fader_", filter_index);

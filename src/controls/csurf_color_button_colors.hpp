@@ -27,13 +27,13 @@ struct ButtonColor {
      */
     void SetColor(const int color, const bool has_alpha) {
         if (has_alpha) {
-            red = (color & 0xff000000) >> 24;
-            green = (color & 0x00ff0000) >> 16;
-            blue = (color & 0x0000ff00) >> 8;
+            red = ((color & 0xff000000) >> 24) / 2;
+            green = ((color & 0x00ff0000) >> 16) / 2;
+            blue = ((color & 0x0000ff00) >> 8) / 2;
         } else {
-            red = (color & 0x00ff0000) >> 16;
-            green = (color & 0x0000ff00) >> 8;
-            blue = color & 0x000000ff;
+            red = ((color & 0x00ff0000) >> 16) / 2;
+            green = ((color & 0x0000ff00) >> 8) / 2;
+            blue = (color & 0x000000ff) / 2;
         }
     }
 

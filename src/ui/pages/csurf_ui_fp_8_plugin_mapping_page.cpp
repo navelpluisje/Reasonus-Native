@@ -1162,8 +1162,13 @@ public:
         double space_y;
 
         UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
-        if (ImGui::BeginChild(m_ctx, "mapping_content_select", 0.0, height,
-                              ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY)) {
+        if (ImGui::BeginChild(
+            m_ctx,
+            "mapping_content_select",
+            0.0,
+            height,
+            ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
+        )) {
             ReaSonusPageTitle(m_ctx, assets, i18n->t("mapping", "edit.select.label"), true);
             if (!param_names.empty()) {
                 ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
@@ -1181,7 +1186,8 @@ public:
                     0,
                     20,
                     0,
-                    "%d");
+                    "%d"
+                );
             }
 
             if (ImGui::BeginChild(m_ctx, "filter_content_input", 0.0, 0.0, ImGui::ChildFlags_AutoResizeY)) {
@@ -1220,19 +1226,24 @@ public:
 
                 ImGui::EndChild(m_ctx);
             }
-            UiStyledElements::PopReaSonusGroupStyle(m_ctx);
             ImGui::EndChild(m_ctx);
         }
+        UiStyledElements::PopReaSonusGroupStyle(m_ctx);
     }
 
-    void RenderMappingFader(double height) {
+    void RenderMappingFader(double width, double height) {
         using namespace std::placeholders; // for `_1, _2 etc`
         double space_x;
         double space_y;
 
         UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
-        if (ImGui::BeginChild(m_ctx, "mapping_content_fader", 0.0, height,
-                              ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY)) {
+        if (ImGui::BeginChild(
+            m_ctx,
+            "mapping_content_fader",
+            width,
+            height,
+            ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
+        )) {
             ReaSonusPageTitle(m_ctx, assets, i18n->t("mapping", "edit.fader.label"), true);
             if (!param_names.empty()) {
                 FaderParamList->Render(
@@ -1240,6 +1251,7 @@ public:
                     0.0
                 );
             }
+
             if (ImGui::BeginChild(m_ctx, "filter_content_input", 0.0, 0.0, ImGui::ChildFlags_AutoResizeY)) {
                 ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
 
@@ -1248,7 +1260,7 @@ public:
                     i18n->t("mapping", "edit.fader.param-name.label"),
                     &fader_name,
                     i18n->t("mapping", "edit.fader.param-name.placeholder"),
-                    space_x * 0.7,
+                    space_x * 0.6,
                     false
                 );
 
@@ -1260,6 +1272,22 @@ public:
             }
             ImGui::EndChild(m_ctx);
         }
+        UiStyledElements::PopReaSonusGroupStyle(m_ctx);
+    }
+
+    void RenderMappingColor(double width, double height) {
+        using namespace std::placeholders; // for `_1, _2 etc`
+        double space_x;
+        double space_y;
+
+        UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
+        if (ImGui::BeginChild(m_ctx, "mapping_content_color", width, height,
+                              ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY)) {
+            ReaSonusPageTitle(m_ctx, assets, i18n->t("mapping", "edit.fader.label"), true);
+
+            ImGui::EndChild(m_ctx);
+        }
+        UiStyledElements::PopReaSonusGroupStyle(m_ctx);
     }
 
     void RenderCenteredText(const std::string &content, const IconFont icon) {
@@ -1453,6 +1481,8 @@ public:
     void RenderMappingContent() {
         double space_x;
         double space_y;
+        double style_var_1;
+        double style_var_2;
 
         if (show_developer_filters) {
             RenderDevelopersFilterList();
@@ -1465,26 +1495,36 @@ public:
                     ? "Groups"
                     : std::string(
                         developers[selected_developer] + " :: " + plugins[selected_developer][selected_plugin]).
-                    c_str());
+                    c_str()
+            );
             ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 4);
+
             RenderInformationBar();
+
             RenderChannelsList();
 
             if (ImGui::BeginChild(m_ctx, "mapping_content_area", 0.0, 0.0)) {
                 ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
+                ImGui::GetStyleVar(m_ctx, ImGui::StyleVar_ItemSpacing, &style_var_1, &style_var_2);
                 const double height = (space_y - 12) / 2;
 
                 RenderMappingSelect(height);
 
-                RenderMappingFader(height);
+                RenderMappingFader((space_x - style_var_1) * 0.6, height);
 
-                UiStyledElements::PopReaSonusGroupStyle(m_ctx);
+                ImGui::SameLine(m_ctx);
+
+                RenderMappingColor(0.0, height);
 
                 ImGui::EndChild(m_ctx);
             }
-        } else if (!selected_plugin_exists && selected_plugin > -1 && (
-                       !selected_plugin_has_type || !selected_plugin_filename_has_type ||
-                       selected_plugin_type_mismatch)) {
+        } else if (
+            !selected_plugin_exists && selected_plugin > -1
+            && (
+                !selected_plugin_has_type || !selected_plugin_filename_has_type ||
+                selected_plugin_type_mismatch
+            )
+        ) {
             RenderPluginTypeSelect();
         } else if (!selected_plugin_exists && selected_plugin > -1) {
             RenderCenteredText(i18n->t("mapping", "message.not-available"), IconRemove);
