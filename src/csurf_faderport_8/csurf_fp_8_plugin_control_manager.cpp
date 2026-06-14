@@ -41,6 +41,18 @@ protected:
         file.write(ini, true);
     }
 
+    int GetMappingGroupColor(const int index) {
+        const std::string param_key = getParamKey("Color_", index);
+
+        if (!ini[param_key].has("color")
+            || (ini[param_key].has("show") && ini[param_key]["show"] == "0")
+        ) {
+            return 0x00ffffff;
+        }
+
+        return stoi(ini[param_key]["color"]);
+    }
+
 public:
     CSurf_FP_8_PluginControlManager(
         const std::vector<CSurf_FP_8_Track *> &tracks,
@@ -68,9 +80,7 @@ public:
             std::string param_key = getParamKey("Select_", filter_index);
             const CSurf_FP_8_Track *track = tracks.at(i);
 
-            const auto track_color = ini[param_key].has("color")
-                                         ? stoi(ini[param_key]["color"])
-                                         : 0x00ffffff;
+            const int track_color = GetMappingGroupColor(filter_index);
 
             track->SetTrackColor(track_color, true);
 

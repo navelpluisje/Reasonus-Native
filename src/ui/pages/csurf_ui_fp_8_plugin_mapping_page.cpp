@@ -308,11 +308,11 @@ protected:
             previous_group_color = group_color;
             group_color_show = plugin_params[color_key].has("show")
                                    ? stoi(plugin_params[color_key]["show"])
-                                   : 1;
+                                   : 0;
         } else {
             group_color = 0x00ffffff;
             previous_group_color = 0x00ffffff;
-            group_color_show = 1;
+            group_color_show = 0;
         }
 
         if (plugin_params.has(select_key)) {
