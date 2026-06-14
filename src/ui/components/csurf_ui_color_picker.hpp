@@ -11,7 +11,7 @@ static void ReaSonusColorPicker(
   int current_color,
   std::vector<int> color_palette,
   double width = 24,
-  double height = 24
+  double height = 242
 
 ) {
   ImGui::PushStyleColor(m_ctx, ImGui::Col_Border, UI_COLORS::FormFieldBorder);

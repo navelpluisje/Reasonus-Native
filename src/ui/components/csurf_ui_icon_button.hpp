@@ -19,10 +19,11 @@ static bool ReaSonusIconButton(
     const std::string &button_id,
     const bool disabled,
     const IconButtonTheme theme,
-    const std::function<void()> &on_click) {
+    const std::function<void()> &on_click
+) {
     bool return_value = false;
-    int menu_button_width = 30;
-    int menu_button_height = 30;
+    constexpr int menu_button_width = 30;
+    constexpr int menu_button_height = 30;
 
     int background_color = theme == ButtonThemeDefault ? UI_COLORS::Main_18 : UI_COLORS::Transparent;
     int border_color = theme == ButtonThemeDefault || theme == ButtonThemeModal
@@ -37,8 +38,13 @@ static bool ReaSonusIconButton(
     double y_mouse_pos;
 
     ImGui::PushFont(m_ctx, assets->GetIconFont(), 20);
-    if (ImGui::BeginChild(m_ctx, ("##" + button_id).c_str(), menu_button_width, menu_button_height,
-                          ImGui::ChildFlags_FrameStyle)) {
+    if (ImGui::BeginChild(
+        m_ctx,
+        ("##" + button_id).c_str(),
+        menu_button_width,
+        menu_button_height,
+        ImGui::ChildFlags_FrameStyle
+    )) {
         ImGui::GetMousePos(m_ctx, &x_mouse_pos, &y_mouse_pos);
         ImGui::GetItemRectMin(m_ctx, &x_pos_1, &y_pos_1);
 
@@ -74,7 +80,7 @@ static bool ReaSonusIconButton(
             }
         }
 
-        ImGui_DrawList *list = ImGui::GetWindowDrawList(m_ctx);
+        ImGui_DrawList *list = ImGui::GetForegroundDrawList(m_ctx);
 
         ImGui::DrawList_AddRectFilled(
             list,
