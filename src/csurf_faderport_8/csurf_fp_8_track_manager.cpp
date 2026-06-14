@@ -137,7 +137,7 @@ public:
             std::string strPan1;
             std::string strPan2;
 
-            CSurf_FP_8_Track *track = tracks.at(i);
+            const CSurf_FP_8_Track *track = tracks.at(i);
             if (context->GetMasterFaderMode() && i == context->GetNbChannels() - 1) {
                 media_track = GetMasterTrack(nullptr);
                 is_master_track = true;
