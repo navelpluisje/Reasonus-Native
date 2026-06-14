@@ -70,7 +70,7 @@ jobs:
                      TOOLCHAIN_PREFIX=aarch64-linux-gnu
               ;;
             esac
-          elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+          elif [[ "${{ matrix.os }}" == "windows-2022" ]]; then
             choco install ninja
             choco install nsis -y
           elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
@@ -116,7 +116,7 @@ jobs:
         working-directory: ${{ github.workspace }}
         shell: bash
         run: |
-          if [[ "${{ matrix.os }}" == "windows-latest" && 
+          if [[ "${{ matrix.os }}" == "windows-2022" && 
                 "${{ matrix.arch }}" == "x64" ]]; then
             cpack
           elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
