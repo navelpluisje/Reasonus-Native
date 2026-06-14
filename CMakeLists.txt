@@ -346,7 +346,7 @@ install(TARGETS ${PROJECT_NAME}
 
 # Set the component as required
 set(CPACK_COMPONENT_${PROJECT_NAME}_REQUIRED ON)
-if (MSVC)
+if (WIN32)
     install(
             FILES $<TARGET_PDB_FILE:${PROJECT_NAME}>
             COMPONENT ${PROJECT_NAME}
