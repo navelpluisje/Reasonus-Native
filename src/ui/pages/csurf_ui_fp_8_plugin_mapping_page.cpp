@@ -1,22 +1,22 @@
 #include <utility>
 #include "../csurf_ui_page_content.hpp"
-#include "../../shared/csurf_utils.hpp"
-#include "../../shared/csurf_plugin_utils.hpp"
-#include "../../shared/csurf_daw.hpp"
-#include "../components/csurf_ui_page_title.hpp"
-#include "../components/csurf_ui_text_input.hpp"
-#include "../components/csurf_ui_pagination_button.hpp"
-#include "../components/csurf_ui_icon_button.hpp"
-#include "../components/csurf_ui_search_combo_input.hpp"
-#include "../components/csurf_ui_goto_input.hpp"
-#include "../components/csurf_ui_int_input.hpp"
-#include "../components/csurf_ui_combo_input.hpp"
-#include "../components/csurf_ui_button_bar.hpp"
-#include "../components/csurf_ui_plugin_selectable.hpp"
-#include "../components/csurf_ui_developer_filter_form.hpp"
-#include "../components/csurf_ui_add_plugin_mapping_form.hpp"
-#include "../components/csurf_ui_color_picker.hpp"
 #include "../../i18n/i18n.hpp"
+#include "../../shared/csurf_daw.hpp"
+#include "../../shared/csurf_plugin_utils.hpp"
+#include "../../shared/csurf_utils.hpp"
+#include "../components/csurf_ui_add_plugin_mapping_form.hpp"
+#include "../components/csurf_ui_button_bar.hpp"
+#include "../components/csurf_ui_color_picker.hpp"
+#include "../components/csurf_ui_combo_input.hpp"
+#include "../components/csurf_ui_developer_filter_form.hpp"
+#include "../components/csurf_ui_goto_input.hpp"
+#include "../components/csurf_ui_icon_button.hpp"
+#include "../components/csurf_ui_int_input.hpp"
+#include "../components/csurf_ui_page_title.hpp"
+#include "../components/csurf_ui_pagination_button.hpp"
+#include "../components/csurf_ui_plugin_selectable.hpp"
+#include "../components/csurf_ui_search_combo_input.hpp"
+#include "../components/csurf_ui_text_input.hpp"
 #include "../windows/csurf_ui_fp_8_control_panel.hpp"
 
 class CSurf_FP_8_PluginMappingPage : public CSurf_UI_PageContent // NOLINT(*-use-internal-linkage)
@@ -759,7 +759,7 @@ protected:
         return "";
     }
 
-    void RenderParamListContextMenu(int param_index) {
+    void RenderParamListContextMenu(const int param_index) {
         ImGui::PushFont(m_ctx, assets->GetMainFont(), 13);
         if (ImGui::BeginChild(m_ctx, "plugin-mapping-context", 0.0, 0.0,
                               ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY |
@@ -1202,7 +1202,7 @@ public :
         UiStyledElements::PopReaSonusGroupStyle(m_ctx);
     }
 
-    void RenderMappingIcon(IconFont icon) {
+    void RenderMappingIcon(const IconFont icon) {
         double space_x;
         double space_y;
         ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
@@ -1526,7 +1526,7 @@ public :
     /**
      * Check if the selected plugin has changed.
      */
-    void PluginCheck(bool force = false) {
+    void PluginCheck(const bool force = false) {
         if (selected_plugin == previous_selected_plugin && !force) {
             return;
         }

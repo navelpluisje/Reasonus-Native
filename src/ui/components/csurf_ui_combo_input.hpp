@@ -1,13 +1,13 @@
 #ifndef CSURF_FP_UI_COMBO_INPUT_H_
 #define CSURF_FP_UI_COMBO_INPUT_H_
 
+#include <functional>
 #include <reaper_imgui_functions.h>
 #include <string>
 #include <utility>
 #include <vector>
-#include <functional>
-#include "../../shared/csurf_utils.hpp"
 #include "csurf_ui_list_selectable.hpp"
+#include "csurf_ui_tooltip.hpp"
 #include "../csurf_ui_styles_elements.hpp"
 
 class ReaSonusComboInput {

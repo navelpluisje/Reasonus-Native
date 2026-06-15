@@ -313,13 +313,6 @@ public:
             RenderInfoCheckbox(
                 m_ctx,
                 assets,
-                i18n->t("settings", "latch-preview-action-enable.label"),
-                &setting_latch_preview_action_enable,
-                i18n->t("settings", "latch-preview-action-enable.tooltip"));
-
-            RenderInfoCheckbox(
-                m_ctx,
-                assets,
                 i18n->t("settings", "instant-multi-select-filter.label"),
                 &setting_instant_multi_select_filter,
                 i18n->t("settings", "instant-multi-select-filter.tooltip"));
@@ -330,6 +323,13 @@ public:
                 i18n->t("settings", "mute-master-on-fwd-rwd.label"),
                 &setting_mute_master_on_fwd_rwd,
                 i18n->t("settings", "mute-master-on-fwd-rwd.tooltip"));
+
+            RenderInfoCheckbox(
+                m_ctx,
+                assets,
+                i18n->t("settings", "latch-preview-action-enable.label"),
+                &setting_latch_preview_action_enable,
+                i18n->t("settings", "latch-preview-action-enable.tooltip"));
 
             if (setting_latch_preview_action_enable) {
                 ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + 26);
