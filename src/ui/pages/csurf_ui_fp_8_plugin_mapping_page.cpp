@@ -396,6 +396,24 @@ protected:
         }
     }
 
+    bool IsColorDirty(const int key) {
+        const std::string color = "color_" + std::to_string(key);
+        if (key == selected_channel) {
+            if (select_param_index <= 0 && plugin_params.has(color)) {
+                plugin_params.remove(color);
+            }
+
+            UpdateValues();
+        }
+
+        if (!plugin_params.has(color)) {
+            return false;
+        }
+
+        return plugin_params[color]["color"] != previous_plugin_params[color]["color"] ||
+               plugin_params[color]["show"] != previous_plugin_params[color]["show"];
+    }
+
     bool IsSelectDirty(const int key) {
         const std::string select = "select_" + std::to_string(key);
         if (key == selected_channel) {
@@ -437,7 +455,7 @@ protected:
     }
 
     bool IsGroupDirty(const int key) {
-        plugin_dirty = IsSelectDirty(key) || isFaderDirty(key);
+        plugin_dirty = IsColorDirty(key) || IsSelectDirty(key) || isFaderDirty(key);
         return plugin_dirty;
     }
 
@@ -1046,7 +1064,7 @@ public :
         }
     }
 
-    void RenderChannelsList() {
+    void RenderGroupsList() {
         using namespace std::placeholders; // for `_1, _2 etc`
 
         double space_x;
@@ -1055,7 +1073,10 @@ public :
         bool has_style_var = false;
         ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_ItemSpacing, 22, 12);
 
-        if (ImGui::BeginChild(m_ctx, "##channel-list", 0.0, 30)) {
+        ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 2);
+        if (ImGui::BeginChild(m_ctx, "##channel-list", 0.0, 32)) {
+            ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 2);
+
             ReaSonusIconButton(
                 m_ctx,
                 assets,
@@ -1070,7 +1091,7 @@ public :
                 has_style_var = false;
                 if (i > channel_offset) {
                     has_style_var = true;
-                    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_ItemSpacing, 4, 0);
+                    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_ItemSpacing, 2, 0);
                 }
 
                 ImGui::SameLine(m_ctx);
@@ -1080,6 +1101,7 @@ public :
                     changed_items += 1;
                 }
 
+                ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 2);
                 ReaSonusPaginationButton(
                     m_ctx,
                     assets,
@@ -1584,7 +1606,7 @@ public :
 
             RenderInformationBar();
 
-            RenderChannelsList();
+            RenderGroupsList();
 
             RenderMappingColor();
 
