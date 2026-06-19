@@ -173,7 +173,7 @@ class ReaSonusInfoComboInputRow {
     const std::string id;
     const std::vector<std::string> &list;
     int *selected_item;
-    const std::string &tooltip;
+    const std::string tooltip;
     ReaSonusComboInput *combo_input;
 
 public:
@@ -184,8 +184,9 @@ public:
         const std::string &id,
         const std::vector<std::string> &list,
         int *selected_item,
-        const std::string &tooltip
-    ) : m_ctx(m_ctx), assets(assets), label(label), id(id), list(list), selected_item(selected_item), tooltip(tooltip) {
+        std::string tooltip
+    ) : m_ctx(m_ctx), assets(assets), label(label), id(id), list(list), selected_item(selected_item),
+        tooltip(std::move(tooltip)) {
         combo_input = new ReaSonusComboInput(
             m_ctx,
             assets,

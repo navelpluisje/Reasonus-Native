@@ -35,6 +35,7 @@ class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-in
     bool setting_latch_preview_action_enable;
     bool setting_overwrite_time_code;
     bool setting_plugin_map_param_clear;
+    int setting_plugin_map_color_mode;
     bool setting_instant_multi_select_filter;
     bool setting_mute_master_on_fwd_rwd;
     std::vector<int> settings_initial_plugin_color_palette;
@@ -60,6 +61,7 @@ class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-in
     ReaSonusInfoComboInputRow *language_select_combo;
     ReaSonusInfoComboInputRow *time_code_combo;
     ReaSonusInfoComboInputRow *latch_preview_action_combo;
+    ReaSonusInfoComboInputRow *plugin_mapping_default_color_mode;
 
     std::array<int, 8> latch_preview_action_indexes = {42013, 42014, 42015, 42016, 42017, 41160, 41161, 41162};
     std::vector<std::string> latch_preview_action_names = {
@@ -131,6 +133,13 @@ class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-in
         i18n->t("settings", "display-track.option.display-value-volume"),
         i18n->t("settings", "display-track.option.display-value-pan-1"),
         i18n->t("settings", "display-track.option.display-value-pan-2"),
+    };
+
+    std::vector<std::string> plugin_map_color_mode_labels = {
+        I18n::GetInstance()->t("mapping", "edit.color.show.combo.hide"),
+        I18n::GetInstance()->t("mapping", "edit.color.show.combo.show"),
+        I18n::GetInstance()->t("mapping", "edit.color.show.combo.bright"),
+        I18n::GetInstance()->t("mapping", "edit.color.show.combo.dimmed"),
     };
 
 public:
@@ -225,11 +234,24 @@ public:
             &setting_latch_preview_action,
             i18n->t("settings", "latch-preview-action.tooltip")
         );
+
+        plugin_mapping_default_color_mode = new ReaSonusInfoComboInputRow(
+            m_ctx,
+            assets,
+            i18n->t("settings", "mapping-default-color-mode.label"),
+            "mapping-default-color-mode",
+            plugin_map_color_mode_labels,
+            &setting_plugin_map_color_mode,
+            replaceAll(i18n->t("settings", "mapping-default-color-mode.tooltip"), "\\n", "\n")
+        );
     }
 
     ~CSurf_FP_8_SettingsPage() override = default;
 
     void RenderGlobalTab() {
+        double width = 0.0;
+        double height = 0.0;
+
         const int language_button_width = getButtonWidth(
             m_ctx,
             i18n->t("settings", "language.button.label"),
@@ -239,6 +261,7 @@ public:
         if (ImGui::BeginTabItem(m_ctx, i18n->t("settings", "tab.global").c_str())) {
             selected_tab = 0;
             ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 16);
+            ImGui::GetContentRegionAvail(m_ctx, &width, &height);
 
             if (ImGui::BeginChild(
                 m_ctx,
@@ -251,25 +274,90 @@ public:
 
                 ImGui::EndChild(m_ctx);
             }
+
             ImGui::SameLine(m_ctx);
-            if (ImGui::BeginChild(m_ctx, "language-action", 0.0, 0.0,
-                                  ImGui::ChildFlags_None | ImGui::ChildFlags_AutoResizeY)) {
+
+            if (ImGui::BeginChild(
+                m_ctx,
+                "language-action",
+                0.0,
+                0.0,
+                ImGui::ChildFlags_None | ImGui::ChildFlags_AutoResizeY
+            )) {
                 ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 22);
                 UiStyledElements::PushReaSonusButtonOutlineStyle(m_ctx, assets->GetMainFontBold());
+
                 if (ImGui::Button(m_ctx, i18n->t("settings", "language.button.label").c_str())) {
                     edit_language = true;
                 }
+
                 UiStyledElements::PopReaSonusButtonOutlineStyle(m_ctx);
 
                 ImGui::EndChild(m_ctx);
             }
 
-            RenderInfoCheckbox(
-                m_ctx,
-                assets,
-                i18n->t("settings", "distraction-free-mode.label"),
-                &setting_distraction_free_mode,
-                i18n->t("settings", "distraction-free-mode.tooltip"));
+            if (ImGui::BeginChild(m_ctx, "global-left-column", width / 2, 0.0, ImGui::ChildFlags_None)) {
+                RenderInfoCheckbox(
+                    m_ctx,
+                    assets,
+                    i18n->t("settings", "distraction-free-mode.label"),
+                    &setting_distraction_free_mode,
+                    i18n->t("settings", "distraction-free-mode.tooltip")
+                );
+
+                ImGui::EndChild(m_ctx);
+            }
+
+            ImGui::SameLine(m_ctx);
+
+            if (ImGui::BeginChild(m_ctx, "global-right-column", width / 2, 0.0, ImGui::ChildFlags_None)) {
+                UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
+                if (ImGui::BeginChild(
+                    m_ctx,
+                    "settings-display",
+                    0.0,
+                    0.0,
+                    ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
+                )) {
+                    ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 2);
+                    ImGui::Text(m_ctx, i18n->t("settings", "color-palette.label").c_str());
+                    ImGui::SameLine(m_ctx);
+                    ReaSonusTooltip(
+                        m_ctx,
+                        assets,
+                        i18n->t("settings", "color-palette.tooltip"),
+                        "color-picker-tooltip",
+                        0,
+                        -3
+                    );
+                    ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 4);
+
+                    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameRounding, 4.0);
+                    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameBorderSize, 2);
+                    ImGui::PushStyleColor(m_ctx, ImGui::Col_Border, UI_COLORS::FormFieldBorder);
+                    for (int i = 0; i < static_cast<int>(settings_plugin_color_palette.size()); i++) {
+                        if (i % 8 != 0) {
+                            ImGui::SameLine(m_ctx);
+                        }
+
+                        ReaSonusColorPicker(
+                            m_ctx,
+                            ("Color Picker##picker" + std::to_string(i)).c_str(),
+                            &settings_plugin_color_palette[i],
+                            settings_initial_plugin_color_palette[i],
+                            settings_plugin_color_palette,
+                            30,
+                            30
+                        );
+                    }
+                    ImGui::PopStyleVar(m_ctx, 2);
+                    ImGui::PopStyleColor(m_ctx, 1);
+                    ImGui::EndChild(m_ctx);
+                }
+                UiStyledElements::PopReaSonusGroupStyle(m_ctx);
+
+                ImGui::EndChild(m_ctx);
+            }
 
             ImGui::EndTabItem(m_ctx);
         }
@@ -389,27 +477,8 @@ public:
                     &setting_plugin_map_param_clear,
                     i18n->t("settings", "plugin-map-param-clear.tooltip"));
 
-                ImGui::Text(m_ctx, "Color Palette");
-                ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameRounding, 4.0);
-                ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameBorderSize, 2);
-                ImGui::PushStyleColor(m_ctx, ImGui::Col_Border, UI_COLORS::FormFieldBorder);
-                for (int i = 0; i < static_cast<int>(settings_plugin_color_palette.size()); i++) {
-                    if (i % 8 != 0) {
-                        ImGui::SameLine(m_ctx);
-                    }
+                plugin_mapping_default_color_mode->Render();
 
-                    ReaSonusColorPicker(
-                        m_ctx,
-                        ("Color Picker##picker" + std::to_string(i)).c_str(),
-                        &settings_plugin_color_palette[i],
-                        settings_initial_plugin_color_palette[i],
-                        settings_plugin_color_palette,
-                        30,
-                        30
-                    );
-                }
-                ImGui::PopStyleVar(m_ctx, 2);
-                ImGui::PopStyleColor(m_ctx, 1);
                 ImGui::EndChild(m_ctx);
             }
 
@@ -625,6 +694,7 @@ public:
         settings->SetSetting("surface", "time-code", time_code_indexes[setting_time_code]);
         settings->SetSetting("surface", "plugin-step-size", setting_plugin_step_size);
         settings->SetSetting("surface", "plugin-map-param-clear", setting_plugin_map_param_clear);
+        settings->SetSetting("surface", "plugin-map-default-color-mode", setting_plugin_map_color_mode);
         settings->SetSetting("surface", "instant-multi-select-filter", setting_instant_multi_select_filter);
         settings->SetSetting("surface", "mute-master-on-fwd-rwd", setting_mute_master_on_fwd_rwd);
         settings->SetSetting("displays", "track", setting_track_display);
@@ -633,7 +703,7 @@ public:
         settings->SetSetting("displays", "track-invert", joinDisplayValues(setting_track_value_line_invert, ","));
         settings->SetSetting("displays", "track-value-bar-mode", setting_track_valuebar_mode);
         settings->SetSetting("displays", "track-value-bar-value", setting_track_valuebar_value);
-        settings->SetSetting("surface", "plugin-color-palette", join(settings_plugin_color_palette, ","));
+        settings->SetSetting("surface", "reasonus-color-palette", join(settings_plugin_color_palette, ","));
 
         if (settings->StoreSettings()) {
             DAW::SetExtState(EXT_STATE_KEY_SAVED_SETTINGS, EXT_STATE_VALUE_TRUE, false);
@@ -667,6 +737,7 @@ public:
         setting_plugin_step_size = settings->GetpluginStepSize();
         setting_track_color_brightness = settings->GetTrackColorBrightness();
         setting_plugin_map_param_clear = settings->ShouldClearParamInput();
+        setting_plugin_map_color_mode = settings->GetPluginMapDefaultColorMode();
         setting_track_display = settings->GetTrackDisplay();
         setting_track_value_line_value = settings->GetTrackDisplayLineValues();
         setting_track_value_line_align = settings->GetTrackDisplayAlignValues();

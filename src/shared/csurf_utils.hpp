@@ -255,7 +255,7 @@ std::string join(const std::vector<int> &list, const std::string &delimiter);
 
 std::string replace(std::string &str, const std::string &search, const std::string &replace);
 
-std::string replaceAll(std::string &str, const std::string &search, const std::string &replace);
+std::string replaceAll(std::string str, const std::string &search, const std::string &replace);
 
 void logInteger(const char *key, int value);
 

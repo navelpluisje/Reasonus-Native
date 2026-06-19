@@ -37,7 +37,21 @@ class ReaSonusSettings {
         {"surface", "endless-track-scroll", "0"},
     };
 
-    std::vector<std::string> palette_colors{24, std::to_string(0x00ffffff)};
+    std::vector<std::string> palette_colors_default{12, std::to_string(0x00ffffff)};
+    std::vector<std::string> palette_colors_theme = {
+        "16711680",
+        "65280",
+        "16711935",
+        "16776960",
+        "65535",
+        "16727871",
+        "8388479",
+        "4161535",
+        "14647263",
+        "14671711",
+        "8380383",
+        "8355839"
+    };
 
     const std::vector<std::vector<std::string>> fp_8_settings = {
         {"surface", "surface", "0"},
@@ -52,7 +66,11 @@ class ReaSonusSettings {
         {"surface", "track-color-brightness", "25"},
         {"surface", "plugin-step-size", "1"},
         {"surface", "plugin-map-param-clear", "0"},
-        {"surface", "plugin-color-palette", join(palette_colors, ",")},
+        {"surface", "plugin-map-default-color-mode", "1"},
+        {
+            "surface", "reasonus-color-palette",
+            join(palette_colors_theme, ",") + "," + join(palette_colors_default, ",")
+        },
         {"surface", "instant-multi-select-filter", "0"},
         {"surface", "mute-master-on-fwd-rwd", "0"},
         {"displays", "track", "8"},
@@ -219,6 +237,8 @@ public:
     int GetMidiOutput();
 
     bool ShouldClearParamInput();
+
+    int GetPluginMapDefaultColorMode();
 
     bool ShouldMultiFilterApplyInstant();
 

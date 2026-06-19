@@ -265,7 +265,7 @@ std::string replace(std::string &str, const std::string &search, const std::stri
     return str;
 }
 
-std::string replaceAll(std::string &str, const std::string &search, const std::string &replace) {
+std::string replaceAll(std::string str, const std::string &search, const std::string &replace) {
     size_t start_pos = str.find(search);
 
     while (start_pos != std::string::npos) {
