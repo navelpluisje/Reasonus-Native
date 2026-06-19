@@ -131,9 +131,21 @@ protected:
      */
     void ValidatePluginData() {
         bool modified = false;
-        for (const auto &[fst, snd]: plugin_params) {
-            auto const &section = fst;
+        for (const auto &[section, snd]: plugin_params) {
+            // auto const &section = fst;
             if (section == "global") {
+                continue;
+            }
+
+            if (section.rfind("color_", 0) == 0
+            ) {
+                if (
+                    !plugin_params[section].has("color")
+                    || plugin_params[section]["color"].empty()
+                ) {
+                    plugin_params[section]["color"] = std::to_string(0x00ffffff);
+                    previous_plugin_params[section]["color"] = std::to_string(0x00ffffff);
+                }
                 continue;
             }
 
@@ -141,12 +153,6 @@ protected:
                 modified = true;
                 plugin_params[section]["uninvert-label"] = "0";
                 previous_plugin_params[section]["uninvert-label"] = "0";
-            }
-
-            if (!plugin_params[section].has("color") || plugin_params[section]["color"].empty()) {
-                modified = true;
-                plugin_params[section]["color"] = std::to_string(0x00ffffff);
-                previous_plugin_params[section]["color"] = std::to_string(0x00ffffff);
             }
         }
 
@@ -382,7 +388,6 @@ protected:
             plugin_params[select_key]["name"] = select_name;
             plugin_params[select_key]["steps"] = std::to_string(select_nb_steps);
             plugin_params[select_key]["param"] = std::to_string(std::get<0>(param_data[select_param_index]));
-            plugin_params[select_key]["color"] = std::to_string(group_color);
             plugin_params[select_key]["uninvert-label"] = std::to_string(select_uninvert_label);
         }
 
@@ -433,7 +438,6 @@ protected:
         return plugin_params[select]["name"] != previous_plugin_params[select]["name"] ||
                plugin_params[select]["steps"] != previous_plugin_params[select]["steps"] ||
                plugin_params[select]["param"] != previous_plugin_params[select]["param"] ||
-               plugin_params[select]["color"] != previous_plugin_params[select]["color"] ||
                plugin_params[select]["uninvert-label"] != previous_plugin_params[select]["uninvert-label"];
     }
 
