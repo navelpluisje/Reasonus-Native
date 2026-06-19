@@ -18,10 +18,6 @@ class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-in
     int selected_tab = -1;
     int selected_display_line = -1;
 
-    // Test Values
-    int selected_color = 0x00FF0000;
-    // End Test Values
-
     int setting_language{};
     bool edit_language = false;
     bool previous_edit_language = false;
@@ -85,7 +81,7 @@ class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-in
         i18n->t("settings", "timecode-list.option.frames"),        // "Abs. Frames"
     };
 
-    int track_display_lines[9] = {3, 3, 4, 2, 2, 3, 3, 3, 3};
+    std::array<int, 9> track_display_lines = {3, 3, 4, 2, 2, 3, 3, 3, 3};
     std::vector<std::string> track_display_names = {
         i18n->t("settings", "display-track.option.display-mode-0"), // "Small, Small, Large (No VU)"
         i18n->t("settings", "display-track.option.display-mode-1"), // "Large, Small, Small (No VU)"
@@ -342,7 +338,7 @@ public:
 
                         ReaSonusColorPicker(
                             m_ctx,
-                            ("Color Picker##picker" + std::to_string(i)).c_str(),
+                            "Color Picker##picker" + std::to_string(i),
                             &settings_plugin_color_palette[i],
                             settings_initial_plugin_color_palette[i],
                             settings_plugin_color_palette,
@@ -749,20 +745,22 @@ public:
         settings_initial_plugin_color_palette = settings->GetPluginColorPalette();
         settings_plugin_color_palette = settings->GetPluginColorPalette();
 
-        const auto iterator = std::find(
+        auto *const iterator = std::find(
             latch_preview_action_indexes.begin(),
             latch_preview_action_indexes.end(),
-            settings->GetLatchPreviewActionCode());
+            settings->GetLatchPreviewActionCode()
+        );
 
         if (iterator != latch_preview_action_indexes.end()) {
             setting_latch_preview_action = static_cast<int>(std::distance(
                 latch_preview_action_indexes.begin(), iterator));
         }
 
-        auto time_code_iterator = std::find(
+        auto *const time_code_iterator = std::find(
             time_code_indexes.begin(),
             time_code_indexes.end(),
-            settings->GetSurfaceTimeCode());
+            settings->GetSurfaceTimeCode()
+        );
 
         if (time_code_iterator != time_code_indexes.end()) {
             setting_time_code = static_cast<int>(std::distance(time_code_indexes.begin(), time_code_iterator));
