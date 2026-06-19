@@ -1,12 +1,13 @@
 #ifndef CSURF_FP_UI_COMBO_INPUT_H_
 #define CSURF_FP_UI_COMBO_INPUT_H_
 
+#include <functional>
 #include <reaper_imgui_functions.h>
 #include <string>
+#include <utility>
 #include <vector>
-#include <functional>
-#include "../../shared/csurf_utils.hpp"
 #include "csurf_ui_list_selectable.hpp"
+#include "csurf_ui_tooltip.hpp"
 #include "../csurf_ui_styles_elements.hpp"
 
 class ReaSonusComboInput {
@@ -24,12 +25,13 @@ public:
     ReaSonusComboInput(
         ImGui_Context *m_ctx,
         CSurf_UI_Assets *assets,
-        const std::string &label,
-        const std::string &id,
+        std::string label,
+        std::string idx,
         const std::vector<std::string> &list,
         int *selected_item,
         const double width = 0.0
-    ) : m_ctx(m_ctx), assets(assets), label(label), id(id), list(list), selected_item(selected_item), width(width) {
+    ) : m_ctx(m_ctx), assets(assets), label(std::move(label)), id(std::move(idx)), list(list),
+        selected_item(selected_item), width(width) {
     }
 
     ~ReaSonusComboInput() = default;
@@ -39,14 +41,19 @@ public:
         double space_y;
 
         UiStyledElements::PushReaSonusFieldGroupStyle(m_ctx);
-        if (ImGui::BeginChild(m_ctx, ("container" + id).c_str(), width, 0.0,
-                              ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY)) {
+        if (ImGui::BeginChild(
+            m_ctx,
+            ("container" + id).c_str(),
+            width,
+            0.0,
+            ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
+        )) {
             ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
             if (width == 0.0) {
                 width = space_x;
             }
 
-            if (label != "" && label.rfind("##", 0) != 0) {
+            if (!label.empty() && label.rfind("##", 0) != 0) {
                 ImGui::Text(m_ctx, label.c_str());
             }
 
@@ -166,7 +173,7 @@ class ReaSonusInfoComboInputRow {
     const std::string id;
     const std::vector<std::string> &list;
     int *selected_item;
-    const std::string &tooltip;
+    const std::string tooltip;
     ReaSonusComboInput *combo_input;
 
 public:
@@ -177,8 +184,9 @@ public:
         const std::string &id,
         const std::vector<std::string> &list,
         int *selected_item,
-        const std::string &tooltip
-    ) : m_ctx(m_ctx), assets(assets), label(label), id(id), list(list), selected_item(selected_item), tooltip(tooltip) {
+        std::string tooltip
+    ) : m_ctx(m_ctx), assets(assets), label(label), id(id), list(list), selected_item(selected_item),
+        tooltip(std::move(tooltip)) {
         combo_input = new ReaSonusComboInput(
             m_ctx,
             assets,

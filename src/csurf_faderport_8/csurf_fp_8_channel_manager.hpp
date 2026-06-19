@@ -8,8 +8,7 @@
 #include "../shared/csurf_reasonus_settings.hpp"
 #include "../shared/csurf_daw.hpp"
 
-class CSurf_FP_8_ChannelManager
-{
+class CSurf_FP_8_ChannelManager {
 protected:
     std::vector<CSurf_FP_8_Track *> tracks;
     CSurf_FP_8_Navigator *navigator;
@@ -19,14 +18,10 @@ protected:
 
     ButtonColor color;
 
-    bool forceUpdate = false;
+    virtual void SetTrackColors(MediaTrack *media_track, const bool is_selected, const bool has_arm = false) {
+        const double brightness = is_selected ? 1 : settings->GetTrackColorBrightnessPercentage();
 
-    virtual void SetTrackColors(MediaTrack *media_track, bool is_selected, bool has_arm = false)
-    {
-        double brightness = is_selected ? 1 : settings->GetTrackColorBrightnessPercentage();
-
-        if (!media_track)
-        {
+        if (media_track == nullptr) {
             color.SetColor(ButtonColorWhite);
             return;
         }
@@ -35,17 +30,15 @@ protected:
         int green = 0x00;
         int blue = 0x00;
 
-        if (!(context->GetArm() && has_arm) && !(DAW::IsTrackArmed(media_track) && settings->GetDistractionFreeMode()))
-        {
-            int trackColor = ::GetTrackColor(media_track);
-            if (trackColor == 0)
-            {
+        if (!(context->GetArm() && has_arm) &&
+            !(DAW::IsTrackArmed(media_track) && settings->GetDistractionFreeMode())
+        ) {
+            const int trackColor = ::GetTrackColor(media_track);
+            if (trackColor == 0) {
                 red = 0x7f;
                 green = 0x7f;
                 blue = 0x7f;
-            }
-            else
-            {
+            } else {
                 ColorFromNative(trackColor, &red, &green, &blue);
             }
         }
@@ -54,67 +47,58 @@ protected:
 
 public:
     CSurf_FP_8_ChannelManager(
-        std::vector<CSurf_FP_8_Track *> tracks,
+        const std::vector<CSurf_FP_8_Track *> &tracks,
         CSurf_FP_8_Navigator *navigator,
         CSurf_Context *context,
-        midi_Output *m_midiout) : tracks(tracks), navigator(navigator), context(context), m_midiout(m_midiout) {};
+        midi_Output *m_midiout) : tracks(tracks), navigator(navigator), context(context), m_midiout(m_midiout) {
+    }
 
-    virtual ~CSurf_FP_8_ChannelManager()
-    {
+    virtual ~CSurf_FP_8_ChannelManager() {
         delete navigator;
         delete context;
         delete m_midiout;
     };
 
-    virtual void UpdateTracks(bool force_update = false)
-    {
-        (void)force_update;
+    virtual void UpdateTracks(const bool force_update = false) {
+        (void) force_update;
     };
 
-    virtual void HandleEndcoderPush(int value)
-    {
-        (void)value;
+    virtual void HandleEndcoderPush(const int value) {
+        (void) value;
     };
 
-    virtual void HandleEndcoderIncrement(int value)
-    {
-        (void)value;
+    virtual void HandleEndcoderIncrement(const int value) {
+        (void) value;
     };
 
-    virtual void HandleEndcoderDecrement(int value)
-    {
-        (void)value;
+    virtual void HandleEndcoderDecrement(const int value) {
+        (void) value;
     };
 
-    virtual void HandleSelectClick(int index, int value)
-    {
-        (void)index;
-        (void)value;
+    virtual void HandleSelectClick(const int index, const int value) {
+        (void) index;
+        (void) value;
     };
 
-    virtual void HandleMuteClick(int index, int value)
-    {
-        (void)index;
-        (void)value;
+    virtual void HandleMuteClick(int index, int value) {
+        (void) index;
+        (void) value;
     };
 
-    virtual void HandleSoloClick(int index, int value)
-    {
-        (void)index;
-        (void)value;
+    virtual void HandleSoloClick(int index, int value) {
+        (void) index;
+        (void) value;
     };
 
-    virtual void HandleFaderTouch(int index, int value)
-    {
-        (void)index;
-        (void)value;
+    virtual void HandleFaderTouch(int index, int value) {
+        (void) index;
+        (void) value;
     };
 
-    virtual void HandleFaderMove(int index, int msb, int lsb)
-    {
-        (void)index;
-        (void)msb;
-        (void)lsb;
+    virtual void HandleFaderMove(int index, int msb, int lsb) {
+        (void) index;
+        (void) msb;
+        (void) lsb;
     };
 };
 

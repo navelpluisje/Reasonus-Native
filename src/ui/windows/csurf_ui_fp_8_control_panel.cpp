@@ -137,8 +137,7 @@ void ReaSonus8ControlPanel::SetPageContent() {
     }
 }
 
-ReaSonus8ControlPanel::ReaSonus8ControlPanel()
-    : m_ctx{} {
+ReaSonus8ControlPanel::ReaSonus8ControlPanel() : m_ctx{} {
     menu_items.emplace_back("menu.functions");
     menu_items.emplace_back("menu.filters");
     menu_items.emplace_back("menu.plugin");
@@ -193,8 +192,12 @@ void ReaSonus8ControlPanel::Frame() // NOLINT(*-function-cognitive-complexity)
     ImGui::PushFont(m_ctx, assets->GetMainFont(), FontSizeDefault);
     ImGui::SetNextWindowSize(m_ctx, 1048, 668, ImGui::Cond_Once);
     bool open{true};
-    if (ImGui::Begin(m_ctx, g_name, &open,
-                     ImGui::WindowFlags_NoCollapse | ImGui::WindowFlags_NoResize | ImGui::WindowFlags_NoScrollbar)) {
+    if (ImGui::Begin(
+        m_ctx,
+        g_name,
+        &open,
+        ImGui::WindowFlags_NoCollapse | ImGui::WindowFlags_NoResize | ImGui::WindowFlags_NoScrollbar
+    )) {
         UiStyledElements::PushReaSonusSidebarStyle(m_ctx);
         if (ImGui::BeginChild(m_ctx, "side_bar", 224.0, 0.0, ImGui::ChildFlags_FrameStyle)) {
             ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);

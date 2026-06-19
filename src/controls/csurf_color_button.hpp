@@ -4,22 +4,23 @@
 #include "csurf_button.hpp"
 #include "csurf_color_button_colors.hpp"
 
-class CSurf_ColorButton : public CSurf_Button
-{
+class CSurf_ColorButton : public CSurf_Button {
 protected:
     ButtonColor color = ButtonColorWhite;
 
-    void SendValue();
+    void SendValue() override;
 
-    void SendColor();
+    void SendColor() const;
 
 public:
     CSurf_ColorButton(ButtonColor color, Btn_Types type, Btn_Value value, midi_Output *m_midiout);
-    ~CSurf_ColorButton() {};
 
-    virtual void SetValue(Btn_Value value, bool force = false) override;
+    ~CSurf_ColorButton() override {
+    }
 
-    void SetColor(ButtonColor color, bool force = false);
+    void SetValue(Btn_Value _value, bool force = false) override;
+
+    void SetColor(ButtonColor _color, bool force = false);
 };
 
 #endif // CSURF_COLOR_BUTTON_H_
