@@ -84,6 +84,8 @@ class CSurf_FP_8_PluginMappingPage : public CSurf_UI_PageContent // NOLINT(*-use
     std::vector<std::string> color_show_labels = {
         I18n::GetInstance()->t("mapping", "edit.color.show.combo.hide"),
         I18n::GetInstance()->t("mapping", "edit.color.show.combo.show"),
+        I18n::GetInstance()->t("mapping", "edit.color.show.combo.bright"),
+        I18n::GetInstance()->t("mapping", "edit.color.show.combo.dimmed"),
     };
 
     std::vector<int> dirty_groups;
@@ -935,7 +937,7 @@ public :
             "show-group-color",
             color_show_labels,
             &group_color_show,
-            120
+            150
         );
 
         SetPluginFolders();

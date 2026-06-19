@@ -41,12 +41,16 @@ protected:
         file.write(ini, true);
     }
 
-    int GetMappingGroupColor(const int index) {
+    int GetMappingGroupColor(const int index, int *color_show_mode) {
         const std::string param_key = getParamKey("Color_", index);
 
-        if (!ini[param_key].has("color")
-            || (ini[param_key].has("show") && ini[param_key]["show"] == "0")
-        ) {
+        if (ini[param_key].has("show")) {
+            *color_show_mode = stoi(ini[param_key].get("show"));
+        }
+        /**
+         * If we have no color or the show flag is set to 0 (hide), return the default color (white)
+         */
+        if (!ini[param_key].has("color") || *color_show_mode == 0) {
             return 0x00ffffff;
         }
 
@@ -80,7 +84,8 @@ public:
             std::string param_key = getParamKey("Select_", filter_index);
             const CSurf_FP_8_Track *track = tracks.at(i);
 
-            const int track_color = GetMappingGroupColor(filter_index);
+            int color_show_mode = 0;
+            const int track_color = GetMappingGroupColor(filter_index, &color_show_mode);
 
             track->SetTrackColor(track_color, true);
 
@@ -101,14 +106,15 @@ public:
                 const std::string formatted_param_value = DAW::GetTrackFxFormattedParamValue(
                     media_track,
                     plugin_id,
+
                     stoi(ini[param_key]["param"])
                 );
-                track->SetSelectButtonValue(BTN_VALUE_ON, force_update);
+                track->SetSelectButtonValue(color_show_mode == 3 ? BTN_VALUE_OFF : BTN_VALUE_ON, force_update);
                 track->SetDisplayLine(1, ALIGN_CENTER, formatted_param_value.c_str(), NON_INVERT, force_update);
             } else {
                 track->SetDisplayLine(0, ALIGN_CENTER, "", NON_INVERT, force_update);
                 track->SetDisplayLine(1, ALIGN_CENTER, "", NON_INVERT, true);
-                track->SetSelectButtonValue(BTN_VALUE_OFF, force_update);
+                track->SetSelectButtonValue(color_show_mode == 2 ? BTN_VALUE_ON : BTN_VALUE_OFF, force_update);
             }
 
             param_key = getParamKey("Fader_", filter_index);
