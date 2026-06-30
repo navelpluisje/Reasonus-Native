@@ -59,7 +59,7 @@ class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-in
     ReaSonusInfoComboInputRow *latch_preview_action_combo;
     ReaSonusInfoComboInputRow *plugin_mapping_default_color_mode;
 
-    std::array<int, 8> latch_preview_action_indexes = {42013, 42014, 42015, 42016, 42017, 41160, 41161, 41162};
+    int latch_preview_action_indexes[8] = {42013, 42014, 42015, 42016, 42017, 41160, 41161, 41162};
     std::vector<std::string> latch_preview_action_names = {
         "Write current values for actively-writing envelopes to time selection",
         "Write current values for actively-writing envelopes from cursor to start of project",
@@ -71,7 +71,7 @@ class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-in
         "Write current values for all writing envelopes from cursor to end of project",
     };
 
-    std::array<int, 6> time_code_indexes = {0, 2, 3, 4, 5, 8};
+    int time_code_indexes[6] = {0, 2, 3, 4, 5, 8};
     std::vector<std::string> time_code_names = {
         i18n->t("settings", "timecode-list.option.time"),          // Time
         i18n->t("settings", "timecode-list.option.beats"),         // "Beats",
@@ -746,25 +746,28 @@ public:
         settings_initial_plugin_color_palette = settings->GetPluginColorPalette();
         settings_plugin_color_palette = settings->GetPluginColorPalette();
 
-        auto *const iterator = std::find(
-            latch_preview_action_indexes.begin(),
-            latch_preview_action_indexes.end(),
+        int *const iterator = std::find(
+            latch_preview_action_indexes,
+            latch_preview_action_indexes + 8,
             settings->GetLatchPreviewActionCode()
         );
 
-        if (iterator != latch_preview_action_indexes.end()) {
-            setting_latch_preview_action = static_cast<int>(std::distance(
-                latch_preview_action_indexes.begin(), iterator));
+        if (iterator != latch_preview_action_indexes + 8) {
+            setting_latch_preview_action = static_cast<int>(
+                std::distance(latch_preview_action_indexes, iterator)
+            );
         }
 
-        auto *const time_code_iterator = std::find(
-            time_code_indexes.begin(),
-            time_code_indexes.end(),
+        int *const time_code_iterator = std::find(
+            time_code_indexes,
+            time_code_indexes + 6,
             settings->GetSurfaceTimeCode()
         );
 
-        if (time_code_iterator != time_code_indexes.end()) {
-            setting_time_code = static_cast<int>(std::distance(time_code_indexes.begin(), time_code_iterator));
+        if (time_code_iterator != time_code_indexes + 6) {
+            setting_time_code = static_cast<int>(
+                std::distance(time_code_indexes, time_code_iterator)
+            );
         }
     }
 
