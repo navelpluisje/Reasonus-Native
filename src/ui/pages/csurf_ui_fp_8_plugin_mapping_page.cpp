@@ -167,7 +167,7 @@ protected:
 
         for (const auto &plugin_type: plugin_types) { // NOLINT(*-use-anyofallof)
             const std::string type_ini = plugin_type + ".ini";
-            const size_t position = plugin_path.find(type_ini);
+            const auto position = plugin_path.find(type_ini);
 
             if (position == std::string::npos) {
                 continue;
@@ -413,7 +413,10 @@ protected:
             UpdateValues();
         }
 
-        if (!plugin_params.has(color)) {
+        if (!plugin_params.has(color) || (
+                stoi(plugin_params[color]["color"]) == 0x00ffffff && !previous_plugin_params.has(color)
+            )
+        ) {
             return false;
         }
 
@@ -744,7 +747,7 @@ protected:
 
         for (const auto &plugin_type: plugin_types) {
             const std::string type_ini = "." + plugin_type + ".ini";
-            const size_t position = plugin.find(type_ini);
+            const auto position = plugin.find(type_ini);
 
             if (position == std::string::npos) {
                 continue;
