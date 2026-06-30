@@ -1387,6 +1387,7 @@ public :
             ImGui::Text(m_ctx, i18n->t("mapping", "edit.color.picker.label").c_str());
             ReaSonusColorPicker(
                 m_ctx,
+                assets,
                 i18n->t("mapping", "edit.color.picker.title"),
                 &group_color,
                 previous_group_color,

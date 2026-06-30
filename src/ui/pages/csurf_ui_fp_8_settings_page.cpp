@@ -338,6 +338,7 @@ public:
 
                         ReaSonusColorPicker(
                             m_ctx,
+                            assets,
                             "Color Picker##picker" + std::to_string(i),
                             &settings_plugin_color_palette[i],
                             settings_initial_plugin_color_palette[i],

@@ -6,6 +6,7 @@
 
 static void ReaSonusColorPicker(
   ImGui_Context *m_ctx,
+  CSurf_UI_Assets const *assets,
   const std::string &label,
   int *selected_color,
   int current_color,
@@ -109,12 +110,6 @@ static void ReaSonusColorPicker(
           60,
           40
         )) {
-          double r, g, b, a;
-          ImGui::ColorConvertU32ToDouble4(current_color, &r, &g, &b, &a);
-          logDouble("r", r);
-          logDouble("g", g);
-          logDouble("b", b);
-          logDouble("a", a);
           *selected_color = current_color;
         }
         ImGui::EndGroup(m_ctx);
@@ -123,6 +118,8 @@ static void ReaSonusColorPicker(
 
         ImGui::Text(m_ctx, "Palette");
         ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_ItemSpacing, 8, 8);
+
+        ImGui::BeginGroup(m_ctx);
         for (int i = 0; i < static_cast<int>(color_palette.size()); i++) {
           ImGui::PushID(m_ctx, std::to_string(i).c_str());
           if (i % 6 != 0) {
@@ -142,6 +139,14 @@ static void ReaSonusColorPicker(
           }
           ImGui::PopID(m_ctx);
         }
+        ImGui::EndGroup(m_ctx);
+
+        ImGui::PushFont(m_ctx, assets->GetMainFont(), 11);
+        ImGui::PushTextWrapPos(m_ctx, 0.0);
+        ImGui::Text(m_ctx, "Go to Settings to update the palette.");
+        ImGui::PopTextWrapPos(m_ctx);
+        ImGui::PopFont(m_ctx);
+
         ImGui::PopStyleVar(m_ctx);
         ImGui::EndChild(m_ctx);
       }

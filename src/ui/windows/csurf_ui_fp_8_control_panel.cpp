@@ -206,16 +206,46 @@ void ReaSonus8ControlPanel::Frame() // NOLINT(*-function-cognitive-complexity)
             if (ImGui::BeginChild(m_ctx, "side_bar_content", 0.0, space_y - height - 10)) {
                 ImGui::Image(m_ctx, assets->GetReaSonusLogo(), 200, 52);
 
-                ReaSonusMenuButton(m_ctx, assets, i18n->t("control-panel", menu_items[0]), IconAction, FUNCTIONS_PAGE,
-                                   &current_page);
-                ReaSonusMenuButton(m_ctx, assets, i18n->t("control-panel", menu_items[1]), IconCustomFilter,
-                                   FILTERS_PAGE, &current_page);
-                ReaSonusMenuButton(m_ctx, assets, i18n->t("control-panel", menu_items[2]), IconSettings, MAPPING_PAGE,
-                                   &current_page);
-                ReaSonusMenuButton(m_ctx, assets, i18n->t("control-panel", menu_items[3]), IconCog, SETTINGS_PAGE,
-                                   &current_page);
-                ReaSonusMenuButton(m_ctx, assets, i18n->t("control-panel", menu_items[4]), IconInformation, ABOUT_PAGE,
-                                   &current_page);
+                ReaSonusMenuButton(
+                    m_ctx,
+                    assets,
+                    i18n->t("control-panel", menu_items[0]),
+                    IconAction,
+                    FUNCTIONS_PAGE,
+                    &current_page
+                );
+                ReaSonusMenuButton(
+                    m_ctx,
+                    assets,
+                    i18n->t("control-panel", menu_items[1]),
+                    IconCustomFilter,
+                    FILTERS_PAGE,
+                    &current_page
+                );
+                ReaSonusMenuButton(
+                    m_ctx,
+                    assets,
+                    i18n->t("control-panel", menu_items[2]),
+                    IconSettings,
+                    MAPPING_PAGE,
+                    &current_page
+                );
+                ReaSonusMenuButton(
+                    m_ctx,
+                    assets,
+                    i18n->t("control-panel", menu_items[3]),
+                    IconCog,
+                    SETTINGS_PAGE,
+                    &current_page
+                );
+                ReaSonusMenuButton(
+                    m_ctx,
+                    assets,
+                    i18n->t("control-panel", menu_items[4]),
+                    IconInformation,
+                    ABOUT_PAGE,
+                    &current_page
+                );
 
                 ImGui::EndChild(m_ctx);
             }
