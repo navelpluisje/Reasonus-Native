@@ -228,8 +228,16 @@ bool ReaSonusSettings::ShouldClearParamInput() {
     return stoi(settings["surface"]["plugin-map-param-clear"]) > 0;
 }
 
+int ReaSonusSettings::GetPluginMapDefaultColorMode() {
+    return stoi(settings["surface"]["plugin-map-default-color-mode"]);
+}
+
 bool ReaSonusSettings::ShouldMultiFilterApplyInstant() {
     return stoi(settings["surface"]["instant-multi-select-filter"]) > 0;
+}
+
+std::vector<int> ReaSonusSettings::GetPluginColorPalette() {
+    return splitToInt(settings["surface"]["reasonus-color-palette"], ",");
 }
 
 bool ReaSonusSettings::ShouldMuteMasterOnFwdRwd() {

@@ -17,10 +17,10 @@ jobs:
         include:
           - os: macos-latest
             arch: arm64;x86_64
-          - os: windows-latest
+          - os: windows-2022
             arch: x64
             win_build_type: RelWithDebInfo
-          - os: windows-latest
+          - os: windows-2022
             arch: x86
             win_build_type: Release
 
@@ -70,7 +70,7 @@ jobs:
                      TOOLCHAIN_PREFIX=aarch64-linux-gnu
               ;;
             esac
-          elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+          elif [[ "${{ matrix.os }}" == "windows-2022" ]]; then
             choco install ninja
             choco install nsis -y
           elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
@@ -92,7 +92,7 @@ jobs:
             -S ${{ github.workspace }} ^
             -DVCPKG_TARGET_TRIPLET=${{matrix.arch}}-windows-static ^
             -DCMAKE_TOOLCHAIN_FILE=%VCPKG_INSTALLATION_ROOT%\scripts\buildsystems\vcpkg.cmake 
-            
+          
           cmake --build ${{ github.workspace }} --config ${{ matrix.win_build_type }}
 
       - name: Unix-like build
@@ -116,7 +116,7 @@ jobs:
         working-directory: ${{ github.workspace }}
         shell: bash
         run: |
-          if [[ "${{ matrix.os }}" == "windows-latest" && 
+          if [[ "${{ matrix.os }}" == "windows-2022" && 
                 "${{ matrix.arch }}" == "x64" ]]; then
             cpack
           elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
@@ -150,7 +150,7 @@ jobs:
             ./src/i18n/locales/en-US.ini
 
   release:
-    needs: [build, locales]
+    needs: [ build, locales ]
     runs-on: ubuntu-latest
     steps:
       - name: Download artifact

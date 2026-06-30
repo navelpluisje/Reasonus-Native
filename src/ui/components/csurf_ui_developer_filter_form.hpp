@@ -8,6 +8,7 @@
 
 #include "csurf_ui_action_text_input.hpp"
 #include "csurf_ui_list_box.hpp"
+#include "csurf_ui_page_title.hpp"
 #include "../../shared/csurf_plugin_utils.hpp"
 
 class ReaSonusDeveloperFilterForm {
@@ -104,6 +105,7 @@ public:
             i18n->t("mapping", "edit.developer-filter.label", developers[selected_developer]),
             true
         );
+        
         if (ImGui::BeginChild(m_ctx, "list-filter-items", 200.0, 436.0, ImGui::ChildFlags_None)) {
             ReaSonusActionTextInput(
                 m_ctx,

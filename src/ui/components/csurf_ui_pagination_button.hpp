@@ -1,11 +1,11 @@
 #ifndef CSURF_FP_UI_PAGINATION_BUTTON_H_
 #define CSURF_FP_UI_PAGINATION_BUTTON_H_
 
+#include <functional>
 #include <reaper_imgui_functions.h>
 #include <string>
-#include <functional>
-#include "../../shared/csurf_utils.hpp"
 #include "../csurf_ui_colors.hpp"
+#include "../../shared/csurf_utils.hpp"
 
 static void ReaSonusPaginationButton( // NOLINT(*-function-cognitive-complexity)
     ImGui_Context *m_ctx,
@@ -15,7 +15,8 @@ static void ReaSonusPaginationButton( // NOLINT(*-function-cognitive-complexity)
     const bool alert,
     const bool selected,
     const std::function<void(int index)> &on_click,
-    const std::function<void(int from_index, int to_index)> &drop_callback) {
+    const std::function<void(int from_index, int to_index)> &drop_callback
+) {
     char data[256]; // NOLINT(*-avoid-c-arrays)
 
     constexpr int menu_button_width = 30;
@@ -33,8 +34,15 @@ static void ReaSonusPaginationButton( // NOLINT(*-function-cognitive-complexity)
     double text_width;
 
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameBorderSize, 0.0);
-    if (ImGui::BeginChild(m_ctx, ("##" + action_label).c_str(), menu_button_width, menu_button_height,
-                          ImGui::ChildFlags_FrameStyle)) {
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBg, UI_COLORS::Transparent);
+    if (ImGui::BeginChild(
+        m_ctx,
+        ("##" + action_label).c_str(),
+        menu_button_width + 2,
+        menu_button_height + 2,
+
+        ImGui::ChildFlags_FrameStyle
+    )) {
         ImGui::GetMousePos(m_ctx, &x_mouse_pos, &y_mouse_pos);
         ImGui::GetItemRectMin(m_ctx, &x_pos_1, &y_pos_1);
 
@@ -57,20 +65,39 @@ static void ReaSonusPaginationButton( // NOLINT(*-function-cognitive-complexity)
 
         ImGui_DrawList *list = ImGui::GetWindowDrawList(m_ctx);
 
-        ImGui::DrawList_AddRectFilled(list, x_pos_1, y_pos_1, x_pos_1 + menu_button_width, y_pos_1 + menu_button_height,
-                                      background_color, 4);
-        ImGui::DrawList_AddRect(list, x_pos_1, y_pos_1, x_pos_1 + menu_button_width, y_pos_1 + menu_button_height,
-                                border_color, 4, ImGui::DrawFlags_None, border_width);
+        ImGui::DrawList_AddRectFilled(
+            list,
+            x_pos_1,
+            y_pos_1 + 2,
+            x_pos_1 + menu_button_width,
+            y_pos_1 + menu_button_height + 2,
+            background_color,
+            4
+        );
+        ImGui::DrawList_AddRect(
+            list,
+            x_pos_1,
+            y_pos_1 + 2,
+            x_pos_1 + menu_button_width,
+            y_pos_1 + menu_button_height + 2,
+            border_color,
+            4,
+            ImGui::DrawFlags_None, border_width
+        );
+
         if (alert) {
-            ImGui::DrawList_AddCircleFilled(list, x_pos_1 + 27, y_pos_1 + 2, 5, border_color);
-            ImGui::DrawList_AddCircleFilled(list, x_pos_1 + 27, y_pos_1 + 2, 4, UI_COLORS::Main_18);
-            ImGui::DrawList_AddCircleFilled(list, x_pos_1 + 27, y_pos_1 + 2, 4, UI_COLORS::Success_50);
+            ImGui::DrawList_AddCircleFilled(list, x_pos_1 + 27, y_pos_1 + 5, 5, border_color);
+            ImGui::DrawList_AddCircleFilled(list, x_pos_1 + 27, y_pos_1 + 5, 4, UI_COLORS::Main_18);
+            ImGui::DrawList_AddCircleFilled(list, x_pos_1 + 27, y_pos_1 + 5, 4, UI_COLORS::Success_50);
         }
         ImGui::PushFont(m_ctx, assets->GetMainFontBold(), FontSizeDefault);
         ImGui::CalcTextSize(m_ctx, action_label.c_str(), &text_width, &text_height);
-        ImGui::DrawList_AddText(list, x_pos_1 + (menu_button_width - text_width) / 2,
-                                y_pos_1 + (menu_button_height - text_height) / 2, UI_COLORS::White,
-                                action_label.c_str());
+        ImGui::DrawList_AddText(
+            list,
+            x_pos_1 + (menu_button_width - text_width) / 2,
+            y_pos_1 + (menu_button_height - text_height) / 2 + 2,
+            UI_COLORS::White,
+            action_label.c_str());
         ImGui::PopFont(m_ctx);
 
         /**
@@ -85,20 +112,44 @@ static void ReaSonusPaginationButton( // NOLINT(*-function-cognitive-complexity)
             /**
              * Create the drag visuals
              */
-            if (ImGui::BeginChild(m_ctx, ("##group-drag-" + action_label).c_str(), 0.0, 0.0,
-                                  ImGui::ChildFlags_AutoResizeX | ImGui::ChildFlags_AutoResizeY)) {
+            if (ImGui::BeginChild(
+                m_ctx,
+                ("##group-drag-" + action_label).c_str(),
+                0.0,
+                0.0,
+                ImGui::ChildFlags_AutoResizeX | ImGui::ChildFlags_AutoResizeY
+            )) {
                 ImGui::GetItemRectMin(m_ctx, &x_pos_1, &y_pos_2);
-
-                ImGui::DrawList_AddRectFilled(list, x_pos_1 - 20, y_pos_1 + 40, x_pos_1 + menu_button_width - 20,
-                                              y_pos_1 + menu_button_height + 40, background_color, 4);
-                ImGui::DrawList_AddRect(list, x_pos_1 - 20, y_pos_1 + 40, x_pos_1 + menu_button_width - 20,
-                                        y_pos_1 + menu_button_height + 40, border_color, 4, ImGui::DrawFlags_None, 1);
+                ImGui::DrawList_AddRectFilled(
+                    list,
+                    x_pos_1 - 20,
+                    y_pos_1 + 40,
+                    x_pos_1 + menu_button_width - 20,
+                    y_pos_1 + menu_button_height + 40,
+                    background_color,
+                    4
+                );
+                ImGui::DrawList_AddRect(
+                    list,
+                    x_pos_1 - 20,
+                    y_pos_1 + 40,
+                    x_pos_1 + menu_button_width - 20,
+                    y_pos_1 + menu_button_height + 40,
+                    border_color,
+                    4,
+                    ImGui::DrawFlags_None,
+                    1
+                );
 
                 ImGui::PushFont(m_ctx, assets->GetMainFontBold(), FontSizeDefault);
                 ImGui::CalcTextSize(m_ctx, action_label.c_str(), &text_width, &text_height);
-                ImGui::DrawList_AddText(list, x_pos_1 - 20 + (menu_button_width - text_width) / 2,
-                                        y_pos_1 + 40 + (menu_button_height - text_height) / 2, UI_COLORS::White,
-                                        action_label.c_str());
+                ImGui::DrawList_AddText(
+                    list,
+                    x_pos_1 - 20 + (menu_button_width - text_width) / 2,
+                    y_pos_1 + 40 + (menu_button_height - text_height) / 2,
+                    UI_COLORS::White,
+                    action_label.c_str()
+                );
                 ImGui::PopFont(m_ctx);
                 ImGui::EndChild(m_ctx);
             }
@@ -108,6 +159,8 @@ static void ReaSonusPaginationButton( // NOLINT(*-function-cognitive-complexity)
         ImGui::EndChild(m_ctx);
     }
     ImGui::PopStyleVar(m_ctx);
+    ImGui::PopStyleColor(m_ctx);
+
     /**
      * Instantiate the drag and drop target
      */

@@ -137,8 +137,7 @@ void ReaSonus8ControlPanel::SetPageContent() {
     }
 }
 
-ReaSonus8ControlPanel::ReaSonus8ControlPanel()
-    : m_ctx{} {
+ReaSonus8ControlPanel::ReaSonus8ControlPanel() : m_ctx{} {
     menu_items.emplace_back("menu.functions");
     menu_items.emplace_back("menu.filters");
     menu_items.emplace_back("menu.plugin");
@@ -193,8 +192,12 @@ void ReaSonus8ControlPanel::Frame() // NOLINT(*-function-cognitive-complexity)
     ImGui::PushFont(m_ctx, assets->GetMainFont(), FontSizeDefault);
     ImGui::SetNextWindowSize(m_ctx, 1048, 668, ImGui::Cond_Once);
     bool open{true};
-    if (ImGui::Begin(m_ctx, g_name, &open,
-                     ImGui::WindowFlags_NoCollapse | ImGui::WindowFlags_NoResize | ImGui::WindowFlags_NoScrollbar)) {
+    if (ImGui::Begin(
+        m_ctx,
+        g_name,
+        &open,
+        ImGui::WindowFlags_NoCollapse | ImGui::WindowFlags_NoResize | ImGui::WindowFlags_NoScrollbar
+    )) {
         UiStyledElements::PushReaSonusSidebarStyle(m_ctx);
         if (ImGui::BeginChild(m_ctx, "side_bar", 224.0, 0.0, ImGui::ChildFlags_FrameStyle)) {
             ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
@@ -203,16 +206,46 @@ void ReaSonus8ControlPanel::Frame() // NOLINT(*-function-cognitive-complexity)
             if (ImGui::BeginChild(m_ctx, "side_bar_content", 0.0, space_y - height - 10)) {
                 ImGui::Image(m_ctx, assets->GetReaSonusLogo(), 200, 52);
 
-                ReaSonusMenuButton(m_ctx, assets, i18n->t("control-panel", menu_items[0]), IconAction, FUNCTIONS_PAGE,
-                                   &current_page);
-                ReaSonusMenuButton(m_ctx, assets, i18n->t("control-panel", menu_items[1]), IconCustomFilter,
-                                   FILTERS_PAGE, &current_page);
-                ReaSonusMenuButton(m_ctx, assets, i18n->t("control-panel", menu_items[2]), IconSettings, MAPPING_PAGE,
-                                   &current_page);
-                ReaSonusMenuButton(m_ctx, assets, i18n->t("control-panel", menu_items[3]), IconCog, SETTINGS_PAGE,
-                                   &current_page);
-                ReaSonusMenuButton(m_ctx, assets, i18n->t("control-panel", menu_items[4]), IconInformation, ABOUT_PAGE,
-                                   &current_page);
+                ReaSonusMenuButton(
+                    m_ctx,
+                    assets,
+                    i18n->t("control-panel", menu_items[0]),
+                    IconAction,
+                    FUNCTIONS_PAGE,
+                    &current_page
+                );
+                ReaSonusMenuButton(
+                    m_ctx,
+                    assets,
+                    i18n->t("control-panel", menu_items[1]),
+                    IconCustomFilter,
+                    FILTERS_PAGE,
+                    &current_page
+                );
+                ReaSonusMenuButton(
+                    m_ctx,
+                    assets,
+                    i18n->t("control-panel", menu_items[2]),
+                    IconSettings,
+                    MAPPING_PAGE,
+                    &current_page
+                );
+                ReaSonusMenuButton(
+                    m_ctx,
+                    assets,
+                    i18n->t("control-panel", menu_items[3]),
+                    IconCog,
+                    SETTINGS_PAGE,
+                    &current_page
+                );
+                ReaSonusMenuButton(
+                    m_ctx,
+                    assets,
+                    i18n->t("control-panel", menu_items[4]),
+                    IconInformation,
+                    ABOUT_PAGE,
+                    &current_page
+                );
 
                 ImGui::EndChild(m_ctx);
             }
