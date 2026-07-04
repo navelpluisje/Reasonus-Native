@@ -332,7 +332,7 @@ public:
                     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameBorderSize, 2);
                     ImGui::PushStyleColor(m_ctx, ImGui::Col_Border, UI_COLORS::FormFieldBorder);
                     for (int i = 0; i < static_cast<int>(settings_plugin_color_palette.size()); i++) {
-                        if (i % 8 != 0) {
+                        if (i % 6 != 0) {
                             ImGui::SameLine(m_ctx);
                         }
 
