@@ -10,6 +10,7 @@
 struct Filter {
     std::string name;
     std::string id;
+    int color;
 };
 
 class CSurf_FP_8_FilterManager : public CSurf_FP_8_ChannelManager {
@@ -25,7 +26,11 @@ protected:
 
         for (int i = 0; i < nbFilters; i++) {
             const std::string filterId = ini["filters"][std::to_string(i)];
-            const Filter filter{ini[filterId]["name"], filterId};
+            const Filter filter{
+                ini[filterId]["name"],
+                filterId,
+                ini[filterId].has("color") ? stoi(ini[filterId]["color"]) : 0x00ffffff
+            };
             filters.push_back(filter);
         }
     }
@@ -78,10 +83,11 @@ public:
             std::string strPan1;
             std::string strPan2;
 
-            CSurf_FP_8_Track *track = tracks.at(i);
+            const CSurf_FP_8_Track *track = tracks.at(i);
             MediaTrack *media_track = media_tracks.Get(i);
-            SetTrackColors(media_track, navigator->HasFilter(filter_index));
-
+            // TODO: Add check if setting is set to show filter colors over track colors
+            // SetTrackColors(media_track, navigator->HasFilter(filter_index));
+            color.SetColor(filters[filter_index].color, false);
             GetFaderValue(media_track, &fader_value, &valuebar_value, &strPan1, &strPan2);
 
             track->SetTrackColor(color);

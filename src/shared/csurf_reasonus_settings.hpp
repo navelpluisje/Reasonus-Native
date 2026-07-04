@@ -274,6 +274,8 @@ public:
 
     std::vector<std::string> GetFilterNames();
 
+    std::vector<int> GetFilterColors();
+
     mINI::INIMap<std::string> GetFilter(const std::string &key);
 
     mINI::INIMap<std::string> GetFilter(int index);

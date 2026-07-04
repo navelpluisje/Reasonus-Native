@@ -346,6 +346,21 @@ std::vector<std::string> ReaSonusSettings::GetFilterNames() {
     return names;
 }
 
+std::vector<int> ReaSonusSettings::GetFilterColors() {
+    std::vector<int> colors = {};
+    colors.reserve(GetNumberOfFilters());
+
+    for (int i = 0; i < GetNumberOfFilters(); i++) {
+        if (settings[settings["filters"][std::to_string(i)]].has("color")) {
+            colors.push_back(stoi(settings[settings["filters"][std::to_string(i)]]["color"]));
+        } else {
+            colors.push_back(0x00ffffff);
+        }
+    }
+
+    return colors;
+}
+
 mINI::INIMap<std::string> ReaSonusSettings::GetFilter(const std::string &key) {
     return settings[key];
 }

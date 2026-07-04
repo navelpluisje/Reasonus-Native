@@ -76,8 +76,10 @@ struct ConfigVar {
             addr = get_config_var(var_name.c_str(), &size);
         }
 
-        if (size == sizeof(T)) {
-            m_addr = static_cast<T *>(addr);
+        m_addr = static_cast<T *>(addr);
+
+        if (size != sizeof(T)) {
+            m_addr = nullptr;
         }
     }
 

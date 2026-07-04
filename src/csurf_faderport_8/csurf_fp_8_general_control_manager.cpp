@@ -329,7 +329,7 @@ public:
         }
     }
 
-    static void HandleMuteClearButton(const int value) {
+    void HandleMuteClearButton(const int value) const { // NOLINT(*-convert-member-functions-to-static)
         if (value == 0) {
             return;
         }
@@ -344,7 +344,7 @@ public:
 
         context->GetShiftLeft()
             ? Main_OnCommandAsyncEx(40344, 0, nullptr) // Track: Toggle FX bypass on all tracks
-            : Main_OnCommandAsyncEx(8, 0, nullptr); // Track: Toggle FX bypass for selected tracks
+            : Main_OnCommandAsyncEx(8, 0, nullptr);    // Track: Toggle FX bypass for selected tracks
     }
 
     void HandleMacroButton(const int value) const {
