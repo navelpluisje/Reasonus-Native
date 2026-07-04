@@ -85,9 +85,13 @@ public:
 
             const CSurf_FP_8_Track *track = tracks.at(i);
             MediaTrack *media_track = media_tracks.Get(i);
-            // TODO: Add check if setting is set to show filter colors over track colors
-            // SetTrackColors(media_track, navigator->HasFilter(filter_index));
-            color.SetColor(filters[filter_index].color, false);
+
+            if (settings->UseFilterColor()) {
+                color.SetColor(filters[filter_index].color, false);
+            } else {
+                SetTrackColors(media_track, navigator->HasFilter(filter_index));
+            }
+
             GetFaderValue(media_track, &fader_value, &valuebar_value, &strPan1, &strPan2);
 
             track->SetTrackColor(color);

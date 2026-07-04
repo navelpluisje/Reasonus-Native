@@ -46,6 +46,7 @@ class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-in
     std::array<int, 4> setting_track_value_line_invert = {-1, -1, -1, -1};
     int setting_track_valuebar_mode;
     int setting_track_valuebar_value;
+    bool setting_filter_custom_color;
 
     std::vector<std::string> language_names;
 
@@ -412,6 +413,13 @@ public:
             RenderInfoCheckbox(
                 m_ctx,
                 assets,
+                i18n->t("settings", "filter-use-custom-color.label"),
+                &setting_filter_custom_color,
+                i18n->t("settings", "filter-use-custom-color.tooltip"));
+
+            RenderInfoCheckbox(
+                m_ctx,
+                assets,
                 i18n->t("settings", "latch-preview-action-enable.label"),
                 &setting_latch_preview_action_enable,
                 i18n->t("settings", "latch-preview-action-enable.tooltip"));
@@ -701,6 +709,7 @@ public:
         settings->SetSetting("displays", "track-value-bar-mode", setting_track_valuebar_mode);
         settings->SetSetting("displays", "track-value-bar-value", setting_track_valuebar_value);
         settings->SetSetting("surface", "reasonus-color-palette", join(settings_plugin_color_palette, ","));
+        settings->SetSetting("filters", "use-custom-color", setting_filter_custom_color);
 
         if (settings->StoreSettings()) {
             DAW::SetExtState(EXT_STATE_KEY_SAVED_SETTINGS, EXT_STATE_VALUE_TRUE, false);
@@ -745,6 +754,7 @@ public:
         setting_mute_master_on_fwd_rwd = settings->ShouldMuteMasterOnFwdRwd();
         settings_initial_plugin_color_palette = settings->GetPluginColorPalette();
         settings_plugin_color_palette = settings->GetPluginColorPalette();
+        setting_filter_custom_color = settings->UseFilterColor();
 
         int *const iterator = std::find(
             latch_preview_action_indexes,

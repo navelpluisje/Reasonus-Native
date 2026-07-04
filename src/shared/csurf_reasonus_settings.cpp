@@ -301,6 +301,10 @@ std::vector<std::string> ReaSonusSettings::GetFilterKeys() {
     return keys;
 }
 
+bool ReaSonusSettings::UseFilterColor() {
+    return settings["filters"]["use-custom-color"] == "1";
+}
+
 void ReaSonusSettings::UpdateFilter(const std::string &key, const mINI::INIMap<std::string> &filter) {
     settings[key] = filter;
 }
