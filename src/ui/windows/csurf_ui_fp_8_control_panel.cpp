@@ -190,7 +190,7 @@ void ReaSonus8ControlPanel::Frame() // NOLINT(*-function-cognitive-complexity)
     PushReaSonusColors(m_ctx);
     PushReaSonusStyle(m_ctx);
     ImGui::PushFont(m_ctx, assets->GetMainFont(), FontSizeDefault);
-    ImGui::SetNextWindowSize(m_ctx, 1048, 668, ImGui::Cond_Once);
+    ImGui::SetNextWindowSize(m_ctx, 1048, 678, ImGui::Cond_Once);
     bool open{true};
     if (ImGui::Begin(
         m_ctx,
