@@ -1,6 +1,6 @@
 target_sources(${PROJECT_NAME}
         PRIVATE
-        windows/csurf_ui_about.cpp
+        pages/csurf_ui_about.cpp
         csurf_ui_styles_elements.cpp
         pages/csurf_ui_function_keys.cpp
         windows/csurf_ui_plugin_mapping_converter.cpp

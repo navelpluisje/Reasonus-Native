@@ -1,6 +1,6 @@
 #include "../pages/csurf_ui_fp_v2_control_panel.hpp"
 #include "../pages/csurf_ui_fp_v2_settings_page.cpp"
-#include "csurf_ui_about.cpp"
+#include "../pages/csurf_ui_about.cpp"
 #include "../pages/csurf_ui_function_keys.hpp"
 #include "../csurf_ui_colors.hpp"
 #include "../csurf_ui_vars.hpp"
