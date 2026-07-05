@@ -363,70 +363,77 @@ public:
     }
 
     void RenderControllerTab() {
+        double width;
+        double height;
+
         UiStyledElements::PushReaSonusTabStyle(m_ctx, selected_tab == 1);
         if (ImGui::BeginTabItem(m_ctx, i18n->t("settings", "tab.functional").c_str())) {
             selected_tab = 1;
             ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 16);
+            ImGui::GetContentRegionAvail(m_ctx, &width, &height);
 
-            RenderInfoCheckbox(
-                m_ctx,
-                assets,
-                i18n->t("settings", "master-fader.label"),
-                &setting_master_fader_mode,
-                i18n->t("settings", "master-fader.tooltip"));
+            if (ImGui::BeginChild(m_ctx, "settings-display", width / 2 - 8, 0.0, ImGui::ChildFlags_None)) {
+                RenderInfoCheckbox(
+                    m_ctx,
+                    assets,
+                    i18n->t("settings", "master-fader.label"),
+                    &setting_master_fader_mode,
+                    i18n->t("settings", "master-fader.tooltip"));
 
-            RenderInfoCheckbox(
-                m_ctx,
-                assets,
-                i18n->t("settings", "swap-shift.label"),
-                &setting_swap_shift,
-                i18n->t("settings", "swap-shift.tooltip"));
+                RenderInfoCheckbox(
+                    m_ctx,
+                    assets,
+                    i18n->t("settings", "swap-shift.label"),
+                    &setting_swap_shift,
+                    i18n->t("settings", "swap-shift.tooltip"));
 
-            RenderInfoCheckbox(
-                m_ctx,
-                assets,
-                i18n->t("settings", "fader-reset.label"),
-                &setting_fader_reset,
-                i18n->t("settings", "fader-reset.tooltip"));
+                RenderInfoCheckbox(
+                    m_ctx,
+                    assets,
+                    i18n->t("settings", "fader-reset.label"),
+                    &setting_fader_reset,
+                    i18n->t("settings", "fader-reset.tooltip"));
 
-            RenderInfoCheckbox(
-                m_ctx,
-                assets,
-                i18n->t("settings", "momentary-mute.label"),
-                &setting_momentary_mute_solo,
-                i18n->t("settings", "momentary-mute.tooltip"));
+                RenderInfoCheckbox(
+                    m_ctx,
+                    assets,
+                    i18n->t("settings", "momentary-mute.label"),
+                    &setting_momentary_mute_solo,
+                    i18n->t("settings", "momentary-mute.tooltip"));
 
-            RenderInfoCheckbox(
-                m_ctx,
-                assets,
-                i18n->t("settings", "instant-multi-select-filter.label"),
-                &setting_instant_multi_select_filter,
-                i18n->t("settings", "instant-multi-select-filter.tooltip"));
+                RenderInfoCheckbox(
+                    m_ctx,
+                    assets,
+                    i18n->t("settings", "instant-multi-select-filter.label"),
+                    &setting_instant_multi_select_filter,
+                    i18n->t("settings", "instant-multi-select-filter.tooltip"));
 
-            RenderInfoCheckbox(
-                m_ctx,
-                assets,
-                i18n->t("settings", "mute-master-on-fwd-rwd.label"),
-                &setting_mute_master_on_fwd_rwd,
-                i18n->t("settings", "mute-master-on-fwd-rwd.tooltip"));
+                RenderInfoCheckbox(
+                    m_ctx,
+                    assets,
+                    i18n->t("settings", "mute-master-on-fwd-rwd.label"),
+                    &setting_mute_master_on_fwd_rwd,
+                    i18n->t("settings", "mute-master-on-fwd-rwd.tooltip"));
 
-            RenderInfoCheckbox(
-                m_ctx,
-                assets,
-                i18n->t("settings", "filter-use-custom-color.label"),
-                &setting_filter_custom_color,
-                i18n->t("settings", "filter-use-custom-color.tooltip"));
+                RenderInfoCheckbox(
+                    m_ctx,
+                    assets,
+                    i18n->t("settings", "filter-use-custom-color.label"),
+                    &setting_filter_custom_color,
+                    i18n->t("settings", "filter-use-custom-color.tooltip"));
 
-            RenderInfoCheckbox(
-                m_ctx,
-                assets,
-                i18n->t("settings", "latch-preview-action-enable.label"),
-                &setting_latch_preview_action_enable,
-                i18n->t("settings", "latch-preview-action-enable.tooltip"));
+                RenderInfoCheckbox(
+                    m_ctx,
+                    assets,
+                    i18n->t("settings", "latch-preview-action-enable.label"),
+                    &setting_latch_preview_action_enable,
+                    i18n->t("settings", "latch-preview-action-enable.tooltip"));
 
-            if (setting_latch_preview_action_enable) {
-                ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + 26);
-                latch_preview_action_combo->Render();
+                if (setting_latch_preview_action_enable) {
+                    ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + 26);
+                    latch_preview_action_combo->Render();
+                }
+                ImGui::EndChild(m_ctx);
             }
 
             ImGui::EndTabItem(m_ctx);
