@@ -45,6 +45,13 @@ void CSurf_FP_8_Track::ClearTrack(const bool display, const bool forceUpdate) co
     this->SetValueBarMode(VALUEBAR_MODE_OFF);
 }
 
+void CSurf_FP_8_Track::SetTrackColor(const int color, const bool force) const {
+    ButtonColor new_color{};
+    new_color.SetColor(color, false);
+
+    selectButton->SetColor(new_color, force);
+}
+
 void CSurf_FP_8_Track::SetTrackColor(const ButtonColor color, const bool force) const {
     selectButton->SetColor(color, force);
 }

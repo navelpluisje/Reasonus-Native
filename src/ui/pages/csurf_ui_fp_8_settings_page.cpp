@@ -10,7 +10,7 @@
 #include "../windows/csurf_ui_fp_8_control_panel.hpp"
 #include "../../shared/csurf_reasonus_settings.hpp"
 #include "../components/csurf_ui_image_combo_input.hpp"
-
+#include "../components/csurf_ui_color_picker.hpp"
 
 class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-internal-linkage)
     I18n *i18n = I18n::GetInstance();
@@ -31,23 +31,35 @@ class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-in
     bool setting_latch_preview_action_enable;
     bool setting_overwrite_time_code;
     bool setting_plugin_map_param_clear;
+    int setting_plugin_map_color_mode;
     bool setting_instant_multi_select_filter;
     bool setting_mute_master_on_fwd_rwd;
+    std::vector<int> settings_initial_plugin_color_palette;
+    std::vector<int> settings_plugin_color_palette;
     int setting_plugin_step_size;
     int setting_latch_preview_action;
     int setting_track_color_brightness = 25;
     int setting_time_code;
     int setting_track_display;
-    std::array<int, 4> setting_track_value_line_value;
-    std::array<int, 4> setting_track_value_line_align;
-    std::array<int, 4> setting_track_value_line_invert;
+    std::array<int, 4> setting_track_value_line_value = {-1, -1, -1, -1};
+    std::array<int, 4> setting_track_value_line_align = {-1, -1, -1, -1};
+    std::array<int, 4> setting_track_value_line_invert = {-1, -1, -1, -1};
     int setting_track_valuebar_mode;
     int setting_track_valuebar_value;
-    int *index;
 
     std::vector<std::string> language_names;
 
-    std::array<int, 8> latch_preview_action_indexes = {42013, 42014, 42015, 42016, 42017, 41160, 41161, 41162};
+    std::vector<ReaSonusComboInputRow *> display_line_value_combo;
+    std::vector<ReaSonusComboInputRow *> display_line_alignment_combo;
+    std::vector<ReaSonusComboInputRow *> display_line_invert_combo;
+    ReaSonusComboInputRow *value_bar_type_combo;
+    ReaSonusComboInputRow *value_bar_value_combo;
+    ReaSonusInfoComboInputRow *language_select_combo;
+    ReaSonusInfoComboInputRow *time_code_combo;
+    ReaSonusInfoComboInputRow *latch_preview_action_combo;
+    ReaSonusInfoComboInputRow *plugin_mapping_default_color_mode;
+
+    int latch_preview_action_indexes[8] = {42013, 42014, 42015, 42016, 42017, 41160, 41161, 41162};
     std::vector<std::string> latch_preview_action_names = {
         "Write current values for actively-writing envelopes to time selection",
         "Write current values for actively-writing envelopes from cursor to start of project",
@@ -59,17 +71,17 @@ class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-in
         "Write current values for all writing envelopes from cursor to end of project",
     };
 
-    std::array<int, 6> time_code_indexes = {0, 2, 3, 4, 5, 8};
+    int time_code_indexes[6] = {0, 2, 3, 4, 5, 8};
     std::vector<std::string> time_code_names = {
-        i18n->t("settings", "timecode-list.option.time"), // Time
-        i18n->t("settings", "timecode-list.option.beats"), // "Beats",
-        i18n->t("settings", "timecode-list.option.seconds"), // "Seconds",
-        i18n->t("settings", "timecode-list.option.samples"), // "Samples",
+        i18n->t("settings", "timecode-list.option.time"),          // Time
+        i18n->t("settings", "timecode-list.option.beats"),         // "Beats",
+        i18n->t("settings", "timecode-list.option.seconds"),       // "Seconds",
+        i18n->t("settings", "timecode-list.option.samples"),       // "Samples",
         i18n->t("settings", "timecode-list.option.hr-min-sec-fr"), // "Hr:Min:Sec:Fr",
-        i18n->t("settings", "timecode-list.option.frames"), // "Abs. Frames"
+        i18n->t("settings", "timecode-list.option.frames"),        // "Abs. Frames"
     };
 
-    int track_display_lines[9] = {3, 3, 4, 2, 2, 3, 3, 3, 3};
+    std::array<int, 9> track_display_lines = {3, 3, 4, 2, 2, 3, 3, 3, 3};
     std::vector<std::string> track_display_names = {
         i18n->t("settings", "display-track.option.display-mode-0"), // "Small, Small, Large (No VU)"
         i18n->t("settings", "display-track.option.display-mode-1"), // "Large, Small, Small (No VU)"
@@ -119,6 +131,13 @@ class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-in
         i18n->t("settings", "display-track.option.display-value-pan-2"),
     };
 
+    std::vector<std::string> plugin_map_color_mode_labels = {
+        I18n::GetInstance()->t("mapping", "edit.color.show.combo.hide"),
+        I18n::GetInstance()->t("mapping", "edit.color.show.combo.show"),
+        I18n::GetInstance()->t("mapping", "edit.color.show.combo.bright"),
+        I18n::GetInstance()->t("mapping", "edit.color.show.combo.dimmed"),
+    };
+
 public:
     CSurf_FP_8_SettingsPage( // NOLINT(*-pro-type-member-init)
         ImGui_Context *m_ctx,
@@ -129,11 +148,106 @@ public:
 
         GetLanguages(language_names);
         CSurf_FP_8_SettingsPage::Reset();
+
+        for (int i = 0; i < 4; i++) {
+            display_line_value_combo.emplace_back(new ReaSonusComboInputRow(
+                m_ctx,
+                assets,
+                i18n->t("settings", "display-track.value.label"),
+                "display-track.value",
+                track_display_values,
+                &setting_track_value_line_value[i],
+                70.0
+            ));
+
+            display_line_alignment_combo.emplace_back(new ReaSonusComboInputRow(
+                m_ctx,
+                assets,
+                i18n->t("settings", "display-track.alignment.label"),
+                "display-track.alignment",
+                track_display_alignments,
+                &setting_track_value_line_align[i],
+                70.0
+            ));
+
+            display_line_invert_combo.emplace_back(new ReaSonusComboInputRow(
+                m_ctx,
+                assets,
+                i18n->t("settings", "display-track.invert.label"),
+                "display-track.invert",
+                track_display_invert,
+                &setting_track_value_line_invert[i],
+                70.0
+            ));
+        }
+
+        value_bar_type_combo = new ReaSonusComboInputRow(
+            m_ctx,
+            assets,
+            i18n->t("settings", "display-track.value-bar-type.label"),
+            "value-bar-type",
+            track_valuebar_modees,
+            &setting_track_valuebar_mode,
+            70.0
+        );
+
+        value_bar_value_combo = new ReaSonusComboInputRow(
+            m_ctx,
+            assets,
+            i18n->t("settings", "display-track.value-bar-value.label"),
+            "value-bar-display",
+            track_valuebar_values,
+            &setting_track_valuebar_value,
+            70.0
+        );
+
+        time_code_combo = new ReaSonusInfoComboInputRow(
+            m_ctx,
+            assets,
+            i18n->t("settings", "timecode-list.label"),
+            "timecode-list",
+            time_code_names,
+            &setting_time_code,
+            i18n->t("settings", "timecode-list.tooltip")
+        );
+
+        language_select_combo = new ReaSonusInfoComboInputRow(
+            m_ctx,
+            assets,
+            i18n->t("settings", "language.label"),
+            "language-select",
+            language_names,
+            &setting_language,
+            i18n->t("settings", "language.tooltip")
+        );
+
+        latch_preview_action_combo = new ReaSonusInfoComboInputRow(
+            m_ctx,
+            assets,
+            i18n->t("settings", "latch-preview-action-list.label"),
+            "latch-preview-action-list",
+            latch_preview_action_names,
+            &setting_latch_preview_action,
+            i18n->t("settings", "latch-preview-action.tooltip")
+        );
+
+        plugin_mapping_default_color_mode = new ReaSonusInfoComboInputRow(
+            m_ctx,
+            assets,
+            i18n->t("settings", "mapping-default-color-mode.label"),
+            "mapping-default-color-mode",
+            plugin_map_color_mode_labels,
+            &setting_plugin_map_color_mode,
+            replaceAll(i18n->t("settings", "mapping-default-color-mode.tooltip"), "\\n", "\n")
+        );
     }
 
     ~CSurf_FP_8_SettingsPage() override = default;
 
     void RenderGlobalTab() {
+        double width = 0.0;
+        double height = 0.0;
+
         const int language_button_width = getButtonWidth(
             m_ctx,
             i18n->t("settings", "language.button.label"),
@@ -143,38 +257,104 @@ public:
         if (ImGui::BeginTabItem(m_ctx, i18n->t("settings", "tab.global").c_str())) {
             selected_tab = 0;
             ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 16);
+            ImGui::GetContentRegionAvail(m_ctx, &width, &height);
 
-            if (ImGui::BeginChild(m_ctx, "language-select", -1 * language_button_width, 0.0,
-                                  ImGui::ChildFlags_None | ImGui::ChildFlags_AutoResizeY)) {
-                RenderInfoComboInput(
-                    m_ctx,
-                    assets,
-                    i18n->t("settings", "language.label"),
-                    language_names,
-                    &setting_language,
-                    i18n->t("settings", "language.tooltip"));
+            if (ImGui::BeginChild(
+                m_ctx,
+                "language-select",
+                -1 * language_button_width,
+                0.0,
+                ImGui::ChildFlags_None | ImGui::ChildFlags_AutoResizeY
+            )) {
+                language_select_combo->Render();
 
                 ImGui::EndChild(m_ctx);
             }
+
             ImGui::SameLine(m_ctx);
-            if (ImGui::BeginChild(m_ctx, "language-action", 0.0, 0.0,
-                                  ImGui::ChildFlags_None | ImGui::ChildFlags_AutoResizeY)) {
+
+            if (ImGui::BeginChild(
+                m_ctx,
+                "language-action",
+                0.0,
+                0.0,
+                ImGui::ChildFlags_None | ImGui::ChildFlags_AutoResizeY
+            )) {
                 ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 22);
                 UiStyledElements::PushReaSonusButtonOutlineStyle(m_ctx, assets->GetMainFontBold());
+
                 if (ImGui::Button(m_ctx, i18n->t("settings", "language.button.label").c_str())) {
                     edit_language = true;
                 }
+
                 UiStyledElements::PopReaSonusButtonOutlineStyle(m_ctx);
 
                 ImGui::EndChild(m_ctx);
             }
 
-            RenderInfoCheckbox(
-                m_ctx,
-                assets,
-                i18n->t("settings", "distraction-free-mode.label"),
-                &setting_distraction_free_mode,
-                i18n->t("settings", "distraction-free-mode.tooltip"));
+            if (ImGui::BeginChild(m_ctx, "global-left-column", width / 2, 0.0, ImGui::ChildFlags_None)) {
+                RenderInfoCheckbox(
+                    m_ctx,
+                    assets,
+                    i18n->t("settings", "distraction-free-mode.label"),
+                    &setting_distraction_free_mode,
+                    i18n->t("settings", "distraction-free-mode.tooltip")
+                );
+
+                ImGui::EndChild(m_ctx);
+            }
+
+            ImGui::SameLine(m_ctx);
+
+            if (ImGui::BeginChild(m_ctx, "global-right-column", width / 2, 0.0, ImGui::ChildFlags_None)) {
+                UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
+                if (ImGui::BeginChild(
+                    m_ctx,
+                    "settings-display",
+                    0.0,
+                    0.0,
+                    ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
+                )) {
+                    ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 2);
+                    ImGui::Text(m_ctx, i18n->t("settings", "color-palette.label").c_str());
+                    ImGui::SameLine(m_ctx);
+                    ReaSonusTooltip(
+                        m_ctx,
+                        assets,
+                        i18n->t("settings", "color-palette.tooltip"),
+                        "color-picker-tooltip",
+                        0,
+                        -3
+                    );
+                    ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 4);
+
+                    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameRounding, 4.0);
+                    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameBorderSize, 2);
+                    ImGui::PushStyleColor(m_ctx, ImGui::Col_Border, UI_COLORS::FormFieldBorder);
+                    for (int i = 0; i < static_cast<int>(settings_plugin_color_palette.size()); i++) {
+                        if (i % 6 != 0) {
+                            ImGui::SameLine(m_ctx);
+                        }
+
+                        ReaSonusColorPicker(
+                            m_ctx,
+                            assets,
+                            "Color Picker##picker" + std::to_string(i),
+                            &settings_plugin_color_palette[i],
+                            settings_initial_plugin_color_palette[i],
+                            settings_plugin_color_palette,
+                            30,
+                            30
+                        );
+                    }
+                    ImGui::PopStyleVar(m_ctx, 2);
+                    ImGui::PopStyleColor(m_ctx, 1);
+                    ImGui::EndChild(m_ctx);
+                }
+                UiStyledElements::PopReaSonusGroupStyle(m_ctx);
+
+                ImGui::EndChild(m_ctx);
+            }
 
             ImGui::EndTabItem(m_ctx);
         }
@@ -218,13 +398,6 @@ public:
             RenderInfoCheckbox(
                 m_ctx,
                 assets,
-                i18n->t("settings", "latch-preview-action-enable.label"),
-                &setting_latch_preview_action_enable,
-                i18n->t("settings", "latch-preview-action-enable.tooltip"));
-
-            RenderInfoCheckbox(
-                m_ctx,
-                assets,
                 i18n->t("settings", "instant-multi-select-filter.label"),
                 &setting_instant_multi_select_filter,
                 i18n->t("settings", "instant-multi-select-filter.tooltip"));
@@ -236,15 +409,16 @@ public:
                 &setting_mute_master_on_fwd_rwd,
                 i18n->t("settings", "mute-master-on-fwd-rwd.tooltip"));
 
+            RenderInfoCheckbox(
+                m_ctx,
+                assets,
+                i18n->t("settings", "latch-preview-action-enable.label"),
+                &setting_latch_preview_action_enable,
+                i18n->t("settings", "latch-preview-action-enable.tooltip"));
+
             if (setting_latch_preview_action_enable) {
                 ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + 26);
-                RenderInfoComboInput(
-                    m_ctx,
-                    assets,
-                    i18n->t("settings", "latch-preview-action-list.label"),
-                    latch_preview_action_names,
-                    &setting_latch_preview_action,
-                    i18n->t("settings", "latch-preview-action.tooltip"));
+                latch_preview_action_combo->Render();
             }
 
             ImGui::EndTabItem(m_ctx);
@@ -286,6 +460,7 @@ public:
                     settings->GetSurface(),
                     i18n->t("settings", "plugin-step-size.tooltip"),
                     "%d");
+
                 ImGui::EndChild(m_ctx);
             }
 
@@ -298,6 +473,8 @@ public:
                     i18n->t("settings", "plugin-map-param-clear.label"),
                     &setting_plugin_map_param_clear,
                     i18n->t("settings", "plugin-map-param-clear.tooltip"));
+
+                plugin_mapping_default_color_mode->Render();
 
                 ImGui::EndChild(m_ctx);
             }
@@ -317,7 +494,6 @@ public:
 
             ImGui::SameLine(m_ctx);
 
-
             UiStyledElements::PushReaSonusGroupStyle(m_ctx, true);
             if (ImGui::BeginChild(
                 m_ctx,
@@ -326,29 +502,9 @@ public:
                 0.0,
                 ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY | ImGui::ChildFlags_ResizeY
             )) {
-                ReaSonusComboInputRow(
-                    m_ctx,
-                    i18n->t("settings", "display-track.value.label"),
-                    track_display_values,
-                    &setting_track_value_line_value[tab_index],
-                    70.0
-                );
-
-                ReaSonusComboInputRow(
-                    m_ctx,
-                    i18n->t("settings", "display-track.alignment.label"),
-                    track_display_alignments,
-                    &setting_track_value_line_align[tab_index],
-                    70.0
-                );
-
-                ReaSonusComboInputRow(
-                    m_ctx,
-                    i18n->t("settings", "display-track.invert.label"),
-                    track_display_invert,
-                    &setting_track_value_line_invert[tab_index],
-                    70.0
-                );
+                display_line_value_combo[tab_index]->Render();
+                display_line_alignment_combo[tab_index]->Render();
+                display_line_invert_combo[tab_index]->Render();
 
                 UiStyledElements::PopReaSonusGroupStyle(m_ctx);
                 ImGui::EndChild(m_ctx);
@@ -427,20 +583,8 @@ public:
                         0.0,
                         ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
                     )) {
-                        ReaSonusComboInputRow(
-                            m_ctx,
-                            i18n->t("settings", "display-track.value-bar-type.label"),
-                            track_valuebar_modees,
-                            &setting_track_valuebar_mode,
-                            70.0
-                        );
-                        ReaSonusComboInputRow(
-                            m_ctx,
-                            i18n->t("settings", "display-track.value-bar-value.label"),
-                            track_valuebar_values,
-                            &setting_track_valuebar_value,
-                            70.0
-                        );
+                        value_bar_type_combo->Render();
+                        value_bar_value_combo->Render();
 
                         UiStyledElements::PopReaSonusGroupStyle(m_ctx);
                         ImGui::EndChild(m_ctx);
@@ -486,15 +630,8 @@ public:
 
                 if (setting_overwrite_time_code) {
                     ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + 26);
-                    RenderInfoComboInput(
-                        m_ctx,
-                        assets,
-                        i18n->t("settings", "timecode-list.label"),
-                        time_code_names,
-                        &setting_time_code,
-                        i18n->t("settings", "timecode-list.tooltip"));
+                    time_code_combo->Render();
                 }
-
 
                 ImGui::EndChild(m_ctx);
             }
@@ -554,6 +691,7 @@ public:
         settings->SetSetting("surface", "time-code", time_code_indexes[setting_time_code]);
         settings->SetSetting("surface", "plugin-step-size", setting_plugin_step_size);
         settings->SetSetting("surface", "plugin-map-param-clear", setting_plugin_map_param_clear);
+        settings->SetSetting("surface", "plugin-map-default-color-mode", setting_plugin_map_color_mode);
         settings->SetSetting("surface", "instant-multi-select-filter", setting_instant_multi_select_filter);
         settings->SetSetting("surface", "mute-master-on-fwd-rwd", setting_mute_master_on_fwd_rwd);
         settings->SetSetting("displays", "track", setting_track_display);
@@ -562,6 +700,7 @@ public:
         settings->SetSetting("displays", "track-invert", joinDisplayValues(setting_track_value_line_invert, ","));
         settings->SetSetting("displays", "track-value-bar-mode", setting_track_valuebar_mode);
         settings->SetSetting("displays", "track-value-bar-value", setting_track_valuebar_value);
+        settings->SetSetting("surface", "reasonus-color-palette", join(settings_plugin_color_palette, ","));
 
         if (settings->StoreSettings()) {
             DAW::SetExtState(EXT_STATE_KEY_SAVED_SETTINGS, EXT_STATE_VALUE_TRUE, false);
@@ -595,6 +734,7 @@ public:
         setting_plugin_step_size = settings->GetpluginStepSize();
         setting_track_color_brightness = settings->GetTrackColorBrightness();
         setting_plugin_map_param_clear = settings->ShouldClearParamInput();
+        setting_plugin_map_color_mode = settings->GetPluginMapDefaultColorMode();
         setting_track_display = settings->GetTrackDisplay();
         setting_track_value_line_value = settings->GetTrackDisplayLineValues();
         setting_track_value_line_align = settings->GetTrackDisplayAlignValues();
@@ -603,24 +743,31 @@ public:
         setting_track_valuebar_value = settings->GetTrackValueBarValue();
         setting_instant_multi_select_filter = settings->ShouldMultiFilterApplyInstant();
         setting_mute_master_on_fwd_rwd = settings->ShouldMuteMasterOnFwdRwd();
+        settings_initial_plugin_color_palette = settings->GetPluginColorPalette();
+        settings_plugin_color_palette = settings->GetPluginColorPalette();
 
-        auto iterator = std::find(
-            latch_preview_action_indexes.begin(),
-            latch_preview_action_indexes.end(),
-            settings->GetLatchPreviewActionCode());
+        int *const iterator = std::find(
+            latch_preview_action_indexes,
+            latch_preview_action_indexes + 8,
+            settings->GetLatchPreviewActionCode()
+        );
 
-        if (iterator != latch_preview_action_indexes.end()) {
-            setting_latch_preview_action = static_cast<int>(std::distance(
-                latch_preview_action_indexes.begin(), iterator));
+        if (iterator != latch_preview_action_indexes + 8) {
+            setting_latch_preview_action = static_cast<int>(
+                std::distance(latch_preview_action_indexes, iterator)
+            );
         }
 
-        auto time_code_iterator = std::find(
-            time_code_indexes.begin(),
-            time_code_indexes.end(),
-            settings->GetSurfaceTimeCode());
+        int *const time_code_iterator = std::find(
+            time_code_indexes,
+            time_code_indexes + 6,
+            settings->GetSurfaceTimeCode()
+        );
 
-        if (time_code_iterator != time_code_indexes.end()) {
-            setting_time_code = static_cast<int>(std::distance(time_code_indexes.begin(), time_code_iterator));
+        if (time_code_iterator != time_code_indexes + 6) {
+            setting_time_code = static_cast<int>(
+                std::distance(time_code_indexes, time_code_iterator)
+            );
         }
     }
 

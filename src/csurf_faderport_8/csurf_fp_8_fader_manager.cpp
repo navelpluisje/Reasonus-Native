@@ -1,4 +1,5 @@
 #include "csurf_fp_8_fader_manager.hpp"
+#include "../shared/csurf_plugin_utils.hpp"
 
 void CSurf_FP_8_FaderManager::SetButtonValues(const bool force) const {
     // Send button has to blink on receive
@@ -296,7 +297,7 @@ void CSurf_FP_8_FaderManager::HandleSoloClick(const int index, const int value) 
         )
         && context->GetPluginEditPluginId() > -1
     ) {
-        if (hasPluginConfigFile(context->GetPluginEditTrack(), context->GetPluginEditPluginId())) {
+        if (PluginUtils::hasPluginConfigFile(context->GetPluginEditTrack(), context->GetPluginEditPluginId())) {
             SetChannelMode(PluginControlMode);
         }
     }

@@ -27,8 +27,8 @@ enum PAN_MODES {
 };
 
 enum SEND_MODES {
-    SEND_MODE_RECEIVE = -1,
-    SEND_MODE_SEND = 0,
+    SEND_MODE_RECEIVE  = -1,
+    SEND_MODE_SEND     = 0,
     SEND_MODE_HARDWARE = 1,
 };
 
@@ -278,6 +278,14 @@ public:
     static bool HasTrackFx(MediaTrack *media_track, int fxIndex);
 
     /**
+     * Gat the full original name of the plugin at the given index
+     * @param media_track The track to check for the plugin
+     * @param fxIndex Index of the plugin
+     * @return The name of the plugin
+     */
+    static std::string GetOrigTrackFxName(MediaTrack *media_track, int fxIndex);
+
+    /**
      * Gat the name of the plugin at the given index
      * @param media_track The track to check for the plugin
      * @param fxIndex Index of the plugin
@@ -355,27 +363,29 @@ public:
     /**
      * Get the parameter name of the parameter with the given values
      * @param media_track The track where we want the plugin param for
-     * @param fxIndex The index on the plugin
+     * @param fx_index The index on the plugin
      * @param param The parameter index to get the name for
      * @return The name of the given parameter
      */
-    static std::string GetTrackFxParamName(MediaTrack *media_track, int fxIndex, int param);
+    static std::string GetTrackFxParamName(MediaTrack *media_track, int fx_index, int param);
+
+    static std::string GetTrackFxFormattedParamValue(MediaTrack *media_track, int fx_index, int param);
 
     /**
      * Get the number of steps of the parameter with the given values
      * @param media_track The track where we want the plugin param for
-     * @param fxIndex The index on the plugin
+     * @param fx_index The index on the plugin
      * @param param The parameter index to get the number of steps for
      * @return The number of steps of the given parameter
      */
-    static int GetTrackFxParamNbSteps(MediaTrack *media_track, int fxIndex, int param);
+    static int GetTrackFxParamNbSteps(MediaTrack *media_track, int fx_index, int param);
 
     /**
      * Untouch the last touched parameter for the given plugin
      * @param media_track The track for the plugin we need
-     * @param fxIndex The index on the plugin
+     * @param fx_index The index on the plugin
      */
-    static void SetTrackFXParamUntouched(MediaTrack *media_track, int fxIndex);
+    static void SetTrackFXParamUntouched(MediaTrack *media_track, int fx_index);
 
     /**************************************************************************************************************
      *  Track Receives related methods

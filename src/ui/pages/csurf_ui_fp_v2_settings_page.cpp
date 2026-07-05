@@ -20,10 +20,11 @@ class CSurf_FP_V2_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-i
     bool endless_track_scroll;
     bool setting_latch_preview_action_enable;
     int setting_latch_preview_action;
-    int *index;
 
     std::vector<std::string> language_names;
     ReaSonusSettings *settings = ReaSonusSettings::GetInstance(FP_V2);
+    ReaSonusInfoComboInputRow *language_select_combo;
+    ReaSonusInfoComboInputRow *latch_preview_action_combo;
 
     std::array<int, 8> latch_preview_action_indexes = {42013, 42014, 42015, 42016, 42017, 41160, 41161, 41162};
     std::vector<std::string> latch_preview_action_names = {
@@ -47,6 +48,26 @@ public:
 
         GetLanguages(language_names);
         CSurf_FP_V2_SettingsPage::Reset();
+
+        language_select_combo = new ReaSonusInfoComboInputRow(
+            m_ctx,
+            assets,
+            i18n->t("settings", "language.label"),
+            "select-language",
+            language_names,
+            &setting_language,
+            i18n->t("settings", "language.tooltip")
+        );
+
+        latch_preview_action_combo = new ReaSonusInfoComboInputRow(
+            m_ctx,
+            assets,
+            i18n->t("settings", "latch-preview-action-list.label"),
+            "latch-preview-action-list",
+            latch_preview_action_names,
+            &setting_latch_preview_action,
+            i18n->t("settings", "latch-preview-action.tooltip")
+        );
     }
 
     ~CSurf_FP_V2_SettingsPage() override = default;
@@ -64,23 +85,35 @@ public:
         );
 
         UiStyledElements::PushReaSonusSettingsContentStyle(m_ctx);
-        if (ImGui::BeginChild(m_ctx, "mapping_lists_content", 0.0, 0.0, ImGui::ChildFlags_FrameStyle,
-                              ImGui::ChildFlags_AutoResizeY)) {
-            if (ImGui::BeginChild(m_ctx, "language-select", -1 * language_button_width, 0.0,
-                                  ImGui::ChildFlags_None | ImGui::ChildFlags_AutoResizeY)) {
-                RenderInfoComboInput(
-                    m_ctx,
-                    assets,
-                    i18n->t("settings", "language.label"),
-                    language_names,
-                    &setting_language,
-                    i18n->t("settings", "language.tooltip"));
+        if (ImGui::BeginChild(
+            m_ctx,
+            "mapping_lists_content",
+            0.0,
+            0.0,
+            ImGui::ChildFlags_FrameStyle,
+            ImGui::ChildFlags_AutoResizeY
+        )) {
+            if (ImGui::BeginChild(
+                m_ctx,
+                "language-select",
+                -1 * language_button_width,
+                0.0,
+                ImGui::ChildFlags_None | ImGui::ChildFlags_AutoResizeY
+            )) {
+                language_select_combo->Render();
 
                 ImGui::EndChild(m_ctx);
             }
+
             ImGui::SameLine(m_ctx);
-            if (ImGui::BeginChild(m_ctx, "language-action", 0.0, 0.0,
-                                  ImGui::ChildFlags_None | ImGui::ChildFlags_AutoResizeY)) {
+
+            if (ImGui::BeginChild(
+                m_ctx,
+                "language-action",
+                0.0,
+                0.0,
+                ImGui::ChildFlags_None | ImGui::ChildFlags_AutoResizeY
+            )) {
                 ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 22);
                 UiStyledElements::PushReaSonusButtonOutlineStyle(m_ctx, assets->GetMainFontBold());
                 if (ImGui::Button(m_ctx, i18n->t("settings", "language.button.label").c_str())) {
@@ -128,13 +161,7 @@ public:
 
             if (setting_latch_preview_action_enable) {
                 ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + 26);
-                RenderInfoComboInput(
-                    m_ctx,
-                    assets,
-                    i18n->t("settings", "latch-preview-action-list.label"),
-                    latch_preview_action_names,
-                    &setting_latch_preview_action,
-                    i18n->t("settings", "latch-preview-action.tooltip"));
+                latch_preview_action_combo->Render();
             }
 
             UiStyledElements::PopReaSonusSettingsContentStyle(m_ctx);
@@ -159,8 +186,11 @@ public:
     }
 
     void Reset() override {
-        const auto language_index = std::find(language_names.begin(), language_names.end(),
-                                              DAW::GetExtState(EXT_STATE_KEY_UI_LANGUAGE, "en-US"));
+        const auto language_index = std::find(
+            language_names.begin(),
+            language_names.end(),
+            DAW::GetExtState(EXT_STATE_KEY_UI_LANGUAGE, "en-US")
+        );
         setting_language = language_index - language_names.begin();
 
         momentary_mute_solo = settings->GetMuteSoloMomentary();
@@ -169,11 +199,16 @@ public:
         endless_track_scroll = settings->GetEndlessTrackScroll();
         setting_latch_preview_action_enable = settings->GetLatchPreviewActionEnabled();
 
-        auto iterator = std::find(latch_preview_action_indexes.begin(), latch_preview_action_indexes.end(),
-                          settings->GetLatchPreviewActionCode());
+        auto iterator = std::find(
+            latch_preview_action_indexes.begin(),
+            latch_preview_action_indexes.end(),
+            settings->GetLatchPreviewActionCode()
+        );
 
         if (iterator != latch_preview_action_indexes.end()) {
-            setting_latch_preview_action = static_cast<int>(std::distance(latch_preview_action_indexes.begin(), iterator));   
+            setting_latch_preview_action = static_cast<int>(std::distance(
+                latch_preview_action_indexes.begin(), iterator
+            ));
         }
     }
 };

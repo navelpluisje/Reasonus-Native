@@ -8,10 +8,14 @@
 class CSurf_FP_8_CustomFiltersPage : public CSurf_UI_PageContent {
     std::string device;
     int selected_filter = -1;
+    int hovered_filter = -1;
+    int active_filter = -1;
     int previous_selected_filter = -1;
 
     std::vector<std::string> filter_keys;
     std::vector<std::string> filter_labels;
+    ReaSonusExtendedListBox *filters_list = nullptr;
+    ReaSonusExtendedListBox *filter_labels_list = nullptr;
 
     bool filter_dirty;
     std::string new_filter_text;
@@ -21,6 +25,7 @@ class CSurf_FP_8_CustomFiltersPage : public CSurf_UI_PageContent {
     std::string filter_name;
     std::vector<std::string> filter_text;
     int selected_filter_text = -1;
+    int hovered_filter_text = -1;
     bool filter_case_insensitive;
     bool filter_siblings;
     bool filter_parents;
@@ -163,8 +168,31 @@ protected:
 
 public:
     CSurf_FP_8_CustomFiltersPage(ImGui_Context *m_ctx, CSurf_UI_Assets *assets) : CSurf_UI_PageContent(m_ctx, assets) {
+        using namespace std::placeholders; // for `_1, _2 etc`
         i18n = I18n::GetInstance();
         settings = ReaSonusSettings::GetInstance(FP_8);
+
+        filters_list = new ReaSonusExtendedListBox(
+            m_ctx,
+            assets,
+            "filters",
+            filter_labels,
+            &selected_filter,
+            std::bind(&CSurf_FP_8_CustomFiltersPage::HandleRemoveFilterListItem, this, _1),
+            true,
+            std::bind(&CSurf_FP_8_CustomFiltersPage::HandleSortFilterList, this, _1, _2)
+        );
+
+        filter_labels_list = new ReaSonusExtendedListBox(
+            m_ctx,
+            assets,
+            "filter-text-list",
+            filter_text,
+            &selected_filter_text,
+            std::bind(&CSurf_FP_8_CustomFiltersPage::HandleRemoveFilterTextListItem, this, _1),
+            false,
+            nullptr
+        );
 
         SetFiltersKeys();
     };
@@ -203,18 +231,10 @@ public:
                         i18n->t("filters", "list.input.label"),
                         &new_filter_name,
                         i18n->t("filters", "list.input.placeholder"),
-                        std::bind(&CSurf_FP_8_CustomFiltersPage::HandleAddFilter, this));
+                        std::bind(&CSurf_FP_8_CustomFiltersPage::HandleAddFilter, this)
+                    );
 
-                    ReaSonusExtendedListBox(
-                        m_ctx,
-                        assets,
-                        "filters",
-                        filter_labels,
-                        &selected_filter,
-                        false,
-                        std::bind(&CSurf_FP_8_CustomFiltersPage::HandleRemoveFilterListItem, this, _1),
-                        true,
-                        std::bind(&CSurf_FP_8_CustomFiltersPage::HandleSortFilterList, this, _1, _2));
+                    filters_list->Render();
 
                     UiStyledElements::PopReaSonusGroupStyle(m_ctx);
                     ImGui::EndChild(m_ctx);
@@ -253,17 +273,7 @@ public:
                             i18n->t("filters", "content.text.placeholder"),
                             std::bind(&CSurf_FP_8_CustomFiltersPage::HandleAddFilterText, this));
 
-                        ReaSonusExtendedListBox(
-                            m_ctx,
-                            assets,
-                            "filter-text-list",
-                            filter_text,
-                            &selected_filter_text,
-                            true,
-                            std::bind(&CSurf_FP_8_CustomFiltersPage::HandleRemoveFilterTextListItem, this, _1),
-                            false,
-                            nullptr
-                        );
+                        filter_labels_list->Render();
 
                         ImGui::EndChild(m_ctx);
                     }

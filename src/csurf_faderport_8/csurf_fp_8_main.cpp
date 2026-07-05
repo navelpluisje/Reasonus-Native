@@ -3,7 +3,6 @@
 #include <array>
 #include <reaper_plugin.h>
 #include <WDL/wdltypes.h> // might be unnecessary in future
-#include <WDL/ptrlist.h>
 #include <reaper_plugin_functions.h>
 #include "../controls/csurf_button.hpp"
 #include "../shared/csurf.h"
@@ -303,8 +302,6 @@ public:
     lastTouchedFxManager = new CSurf_FP_8_LastTouchedFXManager(lastTouchedFxTrack, context, m_midiout);
 
     if (errStats != nullptr && *errStats > 0) {
-      ShowConsoleMsg("Error: ");
-      ShowConsoleMsg(reinterpret_cast<char *>(errStats));
       if (m_midi_in_dev >= 0 && m_midiin == nullptr) {
         *errStats |= 1;
       }
@@ -454,7 +451,7 @@ public:
     (void) play;
     (void) pause;
     (void) rec;
-    
+
     transportManager->HandlePlayStateChange();
   }
 

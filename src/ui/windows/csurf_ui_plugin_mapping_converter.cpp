@@ -8,6 +8,7 @@
 #include "../components/csurf_ui_button_bar.hpp"
 #include "../components/csurf_ui_text_input.hpp"
 #include "../../shared/csurf_utils.hpp"
+#include "../../shared/csurf_plugin_utils.hpp"
 
 constexpr auto g_name{"ReaSonus Native V2 Control Panel"};
 
@@ -106,8 +107,8 @@ void ReaSonusPluginMappingConverter::ConvertFile(const std::string &file_path) {
                 plugin_name = matches[1];
 
                 ini["global"]["origname"] = plugin_name;
-                ini["global"]["name"] = StripPluginName(matches[1]);
-                ini["global"]["developer"] = StripPluginDeveloper(matches[1]);
+                ini["global"]["name"] = PluginUtils::StripPluginName(matches[1]);
+                ini["global"]["developer"] = PluginUtils::StripPluginDeveloper(matches[1]);
                 has_plugin = true;
             }
         } else if ((line.find("Fader") - std::string::npos > 0)) {
@@ -146,8 +147,12 @@ void ReaSonusPluginMappingConverter::ConvertFile(const std::string &file_path) {
     }
 
     if (has_plugin) {
-        const std::string fileName = GetReaSonusPluginPath(ini["global"]["developer"], ini["global"]["name"],
-                                                           ini["global"]["type"], true);
+        const std::string fileName = PluginUtils::GetReaSonusPluginMappingFilePath(
+            ini["global"]["developer"],
+            ini["global"]["name"],
+            ini["global"]["type"],
+            true
+        );
         const mINI::INIFile file(fileName);
         if (!file_exists(fileName.c_str()) && file.write(ini, true)) {
             converted_files.insert(converted_files.begin() + converted_files.size(), plugin_name);

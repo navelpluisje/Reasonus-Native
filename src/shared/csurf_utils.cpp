@@ -5,7 +5,6 @@
 #include <WDL/wdltypes.h> // might be unnecessary in future
 #include <reaper_plugin_functions.h>
 #include <string>
-#include <utility>
 #include <vector>
 #include <regex>
 
@@ -65,7 +64,6 @@ bool SetIntConfigVar(const std::string &var_name, const int value) {
     return var.SetValue(value);
 }
 
-
 bool hasBit(const int val, const int key) {
     return (val & 1 << key) != 0;
 }
@@ -107,60 +105,6 @@ double int14ToVol(const unsigned char msb, const unsigned char lsb) {
     pos = SLIDER2DB(pos);
 
     return DB2VAL(pos);
-}
-
-std::string StripPluginName(const std::string &plugin_name) {
-    std::vector<std::string> pluginNameParts = split(
-        StripPluginNamePrefixes(StripPluginChannelPostfix(plugin_name.data()).data()), " ("
-    );
-
-    if (pluginNameParts.size() > 1) {
-        pluginNameParts.pop_back();
-    }
-
-    return join(pluginNameParts, " (");
-}
-
-std::string StripPluginDeveloper(const std::string &plugin_name) {
-    const std::vector<std::string> pluginNameParts = split(
-        StripPluginNamePrefixes(StripPluginChannelPostfix(plugin_name.data()).data()), " ("
-    );
-
-    std::string developer = pluginNameParts.at(pluginNameParts.size() - 1);
-    if (!developer.empty()) {
-        developer.pop_back();
-    }
-
-    return developer;
-}
-
-std::string StripPluginNamePrefixes(char const *name) {
-    std::vector<std::string> splitted_name = split(std::string(name), PREFIX_SEPARATOR);
-
-    if (splitted_name.empty()) {
-        return {name};
-    }
-
-    return splitted_name[splitted_name.size() - 1];
-}
-
-std::string StripPluginChannelPostfix(char const *name) {
-    std::vector<std::string> splitted_name = split(std::string(name), " (");
-    splitted_name.pop_back();
-
-    return join(splitted_name, " (");
-}
-
-bool IsPluginFX(std::string name) {
-    const int pos = static_cast<int>(name.find(PREFIX_SEPARATOR));
-    // If we can not find the delimiter, we can not determine the type of plugin, so asume it's an effect
-    if (pos < 0) {
-        return true;
-    }
-    name.erase(pos, name.length());
-    name.erase(0, name.length() - 1);
-
-    return name != "i";
 }
 
 std::string Progress(const int current, const int total) {
@@ -217,22 +161,6 @@ std::string GetReaSonusZonesPath() {
     return createPathName({std::string(GetResourcePath()), "CSI", "Zones", "ReasonusFaderPort", "_ReaSonusEffects"});
 }
 
-std::string GetReaSonusPluginPath(
-    std::string developer,
-    const std::string &plugin_name,
-    const std::string &plugin_type,
-    const bool create
-) {
-    const std::string path = createPathName({
-        std::string(GetResourcePath()), "ReaSonus", "Plugins", std::move(developer)
-    });
-
-    if (create) {
-        createPathIfNotExist(path);
-    }
-    return createPathName({path, plugin_name + "." + plugin_type + ".ini"});
-}
-
 std::string GetReaSonusLocalesFolderPath() {
     return createPathName({GetReaSonusFolderPath(), "Locales"});
 }
@@ -275,6 +203,17 @@ std::vector<std::string> split(const std::string &str, const std::string &delimi
     return value;
 }
 
+std::vector<int> splitToInt(const std::string &str, const std::string &delimiter) {
+    std::vector<int> value;
+    std::vector<std::string> splitted_string = split(str, delimiter);
+
+    for (auto val: splitted_string) {
+        value.emplace_back(stoi(val));
+    }
+
+    return value;
+}
+
 std::vector<std::string> cutString(const std::string &str, const size_t size) {
     std::vector<std::string> result;
     std::string value = str;
@@ -303,12 +242,38 @@ std::string join(const std::vector<std::string> &list, const std::string &delimi
     return result;
 }
 
-bool hasPluginConfigFile(MediaTrack *media_track, const int pluginId) {
-    const std::string plugin_name = DAW::GetTrackFxName(media_track, pluginId, false);
-    const std::string developer_name = DAW::GetTrackFxDeveloper(media_track, pluginId);
-    const std::string plugin_type = DAW::GetTrackFxType(media_track, pluginId);
+std::string join(const std::vector<int> &list, const std::string &delimiter) {
+    std::string result;
+    int count = 0;
 
-    return file_exists(GetReaSonusPluginPath(developer_name, plugin_name, plugin_type, false).c_str());
+    for (const auto &key: list) {
+        result += (count > 0 ? delimiter : "") + std::to_string(key);
+        count++;
+    }
+
+    return result;
+}
+
+std::string replace(std::string &str, const std::string &search, const std::string &replace) {
+    const size_t start_pos = str.find(search);
+
+    if (start_pos == std::string::npos) {
+        return str;
+    }
+
+    str.replace(start_pos, search.length(), replace);
+    return str;
+}
+
+std::string replaceAll(std::string str, const std::string &search, const std::string &replace) {
+    size_t start_pos = str.find(search);
+
+    while (start_pos != std::string::npos) {
+        str.replace(start_pos, search.length(), replace);
+        start_pos = str.find(search);
+    }
+
+    return str;
 }
 
 void logInteger(const char *key, const int value) {
@@ -335,39 +300,6 @@ std::string GenerateUniqueKey(std::string prefix) {
     prefix += std::to_string(now);
 
     return prefix;
-}
-
-std::vector<std::string> unwanted_param_names = {
-    "MIDI CC", // Decomposer, Arturia
-    "reserved", // Decomposer, Valhalla
-    // Blue Cat
-    "MIDI Program Change",
-    "MIDI Controller",
-    // Arturia
-    "unassigned",
-    "VST_ProgramChange_",
-    "HardwareDisplayControl",
-    "MPE_",
-    // SPITFIRE
-    "general purpose",
-    // global
-    "undefined",
-};
-
-bool IsWantedParam(const std::string &param_name) {
-    bool result = true;
-
-    for (std::string const &unwanted_name: unwanted_param_names) {
-        const int res = param_name.find(unwanted_name);
-
-        // We found the string. Set result to false and break;
-        if (res != static_cast<int>(std::string::npos)) {
-            result = false;
-            break;
-        }
-    }
-
-    return result;
 }
 
 std::string ltrim(const std::string &value) {
@@ -502,6 +434,7 @@ void GetLanguages(std::vector<std::string> &language_names) {
     for (const auto &entry: std::filesystem::recursive_directory_iterator(locale_path)) {
         if (entry.is_regular_file() && !entry.is_symlink()) {
             const std::filesystem::path &path(entry.path());
+
             if (path.has_extension() && path.extension() == ".ini") {
                 language_names.push_back(split(path.filename().u8string(), ".").at(0));
             }
@@ -551,66 +484,23 @@ std::string toLowerCase(std::string value) {
 }
 
 std::string toUpperCase(std::string value) {
-    std::transform(value.begin(), value.end(), value.begin(), ::toupper);
+    std::transform(value.begin(), value.end(), value.begin(), toupper);
     return value;
 }
 
-double boolToDouble(const bool value) {
+double toDouble(const bool value) {
     return value ? 1.0 : 0.0;
 }
 
-bool doubleToBool(const double value) {
+bool toBool(const double value) {
     return value > 0.0;
 }
 
-std::vector<std::string> GetPluginTypes() {
-    std::vector<std::string> plugin_types = {
-        "vst",
-        "vsti",
-        "vst3",
-        "vst3i",
-        "au",
-        "aui",
-        "clap",
-        "clapi",
-        "lv2",
-        "lv2i"
-    };
-    return plugin_types;
-}
+bool toBool(const std::string &value) {
+    const std::string bool_value = toLowerCase(value);
+    std::istringstream iss(bool_value);
+    bool result;
+    iss >> std::boolalpha >> result;
 
-std::string FormatPluginType(std::string value) {
-    std::string plugin_type = toUpperCase(value);
-
-    if (value.back() == 'i') {
-        plugin_type.pop_back();
-        plugin_type.push_back('i');
-    }
-
-    return plugin_type;
-}
-
-std::string GetPluginRequestString(const std::string &plugin_origname, std::string plugin_type) {
-    std::vector<std::string> allowed_plugin_types = GetPluginTypes();
-    const auto it_type = std::find(allowed_plugin_types.begin(), allowed_plugin_types.end(), plugin_type);
-
-    if (it_type == allowed_plugin_types.end()) {
-        // Not found, the plugin type has either not been set or is invalid!
-        return "";
-    }
-
-    // ------------------------------------------------------------------------
-    // VST actually means version 1 of the VST spec. Most plugins nowadays are
-    // using version 2.x of the VST spec. VST2 is what needs to be used during
-    // plugin insertion, otherwise no plugin will be found unless there is an
-    // alternate version also installed.
-    // ------------------------------------------------------------------------
-    if (plugin_type == "vst" || plugin_type == "vsti") {
-        plugin_type.replace(0, 3, "VST2");
-    }
-
-    // Make sure the properly formatted type is included when adding a plugin!
-    std::string plugin_name_with_type = FormatPluginType(plugin_type) + ": " + plugin_origname;
-
-    return plugin_name_with_type;
+    return result;
 }

@@ -99,19 +99,28 @@ void ReaSonusMessage::Frame() {
             ImGui::GetContentRegionAvail(m_ctx, &width, &height);
             ImGui::PushTextWrapPos(m_ctx, width - 24);
 
-            ImGui::Text(m_ctx, "This release has the following fix:");
-            ImGui::BulletText(m_ctx, "Fixed issue with wrond display of value bar values");
-            ImGui::Separator(m_ctx);
-            ImGui::Text(m_ctx, "Release 0.9.0 has the following fixes and improvements:");
-            ImGui::BulletText(m_ctx, "Fixed issue with message popping up on start");
-            ImGui::BulletText(m_ctx, "(FP 8/16) Instant applying filters in multi select mode (Setting)");
+            ImGui::Text(m_ctx, "This release is focussed on plugin mappings. Changes made contain:");
+            ImGui::BulletText(m_ctx, "Ability to add plugin mappings in the ReaSonus Control Panel");
+            ImGui::BulletText(m_ctx, "Ability to delete plugin mappings");
             ImGui::BulletText(
                 m_ctx,
-                "(FP 8/16) Displays are fully configurable. You can select all display modes, value-bar modes and assign values and settings to every line");
+                "Option to set the color of a mapping group (will be set to the select button)"
+            );
             ImGui::BulletText(
-                m_ctx, "(FP 8/16) Option to Fast forward and rewind without sound (muting the master track) (Setting)");
-            ImGui::BulletText(m_ctx, "(FP 8/16) Solo in Front, with option to set the dim value with the pan-encoder");
-            ImGui::BulletText(m_ctx, "(FP 8/16) Improvements for plugin type checks in the plugin mapper");
+                m_ctx,
+                "Plugin caching (this will cache the parameters and its value) for more performant plugin mapping"
+            );
+            ImGui::BulletText(
+                m_ctx,
+                "Plugin parameter filtering to reduce tha length of the parameters list"
+            );
+            ImGui::Text(m_ctx, " ");
+            ImGui::Text(m_ctx, "Check the documentation for more info on these changes");
+            ImGui::TextLinkOpenURL(
+                m_ctx,
+                "Documentation about Plugin Mapping",
+                "https://navelpluisje.github.io/reasonus/control-panel/plugin-mapping/"
+            );
 
             ImGui::PopTextWrapPos(m_ctx);
             UiStyledElements::PopReaSonusGroupStyle(m_ctx);

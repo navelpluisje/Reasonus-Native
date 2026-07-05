@@ -2,6 +2,7 @@
 #define CSURF_FP_8_PLUGINS_MANAGER_C_
 
 #include "csurf_fp_8_channel_manager.hpp"
+#include "../shared/csurf_plugin_utils.hpp"
 
 class CSurf_FP_8_PluginsManager : public CSurf_FP_8_ChannelManager {
 protected:
@@ -121,7 +122,7 @@ public:
                 track->SetSoloButtonValue(
                     ButtonBlinkOnOff(
                         DAW::GetTrackFxPanelOpen(media_track, plugin_index),
-                        hasPluginConfigFile(media_track, plugin_index),
+                        PluginUtils::hasPluginConfigFile(media_track, plugin_index),
                         settings->GetDistractionFreeMode()));
             } else {
                 track->SetDisplayLine(0, ALIGN_LEFT, DAW::GetTrackName(media_track).c_str(), NON_INVERT, force_update);

@@ -13,12 +13,17 @@ static void ReaSonusTextInput(
     double width,
     const bool select
 ) {
-    static char text[255]; // NOLINT(*-avoid-c-arrays)
+    static char text[255];        // NOLINT(*-avoid-c-arrays)
     strcpy(text, value->c_str()); // NOLINT(*-security.insecureAPI.strcpy)
 
     UiStyledElements::PushReaSonusFieldGroupStyle(m_ctx);
-    if (ImGui::BeginChild(m_ctx, ("container" + label).c_str(), width, 0.0,
-                          ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY)) {
+    if (ImGui::BeginChild(
+        m_ctx,
+        ("container" + label).c_str(),
+        width,
+        0.0,
+        ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
+    )) {
         ImGui::Text(m_ctx, label.c_str());
 
         UiStyledElements::PushReaSonusInputStyle(m_ctx);

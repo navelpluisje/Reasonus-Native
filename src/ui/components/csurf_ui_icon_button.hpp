@@ -19,10 +19,11 @@ static bool ReaSonusIconButton(
     const std::string &button_id,
     const bool disabled,
     const IconButtonTheme theme,
-    const std::function<void()> &on_click) {
+    const std::function<void()> &on_click
+) {
     bool return_value = false;
-    int menu_button_width = 30;
-    int menu_button_height = 30;
+    constexpr int menu_button_width = 30;
+    constexpr int menu_button_height = 30;
 
     int background_color = theme == ButtonThemeDefault ? UI_COLORS::Main_18 : UI_COLORS::Transparent;
     int border_color = theme == ButtonThemeDefault || theme == ButtonThemeModal
@@ -37,8 +38,13 @@ static bool ReaSonusIconButton(
     double y_mouse_pos;
 
     ImGui::PushFont(m_ctx, assets->GetIconFont(), 20);
-    if (ImGui::BeginChild(m_ctx, ("##" + button_id).c_str(), menu_button_width, menu_button_height,
-                          ImGui::ChildFlags_FrameStyle)) {
+    if (ImGui::BeginChild(
+        m_ctx,
+        ("##" + button_id).c_str(),
+        menu_button_width,
+        menu_button_height,
+        ImGui::ChildFlags_FrameStyle
+    )) {
         ImGui::GetMousePos(m_ctx, &x_mouse_pos, &y_mouse_pos);
         ImGui::GetItemRectMin(m_ctx, &x_pos_1, &y_pos_1);
 
@@ -74,15 +80,32 @@ static bool ReaSonusIconButton(
             }
         }
 
-        ImGui_DrawList *list = ImGui::GetForegroundDrawList(m_ctx);
+        ImGui_DrawList *list = ImGui::GetWindowDrawList(m_ctx);
 
-        ImGui::DrawList_AddRectFilled(list, x_pos_1, y_pos_1, x_pos_1 + menu_button_width, y_pos_1 + menu_button_height,
-                                      background_color, 4);
-        ImGui::DrawList_AddRect(list, x_pos_1, y_pos_1, x_pos_1 + menu_button_width, y_pos_1 + menu_button_height,
-                                border_color, 4, ImGui::DrawFlags_None, border_width);
+        ImGui::DrawList_AddRectFilled(
+            list,
+            x_pos_1,
+            y_pos_1,
+            x_pos_1 + menu_button_width,
+            y_pos_1 + menu_button_height,
+            background_color,
+            4
+        );
+        ImGui::DrawList_AddRect(
+            list,
+            x_pos_1 + 1,
+            y_pos_1 + 1,
+            x_pos_1 + menu_button_width - 1,
+            y_pos_1 + menu_button_height - 1,
+            border_color,
+            4,
+            ImGui::DrawFlags_None,
+            border_width
+        );
         ImGui::DrawList_AddText(list, x_pos_1 + 5, y_pos_1 + 5, text_color, std::string(1, icon).c_str());
         ImGui::EndChild(m_ctx);
     }
+
     ImGui::PopFont(m_ctx);
 
     return return_value;
@@ -94,7 +117,8 @@ static bool ReaSonusIconButton(
     const IconFont icon,
     const std::string &button_id,
     const IconButtonTheme theme,
-    const std::function<void()> &on_click) {
+    const std::function<void()> &on_click
+) {
     return ReaSonusIconButton(m_ctx, assets, icon, button_id, false, theme, on_click);
 }
 

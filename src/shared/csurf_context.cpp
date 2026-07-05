@@ -84,8 +84,7 @@ public:
     /**************************************************************************
      * Modifiers
      **************************************************************************/
-    void
-    SetShiftLeft(const bool val) {
+    void SetShiftLeft(const bool val) {
         if (settings->GetSwapShiftButtons()) {
             shift_right = val;
         } else {
