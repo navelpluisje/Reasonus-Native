@@ -12,9 +12,10 @@ static void ReaSonusMenuButton(
     const std::string &action_label,
     const IconFont icon,
     const int value,
-    int *active_item) {
-    int menu_button_width = 200;
-    int menu_button_height = 42;
+    int *active_item
+) {
+    constexpr int menu_button_width = 200;
+    constexpr int menu_button_height = 42;
 
     int background_color = value == *active_item ? UI_COLORS::Accent_25 : UI_COLORS::Main_28;
     int border_width = value == *active_item ? 2 : 1;

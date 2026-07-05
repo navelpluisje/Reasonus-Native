@@ -93,6 +93,9 @@ public:
             if (ImGui::Button(m_ctx, std::string(1, IconSearch).c_str(), 31, 31)) {
                 ImGui::OpenPopup(m_ctx, "search-combo-modal");
             }
+            if (ImGui::IsItemHovered(m_ctx)) {
+                ImGui::SetMouseCursor(m_ctx, ImGui::MouseCursor_Hand);
+            }
             UiStyledElements::PopReaSonusIconButtonStyle(m_ctx);
 
             /**

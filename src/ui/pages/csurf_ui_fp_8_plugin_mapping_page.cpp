@@ -1,21 +1,22 @@
 #include <utility>
 #include "../csurf_ui_page_content.hpp"
-#include "../../shared/csurf_utils.hpp"
-#include "../../shared/csurf_plugin_utils.hpp"
-#include "../../shared/csurf_daw.hpp"
-#include "../components/csurf_ui_page_title.hpp"
-#include "../components/csurf_ui_text_input.hpp"
-#include "../components/csurf_ui_pagination_button.hpp"
-#include "../components/csurf_ui_icon_button.hpp"
-#include "../components/csurf_ui_search_combo_input.hpp"
-#include "../components/csurf_ui_goto_input.hpp"
-#include "../components/csurf_ui_int_input.hpp"
-#include "../components/csurf_ui_combo_input.hpp"
-#include "../components/csurf_ui_button_bar.hpp"
-#include "../components/csurf_ui_plugin_selectable.hpp"
-#include "../components/csurf_ui_developer_filter_form.hpp"
-#include "../components/csurf_ui_add_plugin_mapping_form.hpp"
 #include "../../i18n/i18n.hpp"
+#include "../../shared/csurf_daw.hpp"
+#include "../../shared/csurf_plugin_utils.hpp"
+#include "../../shared/csurf_utils.hpp"
+#include "../components/csurf_ui_add_plugin_mapping_form.hpp"
+#include "../components/csurf_ui_button_bar.hpp"
+#include "../components/csurf_ui_color_picker.hpp"
+#include "../components/csurf_ui_combo_input.hpp"
+#include "../components/csurf_ui_developer_filter_form.hpp"
+#include "../components/csurf_ui_goto_input.hpp"
+#include "../components/csurf_ui_icon_button.hpp"
+#include "../components/csurf_ui_int_input.hpp"
+#include "../components/csurf_ui_page_title.hpp"
+#include "../components/csurf_ui_pagination_button.hpp"
+#include "../components/csurf_ui_plugin_selectable.hpp"
+#include "../components/csurf_ui_search_combo_input.hpp"
+#include "../components/csurf_ui_text_input.hpp"
 #include "../windows/csurf_ui_fp_8_control_panel.hpp"
 
 class CSurf_FP_8_PluginMappingPage : public CSurf_UI_PageContent // NOLINT(*-use-internal-linkage)
@@ -32,6 +33,7 @@ class CSurf_FP_8_PluginMappingPage : public CSurf_UI_PageContent // NOLINT(*-use
     std::vector<std::string> developers;
     std::vector<std::string> plugin_types = PluginUtils::GetPluginTypes();
     std::set<std::string> installed_developers;
+    std::vector<int> plugin_color_palette;
 
     int newly_selected_plugin_type = 0;
     bool save_selected_plugin_type = false;
@@ -65,6 +67,11 @@ class CSurf_FP_8_PluginMappingPage : public CSurf_UI_PageContent // NOLINT(*-use
     int previous_select_param_index = -1;
     int select_uninvert_label = 0;
 
+    std::string color_key;
+    int group_color;
+    int previous_group_color;
+    int group_color_show;
+
     bool show_developer_filters = false;
     bool show_add_plugin_mapping = false;
 
@@ -74,6 +81,12 @@ class CSurf_FP_8_PluginMappingPage : public CSurf_UI_PageContent // NOLINT(*-use
     int fader_uninvert_label = 0;
 
     std::vector<std::string> invert_labels = {"Inverted", "Not inverted"};
+    std::vector<std::string> color_show_labels = {
+        I18n::GetInstance()->t("mapping", "edit.color.show.combo.hide"),
+        I18n::GetInstance()->t("mapping", "edit.color.show.combo.show"),
+        I18n::GetInstance()->t("mapping", "edit.color.show.combo.bright"),
+        I18n::GetInstance()->t("mapping", "edit.color.show.combo.dimmed"),
+    };
 
     std::vector<int> dirty_groups;
 
@@ -84,6 +97,7 @@ class CSurf_FP_8_PluginMappingPage : public CSurf_UI_PageContent // NOLINT(*-use
     ReaSonusComboInput *SelectLabelInvertCombo;
     ReaSonusComboInput *FaderLabelInvertCombo;
     ReaSonusComboInput *PluginTypeCombo;
+    ReaSonusComboInput *ShowColorCombo;
 
     bool plugin_dirty = false;
 
@@ -117,15 +131,28 @@ protected:
      */
     void ValidatePluginData() {
         bool modified = false;
-        for (const auto &[fst, snd]: plugin_params) {
-            auto const &section = fst;
+        for (const auto &[section, snd]: plugin_params) {
+            // auto const &section = fst;
             if (section == "global") {
+                continue;
+            }
+
+            if (section.rfind("color_", 0) == 0
+            ) {
+                if (
+                    !plugin_params[section].has("color")
+                    || plugin_params[section]["color"].empty()
+                ) {
+                    plugin_params[section]["color"] = std::to_string(0x00ffffff);
+                    previous_plugin_params[section]["color"] = std::to_string(0x00ffffff);
+                }
                 continue;
             }
 
             if (!plugin_params[section].has("uninvert-label") || plugin_params[section]["uninvert-label"].empty()) {
                 modified = true;
                 plugin_params[section]["uninvert-label"] = "0";
+                previous_plugin_params[section]["uninvert-label"] = "0";
             }
         }
 
@@ -140,7 +167,7 @@ protected:
 
         for (const auto &plugin_type: plugin_types) { // NOLINT(*-use-anyofallof)
             const std::string type_ini = plugin_type + ".ini";
-            const size_t position = plugin_path.find(type_ini);
+            const auto position = plugin_path.find(type_ini);
 
             if (position == std::string::npos) {
                 continue;
@@ -178,16 +205,16 @@ protected:
             plugin_type_error = true;
         }
 
-        // Type in filename and data do not match
-        if (selected_plugin_filename_type != plugin_params["global"]["type"]) {
-            selected_plugin_type_mismatch = true;
-            plugin_type_error = true;
-        }
-
         if (plugin_type_error) {
             selected_plugin_exists = false;
             newly_selected_plugin_type = 0;
             return false;
+        }
+
+        // Type in filename and data do not match
+        if (selected_plugin_filename_type != plugin_params["global"]["type"]) {
+            selected_plugin_type_mismatch = true;
+            plugin_type_error = true;
         }
 
         selected_plugin_exists = true;
@@ -280,10 +307,26 @@ protected:
     void PopulateFields() {
         select_key = "select_" + std::to_string(selected_channel);
         fader_key = "fader_" + std::to_string(selected_channel);
+        color_key = "color_" + std::to_string(selected_channel);
+
+        if (plugin_params.has(color_key)) {
+            group_color = plugin_params[color_key].has("color")
+                              ? stoi(plugin_params[color_key]["color"])
+                              : 0x00ffffff;
+            previous_group_color = group_color;
+            group_color_show = plugin_params[color_key].has("show")
+                                   ? stoi(plugin_params[color_key]["show"])
+                                   : settings->GetPluginMapDefaultColorMode();
+        } else {
+            group_color = 0x00ffffff;
+            previous_group_color = 0x00ffffff;
+            group_color_show = settings->GetPluginMapDefaultColorMode();
+        }
 
         if (plugin_params.has(select_key)) {
-            if (!plugin_params[select_key].has("uninvert-label") || plugin_params[select_key]["uninvert-label"].
-                empty()) {
+            if (!plugin_params[select_key].has("uninvert-label")
+                || plugin_params[select_key]["uninvert-label"].empty()
+            ) {
                 plugin_params[select_key]["uninvert-label"] = "0";
                 previous_plugin_params[select_key]["uninvert-label"] = "0";
             }
@@ -312,7 +355,8 @@ protected:
         }
 
         if (plugin_params.has(fader_key)) {
-            if (!plugin_params[fader_key].has("uninvert-label") || plugin_params[fader_key]["uninvert-label"].empty()) {
+            if (!plugin_params[fader_key].has("uninvert-label") || plugin_params[fader_key]["uninvert-label"].
+                empty()) {
                 plugin_params[fader_key]["uninvert-label"] = "0";
                 previous_plugin_params[fader_key]["uninvert-label"] = "0";
             }
@@ -352,6 +396,32 @@ protected:
             plugin_params[fader_key]["param"] = std::to_string(std::get<0>(param_data[fader_param_index]));
             plugin_params[fader_key]["uninvert-label"] = std::to_string(fader_uninvert_label);
         }
+
+        if (group_color > 0) {
+            plugin_params[color_key]["color"] = std::to_string(group_color);
+            plugin_params[color_key]["show"] = std::to_string(group_color_show);
+        }
+    }
+
+    bool IsColorDirty(const int key) {
+        const std::string color = "color_" + std::to_string(key);
+        if (key == selected_channel) {
+            if (select_param_index <= 0 && plugin_params.has(color)) {
+                plugin_params.remove(color);
+            }
+
+            UpdateValues();
+        }
+
+        if (!plugin_params.has(color) || (
+                stoi(plugin_params[color]["color"]) == 0x00ffffff && !previous_plugin_params.has(color)
+            )
+        ) {
+            return false;
+        }
+
+        return plugin_params[color]["color"] != previous_plugin_params[color]["color"] ||
+               plugin_params[color]["show"] != previous_plugin_params[color]["show"];
     }
 
     bool IsSelectDirty(const int key) {
@@ -394,7 +464,7 @@ protected:
     }
 
     bool IsGroupDirty(const int key) {
-        plugin_dirty = IsSelectDirty(key) || isFaderDirty(key);
+        plugin_dirty = IsColorDirty(key) || IsSelectDirty(key) || isFaderDirty(key);
         return plugin_dirty;
     }
 
@@ -526,6 +596,7 @@ protected:
     void HandleResetChannel() {
         const std::string select = "select_" + std::to_string(selected_channel);
         const std::string fader = "fader_" + std::to_string(selected_channel);
+        const std::string color = "color_" + std::to_string(selected_channel);
 
         if (previous_plugin_params.has(select) && !previous_plugin_params[select]["param"].empty()) {
             plugin_params.set(select, previous_plugin_params[select]);
@@ -537,6 +608,12 @@ protected:
             plugin_params.set(fader, previous_plugin_params[fader]);
         } else {
             plugin_params.remove(fader);
+        }
+
+        if (previous_plugin_params.has(color) && !previous_plugin_params[color]["param"].empty()) {
+            plugin_params.set(color, previous_plugin_params[color]);
+        } else {
+            plugin_params.remove(color);
         }
 
         PopulateFields();
@@ -670,7 +747,7 @@ protected:
 
         for (const auto &plugin_type: plugin_types) {
             const std::string type_ini = "." + plugin_type + ".ini";
-            const size_t position = plugin.find(type_ini);
+            const auto position = plugin.find(type_ini);
 
             if (position == std::string::npos) {
                 continue;
@@ -709,7 +786,7 @@ protected:
         return "";
     }
 
-    void RenderParamListContextMenu(int param_index) {
+    void RenderParamListContextMenu(const int param_index) {
         ImGui::PushFont(m_ctx, assets->GetMainFont(), 13);
         if (ImGui::BeginChild(m_ctx, "plugin-mapping-context", 0.0, 0.0,
                               ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY |
@@ -721,7 +798,8 @@ protected:
                 ImGui::CloseCurrentPopup(m_ctx);
                 HandleAddToFilterListClick(param_index);
             }
-            if (ImGui::Selectable(m_ctx, I18n::GetInstance()->t("mapping", "list.item.context-menu.close").c_str())) {
+            if (ImGui::Selectable(
+                m_ctx, I18n::GetInstance()->t("mapping", "list.item.context-menu.close").c_str())) {
                 ImGui::CloseCurrentPopup(m_ctx);
             }
             ImGui::EndChild(m_ctx);
@@ -735,11 +813,13 @@ protected:
                               ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY |
                               ImGui::ChildFlags_AutoResizeX
         )) {
-            if (ImGui::Selectable(m_ctx, I18n::GetInstance()->t("mapping", "list.item.context-menu.rebuild").c_str())) {
+            if (ImGui::Selectable(
+                m_ctx, I18n::GetInstance()->t("mapping", "list.item.context-menu.rebuild").c_str())) {
                 ImGui::CloseCurrentPopup(m_ctx);
                 HandleRebuildPluginCacheClick(plugin_index);
             }
-            if (ImGui::Selectable(m_ctx, I18n::GetInstance()->t("mapping", "list.item.context-menu.delete").c_str())) {
+            if (ImGui::Selectable(
+                m_ctx, I18n::GetInstance()->t("mapping", "list.item.context-menu.delete").c_str())) {
                 ImGui::CloseCurrentPopup(m_ctx);
                 HandleRemoveMappingClick(plugin_index);
             }
@@ -748,7 +828,8 @@ protected:
                 ImGui::CloseCurrentPopup(m_ctx);
                 HandleManageFilterListClick();
             }
-            if (ImGui::Selectable(m_ctx, I18n::GetInstance()->t("mapping", "list.item.context-menu.close").c_str())) {
+            if (ImGui::Selectable(
+                m_ctx, I18n::GetInstance()->t("mapping", "list.item.context-menu.close").c_str())) {
                 ImGui::CloseCurrentPopup(m_ctx);
             }
             ImGui::EndChild(m_ctx);
@@ -796,12 +877,14 @@ protected:
         ReaSonus8ControlPanel::SetMessage(i18n->t("mapping", "add.mapping.success.message"));
     }
 
-public:
-    CSurf_FP_8_PluginMappingPage(ImGui_Context *m_ctx, CSurf_UI_Assets *assets) : CSurf_UI_PageContent(m_ctx, assets) {
+public :
+    CSurf_FP_8_PluginMappingPage(ImGui_Context *m_ctx, CSurf_UI_Assets *assets)
+        : CSurf_UI_PageContent(m_ctx, assets) {
         using namespace std::placeholders; // for `_1, _2 etc`
 
         i18n = I18n::GetInstance();
         settings = ReaSonusSettings::GetInstance(FP_8);
+        plugin_color_palette = settings->GetPluginColorPalette();
 
         SelectParamList = new ReaSonusSearchComboInput(
             m_ctx,
@@ -852,6 +935,16 @@ public:
             "plugin-ype-select",
             plugin_types,
             &newly_selected_plugin_type
+        );
+
+        ShowColorCombo = new ReaSonusComboInput(
+            m_ctx,
+            assets,
+            i18n->t("mapping", "edit.color.show.label"),
+            "show-group-color",
+            color_show_labels,
+            &group_color_show,
+            150
         );
 
         SetPluginFolders();
@@ -962,8 +1055,6 @@ public:
             ImGui::PopStyleVar(m_ctx);
             UiStyledElements::PopReaSonusIconButtonStyle(m_ctx);
 
-            ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 4);
-
             UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
             if (ImGui::BeginChild(
                 m_ctx,
@@ -982,7 +1073,7 @@ public:
         }
     }
 
-    void RenderChannelsList() {
+    void RenderGroupsList() {
         using namespace std::placeholders; // for `_1, _2 etc`
 
         double space_x;
@@ -991,7 +1082,10 @@ public:
         bool has_style_var = false;
         ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_ItemSpacing, 22, 12);
 
-        if (ImGui::BeginChild(m_ctx, "##channel-list", 0.0, 30)) {
+        ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 2);
+        if (ImGui::BeginChild(m_ctx, "##channel-list", 0.0, 32)) {
+            ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 2);
+
             ReaSonusIconButton(
                 m_ctx,
                 assets,
@@ -999,13 +1093,14 @@ public:
                 "previous-button",
                 selected_channel == 0,
                 ButtonThemeDefault,
-                std::bind(&CSurf_FP_8_PluginMappingPage::HandlePreviousClick, this));
+                std::bind(&CSurf_FP_8_PluginMappingPage::HandlePreviousClick, this)
+            );
 
             for (int i = channel_offset; i < min(max_items + channel_offset, nb_channels); i++) {
                 has_style_var = false;
                 if (i > channel_offset) {
                     has_style_var = true;
-                    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_ItemSpacing, 4, 0);
+                    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_ItemSpacing, 2, 0);
                 }
 
                 ImGui::SameLine(m_ctx);
@@ -1015,6 +1110,7 @@ public:
                     changed_items += 1;
                 }
 
+                ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 2);
                 ReaSonusPaginationButton(
                     m_ctx,
                     assets,
@@ -1023,7 +1119,8 @@ public:
                     dirty,
                     selected_channel == i,
                     std::bind(&CSurf_FP_8_PluginMappingPage::HandleChannelClick, this, _1),
-                    std::bind(&CSurf_FP_8_PluginMappingPage::HandleGroupDrop, this, _1, _2));
+                    std::bind(&CSurf_FP_8_PluginMappingPage::HandleGroupDrop, this, _1, _2)
+                );
 
                 if (has_style_var) {
                     ImGui::PopStyleVar(m_ctx);
@@ -1041,7 +1138,8 @@ public:
                 "next-button",
                 selected_channel == nb_channels - 1,
                 ButtonThemeDefault,
-                std::bind(&CSurf_FP_8_PluginMappingPage::HandleNextClick, this));
+                std::bind(&CSurf_FP_8_PluginMappingPage::HandleNextClick, this)
+            );
 
             ImGui::EndChild(m_ctx);
         }
@@ -1053,7 +1151,7 @@ public:
         double space_y;
 
         UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
-        if (ImGui::BeginChild(m_ctx, "mapping_content_select", 0.0, 54.0,
+        if (ImGui::BeginChild(m_ctx, "information_bar", 0.0, 54.0,
                               ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY)) {
             ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
 
@@ -1135,20 +1233,55 @@ public:
         UiStyledElements::PopReaSonusGroupStyle(m_ctx);
     }
 
-    void RenderMappingSelect(double height) {
+    void RenderMappingIcon(const IconFont icon) {
+        double space_x;
+        double space_y;
+        ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
+        ImGui::PushFont(m_ctx, assets->GetIconFont(), 32);
+        ImGui::PushStyleColor(m_ctx, ImGui::Col_Text, UI_COLORS::Accent);
+        ImGui::Text(m_ctx, std::string(1, icon).c_str());
+        ImGui::PopStyleColor(m_ctx);
+        ImGui::PopFont(m_ctx);
+
+        ImGui::SameLine(m_ctx);
+
+        ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBg, UI_COLORS::Accent);
+        if (ImGui::BeginChild(
+            m_ctx,
+            "mapping_content_vert_divider",
+            2.0,
+            space_y,
+            ImGui::ChildFlags_FrameStyle
+        )) {
+            ImGui::EndChild(m_ctx);
+        }
+        ImGui::PopStyleColor(m_ctx);
+
+        ImGui::SameLine(m_ctx);
+    }
+
+    void RenderMappingSelect() {
         using namespace std::placeholders; // for `_1, _2 etc`
         double space_x;
         double space_y;
 
         UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
-        if (ImGui::BeginChild(m_ctx, "mapping_content_select", 0.0, height,
-                              ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY)) {
-            ReaSonusPageTitle(m_ctx, assets, i18n->t("mapping", "edit.select.label"), true);
+        if (ImGui::BeginChild(
+            m_ctx,
+            "mapping_content_select",
+            0.0,
+            0.0,
+            ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
+        )) {
+            RenderMappingIcon(IconButton);
+
+            ImGui::BeginGroup(m_ctx);
+            // ReaSonusPageTitle(m_ctx, assets, i18n->t("mapping", "edit.select.label"), true);
             if (!param_names.empty()) {
                 ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
                 SelectParamList->Render(
                     std::bind(&CSurf_FP_8_PluginMappingPage::RenderParamListContextMenu, this, _1),
-                    space_x * 0.7
+                    space_x * 0.65
                 );
 
                 ImGui::SameLine(m_ctx);
@@ -1160,7 +1293,8 @@ public:
                     0,
                     20,
                     0,
-                    "%d");
+                    "%d"
+                );
             }
 
             if (ImGui::BeginChild(m_ctx, "filter_content_input", 0.0, 0.0, ImGui::ChildFlags_AutoResizeY)) {
@@ -1171,35 +1305,47 @@ public:
                     i18n->t("mapping", "edit.select.param-name.label"),
                     &select_name,
                     i18n->t("mapping", "edit.select.param-name.placeholder"),
-                    space_x * 0.7,
+                    space_x * 0.65,
                     false
                 );
+
                 ImGui::SameLine(m_ctx);
 
                 SelectLabelInvertCombo->Render();
 
                 ImGui::EndChild(m_ctx);
             }
-            UiStyledElements::PopReaSonusGroupStyle(m_ctx);
+            ImGui::EndGroup(m_ctx);
+
             ImGui::EndChild(m_ctx);
         }
+        UiStyledElements::PopReaSonusGroupStyle(m_ctx);
     }
 
-    void RenderMappingFader(double height) {
+    void RenderMappingFader() {
         using namespace std::placeholders; // for `_1, _2 etc`
         double space_x;
         double space_y;
 
         UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
-        if (ImGui::BeginChild(m_ctx, "mapping_content_fader", 0.0, height,
-                              ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY)) {
-            ReaSonusPageTitle(m_ctx, assets, i18n->t("mapping", "edit.fader.label"), true);
+        if (ImGui::BeginChild(
+            m_ctx,
+            "mapping_content_fader",
+            0.0,
+            0.0,
+            ImGui::ChildFlags_FrameStyle
+        )) {
+            RenderMappingIcon(IconSettings);
+
+            ImGui::BeginGroup(m_ctx);
+            // ReaSonusPageTitle(m_ctx, assets, i18n->t("mapping", "edit.fader.label"), true);
             if (!param_names.empty()) {
                 FaderParamList->Render(
                     std::bind(&CSurf_FP_8_PluginMappingPage::RenderParamListContextMenu, this, _1),
                     0.0
                 );
             }
+
             if (ImGui::BeginChild(m_ctx, "filter_content_input", 0.0, 0.0, ImGui::ChildFlags_AutoResizeY)) {
                 ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
 
@@ -1208,7 +1354,7 @@ public:
                     i18n->t("mapping", "edit.fader.param-name.label"),
                     &fader_name,
                     i18n->t("mapping", "edit.fader.param-name.placeholder"),
-                    space_x * 0.7,
+                    space_x * 0.65,
                     false
                 );
 
@@ -1218,8 +1364,51 @@ public:
 
                 ImGui::EndChild(m_ctx);
             }
+            ImGui::EndGroup(m_ctx);
+
             ImGui::EndChild(m_ctx);
         }
+        UiStyledElements::PopReaSonusGroupStyle(m_ctx);
+    }
+
+    void RenderMappingColor() {
+        using namespace std::placeholders; // for `_1, _2 etc`
+
+        UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
+        if (ImGui::BeginChild(
+            m_ctx,
+            "mapping_content_color",
+            0.0,
+            0.0,
+            ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
+        )) {
+            RenderMappingIcon(IconColor);
+
+            ImGui::BeginGroup(m_ctx);
+            // ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 23);
+            ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 20, 8.5);
+            ImGui::Text(m_ctx, i18n->t("mapping", "edit.color.picker.label").c_str());
+            ReaSonusColorPicker(
+                m_ctx,
+                assets,
+                i18n->t("mapping", "edit.color.picker.title"),
+                &group_color,
+                previous_group_color,
+                plugin_color_palette,
+                64,
+                33
+            );
+            ImGui::PopStyleVar(m_ctx);
+
+            ImGui::EndGroup(m_ctx);
+
+            ImGui::SameLine(m_ctx);
+
+            ShowColorCombo->Render();
+
+            ImGui::EndChild(m_ctx);
+        }
+        UiStyledElements::PopReaSonusGroupStyle(m_ctx);
     }
 
     void RenderCenteredText(const std::string &content, const IconFont icon) {
@@ -1369,7 +1558,7 @@ public:
     /**
      * Check if the selected plugin has changed.
      */
-    void PluginCheck(bool force = false) {
+    void PluginCheck(const bool force = false) {
         if (selected_plugin == previous_selected_plugin && !force) {
             return;
         }
@@ -1411,9 +1600,6 @@ public:
     }
 
     void RenderMappingContent() {
-        double space_x;
-        double space_y;
-
         if (show_developer_filters) {
             RenderDevelopersFilterList();
         } else if (show_add_plugin_mapping) {
@@ -1425,26 +1611,25 @@ public:
                     ? "Groups"
                     : std::string(
                         developers[selected_developer] + " :: " + plugins[selected_developer][selected_plugin]).
-                    c_str());
-            ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 4);
+                    c_str()
+            );
+
             RenderInformationBar();
-            RenderChannelsList();
 
-            if (ImGui::BeginChild(m_ctx, "mapping_content_area", 0.0, 0.0)) {
-                ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
-                const double height = (space_y - 12) / 2;
+            RenderGroupsList();
 
-                RenderMappingSelect(height);
+            RenderMappingColor();
 
-                RenderMappingFader(height);
+            RenderMappingSelect();
 
-                UiStyledElements::PopReaSonusGroupStyle(m_ctx);
-
-                ImGui::EndChild(m_ctx);
-            }
-        } else if (!selected_plugin_exists && selected_plugin > -1 && (
-                       !selected_plugin_has_type || !selected_plugin_filename_has_type ||
-                       selected_plugin_type_mismatch)) {
+            RenderMappingFader();
+        } else if (
+            !selected_plugin_exists && selected_plugin > -1
+            && (
+                !selected_plugin_has_type || !selected_plugin_filename_has_type ||
+                selected_plugin_type_mismatch
+            )
+        ) {
             RenderPluginTypeSelect();
         } else if (!selected_plugin_exists && selected_plugin > -1) {
             RenderCenteredText(i18n->t("mapping", "message.not-available"), IconRemove);

@@ -87,7 +87,7 @@ public:
             MediaTrack *media_track = media_tracks.Get(i);
 
             if (!media_track) {
-                track->ClearTrack();
+                track->ClearTrack(true, force_update);
                 continue;
             }
 

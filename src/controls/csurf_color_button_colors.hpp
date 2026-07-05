@@ -1,21 +1,40 @@
 #ifndef CSURF_COLOR_BUTTON_COLORS_H_
 #define CSURF_COLOR_BUTTON_COLORS_H_
+#include "../shared/csurf_utils.hpp"
 
 struct ButtonColor {
     int red;
     int green;
     int blue;
 
-    void SetColor(int _red, int _green, int _blue) {
+    void SetColor(const int _red, const int _green, const int _blue) {
         red = _red;
         green = _green;
         blue = _blue;
     }
 
-    void SetColor(ButtonColor color) {
+    void SetColor(const ButtonColor color) {
         red = color.red;
         green = color.green;
         blue = color.blue;
+    }
+
+    /**
+     * Create color from color picker value.
+     * The color picker  has an option for alpha (0xRRGGBBAA) and no alpha (0xXXRRGGBB)
+     * @param color The integer interpretation of the color
+     * @param has_alpha Whter the value has alpha in it
+     */
+    void SetColor(const int color, const bool has_alpha) {
+        if (has_alpha) {
+            red = ((color & 0xff000000) >> 24) / 2;
+            green = ((color & 0x00ff0000) >> 16) / 2;
+            blue = ((color & 0x0000ff00) >> 8) / 2;
+        } else {
+            red = ((color & 0x00ff0000) >> 16) / 2;
+            green = ((color & 0x0000ff00) >> 8) / 2;
+            blue = (color & 0x000000ff) / 2;
+        }
     }
 
     [[nodiscard]] bool IsColor(const ButtonColor color) const {
@@ -43,4 +62,4 @@ static ButtonColor ButtonColorBlueDim = {0x00, 0x1b, 0x7f};
 
 static ButtonColor ButtonColorBlack = {0x00, 0x00, 0x00};
 
-#endif // CSURF_COLOR_BUTTON_H_
+#endif // CSURF_COLOR_BUTTON_COLORS_H_

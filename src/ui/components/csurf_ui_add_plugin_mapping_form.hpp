@@ -2,11 +2,13 @@
 #define CSURF_FP_UI_ADD_PLUGIN_MAPPING_FORM_H_
 
 #include <reaper_imgui_functions.h>
-#include <string>
 #include <set>
+#include <string>
 #include <vector>
 
+#include "csurf_ui_plugin_type_button.hpp"
 #include "../../shared/csurf_plugin_utils.hpp"
+#include "../../ui/components//csurf_ui_combo_input.hpp"
 
 class ReaSonusAddPluginMappingForm {
     ImGui_Context *m_ctx;

@@ -34,7 +34,7 @@ constexpr int AUTOMATION_WRITE = 3;
 
 struct ShiftState {
     bool active = false; // NOLINT(*-non-private-member-variables-in-classes)
-    int start = 0; // NOLINT(*-non-private-member-variables-in-classes)
+    int start = 0;       // NOLINT(*-non-private-member-variables-in-classes)
     bool invert = false; // NOLINT(*-non-private-member-variables-in-classes)
 
     void SetValue(const bool value) {
@@ -100,8 +100,8 @@ private:
 
 struct DoubleClickState {
     bool active = false; // NOLINT(*-non-private-member-variables-in-classes)
-    int start = 0; // NOLINT(*-non-private-member-variables-in-classes)
-    int clicks = 0; // NOLINT(*-non-private-member-variables-in-classes)
+    int start = 0;       // NOLINT(*-non-private-member-variables-in-classes)
+    int clicks = 0;      // NOLINT(*-non-private-member-variables-in-classes)
 
     void SetValue(const bool value) {
         const int time = GetTickCount();
@@ -245,13 +245,17 @@ bool isInteger(const std::string &value);
 
 std::vector<std::string> split(const std::string &str, const std::string &delimiter);
 
+std::vector<int> splitToInt(const std::string &str, const std::string &delimiter);
+
 std::vector<std::string> cutString(const std::string &str, size_t size);
 
 std::string join(const std::vector<std::string> &list, const std::string &delimiter);
 
+std::string join(const std::vector<int> &list, const std::string &delimiter);
+
 std::string replace(std::string &str, const std::string &search, const std::string &replace);
 
-std::string replaceAll(std::string &str, const std::string &search, const std::string &replace);
+std::string replaceAll(std::string str, const std::string &search, const std::string &replace);
 
 void logInteger(const char *key, int value);
 

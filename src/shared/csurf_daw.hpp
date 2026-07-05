@@ -363,27 +363,29 @@ public:
     /**
      * Get the parameter name of the parameter with the given values
      * @param media_track The track where we want the plugin param for
-     * @param fxIndex The index on the plugin
+     * @param fx_index The index on the plugin
      * @param param The parameter index to get the name for
      * @return The name of the given parameter
      */
-    static std::string GetTrackFxParamName(MediaTrack *media_track, int fxIndex, int param);
+    static std::string GetTrackFxParamName(MediaTrack *media_track, int fx_index, int param);
+
+    static std::string GetTrackFxFormattedParamValue(MediaTrack *media_track, int fx_index, int param);
 
     /**
      * Get the number of steps of the parameter with the given values
      * @param media_track The track where we want the plugin param for
-     * @param fxIndex The index on the plugin
+     * @param fx_index The index on the plugin
      * @param param The parameter index to get the number of steps for
      * @return The number of steps of the given parameter
      */
-    static int GetTrackFxParamNbSteps(MediaTrack *media_track, int fxIndex, int param);
+    static int GetTrackFxParamNbSteps(MediaTrack *media_track, int fx_index, int param);
 
     /**
      * Untouch the last touched parameter for the given plugin
      * @param media_track The track for the plugin we need
-     * @param fxIndex The index on the plugin
+     * @param fx_index The index on the plugin
      */
-    static void SetTrackFXParamUntouched(MediaTrack *media_track, int fxIndex);
+    static void SetTrackFXParamUntouched(MediaTrack *media_track, int fx_index);
 
     /**************************************************************************************************************
      *  Track Receives related methods
