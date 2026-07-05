@@ -3,7 +3,7 @@
 #include "../pages/csurf_ui_fp_8_settings_page.cpp"
 #include "../pages/csurf_ui_fp_8_plugin_mapping_page.cpp"
 #include "../pages/csurf_ui_fp_8_custom_filters_page.cpp"
-#include "csurf_ui_about.cpp"
+#include "../pages/csurf_ui_about.cpp"
 #include "../csurf_ui_vars.hpp"
 #include "../components/csurf_ui_menu_button.hpp"
 #include "../components/csurf_ui_button_bar.hpp"
