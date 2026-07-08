@@ -177,13 +177,36 @@ protected:
     }
 
     void RenderFilterList() {
+        ShowConsoleMsg("");
         if (ImGui::BeginChild(m_ctx, "filter_lists", 240.0, 0.0)) {
+            if (ImGui::BeginTabBar(m_ctx, "FilterTabs", ImGui::TabBarFlags_None)) {
+                ImGui::SetNextItemWidth(m_ctx, 200);
+                if (ImGui::BeginTabItem(m_ctx, "Global")) {
+                    ShowConsoleMsg("test 1");
+
+                    ImGui::EndTabItem(m_ctx);
+                }
+                if (ImGui::BeginTabItem(m_ctx, "Project")) {
+                    ShowConsoleMsg("test 2");
+
+                    ImGui::EndTabItem(m_ctx);
+                }
+
+                ImGui::EndTabBar(m_ctx);
+            }
+
             ImGui::Text(m_ctx, i18n->t("filters", "list.label").c_str());
             ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 4);
 
             UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
-            if (ImGui::BeginChild(m_ctx, "filter_lists_content", 0.0, 0.0, ImGui::ChildFlags_FrameStyle,
-                                  ImGui::ChildFlags_AutoResizeY)) {
+            if (ImGui::BeginChild(
+                m_ctx,
+                "filter_lists_content",
+                0.0,
+                0.0,
+                ImGui::ChildFlags_FrameStyle,
+                ImGui::ChildFlags_AutoResizeY
+            )) {
                 ReaSonusActionTextInput(
                     m_ctx,
                     assets,
@@ -195,9 +218,9 @@ protected:
 
                 filters_list->Render();
 
-                UiStyledElements::PopReaSonusGroupStyle(m_ctx);
                 ImGui::EndChild(m_ctx);
             }
+            UiStyledElements::PopReaSonusGroupStyle(m_ctx);
 
             ImGui::EndChild(m_ctx);
         }
@@ -297,8 +320,10 @@ protected:
         ImGui::PopStyleVar(m_ctx);
     }
 
-public:
-    CSurf_FP_8_CustomFiltersPage(ImGui_Context *m_ctx, CSurf_UI_Assets *assets) : CSurf_UI_PageContent(m_ctx, assets) {
+public
+:
+    CSurf_FP_8_CustomFiltersPage(ImGui_Context *m_ctx, CSurf_UI_Assets *assets)
+        : CSurf_UI_PageContent(m_ctx, assets) {
         using namespace std::placeholders; // for `_1, _2 etc`
         i18n = I18n::GetInstance();
         settings = ReaSonusSettings::GetInstance(FP_8);
@@ -331,7 +356,8 @@ public:
         SetFiltersKeys();
     };
 
-    ~CSurf_FP_8_CustomFiltersPage() override = default;
+    ~CSurf_FP_8_CustomFiltersPage()
+    override = default;
 
     void Render() override {
         using namespace std::placeholders; // for `_1, _2 etc`

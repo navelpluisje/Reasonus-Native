@@ -48,6 +48,7 @@ class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-in
     int setting_track_valuebar_mode;
     int setting_track_valuebar_value;
     bool setting_filter_custom_color;
+    bool setting_filter_project_filters;
 
     std::vector<std::string> language_names;
 
@@ -458,6 +459,14 @@ public:
                     i18n->t("settings", "filter-use-custom-color.tooltip")
                 );
 
+                RenderInfoCheckbox(
+                    m_ctx,
+                    assets,
+                    i18n->t("settings", "filter-use-project-filters.label"),
+                    &setting_filter_project_filters,
+                    i18n->t("settings", "filter-use-project-filters.tooltip")
+                );
+
                 ImGui::EndChild(m_ctx);
             }
 
@@ -774,6 +783,7 @@ public:
         settings->SetSetting("displays", "track-value-bar-value", setting_track_valuebar_value);
         settings->SetSetting("surface", "reasonus-color-palette", join(settings_plugin_color_palette, ","));
         settings->SetSetting("filters", "use-custom-color", setting_filter_custom_color);
+        settings->SetSetting("filters", "project-filters", setting_filter_project_filters);
 
         if (settings->StoreSettings()) {
             DAW::SetExtState(EXT_STATE_KEY_SAVED_SETTINGS, EXT_STATE_VALUE_TRUE, false);
@@ -819,6 +829,7 @@ public:
         settings_initial_plugin_color_palette = settings->GetPluginColorPalette();
         settings_plugin_color_palette = settings->GetPluginColorPalette();
         setting_filter_custom_color = settings->UseFilterColor();
+        setting_filter_custom_color = settings->ProjectFiltersEnabled();
 
         int *const iterator = std::find(
             latch_preview_action_indexes,

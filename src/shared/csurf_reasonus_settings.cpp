@@ -305,6 +305,10 @@ bool ReaSonusSettings::UseFilterColor() {
     return settings["filters"]["use-custom-color"] == "1";
 }
 
+bool ReaSonusSettings::ProjectFiltersEnabled() {
+    return settings["filters"]["project-filters"] == "1";
+}
+
 void ReaSonusSettings::UpdateFilter(const std::string &key, const mINI::INIMap<std::string> &filter) {
     settings[key] = filter;
 }

@@ -93,6 +93,7 @@ class ReaSonusSettings {
         {"functions", "16", "0"},
         {"filters", "nb-filters", "0"},
         {"filters", "use-custom-color", "0"},
+        {"filters", "project-filters", "0"},
     };
 
 public:
@@ -241,8 +242,6 @@ public:
 
     int GetPluginMapDefaultColorMode();
 
-    bool ShouldMultiFilterApplyInstant();
-
     std::vector<int> GetPluginColorPalette();
 
     bool ShouldMuteMasterOnFwdRwd();
@@ -259,6 +258,8 @@ public:
     /**
      * Filters related
      */
+    bool ShouldMultiFilterApplyInstant();
+
     int GetNumberOfFilters();
 
     int AddNewFilter(const std::string &filter_name);
@@ -266,6 +267,8 @@ public:
     std::vector<std::string> GetFilterKeys();
 
     bool UseFilterColor();
+
+    bool ProjectFiltersEnabled();
 
     void UpdateFilter(const std::string &key, const mINI::INIMap<std::string> &filter);
 
