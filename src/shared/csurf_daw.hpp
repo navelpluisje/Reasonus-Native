@@ -548,12 +548,20 @@ public:
     static bool HasTrackSend(MediaTrack *media_track, int send);
 
     /**
+     * Check if the give track has a hardware out at the given index
+     * @param media_track The track where we want the send for
+     * @param send The index of the send track
+     * @return Whether the send is available
+     */
+    static bool HasTrackHardwareOut(MediaTrack *media_track, int send);
+
+    /**
      * Get the name of the destination of the send at the given index for the given track
      * @param media_track The track where we want the send for
      * @param send The index of the send track
      * @return The name of the destination of the send
      */
-    static std::string GetTrackSendDestName(MediaTrack *media_track, int send);
+    static std::string GetTrackSendName(MediaTrack *media_track, int send);
 
     /**
      * Get the send mode for the given send
