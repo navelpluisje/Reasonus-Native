@@ -4,11 +4,11 @@
 #include "csurf_fp_8_channel_manager.hpp"
 
 class CSurf_FP_8_SendsManager : public CSurf_FP_8_ChannelManager {
-protected:
     int nb_sends = 0;
     int nb_track_sends[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     int current_send = 0;
 
+protected:
     void GetFaderValue(
         MediaTrack *media_track,
         const int send_index,
@@ -45,8 +45,7 @@ public:
         CSurf_FP_8_SendsManager::UpdateTracks(true);
     }
 
-    ~CSurf_FP_8_SendsManager() override {
-    }
+    ~CSurf_FP_8_SendsManager() override = default;
 
     void UpdateTracks(const bool force_update) override {
         nb_sends = 0;
@@ -55,7 +54,7 @@ public:
 
         for (int i = 0; i < context->GetNbChannels(); i++) {
             MediaTrack *media_track = media_tracks.Get(i);
-            const int _nb_track_sends = GetTrackNumSends(media_track, 0);
+            const int _nb_track_sends = GetTrackNumSends(media_track, 0x10000000);
             nb_track_sends[i] = _nb_track_sends;
 
             if (_nb_track_sends > nb_sends) {
@@ -89,7 +88,7 @@ public:
 
             GetFaderValue(media_track, send_index, &fader_value, &value_bar_value, &pan, &pan_str);
 
-            if (DAW::HasTrackSend(media_track, send_index)) {
+            if (DAW::HasTrackSend(media_track, send_index) || DAW::HasTrackHardwareOut(media_track, send_index)) {
                 if (add_send_enabled) {
                     track->SetDisplayLine(
                         1,
@@ -109,7 +108,7 @@ public:
                     track->SetDisplayLine(
                         1,
                         ALIGN_LEFT,
-                        DAW::GetTrackSendDestName(media_track, send_index).c_str(),
+                        DAW::GetTrackSendName(media_track, send_index).c_str(),
                         INVERT,
                         force_update
                     );

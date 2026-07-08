@@ -82,7 +82,7 @@ public:
                 );
             }
 
-            if (DAW::HasTrackSend(sends_track, send_index)) {
+            if (DAW::HasTrackSend(sends_track, send_index) || DAW::HasTrackHardwareOut(sends_track, send_index)) {
                 if (add_send_enabled) {
                     track->SetDisplayLine(
                         1,
@@ -102,7 +102,7 @@ public:
                     track->SetDisplayLine(
                         1,
                         ALIGN_LEFT,
-                        DAW::GetTrackSendDestName(sends_track, send_index).c_str(),
+                        DAW::GetTrackSendName(sends_track, send_index).c_str(),
                         INVERT,
                         force_update
                     );
