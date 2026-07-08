@@ -534,11 +534,15 @@ bool DAW::HasTrackSend(MediaTrack *media_track, const int send) {
     return GetSetTrackSendInfo(media_track, SEND_MODE_SEND, send, "P_DESTTRACK", nullptr) != nullptr;
 }
 
-std::string DAW::GetTrackSendDestName(MediaTrack *media_track, const int send) {
-    auto *dest_track = static_cast<MediaTrack *>(GetSetTrackSendInfo(media_track, 0, send, "P_DESTTRACK", nullptr));
+bool DAW::HasTrackHardwareOut(MediaTrack *media_track, const int send) {
+    return GetSetTrackSendInfo(media_track, SEND_MODE_HARDWARE, send, "I_SLOT_HINT", nullptr) != nullptr;
+}
 
-    if (dest_track != nullptr) {
-        return GetTrackName(dest_track);
+std::string DAW::GetTrackSendName(MediaTrack *media_track, const int send) {
+    char buffer[256]; // NOLINT(*-avoid-c-arrays)
+
+    if (::GetTrackSendName(media_track, send, buffer, sizeof buffer)) {
+        return buffer;
     }
 
     return "No Dest";
