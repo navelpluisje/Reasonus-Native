@@ -95,6 +95,11 @@ void ReaSonusMessage::Frame() {
             ReaSonusPageTitle(m_ctx, assets, "ReaSonus Native New Version: " + std::string(GIT_VERSION), false);
             ImGui::PushTextWrapPos(m_ctx, 0.0);
 
+            ImGui::Text(m_ctx, "This release is a bugfix release: ");
+            ImGui::BulletText(
+                m_ctx, "Fixed issue where the sends did not work proper when a hardware out was in the list");
+
+            ReaSonusPageTitle(m_ctx, assets, "Version 0.10.0", true);
             ImGui::Text(m_ctx, "This release is focussed on plugin mappings. Changes made contain:");
             ImGui::BulletText(m_ctx, "Ability to add plugin mappings in the ReaSonus Control Panel");
             ImGui::BulletText(m_ctx, "Ability to delete plugin mappings");
