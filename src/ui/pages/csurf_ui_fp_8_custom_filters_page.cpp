@@ -179,23 +179,23 @@ protected:
     void RenderFilterList() {
         ShowConsoleMsg("");
         if (ImGui::BeginChild(m_ctx, "filter_lists", 240.0, 0.0)) {
-            if (ImGui::BeginTabBar(m_ctx, "FilterTabs", ImGui::TabBarFlags_None)) {
-                ImGui::SetNextItemWidth(m_ctx, 200);
-                if (ImGui::BeginTabItem(m_ctx, "Global")) {
-                    ShowConsoleMsg("test 1");
+            // ImGui::SetNextItemWidth(m_ctx, 200);
 
-                    ImGui::EndTabItem(m_ctx);
-                }
-                if (ImGui::BeginTabItem(m_ctx, "Project")) {
-                    ShowConsoleMsg("test 2");
-
-                    ImGui::EndTabItem(m_ctx);
-                }
-
-                ImGui::EndTabBar(m_ctx);
+            UiStyledElements::PushReaSonusFilterTabStyle(m_ctx, false);
+            if (ImGui::Button(m_ctx, "Global", 120)) {
+                ShowConsoleMsg("test 1");
             }
+            UiStyledElements::PopReaSonusFilterTabStyle(m_ctx);
 
-            ImGui::Text(m_ctx, i18n->t("filters", "list.label").c_str());
+            ImGui::SameLine(m_ctx, 120);
+
+            UiStyledElements::PushReaSonusFilterTabStyle(m_ctx, true);
+            if (ImGui::Button(m_ctx, "Project", 120)) {
+                ShowConsoleMsg("test 2");
+            }
+            UiStyledElements::PopReaSonusFilterTabStyle(m_ctx);
+
+            // ImGui::Text(m_ctx, i18n->t("filters", "list.label").c_str());
             ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 4);
 
             UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
@@ -320,8 +320,7 @@ protected:
         ImGui::PopStyleVar(m_ctx);
     }
 
-public
-:
+public:
     CSurf_FP_8_CustomFiltersPage(ImGui_Context *m_ctx, CSurf_UI_Assets *assets)
         : CSurf_UI_PageContent(m_ctx, assets) {
         using namespace std::placeholders; // for `_1, _2 etc`
