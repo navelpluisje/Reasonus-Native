@@ -1,18 +1,21 @@
 #include "csurf_project_state.hpp"
-#include <array>
 #include <reaper_plugin_functions.h>
 #include <utility>
 #include "../shared/csurf_utils.hpp"
 
 ProjectState::ProjectState() {
     ReadProjectState(project_state);
+    // store the project_state to previous_project_state, to make a reset possible
+    // as changes are written to the state instant (but not saved instant)
+    previous_project_state = project_state;
 }
 
 void ProjectState::UpdateSettings() {
     ReadProjectState(project_state);
+    previous_project_state = project_state;
 }
 
-void ProjectState::ReadProjectState(mINI::INIStructure &data) {
+void ProjectState::ReadProjectState(mINI::INIStructure &data) const {
     // Read all the available data from the project state.
     data["filters"];
     data["filters"]["nb-filters"] = GetProjectState("filters-nb-filters", "0");
@@ -52,7 +55,7 @@ void ProjectState::SetProjectState(const std::string &key, const int value) cons
 }
 
 std::string ProjectState::GetProjectState(const std::string &key, std::string default_value) const {
-    char buffer[256];
+    char buffer[256]; // NOLINT(*-avoid-c-arrays)
     if (GetProjExtState(nullptr, project_state_key.c_str(), key.c_str(), buffer, sizeof buffer) == 0) {
         return default_value;
     }
@@ -68,7 +71,7 @@ int ProjectState::GetNumberOfFilters() {
     return stoi(project_state["filters"]["nb-filters"]);
 }
 
-std::string CreateProjectStateFilter(const mINI::INIMap<std::string> &filter) {
+std::string CreateProjectStateFilter(const mINI::INIMap<std::string> &filter) { // NOLINT(*-use-internal-linkage)
     std::string result;
 
     for (auto const &[key, value]: filter) {
@@ -82,18 +85,25 @@ std::string CreateProjectStateFilter(const mINI::INIMap<std::string> &filter) {
 }
 
 bool ProjectState::StoreProjectState() {
-    const std::vector<std::string> keys = GetFilterKeys();
+    try {
+        const std::vector<std::string> keys = GetFilterKeys();
+        for (auto const &key: keys) {
+            const auto filter = project_state[key];
+            SetProjectState(key, CreateProjectStateFilter(filter));
+        }
+        SetProjectState("filters-keys", join(keys, ","));
+        SetProjectState("filters-nb-filters", static_cast<int>(keys.size()));
 
-    for (auto const &key: keys) {
-        const auto filter = project_state[key];
-        SetProjectState(key, CreateProjectStateFilter(filter));
+        Main_SaveProject(nullptr, false);
+
+        return true;
+    } catch (...) {
+        return false;
     }
-    SetProjectState("filters-keys", join(keys, ","));
-    SetProjectState("filters-nb-filters", static_cast<int>(keys.size()));
+}
 
-    Main_SaveProject(nullptr, false);
-
-    return true;
+void ProjectState::ReloadProjectState() {
+    project_state = previous_project_state;
 }
 
 /**
@@ -159,7 +169,8 @@ void ProjectState::Removefilter(const std::string &key) {
         project_state["filters"].remove(std::to_string(i));
     }
 
-    SetProjectState(key, "");
+    // With setting an empty value, the setting will get deleted
+    SetProjectState(key, ""); // NOLINT(*-implicit-bool-conversion)
     UpdateFilterOrder(keys);
 }
 

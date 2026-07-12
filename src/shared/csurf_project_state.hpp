@@ -13,6 +13,7 @@ class ProjectState {
     const std::string project_state_key = "ReaSonus";
 
     mINI::INIStructure project_state;
+    mINI::INIStructure previous_project_state;
 
     static ProjectState *instancePtr;
 
@@ -32,7 +33,7 @@ public:
      */
     void UpdateSettings();
 
-    void ReadProjectState(mINI::INIStructure &data);
+    void ReadProjectState(mINI::INIStructure &data) const;
 
     /**
      * @brief Set a Setting without saving to file
@@ -58,6 +59,8 @@ public:
     int GetNumberOfFilters();
 
     bool StoreProjectState();
+
+    void ReloadProjectState();
 
     /**
      * Filters related

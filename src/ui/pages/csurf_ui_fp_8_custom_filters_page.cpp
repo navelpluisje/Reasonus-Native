@@ -430,6 +430,8 @@ public:
         // TODO: Check if we have to implement this for the project state as well
         if (filter_type == 0) {
             settings->UpdateSettings();
+        } else {
+            project_state->ReloadProjectState();
         }
         SetFiltersKeys();
         PopulateFilter();
@@ -471,14 +473,14 @@ public:
             project_state->UpdateFilterOrder(filter_keys);
         }
 
-        // TODO: Check how to deal with project state
-        project_state->StoreProjectState();
-
-        // if (settings->StoreSettings()) {
-        //     edit_new_filter = false;
-        //     ReaSonus8ControlPanel::SetMessage(i18n->t("filters", "action.save.message"));
-        //     Reset();
-        // }
+        if (
+            (filter_type == 0 && settings->StoreSettings())
+            || (filter_type == 1 && project_state->StoreProjectState())
+        ) {
+            edit_new_filter = false;
+            ReaSonus8ControlPanel::SetMessage(i18n->t("filters", "action.save.message"));
+            Reset();
+        }
     }
 
     void SetPageProperty(const int type, const int value) override {
