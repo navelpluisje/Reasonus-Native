@@ -51,7 +51,8 @@ public:
     ) : m_ctx(m_ctx), assets(assets), element_id(element_id), items(items), colors(colors),
         selected_item(selected_item),
         sortable(sortable),
-        remove_callback(remove_callback), sort_callback(sort_callback) {
+        remove_callback(remove_callback),
+        sort_callback(sort_callback) {
         hovered_item = -1;
         active_item = -1;
     }
@@ -73,7 +74,7 @@ public:
     void Render() {
         UiStyledElements::PushReaSonusListBoxStyle(m_ctx);
         if (ImGui::BeginListBox(m_ctx, ("##" + element_id).c_str(), 0.0, -0.1)) {
-            if (items.size() > 0) {
+            if (static_cast<int>(items.size()) > 0) {
                 for (int i = 0; i < static_cast<int>(items.size()); i++) {
                     ReaSonusFilterSelectable(
                         m_ctx,
@@ -83,6 +84,7 @@ public:
                         i,
                         selected_item,
                         &hovered_item,
+                        &active_item,
                         remove_callback,
                         nullptr
                     );

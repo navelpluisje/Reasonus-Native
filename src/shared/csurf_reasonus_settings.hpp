@@ -3,7 +3,6 @@
 
 #include <string>
 #include <vector>
-#include <algorithm>
 #include <mini/ini.h>
 #include "../shared/csurf_utils.hpp"
 

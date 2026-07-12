@@ -36,19 +36,31 @@ class CSurf_FP_8_CustomFiltersPage : public CSurf_UI_PageContent {
     bool filter_match_multiple;
     int filter_color;
     int previous_filter_color;
+    int filter_type = 0;
 
 protected:
     void SetFiltersKeys() {
         filter_keys.clear();
         filter_labels.clear();
 
-        filter_keys = settings->GetFilterKeys();
-        filter_labels = settings->GetFilterNames();
-        filter_colors = settings->GetFilterColors();
+        if (filter_type == 0) {
+            filter_keys = settings->GetFilterKeys();
+            filter_labels = settings->GetFilterNames();
+            filter_colors = settings->GetFilterColors();
+        } else {
+            filter_keys = project_state->GetFilterKeys();
+            filter_labels = project_state->GetFilterNames();
+            filter_colors = project_state->GetFilterColors();
+        }
     }
 
     void CreateFilter(const std::string &_filter_name) {
-        selected_filter = settings->AddNewFilter(_filter_name);
+        if (filter_type == 0) {
+            selected_filter = settings->AddNewFilter(_filter_name);
+        } else {
+            selected_filter = project_state->AddNewFilter(_filter_name);
+        }
+        filter_name = _filter_name;
         SetFiltersKeys();
         previous_selected_filter = selected_filter;
         edit_new_filter = true;
@@ -72,7 +84,12 @@ protected:
         }
 
         const std::string filter_key = filter_keys[selected_filter];
-        mINI::INIMap filter = settings->GetFilter(filter_key);
+        mINI::INIMap<std::string> filter;
+        if (filter_type == 0) {
+            filter = settings->GetFilter(filter_key);
+        } else {
+            filter = project_state->GetFilter(filter_key);
+        }
 
         filter_text = split(filter["text"], ",");
         filter_name = filter["name"];
@@ -93,8 +110,16 @@ protected:
         }
 
         const std::string filter_text_string = join(filter_text, ",");
+        if (filter_keys.empty()) {
+            return;
+        }
         const std::string filter_key = filter_keys[previous_selected_filter];
-        mINI::INIMap filter = settings->GetFilter(filter_key);
+        mINI::INIMap<std::string> filter;
+        if (filter_type == 0) {
+            filter = settings->GetFilter(filter_key);
+        } else {
+            filter = project_state->GetFilter(filter_key);
+        }
 
         filter_dirty =
                 filter_name != filter["name"] ||
@@ -140,7 +165,11 @@ protected:
         const std::string filter_key = filter_keys.at(index);
         filter_keys.erase(filter_keys.begin() + index);
 
-        settings->Removefilter(filter_key);
+        if (filter_type == 0) {
+            settings->Removefilter(filter_key);
+        } else {
+            project_state->Removefilter(filter_key);
+        }
 
         SetFiltersKeys();
         selected_filter = selected_filter == 0 ? selected_filter : selected_filter - 1;
@@ -152,16 +181,31 @@ protected:
     void HandleSortFilterList(const int current_item, const int next_item) {
         const std::string previous_label = filter_labels[current_item];
         const std::string previous_key = filter_keys[current_item];
+        const int previous_color = filter_colors[current_item];
         filter_labels[current_item] = filter_labels[next_item];
         filter_keys[current_item] = filter_keys[next_item];
+        filter_colors[current_item] = filter_colors[next_item];
         filter_labels[next_item] = previous_label;
         filter_keys[next_item] = previous_key;
+        filter_colors[next_item] = previous_color;
         ImGui::ResetMouseDragDelta(m_ctx, ImGui::MouseButton_Left);
 
-        settings->UpdateFilterOrder(filter_keys);
+        if (filter_type == 0) {
+            settings->UpdateFilterOrder(filter_keys);
+        } else {
+            project_state->UpdateFilterOrder(filter_keys);
+        }
+
         selected_filter = next_item;
         previous_selected_filter = next_item;
         PopulateFilter();
+    }
+
+    void HandleFilterTypeChange(int type) {
+        DirtyCheck();
+        filter_type = type;
+        previous_selected_filter = -1;
+        SetFiltersKeys();
     }
 
     [[nodiscard]] int GetOptionsValue() const {
@@ -177,21 +221,20 @@ protected:
     }
 
     void RenderFilterList() {
-        ShowConsoleMsg("");
         if (ImGui::BeginChild(m_ctx, "filter_lists", 240.0, 0.0)) {
             // ImGui::SetNextItemWidth(m_ctx, 200);
 
-            UiStyledElements::PushReaSonusFilterTabStyle(m_ctx, false);
-            if (ImGui::Button(m_ctx, "Global", 120)) {
-                ShowConsoleMsg("test 1");
+            UiStyledElements::PushReaSonusFilterTabStyle(m_ctx, filter_type == 0);
+            if (ImGui::Button(m_ctx, "Global Filters", 120)) {
+                HandleFilterTypeChange(0);
             }
             UiStyledElements::PopReaSonusFilterTabStyle(m_ctx);
 
             ImGui::SameLine(m_ctx, 120);
 
-            UiStyledElements::PushReaSonusFilterTabStyle(m_ctx, true);
-            if (ImGui::Button(m_ctx, "Project", 120)) {
-                ShowConsoleMsg("test 2");
+            UiStyledElements::PushReaSonusFilterTabStyle(m_ctx, filter_type == 1);
+            if (ImGui::Button(m_ctx, "Project Filters", 120)) {
+                HandleFilterTypeChange(1);
             }
             UiStyledElements::PopReaSonusFilterTabStyle(m_ctx);
 
@@ -326,6 +369,7 @@ public:
         using namespace std::placeholders; // for `_1, _2 etc`
         i18n = I18n::GetInstance();
         settings = ReaSonusSettings::GetInstance(FP_8);
+        project_state = ProjectState::GetInstance();
 
         plugin_color_palette = settings->GetPluginColorPalette();
 
@@ -383,7 +427,10 @@ public:
     }
 
     void Reset() override {
-        settings->UpdateSettings();
+        // TODO: Check if we have to implement this for the project state as well
+        if (filter_type == 0) {
+            settings->UpdateSettings();
+        }
         SetFiltersKeys();
         PopulateFilter();
     }
@@ -398,7 +445,13 @@ public:
             selected = previous_selected_filter;
         }
         const std::string filter_key = filter_keys[selected];
-        mINI::INIMap filter = settings->GetFilter(filter_key);
+
+        mINI::INIMap<std::string> filter;
+        if (filter_type == 0) {
+            filter = settings->GetFilter(filter_key);
+        } else {
+            filter = project_state->GetFilter(filter_key);
+        }
 
         filter["name"] = filter_name;
         filter["text"] = join(filter_text, ",");
@@ -410,14 +463,22 @@ public:
         filter["top-level"] = filter_top_level ? "1" : "0";
         filter["match-multiple"] = filter_match_multiple ? "1" : "0";
 
-        settings->UpdateFilter(filter_key, filter);
-        settings->UpdateFilterOrder(filter_keys);
-
-        if (settings->StoreSettings()) {
-            edit_new_filter = false;
-            ReaSonus8ControlPanel::SetMessage(i18n->t("filters", "action.save.message"));
-            Reset();
+        if (filter_type == 0) {
+            settings->UpdateFilter(filter_key, filter);
+            settings->UpdateFilterOrder(filter_keys);
+        } else {
+            project_state->UpdateFilter(filter_key, filter);
+            project_state->UpdateFilterOrder(filter_keys);
         }
+
+        // TODO: Check how to deal with project state
+        project_state->StoreProjectState();
+
+        // if (settings->StoreSettings()) {
+        //     edit_new_filter = false;
+        //     ReaSonus8ControlPanel::SetMessage(i18n->t("filters", "action.save.message"));
+        //     Reset();
+        // }
     }
 
     void SetPageProperty(const int type, const int value) override {

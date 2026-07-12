@@ -11,6 +11,7 @@
 #include "../i18n/i18n.hpp"
 #include "../ui/windows/csurf_ui_message.hpp"
 #include "../shared/csurf_reasonus_settings.hpp"
+#include "../shared/csurf_project_state.hpp"
 #include "csurf_fp_8_session_manager.cpp"
 #include "csurf_fp_8_mix_manager.cpp"
 #include "csurf_fp_8_automation_manager.cpp"
@@ -22,6 +23,7 @@
 
 I18n *I18n::instancePtr = nullptr;
 ReaSonusSettings *ReaSonusSettings::instance8Ptr = nullptr;
+ProjectState *ProjectState::instancePtr = nullptr;
 
 const int MOMENTARY_TIMEOUT = 500;
 

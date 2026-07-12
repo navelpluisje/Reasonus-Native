@@ -9,12 +9,14 @@
 #include "../i18n/i18n.hpp"
 #include "../shared/csurf_utils.hpp"
 #include "../shared/csurf_reasonus_settings.hpp"
+#include "../shared/csurf_project_state.hpp"
 
 class CSurf_UI_PageContent {
 protected:
     ImGui_Context *m_ctx;
     mINI::INIStructure ini;
     ReaSonusSettings *settings;
+    ProjectState *project_state;
     CSurf_UI_Assets *assets;
     I18n *i18n;
 
