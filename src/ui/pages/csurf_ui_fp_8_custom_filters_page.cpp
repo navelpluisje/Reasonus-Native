@@ -123,6 +123,7 @@ protected:
 
         filter_dirty =
                 filter_name != filter["name"] ||
+                filter_color != stoi(filter["color"]) ||
                 filter_text_string != filter["text"] ||
                 filter_case_insensitive != (filter["case-insensitive"] == "1") ||
                 filter_siblings != (filter["sibblings"] == "1") ||
