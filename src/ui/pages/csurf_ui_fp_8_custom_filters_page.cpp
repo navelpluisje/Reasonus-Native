@@ -201,7 +201,7 @@ protected:
         PopulateFilter();
     }
 
-    void HandleFilterTypeChange(int type) {
+    void HandleFilterTypeChange(const int type) {
         DirtyCheck();
         filter_type = type;
         previous_selected_filter = -1;
@@ -364,7 +364,7 @@ protected:
     }
 
 public:
-    CSurf_FP_8_CustomFiltersPage(ImGui_Context *m_ctx, CSurf_UI_Assets *assets)
+    CSurf_FP_8_CustomFiltersPage(ImGui_Context *m_ctx, CSurf_UI_Assets *assets) // NOLINT(*-pro-type-member-init)
         : CSurf_UI_PageContent(m_ctx, assets) {
         using namespace std::placeholders; // for `_1, _2 etc`
         i18n = I18n::GetInstance();
@@ -397,7 +397,7 @@ public:
         );
 
         SetFiltersKeys();
-    };
+    }
 
     ~CSurf_FP_8_CustomFiltersPage()
     override = default;
@@ -427,7 +427,6 @@ public:
     }
 
     void Reset() override {
-        // TODO: Check if we have to implement this for the project state as well
         if (filter_type == 0) {
             settings->UpdateSettings();
         } else {

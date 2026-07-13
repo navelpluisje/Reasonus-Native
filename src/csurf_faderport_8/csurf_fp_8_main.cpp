@@ -28,6 +28,8 @@ ProjectState *ProjectState::instancePtr = nullptr;
 const int MOMENTARY_TIMEOUT = 500;
 
 class CSurf_FaderPort : public IReaperControlSurface {
+  char project_name_buffer[1024];
+  std::string project_name;
   int m_midi_in_dev, m_midi_out_dev;
   midi_Output *m_midiout;
   midi_Input *m_midiin;
@@ -51,6 +53,7 @@ class CSurf_FaderPort : public IReaperControlSurface {
 
   I18n *i18n = I18n::GetInstance();
   ReaSonusSettings *settings = ReaSonusSettings::GetInstance(FP_8);
+  ProjectState *project_state = ProjectState::GetInstance();
 
   char configtmp[1024]; // NOLINT(*-avoid-c-arrays)
 
@@ -348,10 +351,6 @@ public:
     DELETE_ASYNC(m_midiin);
   }
 
-  // [[nodiscard]] CSurf_Context GetContext() const {
-  //   return *context;
-  // }
-
   const char *GetTypeString() override {
     return "REASONUS_FADERPORT_8";
   }
@@ -376,6 +375,19 @@ public:
 
   bool GetTouchState(MediaTrack *media_track, const int is_pan) override {
     return trackNavigator->IsTrackTouched(media_track, is_pan);
+  }
+
+  /**
+   * Check for project change. If so, we reload the new project state
+   */
+  void CheckProjectChange() {
+    GetProjectName(nullptr, project_name_buffer, sizeof project_name_buffer);
+    const std::string tmp_project_name = project_name_buffer;
+
+    if (tmp_project_name != project_name) {
+      project_state->LoadProjectState();
+      project_name = tmp_project_name;
+    }
   }
 
   void Run() override {
@@ -419,11 +431,12 @@ public:
       if ((now - surface_update_keepalive) >= 990) {
         surface_update_keepalive = now;
         m_midiout->Send(0xa0, 0x00, 0x00, -1);
+        CheckProjectChange();
       }
 
       /**
        * every 1500 ms we check if the settings have been saved.
-       * If so, we updet the settings in the context
+       * If so, we update the settings in the context
        *
        */
       if ((now - surface_update_settings_check) >= 1500) {

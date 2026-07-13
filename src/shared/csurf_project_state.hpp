@@ -20,18 +20,14 @@ class ProjectState {
 public:
     ProjectState(const ProjectState &obj) = delete;
 
+    void LoadProjectState();
+
     static ProjectState *GetInstance() {
         if (instancePtr == nullptr) {
             instancePtr = new ProjectState();
         }
         return instancePtr;
     }
-
-    /**
-     * @brief Read the ini file
-     *
-     */
-    void UpdateSettings();
 
     void ReadProjectState(mINI::INIStructure &data) const;
 

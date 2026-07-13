@@ -10,8 +10,10 @@ ProjectState::ProjectState() {
     previous_project_state = project_state;
 }
 
-void ProjectState::UpdateSettings() {
+void ProjectState::LoadProjectState() {
     ReadProjectState(project_state);
+    // store the project_state to previous_project_state, to make a reset possible
+    // as changes are written to the state instant (but not saved instant)
     previous_project_state = project_state;
 }
 
@@ -95,7 +97,8 @@ bool ProjectState::StoreProjectState() {
         SetProjectState("filters-nb-filters", static_cast<int>(keys.size()));
 
         Main_SaveProject(nullptr, false);
-
+        previous_project_state = project_state;
+        
         return true;
     } catch (...) {
         return false;
