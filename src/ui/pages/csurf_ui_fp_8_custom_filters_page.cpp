@@ -231,13 +231,15 @@ protected:
             }
             UiStyledElements::PopReaSonusFilterTabStyle(m_ctx);
 
-            ImGui::SameLine(m_ctx, 120);
+            if (settings->ProjectFiltersEnabled()) {
+                ImGui::SameLine(m_ctx, 120);
 
-            UiStyledElements::PushReaSonusFilterTabStyle(m_ctx, filter_type == 1);
-            if (ImGui::Button(m_ctx, "Project Filters", 120)) {
-                HandleFilterTypeChange(1);
+                UiStyledElements::PushReaSonusFilterTabStyle(m_ctx, filter_type == 1);
+                if (ImGui::Button(m_ctx, "Project Filters", 120)) {
+                    HandleFilterTypeChange(1);
+                }
+                UiStyledElements::PopReaSonusFilterTabStyle(m_ctx);
             }
-            UiStyledElements::PopReaSonusFilterTabStyle(m_ctx);
 
             // ImGui::Text(m_ctx, i18n->t("filters", "list.label").c_str());
             ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 4);

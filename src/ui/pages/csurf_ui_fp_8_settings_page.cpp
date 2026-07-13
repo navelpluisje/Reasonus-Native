@@ -865,7 +865,7 @@ public:
         settings_initial_plugin_color_palette = settings->GetPluginColorPalette();
         settings_plugin_color_palette = settings->GetPluginColorPalette();
         setting_filter_custom_color = settings->UseFilterColor();
-        setting_filter_custom_color = settings->ProjectFiltersEnabled();
+        setting_filter_project_filters = settings->ProjectFiltersEnabled();
 
         int *const iterator = std::find(
             latch_preview_action_indexes,

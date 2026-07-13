@@ -4,8 +4,8 @@
 #include <utility>
 
 #include "csurf_fp_8_channel_manager.hpp"
-#include "../ui/windows/csurf_ui_fp_8_control_panel.hpp"
 #include "../shared/csurf_faderport_ui_imgui_utils.hpp"
+#include "../ui/windows/csurf_ui_fp_8_control_panel.hpp"
 
 struct Filter {
     std::string name;
@@ -50,7 +50,9 @@ class CSurf_FP_8_FilterManager : public CSurf_FP_8_ChannelManager {
     }
 
     void GetFilters() {
-        GetProjectFilters();
+        if (settings->ProjectFiltersEnabled()) {
+            GetProjectFilters();
+        }
         GetSettingsFilters();
     }
 
