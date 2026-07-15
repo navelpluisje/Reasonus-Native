@@ -85,17 +85,19 @@ public:
 
             const CSurf_FP_8_Track *track = tracks.at(i);
             MediaTrack *media_track = media_tracks.Get(i);
+            const bool filterExist = filter_index < static_cast<int>(filters.size());
 
-            if (settings->UseFilterColor()) {
+            // If the existing slot has a filter and use filter color is set to true, use the filter color. Black otherwise
+            if (settings->UseFilterColor() && filterExist) {
                 color.SetColor(filters[filter_index].color, false);
             } else {
-                SetTrackColors(media_track, navigator->HasFilter(filter_index));
+                color.SetColor(ButtonColorWhite);
             }
 
             GetFaderValue(media_track, &fader_value, &valuebar_value, &strPan1, &strPan2);
 
             track->SetTrackColor(color);
-            track->SetSelectButtonValue(BTN_VALUE_ON, force_update);
+            track->SetSelectButtonValue(filterExist ? BTN_VALUE_ON : BTN_VALUE_OFF, force_update);
             track->SetMuteButtonValue(DAW::IsTrackMuted(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, force_update);
             track->SetSoloButtonValue(DAW::IsTrackSoloed(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, force_update);
             track->SetFaderValue(fader_value, force_update);
