@@ -244,6 +244,10 @@ bool ReaSonusSettings::ShouldMuteMasterOnFwdRwd() {
     return stoi(settings["surface"]["mute-master-on-fwd-rwd"]) > 0;
 }
 
+bool ReaSonusSettings::UseAutomationColors() {
+    return settings["surface"]["use-automation-colors"] == "1";
+}
+
 /**
  * Settings for the FaderPort 2
  */

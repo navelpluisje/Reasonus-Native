@@ -1,6 +1,5 @@
 #ifndef CSURF_COLOR_BUTTON_COLORS_H_
 #define CSURF_COLOR_BUTTON_COLORS_H_
-#include "../shared/csurf_utils.hpp"
 
 struct ButtonColor {
     int red;

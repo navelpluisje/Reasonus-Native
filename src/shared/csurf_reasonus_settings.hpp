@@ -72,6 +72,7 @@ class ReaSonusSettings {
         },
         {"surface", "instant-multi-select-filter", "0"},
         {"surface", "mute-master-on-fwd-rwd", "0"},
+        {"surface", "use-automation-colors", "0"},
         {"displays", "track", "8"},
         {"displays", "track-lines", "0,4,1,2"},
         {"displays", "track-alignment", "1,0,0,0"},
@@ -244,6 +245,8 @@ public:
     std::vector<int> GetPluginColorPalette();
 
     bool ShouldMuteMasterOnFwdRwd();
+
+    bool UseAutomationColors();
 
     /**
      * Settings for the FaderPort 2

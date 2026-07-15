@@ -49,8 +49,20 @@ class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-in
     int setting_track_valuebar_value;
     bool setting_filter_custom_color;
     bool setting_filter_project_filters;
+    bool setting_use_automation_colors;
+    int setting_automation_trim_color[6] = {0xff66ff, 0xff6666, 0x6666ff, 0x66ff66, 0xff66ff, 0xff66ff};
+    std::vector<std::string> setting_automation_trim_labels = {
+        "Latch",
+        "Trim",
+        "Off",
+        "Touch",
+        "Write",
+        "Read",
+    };
+    int prev_automation_trim_color;
 
     std::vector<std::string> language_names;
+    std::vector<int> plugin_color_palette;
 
     std::vector<ReaSonusComboInputRow *> display_line_value_combo;
     std::vector<ReaSonusComboInputRow *> display_line_alignment_combo;
@@ -151,6 +163,7 @@ public:
 
         GetLanguages(language_names);
         CSurf_FP_8_SettingsPage::Reset();
+        plugin_color_palette = settings->GetPluginColorPalette();
 
         for (int i = 0; i < 4; i++) {
             display_line_value_combo.emplace_back(new ReaSonusComboInputRow(
@@ -528,10 +541,43 @@ public:
                     i18n->t("settings", "latch-preview-action-enable.tooltip")
                 );
 
-                if (setting_latch_preview_action_enable) {
-                    ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + 26);
-                    latch_preview_action_combo->Render();
+                ImGui::BeginDisabled(m_ctx, !setting_latch_preview_action_enable);
+                ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + 26);
+                latch_preview_action_combo->Render();
+                ImGui::EndDisabled(m_ctx);
+
+                RenderInfoCheckbox(
+                    m_ctx,
+                    assets,
+                    i18n->t("settings", "overwrite-timecode.label"),
+                    &setting_use_automation_colors,
+                    i18n->t("settings", "overwrite-timecode.tooltip"));
+
+                ImGui::BeginDisabled(m_ctx, !setting_use_automation_colors);
+                ImGui::Text(m_ctx, "Automation Button Colors");
+                ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + 26);
+                for (int i = 0; i < 6; i++) {
+                    ImGui::BeginGroup(m_ctx);
+                    ReaSonusColorPicker(
+                        m_ctx,
+                        assets,
+                        setting_automation_trim_labels[i],
+                        &setting_automation_trim_color[i],
+                        prev_automation_trim_color,
+                        plugin_color_palette,
+                        50,
+                        32
+                    );
+                    ImGui::CalcTextSize(m_ctx, setting_automation_trim_labels[i].c_str(), &width, &height);
+                    ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + (50 - width) / 2);
+                    ImGui::Text(m_ctx, setting_automation_trim_labels[i].c_str());
+                    ImGui::EndGroup(m_ctx);
+
+                    if ((i + 1) % 6 != 0) {
+                        ImGui::SameLine(m_ctx);
+                    }
                 }
+                ImGui::EndDisabled(m_ctx);
 
                 ImGui::EndChild(m_ctx);
             }
@@ -745,10 +791,10 @@ public:
                     &setting_overwrite_time_code,
                     i18n->t("settings", "overwrite-timecode.tooltip"));
 
-                if (setting_overwrite_time_code) {
-                    ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + 26);
-                    time_code_combo->Render();
-                }
+                ImGui::BeginDisabled(m_ctx, !setting_overwrite_time_code);
+                ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + 26);
+                time_code_combo->Render();
+                ImGui::EndDisabled(m_ctx);
 
                 ImGui::EndChild(m_ctx);
             }
@@ -811,6 +857,7 @@ public:
         settings->SetSetting("surface", "plugin-map-default-color-mode", setting_plugin_map_color_mode);
         settings->SetSetting("surface", "instant-multi-select-filter", setting_instant_multi_select_filter);
         settings->SetSetting("surface", "mute-master-on-fwd-rwd", setting_mute_master_on_fwd_rwd);
+        settings->SetSetting("surface", "use-automation-colors", setting_use_automation_colors);
         settings->SetSetting("displays", "track", setting_track_display);
         settings->SetSetting("displays", "track-lines", joinDisplayValues(setting_track_value_line_value, ","));
         settings->SetSetting("displays", "track-alignment", joinDisplayValues(setting_track_value_line_align, ","));
@@ -866,6 +913,7 @@ public:
         settings_plugin_color_palette = settings->GetPluginColorPalette();
         setting_filter_custom_color = settings->UseFilterColor();
         setting_filter_project_filters = settings->ProjectFiltersEnabled();
+        setting_use_automation_colors = settings->UseAutomationColors();
 
         int *const iterator = std::find(
             latch_preview_action_indexes,
