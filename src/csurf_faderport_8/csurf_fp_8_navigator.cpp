@@ -276,6 +276,7 @@ CSurf_FP_8_Navigator::CSurf_FP_8_Navigator(CSurf_Context *context) : context(con
     HandleAllTracksFilter();
     has_mute = false;
     has_solo = false;
+    DAW::SetExtState("FP_TRACK_OFFSET", std::to_string(track_offset), false);
 }
 
 MediaTrack *CSurf_FP_8_Navigator::GetTrackByIndex(const int index) {
@@ -339,6 +340,7 @@ void CSurf_FP_8_Navigator::SetOffset(const int offset) {
     } else {
         track_offset = offset;
     }
+    DAW::SetExtState("FP_TRACK_OFFSET", std::to_string(track_offset), false);
 }
 
 int CSurf_FP_8_Navigator::GetOffset() const {
@@ -370,6 +372,7 @@ void CSurf_FP_8_Navigator::IncrementOffset(const int count) {
     } else {
         track_offset = tracks.GetSize() - context->GetNbBankChannels();
     }
+    DAW::SetExtState("FP_TRACK_OFFSET", std::to_string(track_offset), false);
     UpdateMixerPosition();
 }
 
@@ -379,6 +382,7 @@ void CSurf_FP_8_Navigator::DecrementOffset(const int count) {
     } else {
         track_offset = 0;
     }
+    DAW::SetExtState("FP_TRACK_OFFSET", std::to_string(track_offset), false);
     UpdateMixerPosition();
 }
 
@@ -388,6 +392,7 @@ void CSurf_FP_8_Navigator::HandlePanEncoderChange(const int value) {
     }
     if (!hasBit(value, 6) && track_offset < tracks.GetSize() - context->GetNbChannels()) {
         track_offset += 1;
+        DAW::SetExtState("FP_TRACK_OFFSET", std::to_string(track_offset), false);
     }
 }
 
