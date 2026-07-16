@@ -50,7 +50,7 @@ class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-in
     bool setting_filter_custom_color;
     bool setting_filter_project_filters;
     bool setting_use_automation_colors;
-    int setting_automation_trim_color[6] = {0xff66ff, 0xff6666, 0x6666ff, 0x66ff66, 0xff66ff, 0xff66ff};
+    std::array<int, 6> setting_automation_colors;
     std::vector<std::string> setting_automation_trim_labels = {
         "Latch",
         "Trim",
@@ -549,12 +549,11 @@ public:
                 RenderInfoCheckbox(
                     m_ctx,
                     assets,
-                    i18n->t("settings", "overwrite-timecode.label"),
+                    i18n->t("settings", "use-automation-color.label"),
                     &setting_use_automation_colors,
-                    i18n->t("settings", "overwrite-timecode.tooltip"));
+                    i18n->t("settings", "use-automation-color.tooltip"));
 
                 ImGui::BeginDisabled(m_ctx, !setting_use_automation_colors);
-                ImGui::Text(m_ctx, "Automation Button Colors");
                 ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + 26);
                 for (int i = 0; i < 6; i++) {
                     ImGui::BeginGroup(m_ctx);
@@ -562,7 +561,7 @@ public:
                         m_ctx,
                         assets,
                         setting_automation_trim_labels[i],
-                        &setting_automation_trim_color[i],
+                        &setting_automation_colors[i],
                         prev_automation_trim_color,
                         plugin_color_palette,
                         50,
@@ -847,10 +846,12 @@ public:
         settings->SetSetting("surface", "fader-reset", setting_fader_reset);
         settings->SetSetting("surface", "mute-solo-momentary", setting_momentary_mute_solo);
         settings->SetSetting("surface", "overwrite-time-code", setting_overwrite_time_code);
-        settings->SetSetting("surface", "latch-preview-action", setting_latch_preview_action_enable);
         settings->SetSetting("surface", "track-color-brightness", setting_track_color_brightness);
+        settings->SetSetting("surface", "latch-preview-action", setting_latch_preview_action_enable);
         settings->SetSetting("surface", "latch-preview-action-code",
                              latch_preview_action_indexes[setting_latch_preview_action]);
+        settings->SetSetting("surface", "use-automation-colors", setting_use_automation_colors);
+        settings->SetSetting("surface", "automation-colors", join(setting_automation_colors, ","));
         settings->SetSetting("surface", "time-code", time_code_indexes[setting_time_code]);
         settings->SetSetting("surface", "plugin-step-size", setting_plugin_step_size);
         settings->SetSetting("surface", "plugin-map-param-clear", setting_plugin_map_param_clear);
@@ -859,9 +860,9 @@ public:
         settings->SetSetting("surface", "mute-master-on-fwd-rwd", setting_mute_master_on_fwd_rwd);
         settings->SetSetting("surface", "use-automation-colors", setting_use_automation_colors);
         settings->SetSetting("displays", "track", setting_track_display);
-        settings->SetSetting("displays", "track-lines", joinDisplayValues(setting_track_value_line_value, ","));
-        settings->SetSetting("displays", "track-alignment", joinDisplayValues(setting_track_value_line_align, ","));
-        settings->SetSetting("displays", "track-invert", joinDisplayValues(setting_track_value_line_invert, ","));
+        settings->SetSetting("displays", "track-lines", join(setting_track_value_line_value, ","));
+        settings->SetSetting("displays", "track-alignment", join(setting_track_value_line_align, ","));
+        settings->SetSetting("displays", "track-invert", join(setting_track_value_line_invert, ","));
         settings->SetSetting("displays", "track-value-bar-mode", setting_track_valuebar_mode);
         settings->SetSetting("displays", "track-value-bar-value", setting_track_valuebar_value);
         settings->SetSetting("surface", "reasonus-color-palette", join(settings_plugin_color_palette, ","));
@@ -897,6 +898,8 @@ public:
         setting_momentary_mute_solo = settings->GetMuteSoloMomentary();
         setting_overwrite_time_code = settings->GetOverwriteTimeCode();
         setting_latch_preview_action_enable = settings->GetLatchPreviewActionEnabled();
+        setting_use_automation_colors = settings->UseAutomationColors();
+        setting_automation_colors = settings->GetAutomationColorsArray();
         setting_plugin_step_size = settings->GetpluginStepSize();
         setting_track_color_brightness = settings->GetTrackColorBrightness();
         setting_plugin_map_param_clear = settings->ShouldClearParamInput();
@@ -938,15 +941,5 @@ public:
                 std::distance(time_code_indexes, time_code_iterator)
             );
         }
-    }
-
-    static std::string joinDisplayValues(const std::array<int, 4> list, const std::string &delimiter) {
-        std::string result;
-
-        for (int i = 0; i < static_cast<int>(sizeof(list) / sizeof(list[0])); i++) {
-            result += (i > 0 ? delimiter : "") + std::to_string(list[i]);
-        }
-
-        return result;
     }
 };

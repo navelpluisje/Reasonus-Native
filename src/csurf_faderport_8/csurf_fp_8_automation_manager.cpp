@@ -73,12 +73,36 @@ class CSurf_FP_8_AutomationManager {
             writeButton->SetColor(ButtonColorBlack, force);
             readButton->SetColor(ButtonColorBlack, force);
         } else {
-            latchButton->SetColor(ButtonColorPurple, force);
-            trimButton->SetColor(ButtonColorWhite, force);
-            offButton->SetColor(ButtonColorBlue, force);
-            touchButton->SetColor(ButtonColorYellow, force);
-            writeButton->SetColor(ButtonColorRed, force);
-            readButton->SetColor(ButtonColorGreen, force);
+            latchButton->SetColor(settings->GetAutomationColor(
+                                      AUTOMATION_BUTTON_LATCH,
+                                      ButtonColorPurple.GetColor()),
+                                  force
+            );
+            trimButton->SetColor(settings->GetAutomationColor(
+                                     AUTOMATION_BUTTON_TRIM,
+                                     ButtonColorWhite.GetColor()),
+                                 force
+            );
+            offButton->SetColor(settings->GetAutomationColor(
+                                    AUTOMATION_BUTTON_OFF,
+                                    ButtonColorBlue.GetColor()),
+                                force
+            );
+            touchButton->SetColor(settings->GetAutomationColor(
+                                      AUTOMATION_BUTTON_TOUCH,
+                                      ButtonColorYellow.GetColor()),
+                                  force
+            );
+            writeButton->SetColor(settings->GetAutomationColor(
+                                      AUTOMATION_BUTTON_WRITE,
+                                      ButtonColorRed.GetColor()),
+                                  force
+            );
+            readButton->SetColor(settings->GetAutomationColor(
+                                     AUTOMATION_BUTTON_READ,
+                                     ButtonColorGreen.GetColor()),
+                                 force
+            );
         }
     }
 
