@@ -20,6 +20,7 @@ class ReaSonusComboInput {
     int hovered_item = -1;
     int active_item = -1;
     double width = 0.0;
+    bool show_tooltip = false;
 
 public:
     ReaSonusComboInput(
@@ -29,9 +30,10 @@ public:
         std::string idx,
         const std::vector<std::string> &list,
         int *selected_item,
-        const double width = 0.0
+        const double width = 0.0,
+        const bool show_tooltip = false
     ) : m_ctx(m_ctx), assets(assets), label(std::move(label)), id(std::move(idx)), list(list),
-        selected_item(selected_item), width(width) {
+        selected_item(selected_item), width(width), show_tooltip(show_tooltip) {
     }
 
     ~ReaSonusComboInput() = default;
@@ -75,6 +77,28 @@ public:
                         nullptr,
                         nullptr
                     );
+
+                    if (show_tooltip) {
+                        if (ImGui::BeginItemTooltip(m_ctx)) {
+                            if (ImGui::BeginChild(
+                                m_ctx,
+                                list[i].c_str(),
+                                0.0,
+                                0.0,
+                                ImGui::ChildFlags_AutoResizeY |
+                                ImGui::ChildFlags_AutoResizeX
+                            )) {
+                                ImGui::PushTextWrapPos(m_ctx, 350);
+                                ImGui::PushFont(m_ctx, assets->GetMainFont(), 13);
+                                ImGui::Text(m_ctx, list[i].c_str());
+                                ImGui::PopFont(m_ctx);
+                                ImGui::PopTextWrapPos(m_ctx);
+
+                                ImGui::EndChild(m_ctx);
+                            }
+                            ImGui::EndTooltip(m_ctx);
+                        }
+                    }
                 }
                 UiStyledElements::PopReaSonusListBoxStyle(m_ctx);
                 ImGui::EndCombo(m_ctx);
@@ -184,7 +208,8 @@ public:
         const std::string &id,
         const std::vector<std::string> &list,
         int *selected_item,
-        std::string tooltip
+        std::string tooltip,
+        const bool show_tooltip = false
     ) : m_ctx(m_ctx), assets(assets), label(label), id(id), list(list), selected_item(selected_item),
         tooltip(std::move(tooltip)) {
         combo_input = new ReaSonusComboInput(
@@ -194,7 +219,8 @@ public:
             id,
             list,
             selected_item,
-            -20.0
+            -20.0,
+            show_tooltip
         );
     }
 

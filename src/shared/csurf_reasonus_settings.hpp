@@ -92,6 +92,7 @@ class ReaSonusSettings {
         {"functions", "15", "0"},
         {"functions", "16", "0"},
         {"filters", "nb-filters", "0"},
+        {"filters", "use-custom-color", "0"},
     };
 
 public:
@@ -264,6 +265,8 @@ public:
 
     std::vector<std::string> GetFilterKeys();
 
+    bool UseFilterColor();
+
     void UpdateFilter(const std::string &key, const mINI::INIMap<std::string> &filter);
 
     void UpdateFilterOrder(const std::vector<std::string> &keys);
@@ -273,6 +276,8 @@ public:
     std::string GetFilterKeyByIndex(int index);
 
     std::vector<std::string> GetFilterNames();
+
+    std::vector<int> GetFilterColors();
 
     mINI::INIMap<std::string> GetFilter(const std::string &key);
 

@@ -64,9 +64,6 @@ void ReaSonusMessage::Loop() {
 }
 
 void ReaSonusMessage::Frame() {
-    double width;
-    double height;
-
     if (close_clicked) {
         close_clicked = false;
         Stop();
@@ -96,8 +93,7 @@ void ReaSonusMessage::Frame() {
         if (ImGui::BeginChild(m_ctx, "actions_container", 0.0, 0.0,
                               ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY)) {
             ReaSonusPageTitle(m_ctx, assets, "ReaSonus Native New Version: " + std::string(GIT_VERSION), false);
-            ImGui::GetContentRegionAvail(m_ctx, &width, &height);
-            ImGui::PushTextWrapPos(m_ctx, width - 24);
+            ImGui::PushTextWrapPos(m_ctx, 0.0);
 
             ImGui::Text(m_ctx, "This release is a bugfix release: ");
             ImGui::BulletText(

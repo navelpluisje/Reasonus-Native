@@ -10,6 +10,7 @@
 struct Filter {
     std::string name;
     std::string id;
+    int color;
 };
 
 class CSurf_FP_8_FilterManager : public CSurf_FP_8_ChannelManager {
@@ -25,7 +26,11 @@ protected:
 
         for (int i = 0; i < nbFilters; i++) {
             const std::string filterId = ini["filters"][std::to_string(i)];
-            const Filter filter{ini[filterId]["name"], filterId};
+            const Filter filter{
+                ini[filterId]["name"],
+                filterId,
+                ini[filterId].has("color") ? stoi(ini[filterId]["color"]) : 0x00ffffff
+            };
             filters.push_back(filter);
         }
     }
@@ -78,14 +83,21 @@ public:
             std::string strPan1;
             std::string strPan2;
 
-            CSurf_FP_8_Track *track = tracks.at(i);
+            const CSurf_FP_8_Track *track = tracks.at(i);
             MediaTrack *media_track = media_tracks.Get(i);
-            SetTrackColors(media_track, navigator->HasFilter(filter_index));
+            const bool filterExist = filter_index < static_cast<int>(filters.size());
+
+            // If the existing slot has a filter and use filter color is set to true, use the filter color. Black otherwise
+            if (settings->UseFilterColor() && filterExist) {
+                color.SetColor(filters[filter_index].color, false);
+            } else {
+                color.SetColor(ButtonColorBlack);
+            }
 
             GetFaderValue(media_track, &fader_value, &valuebar_value, &strPan1, &strPan2);
 
             track->SetTrackColor(color);
-            track->SetSelectButtonValue(BTN_VALUE_ON, force_update);
+            track->SetSelectButtonValue(filterExist ? BTN_VALUE_ON : BTN_VALUE_OFF, force_update);
             track->SetMuteButtonValue(DAW::IsTrackMuted(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, force_update);
             track->SetSoloButtonValue(DAW::IsTrackSoloed(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, force_update);
             track->SetFaderValue(fader_value, force_update);
