@@ -44,6 +44,7 @@ class CSurf_FaderPort : public IReaperControlSurface {
   CSurf_FP_8_Track *lastTouchedFxTrack;
 
   DWORD surface_update_lastrun;
+  int last_published_offset = -12345;
   DWORD surface_update_keepalive;
   DWORD surface_update_settings_check;
 
@@ -433,6 +434,15 @@ public:
           DAW::SetExtState(EXT_STATE_KEY_SAVED_SETTINGS, EXT_STATE_VALUE_FALSE, false);
         }
       }
+    }
+
+    // Publish the surface's current bank offset whenever it changed during
+    // this cycle, regardless of which code path changed it. Lets external
+    // tools (e.g. ReaScripts) follow the surface's banking exactly.
+    const int current_offset = trackNavigator->GetOffset();
+    if (current_offset != last_published_offset) {
+      DAW::SetExtState("FP_TRACK_OFFSET", std::to_string(current_offset), false);
+      last_published_offset = current_offset;
     }
   }
 
