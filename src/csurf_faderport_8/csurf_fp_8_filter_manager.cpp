@@ -113,7 +113,7 @@ public:
             if (settings->UseFilterColor() && filterExist) {
                 color.SetColor(filters[filter_index].color, false);
             } else {
-                color.SetColor(ButtonColorWhite);
+                color.SetColor(ButtonColorBlack);
             }
 
             GetFaderValue(media_track, &fader_value, &valuebar_value, &strPan1, &strPan2);
