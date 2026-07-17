@@ -274,42 +274,67 @@ public:
         if (ImGui::BeginTabItem(m_ctx, i18n->t("settings", "tab.global").c_str())) {
             selected_tab = 0;
             ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 16);
-            ImGui::GetContentRegionAvail(m_ctx, &width, &height);
 
+            UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
             if (ImGui::BeginChild(
                 m_ctx,
-                "language-select",
-                -1 * language_button_width,
+                "language-container",
                 0.0,
-                ImGui::ChildFlags_None | ImGui::ChildFlags_AutoResizeY
+                0.0,
+                ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
             )) {
-                language_select_combo->Render();
+                ImGui::GetContentRegionAvail(m_ctx, &width, &height);
+                if (ImGui::BeginChild(
+                    m_ctx,
+                    "language-select",
+                    -1 * language_button_width,
+                    0.0,
+                    ImGui::ChildFlags_None | ImGui::ChildFlags_AutoResizeY
+                )) {
+                    language_select_combo->Render();
 
-                ImGui::EndChild(m_ctx);
-            }
-
-            ImGui::SameLine(m_ctx);
-
-            if (ImGui::BeginChild(
-                m_ctx,
-                "language-action",
-                0.0,
-                0.0,
-                ImGui::ChildFlags_None | ImGui::ChildFlags_AutoResizeY
-            )) {
-                ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 22);
-                UiStyledElements::PushReaSonusButtonOutlineStyle(m_ctx, assets->GetMainFontBold());
-
-                if (ImGui::Button(m_ctx, i18n->t("settings", "language.button.label").c_str())) {
-                    edit_language = true;
+                    ImGui::EndChild(m_ctx);
                 }
 
-                UiStyledElements::PopReaSonusButtonOutlineStyle(m_ctx);
+                ImGui::SameLine(m_ctx);
 
+                if (ImGui::BeginChild(
+                    m_ctx,
+                    "language-action",
+                    0.0,
+                    0.0,
+                    ImGui::ChildFlags_None | ImGui::ChildFlags_AutoResizeY
+                )) {
+                    ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 22);
+                    UiStyledElements::PushReaSonusButtonOutlineStyle(m_ctx, assets->GetMainFontBold());
+
+                    if (ImGui::Button(m_ctx, i18n->t("settings", "language.button.label").c_str())) {
+                        edit_language = true;
+                    }
+
+                    UiStyledElements::PopReaSonusButtonOutlineStyle(m_ctx);
+
+                    ImGui::EndChild(m_ctx);
+                }
                 ImGui::EndChild(m_ctx);
             }
+            UiStyledElements::PopReaSonusGroupStyle(m_ctx);
 
-            if (ImGui::BeginChild(m_ctx, "global-left-column", width / 2 - 8, 0.0, ImGui::ChildFlags_None)) {
+            UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
+            if (ImGui::BeginChild(
+                m_ctx,
+                "global-left-column",
+                width / 2 - 8,
+                0.0,
+                ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
+            )) {
+                ReaSonusPageTitle(
+                    m_ctx,
+                    assets,
+                    i18n->t("settings", "global-group.label"),
+                    true
+                );
+
                 RenderInfoCheckbox(
                     m_ctx,
                     assets,
@@ -328,6 +353,7 @@ public:
 
                 ImGui::EndChild(m_ctx);
             }
+            UiStyledElements::PopReaSonusGroupStyle(m_ctx);
 
             ImGui::SameLine(m_ctx);
 
@@ -598,7 +624,21 @@ public:
             ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 16);
             ImGui::GetContentRegionAvail(m_ctx, &width, &height);
 
-            if (ImGui::BeginChild(m_ctx, "settings-display", width / 2 - 8, 0.0, ImGui::ChildFlags_None)) {
+            UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
+            if (ImGui::BeginChild(
+                m_ctx,
+                "settings-display",
+                width / 2 - 8,
+                0.0,
+                ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
+            )) {
+                ReaSonusPageTitle(
+                    m_ctx,
+                    assets,
+                    i18n->t("settings", "plugin-control-group.label"),
+                    true
+                );
+
                 RenderInfoCheckbox(
                     m_ctx,
                     assets,
@@ -625,10 +665,25 @@ public:
 
                 ImGui::EndChild(m_ctx);
             }
+            UiStyledElements::PopReaSonusGroupStyle(m_ctx);
 
             ImGui::SameLine(m_ctx);
-            ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + 16);
-            if (ImGui::BeginChild(m_ctx, "settings-colors", width / 2 - 8, 0.0, ImGui::ChildFlags_None)) {
+
+            UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
+            if (ImGui::BeginChild(
+                m_ctx,
+                "settings-colors",
+                0.0,
+                0.0,
+                ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
+            )) {
+                ReaSonusPageTitle(
+                    m_ctx,
+                    assets,
+                    i18n->t("settings", "plugin-mapping-group.label"),
+                    true
+                );
+
                 RenderInfoCheckbox(
                     m_ctx,
                     assets,
@@ -640,6 +695,7 @@ public:
 
                 ImGui::EndChild(m_ctx);
             }
+            UiStyledElements::PopReaSonusGroupStyle(m_ctx);
 
             ImGui::EndTabItem(m_ctx);
         }
@@ -692,7 +748,7 @@ public:
             if (ImGui::BeginChild(
                 m_ctx,
                 "settings-display",
-                width / 1.75 - 8,
+                width / 1.85 - 8,
                 0.0,
                 ImGui::ChildFlags_None,
                 ImGui::ChildFlags_AutoResizeY
