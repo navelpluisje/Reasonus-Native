@@ -206,6 +206,7 @@ protected:
         DirtyCheck();
         filter_type = type;
         previous_selected_filter = -1;
+        selected_filter = 0;
         SetFiltersKeys();
     }
 
@@ -448,30 +449,39 @@ public:
         if (selected_filter != previous_selected_filter) {
             selected = previous_selected_filter;
         }
-        const std::string filter_key = filter_keys[selected];
 
-        mINI::INIMap<std::string> filter;
-        if (filter_type == 0) {
-            filter = settings->GetFilter(filter_key);
-        } else {
-            filter = project_state->GetFilter(filter_key);
+        const bool filter_in_range = selected_filter < static_cast<int>(filter_keys.size());
+
+        if (filter_in_range) {
+            mINI::INIMap<std::string> filter;
+            const std::string filter_key = filter_keys[selected];
+
+            if (filter_type == 0) {
+                filter = settings->GetFilter(filter_key);
+            } else {
+                filter = project_state->GetFilter(filter_key);
+            }
+
+            filter["name"] = filter_name;
+            filter["text"] = join(filter_text, ",");
+            filter["color"] = std::to_string(filter_color);
+            filter["case-insensitive"] = filter_case_insensitive ? "1" : "0";
+            filter["sibblings"] = filter_siblings ? "1" : "0";
+            filter["parents"] = filter_parents ? "1" : "0";
+            filter["children"] = filter_children ? "1" : "0";
+            filter["top-level"] = filter_top_level ? "1" : "0";
+            filter["match-multiple"] = filter_match_multiple ? "1" : "0";
+
+            if (filter_type == 0) {
+                settings->UpdateFilter(filter_key, filter);
+            } else {
+                project_state->UpdateFilter(filter_key, filter);
+            }
         }
 
-        filter["name"] = filter_name;
-        filter["text"] = join(filter_text, ",");
-        filter["color"] = std::to_string(filter_color);
-        filter["case-insensitive"] = filter_case_insensitive ? "1" : "0";
-        filter["sibblings"] = filter_siblings ? "1" : "0";
-        filter["parents"] = filter_parents ? "1" : "0";
-        filter["children"] = filter_children ? "1" : "0";
-        filter["top-level"] = filter_top_level ? "1" : "0";
-        filter["match-multiple"] = filter_match_multiple ? "1" : "0";
-
         if (filter_type == 0) {
-            settings->UpdateFilter(filter_key, filter);
             settings->UpdateFilterOrder(filter_keys);
         } else {
-            project_state->UpdateFilter(filter_key, filter);
             project_state->UpdateFilterOrder(filter_keys);
         }
 
