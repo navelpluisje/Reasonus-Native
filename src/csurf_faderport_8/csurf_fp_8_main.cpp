@@ -391,6 +391,8 @@ public:
   }
 
   void Run() override {
+    DWORD const now = GetTickCount();
+
     if (m_midiin != nullptr) {
       m_midiin->SwapBufsPrecise(GetTickCount(), 0.0);
       int l = 0;
@@ -402,8 +404,15 @@ public:
       }
     }
 
+    /**
+     * Every now and then we check in we're still in the same project
+     */
+    if ((now - surface_update_keepalive) >= 990) {
+      CheckProjectChange();
+    }
+
+
     if (m_midiout != nullptr) {
-      DWORD const now = GetTickCount();
       if ((now - surface_update_lastrun) >= 10) {
         const bool force_update = (now - surface_update_lastrun) >= 2000;
 
@@ -431,8 +440,8 @@ public:
       if ((now - surface_update_keepalive) >= 990) {
         surface_update_keepalive = now;
         m_midiout->Send(0xa0, 0x00, 0x00, -1);
-        CheckProjectChange();
       }
+      CheckProjectChange();
 
       /**
        * every 1500 ms we check if the settings have been saved.

@@ -20,10 +20,10 @@ void ProjectState::LoadProjectState() {
 void ProjectState::ReadProjectState(mINI::INIStructure &data) const {
     // Read all the available data from the project state.
     data["filters"];
-    data["filters"]["nb-filters"] = GetProjectState("filters-nb-filters", "0");
+    data["filters"]["nb-filters"] = GetProjectState("FILTERS_NB_FILTERS", "0");
 
     if (stoi(data["filters"]["nb-filters"]) > 0) {
-        const std::vector<std::string> keys = split(GetProjectState("filters-keys", ""), ",");
+        const std::vector<std::string> keys = split(GetProjectState("FILTERS_KEYS", ""), ",");
 
         for (int i = 0; i < static_cast<int>(keys.size()); i++) {
             std::string const &filter_key = keys.at(i);
@@ -61,7 +61,6 @@ std::string ProjectState::GetProjectState(const std::string &key, std::string de
     if (GetProjExtState(nullptr, project_state_key.c_str(), key.c_str(), buffer, sizeof buffer) == 0) {
         return default_value;
     }
-
     std::string value = buffer;
     return value;
 }
@@ -93,8 +92,8 @@ bool ProjectState::StoreProjectState() {
             const auto filter = project_state[key];
             SetProjectState(key, CreateProjectStateFilter(filter));
         }
-        SetProjectState("filters-keys", join(keys, ","));
-        SetProjectState("filters-nb-filters", static_cast<int>(keys.size()));
+        SetProjectState("FILTERS_KEYS", join(keys, ","));
+        SetProjectState("FILTERS_NB_FILTERS", static_cast<int>(keys.size()));
 
         Main_SaveProject(nullptr, false);
         previous_project_state = project_state;
@@ -115,7 +114,7 @@ void ProjectState::ReloadProjectState() {
  * @return int The index of the newly created filter
  */
 int ProjectState::AddNewFilter(const std::string &filter_name) {
-    const std::string newKey = GenerateUniqueKey("filter_");
+    const std::string newKey = toUpperCase(GenerateUniqueKey("FILTER_"));
     // Need to check how to save this
 
     project_state["filters"][project_state["filters"]["nb-filters"]] = newKey;
