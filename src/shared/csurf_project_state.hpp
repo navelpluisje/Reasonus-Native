@@ -10,7 +10,7 @@ class ProjectState {
     // Private Constructor
     explicit ProjectState();
 
-    const std::string project_state_key = "ReaSonus";
+    const std::string project_state_key = "REASONUS";
 
     mINI::INIStructure project_state;
     mINI::INIStructure previous_project_state;
