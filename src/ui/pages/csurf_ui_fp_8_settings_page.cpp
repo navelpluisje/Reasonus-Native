@@ -230,7 +230,7 @@ public:
         language_select_combo = new ReaSonusInfoComboInputRow(
             m_ctx,
             assets,
-            i18n->t("settings", "language.label"),
+            "##" + i18n->t("settings", "language.label"),
             "language-select",
             language_names,
             &setting_language,
@@ -268,7 +268,8 @@ public:
         const int language_button_width = getButtonWidth(
             m_ctx,
             i18n->t("settings", "language.button.label"),
-            assets->GetMainFontBold());
+            assets->GetMainFontBold()
+        );
 
         UiStyledElements::PushReaSonusTabStyle(m_ctx, selected_tab == 0);
         if (ImGui::BeginTabItem(m_ctx, i18n->t("settings", "tab.global").c_str())) {
@@ -284,6 +285,14 @@ public:
                 ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
             )) {
                 ImGui::GetContentRegionAvail(m_ctx, &width, &height);
+
+                ReaSonusPageTitle(
+                    m_ctx,
+                    assets,
+                    i18n->t("settings", "language.label"),
+                    true
+                );
+
                 if (ImGui::BeginChild(
                     m_ctx,
                     "language-select",
@@ -305,17 +314,16 @@ public:
                     0.0,
                     ImGui::ChildFlags_None | ImGui::ChildFlags_AutoResizeY
                 )) {
-                    ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 22);
                     UiStyledElements::PushReaSonusButtonOutlineStyle(m_ctx, assets->GetMainFontBold());
 
                     if (ImGui::Button(m_ctx, i18n->t("settings", "language.button.label").c_str())) {
                         edit_language = true;
                     }
-
                     UiStyledElements::PopReaSonusButtonOutlineStyle(m_ctx);
 
                     ImGui::EndChild(m_ctx);
                 }
+
                 ImGui::EndChild(m_ctx);
             }
             UiStyledElements::PopReaSonusGroupStyle(m_ctx);
@@ -413,7 +421,6 @@ public:
 
                 ImGui::EndChild(m_ctx);
             }
-
             ImGui::EndTabItem(m_ctx);
         }
         UiStyledElements::PopReaSonusTabStyle(m_ctx);
@@ -460,6 +467,17 @@ public:
                         &setting_fader_reset,
                         i18n->t("settings", "fader-reset.tooltip")
                     );
+
+                    RenderinfoIntInput(
+                        m_ctx,
+                        assets,
+                        i18n->t("settings", "track-color-brightness.label"),
+                        &setting_track_color_brightness,
+                        5,
+                        100,
+                        i18n->t("settings", "track-color-brightness.tooltip"),
+                        "%d%%");
+
                     ImGui::EndChild(m_ctx);
                 }
 
@@ -724,15 +742,13 @@ public:
                 display_line_alignment_combo[tab_index]->Render();
                 display_line_invert_combo[tab_index]->Render();
 
-                UiStyledElements::PopReaSonusGroupStyle(m_ctx);
                 ImGui::EndChild(m_ctx);
             }
+            UiStyledElements::PopReaSonusGroupStyle(m_ctx);
 
-            UiStyledElements::PopReaSonusTabStyle(m_ctx);
             ImGui::EndTabItem(m_ctx);
-        } else {
-            UiStyledElements::PopReaSonusTabStyle(m_ctx);
         }
+        UiStyledElements::PopReaSonusTabStyle(m_ctx);
     }
 
     void RenderDisplayTab() {
@@ -748,7 +764,7 @@ public:
             if (ImGui::BeginChild(
                 m_ctx,
                 "settings-display",
-                width / 1.85 - 8,
+                width / 2 - 8,
                 0.0,
                 ImGui::ChildFlags_None,
                 ImGui::ChildFlags_AutoResizeY
@@ -761,10 +777,17 @@ public:
                     0.0,
                     ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
                 )) {
-                    ReaSonusImageComboInput(
+                    ReaSonusPageTitle(
                         m_ctx,
                         assets,
                         i18n->t("settings", "display-track.label"),
+                        true
+                    );
+
+                    ReaSonusImageComboInput(
+                        m_ctx,
+                        assets,
+                        "##" + i18n->t("settings", "display-track.label"),
                         track_display_names,
                         &setting_track_display,
                         0.0
@@ -778,17 +801,21 @@ public:
                         ImGui::ChildFlags_None | ImGui::ChildFlags_AutoResizeY
                     )) {
                         UiStyledElements::PushReaSonusTabBarStyle(m_ctx);
-                        if (ImGui::BeginTabBar(m_ctx, "SettingsDisplayLinesTabs",
-                                               ImGui::TabBarFlags_None | ImGui::ChildFlags_AutoResizeY)) {
+                        if (ImGui::BeginTabBar(
+                            m_ctx,
+                            "SettingsDisplayLinesTabs",
+                            ImGui::TabBarFlags_None | ImGui::ChildFlags_AutoResizeY
+                        )) {
                             for (int i = 0; i < track_display_lines[setting_track_display]; i++) {
                                 RenderDisplayLineTab(i);
                             }
 
-                            UiStyledElements::PopReaSonusTabBarStyle(m_ctx);
                             ImGui::EndTabBar(m_ctx);
                         }
+                        UiStyledElements::PopReaSonusTabBarStyle(m_ctx);
                         ImGui::EndChild(m_ctx);
                     }
+
                     ImGui::Image(m_ctx, assets->GetValueBarType(setting_track_valuebar_mode), 76, 23);
 
                     ImGui::SameLine(m_ctx);
@@ -804,40 +831,33 @@ public:
                         value_bar_type_combo->Render();
                         value_bar_value_combo->Render();
 
-                        UiStyledElements::PopReaSonusGroupStyle(m_ctx);
                         ImGui::EndChild(m_ctx);
-                    } else {
-                        UiStyledElements::PopReaSonusGroupStyle(m_ctx);
                     }
+                    UiStyledElements::PopReaSonusGroupStyle(m_ctx);
 
-                    UiStyledElements::PopReaSonusGroupStyle(m_ctx);
                     ImGui::EndChild(m_ctx);
-                } else {
-                    UiStyledElements::PopReaSonusGroupStyle(m_ctx);
                 }
+                UiStyledElements::PopReaSonusGroupStyle(m_ctx);
 
                 ImGui::EndChild(m_ctx);
             }
 
             ImGui::SameLine(m_ctx);
 
-            ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + 16);
+            UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
             if (ImGui::BeginChild(
                 m_ctx,
                 "settings-colors",
-                width - width / 1.75 - 8,
                 0.0,
-                ImGui::ChildFlags_None
+                0.0,
+                ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
             )) {
-                RenderinfoIntInput(
+                ReaSonusPageTitle(
                     m_ctx,
                     assets,
-                    i18n->t("settings", "track-color-brightness.label"),
-                    &setting_track_color_brightness,
-                    5,
-                    100,
-                    i18n->t("settings", "track-color-brightness.tooltip"),
-                    "%d%%");
+                    i18n->t("settings", "time-code-group.label"),
+                    true
+                );
 
                 RenderInfoCheckbox(
                     m_ctx,
@@ -853,6 +873,7 @@ public:
 
                 ImGui::EndChild(m_ctx);
             }
+            UiStyledElements::PopReaSonusGroupStyle(m_ctx);
 
             ImGui::EndTabItem(m_ctx);
         }
