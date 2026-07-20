@@ -1,14 +1,14 @@
+#include "csurf_ui_plugin_mapping_converter.hpp"
 #include <filesystem>
 #include <fstream>
 #include <regex>
-#include "csurf_ui_plugin_mapping_converter.hpp"
 #include "../csurf_ui_colors.hpp"
 #include "../csurf_ui_vars.hpp"
-#include "../components/csurf_ui_page_title.hpp"
-#include "../components/csurf_ui_button_bar.hpp"
-#include "../components/csurf_ui_text_input.hpp"
-#include "../../shared/csurf_utils.hpp"
 #include "../../shared/csurf_plugin_utils.hpp"
+#include "../../shared/csurf_utils.hpp"
+#include "../components/csurf_ui_button_bar.hpp"
+#include "../components/csurf_ui_page_title.hpp"
+#include "../components/csurf_ui_text_input.hpp"
 
 constexpr auto g_name{"ReaSonus Native V2 Control Panel"};
 

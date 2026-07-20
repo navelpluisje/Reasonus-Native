@@ -2,6 +2,7 @@
 #define CSURF_FP_8_TRACK_MANAGER_C_
 
 #include <array>
+#include <regex>
 #include "csurf_fp_8_channel_manager.hpp"
 
 extern const int MOMENTARY_TIMEOUT;
@@ -399,6 +400,53 @@ public:
             if (touch_start[index] > 0) {
                 DAW::SetTrackVolume(media_track, DAW::GetTrackVolume(media_track));
             }
+        }
+        std::regex str_expr("ACT 0");
+        std::smatch matches;
+
+        if (value == 0) {
+            return;
+        }
+
+        /**
+         * Track has to be in READ mode as we then can read the actual value of the envelope
+         * On value 1 and touch automation is set to true and in READ mode,
+         *   - Get the current volume
+         *   - set automation mode to TRIM
+         *   - Get enevelope, or create an envelope
+         *   - Set a point
+         *
+         * On value 1 and touch automation is set to true and in READ mode
+         *   - Set point with new value
+         *   - set automation mode to READ again
+         */
+        TrackEnvelope *env = GetTrackEnvelopeByChunkName(media_track, "<VOLENV2");
+        if (env != nullptr) {
+            double position = GetPlayPosition();
+            bool sort = false;
+            InsertEnvelopePoint(env, position, DB2SLIDER(-30), 5, 0.5, true, &sort);
+
+            PreventUIRefresh(1);
+            char chunk[1024];
+            GetEnvelopeStateChunk(env, chunk, sizeof chunk, false);
+            std::string xx = chunk;
+            ShowConsoleMsg(chunk);
+            if (xx.rfind("ACT 0") != std::string::npos || xx.rfind("VIS 0") != std::string::npos) {
+                replace(xx, "ACT 0", "ACT 1");
+                replace(xx, "VIS 0", "VIS 1");
+
+                if (SetEnvelopeStateChunk(env, xx.c_str(), false)) {
+                    ShowConsoleMsg("\nSaved to RPP\n");
+                } else {
+                    ShowConsoleMsg("\nWhat happened\n");
+                }
+                Main_SaveProject(nullptr, false);
+            } else {
+                ShowConsoleMsg("No match\n");
+            }
+
+            UpdateArrange();
+            PreventUIRefresh(-1);
         }
     }
 
