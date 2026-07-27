@@ -34,7 +34,7 @@ void ProjectState::ReadProjectState(mINI::INIStructure &data) const {
             if (!filter.empty()) {
                 data[filter_key];
 
-                const std::vector<std::string> filter_parts = split(filter, "$");
+                const std::vector<std::string> filter_parts = split(filter, string_separator);
                 for (const std::string &filter_part: filter_parts) {
                     const std::vector<std::string> filter_value = split(filter_part, "=");
                     data[filter_key][filter_value[0]] = filter_value[1];
@@ -72,12 +72,12 @@ int ProjectState::GetNumberOfFilters() {
     return stoi(project_state["filters"]["nb-filters"]);
 }
 
-std::string CreateProjectStateFilter(const mINI::INIMap<std::string> &filter) { // NOLINT(*-use-internal-linkage)
+std::string CreateProjectStateFilter(const mINI::INIMap<std::string> &filter, const std::string &separator) { // NOLINT(*-use-internal-linkage)
     std::string result;
 
     for (auto const &[key, value]: filter) {
         if (!result.empty()) {
-            result += "$";
+            result += separator;
         }
         result += key + "=" + value;
     }
@@ -88,16 +88,18 @@ std::string CreateProjectStateFilter(const mINI::INIMap<std::string> &filter) { 
 bool ProjectState::StoreProjectState() {
     try {
         const std::vector<std::string> keys = GetFilterKeys();
+
         for (auto const &key: keys) {
             const auto filter = project_state[key];
-            SetProjectState(key, CreateProjectStateFilter(filter));
+            SetProjectState(key, CreateProjectStateFilter(filter, string_separator));
         }
+
         SetProjectState("FILTERS_KEYS", join(keys, ","));
         SetProjectState("FILTERS_NB_FILTERS", static_cast<int>(keys.size()));
 
         Main_SaveProject(nullptr, false);
         previous_project_state = project_state;
-        
+
         return true;
     } catch (...) {
         return false;
@@ -123,6 +125,7 @@ int ProjectState::AddNewFilter(const std::string &filter_name) {
     project_state[newKey];
     project_state[newKey]["name"] = filter_name;
     project_state[newKey]["text"] = "";
+    project_state[newKey]["color"] = std::to_string(0x00ffffff);
     project_state[newKey]["case-insensitive"] = "0";
     project_state[newKey]["sibblings"] = "0";
     project_state[newKey]["parents"] = "0";
@@ -172,7 +175,7 @@ void ProjectState::Removefilter(const std::string &key) {
     }
 
     // With setting an empty value, the setting will get deleted
-    SetProjectState(key, ""); // NOLINT(*-implicit-bool-conversion)
+    SetProjectState(key, std::string(""));
     UpdateFilterOrder(keys);
 }
 
