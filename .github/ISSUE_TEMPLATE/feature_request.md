@@ -6,6 +6,8 @@ labels: "enhancement"
 assignees: ""
 ---
 
+> Please be sure your request is not already made. You can check the issues to be sure
+
 **Is your feature request related to a problem? Please describe.**
 
 A clear and concise description of what the problem is.\

@@ -6,13 +6,29 @@ labels: "bug"
 assignees: ""
 ---
 
+> Please be sure your bug is not already reported by someone else.
+> You can check the issues to be sure
+
 **Describe the bug**
+
+> Be sure:
+> - your FaderPort is using the latest firmware and is in `Studio One`-mode
+> - The Faderports MIDI in and outputs are disabled
+
 A clear and concise description of what the bug is.
 
 **Operating System**
 
 - [ ] Windows 10
+- [ ] Windows 11
 - [ ] Mac OS
+
+**ReaSonus Version**
+
+> You can find the ReaSonus version by opening the ReaSonus Control panel.
+> You should see the version number in the bottom right corner.
+
+Version:
 
 **FaderPort Version**
 
