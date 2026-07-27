@@ -27,5 +27,6 @@ inline const char *EXT_STATE_SECTION = "ReaSonus";
 inline const char *EXT_STATE_KEY_SAVED_SETTINGS = "saved_settings";
 inline const char *EXT_STATE_KEY_UI_LANGUAGE = "language";
 inline const char *EXT_STATE_KEY_VERSION = "version";
+inline const char *FP_TRACK_OFFSET = "FP_TRACK_OFFSET";
 
 #endif

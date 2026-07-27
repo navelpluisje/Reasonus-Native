@@ -276,7 +276,7 @@ CSurf_FP_8_Navigator::CSurf_FP_8_Navigator(CSurf_Context *context) : context(con
     HandleAllTracksFilter();
     has_mute = false;
     has_solo = false;
-    DAW::SetExtState("FP_TRACK_OFFSET", std::to_string(track_offset), false);
+    PublishOffset();
 }
 
 MediaTrack *CSurf_FP_8_Navigator::GetTrackByIndex(const int index) {
@@ -340,7 +340,7 @@ void CSurf_FP_8_Navigator::SetOffset(const int offset) {
     } else {
         track_offset = offset;
     }
-    DAW::SetExtState("FP_TRACK_OFFSET", std::to_string(track_offset), false);
+    PublishOffset();
 }
 
 int CSurf_FP_8_Navigator::GetOffset() const {
@@ -372,7 +372,7 @@ void CSurf_FP_8_Navigator::IncrementOffset(const int count) {
     } else {
         track_offset = tracks.GetSize() - context->GetNbBankChannels();
     }
-    DAW::SetExtState("FP_TRACK_OFFSET", std::to_string(track_offset), false);
+    PublishOffset();
     UpdateMixerPosition();
 }
 
@@ -382,7 +382,7 @@ void CSurf_FP_8_Navigator::DecrementOffset(const int count) {
     } else {
         track_offset = 0;
     }
-    DAW::SetExtState("FP_TRACK_OFFSET", std::to_string(track_offset), false);
+    PublishOffset();
     UpdateMixerPosition();
 }
 
@@ -392,7 +392,7 @@ void CSurf_FP_8_Navigator::HandlePanEncoderChange(const int value) {
     }
     if (!hasBit(value, 6) && track_offset < tracks.GetSize() - context->GetNbChannels()) {
         track_offset += 1;
-        DAW::SetExtState("FP_TRACK_OFFSET", std::to_string(track_offset), false);
+        PublishOffset();
     }
 }
 
@@ -485,4 +485,14 @@ bool CSurf_FP_8_Navigator::HasFilter(const int filter_index) {
                selected_filters.end(),
                find(selected_filters.begin(), selected_filters.end(), filter_index)
            ) != 0;
+}
+
+void CSurf_FP_8_Navigator::PublishOffset() {
+    // Publish the surface's current bank offset whenever it changed during
+    // this cycle, regardless of which code path changed it. Lets external
+    // tools (e.g. ReaScripts) follow the surface's banking exactly.
+    if (track_offset != last_published_offset) {
+      DAW::SetExtState(FP_TRACK_OFFSET, current_offset, false);
+      last_published_offset = current_offset;
+    }
 }
