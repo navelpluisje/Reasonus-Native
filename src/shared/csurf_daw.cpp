@@ -831,6 +831,6 @@ void DAW::SetExtState(const std::string &key, const std::string &value, const bo
     ::SetExtState(EXT_STATE_SECTION, key.c_str(), value.c_str(), persist);
 }
 
-void DAW::SetExtState(const std::string &key, const int value, const bool persist) {
+void DAW::SetExtState(const std::string &key, const double value, const bool persist) {
     ::SetExtState(EXT_STATE_SECTION, key.c_str(), std::to_string(value).c_str(), persist);
 }

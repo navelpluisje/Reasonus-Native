@@ -808,12 +808,12 @@ public:
     static void SetExtState(const std::string &key, const std::string &value, bool persist);
 
     /**
-     * Set the value to the Ext state with the given key for integer values
+     * Set the value to the Ext state with the given key for double values
      * @param key The key to store the value under
-     * @param value The integer value to store
+     * @param value The double value to store
      * @param persist Set to true will store it persistent between projects. Otherwise, it will be stored for the current session
      */
-    static void SetExtState(const std::string &key, int value, bool persist);
+    static void SetExtState(const std::string &key, double value, bool persist);
 };
 
 #endif
