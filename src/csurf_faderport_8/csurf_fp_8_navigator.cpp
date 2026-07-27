@@ -1,6 +1,7 @@
 #include "csurf_fp_8_navigator.hpp"
 #include "../shared/csurf_daw.hpp"
 #include "csurf_fp_8_navigator_filters.hpp"
+#include "../shared/csurf.h"
 
 void CSurf_FP_8_Navigator::UpdateMixerPosition() {
     const WDL_PtrList<MediaTrack> bank = GetBankTracks();
@@ -492,7 +493,7 @@ void CSurf_FP_8_Navigator::PublishOffset() {
     // this cycle, regardless of which code path changed it. Lets external
     // tools (e.g. ReaScripts) follow the surface's banking exactly.
     if (track_offset != last_published_offset) {
-      DAW::SetExtState(FP_TRACK_OFFSET, current_offset, false);
-      last_published_offset = current_offset;
+      DAW::SetExtState(FP_TRACK_OFFSET, track_offset, false);
+      last_published_offset = track_offset;
     }
 }
