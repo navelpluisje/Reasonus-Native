@@ -401,8 +401,6 @@ public:
                 DAW::SetTrackVolume(media_track, DAW::GetTrackVolume(media_track));
             }
         }
-        std::regex str_expr("ACT 0");
-        std::smatch matches;
 
         if (value == 0) {
             return;

@@ -613,6 +613,12 @@ void DAW::SetTrackSendPan(MediaTrack *media_track, const int send, const double 
                            CSurf_OnSendPanChange(media_track, send, pan, false));
 }
 
+TrackEnvelope *DAW::GetTrackEnvelopeByChunkName(MediaTrack *media_track, std::string chunk_name) {
+    TrackEnvelope *env = ::GetTrackEnvelopeByChunkName(media_track, chunk_name.c_str());
+    if (env != nullptr) {
+    }
+}
+
 bool DAW::MediaItemHasMidi(MediaItem *media_item) {
     bool has_midi = false;
 
