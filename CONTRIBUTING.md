@@ -9,6 +9,23 @@ Please note there is
 a [Code of Conduct](https://github.com/navelpluisje/Reasonus-Native/blob/development/CODE_OF_CONDUCT.md), please
 follow it in all your interactions with the project.
 
+## Use of AI
+
+Use of AI is discoraged for the following reasons:
+
+- Writing you own code is more satisfying and you'll learn more by doing it yourself. If you run into issues during
+  developing, reach out via the issue you're trying to fix. I'm happy to try to help you further.
+- Environmental reasons. AI is super power hungry and therefor not beneficial to a better climate. Currently a single
+  Microsoft datacenter in the Netherlands is consuming over 1% of the countries power usage (and there are more data
+  centers then 1).
+- Ethical reasons. A lot of the LLM's are fed with data, code, music, art, literature etc., where they did not pay for.
+  Also no one knows how the data has been processed and if it is biased yes or no. We all know the big tech companies
+  were willing to support Trump financially, so beside stealing they also support a leader with autocratic and fascist
+  tendencies.
+- The upcoming move from Github to Codeberg (not in the short term as there are some technical difficulties).
+
+Of course it's up to you if you want to use AI yes or no, but I might decline pull request for this reason.
+
 ## Filing an Issue or requesting a feature
 
 1. Look for a similar issue or feature request that may already exist.
