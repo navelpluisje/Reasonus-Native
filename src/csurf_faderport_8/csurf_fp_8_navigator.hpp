@@ -65,7 +65,7 @@ class CSurf_FP_8_Navigator {
     WDL_PtrList<MediaTrack> tracks;
     bool has_solo;
     bool has_mute;
-    int last_published_offset = -12345;
+    int last_published_offset = -1;
     bool track_touched[16] = {
         false,
         false,
