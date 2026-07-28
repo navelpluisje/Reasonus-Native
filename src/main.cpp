@@ -24,6 +24,7 @@
 // ReSharper disable once CppUnusedIncludeDirective
 #include "resource.h"
 #include "shared/csurf.h"
+#include "shared/csurf_daw.hpp"
 
 extern reaper_csurf_reg_t
     csurf_faderport_8_reg,
@@ -125,11 +126,13 @@ extern "C" {
     reaper_plugin_info->Register("csurf", &csurf_faderport_8_reg);
     reaper_plugin_info->Register("csurf", &csurf_faderport_v2_reg);
 
-    const std::string version = GIT_VERSION;
-    const std::string name = "ReaSonus Native (" + version + ")";
-    plugin_register("ext_name", (void *) name.c_str());
-    plugin_register("ext_url", (void *) "https://navelpluisje.github.io/reasonus/");
-    plugin_register("ext_vendor", (void *) "Navelpluisje");
+    if (DAW::VersionHasFeature(FEATURE_EXTENSION_DATA)) {
+      const std::string version = GIT_VERSION;
+      const std::string name = "ReaSonus Native (" + version + ")";
+      plugin_register("ext_name", (void *) name.c_str());
+      plugin_register("ext_url", (void *) "https://navelpluisje.github.io/reasonus/");
+      plugin_register("ext_vendor", (void *) "Navelpluisje");
+    }
 
     return 1;
   }
