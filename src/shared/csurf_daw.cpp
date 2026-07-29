@@ -613,10 +613,50 @@ void DAW::SetTrackSendPan(MediaTrack *media_track, const int send, const double 
                            CSurf_OnSendPanChange(media_track, send, pan, false));
 }
 
-TrackEnvelope *DAW::GetTrackEnvelopeByChunkName(MediaTrack *media_track, std::string chunk_name) {
+TrackEnvelope *DAW::GetTrackEnvelopeByChunkName(
+    MediaTrack *media_track,
+    const std::string &chunk_name,
+    const double value
+) {
     TrackEnvelope *env = ::GetTrackEnvelopeByChunkName(media_track, chunk_name.c_str());
-    if (env != nullptr) {
+
+    /**
+     * No envelope found, so return nothing
+     */
+    if (env == nullptr) {
+        return nullptr;
     }
+
+    /**
+     * If the envelope has no points, we add the initial point
+     * We do need this this to overwrite the visibility and active flag.
+     * Without a point, an envelope is invalid and will never get set to active
+     */
+    const double position = GetPlayPosition();
+    bool sort = false;
+    if (CountEnvelopePoints(env) == 0) {
+        InsertEnvelopePoint(env, position, value, 5, 0.5, true, &sort);
+    }
+
+    /**
+     * Now we're going to read the envelope chunk and set visibility and active to true
+     */
+    char chunk[1024];
+    GetEnvelopeStateChunk(env, chunk, sizeof chunk, false);
+    std::string envelope_chunk = chunk;
+
+    // If Active or Visibe ois set to `0`, we set both to `1`
+    if (envelope_chunk.rfind("ACT 0") != std::string::npos || envelope_chunk.rfind("VIS 0") != std::string::npos) {
+        replace(envelope_chunk, "VIS 0", "VIS 1");
+        replace(envelope_chunk, "ACT 0", "ACT 1");
+
+        InsertEnvelopePoint(env, position, value, 5, 0.5, true, &sort);
+        if (!SetEnvelopeStateChunk(env, envelope_chunk.c_str(), false)) {
+            MB("Something went wrong while setting the envelope to visible and active", "ReaSonus Error", 0);
+        }
+    }
+
+    return env;
 }
 
 bool DAW::MediaItemHasMidi(MediaItem *media_item) {

@@ -4,6 +4,7 @@
 #include <array>
 #include <regex>
 #include "csurf_fp_8_channel_manager.hpp"
+#include "db2val.h"
 
 extern const int MOMENTARY_TIMEOUT;
 
@@ -402,7 +403,11 @@ public:
             }
         }
 
-        if (value == 0) {
+        // if (GetTrackAutomationMode(media_track) != AUTOMATION_SINGLE_TOUCH) {
+        //     return;
+        // }
+
+        if (value == 0 && single_touch_start[index] == nullptr) {
             return;
         }
 
@@ -418,33 +423,40 @@ public:
          *   - Set point with new value
          *   - set automation mode to READ again
          */
-        TrackEnvelope *env = GetTrackEnvelopeByChunkName(media_track, "<VOLENV2");
-        if (env != nullptr) {
-            double position = GetPlayPosition();
-            bool sort = false;
-            InsertEnvelopePoint(env, position, DB2SLIDER(-30), 5, 0.5, true, &sort);
+        if (single_touch_start[index] == nullptr) {
+            single_touch_start[index] = DAW::GetTrackEnvelopeByChunkName(
+                media_track,
+                "<VOLENV2",
 
-            PreventUIRefresh(1);
-            char chunk[1024];
-            GetEnvelopeStateChunk(env, chunk, sizeof chunk, false);
-            std::string xx = chunk;
-            ShowConsoleMsg(chunk);
-            if (xx.rfind("ACT 0") != std::string::npos || xx.rfind("VIS 0") != std::string::npos) {
-                replace(xx, "ACT 0", "ACT 1");
-                replace(xx, "VIS 0", "VIS 1");
+                DB2SLIDER(VAL2DB(DAW::GetTrackVolume(media_track)))
+            );
+        }
+        if (single_touch_start[index] == nullptr) {
+            ShowConsoleMsg("Still empty");
+        }
+        const double position = GetPlayPosition();
+        bool sort = false;
+        /**
+         * Get the default env shape:
+         *   - Get the value with ConfigVar and get the key `defenvs`
+         *   - Shift 16 bits (value >> 16)
+         *   - This should get the shape
+         *
+         * Add option to overwrite the default ion teh settings
+         * When bezier is chosen, add option for tension (try to make it vissible)
+         */
+        InsertEnvelopePoint(
+            single_touch_start[index],
+            position,
+            DB2SLIDER(VAL2DB(DAW::GetTrackVolume(media_track))),
+            5,
+            0.5,
+            true,
+            &sort
+        );
 
-                if (SetEnvelopeStateChunk(env, xx.c_str(), false)) {
-                    ShowConsoleMsg("\nSaved to RPP\n");
-                } else {
-                    ShowConsoleMsg("\nWhat happened\n");
-                }
-                Main_SaveProject(nullptr, false);
-            } else {
-                ShowConsoleMsg("No match\n");
-            }
-
-            UpdateArrange();
-            PreventUIRefresh(-1);
+        if (value == 0) {
+            single_touch_start[index] = nullptr;
         }
     }
 

@@ -16,6 +16,11 @@ protected:
     midi_Output *m_midiout;
     ReaSonusSettings *settings = ReaSonusSettings::GetInstance(FP_8);
 
+    std::array<TrackEnvelope *, 16> single_touch_start;
+    // bool single_touch_start[16] = {
+    //     false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false
+    // };
+
     ButtonColor color;
 
     virtual void SetTrackColors(MediaTrack *media_track, const bool is_selected, const bool has_arm = false) {
@@ -50,7 +55,8 @@ public:
         const std::vector<CSurf_FP_8_Track *> &tracks,
         CSurf_FP_8_Navigator *navigator,
         CSurf_Context *context,
-        midi_Output *m_midiout) : tracks(tracks), navigator(navigator), context(context), m_midiout(m_midiout) {
+        midi_Output *m_midiout
+    ) : tracks(tracks), navigator(navigator), context(context), m_midiout(m_midiout) {
     }
 
     virtual ~CSurf_FP_8_ChannelManager() {

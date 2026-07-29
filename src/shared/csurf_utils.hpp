@@ -31,6 +31,10 @@ constexpr int AUTOMATION_TOUCH = 2;
 constexpr int AUTOMATION_LATCH = 4;
 constexpr int AUTOMATION_PREVIEW = 5;
 constexpr int AUTOMATION_WRITE = 3;
+/**
+ * Giving it a fairly high number so it will 'never' interfere with REAPER
+ */
+constexpr int AUTOMATION_SINGLE_TOUCH = 99;
 
 struct ShiftState {
     bool active = false; // NOLINT(*-non-private-member-variables-in-classes)

@@ -692,11 +692,20 @@ public:
      */
     static void SetTrackSendPan(MediaTrack *media_track, int send, double pan);
 
-    /**************************************************************************************************************
-     *  Track Envelope methods
-     *************************************************************************************************************/
+    //**************************************************************************************************************
+    // *  Track Envelope methods
+    // *************************************************************************************************************/
 
-    static TrackEnvelope *GetTrackEnvelopeByChunkName(MediaTrack *media_track, std::string chunk_name);
+    /**
+     * Get the envelope with the given chunk name. Set it to visible and active it. If the envelope does not exist,
+     * it will be ceated and the value will be set to the given value
+     * @param media_track The track we want to get the envelope for
+     * @param chunk_name The chunk name for the envelope. This is the name as it is used in the RPP file
+     * @param value The base value to set if the envelope has to be created
+     * @return The envelope
+     */
+    static TrackEnvelope *GetTrackEnvelopeByChunkName(MediaTrack *media_track, const std::string &chunk_name,
+                                                      double value);
 
     /**************************************************************************************************************
      *  Project related methods
