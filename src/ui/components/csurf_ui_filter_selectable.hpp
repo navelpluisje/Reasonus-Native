@@ -15,6 +15,7 @@ static void ReaSonusFilterSelectable(
     const int filter_index,
     int *selected_filter,
     int *hovered_filter,
+    int *active_item,
     const std::function<void(int index)> &delete_callback,
     const std::function<void(int index)> &select_callbask
 ) {
@@ -75,12 +76,40 @@ static void ReaSonusFilterSelectable(
             ImGui::ChildFlags_FrameStyle
         )
     ) {
+        // This Invisible Button is needed to generate a proper active state.
+        // The child element does not have an active state
+        // When hovered and having the remove option, reduce the witdth as the invisible button is on top of the remove button
+        ImGui::InvisibleButton(
+            m_ctx,
+            ("invisible-button" + filter_name).c_str(),
+            width - (mouse_over && delete_callback != nullptr ? 40 : 0),
+            selectable_height
+        );
+
+        if (ImGui::IsItemActive(m_ctx)) {
+            if (active_item != nullptr) {
+                *active_item = filter_index;
+            }
+        } else {
+            if (active_item != nullptr) {
+                *active_item = -1;
+            }
+        }
+
+        if (ImGui::IsItemClicked(m_ctx, ImGui::MouseButton_Left)) {
+            *selected_filter = filter_index;
+
+            if (select_callbask != nullptr) {
+                select_callbask(filter_index);
+            }
+        }
+
         ImGui::DrawList_AddRectFilled(
             list,
             pos_screen_x + 4,
-            pos_screen_y + 4,
-            pos_screen_x + 24,
-            pos_screen_y + 24,
+            pos_screen_y + 6,
+            pos_screen_x + 20,
+            pos_screen_y + 22,
             filter_color,
             4
         );
@@ -88,7 +117,7 @@ static void ReaSonusFilterSelectable(
         ImGui::PushFont(m_ctx, assets->GetMainFont(), 13);
         ImGui::DrawList_AddText(
             list,
-            pos_screen_x + 30,
+            pos_screen_x + 28,
             pos_screen_y + 6,
             UI_COLORS::White,
             getTextOverflow(m_ctx, filter_name, width - (mouse_over ? 66 : 40)).c_str()
@@ -115,14 +144,6 @@ static void ReaSonusFilterSelectable(
 
     ImGui::PopStyleVar(m_ctx, 2);
     ImGui::PopStyleColor(m_ctx, 1);
-
-    if (ImGui::IsItemClicked(m_ctx, ImGui::MouseButton_Left)) {
-        *selected_filter = filter_index;
-
-        if (select_callbask != nullptr) {
-            select_callbask(filter_index);
-        }
-    }
 }
 
 #endif

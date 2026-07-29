@@ -120,6 +120,7 @@ class ReaSonusComboInputRow {
     int hovered_item = -1;
     int active_item = -1;
     double label_width = 0.0;
+    bool show_label = true;
 
 public:
     ReaSonusComboInputRow(
@@ -132,6 +133,9 @@ public:
         const double label_width = 0.0
     ) : m_ctx(m_ctx), assets(assets), label(label), id(id), list(list), selected_item(selected_item),
         label_width(label_width) {
+        if (label.rfind("##", 0) == 0) {
+            show_label = false;
+        }
     }
 
     ~ReaSonusComboInputRow() = default;
@@ -199,6 +203,7 @@ class ReaSonusInfoComboInputRow {
     int *selected_item;
     const std::string tooltip;
     ReaSonusComboInput *combo_input;
+    bool show_label = true;
 
 public:
     ReaSonusInfoComboInputRow(
@@ -212,6 +217,10 @@ public:
         const bool show_tooltip = false
     ) : m_ctx(m_ctx), assets(assets), label(label), id(id), list(list), selected_item(selected_item),
         tooltip(std::move(tooltip)) {
+        if (label.rfind("##", 0) == 0) {
+            show_label = false;
+        }
+
         combo_input = new ReaSonusComboInput(
             m_ctx,
             assets,
@@ -233,7 +242,7 @@ public:
 
         combo_input->Render();
         ImGui::SameLine(m_ctx);
-        ReaSonusTooltip(m_ctx, assets, tooltip, combo_id, -20, 26);
+        ReaSonusTooltip(m_ctx, assets, tooltip, combo_id, -20, show_label ? 26 : 4);
         ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 4);
         ImGui::Dummy(m_ctx, 0, 0);
     }

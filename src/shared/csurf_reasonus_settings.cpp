@@ -244,6 +244,48 @@ bool ReaSonusSettings::ShouldMuteMasterOnFwdRwd() {
     return stoi(settings["surface"]["mute-master-on-fwd-rwd"]) > 0;
 }
 
+bool ReaSonusSettings::UseAutomationColors() {
+    return settings["surface"]["use-automation-colors"] == "1";
+}
+
+std::vector<int> ReaSonusSettings::GetAutomationColors() {
+    return splitToInt(settings["surface"]["automation-colors"], ",");
+}
+
+std::array<int, 6> ReaSonusSettings::GetAutomationColorsArray() {
+    const std::vector<int> colors = splitToInt(settings["surface"]["automation-colors"], ",");
+    std::array<int, 6> result{};
+
+    for (int i = 0; i < 6; i++) {
+        result[i] = colors[i];
+    }
+    return result;
+}
+
+int ReaSonusSettings::GetAutomationColor(const AutomationButtonIndex &type, const int fallback) {
+    if (!UseAutomationColors()) {
+        return fallback;
+    }
+    const auto colors = splitToInt(settings["surface"]["automation-colors"], ",");
+
+    switch (type) {
+        case AUTOMATION_BUTTON_LATCH:
+            return colors[0];
+        case AUTOMATION_BUTTON_TRIM:
+            return colors[1];
+        case AUTOMATION_BUTTON_OFF:
+            return colors[2];
+        case AUTOMATION_BUTTON_TOUCH:
+            return colors[3];
+        case AUTOMATION_BUTTON_WRITE:
+            return colors[4];
+        case AUTOMATION_BUTTON_READ:
+            return colors[5];
+        default:
+            return stoi(automation_colors[1]);
+    }
+}
+
 /**
  * Settings for the FaderPort 2
  */
@@ -303,6 +345,10 @@ std::vector<std::string> ReaSonusSettings::GetFilterKeys() {
 
 bool ReaSonusSettings::UseFilterColor() {
     return settings["filters"]["use-custom-color"] == "1";
+}
+
+bool ReaSonusSettings::ProjectFiltersEnabled() {
+    return settings["filters"]["project-filters"] == "1";
 }
 
 void ReaSonusSettings::UpdateFilter(const std::string &key, const mINI::INIMap<std::string> &filter) {

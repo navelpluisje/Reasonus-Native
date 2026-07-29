@@ -3,9 +3,10 @@
 
 #include <vector>
 #include "csurf_fp_8_navigator.hpp"
-#include "csurf_fp_8_channel_manager_resources.hpp"
 #include "csurf_fp_8_track.hpp"
+#include "csurf_fp_8_channel_manager_resources.hpp"
 #include "../shared/csurf_reasonus_settings.hpp"
+#include "../shared/csurf_project_state.hpp"
 #include "../shared/csurf_daw.hpp"
 
 class CSurf_FP_8_ChannelManager {
@@ -15,6 +16,7 @@ protected:
     CSurf_Context *context;
     midi_Output *m_midiout;
     ReaSonusSettings *settings = ReaSonusSettings::GetInstance(FP_8);
+    ProjectState *project_state = ProjectState::GetInstance();
 
     std::array<TrackEnvelope *, 16> single_touch_start;
     // bool single_touch_start[16] = {

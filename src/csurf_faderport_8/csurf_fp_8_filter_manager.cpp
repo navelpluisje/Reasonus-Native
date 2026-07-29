@@ -4,8 +4,8 @@
 #include <utility>
 
 #include "csurf_fp_8_channel_manager.hpp"
-#include "../ui/windows/csurf_ui_fp_8_control_panel.hpp"
 #include "../shared/csurf_faderport_ui_imgui_utils.hpp"
+#include "../ui/windows/csurf_ui_fp_8_control_panel.hpp"
 
 struct Filter {
     std::string name;
@@ -18,23 +18,45 @@ class CSurf_FP_8_FilterManager : public CSurf_FP_8_ChannelManager {
     mINI::INIStructure ini;
     std::vector<Filter> filters;
 
-protected:
-    void GetFilters() {
-        const mINI::INIFile file(GetReaSonusIniPath(FP_8));
-        file.read(ini);
-        const int nbFilters = stoi(ini["filters"]["nb-filters"]);
+    void GetProjectFilters() {
+        ProjectState::GetInstance()->LoadProjectState();
+        const std::vector<std::string> filter_keys = ProjectState::GetInstance()->GetFilterKeys();
 
-        for (int i = 0; i < nbFilters; i++) {
-            const std::string filterId = ini["filters"][std::to_string(i)];
+        for (const std::string &key: filter_keys) {
+            const mINI::INIMap<std::string> filter_data = project_state->GetFilter(key);
+
             const Filter filter{
-                ini[filterId]["name"],
-                filterId,
-                ini[filterId].has("color") ? stoi(ini[filterId]["color"]) : 0x00ffffff
+                filter_data.get("name"),
+                key,
+                filter_data.has("color") ? stoi(filter_data.get("color")) : 0x00ffffff
             };
             filters.push_back(filter);
         }
     }
 
+    void GetSettingsFilters() {
+        const std::vector<std::string> filter_keys = settings->GetFilterKeys();
+
+        for (const std::string &key: filter_keys) {
+            const mINI::INIMap<std::string> filter_data = settings->GetFilter(key);
+
+            const Filter filter{
+                filter_data.get("name"),
+                key,
+                filter_data.has("color") ? stoi(filter_data.get("color")) : 0x00ffffff
+            };
+            filters.push_back(filter);
+        }
+    }
+
+    void GetFilters() {
+        if (settings->ProjectFiltersEnabled()) {
+            GetProjectFilters();
+        }
+        GetSettingsFilters();
+    }
+
+protected:
     static void GetFaderValue(
         MediaTrack *media_track,
         int *faderValue,

@@ -177,8 +177,14 @@ void CSurf_UI_FunctionKeysPage::RenderFunction(ImGui_Context *m_ctx, int index, 
     }
 }
 
-void CSurf_UI_FunctionKeysPage::RenderFunctionTab(std::string tab_label, FunctionTypes type, int tab_index,
-                                                  int start_index, int count, CSurf_UI_Assets *assets) {
+void CSurf_UI_FunctionKeysPage::RenderFunctionTab(
+    std::string tab_label,
+    FunctionTypes type,
+    int tab_index,
+    int start_index,
+    int count,
+    CSurf_UI_Assets *assets
+) {
     UiStyledElements::PushReaSonusTabStyle(m_ctx, selected_tab == tab_index);
     if (ImGui::BeginTabItem(m_ctx, tab_label.c_str())) {
         selected_tab = tab_index;
