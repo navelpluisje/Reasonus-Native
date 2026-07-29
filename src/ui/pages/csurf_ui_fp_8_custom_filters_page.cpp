@@ -506,6 +506,8 @@ public:
             ReaSonus8ControlPanel::SetMessage(i18n->t("filters", "action.save.message"));
             Reset();
         }
+
+        new_filter = false;
     }
 
     void SetPageProperty(const int type, const int value) override {
