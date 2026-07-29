@@ -38,6 +38,8 @@ class CSurf_FP_8_CustomFiltersPage : public CSurf_UI_PageContent {
     int previous_filter_color;
     int filter_type = 0;
 
+    bool new_filter = false;
+
 protected:
     void SetFiltersKeys() {
         filter_keys.clear();
@@ -135,7 +137,8 @@ protected:
 
     void DirtyCheck() {
         IsFilterDirty();
-        if (filter_dirty) {
+
+        if (filter_dirty || new_filter) {
             const int res = MB(
                 i18n->t("filters", "popup.unsaved.message").c_str(),
                 i18n->t("filters", "popup.unsaved.title").c_str(),
@@ -143,7 +146,12 @@ protected:
 
             if (res == 6) {
                 Save();
+            } else if (new_filter) {
+                // When a new filter was added, but user does not want to save it, we remove it from the list again
+                HandleRemoveFilterListItem(previous_selected_filter);
             }
+
+            new_filter = false;
         }
     }
 
@@ -151,6 +159,7 @@ protected:
         DirtyCheck();
         CreateFilter(new_filter_name);
         new_filter_name = "";
+        new_filter = true;
     }
 
     void HandleAddFilterText() {
@@ -183,12 +192,15 @@ protected:
         const std::string previous_label = filter_labels[current_item];
         const std::string previous_key = filter_keys[current_item];
         const int previous_color = filter_colors[current_item];
+
         filter_labels[current_item] = filter_labels[next_item];
         filter_keys[current_item] = filter_keys[next_item];
         filter_colors[current_item] = filter_colors[next_item];
+
         filter_labels[next_item] = previous_label;
         filter_keys[next_item] = previous_key;
         filter_colors[next_item] = previous_color;
+
         ImGui::ResetMouseDragDelta(m_ctx, ImGui::MouseButton_Left);
 
         if (filter_type == 0) {
@@ -446,6 +458,7 @@ public:
         }
 
         int selected = selected_filter;
+
         if (selected_filter != previous_selected_filter) {
             selected = previous_selected_filter;
         }
