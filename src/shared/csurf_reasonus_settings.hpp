@@ -26,6 +26,7 @@ class ReaSonusSettings {
         "16776960", // 0xffff00 Yellow
         "16711680", // 0xff0000 Red
         "65280",    // 0x00ff00 Green
+        "16777215", // 0xffffff White
     };
 
     /**
@@ -50,7 +51,7 @@ class ReaSonusSettings {
     /**
      * List with generic settings and their default value. This is used for checking the existance of settings in the inio.
      * If an item does not exist, it will be added with the given default value
-     * The values are setup as {"group", "setting-name", "default value"}}
+     * The values are set up as {"group", "setting-name", "default value"}
      */
     const std::vector<std::vector<std::string>> shared_settings = {
         {"surface", "midiin", "0"},
@@ -70,7 +71,7 @@ class ReaSonusSettings {
     /**
      * List with FP V2 specific settings and their default value. This is used for checking the existance of settings in the inio.
      * If an item does not exist, it will be added with the given default value
-     * The values are setup as {"group", "setting-name", "default value"}}
+     * The values are set up as {"group", "setting-name", "default value"}
      */
     const std::vector<std::vector<std::string>> fp_v2_settings = {
         {"surface", "control-hidden-tracks", "0"},
@@ -81,7 +82,7 @@ class ReaSonusSettings {
     /**
      * List with FP6 / 16 specific settings and their default value. This is used for checking the existance of settings in the inio.
      * If an item does not exist, it will be added with the given default value
-     * The values are setup as {"group", "setting-name", "default value"}}
+     * The values are set up as {"group", "setting-name", "default value"}
      */
     const std::vector<std::vector<std::string>> fp_8_settings = {
         {"surface", "surface", "0"},
@@ -104,8 +105,11 @@ class ReaSonusSettings {
         {"surface", "instant-multi-select-filter", "0"},
         {"surface", "mute-master-on-fwd-rwd", "0"},
         {"surface", "use-automation-colors", "0"},
-        {"surface", "use-automation-colors", "0"},
         {"surface", "automation-colors", join(automation_colors, ",")},
+        {"surface", "use-automation-single-touch", "0"},
+        {"surface", "overwrite-automation-point-shape", "0"},
+        {"surface", "automation-point-shape", "0"},
+        {"surface", "automation-single-bezier-tension", "0"},
 
         {"displays", "track", "8"},
         {"displays", "track-lines", "0,4,1,2"},
@@ -168,6 +172,8 @@ public:
 
     void SetSetting(const std::string &group, const std::string &key, bool value);
 
+    void SetSetting(const std::string &group, const std::string &key, double value);
+
     void SetSetting(const std::string &group, const std::string &key, int value);
 
     /**
@@ -202,6 +208,7 @@ public:
      *
      * @param group
      * @param key
+     * @param default_value
      * @return std::string
      */
     std::string GetSetting(const std::string &group, const std::string &key, std::string default_value = "");
@@ -256,9 +263,17 @@ public:
 
     std::vector<int> GetAutomationColors();
 
-    std::array<int, 6> GetAutomationColorsArray();
+    std::array<int, 7> GetAutomationColorsArray();
 
     int GetAutomationColor(const AutomationButtonIndex &type, int fallback);
+
+    bool UseAutomationSingleTouch();
+
+    bool OverwriteAutomationPointShape();
+
+    int GetAutomationPointShape();
+
+    double GetAutomationSingleBezierTension();
 
     int GetpluginStepSize();
 
