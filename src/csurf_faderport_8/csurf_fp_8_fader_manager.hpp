@@ -47,6 +47,8 @@ public:
 
     void Refresh(bool force = false);
 
+    void ChangeChannelMode(ChannelMode channelMode);
+
     void HandleTrackButtonClick(int value);
 
     void HandlePluginsButtonClick(int value, bool track = false);

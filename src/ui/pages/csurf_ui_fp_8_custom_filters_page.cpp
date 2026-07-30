@@ -1,16 +1,19 @@
 #include "../csurf_ui_page_content.hpp"
 #include "../components/csurf_ui_action_text_input.hpp"
-#include "../components/csurf_ui_list_box.hpp"
-#include "../components/csurf_ui_filter_list_box.hpp"
 #include "../components/csurf_ui_checkbox.hpp"
-#include "../components/csurf_ui_filter_preview.hpp"
 #include "../components/csurf_ui_color_picker.hpp"
+#include "../components/csurf_ui_filter_list_box.hpp"
+#include "../components/csurf_ui_filter_preview.hpp"
+#include "../components/csurf_ui_list_box.hpp"
 #include "../windows/csurf_ui_fp_8_control_panel.hpp"
 
 class CSurf_FP_8_CustomFiltersPage : public CSurf_UI_PageContent {
     std::string device;
     int selected_filter = -1;
     int previous_selected_filter = -1;
+
+    char project_name_buffer[1024];
+    std::string project_name;
 
     std::vector<std::string> filter_keys;
     std::vector<std::string> filter_labels;
@@ -38,10 +41,13 @@ class CSurf_FP_8_CustomFiltersPage : public CSurf_UI_PageContent {
     int previous_filter_color;
     int filter_type = 0;
 
+    bool new_filter = false;
+
 protected:
     void SetFiltersKeys() {
         filter_keys.clear();
         filter_labels.clear();
+        filter_colors.clear();
 
         if (filter_type == 0) {
             filter_keys = settings->GetFilterKeys();
@@ -103,6 +109,24 @@ protected:
         previous_filter_color = filter_color;
     }
 
+    void HandleProjectChange() {
+        project_state->LoadProjectState();
+        new_filter = false;
+        selected_filter = -1;
+        previous_selected_filter = -1;
+        HandleFilterTypeChange(filter_type, false);
+    }
+
+    void CheckProjectChange() {
+        GetProjectName(nullptr, project_name_buffer, sizeof project_name_buffer);
+        const std::string tmp_project_name = project_name_buffer;
+
+        if (tmp_project_name != project_name) {
+            project_name = tmp_project_name;
+            HandleProjectChange();
+        }
+    }
+
     void IsFilterDirty() {
         if (previous_selected_filter < 0) {
             filter_dirty = false;
@@ -135,7 +159,8 @@ protected:
 
     void DirtyCheck() {
         IsFilterDirty();
-        if (filter_dirty) {
+
+        if (filter_dirty || new_filter) {
             const int res = MB(
                 i18n->t("filters", "popup.unsaved.message").c_str(),
                 i18n->t("filters", "popup.unsaved.title").c_str(),
@@ -143,7 +168,12 @@ protected:
 
             if (res == 6) {
                 Save();
+            } else if (new_filter) {
+                // When a new filter was added, but user does not want to save it, we remove it from the list again
+                HandleRemoveFilterListItem(previous_selected_filter);
             }
+
+            new_filter = false;
         }
     }
 
@@ -151,6 +181,7 @@ protected:
         DirtyCheck();
         CreateFilter(new_filter_name);
         new_filter_name = "";
+        new_filter = true;
     }
 
     void HandleAddFilterText() {
@@ -183,12 +214,15 @@ protected:
         const std::string previous_label = filter_labels[current_item];
         const std::string previous_key = filter_keys[current_item];
         const int previous_color = filter_colors[current_item];
+
         filter_labels[current_item] = filter_labels[next_item];
         filter_keys[current_item] = filter_keys[next_item];
         filter_colors[current_item] = filter_colors[next_item];
+
         filter_labels[next_item] = previous_label;
         filter_keys[next_item] = previous_key;
         filter_colors[next_item] = previous_color;
+
         ImGui::ResetMouseDragDelta(m_ctx, ImGui::MouseButton_Left);
 
         if (filter_type == 0) {
@@ -202,8 +236,18 @@ protected:
         PopulateFilter();
     }
 
-    void HandleFilterTypeChange(const int type) {
-        DirtyCheck();
+    /**
+     * Prepare for the new filter type
+     * @param type The type of filter to set:
+     * - `0` for global filters
+     * - `1` for project filters
+     * @param do_dirty_check Wether or not to skip the dirty check.
+     * On project change this should be true as the filter otherwise will get stored in the wrong project
+     */
+    void HandleFilterTypeChange(const int type, const bool do_dirty_check) {
+        if (do_dirty_check) {
+            DirtyCheck();
+        }
         filter_type = type;
         previous_selected_filter = -1;
         selected_filter = 0;
@@ -228,7 +272,7 @@ protected:
 
             UiStyledElements::PushReaSonusFilterTabStyle(m_ctx, filter_type == 0);
             if (ImGui::Button(m_ctx, "Global Filters", 120)) {
-                HandleFilterTypeChange(0);
+                HandleFilterTypeChange(0, true);
             }
             UiStyledElements::PopReaSonusFilterTabStyle(m_ctx);
 
@@ -237,13 +281,10 @@ protected:
 
                 UiStyledElements::PushReaSonusFilterTabStyle(m_ctx, filter_type == 1);
                 if (ImGui::Button(m_ctx, "Project Filters", 120)) {
-                    HandleFilterTypeChange(1);
+                    HandleFilterTypeChange(1, true);
                 }
                 UiStyledElements::PopReaSonusFilterTabStyle(m_ctx);
             }
-
-            // ImGui::Text(m_ctx, i18n->t("filters", "list.label").c_str());
-            ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 4);
 
             UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
             if (ImGui::BeginChild(
@@ -284,7 +325,6 @@ protected:
                     ? i18n->t("filters", "content.title.new").c_str()
                     : i18n->t("filters", "content.title.edit").c_str()
             );
-            ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 4);
 
             UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
             if (ImGui::BeginChild(m_ctx, "filter_content_edit", 0.0, 276.0, ImGui::ChildFlags_FrameStyle)) {
@@ -309,8 +349,9 @@ protected:
                     );
 
                     ImGui::SameLine(m_ctx);
-                    ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 24);
 
+                    ImGui::BeginGroup(m_ctx);
+                    ImGui::Dummy(m_ctx, 10, 16);
                     ReaSonusColorPicker(
                         m_ctx,
                         assets,
@@ -321,6 +362,7 @@ protected:
                         30,
                         32
                     );
+                    ImGui::EndGroup(m_ctx);
 
                     ReaSonusActionTextInput(
                         m_ctx,
@@ -368,8 +410,10 @@ protected:
     }
 
 public:
-    CSurf_FP_8_CustomFiltersPage(ImGui_Context *m_ctx, CSurf_UI_Assets *assets) // NOLINT(*-pro-type-member-init)
-        : CSurf_UI_PageContent(m_ctx, assets) {
+    CSurf_FP_8_CustomFiltersPage( // NOLINT(*-pro-type-member-init)
+        ImGui_Context *m_ctx,
+        CSurf_UI_Assets *assets
+    ) : CSurf_UI_PageContent(m_ctx, assets) {
         using namespace std::placeholders; // for `_1, _2 etc`
         i18n = I18n::GetInstance();
         settings = ReaSonusSettings::GetInstance(FP_8);
@@ -409,6 +453,8 @@ public:
     void Render() override {
         using namespace std::placeholders; // for `_1, _2 etc`
 
+        CheckProjectChange();
+
         if (selected_filter == -1 && !filter_labels.empty()) {
             selected_filter = 0;
         }
@@ -446,6 +492,7 @@ public:
         }
 
         int selected = selected_filter;
+
         if (selected_filter != previous_selected_filter) {
             selected = previous_selected_filter;
         }
@@ -493,6 +540,8 @@ public:
             ReaSonus8ControlPanel::SetMessage(i18n->t("filters", "action.save.message"));
             Reset();
         }
+
+        new_filter = false;
     }
 
     void SetPageProperty(const int type, const int value) override {

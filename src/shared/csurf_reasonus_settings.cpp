@@ -322,6 +322,7 @@ int ReaSonusSettings::AddNewFilter(const std::string &filter_name) {
     settings[newKey];
     settings[newKey]["name"] = filter_name;
     settings[newKey]["text"] = "";
+    settings[newKey]["color"] = std::to_string(0x00ffffff);
     settings[newKey]["case-insensitive"] = "0";
     settings[newKey]["sibblings"] = "0";
     settings[newKey]["parents"] = "0";

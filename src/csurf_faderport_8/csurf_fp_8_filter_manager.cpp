@@ -11,6 +11,7 @@ struct Filter {
     std::string name;
     std::string id;
     int color;
+    bool project;
 };
 
 class CSurf_FP_8_FilterManager : public CSurf_FP_8_ChannelManager {
@@ -28,7 +29,8 @@ class CSurf_FP_8_FilterManager : public CSurf_FP_8_ChannelManager {
             const Filter filter{
                 filter_data.get("name"),
                 key,
-                filter_data.has("color") ? stoi(filter_data.get("color")) : 0x00ffffff
+                filter_data.has("color") ? stoi(filter_data.get("color")) : 0x00ffffff,
+                true
             };
             filters.push_back(filter);
         }
@@ -43,7 +45,8 @@ class CSurf_FP_8_FilterManager : public CSurf_FP_8_ChannelManager {
             const Filter filter{
                 filter_data.get("name"),
                 key,
-                filter_data.has("color") ? stoi(filter_data.get("color")) : 0x00ffffff
+                filter_data.has("color") ? stoi(filter_data.get("color")) : 0x00ffffff,
+                false
             };
             filters.push_back(filter);
         }
@@ -109,11 +112,13 @@ public:
             MediaTrack *media_track = media_tracks.Get(i);
             const bool filterExist = filter_index < static_cast<int>(filters.size());
 
-            // If the existing slot has a filter and use filter color is set to true, use the filter color. Black otherwise
+            // If the existing slot has a filter and use filter color is set to true, use the filter color.
             if (settings->UseFilterColor() && filterExist) {
                 color.SetColor(filters[filter_index].color, false);
             } else {
-                color.SetColor(ButtonColorBlack);
+                // If there is no custom color then default is white, otherwise inactive color is black.
+                ButtonColor button_color = filterExist ? ButtonColorWhite : ButtonColorBlack;
+                color.SetColor(button_color);
             }
 
             GetFaderValue(media_track, &fader_value, &valuebar_value, &strPan1, &strPan2);
@@ -168,7 +173,7 @@ public:
                         navigator->HandleFilter(TrackCustomMultiSelectFilter);
                     }
                 } else {
-                    navigator->HandleCustomFilter(filters.at(filter_index).id);
+                    navigator->HandleCustomFilter(filters.at(filter_index).id, filters.at(filter_index).project);
                 }
             } else {
                 const int result = MB(
