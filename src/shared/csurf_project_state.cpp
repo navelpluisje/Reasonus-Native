@@ -11,6 +11,7 @@ ProjectState::ProjectState() {
 }
 
 void ProjectState::LoadProjectState() {
+    project_state.clear();
     ReadProjectState(project_state);
     // store the project_state to previous_project_state, to make a reset possible
     // as changes are written to the state instant (but not saved instant)
