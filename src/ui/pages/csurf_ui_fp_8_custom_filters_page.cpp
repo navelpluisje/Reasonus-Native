@@ -114,7 +114,7 @@ protected:
         new_filter = false;
         selected_filter = -1;
         previous_selected_filter = -1;
-        HandleFilterTypeChange(0, false);
+        HandleFilterTypeChange(filter_type, false);
     }
 
     void CheckProjectChange() {
