@@ -378,7 +378,7 @@ public:
   }
 
   /**
-   * Check for project change. If so, we reload the new project state
+   * Check for project change. If so, we reload the new project state, and reset the fader mode
    */
   void CheckProjectChange() {
     GetProjectName(nullptr, project_name_buffer, sizeof project_name_buffer);
@@ -387,6 +387,7 @@ public:
     if (tmp_project_name != project_name) {
       project_state->LoadProjectState();
       project_name = tmp_project_name;
+      faderManager->ChangeChannelMode(TrackMode);
     }
   }
 
@@ -410,7 +411,6 @@ public:
     if ((now - surface_update_keepalive) >= 990) {
       CheckProjectChange();
     }
-
 
     if (m_midiout != nullptr) {
       if ((now - surface_update_lastrun) >= 10) {
