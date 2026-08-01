@@ -65,7 +65,7 @@ public:
 
             CSurf_FP_8_Track *track = tracks.at(i);
             MediaTrack *media_track = media_tracks.Get(i);
-            SetTrackColors(media_track, DAW::IsTrackSelected(media_track));
+            SetTrackColors(media_track, DAW::IsTrackSelected(media_track), false);
 
             std::string pan_str;
             GetFaderValue(sends_track, send_index, &fader_value, &value_bar_value, &pan, &pan_str);

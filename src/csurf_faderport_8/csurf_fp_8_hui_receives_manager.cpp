@@ -91,7 +91,7 @@ public:
                 continue;
             }
 
-            SetTrackColors(media_track, DAW::IsTrackSelected(media_track));
+            SetTrackColors(media_track, DAW::IsTrackSelected(media_track), false);
 
             GetFaderValue(media_track, receive_index, &faderValue, &valueBarValue, &pan, &panStr);
 

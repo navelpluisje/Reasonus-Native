@@ -1,12 +1,13 @@
 // ReSharper disable CppRedundantParentheses
-#include "../shared/csurf_daw.hpp"
-#include <utility>
-#include <vector>
+#include "csurf_daw.hpp"
 #include <regex>
 #include <string>
-#include "../shared/csurf_utils.hpp"
+#include <utility>
+#include <vector>
 #include "csurf.h"
 #include "csurf_plugin_utils.hpp"
+#include "csurf_utils.hpp"
+#include "csurf_reasonus_settings.hpp"
 
 int DAW::sendModes[3] = {0, 1, 3};
 
@@ -615,6 +616,7 @@ void DAW::SetTrackSendPan(MediaTrack *media_track, const int send, const double 
 
 TrackEnvelope *DAW::GetTrackEnvelopeByChunkName(
     MediaTrack *media_track,
+    const double position,
     const std::string &chunk_name,
     const double value
 ) {
@@ -632,10 +634,8 @@ TrackEnvelope *DAW::GetTrackEnvelopeByChunkName(
      * We do need this this to overwrite the visibility and active flag.
      * Without a point, an envelope is invalid and will never get set to active
      */
-    const double position = GetPlayPosition();
-    bool sort = false;
     if (CountEnvelopePoints(env) == 0) {
-        InsertEnvelopePoint(env, position, value, 5, 0.5, true, &sort);
+        InsertEnvelopePoint(env, position, value);
     }
 
     /**
@@ -646,17 +646,73 @@ TrackEnvelope *DAW::GetTrackEnvelopeByChunkName(
     std::string envelope_chunk = chunk;
 
     // If Active or Visibe ois set to `0`, we set both to `1`
-    if (envelope_chunk.rfind("ACT 0") != std::string::npos || envelope_chunk.rfind("VIS 0") != std::string::npos) {
+    if (
+        envelope_chunk.rfind("ACT 0") != std::string::npos
+        || envelope_chunk.rfind("VIS 0") != std::string::npos
+        || envelope_chunk.rfind("ARM 0") != std::string::npos
+    ) {
         replace(envelope_chunk, "VIS 0", "VIS 1");
         replace(envelope_chunk, "ACT 0", "ACT 1");
+        replace(envelope_chunk, "ARM 0", "ARM 1");
 
-        InsertEnvelopePoint(env, position, value, 5, 0.5, true, &sort);
+        InsertEnvelopePoint(env, position, value);
         if (!SetEnvelopeStateChunk(env, envelope_chunk.c_str(), false)) {
             MB("Something went wrong while setting the envelope to visible and active", "ReaSonus Error", 0);
         }
     }
 
     return env;
+}
+
+void DAW::DisableEnvelope(TrackEnvelope *env) {
+    char chunk[1024];
+    GetEnvelopeStateChunk(env, chunk, sizeof chunk, false);
+    std::string envelope_chunk = chunk;
+
+    // If Active or Visibe ois set to `0`, we set both to `1`
+    if (envelope_chunk.rfind("ACT 1") != std::string::npos) {
+        replace(envelope_chunk, "ACT 1", "ACT 0");
+
+        if (!SetEnvelopeStateChunk(env, envelope_chunk.c_str(), false)) {
+            MB("Something went wrong while setting the envelope to visible and active", "ReaSonus Error", 0);
+        }
+    }
+}
+
+void DAW::EnableEnvelope(TrackEnvelope *env) {
+    char chunk[1024];
+    GetEnvelopeStateChunk(env, chunk, sizeof chunk, false);
+    std::string envelope_chunk = chunk;
+
+    // If Active or Visibe ois set to `0`, we set both to `1`
+    if (envelope_chunk.rfind("ACT 0") != std::string::npos) {
+        replace(envelope_chunk, "ACT 0", "ACT 1");
+
+        if (!SetEnvelopeStateChunk(env, envelope_chunk.c_str(), false)) {
+            MB("Something went wrong while setting the envelope to visible and active", "ReaSonus Error", 0);
+        }
+    }
+}
+
+int DAW::GetDefaultAutomationPointShape() {
+    const int defenvs = GetIntConfigVar("defenvs");
+    return defenvs >> 16;
+}
+
+void DAW::InsertEnvelopePoint(TrackEnvelope *env, const double position, const double value) {
+    const bool overwrite_point_shape = ReaSonusSettings::GetInstance(FP_8)->OverwriteAutomationPointShape();
+    bool sort = false;
+    int point_shape;
+    double tension = 0.5;
+
+    if (overwrite_point_shape) {
+        point_shape = ReaSonusSettings::GetInstance(FP_8)->GetAutomationPointShape();
+        tension = ReaSonusSettings::GetInstance(FP_8)->GetAutomationSingleBezierTension();
+    } else {
+        point_shape = GetDefaultAutomationPointShape();
+    }
+
+    ::InsertEnvelopePoint(env, position, value, point_shape, tension, true, &sort);
 }
 
 bool DAW::MediaItemHasMidi(MediaItem *media_item) {

@@ -261,6 +261,7 @@ std::array<int, 7> ReaSonusSettings::GetAutomationColorsArray() {
     std::array<int, 7> result{};
 
     for (int i = 0; i < 7; i++) {
+        // A fallback for when there is no 7th color
         if (colors.size() == 6 && i == 6) {
             result[i] = stoi(automation_colors[6]);
         } else {
@@ -274,7 +275,8 @@ int ReaSonusSettings::GetAutomationColor(const AutomationButtonIndex &type, cons
     if (!UseAutomationColors()) {
         return fallback;
     }
-    const auto colors = splitToInt(settings["surface"]["automation-colors"], ",");
+
+    const auto colors = GetAutomationColorsArray();
 
     switch (type) {
         case AUTOMATION_BUTTON_LATCH:
@@ -289,6 +291,8 @@ int ReaSonusSettings::GetAutomationColor(const AutomationButtonIndex &type, cons
             return colors[4];
         case AUTOMATION_BUTTON_READ:
             return colors[5];
+        case AUTOMATION_SINGLE_POINT:
+            return colors[6];
         default:
             return stoi(automation_colors[1]);
     }

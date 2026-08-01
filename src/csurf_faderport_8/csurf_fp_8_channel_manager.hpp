@@ -2,12 +2,13 @@
 #define CSURF_FP_8_CHANNEL_MANAGER_H_
 
 #include <vector>
+#include "csurf_fp_8_channel_manager_resources.hpp"
 #include "csurf_fp_8_navigator.hpp"
 #include "csurf_fp_8_track.hpp"
-#include "csurf_fp_8_channel_manager_resources.hpp"
-#include "../shared/csurf_reasonus_settings.hpp"
-#include "../shared/csurf_project_state.hpp"
 #include "../shared/csurf_daw.hpp"
+#include "../shared/csurf_project_state.hpp"
+#include "../shared/csurf_reasonus_settings.hpp"
+#include "../shared/csurf_single_point_automation_item.hpp"
 
 class CSurf_FP_8_ChannelManager {
 protected:
@@ -18,14 +19,11 @@ protected:
     ReaSonusSettings *settings = ReaSonusSettings::GetInstance(FP_8);
     ProjectState *project_state = ProjectState::GetInstance();
 
-    std::array<TrackEnvelope *, 16> single_touch_start;
-    // bool single_touch_start[16] = {
-    //     false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false
-    // };
+    std::array<SinglePointAutomationItem *, 16> single_touch_automation;
 
     ButtonColor color;
 
-    virtual void SetTrackColors(MediaTrack *media_track, const bool is_selected, const bool has_arm = false) {
+    virtual void SetTrackColors(MediaTrack *media_track, const bool is_selected, const bool has_arm) {
         const double brightness = is_selected ? 1 : settings->GetTrackColorBrightnessPercentage();
 
         if (media_track == nullptr) {
@@ -50,7 +48,33 @@ protected:
             }
         }
         color.SetColor((red * brightness) / 2, (green * brightness) / 2, (blue * brightness) / 2);
-    };
+    }
+
+    bool HasSinglePointAutomation(MediaTrack *media_track, const int index, const int value) const {
+        return GetTrackAutomationMode(media_track) == AUTOMATION_TRIM
+               && context->IsSinglePointAutomationEnabled()
+               && (value != 0 || single_touch_automation[index] != nullptr);
+    }
+
+    void HandleSinglePointAutomation(
+        MediaTrack *media_track,
+        const int index,
+        const int value,
+        const std::string &chunk_name,
+        const double point_value
+    ) {
+        if (single_touch_automation[index] == nullptr) {
+            single_touch_automation[index] = new SinglePointAutomationItem(media_track, chunk_name, point_value);
+        }
+
+        if (value > 0) {
+            single_touch_automation[index]->InsertStartPoint(point_value);
+            return;
+        }
+
+        single_touch_automation[index]->InsertEndPoint(point_value);
+        single_touch_automation[index] = nullptr;
+    }
 
 public:
     CSurf_FP_8_ChannelManager(
@@ -65,49 +89,49 @@ public:
         delete navigator;
         delete context;
         delete m_midiout;
-    };
+    }
 
-    virtual void UpdateTracks(const bool force_update = false) {
+    virtual void UpdateTracks(const bool force_update) {
         (void) force_update;
-    };
+    }
 
     virtual void HandleEndcoderPush(const int value) {
         (void) value;
-    };
+    }
 
     virtual void HandleEndcoderIncrement(const int value) {
         (void) value;
-    };
+    }
 
     virtual void HandleEndcoderDecrement(const int value) {
         (void) value;
-    };
+    }
 
     virtual void HandleSelectClick(const int index, const int value) {
         (void) index;
         (void) value;
-    };
+    }
 
-    virtual void HandleMuteClick(int index, int value) {
+    virtual void HandleMuteClick(const int index, const int value) {
         (void) index;
         (void) value;
-    };
+    }
 
-    virtual void HandleSoloClick(int index, int value) {
+    virtual void HandleSoloClick(const int index, const int value) {
         (void) index;
         (void) value;
-    };
+    }
 
-    virtual void HandleFaderTouch(int index, int value) {
+    virtual void HandleFaderTouch(const int index, const int value) {
         (void) index;
         (void) value;
-    };
+    }
 
-    virtual void HandleFaderMove(int index, int msb, int lsb) {
+    virtual void HandleFaderMove(const int index, const int msb, const int lsb) {
         (void) index;
         (void) msb;
         (void) lsb;
-    };
+    }
 };
 
 #endif

@@ -65,7 +65,38 @@ class CSurf_FP_8_AutomationManager {
     }
 
     void SetButtonColors(const bool force = false) const {
-        if (context->GetShiftLeft()) {
+        if (context->GetShiftRight()) {
+            latchButton->SetColor(settings->GetAutomationColor(
+                                      AUTOMATION_BUTTON_LATCH,
+                                      ButtonColorPurple.GetColor()),
+                                  force
+            );
+            trimButton->SetColor(settings->GetAutomationColor(
+                                     AUTOMATION_BUTTON_TRIM,
+                                     ButtonColorWhite.GetColor()),
+                                 force
+            );
+            offButton->SetColor(settings->GetAutomationColor(
+                                    AUTOMATION_BUTTON_OFF,
+                                    ButtonColorBlue.GetColor()),
+                                force
+            );
+            touchButton->SetColor(settings->GetAutomationColor(
+                                      AUTOMATION_BUTTON_TOUCH,
+                                      ButtonColorYellow.GetColor()),
+                                  force
+            );
+            writeButton->SetColor(settings->GetAutomationColor(
+                                      AUTOMATION_BUTTON_WRITE,
+                                      ButtonColorRed.GetColor()),
+                                  force
+            );
+            readButton->SetColor(settings->GetAutomationColor(
+                                     AUTOMATION_BUTTON_READ,
+                                     ButtonColorGreen.GetColor()),
+                                 force
+            );
+        } else if (context->GetShiftLeft()) {
             latchButton->SetColor(ButtonColorGreen, force);
             trimButton->SetColor(ButtonColorYellow, force);
             offButton->SetColor(ButtonColorYellow, force);
@@ -79,7 +110,9 @@ class CSurf_FP_8_AutomationManager {
                                   force
             );
             trimButton->SetColor(settings->GetAutomationColor(
-                                     AUTOMATION_BUTTON_TRIM,
+                                     context->IsSinglePointAutomationEnabled()
+                                         ? AUTOMATION_SINGLE_POINT
+                                         : AUTOMATION_BUTTON_TRIM,
                                      ButtonColorWhite.GetColor()),
                                  force
             );
@@ -163,6 +196,7 @@ public:
         if (value == 0) {
             return;
         }
+        context->SetSinglePointAutomation(false);
 
         if (context->GetShiftRight()) {
             SetGlobalAutomationMode(AUTOMATION_LATCH);
@@ -184,6 +218,7 @@ public:
         }
 
         if (context->GetShiftRight()) {
+            context->SetSinglePointAutomation(false);
             SetGlobalAutomationMode(AUTOMATION_TRIM);
             return;
         }
@@ -193,15 +228,23 @@ public:
             return;
         }
 
-        // TODO: When already in trim mode set to single_touch_mode.
         MediaTrack *media_track = GetSelectedAutomationTrack();
-        SetTrackAutomationMode(media_track, AUTOMATION_TRIM);
+        if (
+            GetTrackAutomationMode(media_track) == AUTOMATION_TRIM
+            && !context->IsSinglePointAutomationEnabled()
+        ) {
+            context->SetSinglePointAutomation(true);
+        } else {
+            context->SetSinglePointAutomation(false);
+            SetTrackAutomationMode(media_track, AUTOMATION_TRIM);
+        }
     }
 
     void HandleOffButton(const int value) const {
         if (value == 0) {
             return;
         }
+        context->SetSinglePointAutomation(false);
 
         if (context->GetShiftRight()) {
             SetGlobalAutomationMode(AUTOMATION_PREVIEW);
@@ -214,9 +257,12 @@ public:
         }
 
         MediaTrack *media_track = GetSelectedAutomationTrack();
-        if (
-            (GetTrackAutomationMode(media_track) == AUTOMATION_PREVIEW || GetGlobalAutomationOverride() ==
-             AUTOMATION_PREVIEW) && settings->GetLatchPreviewActionEnabled()) {
+        if ((
+                GetTrackAutomationMode(media_track) == AUTOMATION_PREVIEW
+                || GetGlobalAutomationOverride() == AUTOMATION_PREVIEW
+            )
+            && settings->GetLatchPreviewActionEnabled()
+        ) {
             Main_OnCommandAsyncEx(settings->GetLatchPreviewActionCode(), 0, nullptr);
         } else {
             SetTrackAutomationMode(media_track, AUTOMATION_PREVIEW);
@@ -227,6 +273,7 @@ public:
         if (value == 0) {
             return;
         }
+        context->SetSinglePointAutomation(false);
 
         if (context->GetShiftRight() && !context->IsChannelMode(MenuMode)) {
             SetGlobalAutomationMode(AUTOMATION_TOUCH);
@@ -246,6 +293,7 @@ public:
         if (value == 0) {
             return;
         }
+        context->SetSinglePointAutomation(false);
 
         if (context->GetShiftRight()) {
             SetGlobalAutomationMode(AUTOMATION_WRITE);
@@ -264,6 +312,7 @@ public:
         if (value == 0) {
             return;
         }
+        context->SetSinglePointAutomation(false);
 
         if (context->GetShiftRight()) {
             SetGlobalAutomationMode(AUTOMATION_READ);

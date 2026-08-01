@@ -403,60 +403,22 @@ public:
             }
         }
 
-        // if (GetTrackAutomationMode(media_track) != AUTOMATION_SINGLE_TOUCH) {
-        //     return;
-        // }
-
-        if (value == 0 && single_touch_start[index] == nullptr) {
-            return;
-        }
-
         /**
-         * Track has to be in READ mode as we then can read the actual value of the envelope
-         * On value 1 and touch automation is set to true and in READ mode,
-         *   - Get the current volume
-         *   - set automation mode to TRIM
-         *   - Get enevelope, or create an envelope
-         *   - Set a point
-         *
-         * On value 1 and touch automation is set to true and in READ mode
-         *   - Set point with new value
-         *   - set automation mode to READ again
+         * Check if we have the proper conditions to continue with Single touch automation
          */
-        if (single_touch_start[index] == nullptr) {
-            single_touch_start[index] = DAW::GetTrackEnvelopeByChunkName(
-                media_track,
-                "<VOLENV2",
+        if (HasSinglePointAutomation(media_track, index, value)) {
+            // Get the value to write for the automation
+            double volume;
+            if (value > 0) {
+                // We need to set it to read first to get the actual volume of the envelope
+                SetTrackAutomationMode(media_track, AUTOMATION_READ);
+                volume = DB2SLIDER(VAL2DB(DAW::GetTrackVolume(media_track)));
+                SetTrackAutomationMode(media_track, AUTOMATION_TRIM);
+            } else {
+                volume = DB2SLIDER(VAL2DB(DAW::GetTrackVolume(media_track)));
+            }
 
-                DB2SLIDER(VAL2DB(DAW::GetTrackVolume(media_track)))
-            );
-        }
-        if (single_touch_start[index] == nullptr) {
-            ShowConsoleMsg("Still empty");
-        }
-        const double position = GetPlayPosition();
-        bool sort = false;
-        /**
-         * Get the default env shape:
-         *   - Get the value with ConfigVar and get the key `defenvs`
-         *   - Shift 16 bits (value >> 16)
-         *   - This should get the shape
-         *
-         * Add option to overwrite the default ion teh settings
-         * When bezier is chosen, add option for tension (try to make it vissible)
-         */
-        InsertEnvelopePoint(
-            single_touch_start[index],
-            position,
-            DB2SLIDER(VAL2DB(DAW::GetTrackVolume(media_track))),
-            5,
-            0.5,
-            true,
-            &sort
-        );
-
-        if (value == 0) {
-            single_touch_start[index] = nullptr;
+            HandleSinglePointAutomation(media_track, index, value, "<VOLENV2", volume);
         }
     }
 

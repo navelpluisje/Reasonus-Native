@@ -1,10 +1,16 @@
+// ReSharper disable CppWrongIncludesOrder
 #ifndef CSURF_DAW_H_
 #define CSURF_DAW_H_
 
-#include <reaper_plugin.h>
-#include <string>
 #include <map>
+#include <reaper_plugin.h>
+// ReSharper disable once CppUnusedIncludeDirective
+#include <WDL/wdltypes.h> // might be unnecessary in future
+#include <reaper_plugin_functions.h>
+#include <string>
 #include <vector>
+
+#include "db2val.h"
 #include "../controls/csurf_color_button_colors.hpp"
 
 enum Features {
@@ -220,7 +226,7 @@ public:
     /**
      * Get the automation mode for the given track
      * @param media_track The track to get the recording mode for
-     * @return The Automation Mode mode
+     * @return The 'Automation Mode' mode
      */
     static int GetTrackAutomationMode(MediaTrack *media_track);
 
@@ -700,16 +706,29 @@ public:
      * Get the envelope with the given chunk name. Set it to visible and active it. If the envelope does not exist,
      * it will be ceated and the value will be set to the given value
      * @param media_track The track we want to get the envelope for
+     * @param position The current position for the initial point
      * @param chunk_name The chunk name for the envelope. This is the name as it is used in the RPP file
      * @param value The base value to set if the envelope has to be created
      * @return The envelope
      */
-    static TrackEnvelope *GetTrackEnvelopeByChunkName(MediaTrack *media_track, const std::string &chunk_name,
-                                                      double value);
+    static TrackEnvelope *GetTrackEnvelopeByChunkName(
+        MediaTrack *media_track,
+        double position,
+        const std::string &chunk_name,
+        double value
+    );
 
-    /**************************************************************************************************************
-     *  Project related methods
-     *************************************************************************************************************/
+    static void DisableEnvelope(TrackEnvelope *env);
+
+    static void EnableEnvelope(TrackEnvelope *env);
+
+    static int GetDefaultAutomationPointShape();
+
+    static void InsertEnvelopePoint(TrackEnvelope *env, double position, double value);
+
+    //**************************************************************************************************************
+    // *  Project related methods
+    // *************************************************************************************************************/
 
     /**
      * Get the Time Mode. `projtimemode2` gets the time mode of the transport bar when not overwritten by the ruler
@@ -747,9 +766,9 @@ public:
      */
     static std::vector<std::string> GetProjectTime(bool overwrite_time_code, int new_time_code);
 
-    /**************************************************************************************************************
-     *  Media Items related methods
-     *************************************************************************************************************/
+    //**************************************************************************************************************
+    // *  Media Items related methods
+    // *************************************************************************************************************/
 
     /**
      * Check if the given media item is a media item
@@ -778,9 +797,9 @@ public:
      */
     static void EditRedo();
 
-    /**************************************************************************************************************
-     *  Window related methods
-     *************************************************************************************************************/
+    //**************************************************************************************************************
+    // *  Window related methods
+    // *************************************************************************************************************/
 
     /**
      * Be sure that after selecting a track and the setting to follow tcp is enabled,
@@ -802,9 +821,9 @@ public:
      */
     static bool VersionHasFeature(Features feature);
 
-    /**************************************************************************************************************
-     *  Ext State related methods
-     *************************************************************************************************************/
+    //**************************************************************************************************************
+    // *  Ext State related methods
+    // *************************************************************************************************************/
 
     /**
      * Get the value from the ext state with the given key.

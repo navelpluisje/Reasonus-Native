@@ -59,14 +59,19 @@ public:
                 media_track = media_tracks.Get(i);
             }
 
-            SetTrackColors(media_track, DAW::IsTrackSelected(media_track));
+            SetTrackColors(media_track, DAW::IsTrackSelected(media_track), false);
             GetFaderValue(media_track, &fader_value, &valuebar_value);
 
-            if (!media_track) {
+            if (media_track == nullptr) {
                 track->SetDisplayLine(0, ALIGN_LEFT, "", NON_INVERT);
             } else {
-                track->SetDisplayLine(0, ALIGN_LEFT, DAW::GetTrackName(media_track).c_str(),
-                                      plugin_track == media_track ? INVERT : NON_INVERT, force_update);
+                track->SetDisplayLine(
+                    0,
+                    ALIGN_LEFT,
+                    DAW::GetTrackName(media_track).c_str(),
+                    plugin_track == media_track ? INVERT : NON_INVERT,
+                    force_update
+                );
             }
 
             if (DAW::HasTrackFx(plugin_track, plugin_index)) {

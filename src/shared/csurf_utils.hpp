@@ -31,10 +31,6 @@ constexpr int AUTOMATION_TOUCH = 2;
 constexpr int AUTOMATION_LATCH = 4;
 constexpr int AUTOMATION_PREVIEW = 5;
 constexpr int AUTOMATION_WRITE = 3;
-/**
- * Giving it a fairly high number so it will 'never' interfere with REAPER
- */
-constexpr int AUTOMATION_SINGLE_TOUCH = 99;
 
 enum AutomationButtonIndex {
     AUTOMATION_BUTTON_LATCH,
@@ -43,6 +39,8 @@ enum AutomationButtonIndex {
     AUTOMATION_BUTTON_TOUCH,
     AUTOMATION_BUTTON_WRITE,
     AUTOMATION_BUTTON_READ,
+    // Not an actual button, but a button state for the trim button when in single point auutomation mode
+    AUTOMATION_SINGLE_POINT
 };
 
 struct ShiftState {

@@ -82,7 +82,7 @@ public:
                 continue;
             }
 
-            SetTrackColors(media_track, DAW::IsTrackSelected(media_track));
+            SetTrackColors(media_track, DAW::IsTrackSelected(media_track), false);
             GetFaderValue(media_track, &fader_value, &value_bar_value);
 
             if (DAW::HasTrackFx(media_track, plugin_index)) {
