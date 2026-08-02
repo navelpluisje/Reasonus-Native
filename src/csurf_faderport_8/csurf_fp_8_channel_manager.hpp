@@ -72,7 +72,7 @@ protected:
             return;
         }
 
-        single_touch_automation[index]->InsertEndPoint(point_value);
+        single_touch_automation[index]->InsertEndPoint(point_value, chunk_name);
         single_touch_automation[index] = nullptr;
     }
 

@@ -394,6 +394,7 @@ public:
 
         if (context->GetShiftChannelLeft() && settings->GetFaderReset()) {
             DAW::SetTrackVolume(media_track, 1.0);
+            return;
         }
 
         if (GetTrackAutomationMode(media_track) == AUTOMATION_TOUCH) {

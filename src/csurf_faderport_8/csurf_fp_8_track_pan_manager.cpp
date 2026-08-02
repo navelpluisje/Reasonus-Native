@@ -47,20 +47,22 @@ public:
         CSurf_FP_8_PanManager::UpdateTracks(true);
     }
 
-    ~CSurf_FP_8_PanManager() override {
-    }
+    ~CSurf_FP_8_PanManager() override = default;
 
     void UpdateTracks(const bool force_update) override {
         const WDL_PtrList<MediaTrack> media_tracks = navigator->GetBankTracks();
-        std::vector<std::string> time_code;
+        const std::vector<std::string> time_code;
 
         for (int i = 0; i < context->GetNbChannels(); i++) {
             MediaTrack *media_track;
             bool is_master_track = false;
-            int fader_value = 0, value_bar_value = 0;
-            std::string str_pan_1, str_pan_2;
+            int fader_value = 0;
+            int value_bar_value = 0;
+            std::string str_pan_1;
+            std::string str_pan_2;
 
-            CSurf_FP_8_Track *track = tracks.at(i);
+            const CSurf_FP_8_Track *track = tracks.at(i);
+
             if (context->GetMasterFaderMode() && i == context->GetNbChannels() - 1) {
                 media_track = GetMasterTrack(nullptr);
                 is_master_track = true;
@@ -68,7 +70,7 @@ public:
                 media_track = media_tracks.Get(i);
             }
 
-            if (!media_track || (CountTracks(nullptr) < i && !is_master_track)) {
+            if (media_track == nullptr || (CountTracks(nullptr) < i && !is_master_track)) {
                 track->ClearTrack(true, force_update);
                 continue;
             }
@@ -159,20 +161,56 @@ public:
 
     void HandleFaderTouch(const int index, const int value) override {
         (void) value;
+        MediaTrack *media_track = navigator->GetTrackByIndex(index);
+        const int pan_mode = DAW::GetTrackPanMode(media_track);
 
-        if (!settings->GetFaderReset()) {
-            return;
-        }
-
-        if (context->GetShiftChannelLeft()) {
-            MediaTrack *media_track = navigator->GetTrackByIndex(index);
-            const int pan_mode = DAW::GetTrackPanMode(media_track);
-
+        if (context->GetShiftChannelLeft() && settings->GetFaderReset()) {
             if (context->IsChannelMode(PanMode1)) {
                 DAW::SetTrackPan1(media_track, pan_mode < 6 ? 0.0 : 1.0);
             } else if (context->IsChannelMode(PanMode2)) {
                 DAW::SetTrackPan2(media_track, pan_mode < 5 ? 0.0 : 1.0);
             }
+            return;
+        }
+
+        /**
+         * Check if we have the proper conditions to continue with Single touch automation
+         * All pan related values (except for width) are displayed reversed.
+         * Therefore some fo the values are inverted as well, to make it mork as it should
+         */
+        if (HasSinglePointAutomation(media_track, index, value)) {
+            std::string chunk_name;
+            double pan1 = 0.0;
+            double pan2 = 0.0;
+            int dummy = 0;
+
+            if (context->IsChannelMode(PanMode1)) {
+                chunk_name = pan_mode == 6 ? "<DUALPANENVL2" : "<PANENV2";
+            } else if (context->IsChannelMode(PanMode2) && pan_mode > 3) {
+                chunk_name = pan_mode == 6 ? "<DUALPANENV2" : "<WIDTHENV2";
+            }
+
+            // Get the value to write for the automation
+            if (value > 0) {
+                // We need to set it to read first to get the actual volume of the envelope
+                SetTrackAutomationMode(media_track, AUTOMATION_READ);
+                GetTrackUIPan(media_track, &pan1, &pan2, &dummy);
+                SetTrackAutomationMode(media_track, AUTOMATION_TRIM);
+            } else {
+                GetTrackUIPan(media_track, &pan1, &pan2, &dummy);
+            }
+
+            if (context->IsChannelMode(PanMode2) && pan_mode == 6) {
+                pan2 = 0 - pan2;
+            }
+
+            HandleSinglePointAutomation(
+                media_track,
+                index,
+                value,
+                chunk_name,
+                context->IsChannelMode(PanMode1) ? 0 - pan1 : pan2
+            );
         }
     }
 

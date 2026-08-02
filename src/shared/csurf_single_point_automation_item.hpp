@@ -16,9 +16,28 @@ private:
     TrackEnvelope *envelope;
     double start_position;
     double end_position;
+    std::string chunk_name;
+
+    /**
+     * Delete the points between the start point and the endpoint
+     */
+    void DeleteRange() const {
+        DeleteEnvelopePointRange(envelope, start_position + 0.000001, end_position - 0.000001);
+    }
+
+    /**
+     * Delete the start point of the envelope
+     */
+    void DeleteStartPoint() const {
+        DeleteEnvelopePointRange(envelope, start_position, start_position);
+    }
 
 public:
-    SinglePointAutomationItem(MediaTrack *media_track, const std::string &chunk_name, const double value) {
+    SinglePointAutomationItem(
+        MediaTrack *media_track,
+        const std::string &chunk_name,
+        const double value
+    ) : chunk_name(chunk_name) {
         start_position = GetPlayPosition();
         envelope = DAW::GetTrackEnvelopeByChunkName(
             media_track,
@@ -29,22 +48,10 @@ public:
         end_position = -1;
     }
 
-    void SetEndPosition(const double end_pos) {
-        end_position = end_pos;
-    }
-
-    [[nodiscard]] TrackEnvelope *GetEnvelope() const {
-        return envelope;
-    }
-
-    [[nodiscard]] double GetStartPosition() const {
-        return start_position;
-    }
-
-    [[nodiscard]] double GetEndPosition() const {
-        return end_position;
-    }
-
+    /**
+     * Set the start position of the envelope.
+     * @param value The start value for this envelope
+     */
     void InsertStartPoint(const double value) {
         start_position = GetPlayPosition();
         DAW::DisableEnvelope(envelope);
@@ -55,19 +62,28 @@ public:
         );
     }
 
-    void InsertEndPoint(const double value) {
-        end_position = GetPlayPosition();
+    /**
+     * Insert the endpoint for the single point automation. There is a check performed prior adding the point to the envelope:
+     * - The chunk name has to be the same as the start chunk name. As this one differs from theinitial one,
+     * we'll remove the start_position as well as someting unexpected happened
+     * @param value The value for the end point
+     * @param chunk The chunk name to set it for. As this one differs from theinitial one,
+     * we'll remove the start_position as well as someting unexpected happened
+     */
+    void InsertEndPoint(const double value, const std::string &chunk) {
         DAW::EnableEnvelope(envelope);
+        if (chunk != chunk_name) {
+            DeleteStartPoint();
+            return;
+        }
+
+        end_position = GetPlayPosition();
         DAW::InsertEnvelopePoint(
             envelope,
             end_position,
             value
         );
         DeleteRange();
-    }
-
-    void DeleteRange() const {
-        DeleteEnvelopePointRange(envelope, start_position + 0.000001, end_position - 0.000001);
     }
 };
 
