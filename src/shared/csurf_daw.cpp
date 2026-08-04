@@ -761,6 +761,14 @@ std::vector<std::string> DAW::GetProjectTime(const bool overwrite_time_code, con
     return GetTimeSegments(play_position + play_offset, proj_time_mode);
 }
 
+bool DAW::ProjectExist() {
+    char project_name_buffer[1024]; // NOLINT(*-avoid-c-arrays)
+    GetProjectName(nullptr, project_name_buffer, sizeof project_name_buffer);
+    const std::string project_name = project_name_buffer;
+
+    return !project_name.empty();
+}
+
 void DAW::EditSave() {
     Main_SaveProject(nullptr, false);
 }

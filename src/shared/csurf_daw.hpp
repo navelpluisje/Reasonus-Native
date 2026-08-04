@@ -732,6 +732,8 @@ public:
      */
     static std::vector<std::string> GetProjectTime(bool overwrite_time_code, int new_time_code);
 
+    static bool ProjectExist();
+
     /**************************************************************************************************************
      *  Media Items related methods
      *************************************************************************************************************/
