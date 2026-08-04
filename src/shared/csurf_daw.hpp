@@ -732,7 +732,13 @@ public:
      */
     static std::vector<std::string> GetProjectTime(bool overwrite_time_code, int new_time_code);
 
+    /**
+     * Check if a project has been saved before and therfor exists
+     * @return
+     */
     static bool ProjectExist();
+
+    static std::string GetProjectName();
 
     /**************************************************************************************************************
      *  Media Items related methods

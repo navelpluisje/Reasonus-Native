@@ -13,7 +13,6 @@ class CSurf_FP_8_CustomFiltersPage : public CSurf_UI_PageContent {
     int selected_filter = -1;
     int previous_selected_filter = -1;
 
-    char project_name_buffer[1024];
     std::string project_name;
 
     std::vector<std::string> filter_keys;
@@ -111,6 +110,10 @@ protected:
     }
 
     void HandleProjectChange() {
+        // When the new project is an empty and unsaved project, we switch back to global filters
+        if (!DAW::ProjectExist()) {
+            filter_type = 0;
+        }
         project_state->LoadProjectState();
         new_filter = false;
         selected_filter = -1;
@@ -119,8 +122,7 @@ protected:
     }
 
     void CheckProjectChange() {
-        GetProjectName(nullptr, project_name_buffer, sizeof project_name_buffer);
-        const std::string tmp_project_name = project_name_buffer;
+        const std::string tmp_project_name = DAW::GetProjectName();
 
         if (tmp_project_name != project_name) {
             project_name = tmp_project_name;
