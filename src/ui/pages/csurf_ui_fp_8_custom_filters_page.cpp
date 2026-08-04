@@ -1,4 +1,5 @@
 #include "../csurf_ui_page_content.hpp"
+#include "../../shared/csurf_daw.hpp"
 #include "../components/csurf_ui_action_text_input.hpp"
 #include "../components/csurf_ui_checkbox.hpp"
 #include "../components/csurf_ui_color_picker.hpp"
@@ -12,7 +13,6 @@ class CSurf_FP_8_CustomFiltersPage : public CSurf_UI_PageContent {
     int selected_filter = -1;
     int previous_selected_filter = -1;
 
-    char project_name_buffer[1024];
     std::string project_name;
 
     std::vector<std::string> filter_keys;
@@ -110,6 +110,10 @@ protected:
     }
 
     void HandleProjectChange() {
+        // When the new project is an empty and unsaved project, we switch back to global filters
+        if (!DAW::ProjectExist()) {
+            filter_type = 0;
+        }
         project_state->LoadProjectState();
         new_filter = false;
         selected_filter = -1;
@@ -118,8 +122,7 @@ protected:
     }
 
     void CheckProjectChange() {
-        GetProjectName(nullptr, project_name_buffer, sizeof project_name_buffer);
-        const std::string tmp_project_name = project_name_buffer;
+        const std::string tmp_project_name = DAW::GetProjectName();
 
         if (tmp_project_name != project_name) {
             project_name = tmp_project_name;
@@ -237,7 +240,8 @@ protected:
     }
 
     /**
-     * Prepare for the new filter type
+     * Prepare for the new filter type. When selectng the project filter, also a project saved check is performed as
+     * it otherwise might add some weird artefacts
      * @param type The type of filter to set:
      * - `0` for global filters
      * - `1` for project filters
@@ -245,6 +249,16 @@ protected:
      * On project change this should be true as the filter otherwise will get stored in the wrong project
      */
     void HandleFilterTypeChange(const int type, const bool do_dirty_check) {
+        if (!DAW::ProjectExist() && type == 1) {
+            MB(
+                i18n->t("filters", "popup.no-saved-project.message").c_str(),
+                i18n->t("filters", "popup.no-saved-project.title").c_str(),
+                0
+            );
+
+            return;
+        }
+
         if (do_dirty_check) {
             DirtyCheck();
         }
