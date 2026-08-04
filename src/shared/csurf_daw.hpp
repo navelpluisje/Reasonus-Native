@@ -40,7 +40,7 @@ static std::map<Features, double> feature_versions = { // NOLINT(*-statically-co
 
 class DAW {
 public:
-    static int sendModes[3];
+    static std::array<int, 3> sendModes;
 
     /**************************************************************************************************************
      *  Track related methods
@@ -222,7 +222,7 @@ public:
     /**
      * Get the automation mode for the given track
      * @param media_track The track to get the recording mode for
-     * @return The Automation Mode mode
+     * @return The 'Automation Mode' mode
      */
     static int GetTrackAutomationMode(MediaTrack *media_track);
 
