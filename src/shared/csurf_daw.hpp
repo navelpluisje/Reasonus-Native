@@ -4,13 +4,8 @@
 
 #include <map>
 #include <reaper_plugin.h>
-// ReSharper disable once CppUnusedIncludeDirective
-#include <WDL/wdltypes.h> // might be unnecessary in future
-#include <reaper_plugin_functions.h>
 #include <string>
 #include <vector>
-
-#include "db2val.h"
 #include "../controls/csurf_color_button_colors.hpp"
 
 enum Features {
@@ -765,6 +760,14 @@ public:
      * @return
      */
     static std::vector<std::string> GetProjectTime(bool overwrite_time_code, int new_time_code);
+
+    /**
+     * Check if a project has been saved before and therfor exists
+     * @return
+     */
+    static bool ProjectExist();
+
+    static std::string GetProjectName();
 
     //**************************************************************************************************************
     // *  Media Items related methods
