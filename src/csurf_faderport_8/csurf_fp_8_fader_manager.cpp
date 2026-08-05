@@ -146,6 +146,10 @@ void CSurf_FP_8_FaderManager::Refresh(const bool force) {
     SetButtonValues(force);
 }
 
+void CSurf_FP_8_FaderManager::ChangeChannelMode(const ChannelMode channelMode) {
+    SetChannelMode(channelMode, true);
+}
+
 void CSurf_FP_8_FaderManager::HandleTrackButtonClick(const int value) {
     if (value == 0) {
         return;

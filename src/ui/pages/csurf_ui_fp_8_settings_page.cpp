@@ -48,6 +48,7 @@ class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-in
     int setting_track_valuebar_mode;
     int setting_track_valuebar_value;
     bool setting_filter_custom_color;
+    bool setting_filter_project_filters;
 
     std::vector<std::string> language_names;
 
@@ -304,6 +305,14 @@ public:
                     i18n->t("settings", "distraction-free-mode.tooltip")
                 );
 
+                RenderInfoCheckbox(
+                    m_ctx,
+                    assets,
+                    i18n->t("settings", "swap-shift.label"),
+                    &setting_swap_shift,
+                    i18n->t("settings", "swap-shift.tooltip")
+                );
+
                 ImGui::EndChild(m_ctx);
             }
 
@@ -382,6 +391,102 @@ public:
             ImGui::GetContentRegionAvail(m_ctx, &width, &height);
 
             if (ImGui::BeginChild(m_ctx, "settings-display-left", width / 2 - 8, 0.0, ImGui::ChildFlags_None)) {
+                UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
+                if (ImGui::BeginChild(
+                    m_ctx,
+                    "track-settings",
+                    0.0,
+                    0.0,
+                    ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
+                )) {
+                    ReaSonusPageTitle(
+                        m_ctx,
+                        assets,
+                        i18n->t("settings", "track-group.label"),
+                        true
+                    );
+
+                    RenderInfoCheckbox(
+                        m_ctx,
+                        assets,
+                        i18n->t("settings", "momentary-mute.label"),
+                        &setting_momentary_mute_solo,
+                        i18n->t("settings", "momentary-mute.tooltip")
+                    );
+
+                    RenderInfoCheckbox(
+                        m_ctx,
+                        assets,
+                        i18n->t("settings", "fader-reset.label"),
+                        &setting_fader_reset,
+                        i18n->t("settings", "fader-reset.tooltip")
+                    );
+                    ImGui::EndChild(m_ctx);
+                }
+
+                if (ImGui::BeginChild(
+                    m_ctx,
+                    "custom-filter-settings",
+                    0.0,
+                    0.0,
+                    ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
+                )) {
+                    ReaSonusPageTitle(
+                        m_ctx,
+                        assets,
+                        i18n->t("settings", "custom-filter-group.label"),
+                        true
+                    );
+
+                    RenderInfoCheckbox(
+                        m_ctx,
+                        assets,
+                        i18n->t("settings", "instant-multi-select-filter.label"),
+                        &setting_instant_multi_select_filter,
+                        i18n->t("settings", "instant-multi-select-filter.tooltip")
+                    );
+
+                    RenderInfoCheckbox(
+                        m_ctx,
+                        assets,
+                        i18n->t("settings", "filter-use-custom-color.label"),
+                        &setting_filter_custom_color,
+                        i18n->t("settings", "filter-use-custom-color.tooltip")
+                    );
+
+                    RenderInfoCheckbox(
+                        m_ctx,
+                        assets,
+                        i18n->t("settings", "filter-use-project-filters.label"),
+                        &setting_filter_project_filters,
+                        i18n->t("settings", "filter-use-project-filters.tooltip")
+                    );
+
+                    ImGui::EndChild(m_ctx);
+                }
+
+                UiStyledElements::PopReaSonusGroupStyle(m_ctx);
+
+                ImGui::EndChild(m_ctx);
+            }
+
+            ImGui::SameLine(m_ctx);
+            ImGui::BeginGroup(m_ctx);
+            UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
+            if (ImGui::BeginChild(
+                m_ctx,
+                "master-settings",
+                0.0,
+                0.0,
+                ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
+            )) {
+                ReaSonusPageTitle(
+                    m_ctx,
+                    assets,
+                    i18n->t("settings", "master-group.label"),
+                    true
+                );
+
                 RenderInfoCheckbox(
                     m_ctx,
                     assets,
@@ -393,69 +498,9 @@ public:
                 RenderInfoCheckbox(
                     m_ctx,
                     assets,
-                    i18n->t("settings", "swap-shift.label"),
-                    &setting_swap_shift,
-                    i18n->t("settings", "swap-shift.tooltip")
-                );
-
-                RenderInfoCheckbox(
-                    m_ctx,
-                    assets,
-                    i18n->t("settings", "fader-reset.label"),
-                    &setting_fader_reset,
-                    i18n->t("settings", "fader-reset.tooltip")
-                );
-
-                RenderInfoCheckbox(
-                    m_ctx,
-                    assets,
-                    i18n->t("settings", "momentary-mute.label"),
-                    &setting_momentary_mute_solo,
-                    i18n->t("settings", "momentary-mute.tooltip")
-                );
-
-                RenderInfoCheckbox(
-                    m_ctx,
-                    assets,
                     i18n->t("settings", "mute-master-on-fwd-rwd.label"),
                     &setting_mute_master_on_fwd_rwd,
                     i18n->t("settings", "mute-master-on-fwd-rwd.tooltip")
-                );
-
-                ImGui::EndChild(m_ctx);
-            }
-
-            ImGui::SameLine(m_ctx);
-            ImGui::BeginGroup(m_ctx);
-            UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
-            if (ImGui::BeginChild(
-                m_ctx,
-                "custom-filter-settings",
-                0.0,
-                0.0,
-                ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
-            )) {
-                ReaSonusPageTitle(
-                    m_ctx,
-                    assets,
-                    i18n->t("settings", "custom-filter-group.label"),
-                    true
-                );
-
-                RenderInfoCheckbox(
-                    m_ctx,
-                    assets,
-                    i18n->t("settings", "instant-multi-select-filter.label"),
-                    &setting_instant_multi_select_filter,
-                    i18n->t("settings", "instant-multi-select-filter.tooltip")
-                );
-
-                RenderInfoCheckbox(
-                    m_ctx,
-                    assets,
-                    i18n->t("settings", "filter-use-custom-color.label"),
-                    &setting_filter_custom_color,
-                    i18n->t("settings", "filter-use-custom-color.tooltip")
                 );
 
                 ImGui::EndChild(m_ctx);
@@ -774,6 +819,7 @@ public:
         settings->SetSetting("displays", "track-value-bar-value", setting_track_valuebar_value);
         settings->SetSetting("surface", "reasonus-color-palette", join(settings_plugin_color_palette, ","));
         settings->SetSetting("filters", "use-custom-color", setting_filter_custom_color);
+        settings->SetSetting("filters", "project-filters", setting_filter_project_filters);
 
         if (settings->StoreSettings()) {
             DAW::SetExtState(EXT_STATE_KEY_SAVED_SETTINGS, EXT_STATE_VALUE_TRUE, false);
@@ -819,6 +865,7 @@ public:
         settings_initial_plugin_color_palette = settings->GetPluginColorPalette();
         settings_plugin_color_palette = settings->GetPluginColorPalette();
         setting_filter_custom_color = settings->UseFilterColor();
+        setting_filter_project_filters = settings->ProjectFiltersEnabled();
 
         int *const iterator = std::find(
             latch_preview_action_indexes,

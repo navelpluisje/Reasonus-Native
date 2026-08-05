@@ -4,13 +4,14 @@
 #include <utility>
 
 #include "csurf_fp_8_channel_manager.hpp"
-#include "../ui/windows/csurf_ui_fp_8_control_panel.hpp"
 #include "../shared/csurf_faderport_ui_imgui_utils.hpp"
+#include "../ui/windows/csurf_ui_fp_8_control_panel.hpp"
 
 struct Filter {
     std::string name;
     std::string id;
     int color;
+    bool project;
 };
 
 class CSurf_FP_8_FilterManager : public CSurf_FP_8_ChannelManager {
@@ -18,23 +19,47 @@ class CSurf_FP_8_FilterManager : public CSurf_FP_8_ChannelManager {
     mINI::INIStructure ini;
     std::vector<Filter> filters;
 
-protected:
-    void GetFilters() {
-        const mINI::INIFile file(GetReaSonusIniPath(FP_8));
-        file.read(ini);
-        const int nbFilters = stoi(ini["filters"]["nb-filters"]);
+    void GetProjectFilters() {
+        ProjectState::GetInstance()->LoadProjectState();
+        const std::vector<std::string> filter_keys = ProjectState::GetInstance()->GetFilterKeys();
 
-        for (int i = 0; i < nbFilters; i++) {
-            const std::string filterId = ini["filters"][std::to_string(i)];
+        for (const std::string &key: filter_keys) {
+            const mINI::INIMap<std::string> filter_data = project_state->GetFilter(key);
+
             const Filter filter{
-                ini[filterId]["name"],
-                filterId,
-                ini[filterId].has("color") ? stoi(ini[filterId]["color"]) : 0x00ffffff
+                filter_data.get("name"),
+                key,
+                filter_data.has("color") ? stoi(filter_data.get("color")) : 0x00ffffff,
+                true
             };
             filters.push_back(filter);
         }
     }
 
+    void GetSettingsFilters() {
+        const std::vector<std::string> filter_keys = settings->GetFilterKeys();
+
+        for (const std::string &key: filter_keys) {
+            const mINI::INIMap<std::string> filter_data = settings->GetFilter(key);
+
+            const Filter filter{
+                filter_data.get("name"),
+                key,
+                filter_data.has("color") ? stoi(filter_data.get("color")) : 0x00ffffff,
+                false
+            };
+            filters.push_back(filter);
+        }
+    }
+
+    void GetFilters() {
+        if (settings->ProjectFiltersEnabled()) {
+            GetProjectFilters();
+        }
+        GetSettingsFilters();
+    }
+
+protected:
     static void GetFaderValue(
         MediaTrack *media_track,
         int *faderValue,
@@ -87,11 +112,13 @@ public:
             MediaTrack *media_track = media_tracks.Get(i);
             const bool filterExist = filter_index < static_cast<int>(filters.size());
 
-            // If the existing slot has a filter and use filter color is set to true, use the filter color. Black otherwise
+            // If the existing slot has a filter and use filter color is set to true, use the filter color.
             if (settings->UseFilterColor() && filterExist) {
                 color.SetColor(filters[filter_index].color, false);
             } else {
-                color.SetColor(ButtonColorBlack);
+                // If there is no custom color then default is white, otherwise inactive color is black.
+                ButtonColor button_color = filterExist ? ButtonColorWhite : ButtonColorBlack;
+                color.SetColor(button_color);
             }
 
             GetFaderValue(media_track, &fader_value, &valuebar_value, &strPan1, &strPan2);
@@ -146,7 +173,7 @@ public:
                         navigator->HandleFilter(TrackCustomMultiSelectFilter);
                     }
                 } else {
-                    navigator->HandleCustomFilter(filters.at(filter_index).id);
+                    navigator->HandleCustomFilter(filters.at(filter_index).id, filters.at(filter_index).project);
                 }
             } else {
                 const int result = MB(

@@ -280,6 +280,7 @@ int ReaSonusSettings::AddNewFilter(const std::string &filter_name) {
     settings[newKey];
     settings[newKey]["name"] = filter_name;
     settings[newKey]["text"] = "";
+    settings[newKey]["color"] = std::to_string(0x00ffffff);
     settings[newKey]["case-insensitive"] = "0";
     settings[newKey]["sibblings"] = "0";
     settings[newKey]["parents"] = "0";
@@ -303,6 +304,10 @@ std::vector<std::string> ReaSonusSettings::GetFilterKeys() {
 
 bool ReaSonusSettings::UseFilterColor() {
     return settings["filters"]["use-custom-color"] == "1";
+}
+
+bool ReaSonusSettings::ProjectFiltersEnabled() {
+    return settings["filters"]["project-filters"] == "1";
 }
 
 void ReaSonusSettings::UpdateFilter(const std::string &key, const mINI::INIMap<std::string> &filter) {

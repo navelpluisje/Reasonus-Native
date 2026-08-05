@@ -427,6 +427,29 @@ void UiStyledElements::PopReaSonusChannelTabStyle(ImGui_Context *m_ctx) {
     ImGui::PopStyleColor(m_ctx, 4);
 }
 
+void UiStyledElements::PushReaSonusFilterTabStyle(ImGui_Context *m_ctx, const bool active) {
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameBorderSize, 0);
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FrameRounding, 4);
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_ItemInnerSpacing, 30, 30);
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 0, 0);
+
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_ButtonHovered, UI_COLORS::Accent_25);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_ButtonActive, UI_COLORS::Accent_50);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_Button, UI_COLORS::Transparent);
+    if (active) {
+        ImGui::PushStyleColor(m_ctx, ImGui::Col_Text, UI_COLORS::Accent);
+    } else {
+        ImGui::PushStyleColor(m_ctx, ImGui::Col_Text, UI_COLORS::White);
+    }
+
+    ImGui::PushItemWidth(m_ctx, -1);
+}
+
+void UiStyledElements::PopReaSonusFilterTabStyle(ImGui_Context *m_ctx) {
+    ImGui::PopStyleVar(m_ctx, 4);
+    ImGui::PopStyleColor(m_ctx, 4);
+}
+
 void UiStyledElements::PushReaSonusTabBarStyle(ImGui_Context *m_ctx) {
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_TabBarBorderSize, 1);
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_TabRounding, 4);
