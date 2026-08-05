@@ -67,6 +67,7 @@ class CSurf_FP_8_Navigator {
     WDL_PtrList<MediaTrack> tracks;
     bool has_solo;
     bool has_mute;
+    int last_published_offset = -1;
     bool track_touched[16] = {
         false,
         false,
@@ -121,6 +122,8 @@ class CSurf_FP_8_Navigator {
     void HandleTrackCustomMultiSelectFilter();
 
     bool TrackIsInBankTracks(MediaTrack *media_track);
+
+    void PublishOffset();
 
 public:
     explicit CSurf_FP_8_Navigator(CSurf_Context *context);

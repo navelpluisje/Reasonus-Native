@@ -27,5 +27,6 @@ inline auto EXT_STATE_SECTION = "ReaSonus";
 inline auto EXT_STATE_KEY_SAVED_SETTINGS = "saved_settings";
 inline auto EXT_STATE_KEY_UI_LANGUAGE = "language";
 inline auto EXT_STATE_KEY_VERSION = "version";
+inline auto FP_TRACK_OFFSET = "FP_TRACK_OFFSET";
 
 #endif
