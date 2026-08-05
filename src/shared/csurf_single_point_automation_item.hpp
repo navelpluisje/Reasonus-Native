@@ -11,12 +11,19 @@
 #include <reaper_plugin_functions.h>
 #include "csurf_daw.hpp"
 
+enum SinglePointAutomationType {
+    SPA_Track,
+    SPA_Send,
+    SPA_Plugin,
+};
+
 struct SinglePointAutomationItem {
 private:
     TrackEnvelope *envelope;
     double start_position;
     double end_position;
     std::string chunk_name;
+    SinglePointAutomationType type;
 
     /**
      * Delete the points between the start point and the endpoint
@@ -36,15 +43,23 @@ public:
     SinglePointAutomationItem(
         MediaTrack *media_track,
         const std::string &chunk_name,
-        const double value
-    ) : chunk_name(chunk_name) {
+        const double value,
+        const SinglePointAutomationType spa_type
+    ) : chunk_name(chunk_name), type(spa_type) {
         start_position = GetPlayPosition();
-        envelope = DAW::GetTrackEnvelopeByChunkName(
-            media_track,
-            start_position,
-            chunk_name,
-            value
-        );
+        switch (type) {
+            case SPA_Send:
+                envelope = DAW::GetTrackSendEnvelope(media_track, "<VOLENV");
+                break;
+                
+            default:
+                envelope = DAW::GetTrackEnvelopeByChunkName(
+                    media_track,
+                    start_position,
+                    chunk_name,
+                    value
+                );
+        }
         end_position = -1;
     }
 

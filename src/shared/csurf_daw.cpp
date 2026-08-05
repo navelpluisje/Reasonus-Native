@@ -8,6 +8,7 @@
 #include "csurf_plugin_utils.hpp"
 #include "csurf_utils.hpp"
 #include "csurf_reasonus_settings.hpp"
+#include "../actions/action_fp_v2_setting_endless_track_scroll.hpp"
 
 int DAW::sendModes[3] = {0, 1, 3};
 
@@ -456,8 +457,9 @@ bool DAW::HasTrackReceive(MediaTrack *media_track, const int receive) {
 }
 
 std::string DAW::GetTrackReceiveSrcName(MediaTrack *media_track, const int receive) {
-    auto *src_track = static_cast<MediaTrack *>(GetSetTrackSendInfo(media_track, SEND_MODE_RECEIVE, receive,
-                                                                    "P_SRCTRACK", nullptr));
+    auto *src_track = static_cast<MediaTrack *>(
+        GetSetTrackSendInfo(media_track, SEND_MODE_RECEIVE, receive, "P_SRCTRACK", nullptr)
+    );
 
     if (src_track != nullptr) {
         return GetTrackName(src_track);
@@ -582,8 +584,13 @@ bool DAW::GetTrackSendPhase(MediaTrack *media_track, const int send) {
 }
 
 void DAW::ToggleTrackSendPhase(MediaTrack *media_track, const int send) {
-    SetTrackSendInfo_Value(media_track, SEND_MODE_SEND, send, "B_PHASE",
-                           toDouble(!GetTrackSendPhase(media_track, send)));
+    SetTrackSendInfo_Value(
+        media_track,
+        SEND_MODE_SEND,
+        send,
+        "B_PHASE",
+        toDouble(!GetTrackSendPhase(media_track, send))
+    );
 }
 
 bool DAW::GetTrackSendMono(MediaTrack *media_track, const int send) {
@@ -591,8 +598,13 @@ bool DAW::GetTrackSendMono(MediaTrack *media_track, const int send) {
 }
 
 void DAW::ToggleTrackSendMono(MediaTrack *media_track, const int send) {
-    SetTrackSendInfo_Value(media_track, SEND_MODE_SEND, send, "B_MONO",
-                           toDouble(!GetTrackSendMono(media_track, send)));
+    SetTrackSendInfo_Value(
+        media_track,
+        SEND_MODE_SEND,
+        send,
+        "B_MONO",
+        toDouble(!GetTrackSendMono(media_track, send))
+    );
 }
 
 int DAW::GetNextTrackSendMode(MediaTrack *media_track, const int send) {
@@ -600,18 +612,49 @@ int DAW::GetNextTrackSendMode(MediaTrack *media_track, const int send) {
 }
 
 void DAW::SetNextTrackSendMode(MediaTrack *media_track, const int send) {
-    SetTrackSendInfo_Value(media_track, SEND_MODE_SEND, send, "I_SENDMODE",
-                           GetNextTrackSendMode(media_track, send));
+    SetTrackSendInfo_Value(
+        media_track,
+        SEND_MODE_SEND,
+        send,
+        "I_SENDMODE",
+        GetNextTrackSendMode(media_track, send)
+    );
 }
 
 void DAW::SetTrackSendVolume(MediaTrack *media_track, const int send, const double volume) {
-    SetTrackSendInfo_Value(media_track, SEND_MODE_SEND, send, "D_VOL",
-                           CSurf_OnSendVolumeChange(media_track, send, volume, false));
+    SetTrackSendInfo_Value(
+        media_track,
+        SEND_MODE_SEND,
+        send,
+        "D_VOL",
+        CSurf_OnSendVolumeChange(media_track, send, volume, false)
+    );
 }
 
 void DAW::SetTrackSendPan(MediaTrack *media_track, const int send, const double pan) {
-    SetTrackSendInfo_Value(media_track, SEND_MODE_SEND, send, "D_PAN",
-                           CSurf_OnSendPanChange(media_track, send, pan, false));
+    SetTrackSendInfo_Value(
+        media_track,
+        SEND_MODE_SEND,
+        send,
+        "D_PAN",
+        CSurf_OnSendPanChange(media_track, send, pan, false)
+    );
+}
+
+TrackEnvelope *DAW::GetTrackSendEnvelope(
+    MediaTrack *media_track,
+    const std::string &chunk_name
+) {
+    const auto envelope_pointer = static_cast<uintptr_t>(
+        GetTrackSendInfo_Value(media_track, 0, SEND_MODE_SEND, ("P_ENV:" + chunk_name).c_str())
+    );
+    auto *env = reinterpret_cast<TrackEnvelope *>(envelope_pointer);
+
+    if (env == nullptr) {
+        MB("Looks like there is no send envelope available", "ReaSonus Error", 0);
+    }
+
+    return env;
 }
 
 TrackEnvelope *DAW::GetTrackEnvelopeByChunkName(
@@ -674,7 +717,7 @@ void DAW::DisableEnvelope(TrackEnvelope *env) {
         replace(envelope_chunk, "ACT 1", "ACT 0");
 
         if (!SetEnvelopeStateChunk(env, envelope_chunk.c_str(), false)) {
-            MB("Something went wrong while setting the envelope to visible and active", "ReaSonus Error", 0);
+            MB("Something went wrong while disabling the envelope", "ReaSonus Error", 0);
         }
     }
 }
@@ -689,7 +732,7 @@ void DAW::EnableEnvelope(TrackEnvelope *env) {
         replace(envelope_chunk, "ACT 0", "ACT 1");
 
         if (!SetEnvelopeStateChunk(env, envelope_chunk.c_str(), false)) {
-            MB("Something went wrong while setting the envelope to visible and active", "ReaSonus Error", 0);
+            MB("Something went wrong while enabling the envelope", "ReaSonus Error", 0);
         }
     }
 }
@@ -871,7 +914,7 @@ std::string DAW::GetProjectName() {
     char project_name_buffer[1024]; // NOLINT(*-avoid-c-arrays)
     ::GetProjectName(nullptr, project_name_buffer, sizeof project_name_buffer);
     const std::string project_name = project_name_buffer;
-    
+
     return project_name;
 }
 

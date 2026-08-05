@@ -693,6 +693,8 @@ public:
      */
     static void SetTrackSendPan(MediaTrack *media_track, int send, double pan);
 
+    static TrackEnvelope *GetTrackSendEnvelope(MediaTrack *media_track, const std::string &chunk_name);
+
     // *************************************************************************************************************
     // *  Track Envelope methods
     // *************************************************************************************************************

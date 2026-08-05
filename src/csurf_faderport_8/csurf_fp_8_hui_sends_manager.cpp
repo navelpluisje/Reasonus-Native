@@ -2,6 +2,7 @@
 #define CSURF_FP_8_SENDS_MANAGER_C_
 
 #include "csurf_fp_8_channel_manager.hpp"
+#include "db2val.h"
 
 class CSurf_FP_8_SendsManager : public CSurf_FP_8_ChannelManager {
     int nb_sends = 0;
@@ -243,8 +244,36 @@ public:
     }
 
     void HandleFaderTouch(const int index, const int value) override {
-        (void) index;
-        (void) value;
+        MediaTrack *media_track = navigator->GetTrackByIndex(index);
+        /**
+         * Check if we have the proper conditions to continue with Single touch automation
+         * All pan related values (except for width) are displayed reversed.
+         * Therefore some fo the values are inverted as well, to make it mork as it should
+         */
+        if (HasSinglePointAutomation(media_track, index, value)) {
+            const std::string chunk_name = context->GetShiftLeft() ? "<PANENV" : "VOLENV";
+            double volume = 0.0;
+            double pan = 0.0;
+
+            // Get the value to write for the automation
+            if (value > 0) {
+                // We need to set it to read first to get the actual volume of the envelope
+                SetTrackAutomationMode(media_track, AUTOMATION_READ);
+                GetTrackSendUIVolPan(media_track, index, &volume, &pan);
+                SetTrackAutomationMode(media_track, AUTOMATION_TRIM);
+            } else {
+                GetTrackSendUIVolPan(media_track, index, &volume, &pan);
+            }
+
+            HandleSinglePointAutomation(
+                media_track,
+                index,
+                value,
+                chunk_name,
+                context->GetShiftLeft() ? pan : DB2SLIDER(VAL2DB(volume)),
+                SPA_Send
+            );
+        }
     }
 
     void HandleFaderMove(const int index, const int msb, const int lsb) override {

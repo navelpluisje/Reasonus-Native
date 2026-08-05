@@ -61,10 +61,12 @@ protected:
         const int index,
         const int value,
         const std::string &chunk_name,
-        const double point_value
+        const double point_value,
+        const SinglePointAutomationType spa_type
     ) {
         if (single_touch_automation[index] == nullptr) {
-            single_touch_automation[index] = new SinglePointAutomationItem(media_track, chunk_name, point_value);
+            single_touch_automation[index] = new SinglePointAutomationItem(
+                media_track, chunk_name, point_value, spa_type);
         }
 
         if (value > 0) {

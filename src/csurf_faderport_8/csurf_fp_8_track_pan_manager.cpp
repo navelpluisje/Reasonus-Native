@@ -38,6 +38,17 @@ protected:
         }
     }
 
+private:
+    std::string GetChunkName(const int pan_mode) const {
+        if (context->IsChannelMode(PanMode1)) {
+            return pan_mode == PAN_MODE_DUAL_PAN ? "<DUALPANENVL2" : "<PANENV2";
+        }
+        if (context->IsChannelMode(PanMode2) && pan_mode > PAN_MODE_BALANCE_PAN) {
+            return pan_mode == PAN_MODE_DUAL_PAN ? "<DUALPANENV2" : "<WIDTHENV2";
+        }
+        return "";
+    }
+
 public:
     CSurf_FP_8_PanManager(
         const std::vector<CSurf_FP_8_Track *> &tracks,
@@ -179,16 +190,10 @@ public:
          * Therefore some fo the values are inverted as well, to make it mork as it should
          */
         if (HasSinglePointAutomation(media_track, index, value)) {
-            std::string chunk_name;
+            const std::string chunk_name = GetChunkName(pan_mode);
             double pan1 = 0.0;
             double pan2 = 0.0;
             int dummy = 0;
-
-            if (context->IsChannelMode(PanMode1)) {
-                chunk_name = pan_mode == 6 ? "<DUALPANENVL2" : "<PANENV2";
-            } else if (context->IsChannelMode(PanMode2) && pan_mode > 3) {
-                chunk_name = pan_mode == 6 ? "<DUALPANENV2" : "<WIDTHENV2";
-            }
 
             // Get the value to write for the automation
             if (value > 0) {
@@ -200,7 +205,7 @@ public:
                 GetTrackUIPan(media_track, &pan1, &pan2, &dummy);
             }
 
-            if (context->IsChannelMode(PanMode2) && pan_mode == 6) {
+            if (context->IsChannelMode(PanMode2) && pan_mode == PAN_MODE_DUAL_PAN) {
                 pan2 = 0 - pan2;
             }
 
@@ -209,7 +214,8 @@ public:
                 index,
                 value,
                 chunk_name,
-                context->IsChannelMode(PanMode1) ? 0 - pan1 : pan2
+                context->IsChannelMode(PanMode1) ? 0 - pan1 : pan2,
+                SPA_Track
             );
         }
     }

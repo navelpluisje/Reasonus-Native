@@ -419,7 +419,7 @@ public:
                 volume = DB2SLIDER(VAL2DB(DAW::GetTrackVolume(media_track)));
             }
 
-            HandleSinglePointAutomation(media_track, index, value, "<VOLENV2", volume);
+            HandleSinglePointAutomation(media_track, index, value, "<VOLENV2", volume, SPA_Track);
         }
     }
 
