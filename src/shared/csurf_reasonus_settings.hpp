@@ -106,7 +106,7 @@ class ReaSonusSettings {
         {"surface", "mute-master-on-fwd-rwd", "0"},
         {"surface", "use-automation-colors", "0"},
         {"surface", "automation-colors", join(automation_colors, ",")},
-        {"surface", "use-automation-single-touch", "0"},
+        {"surface", "use-automation-point-touch", "0"},
         {"surface", "overwrite-automation-point-shape", "0"},
         {"surface", "automation-point-shape", "0"},
         {"surface", "automation-single-bezier-tension", "0"},
@@ -267,7 +267,7 @@ public:
 
     int GetAutomationColor(const AutomationButtonIndex &type, int fallback);
 
-    bool UseAutomationSingleTouch();
+    bool UseAutomationSinglePoint();
 
     bool OverwriteAutomationPointShape();
 

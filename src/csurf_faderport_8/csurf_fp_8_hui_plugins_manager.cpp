@@ -7,7 +7,6 @@
 class CSurf_FP_8_PluginsManager : public CSurf_FP_8_ChannelManager {
 protected:
     int nb_plugins = 0;
-    int nb_track_plugins[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     int current_plugin = 0;
 
     void GetFaderValue(MediaTrack *media_track, int *fader_value, int *value_bar_value) const {
@@ -55,7 +54,7 @@ public:
             }
 
             const int _nb_track_plugins = TrackFX_GetCount(media_track);
-            nb_track_plugins[i] = _nb_track_plugins;
+            nb_track_items[i] = _nb_track_plugins;
 
             if (_nb_track_plugins > nb_plugins) {
                 nb_plugins = _nb_track_plugins;
@@ -68,7 +67,7 @@ public:
         for (int i = 0; i < context->GetNbChannels(); i++) {
             MediaTrack *media_track;
             int fader_value = 0, value_bar_value = 0;
-            const int plugin_index = context->GetChannelManagerItemIndex(nb_track_plugins[i] - 1);
+            const int plugin_index = context->GetChannelManagerItemIndex(nb_track_items[i] - 1);
 
             CSurf_FP_8_Track *track = tracks.at(i);
             if (context->GetMasterFaderMode() && i == context->GetNbChannels() - 1) {
@@ -110,7 +109,7 @@ public:
                 track->SetDisplayLine(
                     3,
                     ALIGN_CENTER,
-                    Progress(plugin_index + 1, nb_track_plugins[i]).c_str(),
+                    Progress(plugin_index + 1, nb_track_items[i]).c_str(),
                     NON_INVERT,
                     force_update
                 );
@@ -167,7 +166,7 @@ public:
         }
 
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
-        const int plugin_index = context->GetChannelManagerItemIndex(nb_track_plugins[index] - 1);
+        const int plugin_index = context->GetChannelManagerItemIndex(nb_track_items[index] - 1);
 
         if (context->GetShiftChannelLeft()) {
             TrackFX_SetOffline(media_track, plugin_index, !DAW::GetTrackFxOffline(media_track, plugin_index));
@@ -182,7 +181,7 @@ public:
         }
 
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
-        const int plugin_index = context->GetChannelManagerItemIndex(nb_track_plugins[index] - 1);
+        const int plugin_index = context->GetChannelManagerItemIndex(nb_track_items[index] - 1);
 
         // If the current plugin window is open, close it
         // Otherwise Close all other open windows and open the plugin window

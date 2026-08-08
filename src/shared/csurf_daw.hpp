@@ -33,13 +33,19 @@ enum SEND_MODES {
     SEND_MODE_HARDWARE = 1,
 };
 
+enum SEND_SEND_MODES {
+    SEND_POST_FADER = 0,
+    SEND_PRE_FX     = 1,
+    SEND_POST_FX    = 3,
+};
+
 static std::map<Features, double> feature_versions = { // NOLINT(*-statically-constructed-objects, *-throwing-static-initialization)
     {FEATURE_PINNED_TRACKS, 7.46},
 };
 
 class DAW {
 public:
-    static int sendModes[3];
+    static std::array<int, 3> sendModes;
 
     /**************************************************************************************************************
      *  Track related methods
@@ -693,7 +699,13 @@ public:
      */
     static void SetTrackSendPan(MediaTrack *media_track, int send, double pan);
 
-    static TrackEnvelope *GetTrackSendEnvelope(MediaTrack *media_track, const std::string &chunk_name);
+    static TrackEnvelope *GetTrackSendEnvelope(
+        MediaTrack *media_track,
+        int send_index,
+        double position,
+        const std::string &chunk_name,
+        double value
+    );
 
     // *************************************************************************************************************
     // *  Track Envelope methods
@@ -714,6 +726,8 @@ public:
         const std::string &chunk_name,
         double value
     );
+
+    static void InitializeEnveloper(TrackEnvelope *env, double position, double value);
 
     static void DisableEnvelope(TrackEnvelope *env);
 

@@ -298,8 +298,8 @@ int ReaSonusSettings::GetAutomationColor(const AutomationButtonIndex &type, cons
     }
 }
 
-bool ReaSonusSettings::UseAutomationSingleTouch() {
-    return settings["surface"]["use-automation-single-touch"] == "1";
+bool ReaSonusSettings::UseAutomationSinglePoint() {
+    return settings["surface"]["use-automation-single-point"] == "1";
 }
 
 bool ReaSonusSettings::OverwriteAutomationPointShape() {

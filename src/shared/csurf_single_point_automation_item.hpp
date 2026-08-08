@@ -47,19 +47,29 @@ public:
         const SinglePointAutomationType spa_type
     ) : chunk_name(chunk_name), type(spa_type) {
         start_position = GetPlayPosition();
-        switch (type) {
-            case SPA_Send:
-                envelope = DAW::GetTrackSendEnvelope(media_track, "<VOLENV");
-                break;
-                
-            default:
-                envelope = DAW::GetTrackEnvelopeByChunkName(
-                    media_track,
-                    start_position,
-                    chunk_name,
-                    value
-                );
+
+        envelope = DAW::GetTrackEnvelopeByChunkName(
+            media_track,
+            start_position,
+            chunk_name,
+            value
+        );
+
+        end_position = -1;
+    }
+
+    SinglePointAutomationItem(
+        MediaTrack *media_track,
+        const std::string &chunk_name,
+        const double value,
+        const SinglePointAutomationType spa_type,
+        const int item_index
+    ) : chunk_name(chunk_name), type(spa_type) {
+        start_position = GetPlayPosition();
+        if (spa_type == SPA_Send) {
+            envelope = DAW::GetTrackSendEnvelope(media_track, item_index, start_position, chunk_name, value);
         }
+
         end_position = -1;
     }
 

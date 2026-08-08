@@ -405,7 +405,7 @@ public:
         }
 
         /**
-         * Check if we have the proper conditions to continue with Single touch automation
+         * Check if we have the proper conditions to continue with Single point automation
          */
         if (HasSinglePointAutomation(media_track, index, value)) {
             // Get the value to write for the automation

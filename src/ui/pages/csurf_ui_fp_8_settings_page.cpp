@@ -54,9 +54,9 @@ class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-in
     int prev_automation_trim_color;
     bool setting_latch_preview_action_enable;
     int setting_latch_preview_action;
-    bool setting_use_single_touch_mode;
-    bool setting_overwrite_single_touch_shape;
-    int setting_single_touch_mode_shape;
+    bool setting_use_single_point_mode;
+    bool setting_overwrite_single_point_shape;
+    int setting_single_point_mode_shape;
     double setting_single_bezier_tension;
 
     // Plugins
@@ -288,7 +288,7 @@ public:
             "##dummy",
             "automation-single-point-shape",
             automation_mode_shape_labels,
-            &setting_single_touch_mode_shape
+            &setting_single_point_mode_shape
         );
     }
 
@@ -739,30 +739,30 @@ public:
                 RenderInfoCheckbox(
                     m_ctx,
                     assets,
-                    i18n->t("settings", "use-single-touch-mode.label"),
-                    &setting_use_single_touch_mode,
-                    i18n->t("settings", "use-single-touch-mode.tooltip")
+                    i18n->t("settings", "use-single-point-mode.label"),
+                    &setting_use_single_point_mode,
+                    i18n->t("settings", "use-single-point-mode.tooltip")
                 );
 
                 RenderInfoCheckbox(
                     m_ctx,
                     assets,
-                    i18n->t("settings", "single-touch-overwrite-point-shape.label"),
-                    &setting_overwrite_single_touch_shape,
-                    i18n->t("settings", "single-touch-overwrite-point-shape.tooltip")
+                    i18n->t("settings", "single-point-overwrite-point-shape.label"),
+                    &setting_overwrite_single_point_shape,
+                    i18n->t("settings", "single-point-overwrite-point-shape.tooltip")
                 );
 
-                ImGui::BeginDisabled(m_ctx, !setting_overwrite_single_touch_shape);
+                ImGui::BeginDisabled(m_ctx, !setting_overwrite_single_point_shape);
                 ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + 26);
                 ImGui::BeginGroup(m_ctx);
                 automation_single_point_shape->Render();
                 ReaSonusAutomationPointShape(
                     m_ctx,
                     assets,
-                    i18n->t("settings", "single-touch-bezier-tension.label"),
+                    i18n->t("settings", "single-point-bezier-tension.label"),
                     &setting_single_bezier_tension,
-                    setting_single_touch_mode_shape,
-                    !setting_overwrite_single_touch_shape
+                    setting_single_point_mode_shape,
+                    !setting_overwrite_single_point_shape
                 );
                 ImGui::EndGroup(m_ctx);
                 ImGui::EndDisabled(m_ctx);
@@ -1083,9 +1083,9 @@ public:
         settings->SetSetting("surface", "mute-master-on-fwd-rwd", setting_mute_master_on_fwd_rwd);
         settings->SetSetting("surface", "use-automation-colors", setting_use_automation_colors);
 
-        settings->SetSetting("surface", "use-automation-single-touch", setting_use_single_touch_mode);
-        settings->SetSetting("surface", "overwrite-automation-point-shape", setting_overwrite_single_touch_shape);
-        settings->SetSetting("surface", "automation-point-shape", setting_single_touch_mode_shape);
+        settings->SetSetting("surface", "use-automation-single-point", setting_use_single_point_mode);
+        settings->SetSetting("surface", "overwrite-automation-point-shape", setting_overwrite_single_point_shape);
+        settings->SetSetting("surface", "automation-point-shape", setting_single_point_mode_shape);
         settings->SetSetting("surface", "automation-single-bezier-tension", setting_single_bezier_tension);
 
         settings->SetSetting("displays", "track", setting_track_display);
@@ -1146,9 +1146,9 @@ public:
         setting_filter_custom_color = settings->UseFilterColor();
         setting_filter_project_filters = settings->ProjectFiltersEnabled();
         setting_use_automation_colors = settings->UseAutomationColors();
-        setting_use_single_touch_mode = settings->UseAutomationSingleTouch();
-        setting_overwrite_single_touch_shape = settings->OverwriteAutomationPointShape();
-        setting_single_touch_mode_shape = settings->GetAutomationPointShape();
+        setting_use_single_point_mode = settings->UseAutomationSinglePoint();
+        setting_overwrite_single_point_shape = settings->OverwriteAutomationPointShape();
+        setting_single_point_mode_shape = settings->GetAutomationPointShape();
         setting_single_bezier_tension = settings->GetAutomationSingleBezierTension();
 
         int *const iterator = std::find(

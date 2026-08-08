@@ -185,7 +185,7 @@ public:
         }
 
         /**
-         * Check if we have the proper conditions to continue with Single touch automation
+         * Check if we have the proper conditions to continue with Single point automation
          * All pan related values (except for width) are displayed reversed.
          * Therefore some fo the values are inverted as well, to make it mork as it should
          */

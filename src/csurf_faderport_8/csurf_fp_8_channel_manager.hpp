@@ -19,7 +19,9 @@ protected:
     ReaSonusSettings *settings = ReaSonusSettings::GetInstance(FP_8);
     ProjectState *project_state = ProjectState::GetInstance();
 
-    std::array<SinglePointAutomationItem *, 16> single_touch_automation;
+    // is used as nb_sends, nb_receives or nb_plugins for the respective hui mode managers
+    int nb_track_items[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    std::array<SinglePointAutomationItem *, 16> single_point_automation;
 
     ButtonColor color;
 
@@ -53,7 +55,7 @@ protected:
     bool HasSinglePointAutomation(MediaTrack *media_track, const int index, const int value) const {
         return GetTrackAutomationMode(media_track) == AUTOMATION_TRIM
                && context->IsSinglePointAutomationEnabled()
-               && (value != 0 || single_touch_automation[index] != nullptr);
+               && (value != 0 || single_point_automation[index] != nullptr);
     }
 
     void HandleSinglePointAutomation(
@@ -62,20 +64,39 @@ protected:
         const int value,
         const std::string &chunk_name,
         const double point_value,
-        const SinglePointAutomationType spa_type
+        const SinglePointAutomationType spa_type,
+        const int item_index = -1
     ) {
-        if (single_touch_automation[index] == nullptr) {
-            single_touch_automation[index] = new SinglePointAutomationItem(
-                media_track, chunk_name, point_value, spa_type);
+        if (single_point_automation[index] == nullptr) {
+            switch (spa_type) {
+                case SPA_Send: {
+                    single_point_automation[index] = new SinglePointAutomationItem(
+                        media_track,
+                        chunk_name,
+                        point_value,
+                        spa_type,
+                        item_index
+                    );
+                    break;
+                }
+
+                default:
+                    single_point_automation[index] = new SinglePointAutomationItem(
+                        media_track,
+                        chunk_name,
+                        point_value,
+                        spa_type
+                    );
+            }
         }
 
         if (value > 0) {
-            single_touch_automation[index]->InsertStartPoint(point_value);
+            single_point_automation[index]->InsertStartPoint(point_value);
             return;
         }
 
-        single_touch_automation[index]->InsertEndPoint(point_value, chunk_name);
-        single_touch_automation[index] = nullptr;
+        single_point_automation[index]->InsertEndPoint(point_value, chunk_name);
+        single_point_automation[index] = nullptr;
     }
 
 public:

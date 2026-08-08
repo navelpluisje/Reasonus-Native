@@ -6,11 +6,10 @@
 #include <vector>
 #include "csurf.h"
 #include "csurf_plugin_utils.hpp"
-#include "csurf_utils.hpp"
 #include "csurf_reasonus_settings.hpp"
-#include "../actions/action_fp_v2_setting_endless_track_scroll.hpp"
+#include "csurf_utils.hpp"
 
-int DAW::sendModes[3] = {0, 1, 3};
+std::array<int, 3> DAW::sendModes = {SEND_POST_FADER, SEND_PRE_FX, SEND_POST_FX};
 
 /************************************************************************
  * Track
@@ -492,8 +491,13 @@ bool DAW::GetTrackReceiveMute(MediaTrack *media_track, const int receive) {
 }
 
 void DAW::ToggleTrackReceiveMute(MediaTrack *media_track, const int receive) {
-    SetTrackSendInfo_Value(media_track, SEND_MODE_RECEIVE, receive, "B_MUTE",
-                           toDouble(!GetTrackReceiveMute(media_track, receive)));
+    SetTrackSendInfo_Value(
+        media_track,
+        SEND_MODE_RECEIVE,
+        receive,
+        "B_MUTE",
+        toDouble(!GetTrackReceiveMute(media_track, receive))
+    );
 }
 
 bool DAW::GetTrackReceivePhase(MediaTrack *media_track, const int receive) {
@@ -501,8 +505,13 @@ bool DAW::GetTrackReceivePhase(MediaTrack *media_track, const int receive) {
 }
 
 void DAW::ToggleTrackReceivePhase(MediaTrack *media_track, const int receive) {
-    SetTrackSendInfo_Value(media_track, SEND_MODE_RECEIVE, receive, "B_PHASE",
-                           toDouble(!GetTrackReceivePhase(media_track, receive)));
+    SetTrackSendInfo_Value(
+        media_track,
+        SEND_MODE_RECEIVE,
+        receive,
+        "B_PHASE",
+        toDouble(!GetTrackReceivePhase(media_track, receive))
+    );
 }
 
 bool DAW::GetTrackReceiveMono(MediaTrack *media_track, const int receive) {
@@ -510,8 +519,12 @@ bool DAW::GetTrackReceiveMono(MediaTrack *media_track, const int receive) {
 }
 
 void DAW::ToggleTrackReceiveMono(MediaTrack *media_track, const int receive) {
-    SetTrackSendInfo_Value(media_track, SEND_MODE_RECEIVE, receive, "B_MONO",
-                           toDouble(!GetTrackReceiveMono(media_track, receive)));
+    SetTrackSendInfo_Value(
+        media_track,
+        SEND_MODE_RECEIVE,
+        receive, "B_MONO",
+        toDouble(!GetTrackReceiveMono(media_track, receive))
+    );
 }
 
 int DAW::GetNextTrackReceiveMode(MediaTrack *media_track, const int receive) {
@@ -519,18 +532,33 @@ int DAW::GetNextTrackReceiveMode(MediaTrack *media_track, const int receive) {
 }
 
 void DAW::SetNextTrackReceiveMode(MediaTrack *media_track, const int receive) {
-    SetTrackSendInfo_Value(media_track, SEND_MODE_RECEIVE, receive, "I_SENDMODE",
-                           GetNextTrackReceiveMode(media_track, receive));
+    SetTrackSendInfo_Value(
+        media_track,
+        SEND_MODE_RECEIVE,
+        receive,
+        "I_SENDMODE",
+        GetNextTrackReceiveMode(media_track, receive)
+    );
 }
 
 void DAW::SetTrackReceiveVolume(MediaTrack *media_track, const int receive, const double volume) {
-    SetTrackSendInfo_Value(media_track, SEND_MODE_RECEIVE, receive, "D_VOL",
-                           CSurf_OnRecvVolumeChange(media_track, receive, volume, false));
+    SetTrackSendInfo_Value(
+        media_track,
+        SEND_MODE_RECEIVE,
+        receive,
+        "D_VOL",
+        CSurf_OnRecvVolumeChange(media_track, receive, volume, false)
+    );
 }
 
 void DAW::SetTrackReceivePan(MediaTrack *media_track, const int receive, const double pan) {
-    SetTrackSendInfo_Value(media_track, SEND_MODE_RECEIVE, receive, "D_PAN",
-                           CSurf_OnRecvPanChange(media_track, receive, pan, false));
+    SetTrackSendInfo_Value(
+        media_track,
+        SEND_MODE_RECEIVE,
+        receive,
+        "D_PAN",
+        CSurf_OnRecvPanChange(media_track, receive, pan, false)
+    );
 }
 
 bool DAW::HasTrackSend(MediaTrack *media_track, const int send) {
@@ -575,8 +603,13 @@ bool DAW::GetTrackSendMute(MediaTrack *media_track, const int send) {
 }
 
 void DAW::ToggleTrackSendMute(MediaTrack *media_track, const int send) {
-    SetTrackSendInfo_Value(media_track, SEND_MODE_SEND, send, "B_MUTE",
-                           toDouble(!GetTrackSendMute(media_track, send)));
+    SetTrackSendInfo_Value(
+        media_track,
+        SEND_MODE_SEND,
+        send,
+        "B_MUTE",
+        toDouble(!GetTrackSendMute(media_track, send))
+    );
 }
 
 bool DAW::GetTrackSendPhase(MediaTrack *media_track, const int send) {
@@ -643,16 +676,23 @@ void DAW::SetTrackSendPan(MediaTrack *media_track, const int send, const double 
 
 TrackEnvelope *DAW::GetTrackSendEnvelope(
     MediaTrack *media_track,
-    const std::string &chunk_name
+    const int send_index,
+    const double position,
+    const std::string &chunk_name,
+    const double value
 ) {
+    // turn the default double return value into a proper Envelope pointer
+    // As a double can not be sacted to a TrackEnvelope pointer instant, we have to cast it to a int pointer type first
     const auto envelope_pointer = static_cast<uintptr_t>(
-        GetTrackSendInfo_Value(media_track, 0, SEND_MODE_SEND, ("P_ENV:" + chunk_name).c_str())
+        GetTrackSendInfo_Value(media_track, SEND_MODE_SEND, send_index, ("P_ENV:" + chunk_name).c_str())
     );
     auto *env = reinterpret_cast<TrackEnvelope *>(envelope_pointer);
 
     if (env == nullptr) {
-        MB("Looks like there is no send envelope available", "ReaSonus Error", 0);
+        return nullptr;
     }
+
+    InitializeEnveloper(env, position, value);
 
     return env;
 }
@@ -672,11 +712,17 @@ TrackEnvelope *DAW::GetTrackEnvelopeByChunkName(
         return nullptr;
     }
 
+    InitializeEnveloper(env, position, value);
+
+    return env;
+}
+
+void DAW::InitializeEnveloper(TrackEnvelope *env, const double position, const double value) {
     /**
-     * If the envelope has no points, we add the initial point
-     * We do need this this to overwrite the visibility and active flag.
-     * Without a point, an envelope is invalid and will never get set to active
-     */
+ * If the envelope has no points, we add the initial point
+ * We do need this this to overwrite the visibility and active flag.
+ * Without a point, an envelope is invalid and will never get set to active
+ */
     if (CountEnvelopePoints(env) == 0) {
         InsertEnvelopePoint(env, position, value);
     }
@@ -698,13 +744,10 @@ TrackEnvelope *DAW::GetTrackEnvelopeByChunkName(
         replace(envelope_chunk, "ACT 0", "ACT 1");
         replace(envelope_chunk, "ARM 0", "ARM 1");
 
-        InsertEnvelopePoint(env, position, value);
         if (!SetEnvelopeStateChunk(env, envelope_chunk.c_str(), false)) {
             MB("Something went wrong while setting the envelope to visible and active", "ReaSonus Error", 0);
         }
     }
-
-    return env;
 }
 
 void DAW::DisableEnvelope(TrackEnvelope *env) {
