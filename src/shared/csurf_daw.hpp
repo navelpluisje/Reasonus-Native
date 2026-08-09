@@ -394,6 +394,9 @@ public:
      */
     static void SetTrackFXParamUntouched(MediaTrack *media_track, int fx_index);
 
+    static TrackEnvelope *GetTrackFXEnvelope(MediaTrack *media_track, int plugin_index, int plugin_param_index,
+                                             double position, double value);
+
     /**************************************************************************************************************
      *  Track Receives related methods
      *************************************************************************************************************/

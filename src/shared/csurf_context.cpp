@@ -43,7 +43,7 @@ class CSurf_Context // NOLINT(*-use-internal-linkage)
     int channelManagerItemsCount = 0;
 
     // Plugin Edit fields
-    MediaTrack *pluginEditTrack{nullptr};
+    MediaTrack *pluginEditTrack;
     int pluginEditPluginId;
     int pluginEditParamId;
 

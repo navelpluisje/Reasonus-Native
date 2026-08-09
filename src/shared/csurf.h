@@ -1,9 +1,10 @@
-#ifndef _CSURF_H_
-#define _CSURF_H_
+#ifndef REASONUS_CSURF_H_
+#define REASONUS_CSURF_H_
 
 #include <reaper_plugin.h>
 
 #include <WDL/wdlstring.h>
+// ReSharper disable once CppUnusedIncludeDirective
 #include <WDL/win32_utf8.h>
 
 // WARNING: REAPER has a handful of UNDOCUMENTED API functions that are not declared in reaper_plugin_functions.h, so must declare here:

@@ -448,6 +448,24 @@ void DAW::SetTrackFXParamUntouched(MediaTrack *media_track, const int fx_index) 
     TrackFX_SetNamedConfigParm(media_track, fx_index, "last_touched", "-1");
 }
 
+TrackEnvelope *DAW::GetTrackFXEnvelope(
+    MediaTrack *media_track,
+    const int plugin_index,
+    const int plugin_param_index,
+    const double position,
+    const double value
+) {
+    auto *env = GetFXEnvelope(media_track, plugin_index, plugin_param_index, true);
+
+    if (env == nullptr) {
+        return nullptr;
+    }
+
+    InitializeEnveloper(env, position, value);
+
+    return env;
+}
+
 /************************************************************************
  * Track Receive
  ************************************************************************/

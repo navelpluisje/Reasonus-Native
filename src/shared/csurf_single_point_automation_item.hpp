@@ -9,6 +9,8 @@
 // ReSharper disable once CppUnusedIncludeDirective
 #include <WDL/wdltypes.h> // might be unnecessary in future
 #include <reaper_plugin_functions.h>
+
+#include <utility>
 #include "csurf_daw.hpp"
 
 enum SinglePointAutomationType {
@@ -69,6 +71,21 @@ public:
         if (spa_type == SPA_Send) {
             envelope = DAW::GetTrackSendEnvelope(media_track, item_index, start_position, chunk_name, value);
         }
+
+        end_position = -1;
+    }
+
+    SinglePointAutomationItem(
+        MediaTrack *media_track,
+        std::string chunk_name,
+        const double value,
+        const SinglePointAutomationType spa_type,
+        const int plugin_index,
+        const int plugin_param_index
+    ) : chunk_name(std::move(chunk_name)), type(spa_type) {
+        start_position = GetPlayPosition();
+
+        envelope = DAW::GetTrackFXEnvelope(media_track, plugin_index, plugin_param_index, start_position, value);
 
         end_position = -1;
     }

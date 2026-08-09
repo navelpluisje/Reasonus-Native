@@ -65,10 +65,23 @@ protected:
         const std::string &chunk_name,
         const double point_value,
         const SinglePointAutomationType spa_type,
-        const int item_index = -1
+        const int item_index = -1,
+        const int sub_item_index = -1
     ) {
         if (single_point_automation[index] == nullptr) {
             switch (spa_type) {
+                case SPA_Plugin: {
+                    single_point_automation[index] = new SinglePointAutomationItem(
+                        media_track,
+                        chunk_name,
+                        point_value,
+                        spa_type,
+                        item_index,
+                        sub_item_index
+                    );
+                    break;
+                }
+
                 case SPA_Send: {
                     single_point_automation[index] = new SinglePointAutomationItem(
                         media_track,

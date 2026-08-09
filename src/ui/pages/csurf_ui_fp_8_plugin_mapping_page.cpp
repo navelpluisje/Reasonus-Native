@@ -1,4 +1,5 @@
 #include <utility>
+#include <fmt/format.h>
 #include "../csurf_ui_page_content.hpp"
 #include "../../i18n/i18n.hpp"
 #include "../../shared/csurf_daw.hpp"
@@ -296,8 +297,11 @@ protected:
             const std::string param_name = cache["params"][std::to_string(i)];
 
             param_names.emplace_back(param_name);
-            param_data.emplace_back(stoi(cache["id"][std::to_string(i)]), param_name,
-                                    stoi(cache["steps"][std::to_string(i)]));
+            param_data.emplace_back(
+                stoi(cache["id"][std::to_string(i)]),
+                param_name,
+                stoi(cache["steps"][std::to_string(i)])
+            );
         }
 
         // SelectParamList->SetListItems(&param_names);
@@ -305,9 +309,9 @@ protected:
     }
 
     void PopulateFields() {
-        select_key = "select_" + std::to_string(selected_channel);
-        fader_key = "fader_" + std::to_string(selected_channel);
-        color_key = "color_" + std::to_string(selected_channel);
+        select_key = fmt::format("select_{}", selected_channel);
+        fader_key = fmt::format("fader_", selected_channel);
+        color_key = fmt::format("color_", selected_channel);
 
         if (plugin_params.has(color_key)) {
             group_color = plugin_params[color_key].has("color")

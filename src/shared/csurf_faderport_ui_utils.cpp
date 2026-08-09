@@ -7,7 +7,6 @@
 #include <WDL/swell/swell-functions.h>
 #endif
 
-
 void parseParms(const char *config, std::array<int, 4> parms) {
     parms[0] = 0;
     parms[1] = 9;
@@ -33,8 +32,8 @@ void parseParms(const char *config, std::array<int, 4> parms) {
     }
 }
 
-int AddComboEntry(HWND hwndDlg, const int lparam, char *buf, const int comboId) // NOLINT(*-const-correctness)
-{
+// ReSharper disable once CppParameterMayBeConst
+int AddComboEntry(HWND hwndDlg, const int lparam, char const *buf, const int comboId) {
     int const wparam = static_cast<int>(SendDlgItemMessage(hwndDlg, comboId, CB_ADDSTRING, 0,
                                                            reinterpret_cast<LPARAM>(buf)));
     SendDlgItemMessage(hwndDlg, comboId, CB_SETITEMDATA, wparam, lparam);
