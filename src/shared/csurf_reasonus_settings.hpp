@@ -110,6 +110,7 @@ class ReaSonusSettings {
         {"surface", "overwrite-automation-point-shape", "0"},
         {"surface", "automation-point-shape", "0"},
         {"surface", "automation-single-bezier-tension", "0"},
+        {"surface", "automation-single-button-blink", "1"},
 
         {"displays", "track", "8"},
         {"displays", "track-lines", "0,4,1,2"},
@@ -117,6 +118,7 @@ class ReaSonusSettings {
         {"displays", "track-invert", "0,0,0,0"},
         {"displays", "track-value-bar-mode", "1"},
         {"displays", "track-value-bar-value", "0"},
+
         {"functions", "5", "0"},
         {"functions", "6", "0"},
         {"functions", "7", "0"},
@@ -129,6 +131,7 @@ class ReaSonusSettings {
         {"functions", "14", "0"},
         {"functions", "15", "0"},
         {"functions", "16", "0"},
+
         {"filters", "nb-filters", "0"},
         {"filters", "use-custom-color", "0"},
         {"filters", "project-filters", "0"},
@@ -274,6 +277,8 @@ public:
     int GetAutomationPointShape();
 
     double GetAutomationSingleBezierTension();
+
+    bool GetAutomationSingleButtonBlink();
 
     int GetpluginStepSize();
 

@@ -314,6 +314,10 @@ double ReaSonusSettings::GetAutomationSingleBezierTension() {
     return stod(settings["surface"]["automation-single-bezier-tension"]);
 }
 
+bool ReaSonusSettings::GetAutomationSingleButtonBlink() {
+    return settings["surface"]["automation-single-button-blink"] == "1";
+}
+
 /**
  * Settings for the FaderPort 2
  */

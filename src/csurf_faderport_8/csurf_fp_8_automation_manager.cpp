@@ -50,7 +50,13 @@ class CSurf_FP_8_AutomationManager {
             readButton->SetValue(BTN_VALUE_OFF, force);
         } else {
             latchButton->SetValue(IsAutomationSelected(AUTOMATION_LATCH) ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
-            trimButton->SetValue(IsAutomationSelected(AUTOMATION_TRIM) ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+            trimButton->SetValue(ButtonBlinkOnOff(
+                                     IsAutomationSelected(AUTOMATION_TRIM)
+                                     && context->IsSinglePointAutomationEnabled()
+                                     && settings->GetAutomationSingleButtonBlink(),
+                                     IsAutomationSelected(AUTOMATION_TRIM),
+                                     false
+                                 ), force);
             offButton->SetValue(IsAutomationSelected(AUTOMATION_PREVIEW) ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
             touchButton->SetValue(ButtonOnBlinkOff(
                                       IsAutomationSelected(AUTOMATION_TOUCH),

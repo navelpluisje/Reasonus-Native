@@ -58,6 +58,7 @@ class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-in
     bool setting_overwrite_single_point_shape;
     int setting_single_point_mode_shape;
     double setting_single_bezier_tension;
+    bool setting_single_point_button_blink;
 
     // Plugins
     bool setting_disable_plugins;
@@ -767,6 +768,14 @@ public:
                 ImGui::EndGroup(m_ctx);
                 ImGui::EndDisabled(m_ctx);
 
+                RenderInfoCheckbox(
+                    m_ctx,
+                    assets,
+                    i18n->t("settings", "single-point-button-blink.label"),
+                    &setting_single_point_button_blink,
+                    i18n->t("settings", "single-point-button-blink.tooltip")
+                );
+
                 ImGui::EndChild(m_ctx);
             }
 
@@ -1087,6 +1096,7 @@ public:
         settings->SetSetting("surface", "overwrite-automation-point-shape", setting_overwrite_single_point_shape);
         settings->SetSetting("surface", "automation-point-shape", setting_single_point_mode_shape);
         settings->SetSetting("surface", "automation-single-bezier-tension", setting_single_bezier_tension);
+        settings->SetSetting("surface", "automation-single-button-blink", setting_single_point_button_blink);
 
         settings->SetSetting("displays", "track", setting_track_display);
         settings->SetSetting("displays", "track-lines", join(setting_track_value_line_value, ","));
@@ -1150,6 +1160,7 @@ public:
         setting_overwrite_single_point_shape = settings->OverwriteAutomationPointShape();
         setting_single_point_mode_shape = settings->GetAutomationPointShape();
         setting_single_bezier_tension = settings->GetAutomationSingleBezierTension();
+        setting_single_point_button_blink = settings->GetAutomationSingleButtonBlink();
 
         int *const iterator = std::find(
             latch_preview_action_indexes,
