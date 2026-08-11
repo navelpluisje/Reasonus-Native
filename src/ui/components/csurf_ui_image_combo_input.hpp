@@ -12,7 +12,13 @@ static void ReaSonusImageComboInput( // NOLINT(*-function-cognitive-complexity)
     const std::string &label,
     const std::vector<std::string> &string_values,
     int *value,
-    double width) {
+    double width
+) {
+    bool show_label = true;
+    if (label.rfind("##", 0) == 0) {
+        show_label = false;
+    }
+
     double modal_x;
     double modal_y;
     ImGui::GetCursorScreenPos(m_ctx, &modal_x, &modal_y);
@@ -35,7 +41,9 @@ static void ReaSonusImageComboInput( // NOLINT(*-function-cognitive-complexity)
          * Create the text input
          */
         ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_DisabledAlpha, 1);
-        ImGui::Text(m_ctx, label.c_str());
+        if (show_label) {
+            ImGui::Text(m_ctx, label.c_str());
+        }
 
         UiStyledElements::PushReaSonusInputStyle(m_ctx);
         ImGui::SetNextItemWidth(m_ctx, width - 39);

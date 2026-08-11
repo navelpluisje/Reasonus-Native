@@ -9,13 +9,13 @@ CSurf_ColorButton::CSurf_ColorButton(
     color = _color;
     CSurf_ColorButton::SendValue();
     SendColor();
-};
+}
 
 void CSurf_ColorButton::SendValue() {
     if (m_midiout) {
         m_midiout->Send(MIDI_MESSAGE_BUTTON, type, value, -1);
     }
-};
+}
 
 void CSurf_ColorButton::SendColor() const {
     if (m_midiout) {
@@ -23,7 +23,7 @@ void CSurf_ColorButton::SendColor() const {
         m_midiout->Send(MIDI_MESSAGE_COLOR_GREEN, type, color.green, -1);
         m_midiout->Send(MIDI_MESSAGE_COLOR_BLUE, type, color.blue, -1);
     }
-};
+}
 
 void CSurf_ColorButton::SetValue(const Btn_Value _value, const bool force) {
     if (value == _value && !force) {
@@ -31,11 +31,18 @@ void CSurf_ColorButton::SetValue(const Btn_Value _value, const bool force) {
     }
     value = _value;
     this->SendValue();
-};
+}
 
 void CSurf_ColorButton::SetColor(const ButtonColor _color, const bool force) {
     if (!color.IsColor(_color) || force) {
         color = _color;
         SendColor();
     }
-};
+}
+
+void CSurf_ColorButton::SetColor(const int _color, const bool force) {
+    if (!color.IsColor(_color) || force) {
+        color.SetColor(_color, false);
+        SendColor();
+    }
+}

@@ -11,8 +11,8 @@ class CSurf_Context // NOLINT(*-use-internal-linkage)
     /**
      * @brief Number of channels
      */
-    int nbChannels = 8;
-    std::string device = FP_8;
+    int nbChannels;
+    std::string device;
 
     // Shift keys
     bool shift_left;
@@ -61,6 +61,8 @@ public:
     explicit CSurf_Context(const int nbChannels) : nbChannels(nbChannels) {
         if (nbChannels == 1) {
             device = FP_V2;
+        } else {
+            device = FP_8;
         }
         settings = ReaSonusSettings::GetInstance(device);
         shift_left = false;

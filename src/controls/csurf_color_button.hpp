@@ -21,6 +21,8 @@ public:
     void SetValue(Btn_Value _value, bool force = false) override;
 
     void SetColor(ButtonColor _color, bool force = false);
+
+    void SetColor(int _color, bool force);
 };
 
 #endif // CSURF_COLOR_BUTTON_H_

@@ -21,12 +21,12 @@ extern HWND g_hwnd;
       (x)->Destroy();   \
   } while (0)
 
-inline const char *EXT_STATE_VALUE_FALSE = "0";
-inline const char *EXT_STATE_VALUE_TRUE = "1";
-inline const char *EXT_STATE_SECTION = "ReaSonus";
-inline const char *EXT_STATE_KEY_SAVED_SETTINGS = "saved_settings";
-inline const char *EXT_STATE_KEY_UI_LANGUAGE = "language";
-inline const char *EXT_STATE_KEY_VERSION = "version";
-inline const char *FP_TRACK_OFFSET = "FP_TRACK_OFFSET";
+inline auto EXT_STATE_VALUE_FALSE = "0";
+inline auto EXT_STATE_VALUE_TRUE = "1";
+inline auto EXT_STATE_SECTION = "ReaSonus";
+inline auto EXT_STATE_KEY_SAVED_SETTINGS = "saved_settings";
+inline auto EXT_STATE_KEY_UI_LANGUAGE = "language";
+inline auto EXT_STATE_KEY_VERSION = "version";
+inline auto FP_TRACK_OFFSET = "FP_TRACK_OFFSET";
 
 #endif

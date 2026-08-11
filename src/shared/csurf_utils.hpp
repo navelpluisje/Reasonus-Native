@@ -32,6 +32,15 @@ constexpr int AUTOMATION_LATCH = 4;
 constexpr int AUTOMATION_PREVIEW = 5;
 constexpr int AUTOMATION_WRITE = 3;
 
+enum AutomationButtonIndex {
+    AUTOMATION_BUTTON_LATCH,
+    AUTOMATION_BUTTON_TRIM,
+    AUTOMATION_BUTTON_OFF,
+    AUTOMATION_BUTTON_TOUCH,
+    AUTOMATION_BUTTON_WRITE,
+    AUTOMATION_BUTTON_READ,
+};
+
 struct ShiftState {
     bool active = false; // NOLINT(*-non-private-member-variables-in-classes)
     int start = 0;       // NOLINT(*-non-private-member-variables-in-classes)
@@ -254,6 +263,27 @@ std::vector<std::string> cutString(const std::string &str, size_t size);
 std::string join(const std::vector<std::string> &list, const std::string &delimiter);
 
 std::string join(const std::vector<int> &list, const std::string &delimiter);
+
+std::string join(int *list, std::string str);
+
+/**
+ * Join an array with an unknown length to a string
+ * As it uses a template, we can only declare it in the header file
+ * @tparam N Size of the array
+ * @param list Array of integers to join
+ * @param delimiter What character to join all the list items with
+ * @return String with joined values
+ */
+template<size_t N>
+std::string join(const std::array<int, N> &list, const std::string &delimiter) {
+    std::string result;
+
+    for (int i = 0; i < N; i++) {
+        result += (i > 0 ? delimiter : "") + std::to_string(list[i]);
+    }
+
+    return result;
+}
 
 std::string replace(std::string &str, const std::string &search, const std::string &replace);
 

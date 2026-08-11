@@ -205,9 +205,9 @@ std::vector<std::string> split(const std::string &str, const std::string &delimi
 
 std::vector<int> splitToInt(const std::string &str, const std::string &delimiter) {
     std::vector<int> value;
-    std::vector<std::string> splitted_string = split(str, delimiter);
+    const std::vector<std::string> splitted_string = split(str, delimiter);
 
-    for (auto val: splitted_string) {
+    for (const auto &val: splitted_string) {
         value.emplace_back(stoi(val));
     }
 
