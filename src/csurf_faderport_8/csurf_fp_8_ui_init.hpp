@@ -86,6 +86,22 @@ namespace CSURF_FP_8_UI_INIT {
                         SystemOpenURL("https://navelpluisje.github.io/reasonus/documentation/faderport8/");
                         break;
                     }
+                    case IDC_BUTTON_GITHUB: {
+                        SystemOpenURL("https://github.com/navelpluisje/Reasonus-Native/issues");
+                        break;
+                    }
+                    case IDC_BUTTON_REAPER: {
+                        SystemOpenURL("https://forum.cockos.com/showthread.php?t=267116");
+                        break;
+                    }
+                    case IDC_BUTTON_TIPEEE: {
+                        SystemOpenURL("https://en.tipeee.com/navelpluisje");
+                        break;
+                    }
+                    case IDC_BUTTON_COFFEE: {
+                        SystemOpenURL("https://buymeacoffee.com/navelpluisje");
+                        break;
+                    }
 
                     break;
                 }

@@ -68,11 +68,17 @@ BEGIN
     LTEXT           "MIDI In",IDC_STATIC,20,86,28,10
     COMBOBOX        IDC_COMBO_MIDI_OUT,55,105,135,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "MIDI Out",IDC_STATIC,20,106,31,10
-    GROUPBOX        "Settings",IDC_GROUP_SETTINGS,210,5,140,188
+    GROUPBOX        "Other Info",IDC_GROUP_SETTINGS,210,5,140,198
     LTEXT           "Open the ReaSonus documentation",IDC_STATIC,220,25,110,10
-    PUSHBUTTON      "ReaSonus Documentation",IDC_BUTTON_DOCUMENTATION,220,45,80,20
-    LTEXT           "Version:",IDC_STATIC,220,170,31,10
-    LTEXT           "0.0.1",IDC_VERSION,250,170,31,10
+    PUSHBUTTON      "Documentation",IDC_BUTTON_DOCUMENTATION,220,35,80,20
+    LTEXT           "If you find an issue, or have a feature request, please report it via Github or the REAPER Forum. \r\n\r\nI do not follow any socials or so ever (actively).",IDC_STATIC,220,60,115,50
+    PUSHBUTTON      "Github",IDC_BUTTON_GITHUB,220,110,55,20
+    PUSHBUTTON      "REAPER Forum",IDC_BUTTON_REAPER,285,110,55,20
+    LTEXT           "If you like what you see, please consider a donation",IDC_STATIC,220,135,115,50
+    PUSHBUTTON      "Tipeee",IDC_BUTTON_TIPEEE,220,155,55,20
+    PUSHBUTTON      "Buy me a coffee",IDC_BUTTON_COFFEE,285,155,55,20
+    LTEXT           "Version:",IDC_STATIC,220,190,31,10
+    LTEXT           "0.0.1",IDC_VERSION,250,190,31,10
 END
 
 
@@ -86,11 +92,17 @@ BEGIN
     LTEXT           "MIDI In",IDC_STATIC,20,26,28,10
     COMBOBOX        IDC_COMBO_MIDI_OUT,55,45,135,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT           "MIDI Out",IDC_STATIC,20,46,31,10
-    GROUPBOX        "Settings",IDC_GROUP_SETTINGS,210,5,140,188
+    GROUPBOX        "Other Info",IDC_GROUP_SETTINGS,210,5,140,198
     LTEXT           "Open the ReaSonus documentation",IDC_STATIC,220,25,110,10
-    PUSHBUTTON      "Documentation",IDC_BUTTON_DOCUMENTATION,220,45,80,20
-    LTEXT           "Version:",IDC_STATIC,220,170,31,10
-    LTEXT           "0.0.1",IDC_VERSION,250,170,31,10
+    PUSHBUTTON      "Documentation",IDC_BUTTON_DOCUMENTATION,220,35,80,20
+    LTEXT           "If you find an issue, or have a feature request, please report it via Github or the REAPER Forum. \r\n\r\nI do not follow any socials or so ever (actively).",IDC_STATIC,220,60,115,50
+    PUSHBUTTON      "Github",IDC_BUTTON_GITHUB,220,110,55,20
+    PUSHBUTTON      "REAPER Forum",IDC_BUTTON_REAPER,285,110,55,20
+    LTEXT           "If you like what you see, please consider a donation",IDC_STATIC,220,135,115,50
+    PUSHBUTTON      "Tipeee",IDC_BUTTON_TIPEEE,220,155,55,20
+    PUSHBUTTON      "Buy me a coffee",IDC_BUTTON_COFFEE,285,155,55,20
+    LTEXT           "Version:",IDC_STATIC,220,190,31,10
+    LTEXT           "0.0.1",IDC_VERSION,250,190,31,10
 
 END
 
