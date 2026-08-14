@@ -9,7 +9,6 @@
 #include "csurf_reasonus_settings.hpp"
 #include "csurf_utils.hpp"
 
-std::array<int, 3> DAW::sendModes = {SEND_POST_FADER, SEND_PRE_FX, SEND_POST_FX};
 
 /************************************************************************
  * Track
@@ -546,7 +545,7 @@ void DAW::ToggleTrackReceiveMono(MediaTrack *media_track, const int receive) {
 }
 
 int DAW::GetNextTrackReceiveMode(MediaTrack *media_track, const int receive) {
-    return sendModes.[(GetTrackReceiveMode(media_track, receive) + 1) % 4];
+    return sendModes.at((GetTrackReceiveMode(media_track, receive) + 1) % 4);
 }
 
 void DAW::SetNextTrackReceiveMode(MediaTrack *media_track, const int receive) {

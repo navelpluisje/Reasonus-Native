@@ -1,12 +1,12 @@
 #include "../shared/csurf_utils.hpp"
+#include "../shared/csurf.h"
+#include <WDL/wdltypes.h> // might be unnecessary in future
 #include <reaper_plugin_functions.h>
 #include <regex>
 #include <string>
 #include <vector>
 #include <WDL/db2val.h>
-#include <WDL/wdltypes.h> // might be unnecessary in future
 #include "csurf_daw.hpp"
-#include "../shared/csurf.h"
 #include "fmt/format.h"
 
 #ifdef _WIN32

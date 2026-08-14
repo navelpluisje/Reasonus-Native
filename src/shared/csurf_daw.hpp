@@ -2,6 +2,7 @@
 #ifndef CSURF_DAW_H_
 #define CSURF_DAW_H_
 
+#include <array>
 #include <map>
 #include <reaper_plugin.h>
 #include <string>
@@ -45,7 +46,7 @@ static std::map<Features, double> feature_versions = { // NOLINT(*-statically-co
 
 class DAW {
 public:
-    static std::array<int, 3> sendModes;
+    static inline std::array<int, 3> sendModes = {SEND_POST_FADER, SEND_PRE_FX, SEND_POST_FX};
 
     /**************************************************************************************************************
      *  Track related methods
