@@ -546,7 +546,7 @@ void DAW::ToggleTrackReceiveMono(MediaTrack *media_track, const int receive) {
 }
 
 int DAW::GetNextTrackReceiveMode(MediaTrack *media_track, const int receive) {
-    return sendModes[(GetTrackReceiveMode(media_track, receive) + 1) % 4];
+    return sendModes.[(GetTrackReceiveMode(media_track, receive) + 1) % 4];
 }
 
 void DAW::SetNextTrackReceiveMode(MediaTrack *media_track, const int receive) {

@@ -2,7 +2,6 @@
 #define CSURF_FP_8_RECEIVES_MANAGER_C_
 
 #include "csurf_fp_8_channel_manager.hpp"
-#include "db2val.h"
 
 class CSurf_FP_8_ReceivesManager : public CSurf_FP_8_ChannelManager {
 protected:

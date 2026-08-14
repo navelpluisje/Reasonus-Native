@@ -3,8 +3,8 @@
 
 #include <algorithm>
 
+#include <WDL/db2val.h>
 #include "csurf_fp_8_channel_manager.hpp"
-#include "db2val.h"
 
 class CSurf_FP_8_SendsManager : public CSurf_FP_8_ChannelManager {
     int nb_sends = 0;

@@ -2,7 +2,7 @@
 #define CSURF_FP_8_TRACK_SENDS_MANAGER_C_
 
 #include "csurf_fp_8_channel_manager.hpp"
-#include "db2val.h"
+#include <WDL/db2val.h>
 
 class CSurf_FP_8_TrackSendsManager : public CSurf_FP_8_ChannelManager {
 protected:

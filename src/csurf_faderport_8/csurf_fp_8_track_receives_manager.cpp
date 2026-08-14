@@ -2,7 +2,6 @@
 #define CSURF_FP_8_TRACK_RECEIVES_MANAGER_C_
 
 #include "csurf_fp_8_channel_manager.hpp"
-#include "db2val.h"
 
 class CSurf_FP_8_TrackReceivesManager : public CSurf_FP_8_ChannelManager {
 protected:
@@ -231,7 +230,7 @@ public:
             DAW::ToggleTrackReceivePhase(receives_track, receive_index);
         }
     }
-    
+
     void HandleFaderMove(const int index, const int msb, const int lsb) override {
         MediaTrack *receives_track = GetSelectedTrack(nullptr, 0);
         const int receive_index = context->GetChannelManagerItemIndex() + index;

@@ -3,8 +3,8 @@
 
 #include <array>
 #include <regex>
+#include <WDL/db2val.h>
 #include "csurf_fp_8_channel_manager.hpp"
-#include "db2val.h"
 
 extern const int MOMENTARY_TIMEOUT;
 
