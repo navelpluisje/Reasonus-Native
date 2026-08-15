@@ -731,14 +731,54 @@ public:
         double value
     );
 
-    static void InitializeEnveloper(TrackEnvelope *env, double position, double value);
+    /**
+     * Get the envelope chunk for the given envelope.
+     *  Allocates space for a large amount of content and clears it afterward
+     *  More: https://forum.cockos.com/showpost.php?p=2596093&postcount=6
+     * @param env The envelope to get the chunk for
+     * @return The envelope chunk
+     */
+    static std::string GetEnvelopeChunk(TrackEnvelope *env);
 
+    /**
+     * Initialize the given envelope. By default, an envelope does have no points and is inactive, invisible and unarmed.
+     * Here we do enable all the fields and set the initial point to make it a valid chunk
+     * @param env The envelope to initialize
+     * @param position The position to set the initial value
+     * @param value The initial point to set. The initial point is needed to make the chunk valid
+     */
+    static void InitializeEnvelope(TrackEnvelope *env, double position, double value);
+
+    /**
+     * Disable the given envelope
+     * @param env The envelope to disable
+     */
     static void DisableEnvelope(TrackEnvelope *env);
 
+    /**
+     * Enable the given envelope
+     * @param env The envelope to enable
+     */
     static void EnableEnvelope(TrackEnvelope *env);
 
+    /**
+     * Get the default envelope shape from the settings:
+     * - 0: Linear
+     * - 1: Square
+     * - 2: Slow Start and End
+     * - 3: Fast start
+     * - 4: Fast end
+     * - 5: Bezier
+     * @return The envelope shape
+     */
     static int GetDefaultAutomationPointShape();
 
+    /**
+     *
+     * @param env The envelope to set the point
+     * @param position The play position to set the value
+     * @param value The value to set
+     */
     static void InsertEnvelopePoint(TrackEnvelope *env, double position, double value);
 
     //**************************************************************************************************************

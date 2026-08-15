@@ -21,9 +21,12 @@ protected:
 
     // is used as nb_sends, nb_receives or nb_plugins for the respective hui mode managers
     int nb_track_items[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    std::vector<SinglePointAutomationItem *> single_point_automation = {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
+    std::vector<SinglePointAutomationItem *> single_point_automation = {
+        nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,
+        nullptr, nullptr, nullptr, nullptr
+    };
 
-    ButtonColor color;
+    ButtonColor color{};
 
     virtual void SetTrackColors(MediaTrack *media_track, const bool is_selected, const bool has_arm) {
         const double brightness = is_selected ? 1 : settings->GetTrackColorBrightnessPercentage();
@@ -40,7 +43,7 @@ protected:
         if (!(context->GetArm() && has_arm) &&
             !(DAW::IsTrackArmed(media_track) && settings->GetDistractionFreeMode())
         ) {
-            const int trackColor = ::GetTrackColor(media_track);
+            const int trackColor = GetTrackColor(media_track);
             if (trackColor == 0) {
                 red = 0x7f;
                 green = 0x7f;
@@ -50,9 +53,9 @@ protected:
             }
         }
         color.SetColor(
-            static_cast<int>((red * brightness) / 2), 
-            static_cast<int>((green * brightness) / 2), 
-            static_cast<int>((blue * brightness) / 2)
+            static_cast<int>(red * brightness / 2),
+            static_cast<int>(green * brightness / 2),
+            static_cast<int>(blue * brightness / 2)
         );
     }
 
@@ -72,7 +75,7 @@ protected:
         const int item_index = -1,
         const int sub_item_index = -1
     ) {
-        if (single_point_automation.at(index) == nullptr) {
+        if (single_point_automation.at(index) == nullptr && value > 0) {
             switch (spa_type) {
                 case SPA_Plugin: {
                     single_point_automation.at(index) = new SinglePointAutomationItem(
@@ -107,12 +110,15 @@ protected:
             }
         }
 
-        if (value > 0) {
+        if (single_point_automation.at(index) != nullptr && value > 0) {
             single_point_automation.at(index)->InsertStartPoint(point_value);
             return;
         }
 
-        single_point_automation.at(index)->InsertEndPoint(point_value, chunk_name);
+        if (single_point_automation.at(index) != nullptr) {
+            single_point_automation.at(index)->InsertEndPoint(point_value, chunk_name);
+        }
+
         single_point_automation.at(index) = nullptr;
     }
 

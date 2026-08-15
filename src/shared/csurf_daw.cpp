@@ -9,7 +9,6 @@
 #include "csurf_reasonus_settings.hpp"
 #include "csurf_utils.hpp"
 
-
 /************************************************************************
  * Track
  ************************************************************************/
@@ -460,7 +459,7 @@ TrackEnvelope *DAW::GetTrackFXEnvelope(
         return nullptr;
     }
 
-    InitializeEnveloper(env, position, value);
+    InitializeEnvelope(env, position, value);
 
     return env;
 }
@@ -699,7 +698,7 @@ TrackEnvelope *DAW::GetTrackSendEnvelope(
     const double value
 ) {
     // turn the default double return value into a proper Envelope pointer
-    // As a double can not be sacted to a TrackEnvelope pointer instant, we have to cast it to a int pointer type first
+    // As a double can not be sacted to a TrackEnvelope pointer instant, we have to cast it to an int pointer type first
     const auto envelope_pointer = static_cast<uintptr_t>(
         GetTrackSendInfo_Value(media_track, SEND_MODE_SEND, send_index, ("P_ENV:" + chunk_name).c_str())
     );
@@ -709,7 +708,7 @@ TrackEnvelope *DAW::GetTrackSendEnvelope(
         return nullptr;
     }
 
-    InitializeEnveloper(env, position, value);
+    InitializeEnvelope(env, position, value);
 
     return env;
 }
@@ -729,17 +728,36 @@ TrackEnvelope *DAW::GetTrackEnvelopeByChunkName(
         return nullptr;
     }
 
-    InitializeEnveloper(env, position, value);
+    InitializeEnvelope(env, position, value);
 
     return env;
 }
 
-void DAW::InitializeEnveloper(TrackEnvelope *env, const double position, const double value) {
+std::string DAW::GetEnvelopeChunk(TrackEnvelope *env) {
+    std::string envelope_chunk;
+    char chunk_buffer[16384]; // NOLINT(*-avoid-c-arrays)
+    char *ptr = chunk_buffer;
+    int chunk_size = sizeof(chunk_buffer);
+    const int chunk_tok = realloc_cmd_register_buf(&ptr, &chunk_size); // allocate ptr and return initial ptr/size
+
+    if (GetEnvelopeStateChunk(env, chunk_buffer, chunk_size, false)) {
+        envelope_chunk = chunk_buffer;
+    }
+    realloc_cmd_clear(chunk_tok); // don't need you anymore
+
+    return envelope_chunk;
+}
+
+void DAW::InitializeEnvelope(TrackEnvelope *env, const double position, const double value) {
+    if (env == nullptr) {
+        return;
+    }
+
     /**
- * If the envelope has no points, we add the initial point
- * We do need this this to overwrite the visibility and active flag.
- * Without a point, an envelope is invalid and will never get set to active
- */
+     * If the envelope has no points, we add the initial point
+     * We do need this this to overwrite the visibility and active flag.
+     * Without a point, an envelope is invalid and will never get set to active
+     */
     if (CountEnvelopePoints(env) == 0) {
         InsertEnvelopePoint(env, position, value);
     }
@@ -747,9 +765,7 @@ void DAW::InitializeEnveloper(TrackEnvelope *env, const double position, const d
     /**
      * Now we're going to read the envelope chunk and set visibility and active to true
      */
-    char chunk[1024];
-    GetEnvelopeStateChunk(env, chunk, sizeof chunk, false);
-    std::string envelope_chunk = chunk;
+    std::string envelope_chunk = GetEnvelopeChunk(env);
 
     // If Active or Visibe ois set to `0`, we set both to `1`
     if (
@@ -757,8 +773,8 @@ void DAW::InitializeEnveloper(TrackEnvelope *env, const double position, const d
         || envelope_chunk.rfind("VIS 0") != std::string::npos
         || envelope_chunk.rfind("ARM 0") != std::string::npos
     ) {
-        replace(envelope_chunk, "VIS 0", "VIS 1");
         replace(envelope_chunk, "ACT 0", "ACT 1");
+        replace(envelope_chunk, "VIS 0", "VIS 1");
         replace(envelope_chunk, "ARM 0", "ARM 1");
 
         if (!SetEnvelopeStateChunk(env, envelope_chunk.c_str(), false)) {
@@ -768,11 +784,9 @@ void DAW::InitializeEnveloper(TrackEnvelope *env, const double position, const d
 }
 
 void DAW::DisableEnvelope(TrackEnvelope *env) {
-    char chunk[1024];
-    GetEnvelopeStateChunk(env, chunk, sizeof chunk, false);
-    std::string envelope_chunk = chunk;
+    std::string envelope_chunk = GetEnvelopeChunk(env);
 
-    // If Active or Visibe ois set to `0`, we set both to `1`
+    // If Active is set to `0`, we set it to `1`
     if (envelope_chunk.rfind("ACT 1") != std::string::npos) {
         replace(envelope_chunk, "ACT 1", "ACT 0");
 
@@ -783,11 +797,9 @@ void DAW::DisableEnvelope(TrackEnvelope *env) {
 }
 
 void DAW::EnableEnvelope(TrackEnvelope *env) {
-    char chunk[1024];
-    GetEnvelopeStateChunk(env, chunk, sizeof chunk, false);
-    std::string envelope_chunk = chunk;
+    std::string envelope_chunk = GetEnvelopeChunk(env);
 
-    // If Active or Visibe ois set to `0`, we set both to `1`
+    // If Active is set to `0`, we set it to `1`
     if (envelope_chunk.rfind("ACT 0") != std::string::npos) {
         replace(envelope_chunk, "ACT 0", "ACT 1");
 
