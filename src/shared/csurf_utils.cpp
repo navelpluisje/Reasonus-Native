@@ -444,6 +444,11 @@ bool between(const int min, const int val, const int max) {
     return diff > 0 && diff < val;
 }
 
+bool between(const double min, const double val, const double max) {
+    const double diff = max - min;
+    return diff > 0 && diff < val;
+}
+
 /**
  * @brief Create a Path If Not Exist object
  *

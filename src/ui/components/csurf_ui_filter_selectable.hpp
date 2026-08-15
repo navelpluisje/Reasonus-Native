@@ -44,10 +44,9 @@ static void ReaSonusFilterSelectable(
                                                ImGui::PopupFlags_AnyPopupId | ImGui::PopupFlags_AnyPopupLevel);
     const bool selected = filter_index == *selected_filter;
     const bool mouse_over = (!popup_open
-                             && between(static_cast<int>(pos_screen_x), width, static_cast<int>(mouse_pos_x))
-                             && between(static_cast<int>(pos_screen_y), selectable_height,
-                                        static_cast<int>(mouse_pos_y))) || (
-                                popup_open && *hovered_filter == filter_index);
+                             && between(pos_screen_x, width, mouse_pos_x)
+                             && between(pos_screen_y, selectable_height, mouse_pos_y)) 
+                             || (popup_open && *hovered_filter == filter_index);
 
     /**
      * Definings some colors§

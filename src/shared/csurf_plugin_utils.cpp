@@ -89,7 +89,7 @@ std::string PluginUtils::StripPluginChannelPostfix(char const *name) {
 std::string PluginUtils::ExtractDeveloperName(const std::string &plugin_name) {
     const std::vector<std::string> plugin_name_parts = split(plugin_name, " (");
     std::string developer;
-    const int max_index = plugin_name_parts.size() - 1;
+    const int max_index = static_cast<int>(plugin_name_parts.size()) - 1;
     const std::regex regex(".*(^[0-9->]{1,}ch|^[0-9]{1,3}[\\s]out|^mono)\\)");
 
     for (int i = max_index; i > 0; i--) {
@@ -651,7 +651,7 @@ bool PluginUtils::AddDeveloperParamFilter(std::string developer_name, std::strin
         if (!developer_filter_ini.has(developer_name)) {
             developer_filter_ini[developer_name];
         }
-        const int size = developer_filter_ini[developer_name].size();
+        const int size = static_cast<int>(developer_filter_ini[developer_name].size());
         developer_filter_ini[developer_name][std::to_string(size)] = fiter_name;
 
         WriteDevelopersFilterData(developer_filter_ini);
@@ -843,7 +843,7 @@ void PluginUtils::WriteFilterParams(
 
         bool found_filtered_param = false;
         for (const std::string &filter: param_filters) {
-            int filtered_length = filter.length();
+            int filtered_length = static_cast<int>(filter.length());
 
             // Starts with * (search term at end)
             if (filter.find("*", 0, 1) != std::string::npos) {
@@ -858,7 +858,7 @@ void PluginUtils::WriteFilterParams(
             }
 
             // Ends with * (search term at start)
-            filtered_length = filter.length();
+            filtered_length = static_cast<int>(filter.length());
             if (filter.find("*", filtered_length - 1, 1) != std::string::npos) {
                 const std::string filtered_param = filter.substr(0, filtered_length - 1);
                 filtered_length--;

@@ -21,7 +21,7 @@ protected:
 
     // is used as nb_sends, nb_receives or nb_plugins for the respective hui mode managers
     int nb_track_items[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    std::array<SinglePointAutomationItem *, 16> single_point_automation;
+    std::vector<SinglePointAutomationItem *> single_point_automation = {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
 
     ButtonColor color;
 
@@ -49,13 +49,17 @@ protected:
                 ColorFromNative(trackColor, &red, &green, &blue);
             }
         }
-        color.SetColor((red * brightness) / 2, (green * brightness) / 2, (blue * brightness) / 2);
+        color.SetColor(
+            static_cast<int>((red * brightness) / 2), 
+            static_cast<int>((green * brightness) / 2), 
+            static_cast<int>((blue * brightness) / 2)
+        );
     }
 
     bool HasSinglePointAutomation(MediaTrack *media_track, const int index, const int value) const {
         return GetTrackAutomationMode(media_track) == AUTOMATION_TRIM
                && context->IsSinglePointAutomationEnabled()
-               && (value != 0 || single_point_automation[index] != nullptr);
+               && (value != 0 || single_point_automation.at(index) != nullptr);
     }
 
     void HandleSinglePointAutomation(
@@ -68,10 +72,10 @@ protected:
         const int item_index = -1,
         const int sub_item_index = -1
     ) {
-        if (single_point_automation[index] == nullptr) {
+        if (single_point_automation.at(index) == nullptr) {
             switch (spa_type) {
                 case SPA_Plugin: {
-                    single_point_automation[index] = new SinglePointAutomationItem(
+                    single_point_automation.at(index) = new SinglePointAutomationItem(
                         media_track,
                         chunk_name,
                         point_value,
@@ -83,7 +87,7 @@ protected:
                 }
 
                 case SPA_Send: {
-                    single_point_automation[index] = new SinglePointAutomationItem(
+                    single_point_automation.at(index) = new SinglePointAutomationItem(
                         media_track,
                         chunk_name,
                         point_value,
@@ -94,7 +98,7 @@ protected:
                 }
 
                 default:
-                    single_point_automation[index] = new SinglePointAutomationItem(
+                    single_point_automation.at(index) = new SinglePointAutomationItem(
                         media_track,
                         chunk_name,
                         point_value,
@@ -104,12 +108,12 @@ protected:
         }
 
         if (value > 0) {
-            single_point_automation[index]->InsertStartPoint(point_value);
+            single_point_automation.at(index)->InsertStartPoint(point_value);
             return;
         }
 
-        single_point_automation[index]->InsertEndPoint(point_value, chunk_name);
-        single_point_automation[index] = nullptr;
+        single_point_automation.at(index)->InsertEndPoint(point_value, chunk_name);
+        single_point_automation.at(index) = nullptr;
     }
 
 public:

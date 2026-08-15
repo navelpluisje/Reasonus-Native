@@ -348,7 +348,7 @@ protected:
                 });
 
             if (iterator != param_data.end()) {
-                select_param_index = iterator - param_data.begin();
+                select_param_index = static_cast<int>(iterator - param_data.begin());
                 previous_select_param_index = select_param_index;
             }
         } else {
@@ -378,7 +378,7 @@ protected:
                     return param_id == std::get<0>(param);
                 });
             if (iterator != param_data.end()) {
-                fader_param_index = iterator - param_data.begin();
+                fader_param_index = static_cast<int>(iterator - param_data.begin());
             }
         } else {
             fader_name = "";
@@ -758,7 +758,7 @@ protected:
             }
 
             if (position == plugin.length() - type_ini.length()) {
-                return position;
+                return static_cast<int>(position);
             }
         }
 
@@ -859,7 +859,7 @@ protected:
         const auto developer_it = std::find(developers.begin(), developers.end(), developer);
 
         if (developer_it < developers.end()) {
-            developer_index = developer_it - developers.begin();
+            developer_index = static_cast<int>(developer_it - developers.begin());
         }
         selected_developer = developer_index;
         previous_selected_developer = developer_index;
@@ -872,7 +872,7 @@ protected:
         );
 
         if (plugin_it < developer_plugins.end()) {
-            plugin_index = plugin_it - developer_plugins.begin();
+            plugin_index = static_cast<int>(plugin_it - developer_plugins.begin());
         }
 
         selected_plugin = plugin_index;
@@ -1713,7 +1713,7 @@ public :
             case 0: {
                 const auto developer_it = std::find(developers.begin(), developers.end(), value);
                 if (developer_it != developers.end()) {
-                    selected_developer = developer_it - developers.begin();
+                    selected_developer = static_cast<int>(developer_it - developers.begin());
                     previous_selected_developer = selected_developer;
                 }
                 break;

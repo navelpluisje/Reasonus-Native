@@ -39,7 +39,7 @@ public:
 
     void Render(
         const std::function<void(int index)> &render_context_menu,
-        int width
+        double width
     ) {
         using namespace std::placeholders; // for `_1, _2 etc`
 

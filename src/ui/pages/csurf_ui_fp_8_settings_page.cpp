@@ -299,7 +299,7 @@ public:
         double width = 0.0;
         double height = 0.0;
 
-        const int language_button_width = getButtonWidth(
+        const double language_button_width = getButtonWidth(
             m_ctx,
             i18n->t("settings", "language.button.label"),
             assets->GetMainFontBold()

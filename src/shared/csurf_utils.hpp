@@ -441,6 +441,8 @@ void GetLanguages(std::vector<std::string> &language_names);
  */
 bool between(int min, int val, int max);
 
+bool between(double min, double val, double max);
+
 bool createPathIfNotExist(const std::string &path);
 
 std::string createPathName(const std::vector<std::string> &path_elements);

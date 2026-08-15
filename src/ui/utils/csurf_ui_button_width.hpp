@@ -4,7 +4,7 @@
 #include <reaper_imgui_functions.h>
 #include <string>
 
-static int getButtonWidth(
+static double getButtonWidth(
     ImGui_Context *m_ctx,
     const std::string &label,
     ImGui_Font *font)
@@ -15,7 +15,7 @@ static int getButtonWidth(
 
     ImGui::PushFont(m_ctx, font, FontSizeDefault);
     ImGui::CalcTextSize(m_ctx, label.c_str(), &x_pos_1, &y_pos_1);
-    const int buttonWidth = (x_pos_1 + button_padding_x * 2.F) + 1;
+    const double buttonWidth = (x_pos_1 + button_padding_x * 2.F) + 1;
     ImGui::PopFont(m_ctx);
 
     return buttonWidth;

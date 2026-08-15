@@ -63,7 +63,7 @@ static void ReaSonusGoToInput(ImGui_Context *m_ctx, CSurf_UI_Assets *assets, int
                 }
 
                 const int max_group_count = CSurf_Context::GetPluginMaxGroupCount();
-                const int str_value_buffer_length = std::to_string(max_group_count).length() + 1;
+                const int str_value_buffer_length = static_cast<int>(std::to_string(max_group_count).length() + 1);
 
                 if (ImGui::InputText(
                     m_ctx,

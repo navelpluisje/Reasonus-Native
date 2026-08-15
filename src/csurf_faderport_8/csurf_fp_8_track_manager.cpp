@@ -59,7 +59,7 @@ protected:
         }
 
         *faderValue = static_cast<int>(volToNormalized(volume) * 16383.0);
-        *valueBarValue = valuebar_value * 127;
+        *valueBarValue = static_cast<int>(valuebar_value * 127);
     }
 
     static std::string GetDisplayLineValue(MediaTrack *media_track, const DisplayValue display_value) {
@@ -107,7 +107,8 @@ public:
         const std::vector<CSurf_FP_8_Track *> &tracks,
         CSurf_FP_8_Navigator *navigator,
         CSurf_Context *context,
-        midi_Output *m_midiout) : CSurf_FP_8_ChannelManager(tracks, navigator, context, m_midiout) {
+        midi_Output *m_midiout
+    ) : CSurf_FP_8_ChannelManager(tracks, navigator, context, m_midiout) {
         CSurf_FP_8_TrackManager::UpdateTracks(true);
     }
 
