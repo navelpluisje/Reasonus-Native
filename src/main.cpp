@@ -13,6 +13,7 @@
 #include "actions/action_fp_8_setting_fader_reset.hpp"
 #include "actions/action_fp_8_setting_master_fader_mode.hpp"
 #include "actions/action_fp_8_setting_momentary_mute_solo.hpp"
+#include "actions/action_fp_8_setting_script_command.hpp"
 #include "actions/action_fp_8_setting_swap_shift_buttons.hpp"
 #include "actions/action_fp_8_setting_untouch_last_touched_param.hpp"
 #include "actions/action_fp_v2_setting_control_hidden_tracks.hpp"
@@ -60,6 +61,7 @@ REAPER_PLUGIN_DLL_EXPORT auto REAPER_PLUGIN_ENTRYPOINT(
     ACTION_FP_8_SETTING_FADER_RESET_SETTING::Unregister();
     ACTION_FP_8_SETTING_MASTER_FADER_MODE::Unregister();
     ACTION_FP_8_SETTING_MOMENTARY_MUTE_SOLO::Unregister();
+	ACTION_FP_8_SETTING_SCRIPT_COMMAND::Unregister();
     ACTION_FP_8_SETTING_SWAP_SHIFT_BUTTONS::Unregister();
     ACTION_FP_8_SETTING_UNTOUCH_LAST_TOUCHED_PARAM::Unregister();
     ACTION_FP_V2_SETTING_CONTROL_HIDDEN_TRACKS::Unregister();
@@ -108,6 +110,7 @@ REAPER_PLUGIN_DLL_EXPORT auto REAPER_PLUGIN_ENTRYPOINT(
   ACTION_FP_8_SETTING_FADER_RESET_SETTING::Register();
   ACTION_FP_8_SETTING_MASTER_FADER_MODE::Register();
   ACTION_FP_8_SETTING_MOMENTARY_MUTE_SOLO::Register();
+  ACTION_FP_8_SETTING_SCRIPT_COMMAND::Register();
   ACTION_FP_8_SETTING_SWAP_SHIFT_BUTTONS::Register();
   ACTION_FP_8_SETTING_UNTOUCH_LAST_TOUCHED_PARAM::Register();
   ACTION_FP_V2_SETTING_CONTROL_HIDDEN_TRACKS::Register();

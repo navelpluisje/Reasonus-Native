@@ -50,6 +50,7 @@ class CSurf_FaderPort : public IReaperControlSurface {
   DWORD surface_update_lastrun;
   DWORD surface_update_keepalive;
   DWORD surface_update_settings_check;
+  DWORD surface_update_script_command;
 
   I18n *i18n = I18n::GetInstance();
   ReaSonusSettings *settings = ReaSonusSettings::GetInstance(FP_8);
@@ -442,6 +443,20 @@ public:
         m_midiout->Send(0xa0, 0x00, 0x00, -1);
       }
       CheckProjectChange();
+	  
+      /**
+       * Incoming command from script
+       *
+       */
+      if ((now - surface_update_script_command) >= 500) {
+          surface_update_script_command = now;
+          int script_command_id = stoi(settings->GetSetting("surface", "script-command-id", "-1"));
+
+          if (ScriptCommand(script_command_id)) {
+              settings->SetAndSaveSetting("surface", "script-command-id", "-1");
+              settings->UpdateSettings();
+          }
+      }
 
       /**
        * every 1500 ms we check if the settings have been saved.
@@ -458,6 +473,64 @@ public:
         }
       }
     }
+  }
+
+  bool ScriptCommand(int script_command_id) {
+
+      if (script_command_id > 999 && script_command_id < 1016) {
+          script_command_id -= 1000;
+          faderManager->HandlePluginsButtonClick(0x7f, true);
+          faderManager->HandleSoloClick(script_command_id, 0x7f);
+          return true;
+
+      } else {
+          switch (script_command_id) {
+          case 501:
+              faderManager->HandleTrackButtonClick(0x7f);
+              return true;
+
+          case 502:
+              faderManager->HandlePluginsButtonClick(0x7f, false);
+              return true;
+
+          case 503:
+              faderManager->HandlePluginsButtonClick(0x7f, true);
+              return true;
+
+          case 504:
+              faderManager->HandleSendButtonClick(0x7f, false);
+              return true;
+
+          case 505:
+              faderManager->HandleSendButtonClick(0x7f, true);
+              return true;
+
+          case 506:
+              context->SetShiftLeftLocked(true);
+              faderManager->HandleSendButtonClick(0x7f, false);
+              context->SetShiftLeftLocked(false);
+              return true;
+
+          case 507:
+              context->SetShiftLeftLocked(true);
+              faderManager->HandleSendButtonClick(0x7f, true);
+              context->SetShiftLeftLocked(false);
+              return true;
+
+          case 508:
+              faderManager->HandlePanButtonClick(0x7f, false);
+              return true;
+
+          case 509:
+              faderManager->HandlePanButtonClick(0x7f, true);
+              return true;
+
+          default:
+              return false;
+          }
+      }
+
+      return false;
   }
 
   void OnTrackSelection(MediaTrack *media_track) override {
