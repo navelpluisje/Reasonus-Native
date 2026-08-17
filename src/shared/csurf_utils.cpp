@@ -60,6 +60,10 @@ int GetIntConfigVar(const std::string &var_name) {
     return ConfigVar<int>(var_name);
 }
 
+double GetDoubleConfigVar(const std::string &var_name) {
+    return ConfigVar<double>(var_name);
+}
+
 bool SetIntConfigVar(const std::string &var_name, const int value) {
     ConfigVar<int> var(var_name);
     return var.SetValue(value);

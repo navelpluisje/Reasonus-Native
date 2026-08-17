@@ -814,6 +814,10 @@ int DAW::GetDefaultAutomationPointShape() {
     return defenvs >> 16;
 }
 
+int DAW::GetSliderMaxVolume() {
+    return GetDoubleConfigVar("slidermaxv");
+}
+
 void DAW::InsertEnvelopePoint(TrackEnvelope *env, const double position, const double value) {
     const bool overwrite_point_shape = ReaSonusSettings::GetInstance(FP_8)->OverwriteAutomationPointShape();
     bool sort = false;

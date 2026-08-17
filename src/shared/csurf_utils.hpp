@@ -168,6 +168,8 @@ bool GetToggleCommandIdState(int action_id);
 
 bool GetToggleCommandStringState(const std::string &action_name);
 
+double GetDoubleConfigVar(const std::string &var_name);
+
 int GetIntConfigVar(const std::string &var_name);
 
 bool SetIntConfigVar(const std::string &var_name, int value);

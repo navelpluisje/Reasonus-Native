@@ -411,13 +411,17 @@ public:
         if (HasSinglePointAutomation(media_track, index, value)) {
             // Get the value to write for the automation
             double volume;
+            // The slider max value in the REAPER settings has effect on the value to get and write for the automation
+            // That's why we need the decibel offset and use it to determine the actual value to write to the automation.
+            const double fader_offset = 12 - DAW::GetSliderMaxVolume();
+
             if (value > 0) {
                 // We need to set it to read first to get the actual volume of the envelope
                 SetTrackAutomationMode(media_track, AUTOMATION_READ);
-                volume = DB2SLIDER(VAL2DB(DAW::GetTrackVolume(media_track)));
+                volume = DB2SLIDER(VAL2DB(DAW::GetTrackVolume(media_track)) - fader_offset);
                 SetTrackAutomationMode(media_track, AUTOMATION_TRIM);
             } else {
-                volume = DB2SLIDER(VAL2DB(DAW::GetTrackVolume(media_track)));
+                volume = DB2SLIDER(VAL2DB(DAW::GetTrackVolume(media_track)) - fader_offset);
             }
 
             HandleSinglePointAutomation(media_track, index, value, "<VOLENV2", volume, SPA_Track);
