@@ -1047,6 +1047,7 @@ int DAW::GetPinnedTracksHeight() {
 
 bool DAW::VersionHasFeature(const Features feature) {
     double const current_version = std::stod(GetAppVersion());
+
     return current_version >= feature_versions[feature];
 }
 
