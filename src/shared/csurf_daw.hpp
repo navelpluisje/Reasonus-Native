@@ -10,8 +10,7 @@
 #include "../controls/csurf_color_button_colors.hpp"
 
 enum Features {
-    FEATURE_PINNED_TRACKS,
-    FEATURE_EXTENSION_DATA
+    FEATURE_PINNED_TRACKS
 };
 
 enum PAN_MODES {
@@ -43,7 +42,6 @@ enum SEND_SEND_MODES {
 
 static std::map<Features, double> feature_versions = { // NOLINT(*-statically-constructed-objects, *-throwing-static-initialization)
     {FEATURE_PINNED_TRACKS, 7.46},
-    {FEATURE_EXTENSION_DATA, 7.79},
 };
 
 class DAW {
@@ -914,3 +912,5 @@ public:
      */
     static void SetExtState(const std::string &key, int value, bool persist);
 };
+
+#endif
