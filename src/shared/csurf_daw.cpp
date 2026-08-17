@@ -1,14 +1,14 @@
 // ReSharper disable CppRedundantParentheses
 #include "../shared/csurf_daw.hpp"
-#include <utility>
-#include <vector>
 #include <regex>
 #include <string>
-#include "../shared/csurf_utils.hpp"
+#include <utility>
+#include <vector>
 #include "csurf.h"
 #include "csurf_plugin_utils.hpp"
+#include "../shared/csurf_utils.hpp"
 
-int DAW::sendModes[3] = {0, 1, 3};
+std::array<int, 3> DAW::sendModes = {0, 1, 3};
 
 /************************************************************************
  * Track
@@ -830,6 +830,7 @@ int DAW::GetPinnedTracksHeight() {
 
 bool DAW::VersionHasFeature(const Features feature) {
     double const current_version = std::stod(GetAppVersion());
+
     return current_version >= feature_versions[feature];
 }
 
