@@ -238,15 +238,16 @@ public:
          */
         if (HasSinglePointAutomation(media_track, index, value)) {
             double parameter_value = 0.0;
+            double dummy;
 
             // Get the value to write for the automation
             if (value > 0) {
                 // We need to set it to read first to get the actual volume of the envelope
                 SetTrackAutomationMode(media_track, AUTOMATION_READ);
-                parameter_value = TrackFX_GetParamNormalized(media_track, plugin_index, plugin_param_index);
+                parameter_value = TrackFX_GetParam(media_track, plugin_index, plugin_param_index, &dummy, &dummy);
                 SetTrackAutomationMode(media_track, AUTOMATION_TRIM);
             } else {
-                parameter_value = TrackFX_GetParamNormalized(media_track, plugin_index, plugin_param_index);
+                parameter_value = TrackFX_GetParam(media_track, plugin_index, plugin_param_index, &dummy, &dummy);
             }
 
             HandleSinglePointAutomation(
