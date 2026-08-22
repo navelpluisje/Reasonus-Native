@@ -1,13 +1,13 @@
-#include <config.h>
 #include "csurf_ui_fp_8_control_panel.hpp"
-#include "../pages/csurf_ui_fp_8_settings_page.cpp"
-#include "../pages/csurf_ui_fp_8_plugin_mapping_page.cpp"
-#include "../pages/csurf_ui_fp_8_custom_filters_page.cpp"
-#include "../pages/csurf_ui_about.cpp"
-#include "../csurf_ui_vars.hpp"
-#include "../components/csurf_ui_menu_button.hpp"
-#include "../components/csurf_ui_button_bar.hpp"
+#include <config.h>
 #include "csurf_ui_message.hpp"
+#include "../csurf_ui_vars.hpp"
+#include "../components/csurf_ui_button_bar.hpp"
+#include "../components/csurf_ui_menu_button.hpp"
+#include "../pages/csurf_ui_about.cpp"
+#include "../pages/csurf_ui_fp_8_custom_filters_page.cpp"
+#include "../pages/csurf_ui_fp_8_plugin_mapping_page.cpp"
+#include "../pages/csurf_ui_fp_8_settings_page.cpp"
 #include "../pages/csurf_ui_function_keys.hpp"
 
 constexpr auto g_name{"ReaSonus Native 8/16 Control Panel"};
@@ -257,12 +257,19 @@ void ReaSonus8ControlPanel::Frame() // NOLINT(*-function-cognitive-complexity)
             ImGui::EndChild(m_ctx);
             UiStyledElements::PopReaSonusSidebarStyle(m_ctx);
         }
+
         ImGui::SameLine(m_ctx);
         UiStyledElements::PushReaSonusContentStyle(m_ctx);
+
         if (ImGui::BeginChild(m_ctx, "main_content", 0.0, 0.0, ImGui::ChildFlags_FrameStyle)) {
             UiStyledElements::PopReaSonusContentStyle(m_ctx);
-            if (ImGui::BeginChild(m_ctx, "main_content_area", 0.0, current_page != 4 ? -36.0 : 0,
-                                  ImGui::ChildFlags_None)) {
+            if (ImGui::BeginChild(
+                m_ctx,
+                "main_content_area",
+                0.0,
+                current_page != 4 ? -36.0 : 0,
+                ImGui::ChildFlags_None
+            )) {
                 ReaSonusPageTitle(m_ctx, assets, i18n->t("control-panel", menu_items[current_page]), false);
 
                 if (ImGui::BeginChild(m_ctx, "main_content_area", 0.0, -12.0, ImGui::ChildFlags_None)) {
@@ -271,6 +278,7 @@ void ReaSonus8ControlPanel::Frame() // NOLINT(*-function-cognitive-complexity)
                 }
                 ImGui::EndChild(m_ctx);
             }
+            
             if (current_page != 4) {
                 ReaSonusButtonBar(
                     m_ctx,

@@ -117,7 +117,7 @@ void ReaSonusTranslationEditor::HandleAddLanguage() {
     mINI::INIFile file(GetReaSonusLocalesPath(new_language));
     file.write(base_file);
     new_language = "";
-    selected_language = language_list.size() - 1;
+    selected_language = static_cast<int>(language_list.size()) - 1;
 }
 
 void ReaSonusTranslationEditor::SaveChanges() {
@@ -151,13 +151,13 @@ void ReaSonusTranslationEditor::getMultilineString(std::string &value, double wi
         ImGui::CalcTextSize(m_ctx, tmp_str.c_str(), &text_width, &text_height);
 
         if (text_width > width) {
-            int lastSpace = tmp_str.size() - 1;
+            int lastSpace = static_cast<int>(tmp_str.size()) - 1;
             while (tmp_str[lastSpace] != ' ' && lastSpace > 0) {
                 lastSpace--;
             }
 
             if (lastSpace == 0) {
-                lastSpace = tmp_str.size() - 2;
+                lastSpace = static_cast<int>(tmp_str.size()) - 2;
             }
 
             final_str += tmp_str.substr(0, lastSpace + 1) + "\r\n";

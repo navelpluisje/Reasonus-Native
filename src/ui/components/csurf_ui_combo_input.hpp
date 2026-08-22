@@ -135,6 +135,7 @@ public:
         label_width(label_width) {
         if (label.rfind("##", 0) == 0) {
             show_label = false;
+            this->label_width = 0.0;
         }
     }
 
@@ -143,26 +144,29 @@ public:
     void Render() {
         double space_x;
         double space_y;
-        double padding_x;
-        double padding_y;
-        const double start_pos = ImGui::GetCursorPosX(m_ctx);
+        double spacing_x;
+        double spacing_y;
 
-        ImGui::GetStyleVar(m_ctx, ImGui::StyleVar_FramePadding, &padding_x, &padding_y);
-        ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
+        ImGui::GetStyleVar(m_ctx, ImGui::StyleVar_ItemSpacing, &spacing_x, &spacing_y);
 
         UiStyledElements::PushReaSonusFieldGroupStyle(m_ctx);
-        if (ImGui::BeginChild(m_ctx, ("container-" + id).c_str(), 0.0, 0.0,
-                              ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY)) {
-            const double combo_width = space_x - label_width - padding_x;
+        if (ImGui::BeginChild(
+            m_ctx,
+            ("container-" + id).c_str(),
+            0.0,
+            0.0,
+            ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
+        )) {
+            // If we have a label, shift the y-pos a bit for better alignment
+            if (show_label) {
+                ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 8);
+                ImGui::Text(m_ctx, label.c_str());
+                ImGui::SameLine(m_ctx, label_width + spacing_x);
+                ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 8);
+            }
+            ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
 
-            ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 8);
-            ImGui::Text(m_ctx, label.c_str());
-
-            ImGui::SameLine(m_ctx);
-
-            ImGui::SetCursorPosX(m_ctx, start_pos + label_width);
-            ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 8);
-            ImGui::SetNextItemWidth(m_ctx, combo_width);
+            ImGui::SetNextItemWidth(m_ctx, space_x);
 
             UiStyledElements::PushReaSonusComboStyle(m_ctx);
             if (ImGui::BeginCombo(m_ctx, ("##" + id).c_str(), list[*selected_item].c_str())) {

@@ -1,9 +1,11 @@
+// ReSharper disable CppWrongIncludesOrder
 #ifndef CSURF_DAW_H_
 #define CSURF_DAW_H_
 
+#include <array>
+#include <map>
 #include <reaper_plugin.h>
 #include <string>
-#include <map>
 #include <vector>
 #include "../controls/csurf_color_button_colors.hpp"
 
@@ -33,6 +35,12 @@ enum SEND_MODES {
     SEND_MODE_HARDWARE = 1,
 };
 
+enum SEND_SEND_MODES {
+    SEND_POST_FADER = 0,
+    SEND_PRE_FX     = 1,
+    SEND_POST_FX    = 3,
+};
+
 static std::map<Features, double> feature_versions = { // NOLINT(*-statically-constructed-objects, *-throwing-static-initialization)
     {FEATURE_PINNED_TRACKS, 7.46},
     {FEATURE_EXTENSION_DATA, 7.79},
@@ -40,7 +48,7 @@ static std::map<Features, double> feature_versions = { // NOLINT(*-statically-co
 
 class DAW {
 public:
-    static std::array<int, 3> sendModes;
+    static inline std::array<int, 3> sendModes = {SEND_POST_FADER, SEND_PRE_FX, SEND_POST_FX};
 
     /**************************************************************************************************************
      *  Track related methods
@@ -389,6 +397,9 @@ public:
      */
     static void SetTrackFXParamUntouched(MediaTrack *media_track, int fx_index);
 
+    static TrackEnvelope *GetTrackFXEnvelope(MediaTrack *media_track, int plugin_index, int plugin_param_index,
+                                             double position, double value);
+
     /**************************************************************************************************************
      *  Track Receives related methods
      *************************************************************************************************************/
@@ -694,9 +705,93 @@ public:
      */
     static void SetTrackSendPan(MediaTrack *media_track, int send, double pan);
 
-    /**************************************************************************************************************
-     *  Project related methods
-     *************************************************************************************************************/
+    static TrackEnvelope *GetTrackSendEnvelope(
+        MediaTrack *media_track,
+        int send_index,
+        double position,
+        const std::string &chunk_name,
+        double value
+    );
+
+    // *************************************************************************************************************
+    // *  Track Envelope methods
+    // *************************************************************************************************************
+
+    /**
+     * Get the envelope with the given chunk name. Set it to visible and active it. If the envelope does not exist,
+     * it will be ceated and the value will be set to the given value
+     * @param media_track The track we want to get the envelope for
+     * @param position The current position for the initial point
+     * @param chunk_name The chunk name for the envelope. This is the name as it is used in the RPP file
+     * @param value The base value to set if the envelope has to be created
+     * @return The envelope
+     */
+    static TrackEnvelope *GetTrackEnvelopeByChunkName(
+        MediaTrack *media_track,
+        double position,
+        const std::string &chunk_name,
+        double value
+    );
+
+    /**
+     * Get the envelope chunk for the given envelope.
+     *  Allocates space for a large amount of content and clears it afterward
+     *  More: https://forum.cockos.com/showpost.php?p=2596093&postcount=6
+     * @param env The envelope to get the chunk for
+     * @return The envelope chunk
+     */
+    static std::string GetEnvelopeChunk(TrackEnvelope *env);
+
+    /**
+     * Initialize the given envelope. By default, an envelope does have no points and is inactive, invisible and unarmed.
+     * Here we do enable all the fields and set the initial point to make it a valid chunk
+     * @param env The envelope to initialize
+     * @param position The position to set the initial value
+     * @param value The initial point to set. The initial point is needed to make the chunk valid
+     */
+    static void InitializeEnvelope(TrackEnvelope *env, double position, double value);
+
+    /**
+     * Disable the given envelope
+     * @param env The envelope to disable
+     */
+    static void DisableEnvelope(TrackEnvelope *env);
+
+    /**
+     * Enable the given envelope
+     * @param env The envelope to enable
+     */
+    static void EnableEnvelope(TrackEnvelope *env);
+
+    /**
+     * Get the default envelope shape from the settings:
+     * - 0: Linear
+     * - 1: Square
+     * - 2: Slow Start and End
+     * - 3: Fast start
+     * - 4: Fast end
+     * - 5: Bezier
+     * @return The envelope shape
+     */
+    static int GetDefaultAutomationPointShape();
+
+    /**
+     * Get the maximum slider value:
+     * @return the max slider value
+     */
+    static int GetSliderMaxVolume();
+
+    /**
+     *
+     * @param env The envelope to set the point
+     * @param position The play position to set the value
+     * @param value The value to set
+     */
+    static void InsertEnvelopePoint(TrackEnvelope *env, double position, double value);
+
+    //**************************************************************************************************************
+    // *  Project related methods
+    // *************************************************************************************************************/
 
     /**
      * Get the Time Mode. `projtimemode2` gets the time mode of the transport bar when not overwritten by the ruler
@@ -742,9 +837,9 @@ public:
 
     static std::string GetProjectName();
 
-    /**************************************************************************************************************
-     *  Media Items related methods
-     *************************************************************************************************************/
+    //**************************************************************************************************************
+    // *  Media Items related methods
+    // *************************************************************************************************************/
 
     /**
      * Check if the given media item is a media item
@@ -773,9 +868,9 @@ public:
      */
     static void EditRedo();
 
-    /**************************************************************************************************************
-     *  Window related methods
-     *************************************************************************************************************/
+    //**************************************************************************************************************
+    // *  Window related methods
+    // *************************************************************************************************************/
 
     /**
      * Be sure that after selecting a track and the setting to follow tcp is enabled,
@@ -797,9 +892,9 @@ public:
      */
     static bool VersionHasFeature(Features feature);
 
-    /**************************************************************************************************************
-     *  Ext State related methods
-     *************************************************************************************************************/
+    //**************************************************************************************************************
+    // *  Ext State related methods
+    // *************************************************************************************************************/
 
     /**
      * Get the value from the ext state with the given key.

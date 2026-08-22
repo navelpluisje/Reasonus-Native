@@ -1,12 +1,13 @@
 #include "../shared/csurf_utils.hpp"
 #include "../shared/csurf.h"
-#include "csurf_daw.hpp"
-#include <WDL/db2val.h>
 #include <WDL/wdltypes.h> // might be unnecessary in future
 #include <reaper_plugin_functions.h>
+#include <regex>
 #include <string>
 #include <vector>
-#include <regex>
+#include <WDL/db2val.h>
+#include "csurf_daw.hpp"
+#include "fmt/format.h"
 
 #ifdef _WIN32
 #include <ShlObj_core.h>
@@ -59,6 +60,10 @@ int GetIntConfigVar(const std::string &var_name) {
     return ConfigVar<int>(var_name);
 }
 
+double GetDoubleConfigVar(const std::string &var_name) {
+    return ConfigVar<double>(var_name);
+}
+
 bool SetIntConfigVar(const std::string &var_name, const int value) {
     ConfigVar<int> var(var_name);
     return var.SetValue(value);
@@ -108,9 +113,7 @@ double int14ToVol(const unsigned char msb, const unsigned char lsb) {
 }
 
 std::string Progress(const int current, const int total) {
-    char buffer[127];
-    snprintf(buffer, sizeof(buffer), "%d/%d", current, total);
-    return {buffer};
+    return fmt::format("{}/{}", current, total);
 }
 
 std::string GetSendModeString(const int sendMode) {
@@ -174,9 +177,9 @@ std::string GetReaSonusLocalesRootFile() {
 }
 
 bool isInteger(const std::string &value) {
-    char *p;
-    strtol(value.c_str(), &p, 10);
-    return *p == 0;
+    char *pointer;
+    strtol(value.c_str(), &pointer, 10);
+    return *pointer == 0;
 }
 
 std::vector<std::string> split(const std::string &str, const std::string &delimiter) {
@@ -207,6 +210,7 @@ std::vector<int> splitToInt(const std::string &str, const std::string &delimiter
     std::vector<int> value;
     const std::vector<std::string> splitted_string = split(str, delimiter);
 
+    value.reserve(splitted_string.size());
     for (const auto &val: splitted_string) {
         value.emplace_back(stoi(val));
     }
@@ -231,27 +235,11 @@ std::vector<std::string> cutString(const std::string &str, const size_t size) {
 }
 
 std::string join(const std::vector<std::string> &list, const std::string &delimiter) {
-    std::string result;
-    int count = 0;
-
-    for (const std::string &key: list) {
-        result += (count > 0 ? delimiter : "") + key;
-        count++;
-    }
-
-    return result;
+    return fmt::format("{}", fmt::join(list, delimiter));
 }
 
 std::string join(const std::vector<int> &list, const std::string &delimiter) {
-    std::string result;
-    int count = 0;
-
-    for (const auto &key: list) {
-        result += (count > 0 ? delimiter : "") + std::to_string(key);
-        count++;
-    }
-
-    return result;
+    return fmt::format("{}", fmt::join(list, delimiter));
 }
 
 std::string replace(std::string &str, const std::string &search, const std::string &replace) {
@@ -276,25 +264,24 @@ std::string replaceAll(std::string str, const std::string &search, const std::st
     return str;
 }
 
-void logInteger(const char *key, const int value) {
-    char buffer[250];
-    snprintf(buffer, sizeof(buffer), "%s: %d\n", key, value);
-    ShowConsoleMsg(buffer);
+void logInteger(const char *key, const int value, const std::string &base) {
+    const std::string result = fmt::format("{}: {:" + base + "}\n", key, value);
+    ShowConsoleMsg(result.c_str());
 }
 
 void logDouble(const char *key, const double value) {
-    char buffer[250];
-    snprintf(buffer, sizeof(buffer), "%s: %f\n", key, value);
-    ShowConsoleMsg(buffer);
+    const std::string result = fmt::format("{}: {}\n", key, value);
+    ShowConsoleMsg(result.c_str());
 }
 
 std::string GenerateUniqueKey(std::string prefix) {
-    srand(std::time(nullptr));
+    const int seed = static_cast<int>(std::time(nullptr));
+    srand(seed);
     const int now = GetTickCount();
 
-    constexpr char characters[] = "abcdefghijklmnopqrstuvwxyz0123456789";
+    const std::string characters = "abcdefghijklmnopqrstuvwxyz0123456789";
     for (int i = 0; i < 24; i++) {
-        const char rnd = characters[(rand() + 100) % 36];
+        const char rnd = characters[(rand() + 100) % 36]; // NOLINT(*-msc50-cpp, *-predictable-rand)
         prefix += rnd;
     }
     prefix += std::to_string(now);
@@ -356,7 +343,8 @@ double max(const double value_1, const double value_2) {
                : value_2;
 }
 
-HWND findWindowChildByID(const HWND parentHWND, const int window_child_id) {
+// ReSharper disable once CppParameterMayBeConst
+HWND findWindowChildByID(HWND parentHWND, const int window_child_id) {
 #ifdef _WDL_SWELL
     if (!ValidatePtr(parentHWND, "HWND")) {
         return nullptr;
@@ -382,9 +370,14 @@ bool getWindowScrollInfo(
     SCROLLINFO scroll_info = {
         sizeof(SCROLLINFO),
         SIF_ALL,
+        0,
+        0,
+        0,
+        0,
+        0
     };
 
-    const int nBar = strchr(scrollbar, 'v') || strchr(scrollbar, 'V') ? SB_VERT : SB_HORZ;
+    const int nBar = strchr(scrollbar, 'v') != nullptr || strchr(scrollbar, 'V') != nullptr ? SB_VERT : SB_HORZ;
     // Match strings such as "SB_VERT", "VERT" or "v".
 
     const bool isOK = !!CoolSB_GetScrollInfo(static_cast<HWND>(windowHWND), nBar, &scroll_info);
@@ -402,21 +395,21 @@ bool setWindowScrollPos(void *windowHWND, const char *scrollbar, const int posit
     bool isOK = false;
 
     if (ValidatePtr(windowHWND, "HWND")) {
-        if (strchr(scrollbar, 'v') || strchr(scrollbar, 'V')) {
-            isOK = !!CoolSB_SetScrollPos(static_cast<HWND>(windowHWND), SB_VERT, position, TRUE);
+        if (strchr(scrollbar, 'v') != nullptr || strchr(scrollbar, 'V') != nullptr) {
+            isOK = CoolSB_SetScrollPos(static_cast<HWND>(windowHWND), SB_VERT, position, TRUE) != 0;
 
             if (!isOK) {
-                isOK = !!CoolSB_SetScrollPos(static_cast<HWND>(windowHWND), SB_VERT, position, TRUE);
+                isOK = CoolSB_SetScrollPos(static_cast<HWND>(windowHWND), SB_VERT, position, TRUE) != 0;
             }
 
             if (isOK) {
                 SendMessage(static_cast<HWND>(windowHWND), WM_VSCROLL, MAKEWPARAM(SB_THUMBPOSITION, position), 0);
             }
         } else {
-            isOK = !!CoolSB_SetScrollPos(static_cast<HWND>(windowHWND), SB_HORZ, position, TRUE);
+            isOK = CoolSB_SetScrollPos(static_cast<HWND>(windowHWND), SB_HORZ, position, TRUE) != 0;
 
             if (!isOK) {
-                isOK = !!CoolSB_SetScrollPos(static_cast<HWND>(windowHWND), SB_HORZ, position, TRUE);
+                isOK = CoolSB_SetScrollPos(static_cast<HWND>(windowHWND), SB_HORZ, position, TRUE) != 0;
             }
 
             if (isOK) {
@@ -451,6 +444,11 @@ void GetLanguages(std::vector<std::string> &language_names) {
  * @return boolean value
  */
 bool between(const int min, const int val, const int max) {
+    const double diff = max - min;
+    return diff > 0 && diff < val;
+}
+
+bool between(const double min, const double val, const double max) {
     const double diff = max - min;
     return diff > 0 && diff < val;
 }

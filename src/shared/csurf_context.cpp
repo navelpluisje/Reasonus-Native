@@ -43,12 +43,15 @@ class CSurf_Context // NOLINT(*-use-internal-linkage)
     int channelManagerItemsCount = 0;
 
     // Plugin Edit fields
-    MediaTrack *pluginEditTrack{nullptr};
+    MediaTrack *pluginEditTrack;
     int pluginEditPluginId;
     int pluginEditParamId;
 
     // disable fader on v2
     bool fader_disabled;
+
+    // Single Point Automation
+    bool single_point_automation;
 
     ChannelMode channelMode;
     ChannelMode previousChannelMode = TrackMode;
@@ -79,6 +82,7 @@ public:
         pluginEditParamId = 0;
 
         channelMode = TrackMode;
+        single_point_automation = false;
     }
 
     ~CSurf_Context() = default;
@@ -409,6 +413,17 @@ public:
 
     [[nodiscard]] bool GetFaderDisabled() const {
         return fader_disabled;
+    }
+
+    /**************************************************************************
+     * Single Point Automation
+     **************************************************************************/
+    void SetSinglePointAutomation(const bool value) {
+        single_point_automation = value;
+    }
+
+    [[nodiscard]] bool IsSinglePointAutomationEnabled() const {
+        return single_point_automation;
     }
 
     /**************************************************************************

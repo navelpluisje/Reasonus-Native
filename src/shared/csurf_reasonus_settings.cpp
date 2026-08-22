@@ -82,6 +82,10 @@ void ReaSonusSettings::SetSetting(const std::string &group, const std::string &k
     settings[group][key] = value ? "1" : "0";
 }
 
+void ReaSonusSettings::SetSetting(const std::string &group, const std::string &key, const double value) {
+    settings[group][key] = std::to_string(value);
+}
+
 void ReaSonusSettings::SetSetting(const std::string &group, const std::string &key, const int value) {
     settings[group][key] = std::to_string(value);
 }
@@ -252,12 +256,17 @@ std::vector<int> ReaSonusSettings::GetAutomationColors() {
     return splitToInt(settings["surface"]["automation-colors"], ",");
 }
 
-std::array<int, 6> ReaSonusSettings::GetAutomationColorsArray() {
+std::array<int, 7> ReaSonusSettings::GetAutomationColorsArray() {
     const std::vector<int> colors = splitToInt(settings["surface"]["automation-colors"], ",");
-    std::array<int, 6> result{};
+    std::array<int, 7> result{};
 
-    for (int i = 0; i < 6; i++) {
-        result[i] = colors[i];
+    for (int i = 0; i < 7; i++) {
+        // A fallback for when there is no 7th color
+        if (colors.size() == 6 && i == 6) {
+            result[i] = stoi(automation_colors[6]);
+        } else {
+            result[i] = colors[i];
+        }
     }
     return result;
 }
@@ -266,7 +275,8 @@ int ReaSonusSettings::GetAutomationColor(const AutomationButtonIndex &type, cons
     if (!UseAutomationColors()) {
         return fallback;
     }
-    const auto colors = splitToInt(settings["surface"]["automation-colors"], ",");
+
+    const auto colors = GetAutomationColorsArray();
 
     switch (type) {
         case AUTOMATION_BUTTON_LATCH:
@@ -281,9 +291,31 @@ int ReaSonusSettings::GetAutomationColor(const AutomationButtonIndex &type, cons
             return colors[4];
         case AUTOMATION_BUTTON_READ:
             return colors[5];
+        case AUTOMATION_SINGLE_POINT:
+            return colors[6];
         default:
             return stoi(automation_colors[1]);
     }
+}
+
+bool ReaSonusSettings::UseAutomationSinglePoint() {
+    return settings["surface"]["use-automation-single-point"] == "1";
+}
+
+bool ReaSonusSettings::OverwriteAutomationPointShape() {
+    return settings["surface"]["overwrite-automation-point-shape"] == "1";
+}
+
+int ReaSonusSettings::GetAutomationPointShape() {
+    return stoi(settings["surface"]["automation-point-shape"]);
+}
+
+double ReaSonusSettings::GetAutomationSingleBezierTension() {
+    return stod(settings["surface"]["automation-single-bezier-tension"]);
+}
+
+bool ReaSonusSettings::GetAutomationSingleButtonBlink() {
+    return settings["surface"]["automation-single-button-blink"] == "1";
 }
 
 /**

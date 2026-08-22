@@ -6,8 +6,7 @@
 #include "../csurf_ui_assets.hpp"
 #include "../../i18n/i18n.hpp"
 
-class ReaSonus8ControlPanel
-{
+class ReaSonus8ControlPanel {
 public:
     // The page id's
     static const int FUNCTIONS_PAGE = 0;
@@ -20,15 +19,24 @@ public:
     inline static bool control_panel_open;
 
     static void Start();
+
     static void Stop();
 
     static void SetCurrentPage(int page);
+
     static void SetPageProperty(int type, int value = 0);
+
     static void SetPageStringProperty(int type, const std::string &value = "");
+
     static int GetPageProperty(int type);
+
+    // TODO: Add option for message type to make it also work for info messages and error messages
     static void SetMessage(const std::string &_message);
+
     void SetLocalMessage(const std::string &_message);
+
     static std::string GetPageStringProperty(int type);
+
     ~ReaSonus8ControlPanel();
 
 private:
@@ -36,10 +44,13 @@ private:
     CSurf_UI_Assets *assets;
 
     static void Loop();
+
     void SetPageContent();
+
     CSurf_UI_PageContent *page_content = NULL;
 
     ReaSonus8ControlPanel();
+
     void Frame();
 
     ImGui_Context *m_ctx;

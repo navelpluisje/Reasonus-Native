@@ -78,7 +78,7 @@ public:
             Main_OnCommandStringEx("_REASONUS_TRANSLATIONN_EDITOR", 0, nullptr);
         }
 
-        const int language_button_width = getButtonWidth(
+        const double language_button_width = getButtonWidth(
             m_ctx,
             i18n->t("settings", "language.button.label"),
             assets->GetMainFontBold()
@@ -191,7 +191,7 @@ public:
             language_names.end(),
             DAW::GetExtState(EXT_STATE_KEY_UI_LANGUAGE, "en-US")
         );
-        setting_language = language_index - language_names.begin();
+        setting_language = static_cast<int>(language_index - language_names.begin());
 
         momentary_mute_solo = settings->GetMuteSoloMomentary();
         control_hidden_tracks = settings->GetControlHiddenTracks();

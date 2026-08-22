@@ -42,13 +42,12 @@ public:
         CSurf_FP_8_TrackReceivesManager::UpdateTracks(true);
     }
 
-    ~CSurf_FP_8_TrackReceivesManager() override {
-    }
+    ~CSurf_FP_8_TrackReceivesManager() override = default;
 
     void UpdateTracks(const bool force_update) override {
         const WDL_PtrList<MediaTrack> media_tracks = navigator->GetBankTracks();
         MediaTrack *receives_track = GetSelectedTrack(nullptr, 0);
-        MediaTrack *add_receive_track;
+        MediaTrack *add_receive_track = nullptr;
         context->SetChannelManagerItemsCount(GetTrackNumSends(receives_track, -1));
 
         for (int i = 0; i < context->GetNbChannels(); i++) {
@@ -58,21 +57,27 @@ public:
                 add_receive_track = GetTrack(nullptr, context->GetCurrentSelectedSendReceive());
             }
 
-            int fader_value, value_bar_value = 0;
+            int fader_value = 0;
+            int value_bar_value = 0;
             double pan = 0.0;
 
-            CSurf_FP_8_Track *track = tracks.at(i);
+            const CSurf_FP_8_Track *track = tracks.at(i);
             MediaTrack *media_track = media_tracks.Get(i);
-            SetTrackColors(media_track, DAW::IsTrackSelected(media_track));
+            SetTrackColors(media_track, DAW::IsTrackSelected(media_track), false);
 
             std::string pan_str;
             GetFaderValue(receives_track, receive_index, &fader_value, &value_bar_value, &pan, &pan_str);
 
-            if (!media_track) {
+            if (media_track == nullptr) {
                 track->SetDisplayLine(0, ALIGN_LEFT, "", NON_INVERT, force_update);
             } else {
-                track->SetDisplayLine(0, ALIGN_LEFT, DAW::GetTrackName(media_track).c_str(),
-                                      receives_track == media_track ? INVERT : NON_INVERT, force_update);
+                track->SetDisplayLine(
+                    0,
+                    ALIGN_LEFT,
+                    DAW::GetTrackName(media_track).c_str(),
+                    receives_track == media_track ? INVERT : NON_INVERT,
+                    force_update
+                );
             }
 
             if (DAW::HasTrackReceive(receives_track, receive_index)) {

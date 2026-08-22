@@ -39,6 +39,8 @@ enum AutomationButtonIndex {
     AUTOMATION_BUTTON_TOUCH,
     AUTOMATION_BUTTON_WRITE,
     AUTOMATION_BUTTON_READ,
+    // Not an actual button, but a button state for the trim button when in single point auutomation mode
+    AUTOMATION_SINGLE_POINT
 };
 
 struct ShiftState {
@@ -166,6 +168,8 @@ bool GetToggleCommandIdState(int action_id);
 
 bool GetToggleCommandStringState(const std::string &action_name);
 
+double GetDoubleConfigVar(const std::string &var_name);
+
 int GetIntConfigVar(const std::string &var_name);
 
 bool SetIntConfigVar(const std::string &var_name, int value);
@@ -289,7 +293,17 @@ std::string replace(std::string &str, const std::string &search, const std::stri
 
 std::string replaceAll(std::string str, const std::string &search, const std::string &replace);
 
-void logInteger(const char *key, int value);
+/**
+ *
+ * @param key The key to identify the variable to display
+ * @param value The value to display
+ * @param base The base of the value. Options are:
+ * - `d`: decimal
+ * - `x` or `#x`: hex
+ * - `o` or `#o`: oct
+ * - `b` or `#b`: binary
+ */
+void logInteger(const char *key, int value, const std::string &base = "d");
 
 void logDouble(const char *key, double value);
 
@@ -428,6 +442,8 @@ void GetLanguages(std::vector<std::string> &language_names);
  * @return Wether the value is between min and max
  */
 bool between(int min, int val, int max);
+
+bool between(double min, double val, double max);
 
 bool createPathIfNotExist(const std::string &path);
 

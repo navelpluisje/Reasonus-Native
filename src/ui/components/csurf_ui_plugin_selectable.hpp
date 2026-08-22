@@ -46,13 +46,11 @@ static void ReaSonusPluginSelectable(
                                                ImGui::PopupFlags_AnyPopupId | ImGui::PopupFlags_AnyPopupLevel);
     const bool selected = plugin_index == *selected_plugin;
     const bool mouse_over = (!popup_open
-                             && between(static_cast<int>(pos_screen_x), width, static_cast<int>(mouse_pos_x))
-                             && between(static_cast<int>(pos_screen_y), selectable_height,
-                                        static_cast<int>(mouse_pos_y))) || (
-                                popup_open && *hovered_plugin == plugin_index);
-    const bool context_over = between(static_cast<int>(pos_screen_x), width, static_cast<int>(mouse_pos_x))
-                              && between(static_cast<int>(pos_screen_y), selectable_height,
-                                         static_cast<int>(mouse_pos_y));
+                             && between(pos_screen_x, width, mouse_pos_x)
+                             && between(pos_screen_y, selectable_height, mouse_pos_y)) 
+                             || (popup_open && *hovered_plugin == plugin_index);
+    const bool context_over = between(pos_screen_x, width, mouse_pos_x)
+                              && between(pos_screen_y, selectable_height, mouse_pos_y);
 
     /**
      * Definings some colors§

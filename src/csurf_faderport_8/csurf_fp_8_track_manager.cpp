@@ -2,6 +2,8 @@
 #define CSURF_FP_8_TRACK_MANAGER_C_
 
 #include <array>
+#include <regex>
+#include <WDL/db2val.h>
 #include "csurf_fp_8_channel_manager.hpp"
 
 extern const int MOMENTARY_TIMEOUT;
@@ -57,7 +59,7 @@ protected:
         }
 
         *faderValue = static_cast<int>(volToNormalized(volume) * 16383.0);
-        *valueBarValue = valuebar_value * 127;
+        *valueBarValue = static_cast<int>(valuebar_value * 127);
     }
 
     static std::string GetDisplayLineValue(MediaTrack *media_track, const DisplayValue display_value) {
@@ -105,7 +107,8 @@ public:
         const std::vector<CSurf_FP_8_Track *> &tracks,
         CSurf_FP_8_Navigator *navigator,
         CSurf_Context *context,
-        midi_Output *m_midiout) : CSurf_FP_8_ChannelManager(tracks, navigator, context, m_midiout) {
+        midi_Output *m_midiout
+    ) : CSurf_FP_8_ChannelManager(tracks, navigator, context, m_midiout) {
         CSurf_FP_8_TrackManager::UpdateTracks(true);
     }
 
@@ -392,6 +395,7 @@ public:
 
         if (context->GetShiftChannelLeft() && settings->GetFaderReset()) {
             DAW::SetTrackVolume(media_track, 1.0);
+            return;
         }
 
         if (GetTrackAutomationMode(media_track) == AUTOMATION_TOUCH) {
@@ -399,6 +403,28 @@ public:
             if (touch_start[index] > 0) {
                 DAW::SetTrackVolume(media_track, DAW::GetTrackVolume(media_track));
             }
+        }
+
+        /**
+         * Check if we have the proper conditions to continue with Single point automation
+         */
+        if (HasSinglePointAutomation(media_track, index, value)) {
+            // Get the value to write for the automation
+            double volume;
+            // The slider max value in the REAPER settings has effect on the value to get and write for the automation
+            // That's why we need the decibel offset and use it to determine the actual value to write to the automation.
+            const double fader_offset = 12 - DAW::GetSliderMaxVolume();
+
+            if (value > 0) {
+                // We need to set it to read first to get the actual volume of the envelope
+                SetTrackAutomationMode(media_track, AUTOMATION_READ);
+                volume = DB2SLIDER(VAL2DB(DAW::GetTrackVolume(media_track)) - fader_offset);
+                SetTrackAutomationMode(media_track, AUTOMATION_TRIM);
+            } else {
+                volume = DB2SLIDER(VAL2DB(DAW::GetTrackVolume(media_track)) - fader_offset);
+            }
+
+            HandleSinglePointAutomation(media_track, index, value, "<VOLENV2", volume, SPA_Track);
         }
     }
 
