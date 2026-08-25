@@ -26,6 +26,7 @@ class CSurf_FP_8_CustomFiltersPage : public CSurf_UI_PageContent {
     bool filter_dirty;
     std::string new_filter_text;
     std::string new_filter_name;
+    std::string new_filter_key;
     bool edit_new_filter = false;
 
     std::string filter_name;
@@ -70,6 +71,8 @@ protected:
         SetFiltersKeys();
         previous_selected_filter = selected_filter;
         edit_new_filter = true;
+        // We store the new filter key so we now, when deleting a filter, if it was the new one or not
+        new_filter_key = filter_keys[selected_filter];
         PopulateFilter();
     }
 
@@ -89,8 +92,14 @@ protected:
             return;
         }
 
+        if (static_cast<int>(filter_keys.size()) <= selected_filter) {
+            selected_filter = 0;
+            previous_selected_filter = 0;
+        }
+
         const std::string filter_key = filter_keys[selected_filter];
         mINI::INIMap<std::string> filter;
+
         if (filter_type == 0) {
             filter = settings->GetFilter(filter_key);
         } else {
@@ -163,7 +172,8 @@ protected:
     void DirtyCheck() {
         IsFilterDirty();
 
-        if (filter_dirty || new_filter) {
+        // When new_filter is true, we want to be sure we are referring to the correct filter
+        if (filter_dirty || (new_filter && filter_keys[previous_selected_filter] == new_filter_key)) {
             const int res = MB(
                 i18n->t("filters", "popup.unsaved.message").c_str(),
                 i18n->t("filters", "popup.unsaved.title").c_str(),
@@ -198,6 +208,11 @@ protected:
 
     void HandleRemoveFilterListItem(const int index) {
         const std::string filter_key = filter_keys.at(index);
+
+        // If the filter to delete is the newly add filter, we have to set new_filter to false
+        if (filter_key == new_filter_key) {
+            new_filter = false;
+        }
         filter_keys.erase(filter_keys.begin() + index);
 
         if (filter_type == 0) {
@@ -496,6 +511,7 @@ public:
         } else {
             project_state->ReloadProjectState();
         }
+        new_filter = false;
         SetFiltersKeys();
         PopulateFilter();
     }
