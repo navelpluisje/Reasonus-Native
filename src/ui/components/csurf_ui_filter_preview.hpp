@@ -62,7 +62,7 @@ static void ReaSonusFilterPreview(ImGui_Context *m_ctx, const int value)
 
         for (int i = 0; i < static_cast<int>(track_level.size()); i++)
         {
-            const int x_pos = static_cast<int>(last_item_x) + i * track_width + i * 6;
+            const int x_pos = static_cast<int>(last_item_x + i * track_width + i * 6);
             const double track_height = height - (track_level[i] + 1) * 20;
             const bool track_selected = fader_options[value][i] == 1;
             const bool track_matched = i == 2 || i == 6;

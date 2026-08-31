@@ -1,11 +1,13 @@
 #ifndef CSURF_FP_8_SENDS_MANAGER_C_
 #define CSURF_FP_8_SENDS_MANAGER_C_
 
+#include <algorithm>
+
+#include <WDL/db2val.h>
 #include "csurf_fp_8_channel_manager.hpp"
 
 class CSurf_FP_8_SendsManager : public CSurf_FP_8_ChannelManager {
     int nb_sends = 0;
-    int nb_track_sends[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     int current_send = 0;
 
 protected:
@@ -55,18 +57,16 @@ public:
         for (int i = 0; i < context->GetNbChannels(); i++) {
             MediaTrack *media_track = media_tracks.Get(i);
             const int _nb_track_sends = GetTrackNumSends(media_track, 0x10000000);
-            nb_track_sends[i] = _nb_track_sends;
 
-            if (_nb_track_sends > nb_sends) {
-                nb_sends = _nb_track_sends;
-            }
+            nb_track_items[i] = _nb_track_sends;
+            nb_sends = std::max(_nb_track_sends, nb_sends);
         }
 
         context->SetChannelManagerItemsCount(nb_sends);
         current_send = context->GetChannelManagerItemIndex();
 
         for (int i = 0; i < context->GetNbChannels(); i++) {
-            const int send_index = context->GetChannelManagerItemIndex(nb_track_sends[i] - 1);
+            const int send_index = context->GetChannelManagerItemIndex(nb_track_items[i] - 1);
             const bool add_send_enabled = context->GetAddSendReceiveMode() == i;
 
             if (add_send_enabled) {
@@ -84,7 +84,7 @@ public:
                 continue;
             }
 
-            SetTrackColors(media_track, DAW::IsTrackSelected(media_track));
+            SetTrackColors(media_track, DAW::IsTrackSelected(media_track), false);
 
             GetFaderValue(media_track, send_index, &fader_value, &value_bar_value, &pan, &pan_str);
 
@@ -123,7 +123,7 @@ public:
                 track->SetDisplayLine(
                     3,
                     ALIGN_CENTER,
-                    Progress(send_index + 1, nb_track_sends[i]).c_str(),
+                    Progress(send_index + 1, nb_track_items[i]).c_str(),
                     NON_INVERT,
                     force_update
                 );
@@ -218,7 +218,7 @@ public:
         }
 
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
-        const int send_index = context->GetChannelManagerItemIndex(nb_track_sends[index] - 1);
+        const int send_index = context->GetChannelManagerItemIndex(nb_track_items[index] - 1);
 
         if (context->GetShiftChannelLeft()) {
             DAW::SetNextTrackSendMode(media_track, send_index);
@@ -233,7 +233,7 @@ public:
         }
 
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
-        const int send_index = context->GetChannelManagerItemIndex(nb_track_sends[index] - 1);
+        const int send_index = context->GetChannelManagerItemIndex(nb_track_items[index] - 1);
 
         if (context->GetShiftChannelLeft()) {
             DAW::ToggleTrackSendMono(media_track, send_index);
@@ -243,13 +243,44 @@ public:
     }
 
     void HandleFaderTouch(const int index, const int value) override {
-        (void) index;
-        (void) value;
+        MediaTrack *media_track = navigator->GetTrackByIndex(index);
+
+        /**
+         * Check if we have the proper conditions to continue with Single point automation
+         * All pan related values (except for width) are displayed reversed.
+         * Therefore some fo the values are inverted as well, to make it mork as it should
+         */
+        if (HasSinglePointAutomation(media_track, index, value)) {
+            const int send_index = context->GetChannelManagerItemIndex(nb_track_items[index] - 1);
+            const std::string chunk_name = context->GetShiftLeft() ? "<PANENV" : "<VOLENV";
+            double volume = 0.0;
+            double pan = 0.0;
+
+            // Get the value to write for the automation
+            if (value > 0) {
+                // We need to set it to read first to get the actual volume of the envelope
+                SetTrackAutomationMode(media_track, AUTOMATION_READ);
+                GetTrackSendUIVolPan(media_track, send_index, &volume, &pan);
+                SetTrackAutomationMode(media_track, AUTOMATION_TRIM);
+            } else {
+                GetTrackSendUIVolPan(media_track, send_index, &volume, &pan);
+            }
+
+            HandleSinglePointAutomation(
+                media_track,
+                index,
+                value,
+                chunk_name,
+                context->GetShiftLeft() ? pan : DB2SLIDER(VAL2DB(volume)),
+                SPA_Send,
+                send_index
+            );
+        }
     }
 
     void HandleFaderMove(const int index, const int msb, const int lsb) override {
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
-        const int send_index = context->GetChannelManagerItemIndex(nb_track_sends[index] - 1);
+        const int send_index = context->GetChannelManagerItemIndex(nb_track_items[index] - 1);
 
         if (context->GetShiftChannelLeft()) {
             DAW::SetTrackSendPan(media_track, send_index, normalizedToPan(int14ToNormalized(msb, lsb)));

@@ -20,6 +20,7 @@ class ReaSonusComboInput {
     int hovered_item = -1;
     int active_item = -1;
     double width = 0.0;
+    bool show_tooltip = false;
 
 public:
     ReaSonusComboInput(
@@ -29,9 +30,10 @@ public:
         std::string idx,
         const std::vector<std::string> &list,
         int *selected_item,
-        const double width = 0.0
+        const double width = 0.0,
+        const bool show_tooltip = false
     ) : m_ctx(m_ctx), assets(assets), label(std::move(label)), id(std::move(idx)), list(list),
-        selected_item(selected_item), width(width) {
+        selected_item(selected_item), width(width), show_tooltip(show_tooltip) {
     }
 
     ~ReaSonusComboInput() = default;
@@ -75,6 +77,28 @@ public:
                         nullptr,
                         nullptr
                     );
+
+                    if (show_tooltip) {
+                        if (ImGui::BeginItemTooltip(m_ctx)) {
+                            if (ImGui::BeginChild(
+                                m_ctx,
+                                list[i].c_str(),
+                                0.0,
+                                0.0,
+                                ImGui::ChildFlags_AutoResizeY |
+                                ImGui::ChildFlags_AutoResizeX
+                            )) {
+                                ImGui::PushTextWrapPos(m_ctx, 350);
+                                ImGui::PushFont(m_ctx, assets->GetMainFont(), 13);
+                                ImGui::Text(m_ctx, list[i].c_str());
+                                ImGui::PopFont(m_ctx);
+                                ImGui::PopTextWrapPos(m_ctx);
+
+                                ImGui::EndChild(m_ctx);
+                            }
+                            ImGui::EndTooltip(m_ctx);
+                        }
+                    }
                 }
                 UiStyledElements::PopReaSonusListBoxStyle(m_ctx);
                 ImGui::EndCombo(m_ctx);
@@ -96,6 +120,7 @@ class ReaSonusComboInputRow {
     int hovered_item = -1;
     int active_item = -1;
     double label_width = 0.0;
+    bool show_label = true;
 
 public:
     ReaSonusComboInputRow(
@@ -108,6 +133,10 @@ public:
         const double label_width = 0.0
     ) : m_ctx(m_ctx), assets(assets), label(label), id(id), list(list), selected_item(selected_item),
         label_width(label_width) {
+        if (label.rfind("##", 0) == 0) {
+            show_label = false;
+            this->label_width = 0.0;
+        }
     }
 
     ~ReaSonusComboInputRow() = default;
@@ -115,26 +144,29 @@ public:
     void Render() {
         double space_x;
         double space_y;
-        double padding_x;
-        double padding_y;
-        const double start_pos = ImGui::GetCursorPosX(m_ctx);
+        double spacing_x;
+        double spacing_y;
 
-        ImGui::GetStyleVar(m_ctx, ImGui::StyleVar_FramePadding, &padding_x, &padding_y);
-        ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
+        ImGui::GetStyleVar(m_ctx, ImGui::StyleVar_ItemSpacing, &spacing_x, &spacing_y);
 
         UiStyledElements::PushReaSonusFieldGroupStyle(m_ctx);
-        if (ImGui::BeginChild(m_ctx, ("container-" + id).c_str(), 0.0, 0.0,
-                              ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY)) {
-            const double combo_width = space_x - label_width - padding_x;
+        if (ImGui::BeginChild(
+            m_ctx,
+            ("container-" + id).c_str(),
+            0.0,
+            0.0,
+            ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
+        )) {
+            // If we have a label, shift the y-pos a bit for better alignment
+            if (show_label) {
+                ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 8);
+                ImGui::Text(m_ctx, label.c_str());
+                ImGui::SameLine(m_ctx, label_width + spacing_x);
+                ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 8);
+            }
+            ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
 
-            ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 8);
-            ImGui::Text(m_ctx, label.c_str());
-
-            ImGui::SameLine(m_ctx);
-
-            ImGui::SetCursorPosX(m_ctx, start_pos + label_width);
-            ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) - 8);
-            ImGui::SetNextItemWidth(m_ctx, combo_width);
+            ImGui::SetNextItemWidth(m_ctx, space_x);
 
             UiStyledElements::PushReaSonusComboStyle(m_ctx);
             if (ImGui::BeginCombo(m_ctx, ("##" + id).c_str(), list[*selected_item].c_str())) {
@@ -175,6 +207,7 @@ class ReaSonusInfoComboInputRow {
     int *selected_item;
     const std::string tooltip;
     ReaSonusComboInput *combo_input;
+    bool show_label = true;
 
 public:
     ReaSonusInfoComboInputRow(
@@ -184,9 +217,14 @@ public:
         const std::string &id,
         const std::vector<std::string> &list,
         int *selected_item,
-        std::string tooltip
+        std::string tooltip,
+        const bool show_tooltip = false
     ) : m_ctx(m_ctx), assets(assets), label(label), id(id), list(list), selected_item(selected_item),
         tooltip(std::move(tooltip)) {
+        if (label.rfind("##", 0) == 0) {
+            show_label = false;
+        }
+
         combo_input = new ReaSonusComboInput(
             m_ctx,
             assets,
@@ -194,7 +232,8 @@ public:
             id,
             list,
             selected_item,
-            -20.0
+            -20.0,
+            show_tooltip
         );
     }
 
@@ -207,7 +246,7 @@ public:
 
         combo_input->Render();
         ImGui::SameLine(m_ctx);
-        ReaSonusTooltip(m_ctx, assets, tooltip, combo_id, -20, 26);
+        ReaSonusTooltip(m_ctx, assets, tooltip, combo_id, -20, show_label ? 26 : 4);
         ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 4);
         ImGui::Dummy(m_ctx, 0, 0);
     }

@@ -98,6 +98,10 @@ public:
 
     static void PopReaSonusChannelTabStyle(ImGui_Context *m_ctx);
 
+    static void PushReaSonusFilterTabStyle(ImGui_Context *m_ctx, bool active);
+
+    static void PopReaSonusFilterTabStyle(ImGui_Context *m_ctx);
+
     static void PushReaSonusTabBarStyle(ImGui_Context *m_ctx);
 
     static void PopReaSonusTabBarStyle(ImGui_Context *m_ctx);

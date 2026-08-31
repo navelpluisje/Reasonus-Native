@@ -1,23 +1,21 @@
-#ifndef CSURF_FP_UI_PLUGIN_SELECTABLE_H_
-#define CSURF_FP_UI_PLUGIN_SELECTABLE_H_
+#ifndef CSURF_FP_UI_FILTER_SELECTABLE_H_
+#define CSURF_FP_UI_FILTER_SELECTABLE_H_
 
 #include <reaper_imgui_functions.h>
 #include <string>
 #include "../utils/csurf_ui_text_overflow.hpp"
 #include "../../shared/csurf_utils.hpp"
 #include "../csurf_ui_assets.hpp"
-#include "csurf_ui_plugin_type_button.hpp"
-#include "../../i18n/i18n.hpp"
 
-static void ReaSonusPluginSelectable(
+static void ReaSonusFilterSelectable(
     ImGui_Context *m_ctx,
     CSurf_UI_Assets const *assets,
-    std::string plugin_name,
-    const std::string &plugin_type,
-    const int plugin_index,
-    int *selected_plugin,
-    int *hovered_plugin,
-    const std::function<void(int index)> &render_context_menu,
+    std::string filter_name,
+    const int filter_color,
+    const int filter_index,
+    int *selected_filter,
+    int *hovered_filter,
+    int *active_item,
     const std::function<void(int index)> &delete_callback,
     const std::function<void(int index)> &select_callbask
 ) {
@@ -44,27 +42,18 @@ static void ReaSonusPluginSelectable(
      */
     const bool popup_open = ImGui::IsPopupOpen(m_ctx, "t",
                                                ImGui::PopupFlags_AnyPopupId | ImGui::PopupFlags_AnyPopupLevel);
-    const bool selected = plugin_index == *selected_plugin;
+    const bool selected = filter_index == *selected_filter;
     const bool mouse_over = (!popup_open
                              && between(pos_screen_x, width, mouse_pos_x)
                              && between(pos_screen_y, selectable_height, mouse_pos_y)) 
-                             || (popup_open && *hovered_plugin == plugin_index);
-    const bool context_over = between(pos_screen_x, width, mouse_pos_x)
-                              && between(pos_screen_y, selectable_height, mouse_pos_y);
+                             || (popup_open && *hovered_filter == filter_index);
 
     /**
      * Definings some colors§
      */
     int selectable_bg = mouse_over ? UI_COLORS::Accent_14 : UI_COLORS::Transparent;
     if (mouse_over) {
-        *hovered_plugin = plugin_index;
-    }
-
-    if (context_over && ImGui::IsMouseClicked(m_ctx, ImGui::MouseButton_Right)) {
-        if (popup_open) {
-            ImGui::CloseCurrentPopup(m_ctx);
-        }
-        ImGui::OpenPopup(m_ctx, ("context-" + std::to_string(plugin_index)).c_str());
+        *hovered_filter = filter_index;
     }
 
     if (selected) {
@@ -73,13 +62,6 @@ static void ReaSonusPluginSelectable(
         selectable_bg = UI_COLORS::Accent_50;
     }
 
-    UiStyledElements::PushReaSonusContextMenuStyle(m_ctx);
-    if (ImGui::BeginPopupContextWindow(m_ctx, ("context-" + std::to_string(plugin_index)).c_str())) {
-        render_context_menu(plugin_index);
-        ImGui::EndPopup(m_ctx);
-    }
-    UiStyledElements::PopReaSonusContextMenuStyle(m_ctx);
-
     ImGui_DrawList *list = ImGui::GetWindowDrawList(m_ctx);
 
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 0, 0);
@@ -87,27 +69,57 @@ static void ReaSonusPluginSelectable(
     ImGui::PushStyleColor(m_ctx, ImGui::Col_FrameBg, selectable_bg);
     if (ImGui::BeginChild(
             m_ctx,
-            ("plugin_selector" + plugin_name + plugin_type).c_str(),
+            ("plugin_selector" + filter_name + std::to_string(filter_color)).c_str(),
             0.0,
             selectable_height,
             ImGui::ChildFlags_FrameStyle
         )
     ) {
-        ReaSonusPluginTypeButton(
+        // This Invisible Button is needed to generate a proper active state.
+        // The child element does not have an active state
+        // When hovered and having the remove option, reduce the witdth as the invisible button is on top of the remove button
+        ImGui::InvisibleButton(
             m_ctx,
-            assets,
+            ("invisible-button" + filter_name).c_str(),
+            width - (mouse_over && delete_callback != nullptr ? 40 : 0),
+            selectable_height
+        );
+
+        if (ImGui::IsItemActive(m_ctx)) {
+            if (active_item != nullptr) {
+                *active_item = filter_index;
+            }
+        } else {
+            if (active_item != nullptr) {
+                *active_item = -1;
+            }
+        }
+
+        if (ImGui::IsItemClicked(m_ctx, ImGui::MouseButton_Left)) {
+            *selected_filter = filter_index;
+
+            if (select_callbask != nullptr) {
+                select_callbask(filter_index);
+            }
+        }
+
+        ImGui::DrawList_AddRectFilled(
+            list,
             pos_screen_x + 4,
-            pos_screen_y + 3,
-            plugin_type
+            pos_screen_y + 6,
+            pos_screen_x + 20,
+            pos_screen_y + 22,
+            filter_color,
+            4
         );
 
         ImGui::PushFont(m_ctx, assets->GetMainFont(), 13);
         ImGui::DrawList_AddText(
             list,
-            pos_screen_x + 30,
+            pos_screen_x + 28,
             pos_screen_y + 6,
             UI_COLORS::White,
-            getTextOverflow(m_ctx, plugin_name, width - (mouse_over ? 66 : 40)).c_str()
+            getTextOverflow(m_ctx, filter_name, width - (mouse_over ? 66 : 40)).c_str()
         );
         ImGui::PopFont(m_ctx);
 
@@ -119,20 +131,11 @@ static void ReaSonusPluginSelectable(
             ImGui::PushStyleColor(m_ctx, ImGui::Col_Button, UI_COLORS::Main_18);
 
             if (ImGui::Button(m_ctx, std::string(1, IconRemove).c_str())) {
-                delete_callback(plugin_index);
+                delete_callback(filter_index);
             }
             ImGui::PopFont(m_ctx);
             ImGui::PopStyleVar(m_ctx);
             ImGui::PopStyleColor(m_ctx);
-            ReaSonusSimpleTooltip(
-                m_ctx,
-                assets,
-                I18n::GetInstance()->t("mapping", "list.item.action.delete"),
-                "plugin-mapping-tooltip-add-group"
-            );
-        }
-        if (context_over) {
-            ImGui::SetMouseCursor(m_ctx, ImGui::MouseCursor_Hand);
         }
 
         ImGui::EndChild(m_ctx);
@@ -140,14 +143,6 @@ static void ReaSonusPluginSelectable(
 
     ImGui::PopStyleVar(m_ctx, 2);
     ImGui::PopStyleColor(m_ctx, 1);
-
-    if (ImGui::IsItemClicked(m_ctx, ImGui::MouseButton_Left)) {
-        *selected_plugin = plugin_index;
-
-        if (select_callbask != nullptr) {
-            select_callbask(plugin_index);
-        }
-    }
 }
 
 #endif

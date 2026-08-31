@@ -1,14 +1,13 @@
 // ReSharper disable CppRedundantParentheses
-#include "../shared/csurf_daw.hpp"
-#include <utility>
-#include <vector>
+#include "csurf_daw.hpp"
 #include <regex>
 #include <string>
-#include "../shared/csurf_utils.hpp"
+#include <utility>
+#include <vector>
 #include "csurf.h"
 #include "csurf_plugin_utils.hpp"
-
-int DAW::sendModes[3] = {0, 1, 3};
+#include "csurf_reasonus_settings.hpp"
+#include "csurf_utils.hpp"
 
 /************************************************************************
  * Track
@@ -447,6 +446,24 @@ void DAW::SetTrackFXParamUntouched(MediaTrack *media_track, const int fx_index) 
     TrackFX_SetNamedConfigParm(media_track, fx_index, "last_touched", "-1");
 }
 
+TrackEnvelope *DAW::GetTrackFXEnvelope(
+    MediaTrack *media_track,
+    const int plugin_index,
+    const int plugin_param_index,
+    const double position,
+    const double value
+) {
+    auto *env = GetFXEnvelope(media_track, plugin_index, plugin_param_index, true);
+
+    if (env == nullptr) {
+        return nullptr;
+    }
+
+    InitializeEnvelope(env, position, value);
+
+    return env;
+}
+
 /************************************************************************
  * Track Receive
  ************************************************************************/
@@ -455,8 +472,9 @@ bool DAW::HasTrackReceive(MediaTrack *media_track, const int receive) {
 }
 
 std::string DAW::GetTrackReceiveSrcName(MediaTrack *media_track, const int receive) {
-    auto *src_track = static_cast<MediaTrack *>(GetSetTrackSendInfo(media_track, SEND_MODE_RECEIVE, receive,
-                                                                    "P_SRCTRACK", nullptr));
+    auto *src_track = static_cast<MediaTrack *>(
+        GetSetTrackSendInfo(media_track, SEND_MODE_RECEIVE, receive, "P_SRCTRACK", nullptr)
+    );
 
     if (src_track != nullptr) {
         return GetTrackName(src_track);
@@ -489,8 +507,13 @@ bool DAW::GetTrackReceiveMute(MediaTrack *media_track, const int receive) {
 }
 
 void DAW::ToggleTrackReceiveMute(MediaTrack *media_track, const int receive) {
-    SetTrackSendInfo_Value(media_track, SEND_MODE_RECEIVE, receive, "B_MUTE",
-                           toDouble(!GetTrackReceiveMute(media_track, receive)));
+    SetTrackSendInfo_Value(
+        media_track,
+        SEND_MODE_RECEIVE,
+        receive,
+        "B_MUTE",
+        toDouble(!GetTrackReceiveMute(media_track, receive))
+    );
 }
 
 bool DAW::GetTrackReceivePhase(MediaTrack *media_track, const int receive) {
@@ -498,8 +521,13 @@ bool DAW::GetTrackReceivePhase(MediaTrack *media_track, const int receive) {
 }
 
 void DAW::ToggleTrackReceivePhase(MediaTrack *media_track, const int receive) {
-    SetTrackSendInfo_Value(media_track, SEND_MODE_RECEIVE, receive, "B_PHASE",
-                           toDouble(!GetTrackReceivePhase(media_track, receive)));
+    SetTrackSendInfo_Value(
+        media_track,
+        SEND_MODE_RECEIVE,
+        receive,
+        "B_PHASE",
+        toDouble(!GetTrackReceivePhase(media_track, receive))
+    );
 }
 
 bool DAW::GetTrackReceiveMono(MediaTrack *media_track, const int receive) {
@@ -507,27 +535,46 @@ bool DAW::GetTrackReceiveMono(MediaTrack *media_track, const int receive) {
 }
 
 void DAW::ToggleTrackReceiveMono(MediaTrack *media_track, const int receive) {
-    SetTrackSendInfo_Value(media_track, SEND_MODE_RECEIVE, receive, "B_MONO",
-                           toDouble(!GetTrackReceiveMono(media_track, receive)));
+    SetTrackSendInfo_Value(
+        media_track,
+        SEND_MODE_RECEIVE,
+        receive, "B_MONO",
+        toDouble(!GetTrackReceiveMono(media_track, receive))
+    );
 }
 
 int DAW::GetNextTrackReceiveMode(MediaTrack *media_track, const int receive) {
-    return sendModes[(GetTrackReceiveMode(media_track, receive) + 1) % 4];
+    return sendModes.at((GetTrackReceiveMode(media_track, receive) + 1) % 4);
 }
 
 void DAW::SetNextTrackReceiveMode(MediaTrack *media_track, const int receive) {
-    SetTrackSendInfo_Value(media_track, SEND_MODE_RECEIVE, receive, "I_SENDMODE",
-                           GetNextTrackReceiveMode(media_track, receive));
+    SetTrackSendInfo_Value(
+        media_track,
+        SEND_MODE_RECEIVE,
+        receive,
+        "I_SENDMODE",
+        GetNextTrackReceiveMode(media_track, receive)
+    );
 }
 
 void DAW::SetTrackReceiveVolume(MediaTrack *media_track, const int receive, const double volume) {
-    SetTrackSendInfo_Value(media_track, SEND_MODE_RECEIVE, receive, "D_VOL",
-                           CSurf_OnRecvVolumeChange(media_track, receive, volume, false));
+    SetTrackSendInfo_Value(
+        media_track,
+        SEND_MODE_RECEIVE,
+        receive,
+        "D_VOL",
+        CSurf_OnRecvVolumeChange(media_track, receive, volume, false)
+    );
 }
 
 void DAW::SetTrackReceivePan(MediaTrack *media_track, const int receive, const double pan) {
-    SetTrackSendInfo_Value(media_track, SEND_MODE_RECEIVE, receive, "D_PAN",
-                           CSurf_OnRecvPanChange(media_track, receive, pan, false));
+    SetTrackSendInfo_Value(
+        media_track,
+        SEND_MODE_RECEIVE,
+        receive,
+        "D_PAN",
+        CSurf_OnRecvPanChange(media_track, receive, pan, false)
+    );
 }
 
 bool DAW::HasTrackSend(MediaTrack *media_track, const int send) {
@@ -572,8 +619,13 @@ bool DAW::GetTrackSendMute(MediaTrack *media_track, const int send) {
 }
 
 void DAW::ToggleTrackSendMute(MediaTrack *media_track, const int send) {
-    SetTrackSendInfo_Value(media_track, SEND_MODE_SEND, send, "B_MUTE",
-                           toDouble(!GetTrackSendMute(media_track, send)));
+    SetTrackSendInfo_Value(
+        media_track,
+        SEND_MODE_SEND,
+        send,
+        "B_MUTE",
+        toDouble(!GetTrackSendMute(media_track, send))
+    );
 }
 
 bool DAW::GetTrackSendPhase(MediaTrack *media_track, const int send) {
@@ -581,8 +633,13 @@ bool DAW::GetTrackSendPhase(MediaTrack *media_track, const int send) {
 }
 
 void DAW::ToggleTrackSendPhase(MediaTrack *media_track, const int send) {
-    SetTrackSendInfo_Value(media_track, SEND_MODE_SEND, send, "B_PHASE",
-                           toDouble(!GetTrackSendPhase(media_track, send)));
+    SetTrackSendInfo_Value(
+        media_track,
+        SEND_MODE_SEND,
+        send,
+        "B_PHASE",
+        toDouble(!GetTrackSendPhase(media_track, send))
+    );
 }
 
 bool DAW::GetTrackSendMono(MediaTrack *media_track, const int send) {
@@ -590,8 +647,13 @@ bool DAW::GetTrackSendMono(MediaTrack *media_track, const int send) {
 }
 
 void DAW::ToggleTrackSendMono(MediaTrack *media_track, const int send) {
-    SetTrackSendInfo_Value(media_track, SEND_MODE_SEND, send, "B_MONO",
-                           toDouble(!GetTrackSendMono(media_track, send)));
+    SetTrackSendInfo_Value(
+        media_track,
+        SEND_MODE_SEND,
+        send,
+        "B_MONO",
+        toDouble(!GetTrackSendMono(media_track, send))
+    );
 }
 
 int DAW::GetNextTrackSendMode(MediaTrack *media_track, const int send) {
@@ -599,18 +661,177 @@ int DAW::GetNextTrackSendMode(MediaTrack *media_track, const int send) {
 }
 
 void DAW::SetNextTrackSendMode(MediaTrack *media_track, const int send) {
-    SetTrackSendInfo_Value(media_track, SEND_MODE_SEND, send, "I_SENDMODE",
-                           GetNextTrackSendMode(media_track, send));
+    SetTrackSendInfo_Value(
+        media_track,
+        SEND_MODE_SEND,
+        send,
+        "I_SENDMODE",
+        GetNextTrackSendMode(media_track, send)
+    );
 }
 
 void DAW::SetTrackSendVolume(MediaTrack *media_track, const int send, const double volume) {
-    SetTrackSendInfo_Value(media_track, SEND_MODE_SEND, send, "D_VOL",
-                           CSurf_OnSendVolumeChange(media_track, send, volume, false));
+    SetTrackSendInfo_Value(
+        media_track,
+        SEND_MODE_SEND,
+        send,
+        "D_VOL",
+        CSurf_OnSendVolumeChange(media_track, send, volume, false)
+    );
 }
 
 void DAW::SetTrackSendPan(MediaTrack *media_track, const int send, const double pan) {
-    SetTrackSendInfo_Value(media_track, SEND_MODE_SEND, send, "D_PAN",
-                           CSurf_OnSendPanChange(media_track, send, pan, false));
+    SetTrackSendInfo_Value(
+        media_track,
+        SEND_MODE_SEND,
+        send,
+        "D_PAN",
+        CSurf_OnSendPanChange(media_track, send, pan, false)
+    );
+}
+
+TrackEnvelope *DAW::GetTrackSendEnvelope(
+    MediaTrack *media_track,
+    const int send_index,
+    const double position,
+    const std::string &chunk_name,
+    const double value
+) {
+    // turn the default double return value into a proper Envelope pointer
+    // As a double can not be sacted to a TrackEnvelope pointer instant, we have to cast it to an int pointer type first
+    const auto envelope_pointer = static_cast<uintptr_t>(
+        GetTrackSendInfo_Value(media_track, SEND_MODE_SEND, send_index, ("P_ENV:" + chunk_name).c_str())
+    );
+    auto *env = reinterpret_cast<TrackEnvelope *>(envelope_pointer);
+
+    if (env == nullptr) {
+        return nullptr;
+    }
+
+    InitializeEnvelope(env, position, value);
+
+    return env;
+}
+
+TrackEnvelope *DAW::GetTrackEnvelopeByChunkName(
+    MediaTrack *media_track,
+    const double position,
+    const std::string &chunk_name,
+    const double value
+) {
+    TrackEnvelope *env = ::GetTrackEnvelopeByChunkName(media_track, chunk_name.c_str());
+
+    /**
+     * No envelope found, so return nothing
+     */
+    if (env == nullptr) {
+        return nullptr;
+    }
+
+    InitializeEnvelope(env, position, value);
+
+    return env;
+}
+
+std::string DAW::GetEnvelopeChunk(TrackEnvelope *env) {
+    std::string envelope_chunk;
+    char chunk_buffer[16384]; // NOLINT(*-avoid-c-arrays)
+    char *ptr = chunk_buffer;
+    int chunk_size = sizeof(chunk_buffer);
+    const int chunk_tok = realloc_cmd_register_buf(&ptr, &chunk_size); // allocate ptr and return initial ptr/size
+
+    if (GetEnvelopeStateChunk(env, chunk_buffer, chunk_size, false)) {
+        envelope_chunk = chunk_buffer;
+    }
+    realloc_cmd_clear(chunk_tok); // don't need you anymore
+
+    return envelope_chunk;
+}
+
+void DAW::InitializeEnvelope(TrackEnvelope *env, const double position, const double value) {
+    if (env == nullptr) {
+        return;
+    }
+
+    /**
+     * If the envelope has no points, we add the initial point
+     * We do need this this to overwrite the visibility and active flag.
+     * Without a point, an envelope is invalid and will never get set to active
+     */
+    if (CountEnvelopePoints(env) == 0) {
+        InsertEnvelopePoint(env, position, value);
+    }
+
+    /**
+     * Now we're going to read the envelope chunk and set visibility and active to true
+     */
+    std::string envelope_chunk = GetEnvelopeChunk(env);
+
+    // If Active or Visibe ois set to `0`, we set both to `1`
+    if (
+        envelope_chunk.rfind("ACT 0") != std::string::npos
+        || envelope_chunk.rfind("VIS 0") != std::string::npos
+        || envelope_chunk.rfind("ARM 0") != std::string::npos
+    ) {
+        replace(envelope_chunk, "ACT 0", "ACT 1");
+        replace(envelope_chunk, "VIS 0", "VIS 1");
+        replace(envelope_chunk, "ARM 0", "ARM 1");
+
+        if (!SetEnvelopeStateChunk(env, envelope_chunk.c_str(), false)) {
+            MB("Something went wrong while setting the envelope to visible and active", "ReaSonus Error", 0);
+        }
+    }
+}
+
+void DAW::DisableEnvelope(TrackEnvelope *env) {
+    std::string envelope_chunk = GetEnvelopeChunk(env);
+
+    // If Active is set to `0`, we set it to `1`
+    if (envelope_chunk.rfind("ACT 1") != std::string::npos) {
+        replace(envelope_chunk, "ACT 1", "ACT 0");
+
+        if (!SetEnvelopeStateChunk(env, envelope_chunk.c_str(), false)) {
+            MB("Something went wrong while disabling the envelope", "ReaSonus Error", 0);
+        }
+    }
+}
+
+void DAW::EnableEnvelope(TrackEnvelope *env) {
+    std::string envelope_chunk = GetEnvelopeChunk(env);
+
+    // If Active is set to `0`, we set it to `1`
+    if (envelope_chunk.rfind("ACT 0") != std::string::npos) {
+        replace(envelope_chunk, "ACT 0", "ACT 1");
+
+        if (!SetEnvelopeStateChunk(env, envelope_chunk.c_str(), false)) {
+            MB("Something went wrong while enabling the envelope", "ReaSonus Error", 0);
+        }
+    }
+}
+
+int DAW::GetDefaultAutomationPointShape() {
+    const int defenvs = GetIntConfigVar("defenvs");
+    return defenvs >> 16;
+}
+
+int DAW::GetSliderMaxVolume() {
+    return GetDoubleConfigVar("slidermaxv");
+}
+
+void DAW::InsertEnvelopePoint(TrackEnvelope *env, const double position, const double value) {
+    const bool overwrite_point_shape = ReaSonusSettings::GetInstance(FP_8)->OverwriteAutomationPointShape();
+    bool sort = false;
+    int point_shape;
+    double tension = 0.5;
+
+    if (overwrite_point_shape) {
+        point_shape = ReaSonusSettings::GetInstance(FP_8)->GetAutomationPointShape();
+        tension = ReaSonusSettings::GetInstance(FP_8)->GetAutomationSingleBezierTension();
+    } else {
+        point_shape = GetDefaultAutomationPointShape();
+    }
+
+    ::InsertEnvelopePoint(env, position, value, point_shape, tension, true, &sort);
 }
 
 bool DAW::MediaItemHasMidi(MediaItem *media_item) {
@@ -761,6 +982,18 @@ std::vector<std::string> DAW::GetProjectTime(const bool overwrite_time_code, con
     return GetTimeSegments(play_position + play_offset, proj_time_mode);
 }
 
+bool DAW::ProjectExist() {
+    return !GetProjectName().empty();
+}
+
+std::string DAW::GetProjectName() {
+    char project_name_buffer[1024]; // NOLINT(*-avoid-c-arrays)
+    ::GetProjectName(nullptr, project_name_buffer, sizeof project_name_buffer);
+    const std::string project_name = project_name_buffer;
+
+    return project_name;
+}
+
 void DAW::EditSave() {
     Main_SaveProject(nullptr, false);
 }
@@ -818,6 +1051,7 @@ int DAW::GetPinnedTracksHeight() {
 
 bool DAW::VersionHasFeature(const Features feature) {
     double const current_version = std::stod(GetAppVersion());
+
     return current_version >= feature_versions[feature];
 }
 
@@ -829,4 +1063,8 @@ std::string DAW::GetExtState(const std::string &key, std::string default_value) 
 
 void DAW::SetExtState(const std::string &key, const std::string &value, const bool persist) {
     ::SetExtState(EXT_STATE_SECTION, key.c_str(), value.c_str(), persist);
+}
+
+void DAW::SetExtState(const std::string &key, const int value, const bool persist) {
+    ::SetExtState(EXT_STATE_SECTION, key.c_str(), std::to_string(value).c_str(), persist);
 }

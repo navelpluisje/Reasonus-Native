@@ -1,6 +1,5 @@
 #ifndef CSURF_COLOR_BUTTON_COLORS_H_
 #define CSURF_COLOR_BUTTON_COLORS_H_
-#include "../shared/csurf_utils.hpp"
 
 struct ButtonColor {
     int red;
@@ -37,8 +36,20 @@ struct ButtonColor {
         }
     }
 
+    [[nodiscard]] int GetColor() const {
+        return ((red * 2) << 16) + ((green * 2) << 8) + blue * 2;
+    }
+
     [[nodiscard]] bool IsColor(const ButtonColor color) const {
         return color.blue == blue && color.red == red && color.green == green;
+    }
+
+    [[nodiscard]] bool IsColor(const int color) const {
+        const int _red = ((color & 0x00ff0000) >> 16) / 2;
+        const int _green = ((color & 0x0000ff00) >> 8) / 2;
+        const int _blue = (color & 0x000000ff) / 2;
+
+        return _blue == blue && _red == red && _green == green;
     }
 };
 

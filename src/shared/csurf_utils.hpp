@@ -32,6 +32,17 @@ constexpr int AUTOMATION_LATCH = 4;
 constexpr int AUTOMATION_PREVIEW = 5;
 constexpr int AUTOMATION_WRITE = 3;
 
+enum AutomationButtonIndex {
+    AUTOMATION_BUTTON_LATCH,
+    AUTOMATION_BUTTON_TRIM,
+    AUTOMATION_BUTTON_OFF,
+    AUTOMATION_BUTTON_TOUCH,
+    AUTOMATION_BUTTON_WRITE,
+    AUTOMATION_BUTTON_READ,
+    // Not an actual button, but a button state for the trim button when in single point auutomation mode
+    AUTOMATION_SINGLE_POINT
+};
+
 struct ShiftState {
     bool active = false; // NOLINT(*-non-private-member-variables-in-classes)
     int start = 0;       // NOLINT(*-non-private-member-variables-in-classes)
@@ -76,8 +87,10 @@ struct ConfigVar {
             addr = get_config_var(var_name.c_str(), &size);
         }
 
-        if (size == sizeof(T)) {
-            m_addr = static_cast<T *>(addr);
+        m_addr = static_cast<T *>(addr);
+
+        if (size != sizeof(T)) {
+            m_addr = nullptr;
         }
     }
 
@@ -154,6 +167,8 @@ void SetActionState(const std::string &action_name, int new_state);
 bool GetToggleCommandIdState(int action_id);
 
 bool GetToggleCommandStringState(const std::string &action_name);
+
+double GetDoubleConfigVar(const std::string &var_name);
 
 int GetIntConfigVar(const std::string &var_name);
 
@@ -253,11 +268,42 @@ std::string join(const std::vector<std::string> &list, const std::string &delimi
 
 std::string join(const std::vector<int> &list, const std::string &delimiter);
 
+std::string join(int *list, std::string str);
+
+/**
+ * Join an array with an unknown length to a string
+ * As it uses a template, we can only declare it in the header file
+ * @tparam N Size of the array
+ * @param list Array of integers to join
+ * @param delimiter What character to join all the list items with
+ * @return String with joined values
+ */
+template<size_t N>
+std::string join(const std::array<int, N> &list, const std::string &delimiter) {
+    std::string result;
+
+    for (int i = 0; i < N; i++) {
+        result += (i > 0 ? delimiter : "") + std::to_string(list[i]);
+    }
+
+    return result;
+}
+
 std::string replace(std::string &str, const std::string &search, const std::string &replace);
 
 std::string replaceAll(std::string str, const std::string &search, const std::string &replace);
 
-void logInteger(const char *key, int value);
+/**
+ *
+ * @param key The key to identify the variable to display
+ * @param value The value to display
+ * @param base The base of the value. Options are:
+ * - `d`: decimal
+ * - `x` or `#x`: hex
+ * - `o` or `#o`: oct
+ * - `b` or `#b`: binary
+ */
+void logInteger(const char *key, int value, const std::string &base = "d");
 
 void logDouble(const char *key, double value);
 
@@ -396,6 +442,8 @@ void GetLanguages(std::vector<std::string> &language_names);
  * @return Wether the value is between min and max
  */
 bool between(int min, int val, int max);
+
+bool between(double min, double val, double max);
 
 bool createPathIfNotExist(const std::string &path);
 

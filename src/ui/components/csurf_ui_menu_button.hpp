@@ -5,6 +5,7 @@
 #include <string>
 #include "../../shared/csurf_utils.hpp"
 #include "../csurf_ui_assets.hpp"
+#include "../csurf_ui_colors.hpp"
 
 static void ReaSonusMenuButton(
     ImGui_Context *m_ctx,

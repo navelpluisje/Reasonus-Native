@@ -11,6 +11,7 @@
 #include "../i18n/i18n.hpp"
 #include "../ui/windows/csurf_ui_message.hpp"
 #include "../shared/csurf_reasonus_settings.hpp"
+#include "../shared/csurf_project_state.hpp"
 #include "csurf_fp_8_session_manager.cpp"
 #include "csurf_fp_8_mix_manager.cpp"
 #include "csurf_fp_8_automation_manager.cpp"
@@ -22,10 +23,13 @@
 
 I18n *I18n::instancePtr = nullptr;
 ReaSonusSettings *ReaSonusSettings::instance8Ptr = nullptr;
+ProjectState *ProjectState::instancePtr = nullptr;
 
 const int MOMENTARY_TIMEOUT = 500;
 
 class CSurf_FaderPort : public IReaperControlSurface {
+  char project_name_buffer[1024];
+  std::string project_name;
   int m_midi_in_dev, m_midi_out_dev;
   midi_Output *m_midiout;
   midi_Input *m_midiin;
@@ -49,6 +53,7 @@ class CSurf_FaderPort : public IReaperControlSurface {
 
   I18n *i18n = I18n::GetInstance();
   ReaSonusSettings *settings = ReaSonusSettings::GetInstance(FP_8);
+  ProjectState *project_state = ProjectState::GetInstance();
 
   char configtmp[1024]; // NOLINT(*-avoid-c-arrays)
 
@@ -346,10 +351,6 @@ public:
     DELETE_ASYNC(m_midiin);
   }
 
-  // [[nodiscard]] CSurf_Context GetContext() const {
-  //   return *context;
-  // }
-
   const char *GetTypeString() override {
     return "REASONUS_FADERPORT_8";
   }
@@ -376,7 +377,23 @@ public:
     return trackNavigator->IsTrackTouched(media_track, is_pan);
   }
 
+  /**
+   * Check for project change. If so, we reload the new project state, and reset the fader mode
+   */
+  void CheckProjectChange() {
+    GetProjectName(nullptr, project_name_buffer, sizeof project_name_buffer);
+    const std::string tmp_project_name = project_name_buffer;
+
+    if (tmp_project_name != project_name) {
+      project_state->LoadProjectState();
+      project_name = tmp_project_name;
+      faderManager->ChangeChannelMode(TrackMode);
+    }
+  }
+
   void Run() override {
+    DWORD const now = GetTickCount();
+
     if (m_midiin != nullptr) {
       m_midiin->SwapBufsPrecise(GetTickCount(), 0.0);
       int l = 0;
@@ -388,8 +405,14 @@ public:
       }
     }
 
+    /**
+     * Every now and then we check in we're still in the same project
+     */
+    if ((now - surface_update_keepalive) >= 990) {
+      CheckProjectChange();
+    }
+
     if (m_midiout != nullptr) {
-      DWORD const now = GetTickCount();
       if ((now - surface_update_lastrun) >= 10) {
         const bool force_update = (now - surface_update_lastrun) >= 2000;
 
@@ -418,10 +441,11 @@ public:
         surface_update_keepalive = now;
         m_midiout->Send(0xa0, 0x00, 0x00, -1);
       }
+      CheckProjectChange();
 
       /**
        * every 1500 ms we check if the settings have been saved.
-       * If so, we updet the settings in the context
+       * If so, we update the settings in the context
        *
        */
       if ((now - surface_update_settings_check) >= 1500) {

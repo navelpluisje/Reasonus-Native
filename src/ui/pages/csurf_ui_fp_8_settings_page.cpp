@@ -11,6 +11,8 @@
 #include "../../shared/csurf_reasonus_settings.hpp"
 #include "../components/csurf_ui_image_combo_input.hpp"
 #include "../components/csurf_ui_color_picker.hpp"
+#include "../components/csurf_ui_page_title.hpp"
+#include "../components/csurf_ui_automation_point_shape.hpp"
 
 class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-internal-linkage)
     I18n *i18n = I18n::GetInstance();
@@ -18,36 +20,64 @@ class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-in
     int selected_tab = -1;
     int selected_display_line = -1;
 
+    // Global
+    std::vector<std::string> language_names;
     int setting_language{};
     bool edit_language = false;
     bool previous_edit_language = false;
     bool setting_distraction_free_mode = false;
+    bool setting_swap_shift;
+    std::vector<int> plugin_color_palette;
+
+    // Controller
+    bool setting_momentary_mute_solo;
+    bool setting_fader_reset;
+    int setting_track_color_brightness = 25;
+    bool setting_instant_multi_select_filter;
+    bool setting_filter_custom_color;
+    bool setting_filter_project_filters;
+    bool setting_master_fader_mode;
+    bool setting_mute_master_on_fwd_rwd;
+
+    // Automation
+    bool setting_use_automation_colors;
+    std::array<int, 7> setting_automation_colors;
+    std::vector<std::string> setting_automation_trim_labels = {
+        "Latch",
+        "Trim",
+        "Off",
+        "Touch",
+        "Write",
+        "Read",
+        "Single",
+    };
+    int prev_automation_trim_color;
+    bool setting_latch_preview_action_enable;
+    int setting_latch_preview_action;
+    bool setting_use_single_point_mode;
+    bool setting_overwrite_single_point_shape;
+    int setting_single_point_mode_shape;
+    double setting_single_bezier_tension;
+    bool setting_single_point_button_blink;
+
+    // Plugins
     bool setting_disable_plugins;
     bool setting_untouch_after_learn;
-    bool setting_master_fader_mode;
-    bool setting_swap_shift;
-    bool setting_fader_reset;
-    bool setting_momentary_mute_solo;
-    bool setting_latch_preview_action_enable;
-    bool setting_overwrite_time_code;
+    int setting_plugin_step_size;
     bool setting_plugin_map_param_clear;
     int setting_plugin_map_color_mode;
-    bool setting_instant_multi_select_filter;
-    bool setting_mute_master_on_fwd_rwd;
+
+    // Displays
     std::vector<int> settings_initial_plugin_color_palette;
     std::vector<int> settings_plugin_color_palette;
-    int setting_plugin_step_size;
-    int setting_latch_preview_action;
-    int setting_track_color_brightness = 25;
-    int setting_time_code;
     int setting_track_display;
     std::array<int, 4> setting_track_value_line_value = {-1, -1, -1, -1};
     std::array<int, 4> setting_track_value_line_align = {-1, -1, -1, -1};
     std::array<int, 4> setting_track_value_line_invert = {-1, -1, -1, -1};
     int setting_track_valuebar_mode;
     int setting_track_valuebar_value;
-
-    std::vector<std::string> language_names;
+    bool setting_overwrite_time_code;
+    int setting_time_code;
 
     std::vector<ReaSonusComboInputRow *> display_line_value_combo;
     std::vector<ReaSonusComboInputRow *> display_line_alignment_combo;
@@ -58,17 +88,18 @@ class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-in
     ReaSonusInfoComboInputRow *time_code_combo;
     ReaSonusInfoComboInputRow *latch_preview_action_combo;
     ReaSonusInfoComboInputRow *plugin_mapping_default_color_mode;
+    ReaSonusComboInputRow *automation_single_point_shape;
 
     int latch_preview_action_indexes[8] = {42013, 42014, 42015, 42016, 42017, 41160, 41161, 41162};
     std::vector<std::string> latch_preview_action_names = {
-        "Write current values for actively-writing envelopes to time selection",
-        "Write current values for actively-writing envelopes from cursor to start of project",
-        "Write current values for actively-writing envelopes from cursor to end of project",
-        "Write current values for actively-writing envelopes from cursor to first touch position",
-        "Write current values for actively-writing envelopes to entire envelope",
-        "Write current values for all writing envelopes to time selection",
-        "Write current values for all writing envelopes from cursor to start of project",
-        "Write current values for all writing envelopes from cursor to end of project",
+        "actively-writing envelopes to time selection",
+        "actively-writing envelopes from cursor to start of project",
+        "actively-writing envelopes from cursor to end of project",
+        "actively-writing envelopes from cursor to first touch position",
+        "actively-writing envelopes to entire envelope",
+        "all writing envelopes to time selection",
+        "all writing envelopes from cursor to start of project",
+        "all writing envelopes from cursor to end of project",
     };
 
     int time_code_indexes[6] = {0, 2, 3, 4, 5, 8};
@@ -132,10 +163,19 @@ class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-in
     };
 
     std::vector<std::string> plugin_map_color_mode_labels = {
-        I18n::GetInstance()->t("mapping", "edit.color.show.combo.hide"),
-        I18n::GetInstance()->t("mapping", "edit.color.show.combo.show"),
-        I18n::GetInstance()->t("mapping", "edit.color.show.combo.bright"),
-        I18n::GetInstance()->t("mapping", "edit.color.show.combo.dimmed"),
+        i18n->t("mapping", "edit.color.show.combo.hide"),
+        i18n->t("mapping", "edit.color.show.combo.show"),
+        i18n->t("mapping", "edit.color.show.combo.bright"),
+        i18n->t("mapping", "edit.color.show.combo.dimmed"),
+    };
+
+    std::vector<std::string> automation_mode_shape_labels = {
+        i18n->t("settings", "automation-single.point.shape.linear"),
+        i18n->t("settings", "automation-single.point.shape.square"),
+        i18n->t("settings", "automation-single.point.shape.slow-start-end"),
+        i18n->t("settings", "automation-single.point.shape.fast-start"),
+        i18n->t("settings", "automation-single.point.shape.fast-end"),
+        i18n->t("settings", "automation-single.point.shape.bezier"),
     };
 
 public:
@@ -148,6 +188,7 @@ public:
 
         GetLanguages(language_names);
         CSurf_FP_8_SettingsPage::Reset();
+        plugin_color_palette = settings->GetPluginColorPalette();
 
         for (int i = 0; i < 4; i++) {
             display_line_value_combo.emplace_back(new ReaSonusComboInputRow(
@@ -214,7 +255,7 @@ public:
         language_select_combo = new ReaSonusInfoComboInputRow(
             m_ctx,
             assets,
-            i18n->t("settings", "language.label"),
+            "##" + i18n->t("settings", "language.label"),
             "language-select",
             language_names,
             &setting_language,
@@ -228,7 +269,8 @@ public:
             "latch-preview-action-list",
             latch_preview_action_names,
             &setting_latch_preview_action,
-            i18n->t("settings", "latch-preview-action.tooltip")
+            i18n->t("settings", "latch-preview-action-list.tooltip"),
+            true
         );
 
         plugin_mapping_default_color_mode = new ReaSonusInfoComboInputRow(
@@ -240,59 +282,101 @@ public:
             &setting_plugin_map_color_mode,
             replaceAll(i18n->t("settings", "mapping-default-color-mode.tooltip"), "\\n", "\n")
         );
+
+        automation_single_point_shape = new ReaSonusComboInputRow(
+            m_ctx,
+            assets,
+            "##dummy",
+            "automation-single-point-shape",
+            automation_mode_shape_labels,
+            &setting_single_point_mode_shape
+        );
     }
 
     ~CSurf_FP_8_SettingsPage() override = default;
 
-    void RenderGlobalTab() {
+    void RenderGlobalTab(const int tab_index) {
         double width = 0.0;
         double height = 0.0;
 
-        const int language_button_width = getButtonWidth(
+        const double language_button_width = getButtonWidth(
             m_ctx,
             i18n->t("settings", "language.button.label"),
-            assets->GetMainFontBold());
+            assets->GetMainFontBold()
+        );
 
-        UiStyledElements::PushReaSonusTabStyle(m_ctx, selected_tab == 0);
+        UiStyledElements::PushReaSonusTabStyle(m_ctx, selected_tab == tab_index);
         if (ImGui::BeginTabItem(m_ctx, i18n->t("settings", "tab.global").c_str())) {
-            selected_tab = 0;
+            selected_tab = tab_index;
             ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 16);
-            ImGui::GetContentRegionAvail(m_ctx, &width, &height);
 
+            UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
             if (ImGui::BeginChild(
                 m_ctx,
-                "language-select",
-                -1 * language_button_width,
+                "language-container",
                 0.0,
-                ImGui::ChildFlags_None | ImGui::ChildFlags_AutoResizeY
+                0.0,
+                ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
             )) {
-                language_select_combo->Render();
+                ImGui::GetContentRegionAvail(m_ctx, &width, &height);
 
-                ImGui::EndChild(m_ctx);
-            }
+                ReaSonusPageTitle(
+                    m_ctx,
+                    assets,
+                    i18n->t("settings", "language.label"),
+                    true
+                );
 
-            ImGui::SameLine(m_ctx);
+                if (ImGui::BeginChild(
+                    m_ctx,
+                    "language-select",
+                    -1 * language_button_width,
+                    0.0,
+                    ImGui::ChildFlags_None | ImGui::ChildFlags_AutoResizeY
+                )) {
+                    language_select_combo->Render();
 
-            if (ImGui::BeginChild(
-                m_ctx,
-                "language-action",
-                0.0,
-                0.0,
-                ImGui::ChildFlags_None | ImGui::ChildFlags_AutoResizeY
-            )) {
-                ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 22);
-                UiStyledElements::PushReaSonusButtonOutlineStyle(m_ctx, assets->GetMainFontBold());
-
-                if (ImGui::Button(m_ctx, i18n->t("settings", "language.button.label").c_str())) {
-                    edit_language = true;
+                    ImGui::EndChild(m_ctx);
                 }
 
-                UiStyledElements::PopReaSonusButtonOutlineStyle(m_ctx);
+                ImGui::SameLine(m_ctx);
+
+                if (ImGui::BeginChild(
+                    m_ctx,
+                    "language-action",
+                    0.0,
+                    0.0,
+                    ImGui::ChildFlags_None | ImGui::ChildFlags_AutoResizeY
+                )) {
+                    UiStyledElements::PushReaSonusButtonOutlineStyle(m_ctx, assets->GetMainFontBold());
+
+                    if (ImGui::Button(m_ctx, i18n->t("settings", "language.button.label").c_str())) {
+                        edit_language = true;
+                    }
+                    UiStyledElements::PopReaSonusButtonOutlineStyle(m_ctx);
+
+                    ImGui::EndChild(m_ctx);
+                }
 
                 ImGui::EndChild(m_ctx);
             }
+            UiStyledElements::PopReaSonusGroupStyle(m_ctx);
 
-            if (ImGui::BeginChild(m_ctx, "global-left-column", width / 2, 0.0, ImGui::ChildFlags_None)) {
+            UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
+            if (ImGui::BeginChild(
+                m_ctx,
+                "global-left-column",
+                width / 2 - 8,
+                0.0,
+                ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
+            )) {
+                ReaSonusPageTitle(
+                    m_ctx,
+                    assets,
+                    i18n->t("settings", "global-group.label"),
+                    true
+                );
+
                 RenderInfoCheckbox(
                     m_ctx,
                     assets,
@@ -301,12 +385,21 @@ public:
                     i18n->t("settings", "distraction-free-mode.tooltip")
                 );
 
+                RenderInfoCheckbox(
+                    m_ctx,
+                    assets,
+                    i18n->t("settings", "swap-shift.label"),
+                    &setting_swap_shift,
+                    i18n->t("settings", "swap-shift.tooltip")
+                );
+
                 ImGui::EndChild(m_ctx);
             }
+            UiStyledElements::PopReaSonusGroupStyle(m_ctx);
 
             ImGui::SameLine(m_ctx);
 
-            if (ImGui::BeginChild(m_ctx, "global-right-column", width / 2, 0.0, ImGui::ChildFlags_None)) {
+            if (ImGui::BeginChild(m_ctx, "global-right-column", 0.0, 0.0, ImGui::ChildFlags_None)) {
                 UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
                 if (ImGui::BeginChild(
                     m_ctx,
@@ -315,6 +408,13 @@ public:
                     0.0,
                     ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
                 )) {
+                    ReaSonusPageTitle(
+                        m_ctx,
+                        assets,
+                        i18n->t("settings", "color-group.label"),
+                        true
+                    );
+
                     ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 2);
                     ImGui::Text(m_ctx, i18n->t("settings", "color-palette.label").c_str());
                     ImGui::SameLine(m_ctx);
@@ -355,88 +455,363 @@ public:
 
                 ImGui::EndChild(m_ctx);
             }
-
             ImGui::EndTabItem(m_ctx);
         }
         UiStyledElements::PopReaSonusTabStyle(m_ctx);
     }
 
-    void RenderControllerTab() {
-        UiStyledElements::PushReaSonusTabStyle(m_ctx, selected_tab == 1);
+    void RenderControllerTab(const int tab_index) {
+        double width;
+        double height;
+
+        UiStyledElements::PushReaSonusTabStyle(m_ctx, selected_tab == tab_index);
         if (ImGui::BeginTabItem(m_ctx, i18n->t("settings", "tab.functional").c_str())) {
-            selected_tab = 1;
-            ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 16);
-
-            RenderInfoCheckbox(
-                m_ctx,
-                assets,
-                i18n->t("settings", "master-fader.label"),
-                &setting_master_fader_mode,
-                i18n->t("settings", "master-fader.tooltip"));
-
-            RenderInfoCheckbox(
-                m_ctx,
-                assets,
-                i18n->t("settings", "swap-shift.label"),
-                &setting_swap_shift,
-                i18n->t("settings", "swap-shift.tooltip"));
-
-            RenderInfoCheckbox(
-                m_ctx,
-                assets,
-                i18n->t("settings", "fader-reset.label"),
-                &setting_fader_reset,
-                i18n->t("settings", "fader-reset.tooltip"));
-
-            RenderInfoCheckbox(
-                m_ctx,
-                assets,
-                i18n->t("settings", "momentary-mute.label"),
-                &setting_momentary_mute_solo,
-                i18n->t("settings", "momentary-mute.tooltip"));
-
-            RenderInfoCheckbox(
-                m_ctx,
-                assets,
-                i18n->t("settings", "instant-multi-select-filter.label"),
-                &setting_instant_multi_select_filter,
-                i18n->t("settings", "instant-multi-select-filter.tooltip"));
-
-            RenderInfoCheckbox(
-                m_ctx,
-                assets,
-                i18n->t("settings", "mute-master-on-fwd-rwd.label"),
-                &setting_mute_master_on_fwd_rwd,
-                i18n->t("settings", "mute-master-on-fwd-rwd.tooltip"));
-
-            RenderInfoCheckbox(
-                m_ctx,
-                assets,
-                i18n->t("settings", "latch-preview-action-enable.label"),
-                &setting_latch_preview_action_enable,
-                i18n->t("settings", "latch-preview-action-enable.tooltip"));
-
-            if (setting_latch_preview_action_enable) {
-                ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + 26);
-                latch_preview_action_combo->Render();
-            }
-
-            ImGui::EndTabItem(m_ctx);
-        }
-        UiStyledElements::PopReaSonusTabStyle(m_ctx);
-    }
-
-    void RenderPluginsTab() {
-        double width = 0.0;
-        double height = 0.0;
-
-        UiStyledElements::PushReaSonusTabStyle(m_ctx, selected_tab == 2);
-        if (ImGui::BeginTabItem(m_ctx, i18n->t("settings", "tab.plugins").c_str())) {
-            selected_tab = 2;
+            selected_tab = tab_index;
             ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 16);
             ImGui::GetContentRegionAvail(m_ctx, &width, &height);
 
-            if (ImGui::BeginChild(m_ctx, "settings-display", width / 2 - 8, 0.0, ImGui::ChildFlags_None)) {
+            if (ImGui::BeginChild(m_ctx, "settings-display-left", width / 2 - 8, 0.0, ImGui::ChildFlags_None)) {
+                UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
+                if (ImGui::BeginChild(
+                    m_ctx,
+                    "track-settings",
+                    0.0,
+                    0.0,
+                    ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
+                )) {
+                    ReaSonusPageTitle(
+                        m_ctx,
+                        assets,
+                        i18n->t("settings", "track-group.label"),
+                        true
+                    );
+
+                    RenderInfoCheckbox(
+                        m_ctx,
+                        assets,
+                        i18n->t("settings", "momentary-mute.label"),
+                        &setting_momentary_mute_solo,
+                        i18n->t("settings", "momentary-mute.tooltip")
+                    );
+
+                    RenderInfoCheckbox(
+                        m_ctx,
+                        assets,
+                        i18n->t("settings", "fader-reset.label"),
+                        &setting_fader_reset,
+                        i18n->t("settings", "fader-reset.tooltip")
+                    );
+
+                    RenderinfoIntInput(
+                        m_ctx,
+                        assets,
+                        i18n->t("settings", "track-color-brightness.label"),
+                        &setting_track_color_brightness,
+                        5,
+                        100,
+                        i18n->t("settings", "track-color-brightness.tooltip"),
+                        "%d%%");
+
+                    ImGui::EndChild(m_ctx);
+                }
+
+                if (ImGui::BeginChild(
+                    m_ctx,
+                    "custom-filter-settings",
+                    0.0,
+                    0.0,
+                    ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
+                )) {
+                    ReaSonusPageTitle(
+                        m_ctx,
+                        assets,
+                        i18n->t("settings", "custom-filter-group.label"),
+                        true
+                    );
+
+                    RenderInfoCheckbox(
+                        m_ctx,
+                        assets,
+                        i18n->t("settings", "instant-multi-select-filter.label"),
+                        &setting_instant_multi_select_filter,
+                        i18n->t("settings", "instant-multi-select-filter.tooltip")
+                    );
+
+                    RenderInfoCheckbox(
+                        m_ctx,
+                        assets,
+                        i18n->t("settings", "filter-use-custom-color.label"),
+                        &setting_filter_custom_color,
+                        i18n->t("settings", "filter-use-custom-color.tooltip")
+                    );
+
+                    RenderInfoCheckbox(
+                        m_ctx,
+                        assets,
+                        i18n->t("settings", "filter-use-project-filters.label"),
+                        &setting_filter_project_filters,
+                        i18n->t("settings", "filter-use-project-filters.tooltip")
+                    );
+
+                    ImGui::EndChild(m_ctx);
+                }
+
+                UiStyledElements::PopReaSonusGroupStyle(m_ctx);
+
+                ImGui::EndChild(m_ctx);
+            }
+
+            ImGui::SameLine(m_ctx);
+            ImGui::BeginGroup(m_ctx);
+            UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
+            if (ImGui::BeginChild(
+                m_ctx,
+                "master-settings",
+                0.0,
+                0.0,
+                ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
+            )) {
+                ReaSonusPageTitle(
+                    m_ctx,
+                    assets,
+                    i18n->t("settings", "master-group.label"),
+                    true
+                );
+
+                RenderInfoCheckbox(
+                    m_ctx,
+                    assets,
+                    i18n->t("settings", "master-fader.label"),
+                    &setting_master_fader_mode,
+                    i18n->t("settings", "master-fader.tooltip")
+                );
+
+                RenderInfoCheckbox(
+                    m_ctx,
+                    assets,
+                    i18n->t("settings", "mute-master-on-fwd-rwd.label"),
+                    &setting_mute_master_on_fwd_rwd,
+                    i18n->t("settings", "mute-master-on-fwd-rwd.tooltip")
+                );
+
+                ImGui::EndChild(m_ctx);
+            }
+            UiStyledElements::PopReaSonusGroupStyle(m_ctx);
+            ImGui::EndGroup(m_ctx);
+
+            ImGui::EndTabItem(m_ctx);
+        }
+        UiStyledElements::PopReaSonusTabStyle(m_ctx);
+    }
+
+    void RenderAutomationTab(const int tab_index) {
+        double width;
+        double height;
+
+        UiStyledElements::PushReaSonusTabStyle(m_ctx, selected_tab == tab_index);
+        if (ImGui::BeginTabItem(m_ctx, i18n->t("settings", "tab.automation").c_str())) {
+            selected_tab = tab_index;
+            ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 16);
+            ImGui::GetContentRegionAvail(m_ctx, &width, &height);
+
+            if (ImGui::BeginChild(m_ctx, "settings-automation-left", width / 2 - 8, 0.0, ImGui::ChildFlags_None)) {
+                UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
+                if (ImGui::BeginChild(
+                    m_ctx,
+                    "automation-color-settings",
+                    0.0,
+                    0.0,
+                    ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
+                )) {
+                    ReaSonusPageTitle(
+                        m_ctx,
+                        assets,
+                        i18n->t("settings", "automation-color-group.label"),
+                        true
+                    );
+
+                    RenderInfoCheckbox(
+                        m_ctx,
+                        assets,
+                        i18n->t("settings", "use-automation-color.label"),
+                        &setting_use_automation_colors,
+                        i18n->t("settings", "use-automation-color.tooltip"));
+
+                    ImGui::BeginDisabled(m_ctx, !setting_use_automation_colors);
+                    ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + 26);
+                    ImGui::BeginGroup(m_ctx);
+                    for (int i = 0; i < 6; i++) {
+                        ImGui::BeginGroup(m_ctx);
+                        ReaSonusColorPicker(
+                            m_ctx,
+                            assets,
+                            setting_automation_trim_labels[i],
+                            &setting_automation_colors[i],
+                            prev_automation_trim_color,
+                            plugin_color_palette,
+                            50,
+                            32
+                        );
+                        ImGui::CalcTextSize(m_ctx, setting_automation_trim_labels[i].c_str(), &width, &height);
+                        ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + (50 - width) / 2);
+                        ImGui::Text(m_ctx, setting_automation_trim_labels[i].c_str());
+                        ImGui::EndGroup(m_ctx);
+
+                        if ((i + 1) % 6 != 0) {
+                            ImGui::SameLine(m_ctx);
+                        }
+                    }
+                    ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + 58);
+                    ImGui::BeginGroup(m_ctx);
+                    ReaSonusColorPicker(
+                        m_ctx,
+                        assets,
+                        setting_automation_trim_labels[6],
+                        &setting_automation_colors[6],
+                        prev_automation_trim_color,
+                        plugin_color_palette,
+                        50,
+                        32
+                    );
+                    ImGui::CalcTextSize(m_ctx, setting_automation_trim_labels[6].c_str(), &width, &height);
+                    ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + (50 - width) / 2);
+                    ImGui::Text(m_ctx, setting_automation_trim_labels[6].c_str());
+                    ImGui::EndGroup(m_ctx);
+
+                    ImGui::EndGroup(m_ctx);
+
+                    ImGui::EndDisabled(m_ctx);
+
+                    ImGui::EndChild(m_ctx);
+                }
+
+                if (ImGui::BeginChild(
+                    m_ctx,
+                    "automation-latch-settings",
+                    0.0,
+                    0.0,
+                    ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
+                )) {
+                    ReaSonusPageTitle(
+                        m_ctx,
+                        assets,
+                        i18n->t("settings", "automation-latch-group.label"),
+                        true
+                    );
+
+                    RenderInfoCheckbox(
+                        m_ctx,
+                        assets,
+                        i18n->t("settings", "latch-preview-action-enable.label"),
+                        &setting_latch_preview_action_enable,
+                        i18n->t("settings", "latch-preview-action-enable.tooltip")
+                    );
+
+                    ImGui::BeginDisabled(m_ctx, !setting_latch_preview_action_enable);
+                    ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + 26);
+                    latch_preview_action_combo->Render();
+                    ImGui::EndDisabled(m_ctx);
+
+                    ImGui::EndChild(m_ctx);
+                }
+
+                UiStyledElements::PopReaSonusGroupStyle(m_ctx);
+
+                ImGui::EndChild(m_ctx);
+            }
+
+            ImGui::SameLine(m_ctx);
+            ImGui::BeginGroup(m_ctx);
+            UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
+            if (ImGui::BeginChild(
+                m_ctx,
+                "automation-single-settings",
+                0.0,
+                0.0,
+                ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
+            )) {
+                ReaSonusPageTitle(
+                    m_ctx,
+                    assets,
+                    i18n->t("settings", "automation-single-group.label"),
+                    true
+                );
+
+                RenderInfoCheckbox(
+                    m_ctx,
+                    assets,
+                    i18n->t("settings", "use-single-point-mode.label"),
+                    &setting_use_single_point_mode,
+                    i18n->t("settings", "use-single-point-mode.tooltip")
+                );
+
+                RenderInfoCheckbox(
+                    m_ctx,
+                    assets,
+                    i18n->t("settings", "single-point-overwrite-point-shape.label"),
+                    &setting_overwrite_single_point_shape,
+                    i18n->t("settings", "single-point-overwrite-point-shape.tooltip")
+                );
+
+                ImGui::BeginDisabled(m_ctx, !setting_overwrite_single_point_shape);
+                ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + 26);
+                ImGui::BeginGroup(m_ctx);
+                automation_single_point_shape->Render();
+                ReaSonusAutomationPointShape(
+                    m_ctx,
+                    assets,
+                    i18n->t("settings", "single-point-bezier-tension.label"),
+                    &setting_single_bezier_tension,
+                    setting_single_point_mode_shape,
+                    !setting_overwrite_single_point_shape
+                );
+                ImGui::EndGroup(m_ctx);
+                ImGui::EndDisabled(m_ctx);
+
+                RenderInfoCheckbox(
+                    m_ctx,
+                    assets,
+                    i18n->t("settings", "single-point-button-blink.label"),
+                    &setting_single_point_button_blink,
+                    i18n->t("settings", "single-point-button-blink.tooltip")
+                );
+
+                ImGui::EndChild(m_ctx);
+            }
+
+            UiStyledElements::PopReaSonusGroupStyle(m_ctx);
+            ImGui::EndGroup(m_ctx);
+
+            ImGui::EndTabItem(m_ctx);
+        }
+        UiStyledElements::PopReaSonusTabStyle(m_ctx);
+    }
+
+    void RenderPluginsTab(const int tab_index) {
+        double width = 0.0;
+        double height = 0.0;
+
+        UiStyledElements::PushReaSonusTabStyle(m_ctx, selected_tab == tab_index);
+        if (ImGui::BeginTabItem(m_ctx, i18n->t("settings", "tab.plugins").c_str())) {
+            selected_tab = tab_index;
+            ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 16);
+            ImGui::GetContentRegionAvail(m_ctx, &width, &height);
+
+            UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
+            if (ImGui::BeginChild(
+                m_ctx,
+                "settings-display",
+                width / 2 - 8,
+                0.0,
+                ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
+            )) {
+                ReaSonusPageTitle(
+                    m_ctx,
+                    assets,
+                    i18n->t("settings", "plugin-control-group.label"),
+                    true
+                );
+
                 RenderInfoCheckbox(
                     m_ctx,
                     assets,
@@ -463,10 +838,25 @@ public:
 
                 ImGui::EndChild(m_ctx);
             }
+            UiStyledElements::PopReaSonusGroupStyle(m_ctx);
 
             ImGui::SameLine(m_ctx);
-            ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + 16);
-            if (ImGui::BeginChild(m_ctx, "settings-colors", width / 2 - 8, 0.0, ImGui::ChildFlags_None)) {
+
+            UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
+            if (ImGui::BeginChild(
+                m_ctx,
+                "settings-colors",
+                0.0,
+                0.0,
+                ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
+            )) {
+                ReaSonusPageTitle(
+                    m_ctx,
+                    assets,
+                    i18n->t("settings", "plugin-mapping-group.label"),
+                    true
+                );
+
                 RenderInfoCheckbox(
                     m_ctx,
                     assets,
@@ -478,6 +868,7 @@ public:
 
                 ImGui::EndChild(m_ctx);
             }
+            UiStyledElements::PopReaSonusGroupStyle(m_ctx);
 
             ImGui::EndTabItem(m_ctx);
         }
@@ -506,31 +897,29 @@ public:
                 display_line_alignment_combo[tab_index]->Render();
                 display_line_invert_combo[tab_index]->Render();
 
-                UiStyledElements::PopReaSonusGroupStyle(m_ctx);
                 ImGui::EndChild(m_ctx);
             }
+            UiStyledElements::PopReaSonusGroupStyle(m_ctx);
 
-            UiStyledElements::PopReaSonusTabStyle(m_ctx);
             ImGui::EndTabItem(m_ctx);
-        } else {
-            UiStyledElements::PopReaSonusTabStyle(m_ctx);
         }
+        UiStyledElements::PopReaSonusTabStyle(m_ctx);
     }
 
-    void RenderDisplayTab() {
+    void RenderDisplayTab(const int tab_index) {
         double width = 0.0;
         double height = 0.0;
 
-        UiStyledElements::PushReaSonusTabStyle(m_ctx, selected_tab == 3);
+        UiStyledElements::PushReaSonusTabStyle(m_ctx, selected_tab == tab_index);
         if (ImGui::BeginTabItem(m_ctx, i18n->t("settings", "tab.display").c_str())) {
-            selected_tab = 3;
+            selected_tab = tab_index;
             ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 16);
             ImGui::GetContentRegionAvail(m_ctx, &width, &height);
 
             if (ImGui::BeginChild(
                 m_ctx,
                 "settings-display",
-                width / 1.75 - 8,
+                width / 2 - 8,
                 0.0,
                 ImGui::ChildFlags_None,
                 ImGui::ChildFlags_AutoResizeY
@@ -543,10 +932,17 @@ public:
                     0.0,
                     ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
                 )) {
-                    ReaSonusImageComboInput(
+                    ReaSonusPageTitle(
                         m_ctx,
                         assets,
                         i18n->t("settings", "display-track.label"),
+                        true
+                    );
+
+                    ReaSonusImageComboInput(
+                        m_ctx,
+                        assets,
+                        "##" + i18n->t("settings", "display-track.label"),
                         track_display_names,
                         &setting_track_display,
                         0.0
@@ -560,17 +956,21 @@ public:
                         ImGui::ChildFlags_None | ImGui::ChildFlags_AutoResizeY
                     )) {
                         UiStyledElements::PushReaSonusTabBarStyle(m_ctx);
-                        if (ImGui::BeginTabBar(m_ctx, "SettingsDisplayLinesTabs",
-                                               ImGui::TabBarFlags_None | ImGui::ChildFlags_AutoResizeY)) {
+                        if (ImGui::BeginTabBar(
+                            m_ctx,
+                            "SettingsDisplayLinesTabs",
+                            ImGui::TabBarFlags_None | ImGui::ChildFlags_AutoResizeY
+                        )) {
                             for (int i = 0; i < track_display_lines[setting_track_display]; i++) {
                                 RenderDisplayLineTab(i);
                             }
 
-                            UiStyledElements::PopReaSonusTabBarStyle(m_ctx);
                             ImGui::EndTabBar(m_ctx);
                         }
+                        UiStyledElements::PopReaSonusTabBarStyle(m_ctx);
                         ImGui::EndChild(m_ctx);
                     }
+
                     ImGui::Image(m_ctx, assets->GetValueBarType(setting_track_valuebar_mode), 76, 23);
 
                     ImGui::SameLine(m_ctx);
@@ -586,40 +986,33 @@ public:
                         value_bar_type_combo->Render();
                         value_bar_value_combo->Render();
 
-                        UiStyledElements::PopReaSonusGroupStyle(m_ctx);
                         ImGui::EndChild(m_ctx);
-                    } else {
-                        UiStyledElements::PopReaSonusGroupStyle(m_ctx);
                     }
+                    UiStyledElements::PopReaSonusGroupStyle(m_ctx);
 
-                    UiStyledElements::PopReaSonusGroupStyle(m_ctx);
                     ImGui::EndChild(m_ctx);
-                } else {
-                    UiStyledElements::PopReaSonusGroupStyle(m_ctx);
                 }
+                UiStyledElements::PopReaSonusGroupStyle(m_ctx);
 
                 ImGui::EndChild(m_ctx);
             }
 
             ImGui::SameLine(m_ctx);
 
-            ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + 16);
+            UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
             if (ImGui::BeginChild(
                 m_ctx,
                 "settings-colors",
-                width - width / 1.75 - 8,
                 0.0,
-                ImGui::ChildFlags_None
+                0.0,
+                ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
             )) {
-                RenderinfoIntInput(
+                ReaSonusPageTitle(
                     m_ctx,
                     assets,
-                    i18n->t("settings", "track-color-brightness.label"),
-                    &setting_track_color_brightness,
-                    5,
-                    100,
-                    i18n->t("settings", "track-color-brightness.tooltip"),
-                    "%d%%");
+                    i18n->t("settings", "time-code-group.label"),
+                    true
+                );
 
                 RenderInfoCheckbox(
                     m_ctx,
@@ -628,13 +1021,14 @@ public:
                     &setting_overwrite_time_code,
                     i18n->t("settings", "overwrite-timecode.tooltip"));
 
-                if (setting_overwrite_time_code) {
-                    ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + 26);
-                    time_code_combo->Render();
-                }
+                ImGui::BeginDisabled(m_ctx, !setting_overwrite_time_code);
+                ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + 26);
+                time_code_combo->Render();
+                ImGui::EndDisabled(m_ctx);
 
                 ImGui::EndChild(m_ctx);
             }
+            UiStyledElements::PopReaSonusGroupStyle(m_ctx);
 
             ImGui::EndTabItem(m_ctx);
         }
@@ -658,10 +1052,11 @@ public:
         )) {
             UiStyledElements::PushReaSonusTabBarStyle(m_ctx);
             if (ImGui::BeginTabBar(m_ctx, "SettingsTabs", ImGui::TabBarFlags_None)) {
-                RenderGlobalTab();
-                RenderControllerTab();
-                RenderPluginsTab();
-                RenderDisplayTab();
+                RenderGlobalTab(0);
+                RenderControllerTab(1);
+                RenderAutomationTab(3);
+                RenderPluginsTab(2);
+                RenderDisplayTab(4);
 
                 UiStyledElements::PopReaSonusTabBarStyle(m_ctx);
                 ImGui::EndTabBar(m_ctx);
@@ -684,23 +1079,34 @@ public:
         settings->SetSetting("surface", "fader-reset", setting_fader_reset);
         settings->SetSetting("surface", "mute-solo-momentary", setting_momentary_mute_solo);
         settings->SetSetting("surface", "overwrite-time-code", setting_overwrite_time_code);
-        settings->SetSetting("surface", "latch-preview-action", setting_latch_preview_action_enable);
         settings->SetSetting("surface", "track-color-brightness", setting_track_color_brightness);
+        settings->SetSetting("surface", "latch-preview-action", setting_latch_preview_action_enable);
         settings->SetSetting("surface", "latch-preview-action-code",
                              latch_preview_action_indexes[setting_latch_preview_action]);
+        settings->SetSetting("surface", "automation-colors", join(setting_automation_colors, ","));
         settings->SetSetting("surface", "time-code", time_code_indexes[setting_time_code]);
         settings->SetSetting("surface", "plugin-step-size", setting_plugin_step_size);
         settings->SetSetting("surface", "plugin-map-param-clear", setting_plugin_map_param_clear);
         settings->SetSetting("surface", "plugin-map-default-color-mode", setting_plugin_map_color_mode);
         settings->SetSetting("surface", "instant-multi-select-filter", setting_instant_multi_select_filter);
         settings->SetSetting("surface", "mute-master-on-fwd-rwd", setting_mute_master_on_fwd_rwd);
+        settings->SetSetting("surface", "use-automation-colors", setting_use_automation_colors);
+
+        settings->SetSetting("surface", "use-automation-single-point", setting_use_single_point_mode);
+        settings->SetSetting("surface", "overwrite-automation-point-shape", setting_overwrite_single_point_shape);
+        settings->SetSetting("surface", "automation-point-shape", setting_single_point_mode_shape);
+        settings->SetSetting("surface", "automation-single-bezier-tension", setting_single_bezier_tension);
+        settings->SetSetting("surface", "automation-single-button-blink", setting_single_point_button_blink);
+
         settings->SetSetting("displays", "track", setting_track_display);
-        settings->SetSetting("displays", "track-lines", joinDisplayValues(setting_track_value_line_value, ","));
-        settings->SetSetting("displays", "track-alignment", joinDisplayValues(setting_track_value_line_align, ","));
-        settings->SetSetting("displays", "track-invert", joinDisplayValues(setting_track_value_line_invert, ","));
+        settings->SetSetting("displays", "track-lines", join(setting_track_value_line_value, ","));
+        settings->SetSetting("displays", "track-alignment", join(setting_track_value_line_align, ","));
+        settings->SetSetting("displays", "track-invert", join(setting_track_value_line_invert, ","));
         settings->SetSetting("displays", "track-value-bar-mode", setting_track_valuebar_mode);
         settings->SetSetting("displays", "track-value-bar-value", setting_track_valuebar_value);
         settings->SetSetting("surface", "reasonus-color-palette", join(settings_plugin_color_palette, ","));
+        settings->SetSetting("filters", "use-custom-color", setting_filter_custom_color);
+        settings->SetSetting("filters", "project-filters", setting_filter_project_filters);
 
         if (settings->StoreSettings()) {
             DAW::SetExtState(EXT_STATE_KEY_SAVED_SETTINGS, EXT_STATE_VALUE_TRUE, false);
@@ -731,6 +1137,8 @@ public:
         setting_momentary_mute_solo = settings->GetMuteSoloMomentary();
         setting_overwrite_time_code = settings->GetOverwriteTimeCode();
         setting_latch_preview_action_enable = settings->GetLatchPreviewActionEnabled();
+        setting_use_automation_colors = settings->UseAutomationColors();
+        setting_automation_colors = settings->GetAutomationColorsArray();
         setting_plugin_step_size = settings->GetpluginStepSize();
         setting_track_color_brightness = settings->GetTrackColorBrightness();
         setting_plugin_map_param_clear = settings->ShouldClearParamInput();
@@ -745,6 +1153,14 @@ public:
         setting_mute_master_on_fwd_rwd = settings->ShouldMuteMasterOnFwdRwd();
         settings_initial_plugin_color_palette = settings->GetPluginColorPalette();
         settings_plugin_color_palette = settings->GetPluginColorPalette();
+        setting_filter_custom_color = settings->UseFilterColor();
+        setting_filter_project_filters = settings->ProjectFiltersEnabled();
+        setting_use_automation_colors = settings->UseAutomationColors();
+        setting_use_single_point_mode = settings->UseAutomationSinglePoint();
+        setting_overwrite_single_point_shape = settings->OverwriteAutomationPointShape();
+        setting_single_point_mode_shape = settings->GetAutomationPointShape();
+        setting_single_bezier_tension = settings->GetAutomationSingleBezierTension();
+        setting_single_point_button_blink = settings->GetAutomationSingleButtonBlink();
 
         int *const iterator = std::find(
             latch_preview_action_indexes,
@@ -769,15 +1185,5 @@ public:
                 std::distance(time_code_indexes, time_code_iterator)
             );
         }
-    }
-
-    static std::string joinDisplayValues(const std::array<int, 4> list, const std::string &delimiter) {
-        std::string result;
-
-        for (int i = 0; i < static_cast<int>(sizeof(list) / sizeof(list[0])); i++) {
-            result += (i > 0 ? delimiter : "") + std::to_string(list[i]);
-        }
-
-        return result;
     }
 };

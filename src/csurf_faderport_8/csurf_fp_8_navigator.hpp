@@ -7,6 +7,7 @@
 // #include <reaper_plugin.h>
 // #include "../shared/csurf_utils.hpp"
 #include "../shared/csurf_context.cpp"
+#include "../shared/csurf_project_state.hpp"
 
 enum NavigatorFilter {
     /**
@@ -61,10 +62,12 @@ class CSurf_FP_8_Navigator {
     int track_offset = 0;
     CSurf_Context *context;
     ReaSonusSettings *settings = ReaSonusSettings::GetInstance(FP_8);
+    ProjectState *project_state = ProjectState::GetInstance();
 
     WDL_PtrList<MediaTrack> tracks;
     bool has_solo;
     bool has_mute;
+    int last_published_offset = -1;
     bool track_touched[16] = {
         false,
         false,
@@ -114,11 +117,13 @@ class CSurf_FP_8_Navigator {
 
     void HandleTracksAreVcaFilter();
 
-    void HandleTracksCustomFilter(const std::string &filter_name);
+    void HandleTracksCustomFilter(const std::string &filter_name, const bool &project_filter);
 
     void HandleTrackCustomMultiSelectFilter();
 
     bool TrackIsInBankTracks(MediaTrack *media_track);
+
+    void PublishOffset();
 
 public:
     explicit CSurf_FP_8_Navigator(CSurf_Context *context);
@@ -147,7 +152,7 @@ public:
 
     void HandleFilter(NavigatorFilter filter);
 
-    void HandleCustomFilter(const std::string &filterName);
+    void HandleCustomFilter(const std::string &filterName, const bool &projectFilter);
 
     void SetTrackTouched(int index, bool value);
 

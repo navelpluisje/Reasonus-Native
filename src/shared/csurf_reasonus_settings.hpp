@@ -3,7 +3,6 @@
 
 #include <string>
 #include <vector>
-#include <algorithm>
 #include <mini/ini.h>
 #include "../shared/csurf_utils.hpp"
 
@@ -16,27 +15,23 @@ class ReaSonusSettings {
     static ReaSonusSettings *instance8Ptr;
     static ReaSonusSettings *instanceV2Ptr;
 
-    const std::vector<std::vector<std::string>> shared_settings = {
-        {"surface", "midiin", "0"},
-        {"surface", "midiout", "0"},
-        {"surface", "mute-solo-momentary", "0"},
-        {"surface", "latch-preview-action", "0"},
-        {"surface", "latch-preview-action-code", "42013"},
-        {"functions", "1", "0"},
-        {"functions", "2", "0"},
-        {"functions", "3", "0"},
-        {"functions", "4", "0"},
-        {"footswitch", "1", "0"},
-        {"footswitch", "2", "0"},
-        {"footswitch", "3", "0"},
+    /**
+     * Default list with colors for the automation buttons.
+     * The colors are tha same as the colors used when using automation colors is turned off
+     */
+    std::vector<std::string> automation_colors = {
+        "3539199",  // 0x3600ff Purple
+        "16777215", // 0xffffff White
+        "14079",    // 0x0036ff Blue
+        "16776960", // 0xffff00 Yellow
+        "16711680", // 0xff0000 Red
+        "65280",    // 0x00ff00 Green
+        "16777215", // 0xffffff White
     };
 
-    const std::vector<std::vector<std::string>> fp_v2_settings = {
-        {"surface", "control-hidden-tracks", "0"},
-        {"surface", "can-disable-fader", "0"},
-        {"surface", "endless-track-scroll", "0"},
-    };
-
+    /**
+     * 2 lists for setting as the defaults for the color palette of the color picker.
+     */
     std::vector<std::string> palette_colors_default{12, std::to_string(0x00ffffff)};
     std::vector<std::string> palette_colors_theme = {
         "16711680",
@@ -53,6 +48,42 @@ class ReaSonusSettings {
         "8355839"
     };
 
+    /**
+     * List with generic settings and their default value. This is used for checking the existance of settings in the inio.
+     * If an item does not exist, it will be added with the given default value
+     * The values are set up as {"group", "setting-name", "default value"}
+     */
+    const std::vector<std::vector<std::string>> shared_settings = {
+        {"surface", "midiin", "0"},
+        {"surface", "midiout", "0"},
+        {"surface", "mute-solo-momentary", "0"},
+        {"surface", "latch-preview-action", "0"},
+        {"surface", "latch-preview-action-code", "42013"},
+        {"functions", "1", "0"},
+        {"functions", "2", "0"},
+        {"functions", "3", "0"},
+        {"functions", "4", "0"},
+        {"footswitch", "1", "0"},
+        {"footswitch", "2", "0"},
+        {"footswitch", "3", "0"},
+    };
+
+    /**
+     * List with FP V2 specific settings and their default value. This is used for checking the existance of settings in the inio.
+     * If an item does not exist, it will be added with the given default value
+     * The values are set up as {"group", "setting-name", "default value"}
+     */
+    const std::vector<std::vector<std::string>> fp_v2_settings = {
+        {"surface", "control-hidden-tracks", "0"},
+        {"surface", "can-disable-fader", "0"},
+        {"surface", "endless-track-scroll", "0"},
+    };
+
+    /**
+     * List with FP6 / 16 specific settings and their default value. This is used for checking the existance of settings in the inio.
+     * If an item does not exist, it will be added with the given default value
+     * The values are set up as {"group", "setting-name", "default value"}
+     */
     const std::vector<std::vector<std::string>> fp_8_settings = {
         {"surface", "surface", "0"},
         {"surface", "disable-plugins", "0"},
@@ -73,12 +104,21 @@ class ReaSonusSettings {
         },
         {"surface", "instant-multi-select-filter", "0"},
         {"surface", "mute-master-on-fwd-rwd", "0"},
+        {"surface", "use-automation-colors", "0"},
+        {"surface", "automation-colors", join(automation_colors, ",")},
+        {"surface", "use-automation-point-touch", "0"},
+        {"surface", "overwrite-automation-point-shape", "0"},
+        {"surface", "automation-point-shape", "0"},
+        {"surface", "automation-single-bezier-tension", "0"},
+        {"surface", "automation-single-button-blink", "1"},
+
         {"displays", "track", "8"},
         {"displays", "track-lines", "0,4,1,2"},
         {"displays", "track-alignment", "1,0,0,0"},
         {"displays", "track-invert", "0,0,0,0"},
         {"displays", "track-value-bar-mode", "1"},
         {"displays", "track-value-bar-value", "0"},
+
         {"functions", "5", "0"},
         {"functions", "6", "0"},
         {"functions", "7", "0"},
@@ -91,7 +131,10 @@ class ReaSonusSettings {
         {"functions", "14", "0"},
         {"functions", "15", "0"},
         {"functions", "16", "0"},
+
         {"filters", "nb-filters", "0"},
+        {"filters", "use-custom-color", "0"},
+        {"filters", "project-filters", "0"},
     };
 
 public:
@@ -132,6 +175,8 @@ public:
 
     void SetSetting(const std::string &group, const std::string &key, bool value);
 
+    void SetSetting(const std::string &group, const std::string &key, double value);
+
     void SetSetting(const std::string &group, const std::string &key, int value);
 
     /**
@@ -166,6 +211,7 @@ public:
      *
      * @param group
      * @param key
+     * @param default_value
      * @return std::string
      */
     std::string GetSetting(const std::string &group, const std::string &key, std::string default_value = "");
@@ -216,6 +262,24 @@ public:
 
     int GetLatchPreviewActionCode();
 
+    bool UseAutomationColors();
+
+    std::vector<int> GetAutomationColors();
+
+    std::array<int, 7> GetAutomationColorsArray();
+
+    int GetAutomationColor(const AutomationButtonIndex &type, int fallback);
+
+    bool UseAutomationSinglePoint();
+
+    bool OverwriteAutomationPointShape();
+
+    int GetAutomationPointShape();
+
+    double GetAutomationSingleBezierTension();
+
+    bool GetAutomationSingleButtonBlink();
+
     int GetpluginStepSize();
 
     int GetTrackDisplay();
@@ -240,8 +304,6 @@ public:
 
     int GetPluginMapDefaultColorMode();
 
-    bool ShouldMultiFilterApplyInstant();
-
     std::vector<int> GetPluginColorPalette();
 
     bool ShouldMuteMasterOnFwdRwd();
@@ -258,11 +320,17 @@ public:
     /**
      * Filters related
      */
+    bool ShouldMultiFilterApplyInstant();
+
     int GetNumberOfFilters();
 
     int AddNewFilter(const std::string &filter_name);
 
     std::vector<std::string> GetFilterKeys();
+
+    bool UseFilterColor();
+
+    bool ProjectFiltersEnabled();
 
     void UpdateFilter(const std::string &key, const mINI::INIMap<std::string> &filter);
 
@@ -273,6 +341,8 @@ public:
     std::string GetFilterKeyByIndex(int index);
 
     std::vector<std::string> GetFilterNames();
+
+    std::vector<int> GetFilterColors();
 
     mINI::INIMap<std::string> GetFilter(const std::string &key);
 

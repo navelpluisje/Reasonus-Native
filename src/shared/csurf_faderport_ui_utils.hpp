@@ -1,7 +1,6 @@
 #ifndef CSURF_FADERPORT_UI_UTILS_H_
 #define CSURF_FADERPORT_UI_UTILS_H_
 
-// #include <cstdio>
 #include <string>
 #include <WDL/wdltypes.h> // might be unnecessary in future
 #include <WDL/win32_utf8.h>
@@ -24,7 +23,7 @@ extern HWND g_hwnd;
 
 void parseParms(const char *config, std::array<int, 4> parms);
 
-int AddComboEntry(HWND hwndDlg, int lparam, char *buf, int comboId);
+int AddComboEntry(HWND hwndDlg, int lparam, char const *buf, int comboId);
 
 void AddListEntry(HWND hwndDlg, const std::string &buf, int listId);
 

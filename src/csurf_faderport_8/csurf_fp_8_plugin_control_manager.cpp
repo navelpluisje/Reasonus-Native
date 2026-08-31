@@ -3,16 +3,16 @@
 
 #include "csurf_fp_8_channel_manager.hpp"
 #include "../shared/csurf_plugin_utils.hpp"
+#include "fmt/format.h"
 
 class CSurf_FP_8_PluginControlManager : public CSurf_FP_8_ChannelManager {
-protected:
     mINI::INIStructure ini;
     ReaSonusSettings *settings = ReaSonusSettings::GetInstance(FP_8);
     std::string fileName;
-    int updateCount;
     bool editStepSize;
     int stepSize;
 
+protected:
     [[nodiscard]] std::string getParamKey(const std::string &prefix, const int index) const { // NOLINT(*-convert-member-functions-to-static)
         return prefix + std::to_string(index);
     }
@@ -57,6 +57,13 @@ protected:
         return stoi(ini[param_key]["color"]);
     }
 
+    Inverted GetLabelInvertState(const std::string &param_key) {
+        return ini[param_key].has("uninvert-label")
+               && ini[param_key]["uninvert-label"] == "1"
+                   ? NON_INVERT
+                   : INVERT;
+    }
+
 public:
     CSurf_FP_8_PluginControlManager(
         const std::vector<CSurf_FP_8_Track *> &tracks,
@@ -97,10 +104,7 @@ public:
             track->SetDisplayMode(DISPLAY_MODE_2, force_update);
 
             if (ini.has(param_key) && !ini[param_key]["param"].empty()) {
-                const Inverted inverted = ini[param_key].has("uninvert-label")
-                                          && ini[param_key]["uninvert-label"] == "1"
-                                              ? NON_INVERT
-                                              : INVERT;
+                const Inverted inverted = GetLabelInvertState(param_key);
 
                 track->SetDisplayLine(0, ALIGN_CENTER, ini[param_key]["name"].c_str(), inverted, force_update);
                 const std::string formatted_param_value = DAW::GetTrackFxFormattedParamValue(
@@ -120,10 +124,7 @@ public:
             param_key = getParamKey("Fader_", filter_index);
             if (ini.has(param_key) && !ini[param_key]["param"].empty()) {
                 if (!display_step_size) {
-                    const Inverted inverted = ini[param_key].has("uninvert-label")
-                                              && ini[param_key]["uninvert-label"] == "1"
-                                                  ? NON_INVERT
-                                                  : INVERT;
+                    const Inverted inverted = GetLabelInvertState(param_key);
 
                     track->SetDisplayLine(2, ALIGN_CENTER, ini[param_key]["name"].c_str(), inverted, force_update);
                     const std::string formatted_param_value = DAW::GetTrackFxFormattedParamValue(
@@ -220,18 +221,51 @@ public:
     }
 
     void HandleFaderTouch(const int index, const int value) override {
-        const int control_index = context->GetChannelManagerItemIndex() + index;
-        const int plugin_id = context->GetPluginEditPluginId();
+        const int item_index = context->GetChannelManagerItemIndex() + index;
+        const int plugin_index = context->GetPluginEditPluginId();
+        const std::string param_key = getParamKey("Fader_", item_index);
+        if (!ini.has(param_key)) {
+            return;
+        }
 
-        const std::string param_key = getParamKey("Fader_", control_index);
+        MediaTrack *media_track = context->GetPluginEditTrack();
+        const int plugin_param_index = stoi(ini[param_key]["param"]);
 
-        if (ini.has(param_key)) {
-            MediaTrack *media_track = context->GetPluginEditTrack();
+        /**
+         * Check if we have the proper conditions to continue with Single point automation
+         * All pan related values (except for width) are displayed reversed.
+         * Therefore some fo the values are inverted as well, to make it mork as it should
+         */
+        if (HasSinglePointAutomation(media_track, index, value)) {
+            double parameter_value = 0.0;
+            double dummy;
+
+            // Get the value to write for the automation
+            if (value > 0) {
+                // We need to set it to read first to get the actual volume of the envelope
+                SetTrackAutomationMode(media_track, AUTOMATION_READ);
+                parameter_value = TrackFX_GetParam(media_track, plugin_index, plugin_param_index, &dummy, &dummy);
+                SetTrackAutomationMode(media_track, AUTOMATION_TRIM);
+            } else {
+                parameter_value = TrackFX_GetParam(media_track, plugin_index, plugin_param_index, &dummy, &dummy);
+            }
+
+            HandleSinglePointAutomation(
+                media_track,
+                index,
+                value,
+                fmt::format("{}_{}_{}", index, plugin_index, param_key),
+                parameter_value,
+                SPA_Plugin,
+                plugin_index,
+                plugin_param_index
+            );
+        } else {
             if (value > 0 || media_track == nullptr) {
                 return;
             }
-
-            TrackFX_EndParamEdit(media_track, plugin_id, stoi(ini[param_key]["param"]));
+            // Tell REAPER we do not alter the automatiuon anymore
+            TrackFX_EndParamEdit(media_track, plugin_index, plugin_param_index);
         }
     }
 

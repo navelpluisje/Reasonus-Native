@@ -6,32 +6,42 @@
 #include "../csurf_ui_styles_elements.hpp"
 #include "csurf_ui_tooltip.hpp"
 
-static void ReaSonusCheckBox(ImGui_Context *m_ctx, const std::string &label, bool *value)
-{
+static void ReaSonusCheckBox(ImGui_Context *m_ctx, const std::string &label, bool *value) {
     bool _value = *value;
 
     UiStyledElements::PushReaSonusCheckboxStyle(m_ctx);
-    if (ImGui::Checkbox(m_ctx, label.c_str(), &_value))
-    {
+    ImGui::PushTextWrapPos(m_ctx, 100.0);
+    if (ImGui::Checkbox(m_ctx, label.c_str(), &_value)) {
         *value = !*value;
     }
+    ImGui::PopTextWrapPos(m_ctx);
     UiStyledElements::PopReaSonusCheckboxStyle(m_ctx);
 }
 
 static void RenderInfoCheckbox(
     ImGui_Context *m_ctx,
     CSurf_UI_Assets *assets,
-    const std::string& label,
+    const std::string &label,
     bool *value,
-    const std::string &tooltip)
-{
-    const double x_pos = ImGui::GetCursorPosX(m_ctx);
-    const double y_pos = ImGui::GetCursorPosY(m_ctx);
-    const std::string tooltip_id = std::to_string(x_pos) + "-" + std::to_string(y_pos);
+    const std::string &tooltip
+) {
+    double width;
+    double height;
 
-    ReaSonusCheckBox(m_ctx, label, value);
+    ReaSonusCheckBox(m_ctx, "##" + label, value);
     ImGui::SameLine(m_ctx);
-    ReaSonusTooltip(m_ctx, assets, tooltip, tooltip_id, 0, -3);
+
+    ImGui::GetContentRegionAvail(m_ctx, &width, &height);
+    ImGui::PushTextWrapPos(m_ctx, width - 20);
+
+    ImGui::Text(m_ctx, label.c_str());
+    if (ImGui::IsItemClicked(m_ctx)) {
+        *value = !*value;
+    }
+    ImGui::PopTextWrapPos(m_ctx);
+    ImGui::SameLine(m_ctx);
+
+    ReaSonusTooltip(m_ctx, assets, tooltip, tooltip + label, 0, -3);
     ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 4);
     ImGui::Dummy(m_ctx, 0, 0);
 }

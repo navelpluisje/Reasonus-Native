@@ -11,8 +11,8 @@ class CSurf_Context // NOLINT(*-use-internal-linkage)
     /**
      * @brief Number of channels
      */
-    int nbChannels = 8;
-    std::string device = FP_8;
+    int nbChannels;
+    std::string device;
 
     // Shift keys
     bool shift_left;
@@ -43,12 +43,15 @@ class CSurf_Context // NOLINT(*-use-internal-linkage)
     int channelManagerItemsCount = 0;
 
     // Plugin Edit fields
-    MediaTrack *pluginEditTrack{nullptr};
+    MediaTrack *pluginEditTrack;
     int pluginEditPluginId;
     int pluginEditParamId;
 
     // disable fader on v2
     bool fader_disabled;
+
+    // Single Point Automation
+    bool single_point_automation;
 
     ChannelMode channelMode;
     ChannelMode previousChannelMode = TrackMode;
@@ -61,6 +64,8 @@ public:
     explicit CSurf_Context(const int nbChannels) : nbChannels(nbChannels) {
         if (nbChannels == 1) {
             device = FP_V2;
+        } else {
+            device = FP_8;
         }
         settings = ReaSonusSettings::GetInstance(device);
         shift_left = false;
@@ -77,6 +82,7 @@ public:
         pluginEditParamId = 0;
 
         channelMode = TrackMode;
+        single_point_automation = false;
     }
 
     ~CSurf_Context() = default;
@@ -407,6 +413,17 @@ public:
 
     [[nodiscard]] bool GetFaderDisabled() const {
         return fader_disabled;
+    }
+
+    /**************************************************************************
+     * Single Point Automation
+     **************************************************************************/
+    void SetSinglePointAutomation(const bool value) {
+        single_point_automation = value;
+    }
+
+    [[nodiscard]] bool IsSinglePointAutomationEnabled() const {
+        return single_point_automation;
     }
 
     /**************************************************************************

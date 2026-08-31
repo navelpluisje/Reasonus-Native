@@ -21,12 +21,22 @@ static void ReaSonusIntInput(
     int local_value = *value;
 
     UiStyledElements::PushReaSonusFieldGroupStyle(m_ctx);
-    if (ImGui::BeginChild(m_ctx, ("container" + label).c_str(), width, 0.0,
-                          ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY)) {
+    if (ImGui::BeginChild(
+        m_ctx,
+        ("container" + label).c_str(),
+        width,
+        0.0,
+        ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
+    )) {
         ImGui::Text(m_ctx, label.c_str());
 
-        if (ImGui::BeginChild(m_ctx, ("input-container" + label).c_str(), width, 0.0,
-                              ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY)) {
+        if (ImGui::BeginChild(
+            m_ctx,
+            ("input-container" + label).c_str(),
+            width,
+            0.0,
+            ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
+        )) {
             UiStyledElements::PushReaSonusInputStyle(m_ctx);
             if (ImGui::SliderInt(m_ctx, ("##" + label).c_str(), &local_value, v_min, v_max, format.c_str())) {
                 *value = local_value;

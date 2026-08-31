@@ -82,6 +82,10 @@ void ReaSonusSettings::SetSetting(const std::string &group, const std::string &k
     settings[group][key] = value ? "1" : "0";
 }
 
+void ReaSonusSettings::SetSetting(const std::string &group, const std::string &key, const double value) {
+    settings[group][key] = std::to_string(value);
+}
+
 void ReaSonusSettings::SetSetting(const std::string &group, const std::string &key, const int value) {
     settings[group][key] = std::to_string(value);
 }
@@ -244,6 +248,76 @@ bool ReaSonusSettings::ShouldMuteMasterOnFwdRwd() {
     return stoi(settings["surface"]["mute-master-on-fwd-rwd"]) > 0;
 }
 
+bool ReaSonusSettings::UseAutomationColors() {
+    return settings["surface"]["use-automation-colors"] == "1";
+}
+
+std::vector<int> ReaSonusSettings::GetAutomationColors() {
+    return splitToInt(settings["surface"]["automation-colors"], ",");
+}
+
+std::array<int, 7> ReaSonusSettings::GetAutomationColorsArray() {
+    const std::vector<int> colors = splitToInt(settings["surface"]["automation-colors"], ",");
+    std::array<int, 7> result{};
+
+    for (int i = 0; i < 7; i++) {
+        // A fallback for when there is no 7th color
+        if (colors.size() == 6 && i == 6) {
+            result[i] = stoi(automation_colors[6]);
+        } else {
+            result[i] = colors[i];
+        }
+    }
+    return result;
+}
+
+int ReaSonusSettings::GetAutomationColor(const AutomationButtonIndex &type, const int fallback) {
+    if (!UseAutomationColors()) {
+        return fallback;
+    }
+
+    const auto colors = GetAutomationColorsArray();
+
+    switch (type) {
+        case AUTOMATION_BUTTON_LATCH:
+            return colors[0];
+        case AUTOMATION_BUTTON_TRIM:
+            return colors[1];
+        case AUTOMATION_BUTTON_OFF:
+            return colors[2];
+        case AUTOMATION_BUTTON_TOUCH:
+            return colors[3];
+        case AUTOMATION_BUTTON_WRITE:
+            return colors[4];
+        case AUTOMATION_BUTTON_READ:
+            return colors[5];
+        case AUTOMATION_SINGLE_POINT:
+            return colors[6];
+        default:
+            return stoi(automation_colors[1]);
+    }
+}
+
+bool ReaSonusSettings::UseAutomationSinglePoint() {
+    return settings["surface"]["use-automation-single-point"] == "1";
+}
+
+bool ReaSonusSettings::OverwriteAutomationPointShape() {
+    return settings["surface"]["overwrite-automation-point-shape"] == "1";
+}
+
+int ReaSonusSettings::GetAutomationPointShape() {
+    return stoi(settings["surface"]["automation-point-shape"]);
+}
+
+double ReaSonusSettings::GetAutomationSingleBezierTension() {
+    return stod(settings["surface"]["automation-single-bezier-tension"]);
+}
+
+bool ReaSonusSettings::GetAutomationSingleButtonBlink() {
+    return settings["surface"]["automation-single-button-blink"] == "1";
+}
+
 /**
  * Settings for the FaderPort 2
  */
@@ -280,6 +354,7 @@ int ReaSonusSettings::AddNewFilter(const std::string &filter_name) {
     settings[newKey];
     settings[newKey]["name"] = filter_name;
     settings[newKey]["text"] = "";
+    settings[newKey]["color"] = std::to_string(0x00ffffff);
     settings[newKey]["case-insensitive"] = "0";
     settings[newKey]["sibblings"] = "0";
     settings[newKey]["parents"] = "0";
@@ -299,6 +374,14 @@ std::vector<std::string> ReaSonusSettings::GetFilterKeys() {
     }
 
     return keys;
+}
+
+bool ReaSonusSettings::UseFilterColor() {
+    return settings["filters"]["use-custom-color"] == "1";
+}
+
+bool ReaSonusSettings::ProjectFiltersEnabled() {
+    return settings["filters"]["project-filters"] == "1";
 }
 
 void ReaSonusSettings::UpdateFilter(const std::string &key, const mINI::INIMap<std::string> &filter) {
@@ -344,6 +427,21 @@ std::vector<std::string> ReaSonusSettings::GetFilterNames() {
     }
 
     return names;
+}
+
+std::vector<int> ReaSonusSettings::GetFilterColors() {
+    std::vector<int> colors = {};
+    colors.reserve(GetNumberOfFilters());
+
+    for (int i = 0; i < GetNumberOfFilters(); i++) {
+        if (settings[settings["filters"][std::to_string(i)]].has("color")) {
+            colors.push_back(stoi(settings[settings["filters"][std::to_string(i)]]["color"]));
+        } else {
+            colors.push_back(0x00ffffff);
+        }
+    }
+
+    return colors;
 }
 
 mINI::INIMap<std::string> ReaSonusSettings::GetFilter(const std::string &key) {

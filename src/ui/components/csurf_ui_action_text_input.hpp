@@ -14,7 +14,7 @@
  * @param m_ctx The famous ReaImgui context
  * @param assets Assets helper to get the asset you need
  * @param label The label for the input field. This will also be used to create the id's
- * @param value The value for the input field
+ * @param tension The value for the input field
  * @param hint The placeholder for the input when the value is empty
  * @param callback Tha callback function triggered when clicking the action button
  */
@@ -22,9 +22,10 @@ static void ReaSonusActionTextInput(
     ImGui_Context *m_ctx,
     const CSurf_UI_Assets *assets,
     const std::string &label,
-    std::string *value,
+    std::string *tension,
     const std::string &hint,
-    const std::function<void()> &callback) {
+    const std::function<void()> &callback
+) {
     double space_x;
     double space_y;
 
@@ -32,11 +33,11 @@ static void ReaSonusActionTextInput(
                           ImGui::ChildFlags_None | ImGui::ChildFlags_AutoResizeY)) {
         ImGui::GetContentRegionAvail(m_ctx, &space_x, &space_y);
 
-        ReaSonusTextInput(m_ctx, label, value, hint, space_x - 38, false);
+        ReaSonusTextInput(m_ctx, label, tension, hint, space_x - 38, false);
 
-        if (ImGui::IsKeyPressed(m_ctx, ImGui::Key_Enter) && !value->empty()) {
-            const std::string trimmer_value = ltrim(rtrim(*value));
-            *value = trimmer_value;
+        if (ImGui::IsKeyPressed(m_ctx, ImGui::Key_Enter) && !tension->empty()) {
+            const std::string trimmer_value = ltrim(rtrim(*tension));
+            *tension = trimmer_value;
 
             if (!trimmer_value.empty()) {
                 callback();
@@ -48,9 +49,9 @@ static void ReaSonusActionTextInput(
 
         UiStyledElements::PushReaSonusIconButtonStyle(m_ctx, assets);
         if (ImGui::Button(m_ctx, std::string(1, IconAddList).c_str())) {
-            if (!value->empty()) {
-                const std::string trimmer_value = ltrim(rtrim(*value));
-                *value = trimmer_value;
+            if (!tension->empty()) {
+                const std::string trimmer_value = ltrim(rtrim(*tension));
+                *tension = trimmer_value;
 
                 if (!trimmer_value.empty()) {
                     callback();

@@ -1,6 +1,7 @@
 #include "csurf_fp_8_navigator.hpp"
 #include "../shared/csurf_daw.hpp"
 #include "csurf_fp_8_navigator_filters.hpp"
+#include "../shared/csurf.h"
 
 void CSurf_FP_8_Navigator::UpdateMixerPosition() {
     const WDL_PtrList<MediaTrack> bank = GetBankTracks();
@@ -226,8 +227,8 @@ void CSurf_FP_8_Navigator::HandleTracksAreVcaFilter() {
     SetOffset(0);
 }
 
-void CSurf_FP_8_Navigator::HandleTracksCustomFilter(const std::string &filter_name) {
-    const mINI::INIMap<std::string> filter = settings->GetFilter(filter_name);
+void CSurf_FP_8_Navigator::HandleTracksCustomFilter(const std::string &filter_name, const bool &project_filter) {
+    const mINI::INIMap<std::string> filter = project_filter ? project_state->GetFilter(filter_name) : settings->GetFilter(filter_name);   
 
     std::map<int, bool> custom_filter_tracks = GetCustomFilterTracks(filter);
     std::map<int, bool> allTracks = GetAllTracksBase();
@@ -276,6 +277,7 @@ CSurf_FP_8_Navigator::CSurf_FP_8_Navigator(CSurf_Context *context) : context(con
     HandleAllTracksFilter();
     has_mute = false;
     has_solo = false;
+    PublishOffset();
 }
 
 MediaTrack *CSurf_FP_8_Navigator::GetTrackByIndex(const int index) {
@@ -339,6 +341,7 @@ void CSurf_FP_8_Navigator::SetOffset(const int offset) {
     } else {
         track_offset = offset;
     }
+    PublishOffset();
 }
 
 int CSurf_FP_8_Navigator::GetOffset() const {
@@ -370,6 +373,7 @@ void CSurf_FP_8_Navigator::IncrementOffset(const int count) {
     } else {
         track_offset = tracks.GetSize() - context->GetNbBankChannels();
     }
+    PublishOffset();
     UpdateMixerPosition();
 }
 
@@ -379,6 +383,7 @@ void CSurf_FP_8_Navigator::DecrementOffset(const int count) {
     } else {
         track_offset = 0;
     }
+    PublishOffset();
     UpdateMixerPosition();
 }
 
@@ -388,6 +393,7 @@ void CSurf_FP_8_Navigator::HandlePanEncoderChange(const int value) {
     }
     if (!hasBit(value, 6) && track_offset < tracks.GetSize() - context->GetNbChannels()) {
         track_offset += 1;
+        PublishOffset();
     }
 }
 
@@ -439,8 +445,8 @@ void CSurf_FP_8_Navigator::HandleFilter(const NavigatorFilter filter) {
     }
 }
 
-void CSurf_FP_8_Navigator::HandleCustomFilter(const std::string &filterName) {
-    HandleTracksCustomFilter(filterName);
+void CSurf_FP_8_Navigator::HandleCustomFilter(const std::string &filterName, const bool & projectFilter) {
+    HandleTracksCustomFilter(filterName, projectFilter);
 }
 
 void CSurf_FP_8_Navigator::SetTrackTouched(const int index, const bool value) {
@@ -480,4 +486,14 @@ bool CSurf_FP_8_Navigator::HasFilter(const int filter_index) {
                selected_filters.end(),
                find(selected_filters.begin(), selected_filters.end(), filter_index)
            ) != 0;
+}
+
+void CSurf_FP_8_Navigator::PublishOffset() {
+    // Publish the surface's current bank offset whenever it changed during
+    // this cycle, regardless of which code path changed it. Lets external
+    // tools (e.g. ReaScripts) follow the surface's banking exactly.
+    if (track_offset != last_published_offset) {
+      DAW::SetExtState(FP_TRACK_OFFSET, track_offset, false);
+      last_published_offset = track_offset;
+    }
 }

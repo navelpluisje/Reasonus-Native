@@ -1,4 +1,5 @@
 #include <utility>
+#include <fmt/format.h>
 #include "../csurf_ui_page_content.hpp"
 #include "../../i18n/i18n.hpp"
 #include "../../shared/csurf_daw.hpp"
@@ -296,8 +297,11 @@ protected:
             const std::string param_name = cache["params"][std::to_string(i)];
 
             param_names.emplace_back(param_name);
-            param_data.emplace_back(stoi(cache["id"][std::to_string(i)]), param_name,
-                                    stoi(cache["steps"][std::to_string(i)]));
+            param_data.emplace_back(
+                stoi(cache["id"][std::to_string(i)]),
+                param_name,
+                stoi(cache["steps"][std::to_string(i)])
+            );
         }
 
         // SelectParamList->SetListItems(&param_names);
@@ -305,9 +309,9 @@ protected:
     }
 
     void PopulateFields() {
-        select_key = "select_" + std::to_string(selected_channel);
-        fader_key = "fader_" + std::to_string(selected_channel);
-        color_key = "color_" + std::to_string(selected_channel);
+        select_key = fmt::format("select_{}", selected_channel);
+        fader_key = fmt::format("fader_", selected_channel);
+        color_key = fmt::format("color_", selected_channel);
 
         if (plugin_params.has(color_key)) {
             group_color = plugin_params[color_key].has("color")
@@ -344,7 +348,7 @@ protected:
                 });
 
             if (iterator != param_data.end()) {
-                select_param_index = iterator - param_data.begin();
+                select_param_index = static_cast<int>(iterator - param_data.begin());
                 previous_select_param_index = select_param_index;
             }
         } else {
@@ -374,7 +378,7 @@ protected:
                     return param_id == std::get<0>(param);
                 });
             if (iterator != param_data.end()) {
-                fader_param_index = iterator - param_data.begin();
+                fader_param_index = static_cast<int>(iterator - param_data.begin());
             }
         } else {
             fader_name = "";
@@ -754,7 +758,7 @@ protected:
             }
 
             if (position == plugin.length() - type_ini.length()) {
-                return position;
+                return static_cast<int>(position);
             }
         }
 
@@ -855,7 +859,7 @@ protected:
         const auto developer_it = std::find(developers.begin(), developers.end(), developer);
 
         if (developer_it < developers.end()) {
-            developer_index = developer_it - developers.begin();
+            developer_index = static_cast<int>(developer_it - developers.begin());
         }
         selected_developer = developer_index;
         previous_selected_developer = developer_index;
@@ -868,7 +872,7 @@ protected:
         );
 
         if (plugin_it < developer_plugins.end()) {
-            plugin_index = plugin_it - developer_plugins.begin();
+            plugin_index = static_cast<int>(plugin_it - developer_plugins.begin());
         }
 
         selected_plugin = plugin_index;
@@ -1709,7 +1713,7 @@ public :
             case 0: {
                 const auto developer_it = std::find(developers.begin(), developers.end(), value);
                 if (developer_it != developers.end()) {
-                    selected_developer = developer_it - developers.begin();
+                    selected_developer = static_cast<int>(developer_it - developers.begin());
                     previous_selected_developer = selected_developer;
                 }
                 break;
