@@ -42,12 +42,23 @@ public:
                 UiStyledElements::PopReaSonusGroupStyle(m_ctx);
                 ImGui::PopTextWrapPos(m_ctx);
 
-                if (ImGui::Button(m_ctx, "Click")) {
+                if (ImGui::Button(m_ctx, "Click 2")) {
                     reasonus_modal->ShowModal(
                         "Title",
                         "Message",
                         "",
                         "",
+                        INFO_MODAL,
+                        nullptr
+                    );
+                }
+
+                if (ImGui::Button(m_ctx, "Click")) {
+                    reasonus_modal->ShowModal(
+                        "Title 2",
+                        "Message 2",
+                        "",
+                        "STOPPPPPP",
                         INFO_MODAL,
                         nullptr
                     );

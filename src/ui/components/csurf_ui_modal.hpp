@@ -70,7 +70,8 @@ public:
     }
 
     void Render() {
-        if (ImGui::BeginPopupModal(m_ctx, "reasonus_modal", nullptr, ImGui::WindowFlags_AlwaysAutoResize)) {
+        if (ImGui::BeginPopupModal(m_ctx, "ReaSomus Message", nullptr,
+                                   ImGui::WindowFlags_AlwaysAutoResize | ImGui::WindowFlags_TopMost)) {
             ImGui::Text(m_ctx, message.c_str());
             ImGui::Separator(m_ctx);
 
@@ -85,6 +86,7 @@ public:
 
             ImGui::SetItemDefaultFocus(m_ctx);
             ImGui::SameLine(m_ctx);
+
             if (ImGui::Button(m_ctx, "Cancel", 120, 0)) {
                 ImGui::CloseCurrentPopup(m_ctx);
             }
@@ -92,7 +94,7 @@ public:
         }
 
         if (show_modal) {
-            ImGui::OpenPopup(m_ctx, "reasonus_modal");
+            ImGui::OpenPopup(m_ctx, "ReaSomus Message");
             show_modal = false;
         }
     }
