@@ -178,8 +178,6 @@ void ReaSonus8ControlPanel::Frame() // NOLINT(*-function-cognitive-complexity)
 
     SetPageContent();
 
-    reasonus_modal->Render();
-
     if (save_clicked) {
         save_clicked = false;
         page_content->Save();
@@ -195,6 +193,7 @@ void ReaSonus8ControlPanel::Frame() // NOLINT(*-function-cognitive-complexity)
     ImGui::PushFont(m_ctx, assets->GetMainFont(), FontSizeDefault);
     ImGui::SetNextWindowSize(m_ctx, 1048, 678, ImGui::Cond_Once);
     bool open{true};
+
     if (ImGui::Begin(
         m_ctx,
         g_name,
@@ -295,6 +294,8 @@ void ReaSonus8ControlPanel::Frame() // NOLINT(*-function-cognitive-complexity)
             }
             ImGui::EndChild(m_ctx);
         }
+
+        reasonus_modal->Render();
 
         ImGui::End(m_ctx);
     }

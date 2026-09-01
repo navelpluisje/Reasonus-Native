@@ -2,9 +2,9 @@
 #define CSURF_FP_UI_MODAL_H_
 
 #include <functional>
-#include <reaper_imgui_functions.h>
 #include <string>
 
+#include <reaper_imgui_functions.h>
 #include "csurf_ui_filter_selectable.hpp"
 
 enum ModalTypes {
@@ -14,12 +14,12 @@ enum ModalTypes {
 };
 
 /**
- * @brief Create a listbox with
+ * @brief Create a modal with
  *
  * @param m_ctx The famous ReaImgui context
  * @param assets
- * @param element_id Id for the leement to create
- * @param items The items of the list
+ * @param title Id for the leement to create
+ * @param message The message to tell the viewer
  * @param selected_item The index of the current selected item
  * @param hovered_item The index of the current hovered item
  * @param active_item The currently active Item
@@ -32,15 +32,20 @@ class ReaSonusModal {
     const CSurf_UI_Assets *assets;
     std::string title;
     std::string message;
-    bool has_action;
+    bool has_action{false};
     std::string action_button;
     std::string cancel_button;
-    ModalTypes type;
+    ModalTypes type = INFO_MODAL;
     std::function<void(int index)> action_callback;
 
-    bool show_modal;
+    bool show_modal{false};
 
 public:
+    /**
+     *
+     * @param m_ctx The famous ReaImgui context
+     * @param assets Tha available assets
+     */
     ReaSonusModal(
         ImGui_Context *m_ctx,
         const CSurf_UI_Assets *assets
@@ -49,12 +54,21 @@ public:
 
     ~ReaSonusModal() = default;
 
+    /**
+     * Set the values for the modal and set show_modal to true
+     * @param _title The title for the modal
+     * @param _message The message to communicate to the user
+     * @param _action_button Label for the action button
+     * @param _cancel_button Label for the Cancel button
+     * @param _type The type of modal
+     * @param _action_callback The callback for the action button
+     */
     void ShowModal(
-        std::string _title,
-        std::string _message,
-        std::string _action_button,
-        std::string _cancel_button,
-        ModalTypes _type,
+        const std::string &_title,
+        const std::string &_message,
+        const std::string &_action_button,
+        const std::string &_cancel_button,
+        const ModalTypes _type,
         const std::function<void(int index)> &_action_callback
 
     ) {
@@ -70,8 +84,22 @@ public:
     }
 
     void Render() {
-        if (ImGui::BeginPopupModal(m_ctx, "ReaSomus Message", nullptr,
-                                   ImGui::WindowFlags_AlwaysAutoResize | ImGui::WindowFlags_TopMost)) {
+        double left;
+        double top;
+
+        /**
+         * Calculate the center position of ReaSonus Control Panel
+         * and set the modal position
+         */
+        ImGui::Viewport_GetCenter(ImGui::GetWindowViewport(m_ctx), &left, &top);
+        ImGui::SetNextWindowPos(m_ctx, left, top, ImGui::Cond_Appearing, 0.5, 0.5);
+
+        if (ImGui::BeginPopupModal(
+            m_ctx,
+            title.c_str(),
+            nullptr,
+            ImGui::WindowFlags_AlwaysAutoResize | ImGui::WindowFlags_TopMost
+        )) {
             ImGui::Text(m_ctx, message.c_str());
             ImGui::Separator(m_ctx);
 
@@ -94,7 +122,7 @@ public:
         }
 
         if (show_modal) {
-            ImGui::OpenPopup(m_ctx, "ReaSomus Message");
+            ImGui::OpenPopup(m_ctx, title.c_str());
             show_modal = false;
         }
     }
