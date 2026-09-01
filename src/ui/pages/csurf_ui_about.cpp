@@ -5,21 +5,24 @@
 #include "../../i18n/i18n.hpp"
 
 class CSurf_UI_AboutPage : public CSurf_UI_PageContent {
-protected:
     std::string device;
 
 public:
-    CSurf_UI_AboutPage(ImGui_Context *m_ctx, CSurf_UI_Assets *assets, std::string _device) : CSurf_UI_PageContent(
-        m_ctx, assets) {
-        device = _device;
+    CSurf_UI_AboutPage(
+        ImGui_Context *m_ctx,
+        CSurf_UI_Assets *assets,
+        std::string _device,
+        ReaSonusModal *reasonus_modal
+    ) : CSurf_UI_PageContent(m_ctx, assets, reasonus_modal) {
+        device = std::move(_device);
         i18n = I18n::GetInstance();
-    };
+    }
 
-    virtual ~CSurf_UI_AboutPage() {
-    };
+    ~CSurf_UI_AboutPage() override = default;
 
     void Render() override {
-        double available_width, available_height;
+        double available_width;
+        double available_height;
 
         ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_ItemSpacing, 12.0, 12.0);
         if (ImGui::BeginChild(m_ctx, "main_about_page", 0.0, 0.0, ImGui::ChildFlags_None)) {
@@ -28,9 +31,9 @@ public:
                 ImGui::GetContentRegionAvail(m_ctx, &available_width, &available_height);
                 ImGui::PushTextWrapPos(m_ctx, available_width);
 
-                ReaSonusPageTitle(m_ctx, assets, i18n->t("about", "about.title").c_str(), true);
+                ReaSonusPageTitle(m_ctx, assets, i18n->t("about", "about.title"), true);
 
-                ImGui::Text(m_ctx, i18n->t("about", "about.top").c_str());
+                ImGui::Text(m_ctx, i18n->t("about_reasonus", "about.top").c_str());
                 ImGui::BulletText(m_ctx, i18n->t("about", "about.list.1").c_str());
                 ImGui::BulletText(m_ctx, i18n->t("about", "about.list.2").c_str());
                 ImGui::BulletText(m_ctx, i18n->t("about", "about.list.3").c_str());
@@ -38,18 +41,30 @@ public:
 
                 UiStyledElements::PopReaSonusGroupStyle(m_ctx);
                 ImGui::PopTextWrapPos(m_ctx);
+
+                if (ImGui::Button(m_ctx, "Click")) {
+                    reasonus_modal->ShowModal(
+                        "Title",
+                        "Message",
+                        "",
+                        "",
+                        INFO_MODAL,
+                        nullptr
+                    );
+                }
+
                 ImGui::EndChild(m_ctx);
             }
             ImGui::SameLine(m_ctx);
 
-            if (ImGui::BeginChild(m_ctx, "filter_content", 0.0, 0.0)) {
+            if (ImGui::BeginChild(m_ctx, "about_contribute", 0.0, 0.0)) {
                 UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
                 if (ImGui::BeginChild(m_ctx, "Contribute & Links", 0.0, device != FP_V2 ? 292.0 : 0.0,
                                       ImGui::ChildFlags_FrameStyle)) {
                     ImGui::GetContentRegionAvail(m_ctx, &available_width, &available_height);
                     ImGui::PushTextWrapPos(m_ctx, available_width);
 
-                    ReaSonusPageTitle(m_ctx, assets, i18n->t("about", "contribute.title").c_str(), true);
+                    ReaSonusPageTitle(m_ctx, assets, i18n->t("about", "contribute.title"), true);
                     ImGui::Text(m_ctx, i18n->t("about", "contribute.top").c_str());
                     ImGui::TextLinkOpenURL(m_ctx, i18n->t("about", "contribute.link.coffee").c_str(),
                                            "https://buymeacoffee.com/navelpluisje");
@@ -83,11 +98,11 @@ public:
 
                 if (device != FP_V2) {
                     UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
-                    if (ImGui::BeginChild(m_ctx, "Thanks", 0.0, 0.0, ImGui::ChildFlags_FrameStyle)) {
+                    if (ImGui::BeginChild(m_ctx, "about_thanks", 0.0, 0.0, ImGui::ChildFlags_FrameStyle)) {
                         ImGui::GetContentRegionAvail(m_ctx, &available_width, &available_height);
                         ImGui::PushTextWrapPos(m_ctx, available_width);
 
-                        ReaSonusPageTitle(m_ctx, assets, i18n->t("about", "thanks.title").c_str(), true);
+                        ReaSonusPageTitle(m_ctx, assets, i18n->t("about", "thanks.title"), true);
                         ImGui::Text(m_ctx, i18n->t("about", "thanks.bottom").c_str());
                         ImGui::BulletText(m_ctx, i18n->t("about", "thanks.list.0").c_str());
                         ImGui::BulletText(m_ctx, i18n->t("about", "thanks.list.1").c_str());

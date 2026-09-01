@@ -181,8 +181,9 @@ class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-in
 public:
     CSurf_FP_8_SettingsPage( // NOLINT(*-pro-type-member-init)
         ImGui_Context *m_ctx,
-        CSurf_UI_Assets *assets
-    ) : CSurf_UI_PageContent(m_ctx, assets) {
+        CSurf_UI_Assets *assets,
+        ReaSonusModal *reasonus_modal
+    ) : CSurf_UI_PageContent(m_ctx, assets, reasonus_modal) {
         i18n = I18n::GetInstance();
         settings = ReaSonusSettings::GetInstance(FP_8);
 

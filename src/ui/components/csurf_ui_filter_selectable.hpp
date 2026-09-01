@@ -6,6 +6,7 @@
 #include "../utils/csurf_ui_text_overflow.hpp"
 #include "../../shared/csurf_utils.hpp"
 #include "../csurf_ui_assets.hpp"
+#include "../csurf_ui_colors.hpp"
 
 static void ReaSonusFilterSelectable(
     ImGui_Context *m_ctx,
@@ -45,8 +46,8 @@ static void ReaSonusFilterSelectable(
     const bool selected = filter_index == *selected_filter;
     const bool mouse_over = (!popup_open
                              && between(pos_screen_x, width, mouse_pos_x)
-                             && between(pos_screen_y, selectable_height, mouse_pos_y)) 
-                             || (popup_open && *hovered_filter == filter_index);
+                             && between(pos_screen_y, selectable_height, mouse_pos_y))
+                            || (popup_open && *hovered_filter == filter_index);
 
     /**
      * Definings some colors§

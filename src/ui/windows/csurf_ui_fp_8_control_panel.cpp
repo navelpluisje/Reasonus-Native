@@ -114,23 +114,23 @@ void ReaSonus8ControlPanel::SetPageContent() {
                 CSurf_UI_FunctionKeysPage::selected_function = -1;
                 CSurf_UI_FunctionKeysPage::selected_action = -1;
 
-                page_content = new CSurf_UI_FunctionKeysPage(m_ctx, assets, FP_8);
+                page_content = new CSurf_UI_FunctionKeysPage(m_ctx, assets, FP_8, reasonus_modal);
                 break;
 
             case FILTERS_PAGE:
-                page_content = new CSurf_FP_8_CustomFiltersPage(m_ctx, assets);
+                page_content = new CSurf_FP_8_CustomFiltersPage(m_ctx, assets, reasonus_modal);
                 break;
 
             case MAPPING_PAGE:
-                page_content = new CSurf_FP_8_PluginMappingPage(m_ctx, assets);
+                page_content = new CSurf_FP_8_PluginMappingPage(m_ctx, assets, reasonus_modal);
                 break;
 
             case SETTINGS_PAGE:
-                page_content = new CSurf_FP_8_SettingsPage(m_ctx, assets);
+                page_content = new CSurf_FP_8_SettingsPage(m_ctx, assets, reasonus_modal);
                 break;
 
             case ABOUT_PAGE:
-                page_content = new CSurf_UI_AboutPage(m_ctx, assets, FP_8);
+                page_content = new CSurf_UI_AboutPage(m_ctx, assets, FP_8, reasonus_modal);
                 break;
             default: ;
         }
@@ -147,6 +147,7 @@ ReaSonus8ControlPanel::ReaSonus8ControlPanel() : m_ctx{} {
     ImGui::init(plugin_getapi);
     m_ctx = ImGui::CreateContext(g_name);
     assets = new CSurf_UI_Assets(m_ctx);
+    reasonus_modal = new ReaSonusModal(m_ctx, assets);
 
     plugin_register("timer", reinterpret_cast<void *>(&Loop));
 }
@@ -176,6 +177,8 @@ void ReaSonus8ControlPanel::Frame() // NOLINT(*-function-cognitive-complexity)
     }
 
     SetPageContent();
+
+    reasonus_modal->Render();
 
     if (save_clicked) {
         save_clicked = false;
@@ -278,7 +281,7 @@ void ReaSonus8ControlPanel::Frame() // NOLINT(*-function-cognitive-complexity)
                 }
                 ImGui::EndChild(m_ctx);
             }
-            
+
             if (current_page != 4) {
                 ReaSonusButtonBar(
                     m_ctx,

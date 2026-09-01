@@ -12,8 +12,7 @@
 #include "../csurf_ui_assets.hpp"
 #include "../../i18n/i18n.hpp"
 
-class ReaSonusV2ControlPanel
-{
+class ReaSonusV2ControlPanel {
 public:
     // The page id's
     static constexpr int FUNCTIONS_PAGE = 0;
@@ -24,10 +23,13 @@ public:
     inline static bool control_panel_open = false;
 
     static void Start(int page);
+
     static void Stop();
 
     static void SetCurrentPage(int page);
+
     static void SetMessage(const std::string &_message);
+
     void SetLocalMessage(const std::string &_message);
 
     ~ReaSonusV2ControlPanel();
@@ -37,13 +39,17 @@ private:
     CSurf_UI_Assets *assets;
 
     static void Loop();
+
     void SetPageContent();
+
     CSurf_UI_PageContent *page_content = nullptr;
 
     ReaSonusV2ControlPanel();
+
     void Frame();
 
     ImGui_Context *m_ctx;
+    ReaSonusModal *reasonus_modal;
 
     int previous_page = -1;
     bool save_clicked = false;

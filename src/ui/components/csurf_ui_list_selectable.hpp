@@ -58,8 +58,8 @@ static void ReaSonusListSelectable(
     const bool selected = item_index == *selected_item;
     const bool mouse_over = (!popup_open
                              && between(pos_screen_x, width, mouse_pos_x)
-                             && between(pos_screen_y, selectable_height, mouse_pos_y)) 
-                             || (popup_open && *hovered_item == item_index);
+                             && between(pos_screen_y, selectable_height, mouse_pos_y))
+                            || (popup_open && *hovered_item == item_index);
     const bool context_over = between(pos_screen_x, width, mouse_pos_x)
                               && between(pos_screen_y, selectable_height, mouse_pos_y);
 
@@ -141,7 +141,7 @@ static void ReaSonusListSelectable(
         ImGui::PopFont(m_ctx);
 
         if (mouse_over && has_delete) {
-            ImGui::SetCursorPos(m_ctx, width - 21, 5);
+            // ImGui::SetCursorPos(m_ctx, width - 21, 5);
 
             ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_FramePadding, 1.0, 1.0);
             ImGui::PushFont(m_ctx, assets->GetIconFont(), 16);

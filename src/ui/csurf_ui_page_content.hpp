@@ -10,6 +10,7 @@
 #include "../shared/csurf_utils.hpp"
 #include "../shared/csurf_reasonus_settings.hpp"
 #include "../shared/csurf_project_state.hpp"
+#include "components/csurf_ui_modal.hpp"
 
 class CSurf_UI_PageContent {
 protected:
@@ -19,9 +20,14 @@ protected:
     ProjectState *project_state;
     CSurf_UI_Assets *assets;
     I18n *i18n;
+    ReaSonusModal *reasonus_modal;
 
 public:
-    CSurf_UI_PageContent(ImGui_Context *m_ctx, CSurf_UI_Assets *assets) : m_ctx(m_ctx), assets(assets) {
+    CSurf_UI_PageContent(
+        ImGui_Context *m_ctx,
+        CSurf_UI_Assets *assets,
+        ReaSonusModal *reasonus_modal
+    ) : m_ctx(m_ctx), assets(assets), reasonus_modal(reasonus_modal) {
     };
 
     virtual ~CSurf_UI_PageContent() = default;

@@ -86,15 +86,15 @@ void ReaSonusV2ControlPanel::SetPageContent() {
                 CSurf_UI_FunctionKeysPage::selected_function = -1;
                 CSurf_UI_FunctionKeysPage::selected_action = -1;
 
-                page_content = new CSurf_UI_FunctionKeysPage(m_ctx, assets, FP_V2);
+                page_content = new CSurf_UI_FunctionKeysPage(m_ctx, assets, FP_V2, reasonus_modal);
                 break;
 
             case SETTINGS_PAGE:
-                page_content = new CSurf_FP_V2_SettingsPage(m_ctx, assets);
+                page_content = new CSurf_FP_V2_SettingsPage(m_ctx, assets, reasonus_modal);
                 break;
 
             case ABOUT_PAGE:
-                page_content = new CSurf_UI_AboutPage(m_ctx, assets, FP_V2);
+                page_content = new CSurf_UI_AboutPage(m_ctx, assets, FP_V2, reasonus_modal);
                 break;
             default: ;
         }
@@ -109,6 +109,7 @@ ReaSonusV2ControlPanel::ReaSonusV2ControlPanel() : m_ctx{} {
     ImGui::init(plugin_getapi);
     m_ctx = ImGui::CreateContext(g_name);
     assets = new CSurf_UI_Assets(m_ctx);
+    reasonus_modal = new ReaSonusModal(m_ctx, assets);
 
     plugin_register("timer", reinterpret_cast<void *>(&Loop));
 }

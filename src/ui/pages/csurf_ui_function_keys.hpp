@@ -7,14 +7,12 @@
 #include "../../shared/csurf_reasonus_settings.hpp"
 #include "../csurf_ui_assets.hpp"
 
-enum FunctionTypes
-{
+enum FunctionTypes {
     TypeFunction,
     TypeFootSwitch,
 };
 
-class CSurf_UI_FunctionKeysPage : public CSurf_UI_PageContent
-{
+class CSurf_UI_FunctionKeysPage : public CSurf_UI_PageContent {
 protected:
     std::vector<std::string> functions;
     std::vector<std::string> footswitch;
@@ -27,9 +25,15 @@ public:
     static int selected_action;
     static FunctionTypes selected_type;
 
-    CSurf_UI_FunctionKeysPage(ImGui_Context *m_ctx, CSurf_UI_Assets *assets, std::string _device);
+    CSurf_UI_FunctionKeysPage(
+        ImGui_Context *m_ctx,
+        CSurf_UI_Assets *assets,
+        std::string _device,
+        ReaSonusModal *reasonus_modal
+    );
 
-    virtual ~CSurf_UI_FunctionKeysPage() {};
+    virtual ~CSurf_UI_FunctionKeysPage() {
+    };
 
     void Reset() override;
 
@@ -43,9 +47,11 @@ public:
 
     static void HandleResetButtonClick(int index, FunctionTypes type);
 
-    static void RenderFunction(ImGui_Context *m_ctx, int index, CSurf_UI_FunctionKeysPage &page, CSurf_UI_Assets *assets, FunctionTypes type = TypeFunction);
+    static void RenderFunction(ImGui_Context *m_ctx, int index, CSurf_UI_FunctionKeysPage &page,
+                               CSurf_UI_Assets *assets, FunctionTypes type = TypeFunction);
 
-    void RenderFunctionTab(std::string tab_label, FunctionTypes type, int tab_index, int start_index, int count, CSurf_UI_Assets *assets);
+    void RenderFunctionTab(std::string tab_label, FunctionTypes type, int tab_index, int start_index, int count,
+                           CSurf_UI_Assets *assets);
 
     void RenderFPV2FunctionGroup();
 
