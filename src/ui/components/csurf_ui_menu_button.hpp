@@ -25,8 +25,13 @@ static void ReaSonusMenuButton(
     double x_mouse_pos;
     double y_mouse_pos;
 
-    if (ImGui::BeginChild(m_ctx, ("##" + action_label).c_str(), menu_button_width, menu_button_height,
-                          ImGui::ChildFlags_FrameStyle)) {
+    if (ImGui::BeginChild(
+        m_ctx,
+        ("##" + action_label).c_str(),
+        menu_button_width,
+        menu_button_height,
+        ImGui::ChildFlags_FrameStyle
+    )) {
         ImGui::GetMousePos(m_ctx, &x_mouse_pos, &y_mouse_pos);
         ImGui::GetItemRectMin(m_ctx, &x_pos_1, &y_pos_1);
 

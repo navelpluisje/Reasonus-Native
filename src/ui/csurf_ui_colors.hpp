@@ -114,7 +114,7 @@ static void PushReaSonusColors(ImGui_Context *m_ctx) {
     ImGui::PushStyleColor(m_ctx, ImGui::Col_NavCursor, 0x4296FAFF);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_NavWindowingHighlight, 0xFFFFFFB3);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_NavWindowingDimBg, 0xCCCCCC33);
-    ImGui::PushStyleColor(m_ctx, ImGui::Col_ModalWindowDimBg, 0xCCCCCC59);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_ModalWindowDimBg, 0x757C807f);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_InputTextCursor, UI_COLORS::Accent);
 }
 

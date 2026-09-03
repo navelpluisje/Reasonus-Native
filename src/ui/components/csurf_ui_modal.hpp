@@ -5,6 +5,8 @@
 #include <string>
 
 #include <reaper_imgui_functions.h>
+
+#include "csurf_ui_button_bar.hpp"
 #include "csurf_ui_filter_selectable.hpp"
 #include "csurf_ui_page_title.hpp"
 
@@ -39,8 +41,16 @@ class ReaSonusModal {
     std::string cancel_button;
     ModalTypes type = INFO_MODAL;
     std::function<void()> action_callback;
+    std::string dummy;
 
     bool show_modal{false};
+
+    void HandleActionClick() {
+        if (action_callback != nullptr) {
+            action_callback();
+        }
+        ImGui::CloseCurrentPopup(m_ctx);
+    }
 
 public:
     /**
@@ -76,7 +86,7 @@ public:
     ) {
         title = _title;
         message = _message;
-        has_action = _action_button.empty() && _action_callback != nullptr;
+        has_action = !_action_button.empty();
         action_button = _action_button;
         cancel_button = _cancel_button.empty() ? "Cancel" : _cancel_button;
         type = _type;
@@ -107,31 +117,27 @@ public:
          * and set the modal position
          */
         ImGui::Viewport_GetCenter(ImGui::GetWindowViewport(m_ctx), &left, &top);
-        ImGui::SetNextWindowPos(m_ctx, left, top, ImGui::Cond_Appearing, 0.5, 0.5);
+        ImGui::SetNextWindowPos(m_ctx, left, top - 150, ImGui::Cond_Appearing, 0.5, 0);
         ImGui::SetNextWindowSize(m_ctx, 320, 0.0);
         ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_ItemSpacing, 0, 0);
 
         if (ImGui::BeginPopupModal(
             m_ctx,
+
             modal_title.c_str(),
             nullptr,
             ImGui::WindowFlags_AlwaysAutoResize | ImGui::WindowFlags_TopMost
         )) {
             UiStyledElements::PushReaSonusContentStyle(m_ctx);
-            if (ImGui::BeginChild(m_ctx, "modal-icon", 0, 0,
-                                  ImGui::ChildFlags_AutoResizeY | ImGui::ChildFlags_FrameStyle)) {
-                ImGui::Text(m_ctx, "Icon here");
-                ImGui::EndChild(m_ctx);
-            }
-
-            if (ImGui::BeginChild(m_ctx, "modal-title", 0, 0,
-                                  ImGui::ChildFlags_AutoResizeY | ImGui::ChildFlags_FrameStyle)) {
+            if (ImGui::BeginChild(
+                m_ctx,
+                "modal-icon",
+                0,
+                0,
+                ImGui::ChildFlags_AutoResizeY | ImGui::ChildFlags_FrameStyle
+            )) {
                 ReaSonusPageTitle(m_ctx, assets, title, true);
-                ImGui::EndChild(m_ctx);
-            }
 
-            if (ImGui::BeginChild(m_ctx, "modal-message", 0, 0,
-                                  ImGui::ChildFlags_AutoResizeY | ImGui::ChildFlags_FrameStyle)) {
                 UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
                 if (ImGui::BeginChild(
                     m_ctx,
@@ -140,31 +146,30 @@ public:
                     0.0,
                     ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
                 )) {
+                    ImGui::PushTextWrapPos(m_ctx, 0.0);
                     ImGui::Text(m_ctx, message.c_str());
+                    ImGui::PopTextWrapPos(m_ctx);
                     ImGui::EndChild(m_ctx);
                 }
                 UiStyledElements::PopReaSonusGroupStyle(m_ctx);
+
+                ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 8);
+
+                ReaSonusButtonBar(
+                    m_ctx,
+                    assets,
+                    has_action ? action_button : cancel_button,
+                    std::bind(&ReaSonusModal::HandleActionClick, this),
+                    has_action,
+                    std::bind(ImGui::CloseCurrentPopup, m_ctx),
+                    cancel_button,
+                    &dummy
+                );
+
                 ImGui::EndChild(m_ctx);
+                UiStyledElements::PopReaSonusContentStyle(m_ctx);
             }
 
-            ImGui::Separator(m_ctx);
-
-            if (has_action) {
-                if (ImGui::Button(m_ctx, "OK", 120, 0)) {
-                    if (action_callback != nullptr) {
-                        action_callback();
-                    }
-                    ImGui::CloseCurrentPopup(m_ctx);
-                }
-            }
-
-            ImGui::SetItemDefaultFocus(m_ctx);
-            ImGui::SameLine(m_ctx);
-
-            if (ImGui::Button(m_ctx, "Cancel", 120, 0)) {
-                ImGui::CloseCurrentPopup(m_ctx);
-            }
-            UiStyledElements::PopReaSonusContentStyle(m_ctx);
             ImGui::EndPopup(m_ctx);
         }
 

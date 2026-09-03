@@ -55,10 +55,10 @@ public:
 
                 if (ImGui::Button(m_ctx, "Click")) {
                     reasonus_modal->ShowModal(
-                        "Title 2",
-                        "Message 2",
-                        "",
-                        "STOPPPPPP",
+                        "Remove mapping",
+                        "Are you sure you want to delete:\nItem name herer\nThis can not be undone",
+                        "Delete",
+                        "Cancel",
                         WARNING_MODAL,
                         nullptr
                     );

@@ -51,7 +51,9 @@ static void ReaSonusButtonBar(
         const float save_button_width = static_cast<float>(x_pos_1) + button_padding_x * 2.F;
         ImGui::GetStyleVar(m_ctx, ImGui::StyleVar_ItemSpacing, &x_pos_2, &y_pos_2);
 
-        const float widthNeeded = has_cancel ? static_cast<float>(cancel_button_width + x_pos_2 + save_button_width) : cancel_button_width;
+        const float widthNeeded = has_cancel
+                                      ? static_cast<float>(cancel_button_width + x_pos_2 + save_button_width)
+                                      : cancel_button_width;
         ImGui::GetContentRegionAvail(m_ctx, &x_pos_2, &y_pos_2);
         ImGui::PopFont(m_ctx);
 
@@ -84,7 +86,8 @@ static void ReaSonusButtonBar(
     const bool has_cancel,
     const std::function<void()> &cancel_callback,
     const std::string &cancel_label,
-    const std::string *message) {
+    const std::string *message
+) {
     double x_pos_1;
     double y_pos_1;
     double x_pos_2;
@@ -116,7 +119,9 @@ static void ReaSonusButtonBar(
         const float save_button_width = static_cast<float>(x_pos_1) + button_padding_x * 2.F;
         ImGui::GetStyleVar(m_ctx, ImGui::StyleVar_ItemSpacing, &x_pos_2, &y_pos_2);
 
-        const float widthNeeded = has_cancel ? static_cast<float>(cancel_button_width + x_pos_2) + save_button_width : cancel_button_width;
+        const float widthNeeded = has_cancel
+                                      ? static_cast<float>(cancel_button_width + x_pos_2) + save_button_width
+                                      : cancel_button_width;
         ImGui::GetContentRegionAvail(m_ctx, &x_pos_2, &y_pos_2);
         ImGui::PopFont(m_ctx);
 
