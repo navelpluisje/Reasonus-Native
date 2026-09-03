@@ -63,7 +63,7 @@ public:
 
                     ImGui::Text(m_ctx, i18n->t("about", "contribute.center").c_str());
                     ImGui::TextLinkOpenURL(m_ctx, i18n->t("about", "contribute.link.documentation").c_str(),
-                                           "https://navelpluisje.github.io/reasonus/");
+                                           "https://reasonus.net/");
 
                     ImGui::Separator(m_ctx);
 
