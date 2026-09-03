@@ -6,6 +6,7 @@
 
 #include <reaper_imgui_functions.h>
 #include "csurf_ui_filter_selectable.hpp"
+#include "csurf_ui_page_title.hpp"
 
 enum ModalTypes {
     INFO_MODAL,
@@ -30,13 +31,14 @@ enum ModalTypes {
 class ReaSonusModal {
     ImGui_Context *m_ctx;
     const CSurf_UI_Assets *assets;
+    std::string modal_title;
     std::string title;
     std::string message;
     bool has_action{false};
     std::string action_button;
     std::string cancel_button;
     ModalTypes type = INFO_MODAL;
-    std::function<void(int index)> action_callback;
+    std::function<void()> action_callback;
 
     bool show_modal{false};
 
@@ -69,7 +71,7 @@ public:
         const std::string &_action_button,
         const std::string &_cancel_button,
         const ModalTypes _type,
-        const std::function<void(int index)> &_action_callback
+        const std::function<void()> &_action_callback
 
     ) {
         title = _title;
@@ -79,6 +81,19 @@ public:
         cancel_button = _cancel_button.empty() ? "Cancel" : _cancel_button;
         type = _type;
         action_callback = _action_callback;
+
+        switch (type) {
+            case ERROR_MODAL:
+                modal_title = "ReaSonus Error";
+                break;
+
+            case WARNING_MODAL:
+                modal_title = "ReaSonus Warning";
+                break;
+
+            default:
+                modal_title = "ReaSonus Message";
+        }
 
         show_modal = true;
     }
@@ -93,20 +108,51 @@ public:
          */
         ImGui::Viewport_GetCenter(ImGui::GetWindowViewport(m_ctx), &left, &top);
         ImGui::SetNextWindowPos(m_ctx, left, top, ImGui::Cond_Appearing, 0.5, 0.5);
+        ImGui::SetNextWindowSize(m_ctx, 320, 0.0);
+        ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_ItemSpacing, 0, 0);
 
         if (ImGui::BeginPopupModal(
             m_ctx,
-            title.c_str(),
+            modal_title.c_str(),
             nullptr,
             ImGui::WindowFlags_AlwaysAutoResize | ImGui::WindowFlags_TopMost
         )) {
-            ImGui::Text(m_ctx, message.c_str());
+            UiStyledElements::PushReaSonusContentStyle(m_ctx);
+            if (ImGui::BeginChild(m_ctx, "modal-icon", 0, 0,
+                                  ImGui::ChildFlags_AutoResizeY | ImGui::ChildFlags_FrameStyle)) {
+                ImGui::Text(m_ctx, "Icon here");
+                ImGui::EndChild(m_ctx);
+            }
+
+            if (ImGui::BeginChild(m_ctx, "modal-title", 0, 0,
+                                  ImGui::ChildFlags_AutoResizeY | ImGui::ChildFlags_FrameStyle)) {
+                ReaSonusPageTitle(m_ctx, assets, title, true);
+                ImGui::EndChild(m_ctx);
+            }
+
+            if (ImGui::BeginChild(m_ctx, "modal-message", 0, 0,
+                                  ImGui::ChildFlags_AutoResizeY | ImGui::ChildFlags_FrameStyle)) {
+                UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
+                if (ImGui::BeginChild(
+                    m_ctx,
+                    "modal-message",
+                    0.0,
+                    0.0,
+                    ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
+                )) {
+                    ImGui::Text(m_ctx, message.c_str());
+                    ImGui::EndChild(m_ctx);
+                }
+                UiStyledElements::PopReaSonusGroupStyle(m_ctx);
+                ImGui::EndChild(m_ctx);
+            }
+
             ImGui::Separator(m_ctx);
 
             if (has_action) {
                 if (ImGui::Button(m_ctx, "OK", 120, 0)) {
                     if (action_callback != nullptr) {
-                        action_callback(0);
+                        action_callback();
                     }
                     ImGui::CloseCurrentPopup(m_ctx);
                 }
@@ -118,11 +164,14 @@ public:
             if (ImGui::Button(m_ctx, "Cancel", 120, 0)) {
                 ImGui::CloseCurrentPopup(m_ctx);
             }
+            UiStyledElements::PopReaSonusContentStyle(m_ctx);
             ImGui::EndPopup(m_ctx);
         }
 
+        ImGui::PopStyleVar(m_ctx);
+
         if (show_modal) {
-            ImGui::OpenPopup(m_ctx, title.c_str());
+            ImGui::OpenPopup(m_ctx, modal_title.c_str());
             show_modal = false;
         }
     }

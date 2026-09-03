@@ -64,9 +64,9 @@ static void PushReaSonusColors(ImGui_Context *m_ctx) {
     ImGui::PushStyleColor(m_ctx, ImGui::Col_SliderGrabActive, UI_COLORS::Accent_50);
 
     // Button
-    ImGui::PushStyleColor(m_ctx, ImGui::Col_Button, 0x4296FA66);
-    ImGui::PushStyleColor(m_ctx, ImGui::Col_ButtonHovered, 0xF55D3EFF);
-    ImGui::PushStyleColor(m_ctx, ImGui::Col_ButtonActive, 0x0F87FAFF);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_Button, UI_COLORS::Accent);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_ButtonActive, 0xF7CB15bF);
+    ImGui::PushStyleColor(m_ctx, ImGui::Col_ButtonHovered, 0xF7CB15dF);
 
     // Header
     ImGui::PushStyleColor(m_ctx, ImGui::Col_Header, UI_COLORS::Accent_50);

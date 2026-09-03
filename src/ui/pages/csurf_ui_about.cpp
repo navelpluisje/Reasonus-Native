@@ -59,7 +59,7 @@ public:
                         "Message 2",
                         "",
                         "STOPPPPPP",
-                        INFO_MODAL,
+                        WARNING_MODAL,
                         nullptr
                     );
                 }

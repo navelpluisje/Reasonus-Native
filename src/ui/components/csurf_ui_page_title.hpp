@@ -6,6 +6,13 @@
 #include "../csurf_ui_styles_elements.hpp"
 #include "../csurf_ui_assets.hpp"
 
+/**
+ *
+ * @param m_ctx The good old ImGui context
+ * @param assets All available assets witing ImGui
+ * @param label The label to display
+ * @param sub_title Wether the fontsize is slightly reduced
+ */
 static void ReaSonusPageTitle(
     ImGui_Context *m_ctx,
     CSurf_UI_Assets const *assets,
@@ -13,6 +20,7 @@ static void ReaSonusPageTitle(
     const bool sub_title
 ) {
     UiStyledElements::PushReaSonusPageTitleStyle(m_ctx);
+    ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_SeparatorTextAlign, 0.5, 0.5);
     if (ImGui::BeginChild(m_ctx, ("container" + label).c_str(), 0.0, 32.0, ImGui::ChildFlags_FrameStyle)) {
         ImGui::PushFont(m_ctx, assets->GetMainFontBold(), sub_title ? FontSizeLarge : FontSizePageTitle);
         ImGui::Text(m_ctx, label.c_str());
@@ -22,6 +30,7 @@ static void ReaSonusPageTitle(
 
         ImGui::EndChild(m_ctx);
     }
+    ImGui::PopStyleVar(m_ctx);
     UiStyledElements::PopReaSonusPageTitleStyle(m_ctx);
 }
 

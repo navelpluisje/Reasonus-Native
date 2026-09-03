@@ -103,15 +103,12 @@ void UiStyledElements::PushReaSonusButtonStyle(ImGui_Context *m_ctx, ImGui_Font 
 
     ImGui::PushStyleColor(m_ctx, ImGui::Col_Text, UI_COLORS::Main_15);
     ImGui::PushStyleColor(m_ctx, ImGui::Col_Border, UI_COLORS::Accent);
-    ImGui::PushStyleColor(m_ctx, ImGui::Col_Button, UI_COLORS::Accent);
-    ImGui::PushStyleColor(m_ctx, ImGui::Col_ButtonActive, 0xF7CB15bF);
-    ImGui::PushStyleColor(m_ctx, ImGui::Col_ButtonHovered, 0xF7CB15dF);
 }
 
 void UiStyledElements::PopReaSonusButtonStyle(ImGui_Context *m_ctx) {
     ImGui::PopFont(m_ctx);
     ImGui::PopStyleVar(m_ctx, 4);
-    ImGui::PopStyleColor(m_ctx, 5);
+    ImGui::PopStyleColor(m_ctx, 2);
 }
 
 void UiStyledElements::PushReaSonusButtonOutlineStyle(ImGui_Context *m_ctx, ImGui_Font *button_font) {
