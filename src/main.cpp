@@ -130,7 +130,7 @@ extern "C" {
       const std::string version = GIT_VERSION;
       const std::string name = "ReaSonus Native (" + version + ")";
       plugin_register("ext_name", (void *) name.c_str());
-      plugin_register("ext_url", (void *) "https://navelpluisje.github.io/reasonus/");
+      plugin_register("ext_url", (void *) "https://reasonus.net/");
       plugin_register("ext_vendor", (void *) "Navelpluisje");
     }
 
