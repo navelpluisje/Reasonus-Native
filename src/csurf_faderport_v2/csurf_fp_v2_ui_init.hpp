@@ -69,7 +69,7 @@ namespace CSURF_FP_V2_UI_INIT {
             case WM_COMMAND:
                 switch (LOWORD(wParam)) {
                     case IDC_BUTTON_DOCUMENTATION: {
-                        SystemOpenURL("https://navelpluisje.github.io/reasonus/documentation/faderportv2/");
+                        SystemOpenURL("https://reasonus.net/documentation/faderportv2/");
                         break;
                     }
 
