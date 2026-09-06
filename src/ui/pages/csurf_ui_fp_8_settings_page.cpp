@@ -62,6 +62,7 @@ class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-in
 
     // Plugins
     bool setting_disable_plugins;
+    bool setting_plugin_respect_slots;
     bool setting_untouch_after_learn;
     int setting_plugin_step_size;
     bool setting_plugin_map_param_clear;
@@ -822,6 +823,13 @@ public:
                 RenderInfoCheckbox(
                     m_ctx,
                     assets,
+                    i18n->t("settings", "plugin-respects-slots.label"),
+                    &setting_plugin_respect_slots,
+                    i18n->t("settings", "plugin-respects-slots.tooltip"));
+
+                RenderInfoCheckbox(
+                    m_ctx,
+                    assets,
                     i18n->t("settings", "untouch-after-learn.label"),
                     &setting_untouch_after_learn,
                     i18n->t("settings", "untouch-after-learn.tooltip"));
@@ -1086,6 +1094,7 @@ public:
         settings->SetSetting("surface", "automation-colors", join(setting_automation_colors, ","));
         settings->SetSetting("surface", "time-code", time_code_indexes[setting_time_code]);
         settings->SetSetting("surface", "plugin-step-size", setting_plugin_step_size);
+        settings->SetSetting("surface", "plugin-respect-slots", setting_plugin_respect_slots);
         settings->SetSetting("surface", "plugin-map-param-clear", setting_plugin_map_param_clear);
         settings->SetSetting("surface", "plugin-map-default-color-mode", setting_plugin_map_color_mode);
         settings->SetSetting("surface", "instant-multi-select-filter", setting_instant_multi_select_filter);
@@ -1141,6 +1150,7 @@ public:
         setting_automation_colors = settings->GetAutomationColorsArray();
         setting_plugin_step_size = settings->GetpluginStepSize();
         setting_track_color_brightness = settings->GetTrackColorBrightness();
+        setting_plugin_respect_slots = settings->PluginsShouldRespectSlots();
         setting_plugin_map_param_clear = settings->ShouldClearParamInput();
         setting_plugin_map_color_mode = settings->GetPluginMapDefaultColorMode();
         setting_track_display = settings->GetTrackDisplay();

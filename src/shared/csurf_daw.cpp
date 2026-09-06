@@ -404,6 +404,41 @@ void DAW::ToggleTrackFxBypass(MediaTrack *media_track) {
     }
 }
 
+int DAW::GetTrackFxCount(MediaTrack *media_track, bool slots) {
+    const int fx_count = TrackFX_GetCount(media_track);
+
+    if (!slots || fx_count < 1) {
+        return fx_count;
+    }
+
+    char slot_index[256] = "";
+    TrackFX_GetNamedConfigParm(media_track, fx_count - 1, "slot_hint", slot_index, sizeof slot_index);
+
+    return std::stoi(slot_index) + 1;
+}
+
+int DAW::GetTrackFxIndexBySlotIndex(MediaTrack *media_track, const int _slot_index) {
+    const int fx_count = TrackFX_GetCount(media_track);
+    char slot_index[256] = "";
+    int fx_index = -1;
+
+    for (auto i = 0; i < fx_count; i++) {
+        TrackFX_GetNamedConfigParm(media_track, i, "slot_hint", slot_index, sizeof slot_index);
+        const int index = std::stoi(slot_index);
+
+        if (index == _slot_index) {
+            fx_index = i;
+            break;
+        }
+        if (index == -1 && i == _slot_index) {
+            fx_index = i;
+            break;
+        }
+    }
+
+    return fx_index;
+}
+
 /************************************************************************
  * Track FX Param
  ************************************************************************/

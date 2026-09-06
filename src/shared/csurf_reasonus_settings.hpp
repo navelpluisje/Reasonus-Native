@@ -96,6 +96,7 @@ class ReaSonusSettings {
         {"surface", "time-code", "2"},
         {"surface", "track-color-brightness", "25"},
         {"surface", "plugin-step-size", "1"},
+        {"surface", "plugin-respect-slots", "0"},
         {"surface", "plugin-map-param-clear", "0"},
         {"surface", "plugin-map-default-color-mode", "1"},
         {
@@ -301,6 +302,8 @@ public:
     int GetMidiOutput();
 
     bool ShouldClearParamInput();
+
+    bool PluginsShouldRespectSlots();
 
     int GetPluginMapDefaultColorMode();
 

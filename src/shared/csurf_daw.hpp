@@ -371,6 +371,23 @@ public:
     static void ToggleTrackFxBypass(MediaTrack *media_track);
 
     /**
+     * Get the number of plugons for the given track. When `slots` is set to true,
+     * it will count the number of slots used,
+     * @param media_track The track to get the number of plugins fpr
+     * @param slots Wether or not to keet slots in account
+     * @return Thenumber of pugins for the given track
+     */
+    static int GetTrackFxCount(MediaTrack *media_track, bool slots);
+
+    /**
+     * Get the track fx index of the fx with the corresponding slot index.
+     * @param media_track The track to get the fx inex for
+     * @param _slot_index The slot index to check
+     * @return
+     */
+    static int GetTrackFxIndexBySlotIndex(MediaTrack *media_track, int _slot_index);
+
+    /**
      * Get the parameter name of the parameter with the given values
      * @param media_track The track where we want the plugin param for
      * @param fx_index The index on the plugin
