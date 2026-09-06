@@ -74,7 +74,8 @@ bool hasBit(const int val, const int key) {
     return (val & 1 << key) != 0;
 }
 
-__uint128_t clearBit(const __uint128_t val, const int key) {
+template<typename T>
+T clearBit(const T val, const int key) {
     return val & ~(1 << key);
 }
 
@@ -516,11 +517,11 @@ bool isMidiInDeviceDisabled(const int index) {
 
 void disableMidiIn(const int index) {
     ConfigVar<__uint128_t> midiins("midiins");
-    __uint128_t new_value = clearBit(midiins.GetValue(), index);
+    auto new_value = clearBit<__uint128_t>(midiins.GetValue(), index);
     midiins.SetValue(new_value);
 
     ConfigVar<__uint128_t> midiins_all("midiins_all");
-    new_value = clearBit(midiins_all.GetValue(), index);
+    new_value = clearBit<__uint128_t>(midiins_all.GetValue(), index);
     midiins_all.SetValue(new_value);
 }
 
@@ -532,7 +533,7 @@ bool isMidiOutDeviceDisabled(const int index) {
 
 void disableMidiOut(const int index) {
     ConfigVar<__uint128_t> midiouts("midiouts");
-    const __uint128_t new_value = clearBit(midiouts.GetValue(), index);
+    const auto new_value = clearBit<__uint128_t>(midiouts.GetValue(), index);
     midiouts.SetValue(new_value);
 }
 

@@ -195,7 +195,8 @@ bool hasBit(int val, int key);
  * @param key The index to set to 0
  * @return The modified integer
  */
-int clearBit(int val, int key);
+template<typename T>
+T clearBit(T val, int key);
 
 /**
  * @brief Get the normalized value of the volume to send to the device faders
