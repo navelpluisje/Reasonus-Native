@@ -412,7 +412,7 @@ int DAW::GetTrackFxCount(MediaTrack *media_track, bool slots) {
     }
 
     char slot_index[256] = "";
-    TrackFX_GetNamedConfigParm(media_track, fx_count - 1, "slot_hint", slot_index, sizeof slot_index);
+    TrackFX_GetNamedConfigParm(media_track, fx_count - 1, "chain_index_to_slot", slot_index, sizeof slot_index);
 
     return std::stoi(slot_index) + 1;
 }
@@ -423,7 +423,7 @@ int DAW::GetTrackFxIndexBySlotIndex(MediaTrack *media_track, const int _slot_ind
     int fx_index = -1;
 
     for (auto i = 0; i < fx_count; i++) {
-        TrackFX_GetNamedConfigParm(media_track, i, "slot_hint", slot_index, sizeof slot_index);
+        TrackFX_GetNamedConfigParm(media_track, i, "chain_index_to_slot", slot_index, sizeof slot_index);
         const int index = std::stoi(slot_index);
 
         if (index == _slot_index) {
