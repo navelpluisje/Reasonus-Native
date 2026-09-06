@@ -5,6 +5,7 @@
 #include <regex>
 #include <string>
 #include <vector>
+#include <array>
 #include <WDL/db2val.h>
 #include "csurf_daw.hpp"
 #include "fmt/format.h"
@@ -71,6 +72,11 @@ bool SetIntConfigVar(const std::string &var_name, const int value) {
 
 bool hasBit(const int val, const int key) {
     return (val & 1 << key) != 0;
+}
+
+template<typename T>
+T clearBit(const T val, const int key) {
+    return val & ~(1 << key);
 }
 
 double volToNormalized(const double vol) {
@@ -502,3 +508,32 @@ bool toBool(const std::string &value) {
 
     return result;
 }
+
+bool isMidiInDeviceDisabled(const int index) {
+    const __uint128_t midi_inputs = ConfigVar<__uint128_t>("midiins");
+
+    return !hasBit(midi_inputs, index);
+}
+
+void disableMidiIn(const int index) {
+    ConfigVar<__uint128_t> midiins("midiins");
+    auto new_value = clearBit<__uint128_t>(midiins.GetValue(), index);
+    midiins.SetValue(new_value);
+
+    ConfigVar<__uint128_t> midiins_all("midiins_all");
+    new_value = clearBit<__uint128_t>(midiins_all.GetValue(), index);
+    midiins_all.SetValue(new_value);
+}
+
+bool isMidiOutDeviceDisabled(const int index) {
+    const __uint128_t midi_outputs = ConfigVar<__uint128_t>("midiouts");
+
+    return !hasBit(midi_outputs, index);
+}
+
+void disableMidiOut(const int index) {
+    ConfigVar<__uint128_t> midiouts("midiouts");
+    const auto new_value = clearBit<__uint128_t>(midiouts.GetValue(), index);
+    midiouts.SetValue(new_value);
+}
+

@@ -103,6 +103,10 @@ struct ConfigVar {
         return true;
     }
 
+    T GetValue() {
+        return *m_addr;
+    }
+
     operator T() {
         return *m_addr;
     }
@@ -183,6 +187,16 @@ bool SetIntConfigVar(const std::string &var_name, int value);
  * @return false
  */
 bool hasBit(int val, int key);
+
+/**
+ * @brief Set the bit with index key to 0
+ *
+ * @param val The value to edit
+ * @param key The index to set to 0
+ * @return The modified integer
+ */
+template<typename T>
+T clearBit(T val, int key);
 
 /**
  * @brief Get the normalized value of the volume to send to the device faders
@@ -483,5 +497,23 @@ bool toBool(double value);
  * @return
  */
 bool toBool(const std::string &value);
+
+/**
+ *
+ * @param index The index of the midi in device
+ * @return true when the midi in device is disabled
+ */
+bool isMidiInDeviceDisabled(int index);
+
+void disableMidiIn(int index);
+
+/**
+ *
+ * @param index The index of the midi out device
+ * @return true when the midi out device is disabled
+ */
+bool isMidiOutDeviceDisabled(int index);
+
+void disableMidiOut(int index);
 
 #endif // CSURF_UTILS_H_

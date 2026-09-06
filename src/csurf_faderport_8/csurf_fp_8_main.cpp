@@ -1,6 +1,6 @@
+#include <array>
 #include <string>
 #include <vector>
-#include <array>
 #include <reaper_plugin.h>
 #include <WDL/wdltypes.h> // might be unnecessary in future
 #include <reaper_plugin_functions.h>
@@ -313,6 +313,20 @@ public:
       if (m_midi_out_dev >= 0 && m_midiout == nullptr) {
         *errStats |= 2;
       }
+    }
+
+    /**
+     * Check if the midi in or out is enabled an show a message to disable them
+     */
+    if (!isMidiInDeviceDisabled(m_midi_in_dev) || !isMidiOutDeviceDisabled(m_midi_out_dev)) {
+      MB(
+        "The MIDI input and/or output is not disabled. \n\nReaSonus will disable them for the session duration. \n\nPlease disable them in the settings to prevent this message showing again.",
+        "ReaSonus MIDI Error",
+        0
+      );
+
+      disableMidiIn(m_midi_in_dev);
+      disableMidiOut(m_midi_out_dev);
     }
 
     if (m_midiin != nullptr) {
