@@ -201,7 +201,6 @@ public:
         /**
          * Set add_send_mode when right shift and select are engaged.
          * If add_send_mode is set, regardless the shift keys, we will reset the add_send_mode
-         *
          */
         if (context->GetShiftChannelLeft()) {
             if (context->GetAddSendReceiveMode() == -1) {

@@ -1,6 +1,8 @@
 #include "csurf_reasonus_settings.hpp"
 #include <array>
 #include <utility>
+
+#include "csurf_daw.hpp"
 #include "../shared/csurf_utils.hpp"
 
 ReaSonusSettings::ReaSonusSettings(std::string _device) {
@@ -233,6 +235,9 @@ bool ReaSonusSettings::ShouldClearParamInput() {
 }
 
 bool ReaSonusSettings::PluginsShouldRespectSlots() {
+    if (!DAW::VersionHasFeature(FEATURE_SLOTS)) {
+        return false;
+    }
     return stoi(settings["surface"]["plugin-respect-slots"]) > 0;
 }
 

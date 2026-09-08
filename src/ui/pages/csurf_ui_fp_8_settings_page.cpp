@@ -599,29 +599,30 @@ public:
                 ImGui::EndChild(m_ctx);
             }
 
-            if (ImGui::BeginChild(
-                m_ctx,
-                "sends-settings",
-                0.0,
-                0.0,
-                ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
-            )) {
-                ReaSonusPageTitle(
+            if (!DAW::VersionHasFeature(FEATURE_SLOTS)) {
+                if (ImGui::BeginChild(
                     m_ctx,
-                    assets,
-                    i18n->t("settings", "sends-receives-group.label"),
-                    true
-                );
+                    "sends-settings",
+                    0.0,
+                    0.0,
+                    ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
+                )) {
+                    ReaSonusPageTitle(
+                        m_ctx,
+                        assets,
+                        i18n->t("settings", "sends-receives-group.label"),
+                        true
+                    );
 
-                RenderInfoCheckbox(
-                    m_ctx,
-                    assets,
-                    i18n->t("settings", "sends-respect-slots.label"),
-                    &setting_sends_respect_slots,
-                    i18n->t("settings", "sends-respect-slots.tooltip")
-                );
-
-                ImGui::EndChild(m_ctx);
+                    RenderInfoCheckbox(
+                        m_ctx,
+                        assets,
+                        i18n->t("settings", "sends-respect-slots.label"),
+                        &setting_sends_respect_slots,
+                        i18n->t("settings", "sends-respect-slots.tooltip")
+                    );
+                    ImGui::EndChild(m_ctx);
+                }
             }
             UiStyledElements::PopReaSonusGroupStyle(m_ctx);
             ImGui::EndGroup(m_ctx);
@@ -844,21 +845,26 @@ public:
                     assets,
                     i18n->t("settings", "plugin-control.label"),
                     &setting_disable_plugins,
-                    i18n->t("settings", "plugin-control.tooltip"));
+                    i18n->t("settings", "plugin-control.tooltip")
+                );
 
-                RenderInfoCheckbox(
-                    m_ctx,
-                    assets,
-                    i18n->t("settings", "plugin-respects-slots.label"),
-                    &setting_plugin_respect_slots,
-                    i18n->t("settings", "plugin-respects-slots.tooltip"));
+                if (!DAW::VersionHasFeature(FEATURE_SLOTS)) {
+                    RenderInfoCheckbox(
+                        m_ctx,
+                        assets,
+                        i18n->t("settings", "plugin-respects-slots.label"),
+                        &setting_plugin_respect_slots,
+                        i18n->t("settings", "plugin-respects-slots.tooltip")
+                    );
+                }
 
                 RenderInfoCheckbox(
                     m_ctx,
                     assets,
                     i18n->t("settings", "untouch-after-learn.label"),
                     &setting_untouch_after_learn,
-                    i18n->t("settings", "untouch-after-learn.tooltip"));
+                    i18n->t("settings", "untouch-after-learn.tooltip")
+                );
 
                 RenderinfoIntInput(
                     m_ctx,
@@ -868,7 +874,8 @@ public:
                     1,
                     settings->GetSurface(),
                     i18n->t("settings", "plugin-step-size.tooltip"),
-                    "%d");
+                    "%d"
+                );
 
                 ImGui::EndChild(m_ctx);
             }
