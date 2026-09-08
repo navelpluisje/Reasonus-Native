@@ -599,7 +599,8 @@ public:
                 ImGui::EndChild(m_ctx);
             }
 
-            if (!DAW::VersionHasFeature(FEATURE_SLOTS)) {
+            // Once we have more items under sends/receives, this has to be set around the `setting_sends_respect_slots` setting
+            if (DAW::VersionHasFeature(FEATURE_SLOTS)) {
                 if (ImGui::BeginChild(
                     m_ctx,
                     "sends-settings",
@@ -848,13 +849,13 @@ public:
                     i18n->t("settings", "plugin-control.tooltip")
                 );
 
-                if (!DAW::VersionHasFeature(FEATURE_SLOTS)) {
+                if (DAW::VersionHasFeature(FEATURE_SLOTS)) {
                     RenderInfoCheckbox(
                         m_ctx,
                         assets,
-                        i18n->t("settings", "plugin-respects-slots.label"),
+                        i18n->t("settings", "plugin-respect-slots.label"),
                         &setting_plugin_respect_slots,
-                        i18n->t("settings", "plugin-respects-slots.tooltip")
+                        i18n->t("settings", "plugin-respect-slots.tooltip")
                     );
                 }
 
