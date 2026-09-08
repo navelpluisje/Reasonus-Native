@@ -236,6 +236,10 @@ bool ReaSonusSettings::PluginsShouldRespectSlots() {
     return stoi(settings["surface"]["plugin-respect-slots"]) > 0;
 }
 
+bool ReaSonusSettings::SendsShouldRespectSlots() {
+    return stoi(settings["surface"]["sends-respect-slots"]) > 0;
+}
+
 int ReaSonusSettings::GetPluginMapDefaultColorMode() {
     return stoi(settings["surface"]["plugin-map-default-color-mode"]);
 }

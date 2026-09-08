@@ -37,8 +37,7 @@ public:
         CSurf_FP_8_PluginsManager::UpdateTracks(true);
     }
 
-    ~CSurf_FP_8_PluginsManager() override {
-    }
+    ~CSurf_FP_8_PluginsManager() override = default;
 
     void UpdateTracks(const bool force_update) override {
         nb_plugins = 0;
@@ -65,10 +64,10 @@ public:
 
         for (int i = 0; i < context->GetNbChannels(); i++) {
             MediaTrack *media_track;
+            const CSurf_FP_8_Track *track = tracks.at(i);
+
             int fader_value = 0;
             int value_bar_value = 0;
-
-            CSurf_FP_8_Track *track = tracks.at(i);
 
             if (context->GetMasterFaderMode() && i == context->GetNbChannels() - 1) {
                 media_track = GetMasterTrack(nullptr);

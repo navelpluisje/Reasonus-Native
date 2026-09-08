@@ -94,6 +94,7 @@ class ReaSonusSettings {
         {"surface", "fader-reset", "0"},
         {"surface", "overwrite-time-code", "1"},
         {"surface", "time-code", "2"},
+        {"surface", "sends-respect-slots", "0"},
         {"surface", "track-color-brightness", "25"},
         {"surface", "plugin-step-size", "1"},
         {"surface", "plugin-respect-slots", "0"},
@@ -304,6 +305,8 @@ public:
     bool ShouldClearParamInput();
 
     bool PluginsShouldRespectSlots();
+
+    bool SendsShouldRespectSlots();
 
     int GetPluginMapDefaultColorMode();
 

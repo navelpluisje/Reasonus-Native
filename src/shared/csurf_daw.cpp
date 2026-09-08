@@ -404,7 +404,7 @@ void DAW::ToggleTrackFxBypass(MediaTrack *media_track) {
     }
 }
 
-int DAW::GetTrackFxCount(MediaTrack *media_track, bool slots) {
+int DAW::GetTrackFxCount(MediaTrack *media_track, const bool slots) {
     const int fx_count = TrackFX_GetCount(media_track);
 
     if (!slots || fx_count < 1) {
@@ -617,7 +617,7 @@ bool DAW::HasTrackSend(MediaTrack *media_track, const int send) {
 }
 
 bool DAW::HasTrackHardwareOut(MediaTrack *media_track, const int send) {
-    return GetSetTrackSendInfo(media_track, SEND_MODE_HARDWARE, send, "I_SLOT_HINT", nullptr) != nullptr;
+    return GetSetTrackSendInfo(media_track, SEND_MODE_HARDWARE, send, "P_DESTTRACK", nullptr) == nullptr;
 }
 
 std::string DAW::GetTrackSendName(MediaTrack *media_track, const int send) {
@@ -628,6 +628,61 @@ std::string DAW::GetTrackSendName(MediaTrack *media_track, const int send) {
     }
 
     return "No Dest";
+}
+
+int DAW::GetTrackSendCount(MediaTrack *media_track, const bool slots) {
+    const int sends_count = GetTrackNumSends(media_track, SEND_MODE_SEND);
+    const int hardware_count = GetTrackNumSends(media_track, SEND_MODE_HARDWARE);
+
+    if (!slots || (sends_count + hardware_count) < 1) {
+        return sends_count + hardware_count;
+    }
+
+    return GetTrackNumSends(media_track, 0x10000000);
+}
+
+int DAW::GetTrackSendIndexBySlotIndex(MediaTrack *media_track, const int _slot_index) {
+    const int hardware_count = GetTrackNumSends(media_track, SEND_MODE_HARDWARE);
+    const int sends_count = GetTrackNumSends(media_track, SEND_MODE_SEND);
+    int send_index = -1;
+
+    for (auto i = 0; i < hardware_count; i++) {
+        const int hardware_slot_index = static_cast<int>(GetTrackSendInfo_Value(
+            media_track,
+            SEND_MODE_HARDWARE,
+            i,
+            "I_SLOT_HINT"
+        ));
+
+        if (hardware_slot_index == _slot_index) {
+            send_index = i;
+            break;
+        }
+        if (hardware_slot_index == -1 && i == _slot_index) {
+            send_index = i;
+            break;
+        }
+    }
+
+    for (auto i = 0; i < sends_count; i++) {
+        const int send_slot_index = static_cast<int>(GetTrackSendInfo_Value(
+            media_track,
+            SEND_MODE_SEND,
+            i,
+            "I_SLOT_HINT"
+        ));
+
+        if (send_slot_index == _slot_index) {
+            send_index = i + hardware_count;
+            break;
+        }
+        if (send_slot_index == -1 && (i + hardware_count) == _slot_index) {
+            send_index = i + hardware_count;
+            break;
+        }
+    }
+
+    return send_index;
 }
 
 int DAW::GetTrackSendMode(MediaTrack *media_track, const int send) {

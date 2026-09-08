@@ -1,8 +1,6 @@
 #ifndef CSURF_FP_8_SENDS_MANAGER_C_
 #define CSURF_FP_8_SENDS_MANAGER_C_
 
-#include <algorithm>
-
 #include <WDL/db2val.h>
 #include "csurf_fp_8_channel_manager.hpp"
 
@@ -52,11 +50,12 @@ public:
     void UpdateTracks(const bool force_update) override {
         nb_sends = 0;
         const WDL_PtrList<MediaTrack> media_tracks = navigator->GetBankTracks();
+        const bool respect_slots = settings->SendsShouldRespectSlots();
         MediaTrack *add_send_track;
 
         for (int i = 0; i < context->GetNbChannels(); i++) {
             MediaTrack *media_track = media_tracks.Get(i);
-            const int _nb_track_sends = GetTrackNumSends(media_track, 0x10000000);
+            const int _nb_track_sends = DAW::GetTrackSendCount(media_track, respect_slots);
 
             nb_track_items[i] = _nb_track_sends;
             nb_sends = std::max(_nb_track_sends, nb_sends);
@@ -66,23 +65,30 @@ public:
         current_send = context->GetChannelManagerItemIndex();
 
         for (int i = 0; i < context->GetNbChannels(); i++) {
-            const int send_index = context->GetChannelManagerItemIndex(nb_track_items[i] - 1);
-            const bool add_send_enabled = context->GetAddSendReceiveMode() == i;
-
-            if (add_send_enabled) {
-                add_send_track = GetTrack(nullptr, context->GetCurrentSelectedSendReceive());
-            }
-
-            int pan, fader_value, value_bar_value = 0;
-            std::string pan_str;
-
-            CSurf_FP_8_Track *track = tracks.at(i);
+            const CSurf_FP_8_Track *track = tracks.at(i);
             MediaTrack *media_track = media_tracks.Get(i);
 
             if (!media_track) {
                 track->ClearTrack(true, force_update);
                 continue;
             }
+
+            const int slot_index = context->GetChannelManagerItemIndex(
+                respect_slots ? nb_sends : nb_track_items[i] - 1
+            );
+            const int send_index = respect_slots
+                                       ? DAW::GetTrackSendIndexBySlotIndex(media_track, slot_index)
+                                       : slot_index;
+            const bool add_send_enabled = context->GetAddSendReceiveMode() == i;
+
+            if (add_send_enabled) {
+                add_send_track = GetTrack(nullptr, context->GetCurrentSelectedSendReceive());
+            }
+
+            int pan = 0;
+            int fader_value = 0;
+            int value_bar_value = 0;
+            std::string pan_str;
 
             SetTrackColors(media_track, DAW::IsTrackSelected(media_track), false);
 
@@ -123,7 +129,7 @@ public:
                 track->SetDisplayLine(
                     3,
                     ALIGN_CENTER,
-                    Progress(send_index + 1, nb_track_items[i]).c_str(),
+                    Progress(slot_index + 1, respect_slots ? nb_sends : nb_track_items[i]).c_str(),
                     NON_INVERT,
                     force_update
                 );
@@ -146,11 +152,21 @@ public:
                         INVERT,
                         force_update
                     );
+                    track->SetDisplayLine(3, ALIGN_CENTER, "", NON_INVERT, force_update);
                 } else {
                     track->SetDisplayLine(1, ALIGN_LEFT, "No Sends", INVERT, force_update);
                     track->SetDisplayLine(2, ALIGN_CENTER, "", NON_INVERT, force_update);
+                    track->SetDisplayLine(
+                        3,
+                        ALIGN_CENTER,
+                        respect_slots
+                            ? Progress(slot_index + 1, respect_slots ? nb_sends : nb_track_items[i]).
+                            c_str()
+                            : "",
+                        NON_INVERT,
+                        force_update
+                    );
                 }
-                track->SetDisplayLine(3, ALIGN_CENTER, "", NON_INVERT, force_update);
                 track->SetFaderValue(0, force_update);
                 track->SetValueBarMode(VALUEBAR_MODE_FILL);
                 track->SetValueBarValue(0);

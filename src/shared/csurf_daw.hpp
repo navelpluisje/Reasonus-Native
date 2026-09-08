@@ -594,6 +594,23 @@ public:
     static std::string GetTrackSendName(MediaTrack *media_track, int send);
 
     /**
+     * Get the number of sends for the given track. When `slots` is set to true,
+     * it will count the number of slots used,
+     * @param media_track The track to get the number of plugins fpr
+     * @param slots Wether or not to keep slots in account
+     * @return Thenumber of pugins for the given track
+     */
+    static int GetTrackSendCount(MediaTrack *media_track, bool slots);
+
+    /**
+     * Get the track send index of the send with the corresponding slot index.
+     * @param media_track The track to get the send index for
+     * @param _slot_index The slot index to check
+     * @return
+     */
+    static int GetTrackSendIndexBySlotIndex(MediaTrack *media_track, int _slot_index);
+
+    /**
      * Get the send mode for the given send
      * @param media_track The track where we want the send for
      * @param send The index of the send track
