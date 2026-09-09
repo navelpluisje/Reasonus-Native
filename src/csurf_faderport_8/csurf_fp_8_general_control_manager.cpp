@@ -236,9 +236,17 @@ public:
                                          ? trackNavigator->GetTrackByIndex(context->GetAddSendReceiveMode())
                                          : GetTrack(nullptr, context->GetCurrentSelectedSendReceive());
 
-            if (CreateTrackSend(src_track, dest_track) > -1) {
+            const int send_receive_index = CreateTrackSend(src_track, dest_track);
+            
+            if (send_receive_index > -1) {
                 context->SetAddSendReceiveMode(-1);
             }
+
+            if (settings->PluginsShouldRespectSlots() && !is_receive_mode) {
+                const int slot_index = context->GetChannelManagerItemIndex(99);
+                SetTrackSendInfo_Value(src_track, SEND_MODE_SEND, send_receive_index, "I_SLOT_HINT", slot_index);
+            }
+
             return;
         }
 
