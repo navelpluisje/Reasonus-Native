@@ -5,7 +5,6 @@
 #include <regex>
 #include <string>
 #include <vector>
-#include <array>
 #include <WDL/db2val.h>
 #include "csurf_daw.hpp"
 #include "fmt/format.h"
@@ -164,6 +163,10 @@ std::string GetReaSonusFolderPath() {
 
 std::string GetReaSonusIniPath(const std::string &device) {
     return createPathName({GetReaSonusFolderPath(), device + ".ini"});
+}
+
+std::string GetReaperIniPath() {
+    return createPathName({GetResourcePath(), "reaper.ini"});
 }
 
 std::string GetReaSonusZonesPath() {
@@ -515,14 +518,19 @@ bool isMidiInDeviceDisabled(const int index) {
     return !hasBit(midi_inputs, index);
 }
 
-void disableMidiIn(const int index) {
+void disableMidiIn(const int index, const bool persist) {
     ConfigVar<__uint128_t> midiins("midiins");
-    auto new_value = clearBit<__uint128_t>(midiins.GetValue(), index);
-    midiins.SetValue(new_value);
+    const auto new_midiins_value = clearBit<__uint128_t>(midiins.GetValue(), index);
+    midiins.SetValue(new_midiins_value);
 
     ConfigVar<__uint128_t> midiins_all("midiins_all");
-    new_value = clearBit<__uint128_t>(midiins_all.GetValue(), index);
-    midiins_all.SetValue(new_value);
+    const auto new_midiins_all_value = clearBit<__uint128_t>(midiins_all.GetValue(), index);
+    midiins_all.SetValue(new_midiins_all_value);
+
+    if (persist) {
+        writeReaperIni("REAPER", "midiins", fmt::format("{}", new_midiins_value));
+        writeReaperIni("REAPER", "midiins_all", fmt::format("{}", new_midiins_all_value));
+    }
 }
 
 bool isMidiOutDeviceDisabled(const int index) {
@@ -531,9 +539,40 @@ bool isMidiOutDeviceDisabled(const int index) {
     return !hasBit(midi_outputs, index);
 }
 
-void disableMidiOut(const int index) {
+void disableMidiOut(const int index, const bool persist) {
     ConfigVar<__uint128_t> midiouts("midiouts");
     const auto new_value = clearBit<__uint128_t>(midiouts.GetValue(), index);
     midiouts.SetValue(new_value);
+
+    if (persist) {
+        writeReaperIni("REAPER", "midiouts", fmt::format("{}", new_value));
+    }
+}
+
+bool writeReaperIni(std::string section, std::string key, std::string value) { // NOLINT(*-unnecessary-value-param)
+    mINI::INIStructure data;
+    const mINI::INIFile file(GetReaperIniPath());
+
+    if (!file.read(data)) {
+        return false;
+    }
+
+    /**
+     * If va;ue is the same, we just return true;
+     */
+    if (data.get(section).has(key) && data[section][key] == value) {
+        data.clear();
+        return true;
+    }
+
+    data[section][key] = value;
+
+    if (!file.write(data, true)) {
+        MB("Error while writing the reaper ini file", "ReaSonus Settings Error", 0);
+        return false;
+    }
+
+    data.clear();
+    return true;
 }
 
