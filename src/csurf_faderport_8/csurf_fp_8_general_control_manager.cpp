@@ -356,9 +356,16 @@ public:
             return;
         }
 
-        context->GetShiftLeft()
-            ? Main_OnCommandAsyncEx(40344, 0, nullptr) // Track: Toggle FX bypass on all tracks
-            : Main_OnCommandAsyncEx(8, 0, nullptr);    // Track: Toggle FX bypass for selected tracks
+        if (context->GetShiftLeft()) {
+            if (context->GetChannelMode() == PluginMode && settings->PluginsShouldRespectSlots()) {
+                DAW::ToggleTrackFxBypassForSlot(context->GetChannelManagerItemIndex(99));
+            } else {
+                Main_OnCommandAsyncEx(40344, 0, nullptr); // Track: Toggle FX bypass on all tracks
+            }
+            return;
+        }
+
+        Main_OnCommandAsyncEx(8, 0, nullptr); // Track: Toggle FX bypass for selected tracks
     }
 
     void HandleMacroButton(const int value) const {

@@ -439,6 +439,42 @@ int DAW::GetTrackFxIndexBySlotIndex(MediaTrack *media_track, const int _slot_ind
     return fx_index;
 }
 
+bool DAW::SlotHasNoBypassedTrackFx(const int _slot_index) {
+    bool result = true;
+
+    for (int i = 0; i < GetNumTracks(); i++) {
+        MediaTrack *media_track = GetTrack(nullptr, i);
+        const int plugin_index = GetTrackFxIndexBySlotIndex(media_track, _slot_index);
+
+        if (plugin_index > -1 && GetTrackFxEnabled(media_track, plugin_index)) {
+            result = false;
+            break;
+        }
+    }
+
+    return result;
+}
+
+void DAW::ToggleTrackFxBypassForSlot(int _slot_index) {
+    double new_value = 0;
+
+    if (SlotHasNoBypassedTrackFx(_slot_index)) {
+        new_value = 1.0;
+    }
+
+    for (int i = 0; i < GetNumTracks(); i++) {
+        MediaTrack *media_track = GetTrack(nullptr, i);
+
+        const int plugin_index = GetTrackFxIndexBySlotIndex(media_track, _slot_index);
+
+        if (plugin_index == -1) {
+            continue;
+        }
+
+        TrackFX_SetEnabled(media_track, plugin_index, new_value > 0);
+    }
+}
+
 /************************************************************************
  * Track FX Param
  ************************************************************************/

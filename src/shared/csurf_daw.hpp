@@ -390,6 +390,21 @@ public:
     static int GetTrackFxIndexBySlotIndex(MediaTrack *media_track, int _slot_index);
 
     /**
+     * Check if there are any muted sends for the given slot
+     * @param _slot_index The slot index to check for muted sends
+     * @return
+     */
+    static bool SlotHasNoBypassedTrackFx(int _slot_index);
+
+    /**
+     * Toggle all plugin bypasses for the given slot. When all plugins are bypassed, they will all get active.
+     * If some or none of the plugins are bypassed, all plugins will be bypassed
+     * @param _slot_index The slot index to toggle the nute for
+     * @return
+     */
+    static void ToggleTrackFxBypassForSlot(int _slot_index);
+
+    /**
      * Get the parameter name of the parameter with the given values
      * @param media_track The track where we want the plugin param for
      * @param fx_index The index on the plugin
