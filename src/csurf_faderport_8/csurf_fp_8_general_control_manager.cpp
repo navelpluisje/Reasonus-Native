@@ -237,7 +237,7 @@ public:
                                          : GetTrack(nullptr, context->GetCurrentSelectedSendReceive());
 
             const int send_receive_index = CreateTrackSend(src_track, dest_track);
-            
+
             if (send_receive_index > -1) {
                 context->SetAddSendReceiveMode(-1);
             }
@@ -342,7 +342,13 @@ public:
             return;
         }
 
-        Main_OnCommandAsyncEx(40339, 0, nullptr); // Track: Unmute all tracks
+        if (context->GetShiftLeft()) {
+            if (context->GetChannelMode() == SendMode && settings->SendsShouldRespectSlots()) {
+                DAW::ToggleSendMuteForSlot(context->GetChannelManagerItemIndex(99));
+            }
+        } else {
+            Main_OnCommandAsyncEx(40339, 0, nullptr); // Track: Unmute all tracks
+        }
     }
 
     void HandleBypassButton(const int value) const {

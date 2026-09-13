@@ -641,10 +641,16 @@ int DAW::GetTrackSendCount(MediaTrack *media_track, const bool slots) {
     return GetTrackNumSends(media_track, 0x10000000);
 }
 
-int DAW::GetTrackSendIndexBySlotIndex(MediaTrack *media_track, const int _slot_index) {
+int DAW::GetTrackSendIndexBySlotIndex(
+    MediaTrack *media_track,
+    const int _slot_index,
+    const bool add_hardware,
+    bool *is_hardware
+) {
     const int hardware_count = GetTrackNumSends(media_track, SEND_MODE_HARDWARE);
     const int sends_count = GetTrackNumSends(media_track, SEND_MODE_SEND);
     int send_index = -1;
+    *is_hardware = false;
 
     for (auto i = 0; i < hardware_count; i++) {
         const int hardware_slot_index = static_cast<int>(GetTrackSendInfo_Value(
@@ -658,10 +664,16 @@ int DAW::GetTrackSendIndexBySlotIndex(MediaTrack *media_track, const int _slot_i
             send_index = i;
             break;
         }
+
         if (hardware_slot_index == -1 && i == _slot_index) {
             send_index = i;
             break;
         }
+    }
+
+    if (send_index != -1) {
+        *is_hardware = true;
+        return send_index;
     }
 
     for (auto i = 0; i < sends_count; i++) {
@@ -673,16 +685,58 @@ int DAW::GetTrackSendIndexBySlotIndex(MediaTrack *media_track, const int _slot_i
         ));
 
         if (send_slot_index == _slot_index) {
-            send_index = i + hardware_count;
+            send_index = i + (add_hardware ? hardware_count : 0);
             break;
         }
         if (send_slot_index == -1 && (i + hardware_count) == _slot_index) {
-            send_index = i + hardware_count;
+            send_index = i + (add_hardware ? hardware_count : 0);
             break;
         }
     }
 
     return send_index;
+}
+
+bool DAW::SlotHasNoMutedSend(const int _slot_index) {
+    bool result = true;
+    bool dummy;
+    for (int i = 0; i < GetNumTracks(); i++) {
+        MediaTrack *media_track = GetTrack(nullptr, i);
+        const int send_index = GetTrackSendIndexBySlotIndex(media_track, _slot_index, true, &dummy);
+
+        if (send_index > -1 && GetTrackSendMute(media_track, send_index)) {
+            result = false;
+            break;
+        }
+    }
+
+    return result;
+}
+
+void DAW::ToggleSendMuteForSlot(int _slot_index) {
+    double new_value = 0;
+
+    if (SlotHasNoMutedSend(_slot_index)) {
+        new_value = 1.0;
+    }
+
+    for (int i = 0; i < GetNumTracks(); i++) {
+        MediaTrack *media_track = GetTrack(nullptr, i);
+        bool is_hardware = false;
+        const int send_index = GetTrackSendIndexBySlotIndex(media_track, _slot_index, false, &is_hardware);
+
+        if (send_index == -1) {
+            continue;
+        }
+
+        SetTrackSendInfo_Value(
+            media_track,
+            is_hardware ? SEND_MODE_HARDWARE : SEND_MODE_SEND,
+            send_index,
+            "B_MUTE",
+            new_value
+        );
+    }
 }
 
 int DAW::GetTrackSendMode(MediaTrack *media_track, const int send) {

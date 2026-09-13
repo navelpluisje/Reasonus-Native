@@ -51,6 +51,7 @@ public:
         nb_sends = 0;
         const WDL_PtrList<MediaTrack> media_tracks = navigator->GetBankTracks();
         const bool respect_slots = settings->SendsShouldRespectSlots();
+        bool dummy;
         MediaTrack *add_send_track;
 
         for (int i = 0; i < context->GetNbChannels(); i++) {
@@ -77,7 +78,7 @@ public:
                 respect_slots ? nb_sends : nb_track_items[i] - 1
             );
             const int send_index = respect_slots
-                                       ? DAW::GetTrackSendIndexBySlotIndex(media_track, slot_index)
+                                       ? DAW::GetTrackSendIndexBySlotIndex(media_track, slot_index, true, &dummy)
                                        : slot_index;
             const bool add_send_enabled = context->GetAddSendReceiveMode() == i;
 
@@ -295,7 +296,13 @@ public:
 
     void HandleFaderMove(const int index, const int msb, const int lsb) override {
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
-        const int send_index = context->GetChannelManagerItemIndex(nb_track_items[index] - 1);
+        const bool respect_slots = settings->SendsShouldRespectSlots();
+        bool dummy;
+
+        const int slot_index = context->GetChannelManagerItemIndex(nb_track_items[index] - 1);
+        const int send_index = respect_slots
+                                   ? DAW::GetTrackSendIndexBySlotIndex(media_track, slot_index, true, &dummy)
+                                   : slot_index;
 
         if (context->GetShiftChannelLeft()) {
             DAW::SetTrackSendPan(media_track, send_index, normalizedToPan(int14ToNormalized(msb, lsb)));

@@ -608,9 +608,31 @@ public:
      * Get the track send index of the send with the corresponding slot index.
      * @param media_track The track to get the send index for
      * @param _slot_index The slot index to check
+     * @param add_hardware Whether to add the hardware count for the sends index
+     * @param is_hardware Set to treu when the slot is a hardware out
      * @return
      */
-    static int GetTrackSendIndexBySlotIndex(MediaTrack *media_track, int _slot_index);
+    static int GetTrackSendIndexBySlotIndex(
+        MediaTrack *media_track,
+        int _slot_index,
+        bool add_hardware,
+        bool *is_hardware
+    );
+
+    /**
+     * Check if there are any muted sends for the given slot
+     * @param _slot_index The slot index to check for muted sends
+     * @return
+     */
+    static bool SlotHasNoMutedSend(int _slot_index);
+
+    /**
+     * Toggle all send mutes. When all sends are muted, they will all get unmuted.
+     * If some or none sends are muted, mute all the sends
+     * @param _slot_index The slot index to toggle the nute for
+     * @return
+     */
+    static void ToggleSendMuteForSlot(int _slot_index);
 
     /**
      * Get the send mode for the given send
