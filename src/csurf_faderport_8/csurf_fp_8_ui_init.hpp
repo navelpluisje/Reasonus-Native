@@ -32,9 +32,16 @@ namespace CSURF_FP_8_UI_INIT {
             }
 
             SetDlgItemText(hwndDlg, IDC_MIDI_DISABLED_2, "This is needed to make ReaSonus function properly.");
+
+            ShowWindow(GetDlgItem(hwndDlg, IDC_BUTTON_DISABLE_DEVICES), SW_SHOW);
+            ShowWindow(GetDlgItem(hwndDlg, IDC_GROUP_MIDI_DEVICES_LARGE), SW_SHOW);
+            ShowWindow(GetDlgItem(hwndDlg, IDC_MIDI_DISABLED_1), SW_SHOW);
+            ShowWindow(GetDlgItem(hwndDlg, IDC_MIDI_DISABLED_2), SW_SHOW);
         } else {
-            SetDlgItemText(hwndDlg, IDC_MIDI_DISABLED_1, "");
-            SetDlgItemText(hwndDlg, IDC_MIDI_DISABLED_2, "");
+            ShowWindow(GetDlgItem(hwndDlg, IDC_BUTTON_DISABLE_DEVICES), SW_HIDE);
+            ShowWindow(GetDlgItem(hwndDlg, IDC_GROUP_MIDI_DEVICES_LARGE), SW_HIDE);
+            ShowWindow(GetDlgItem(hwndDlg, IDC_MIDI_DISABLED_1), SW_HIDE);
+            ShowWindow(GetDlgItem(hwndDlg, IDC_MIDI_DISABLED_2), SW_HIDE);
         }
     }
 
@@ -114,6 +121,11 @@ namespace CSURF_FP_8_UI_INIT {
 
                 SetDlgItemText(hwndDlg, IDC_VERSION, GIT_VERSION);
 
+                ShowWindow(GetDlgItem(hwndDlg, IDC_BUTTON_DISABLE_DEVICES), SW_HIDE);
+                ShowWindow(GetDlgItem(hwndDlg, IDC_GROUP_MIDI_DEVICES_LARGE), SW_HIDE);
+                ShowWindow(GetDlgItem(hwndDlg, IDC_MIDI_DISABLED_1), SW_HIDE);
+                ShowWindow(GetDlgItem(hwndDlg, IDC_MIDI_DISABLED_2), SW_HIDE);
+
                 HandleMidiMessage(
                     hwndDlg,
                     stoi(ini["surface"]["midiin"]),
@@ -168,6 +180,29 @@ namespace CSURF_FP_8_UI_INIT {
                     case IDC_BUTTON_COFFEE: {
                         SystemOpenURL("https://buymeacoffee.com/navelpluisje");
                         break;
+                    }
+
+                    case IDC_BUTTON_DISABLE_DEVICES: {
+                        LRESULT combo_value = SendDlgItemMessage(hwndDlg, IDC_COMBO_MIDI_IN, CB_GETCURSEL, 0, 0);
+                        if (combo_value != CB_ERR) {
+                            auto indev = static_cast<int>(
+                                SendDlgItemMessage(hwndDlg, IDC_COMBO_MIDI_IN, CB_GETITEMDATA, combo_value, 0)
+                            );
+                            disableMidiIn(indev, true);
+                        }
+
+                        combo_value = SendDlgItemMessage(hwndDlg, IDC_COMBO_MIDI_OUT, CB_GETCURSEL, 0, 0);
+                        if (combo_value != CB_ERR) {
+                            auto outdev = static_cast<int>(
+                                SendDlgItemMessage(hwndDlg, IDC_COMBO_MIDI_OUT, CB_GETITEMDATA, combo_value, 0)
+                            );
+                            disableMidiOut(outdev, true);
+                        }
+
+                        ShowWindow(GetDlgItem(hwndDlg, IDC_BUTTON_DISABLE_DEVICES), SW_HIDE);
+                        ShowWindow(GetDlgItem(hwndDlg, IDC_GROUP_MIDI_DEVICES_LARGE), SW_HIDE);
+                        ShowWindow(GetDlgItem(hwndDlg, IDC_MIDI_DISABLED_1), SW_HIDE);
+                        ShowWindow(GetDlgItem(hwndDlg, IDC_MIDI_DISABLED_2), SW_HIDE);
                     }
 
                     default: ;
