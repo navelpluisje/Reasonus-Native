@@ -9,6 +9,8 @@
 #include <reaper_plugin_functions.h>
 #include <mini/ini.h>
 
+#include "fmt/format.h"
+
 constexpr char PATH_SEPARATOR =
 #ifdef _WIN32
         '\\';
@@ -19,7 +21,7 @@ constexpr char PATH_SEPARATOR =
 const std::string PREFIX_SEPARATOR = ": ";
 
 constexpr int TOGGLE_SPEED = 150;
-constexpr int DOUBLE_CLICK_SPEED = 750;
+constexpr int DOUBLE_CLICK_SPEED = 300;
 
 const std::string FP_V2 = "FP_V2";
 const std::string FP_8 = "FP";
@@ -113,11 +115,18 @@ private:
 
 struct DoubleClickState {
     bool active = false; // NOLINT(*-non-private-member-variables-in-classes)
-    int start = 0;       // NOLINT(*-non-private-member-variables-in-classes)
+    uint start = 0;      // NOLINT(*-non-private-member-variables-in-classes)
     int clicks = 0;      // NOLINT(*-non-private-member-variables-in-classes)
 
     void SetValue(const bool value) {
         const int time = GetTickCount();
+
+        // Check if the double click has been timed out and reset values
+        if (time - start > DOUBLE_CLICK_SPEED && clicks > 0) {
+            active = false;
+            start = 0;
+            clicks = 0;
+        }
 
         if (value && start > 0 && clicks == 1) {
             if (time - start < DOUBLE_CLICK_SPEED) {
@@ -126,8 +135,8 @@ struct DoubleClickState {
                 clicks = 0;
             } else {
                 active = false;
-                start = time;
-                clicks = 1;
+                start = 0;
+                clicks = 0;
             }
             return;
         }
@@ -138,7 +147,7 @@ struct DoubleClickState {
             return;
         }
 
-        if (start == 0 && value && clicks == 0) {
+        if (value && start == 0 && clicks == 0) {
             clicks += 1;
             start = time;
             active = false;
