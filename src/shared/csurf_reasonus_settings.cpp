@@ -192,6 +192,10 @@ int ReaSonusSettings::GetpluginStepSize() {
     return stoi(settings["surface"]["plugin-step-size"]);
 }
 
+bool ReaSonusSettings::HasPluginInputControl() {
+    return stoi(settings["surface"]["plugin-has-input-control"]) > 0;
+}
+
 int ReaSonusSettings::GetTrackDisplay() {
     return stoi(settings["displays"]["track"]);
 }
