@@ -192,7 +192,7 @@ public:
             media_track = GetMasterTrack(nullptr);
         }
 
-        const int plugin_index = context->GetChannelManagerItemIndex() + index;
+        const int plugin_index = GetPluginIndex(index);
 
         if (DAW::GetTrackFxPanelOpen(media_track, plugin_index)) {
             TrackFX_Show(media_track, plugin_index, 0);
