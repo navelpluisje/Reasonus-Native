@@ -7,11 +7,11 @@
 #include "../shared/csurf_plugin_utils.hpp"
 
 class CSurf_FP_8_PluginsManager : public CSurf_FP_8_ChannelManager {
-protected:
     int nb_plugins = 0;
     int current_plugin = 0;
 
-    void GetFaderValue(MediaTrack *media_track, int *fader_value, int *value_bar_value) const {
+protected:
+    void GetFaderValue(MediaTrack *media_track, int *fader_value, int *value_bar_value) const { // NOLINT(*-convert-member-functions-to-static)
         int panMode = 0;
         double volume = 0.0;
         double pan1 = 0.0;
@@ -24,11 +24,11 @@ protected:
         *value_bar_value = static_cast<int>(panToNormalized(pan1) * 127);
     }
 
-    std::string GetBypassedText(const bool bypassed) const {
+    [[nodiscard]] std::string GetBypassedText(const bool bypassed) const { // NOLINT(*-convert-member-functions-to-static)
         return bypassed ? "Bypassed" : "Enabled";
     }
 
-    int GetPluginIndex(const int index) {
+    [[nodiscard]] int GetPluginIndex(const int index) const {
         const bool control_input_plugins = settings->HasPluginInputControl() && context->GetArm();
 
         return context->GetChannelManagerItemIndex(nb_track_items[index] - 1) + (
