@@ -115,7 +115,7 @@ private:
 
 struct DoubleClickState {
     bool active = false; // NOLINT(*-non-private-member-variables-in-classes)
-    uint start = 0;      // NOLINT(*-non-private-member-variables-in-classes)
+    int start = 0;      // NOLINT(*-non-private-member-variables-in-classes)
     int clicks = 0;      // NOLINT(*-non-private-member-variables-in-classes)
 
     void SetValue(const bool value) {
