@@ -1,6 +1,6 @@
+#include <array>
 #include <string>
 #include <vector>
-#include <array>
 #include <reaper_plugin.h>
 #include <WDL/wdltypes.h> // might be unnecessary in future
 #include <reaper_plugin_functions.h>
@@ -312,6 +312,22 @@ public:
       }
       if (m_midi_out_dev >= 0 && m_midiout == nullptr) {
         *errStats |= 2;
+      }
+    }
+
+    /**
+     * Check if the midi in or out is enabled an show a message to disable them
+     */
+    if (!isMidiInDeviceDisabled(m_midi_in_dev) || !isMidiOutDeviceDisabled(m_midi_out_dev)) {
+      const int result = MB(
+        "The MIDI input and/or output is not disabled. Do you want to disable them permanently?\n\nClick Yes to disable them permanent (recommended)\n\nClick No to disable them for the duration of the REAPER session\n\nClick Cancel otherwise. ReaSonus might in this case not work 100% as intended",
+        "ReaSonus MIDI Error",
+        3
+      );
+
+      if (result != 2) {
+        disableMidiIn(m_midi_in_dev, result == 6);
+        disableMidiOut(m_midi_out_dev, result == 6);
       }
     }
 
