@@ -41,7 +41,7 @@ class CSurf_TransportManager {
 
     void SetForwardingState();
 
-    void handleFootSwitchKey(const std::string &key) const;
+    void handleFunctionKey(const std::string &key, FunctionTypes type) const;
 
 public:
     CSurf_TransportManager(CSurf_Context *context, midi_Output *m_midiout);
