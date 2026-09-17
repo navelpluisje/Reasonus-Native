@@ -236,9 +236,17 @@ public:
                                          ? trackNavigator->GetTrackByIndex(context->GetAddSendReceiveMode())
                                          : GetTrack(nullptr, context->GetCurrentSelectedSendReceive());
 
-            if (CreateTrackSend(src_track, dest_track) > -1) {
+            const int send_receive_index = CreateTrackSend(src_track, dest_track);
+
+            if (send_receive_index > -1) {
                 context->SetAddSendReceiveMode(-1);
             }
+
+            if (settings->PluginsShouldRespectSlots() && !is_receive_mode) {
+                const int slot_index = context->GetChannelManagerItemIndex(99);
+                SetTrackSendInfo_Value(src_track, SEND_MODE_SEND, send_receive_index, "I_SLOT_HINT", slot_index);
+            }
+
             return;
         }
 
@@ -334,7 +342,13 @@ public:
             return;
         }
 
-        Main_OnCommandAsyncEx(40339, 0, nullptr); // Track: Unmute all tracks
+        if (context->GetShiftLeft()) {
+            if (context->GetChannelMode() == SendMode && settings->SendsShouldRespectSlots()) {
+                DAW::ToggleSendMuteForSlot(context->GetChannelManagerItemIndex(99));
+            }
+        } else {
+            Main_OnCommandAsyncEx(40339, 0, nullptr); // Track: Unmute all tracks
+        }
     }
 
     void HandleBypassButton(const int value) const {
@@ -342,9 +356,16 @@ public:
             return;
         }
 
-        context->GetShiftLeft()
-            ? Main_OnCommandAsyncEx(40344, 0, nullptr) // Track: Toggle FX bypass on all tracks
-            : Main_OnCommandAsyncEx(8, 0, nullptr);    // Track: Toggle FX bypass for selected tracks
+        if (context->GetShiftLeft()) {
+            if (context->GetChannelMode() == PluginMode && settings->PluginsShouldRespectSlots()) {
+                DAW::ToggleTrackFxBypassForSlot(context->GetChannelManagerItemIndex(99));
+            } else {
+                Main_OnCommandAsyncEx(40344, 0, nullptr); // Track: Toggle FX bypass on all tracks
+            }
+            return;
+        }
+
+        Main_OnCommandAsyncEx(8, 0, nullptr); // Track: Toggle FX bypass for selected tracks
     }
 
     void HandleMacroButton(const int value) const {
