@@ -6,15 +6,33 @@
 
 Documentation can be found here: [https://navelpluisje.github.io/reasonus/](https://navelpluisje.github.io/reasonus/)
 
+## Install
+
+Using `vcpkg` for package management
+
+- git clone .....
+- remove the build folder (You might otherwise end up in cache issues which can cause errors)
+- git submodule init
+- git submodule update
+- Run vcpkg bootstrap
+    - **Windows**: `.\vcpkg\bootstrap-vcpkg.bat -disableMetrics`
+    - **Others**: `./vcpkg/bootstrap-vcpkg.sh -disableMetrics`
+- Install the packages:
+    - **Windows**: `.\vcpkg\vcpkg.exe install`
+    - **Others**: `./vcpkg/vcpkg install`
+- Add configure argument:
+    - **Windows**: `-DCMAKE_TOOLCHAIN_FILE="vcpkg\scripts\buildsystem\vcpkg.cmake"`
+    - **Others**: `-DCMAKE_TOOLCHAIN_FILE="vcpkg/scripts/buildsystem/vcpkg.cmake"`
+
 ## Contribute
 
 Feel free to contribute. You can contribute inmultiple ways:
 
 - Report an issue. If you fond an issue, please report it and provide the information needed.
 - If you found an issue and are able to fix it yourself:
-  - Fork the repository
-  - Edit the code
-  - Create a pull request
+    - Fork the repository
+    - Edit the code
+    - Create a pull request
 
 Always respect the code of conduct.
 
