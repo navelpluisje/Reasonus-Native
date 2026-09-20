@@ -3,14 +3,14 @@ Version: 2026-07-21
 Architecture: arm64-osx
 Multi-Arch: same
 Abi: 5cd2cf62d94ee4ac93af7b3565e6a1df2d7cd13b430c268e9befc3796a3ea97c
-Status: purge ok not-installed
+Status: install ok installed
 
 Package: vcpkg-cmake
 Version: 2025-08-07
 Architecture: arm64-osx
 Multi-Arch: same
 Abi: 6417c1a9d180adf72f39580580da3a055472c48ffdc8d14126fc843b802c5245
-Status: purge ok not-installed
+Status: install ok installed
 
 Package: fmt
 Version: 12.2.0
@@ -20,7 +20,7 @@ Architecture: arm64-osx
 Multi-Arch: same
 Abi: c18c0fdbd5eb2e25f8b164ea4d591fcf4d268b13b0b33d05f19a083ad285492e
 Description: {fmt} is an open-source formatting library providing a fast and safe alternative to C stdio and C++ iostreams.
-Status: purge ok not-installed
+Status: install ok installed
 
 Package: pulzed-mini
 Version: 0.9.20
@@ -28,7 +28,7 @@ Architecture: arm64-osx
 Multi-Arch: same
 Abi: e1e6afa708071ba9691f2fe8d1ecc7b158c4d00b99ce01cf5fda1e25f51e5673
 Description: INI file reader and writer
-Status: purge ok not-installed
+Status: install ok installed
 
 Package: gsl
 Version: 2.8
@@ -38,21 +38,21 @@ Architecture: arm64-osx
 Multi-Arch: same
 Abi: 0d03dea0217d539fa5e6f01ee5243237d619f4f08e56553f6518f31b02a53725
 Description: The GNU Scientific Library is a numerical library for C and C++ programmers
-Status: purge ok not-installed
+Status: install ok installed
 
 Package: vcpkg-cmake-config
 Version: 2026-07-21
 Architecture: arm64-windows
 Multi-Arch: same
 Abi: b14903c7f72efcec42f469f595acc21e713b9655ed28f5d966eab42d5dea3ca6
-Status: install ok installed
+Status: purge ok not-installed
 
 Package: vcpkg-cmake
 Version: 2025-08-07
 Architecture: arm64-windows
 Multi-Arch: same
 Abi: 0bf1440c5b665ea643b747243912cf8c50c688c720a1790948937801a1b62707
-Status: install ok installed
+Status: purge ok not-installed
 
 Package: fmt
 Version: 12.2.0
@@ -62,7 +62,7 @@ Architecture: arm64-windows
 Multi-Arch: same
 Abi: 2635f424f188cf88bde5b11be43c8f8ce5eb540d8a1389c6277dc585d3551945
 Description: {fmt} is an open-source formatting library providing a fast and safe alternative to C stdio and C++ iostreams.
-Status: install ok installed
+Status: purge ok not-installed
 
 Package: gsl
 Version: 2.8
@@ -72,7 +72,7 @@ Architecture: arm64-windows
 Multi-Arch: same
 Abi: 8d525917736a56c61d8d7f94801e7440be4557bc1a1bd2b215e286f491d6bb8c
 Description: The GNU Scientific Library is a numerical library for C and C++ programmers
-Status: install ok installed
+Status: purge ok not-installed
 
 Package: pulzed-mini
 Version: 0.9.20
@@ -80,5 +80,17 @@ Architecture: arm64-windows
 Multi-Arch: same
 Abi: 1f298d59625529c85f31729fd486a901d8e30efa87c9d91c63aab2090e88b4b5
 Description: INI file reader and writer
+Status: purge ok not-installed
+
+Package: abseil
+Version: 20260107.1
+Port-Version: 3
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: arm64-osx
+Multi-Arch: same
+Abi: b27ea139638f1dfcf61953a619b9497a796fc3ae0e3e03ffdbc6411c518e22a9
+Description: Abseil is an open-source collection of C++ library code designed to augment the C++ standard library. The Abseil library code is collected from Google's own C++ code base, has been extensively tested and used in production, and is the same code we depend on in our daily coding lives.
+    In some cases, Abseil provides pieces missing from the C++ standard; in others, Abseil provides alternatives to the standard for special needs we've found through usage in the Google code base. We denote those cases clearly within the library code we provide you.
+    Abseil is not meant to be a competitor to the standard library; we've just found that many of these utilities serve a purpose within our code base, and we now want to provide those resources to the C++ community as a whole.
 Status: install ok installed
 

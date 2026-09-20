@@ -7,6 +7,7 @@
 // ReSharper disable once CppUnusedIncludeDirective
 #include <WDL/wdltypes.h> // might be unnecessary in future
 #include <reaper_plugin_functions.h>
+#include <absl/numeric/int128.h>
 #include <mini/ini.h>
 
 constexpr char PATH_SEPARATOR =
@@ -189,6 +190,8 @@ bool SetIntConfigVar(const std::string &var_name, int value);
  * @return false
  */
 bool hasBit(int val, int key);
+
+bool hasBit(absl::uint128 val, int key);
 
 /**
  * @brief Set the bit with index key to 0
@@ -539,4 +542,5 @@ void disableMidiOut(int index, bool persist);
  */
 bool writeReaperIni(std::string section, std::string key, std::string value);
 
+std::string ToString(absl::uint128);
 #endif // CSURF_UTILS_H_

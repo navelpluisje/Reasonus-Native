@@ -1,0 +1,19 @@
+{
+  "packages": [
+{
+  "SPDXID" : "SPDXRef-resource-0",
+  "checksums" : 
+  [
+    {
+      "algorithm" : "SHA512",
+      "checksumValue" : "f5012885d6b6844a9cf5ed92ad5468b8757db33dfe1364bfb232fff928e06c550c7eb4557f45186a8ac4d18b178df9be267681abab4a6de40823b574afbe9960"
+    }
+  ],
+  "copyrightText" : "NOASSERTION",
+  "downloadLocation" : "git+https://github.com/abseil/abseil-cpp@20260107.1",
+  "licenseConcluded" : "NOASSERTION",
+  "licenseDeclared" : "NOASSERTION",
+  "name" : "abseil/abseil-cpp"
+}
+  ]
+}

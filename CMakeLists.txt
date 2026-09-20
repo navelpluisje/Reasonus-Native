@@ -9,6 +9,7 @@ project(ReasonusNative VERSION 0.1.2 LANGUAGES C CXX)
 # Find the libraries
 find_package(fmt CONFIG REQUIRED)
 find_package(GSL REQUIRED)
+find_package(absl CONFIG REQUIRED)
 
 # Find header file(s) only libraries
 find_path(PULZED_MINI_INCLUDE_DIRS "mini/ini.h")
@@ -165,11 +166,13 @@ target_include_directories(reaper-sdk INTERFACE ${header_paths})
 
 target_link_libraries(reaper-sdk INTERFACE fmt::fmt)
 target_link_libraries(reaper-sdk INTERFACE GSL::gsl)
-target_include_directories(reaper-sdk INTERFACE ${CMAKE_BINARY_DIR})
+target_link_libraries(reaper-sdk INTERFACE absl::any absl::numeric absl::strings)
 
+target_include_directories(reaper-sdk INTERFACE ${CMAKE_BINARY_DIR})
 target_include_directories(reaper-sdk INTERFACE ${PULZED_MINI_INCLUDE_DIRS})
 
 target_include_directories(reaper-sdk INTERFACE ${PROJECT_LIB_DIR}/reaImgui)
+
 
 # ------------------------------------------------------------------------------
 # Find and Link WDL + SWELL

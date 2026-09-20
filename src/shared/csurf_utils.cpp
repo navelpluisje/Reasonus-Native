@@ -1,14 +1,16 @@
 #include "../shared/csurf_utils.hpp"
-#include "../shared/csurf.h"
 #include <WDL/wdltypes.h> // might be unnecessary in future
 #include <reaper_plugin_functions.h>
 #include <regex>
 #include <string>
 #include <vector>
+#include <absl/numeric/int128.h>
+#include <absl/strings/str_format.h>
+#include <fmt/format.h>
+#include <fmt/ranges.h>
 #include <WDL/db2val.h>
 #include "csurf_daw.hpp"
-#include "fmt/format.h"
-#include "fmt/ranges.h"
+#include "../shared/csurf.h"
 
 #ifdef _WIN32
 #include <ShlObj_core.h>
@@ -71,6 +73,10 @@ bool SetIntConfigVar(const std::string &var_name, const int value) {
 }
 
 bool hasBit(const int val, const int key) {
+    return (val & 1 << key) != 0;
+}
+
+bool hasBit(const absl::uint128 val, const int key) {
     return (val & 1 << key) != 0;
 }
 
@@ -514,39 +520,39 @@ bool toBool(const std::string &value) {
 }
 
 bool isMidiInDeviceDisabled(const int index) {
-    const uint64_t midi_inputs = ConfigVar<uint64_t>("midiins");
+    const absl::uint128 midi_inputs = ConfigVar<absl::uint128>("midiins");
 
     return !hasBit(midi_inputs, index);
 }
 
 void disableMidiIn(const int index, const bool persist) {
-    ConfigVar<uint64_t> midiins("midiins");
-    const auto new_midiins_value = clearBit<uint64_t>(midiins.GetValue(), index);
+    ConfigVar<absl::uint128> midiins("midiins");
+    const auto new_midiins_value = clearBit<absl::uint128>(midiins.GetValue(), index);
     midiins.SetValue(new_midiins_value);
 
-    ConfigVar<uint64_t> midiins_all("midiins_all");
-    const auto new_midiins_all_value = clearBit<uint64_t>(midiins_all.GetValue(), index);
+    ConfigVar<absl::uint128> midiins_all("midiins_all");
+    const auto new_midiins_all_value = clearBit<absl::uint128>(midiins_all.GetValue(), index);
     midiins_all.SetValue(new_midiins_all_value);
 
     if (persist) {
-        writeReaperIni("REAPER", "midiins", fmt::format("{}", new_midiins_value));
-        writeReaperIni("REAPER", "midiins_all", fmt::format("{}", new_midiins_all_value));
+        writeReaperIni("REAPER", "midiins", ToString(new_midiins_value));
+        writeReaperIni("REAPER", "midiins_all", ToString(new_midiins_all_value));
     }
 }
 
 bool isMidiOutDeviceDisabled(const int index) {
-    const uint64_t midi_outputs = ConfigVar<uint64_t>("midiouts");
+    const absl::uint128 midi_outputs = ConfigVar<absl::uint128>("midiouts");
 
     return !hasBit(midi_outputs, index);
 }
 
 void disableMidiOut(const int index, const bool persist) {
-    ConfigVar<uint64_t> midiouts("midiouts");
-    const auto new_value = clearBit<uint64_t>(midiouts.GetValue(), index);
+    ConfigVar<absl::uint128> midiouts("midiouts");
+    const auto new_value = clearBit<absl::uint128>(midiouts.GetValue(), index);
     midiouts.SetValue(new_value);
 
     if (persist) {
-        writeReaperIni("REAPER", "midiouts", fmt::format("{}", new_value));
+        writeReaperIni("REAPER", "midiouts", ToString(new_value));
     }
 }
 
@@ -576,3 +582,10 @@ bool writeReaperIni(std::string section, std::string key, std::string value) { /
     data.clear();
     return true;
 }
+
+std::string ToString(const absl::uint128 value) {
+    std::stringstream stream;
+    stream << value;
+    return stream.str();
+}
+
