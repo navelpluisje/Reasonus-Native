@@ -164,7 +164,7 @@ add_library(reaper-sdk INTERFACE)
 target_include_directories(reaper-sdk INTERFACE ${header_paths})
 
 target_link_libraries(reaper-sdk INTERFACE fmt::fmt)
-target_link_libraries(reaper-sdk INTERFACE GSL::gsl GSL::gslcblas)
+target_link_libraries(reaper-sdk INTERFACE GSL::gsl)
 target_include_directories(reaper-sdk INTERFACE ${CMAKE_BINARY_DIR})
 
 target_include_directories(reaper-sdk INTERFACE ${PULZED_MINI_INCLUDE_DIRS})
