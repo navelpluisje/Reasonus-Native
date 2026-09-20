@@ -6,6 +6,15 @@ cmake_minimum_required(VERSION 3.15)
 
 project(ReasonusNative VERSION 0.1.2 LANGUAGES C CXX)
 
+# Find the libraries
+find_package(fmt CONFIG REQUIRED)
+find_package(GSL REQUIRED)
+
+# Find header file(s) only libraries
+find_path(PULZED_MINI_INCLUDE_DIRS "mini/ini.h")
+
+#find_package(mini CONFIG REQUIRED)
+
 find_package(Git)
 if (GIT_FOUND)
     execute_process(
@@ -68,25 +77,25 @@ FetchContent_Declare(WDL
         GIT_TAG "origin/main"
 )
 
-FetchContent_Declare(GSL
-        GIT_REPOSITORY "https://github.com/microsoft/GSL"
-        GIT_TAG "origin/main"
-        SOURCE_DIR "${PROJECT_LIB_DIR}/GSL"
-)
+#FetchContent_Declare(GSL
+#        GIT_REPOSITORY "https://github.com/microsoft/GSL"
+#        GIT_TAG "origin/main"
+#        SOURCE_DIR "${PROJECT_LIB_DIR}/GSL"
+#)
 
-FetchContent_Declare(mINI
-        GIT_REPOSITORY "https://github.com/metayeti/mINI"
-        GIT_TAG "origin/master"
-        SOURCE_DIR "${PROJECT_LIB_DIR}/mINI"
-)
+#FetchContent_Declare(mINI
+#        GIT_REPOSITORY "https://github.com/metayeti/mINI"
+#        GIT_TAG "origin/master"
+#        SOURCE_DIR "${PROJECT_LIB_DIR}/mINI"
+#)
 
-FetchContent_Declare(fmt
-        GIT_REPOSITORY https://github.com/fmtlib/fmt
-        GIT_TAG e69e5f977d458f2650bb346dadf2ad30c5320281 # 10.2.1
-        SOURCE_DIR "${PROJECT_LIB_DIR}/fmt"
-)
+#FetchContent_Declare(fmt
+#        GIT_REPOSITORY https://github.com/fmtlib/fmt
+#        GIT_TAG e69e5f977d458f2650bb346dadf2ad30c5320281 # 10.2.1
+#        SOURCE_DIR "${PROJECT_LIB_DIR}/fmt"
+#)
 
-FetchContent_MakeAvailable(WDL reaper-sdk GSL mINI fmt)
+FetchContent_MakeAvailable(WDL reaper-sdk)
 
 # ------------------------------------------------------------------------------
 # Single file downloads
@@ -154,12 +163,12 @@ add_library(reaper-sdk INTERFACE)
 
 target_include_directories(reaper-sdk INTERFACE ${header_paths})
 
-target_link_libraries(reaper-sdk INTERFACE GSL fmt::fmt)
+target_link_libraries(reaper-sdk INTERFACE fmt::fmt)
+target_link_libraries(reaper-sdk INTERFACE GSL::gsl GSL::gslcblas)
 target_include_directories(reaper-sdk INTERFACE ${CMAKE_BINARY_DIR})
 
-target_link_libraries(reaper-sdk INTERFACE mINI)
+target_include_directories(reaper-sdk INTERFACE ${PULZED_MINI_INCLUDE_DIRS})
 
-# target_link_libraries(reaper-sdk INTERFACE ${PROJECT_LIB_DIR}/reaImgui/reaper_imgui_functions.h)  
 target_include_directories(reaper-sdk INTERFACE ${PROJECT_LIB_DIR}/reaImgui)
 
 # ------------------------------------------------------------------------------

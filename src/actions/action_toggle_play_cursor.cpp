@@ -1,4 +1,5 @@
 #include "action_toggle_play_cursor.hpp"
+#include <algorithm>
 
 #define STRINGIZE_DEF(x) #x
 #define STRINGIZE(x) STRINGIZE_DEF(x)
@@ -6,8 +7,7 @@
 #define max(a, b) ((a) > (b) ? (a) : (b))
 
 // confine my plugin to namespace
-namespace ACTION_TOGGLE_PLAY_CURSOR
-{
+namespace ACTION_TOGGLE_PLAY_CURSOR {
     // some global non-const variables
     // the necessary 'evil'
     int command_id{0};
@@ -18,10 +18,8 @@ namespace ACTION_TOGGLE_PLAY_CURSOR
 
     // the main function of my plugin
     // gets called via callback or timer
-    void MainFunctionOfMyPlugin()
-    {
-        if (toggle_action_state)
-        {
+    void MainFunctionOfMyPlugin() {
+        if (toggle_action_state) {
             Main_OnCommandEx(40150, 0, 0);
         }
         Main_OnCommandEx(40036, 0, 0);
@@ -29,10 +27,8 @@ namespace ACTION_TOGGLE_PLAY_CURSOR
 
     // c++11 trailing return type syntax
     // REAPER calls this to check this action it's toggle state
-    auto ToggleActionCallback(int command) -> int
-    {
-        if (command != command_id)
-        {
+    auto ToggleActionCallback(int command) -> int {
+        if (command != command_id) {
             // not quite our command_id
             return -1;
         }
@@ -44,18 +40,16 @@ namespace ACTION_TOGGLE_PLAY_CURSOR
     }
 
     // this gets called when my plugin action is run (e.g. from action list)
-    bool OnAction(KbdSectionInfo *sec, int command, int val, int valhw, int relmode, HWND hwnd)
-    {
+    bool OnAction(KbdSectionInfo *sec, int command, int val, int valhw, int relmode, HWND hwnd) {
         // treat unused variables 'pedantically'
-        (void)sec;
-        (void)val;
-        (void)valhw;
-        (void)relmode;
-        (void)hwnd;
+        (void) sec;
+        (void) val;
+        (void) valhw;
+        (void) relmode;
+        (void) hwnd;
 
         // check command
-        if (command != command_id)
-        {
+        if (command != command_id) {
             return false;
         }
 
@@ -66,8 +60,7 @@ namespace ACTION_TOGGLE_PLAY_CURSOR
         return true;
     }
 
-    void GetVersion(int *majorOut, int *minorOut, int *patchOut, int *tweakOut, char *commitOut, int commitOut_sz)
-    {
+    void GetVersion(int *majorOut, int *minorOut, int *patchOut, int *tweakOut, char *commitOut, int commitOut_sz) {
         *majorOut = PROJECT_VERSION_MAJOR;
         *minorOut = PROJECT_VERSION_MINOR;
         *patchOut = PROJECT_VERSION_PATCH;
@@ -79,23 +72,20 @@ namespace ACTION_TOGGLE_PLAY_CURSOR
 
     // when my plugin gets loaded
     // function to register my plugins 'stuff' with REAPER
-    void Register()
-    {
+    void Register() {
         // register action name and get command_id
         command_id = plugin_register("custom_action", &action);
-        plugin_register("toggleaction", (void *)ToggleActionCallback);
+        plugin_register("toggleaction", (void *) ToggleActionCallback);
 
         // register run action/command
-        plugin_register("hookcommand2", (void *)OnAction);
+        plugin_register("hookcommand2", (void *) OnAction);
     }
 
     // shutdown, time to exit
     // modern C++11 syntax
-    auto Unregister() -> void
-    {
+    auto Unregister() -> void {
         plugin_register("-custom_action", &action);
-        plugin_register("-toggleaction", (void *)ToggleActionCallback);
-        plugin_register("-hookcommand2", (void *)OnAction);
+        plugin_register("-toggleaction", (void *) ToggleActionCallback);
+        plugin_register("-hookcommand2", (void *) OnAction);
     }
-
 } // namespace ACTION_TOGGLE_PLAY_CURSOR

@@ -1,0 +1,42 @@
+Package: vcpkg-cmake-config
+Version: 2026-07-21
+Architecture: arm64-osx
+Multi-Arch: same
+Abi: 5cd2cf62d94ee4ac93af7b3565e6a1df2d7cd13b430c268e9befc3796a3ea97c
+Status: install ok installed
+
+Package: vcpkg-cmake
+Version: 2025-08-07
+Architecture: arm64-osx
+Multi-Arch: same
+Abi: 6417c1a9d180adf72f39580580da3a055472c48ffdc8d14126fc843b802c5245
+Status: install ok installed
+
+Package: fmt
+Version: 12.2.0
+Port-Version: 1
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: arm64-osx
+Multi-Arch: same
+Abi: c18c0fdbd5eb2e25f8b164ea4d591fcf4d268b13b0b33d05f19a083ad285492e
+Description: {fmt} is an open-source formatting library providing a fast and safe alternative to C stdio and C++ iostreams.
+Status: install ok installed
+
+Package: pulzed-mini
+Version: 0.9.20
+Architecture: arm64-osx
+Multi-Arch: same
+Abi: e1e6afa708071ba9691f2fe8d1ecc7b158c4d00b99ce01cf5fda1e25f51e5673
+Description: INI file reader and writer
+Status: install ok installed
+
+Package: gsl
+Version: 2.8
+Port-Version: 2
+Depends: vcpkg-cmake
+Architecture: arm64-osx
+Multi-Arch: same
+Abi: 0d03dea0217d539fa5e6f01ee5243237d619f4f08e56553f6518f31b02a53725
+Description: The GNU Scientific Library is a numerical library for C and C++ programmers
+Status: install ok installed
+

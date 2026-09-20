@@ -8,6 +8,7 @@
 #include <WDL/db2val.h>
 #include "csurf_daw.hpp"
 #include "fmt/format.h"
+#include "fmt/ranges.h"
 
 #ifdef _WIN32
 #include <ShlObj_core.h>
@@ -575,4 +576,3 @@ bool writeReaperIni(std::string section, std::string key, std::string value) { /
     data.clear();
     return true;
 }
-

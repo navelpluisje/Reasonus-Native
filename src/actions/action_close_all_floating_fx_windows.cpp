@@ -1,4 +1,5 @@
 #include "action_close_all_floating_fx_windows.hpp"
+#include <algorithm>
 
 #define STRINGIZE_DEF(x) #x
 #define STRINGIZE(x) STRINGIZE_DEF(x)
@@ -6,8 +7,7 @@
 #define max(a, b) ((a) > (b) ? (a) : (b))
 
 // confine my plugin to namespace
-namespace ACTION_CLOSE_ALL_FLOATING_FX_WINDOWS
-{
+namespace ACTION_CLOSE_ALL_FLOATING_FX_WINDOWS {
     // some global non-const variables
     // the necessary 'evil'
     int command_id{0};
@@ -17,17 +17,14 @@ namespace ACTION_CLOSE_ALL_FLOATING_FX_WINDOWS
 
     // the main function of my plugin
     // gets called via callback or timer
-    void MainFunctionOfMyPlugin()
-    {
+    void MainFunctionOfMyPlugin() {
         int nb_tracks = ::GetNumTracks();
 
-        for (int i = 0; i < nb_tracks; i++)
-        {
+        for (int i = 0; i < nb_tracks; i++) {
             MediaTrack *media_track = ::GetTrack(0, i);
             int nb_plugins = ::TrackFX_GetCount(media_track);
 
-            for (int j = 0; j < nb_plugins; j++)
-            {
+            for (int j = 0; j < nb_plugins; j++) {
                 ::TrackFX_Show(media_track, j, 0);
                 ::TrackFX_Show(media_track, j, 2);
             }
@@ -35,18 +32,16 @@ namespace ACTION_CLOSE_ALL_FLOATING_FX_WINDOWS
     }
 
     // this gets called when my plugin action is run (e.g. from action list)
-    bool OnAction(KbdSectionInfo *sec, int command, int val, int valhw, int relmode, HWND hwnd)
-    {
+    bool OnAction(KbdSectionInfo *sec, int command, int val, int valhw, int relmode, HWND hwnd) {
         // treat unused variables 'pedantically'
-        (void)sec;
-        (void)val;
-        (void)valhw;
-        (void)relmode;
-        (void)hwnd;
+        (void) sec;
+        (void) val;
+        (void) valhw;
+        (void) relmode;
+        (void) hwnd;
 
         // check command
-        if (command != command_id)
-        {
+        if (command != command_id) {
             return false;
         }
         MainFunctionOfMyPlugin();
@@ -54,8 +49,7 @@ namespace ACTION_CLOSE_ALL_FLOATING_FX_WINDOWS
         return true;
     }
 
-    void GetVersion(int *majorOut, int *minorOut, int *patchOut, int *tweakOut, char *commitOut, int commitOut_sz)
-    {
+    void GetVersion(int *majorOut, int *minorOut, int *patchOut, int *tweakOut, char *commitOut, int commitOut_sz) {
         *majorOut = PROJECT_VERSION_MAJOR;
         *minorOut = PROJECT_VERSION_MINOR;
         *patchOut = PROJECT_VERSION_PATCH;
@@ -67,21 +61,18 @@ namespace ACTION_CLOSE_ALL_FLOATING_FX_WINDOWS
 
     // when my plugin gets loaded
     // function to register my plugins 'stuff' with REAPER
-    void Register()
-    {
+    void Register() {
         // register action name and get command_id
         command_id = plugin_register("custom_action", &action);
 
         // register run action/command
-        plugin_register("hookcommand2", (void *)OnAction);
+        plugin_register("hookcommand2", (void *) OnAction);
     }
 
     // shutdown, time to exit
     // modern C++11 syntax
-    auto Unregister() -> void
-    {
+    auto Unregister() -> void {
         plugin_register("-custom_action", &action);
-        plugin_register("-hookcommand2", (void *)OnAction);
+        plugin_register("-hookcommand2", (void *) OnAction);
     }
-
 } // namespace ACTION_CLOSE_ALL_FLOATING_FX_WINDOWS

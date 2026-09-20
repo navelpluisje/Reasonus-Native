@@ -1,0 +1,10 @@
+{
+  "dependencies": [
+    "fmt",
+    {
+      "name": "pulzed-mini",
+      "version>=": "0.9.20"
+    },
+    "gsl"
+  ]
+}
