@@ -514,18 +514,18 @@ bool toBool(const std::string &value) {
 }
 
 bool isMidiInDeviceDisabled(const int index) {
-    const __uint128_t midi_inputs = ConfigVar<__uint128_t>("midiins");
+    const uint64_t midi_inputs = ConfigVar<uint64_t>("midiins");
 
     return !hasBit(midi_inputs, index);
 }
 
 void disableMidiIn(const int index, const bool persist) {
-    ConfigVar<__uint128_t> midiins("midiins");
-    const auto new_midiins_value = clearBit<__uint128_t>(midiins.GetValue(), index);
+    ConfigVar<uint64_t> midiins("midiins");
+    const auto new_midiins_value = clearBit<uint64_t>(midiins.GetValue(), index);
     midiins.SetValue(new_midiins_value);
 
-    ConfigVar<__uint128_t> midiins_all("midiins_all");
-    const auto new_midiins_all_value = clearBit<__uint128_t>(midiins_all.GetValue(), index);
+    ConfigVar<uint64_t> midiins_all("midiins_all");
+    const auto new_midiins_all_value = clearBit<uint64_t>(midiins_all.GetValue(), index);
     midiins_all.SetValue(new_midiins_all_value);
 
     if (persist) {
@@ -535,14 +535,14 @@ void disableMidiIn(const int index, const bool persist) {
 }
 
 bool isMidiOutDeviceDisabled(const int index) {
-    const __uint128_t midi_outputs = ConfigVar<__uint128_t>("midiouts");
+    const uint64_t midi_outputs = ConfigVar<uint64_t>("midiouts");
 
     return !hasBit(midi_outputs, index);
 }
 
 void disableMidiOut(const int index, const bool persist) {
-    ConfigVar<__uint128_t> midiouts("midiouts");
-    const auto new_value = clearBit<__uint128_t>(midiouts.GetValue(), index);
+    ConfigVar<uint64_t> midiouts("midiouts");
+    const auto new_value = clearBit<uint64_t>(midiouts.GetValue(), index);
     midiouts.SetValue(new_value);
 
     if (persist) {
