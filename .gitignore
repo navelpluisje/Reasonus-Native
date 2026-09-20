@@ -10,3 +10,6 @@
 
 /lib/*
 !/lib/CMakeLists.txt
+
+# VCPKG
+/vcpkg_installed
