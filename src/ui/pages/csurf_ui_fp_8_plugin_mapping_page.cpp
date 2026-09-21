@@ -78,7 +78,7 @@ class CSurf_FP_8_PluginMappingPage : public CSurf_UI_PageContent // NOLINT(*-use
 
     std::string fader_key;
     std::string fader_name;
-    int fader_param_index{};
+    int fader_param_index = -1;
     int fader_uninvert_label = 0;
 
     std::vector<std::string> invert_labels = {"Inverted", "Not inverted"};
@@ -138,10 +138,10 @@ protected:
                 continue;
             }
 
-            if (section.rfind("color_", 0) == 0
-            ) {
+            if (section != "color_" && section.rfind("color_", 0) == 0) {
                 if (
-                    !plugin_params[section].has("color")
+                    !plugin_params.has(section)
+                    || !plugin_params[section].has("color")
                     || plugin_params[section]["color"].empty()
                 ) {
                     plugin_params[section]["color"] = std::to_string(0x00ffffff);
@@ -150,7 +150,18 @@ protected:
                 continue;
             }
 
-            if (!plugin_params[section].has("uninvert-label") || plugin_params[section]["uninvert-label"].empty()) {
+            if (
+                section == "select_"
+                || section == "fader_"
+                || section == "color_"
+            ) {
+                modified = true;
+                plugin_params.remove(section);
+            } else if (
+                !plugin_params.has(section)
+                || !plugin_params[section].has("uninvert-label")
+                || plugin_params[section]["uninvert-label"].empty()
+            ) {
                 modified = true;
                 plugin_params[section]["uninvert-label"] = "0";
                 previous_plugin_params[section]["uninvert-label"] = "0";
@@ -222,8 +233,7 @@ protected:
         selected_plugin_filename_has_type = true;
         selected_plugin_type_mismatch = false;
 
-        for (const auto &[fst, snd]: plugin_params) {
-            const std::string section = fst;
+        for (const auto &[section, snd]: plugin_params) {
             const std::string group_id = split(section, "_").back();
 
             if (!isInteger(group_id)) {
@@ -310,8 +320,8 @@ protected:
 
     void PopulateFields() {
         select_key = fmt::format("select_{}", selected_channel);
-        fader_key = fmt::format("fader_", selected_channel);
-        color_key = fmt::format("color_", selected_channel);
+        fader_key = fmt::format("fader_{}", selected_channel);
+        color_key = fmt::format("color_{}", selected_channel);
 
         if (plugin_params.has(color_key)) {
             group_color = plugin_params[color_key].has("color")
@@ -322,6 +332,12 @@ protected:
                                    ? stoi(plugin_params[color_key]["show"])
                                    : settings->GetPluginMapDefaultColorMode();
         } else {
+            plugin_params[color_key]["color"] = "16777215";
+            plugin_params[color_key]["show"] = std::to_string(settings->GetPluginMapDefaultColorMode());
+
+            previous_plugin_params[color_key]["color"] = "16777215";
+            previous_plugin_params[color_key]["show"] = std::to_string(settings->GetPluginMapDefaultColorMode());
+
             group_color = 0x00ffffff;
             previous_group_color = 0x00ffffff;
             group_color_show = settings->GetPluginMapDefaultColorMode();
@@ -352,6 +368,16 @@ protected:
                 previous_select_param_index = select_param_index;
             }
         } else {
+            plugin_params[select_key]["name"] = "";
+            plugin_params[select_key]["steps"] = "0";
+            plugin_params[select_key]["param"] = "0";
+            plugin_params[select_key]["uninvert-label"] = "0";
+
+            previous_plugin_params[select_key]["name"] = "";
+            previous_plugin_params[select_key]["steps"] = "0";
+            previous_plugin_params[select_key]["param"] = "0";
+            previous_plugin_params[select_key]["uninvert-label"] = "0";
+
             select_name = "";
             select_nb_steps = 0;
             select_param_index = 0;
@@ -381,6 +407,14 @@ protected:
                 fader_param_index = static_cast<int>(iterator - param_data.begin());
             }
         } else {
+            plugin_params[select_key]["name"] = "";
+            plugin_params[select_key]["param"] = "0";
+            plugin_params[select_key]["uninvert-label"] = "0";
+
+            previous_plugin_params[select_key]["name"] = "";
+            previous_plugin_params[select_key]["param"] = "0";
+            previous_plugin_params[select_key]["uninvert-label"] = "0";
+
             fader_name = "";
             fader_param_index = 0;
             fader_uninvert_label = 0;
@@ -408,7 +442,7 @@ protected:
     }
 
     bool IsColorDirty(const int key) {
-        const std::string color = "color_" + std::to_string(key);
+        const std::string color = fmt::format("color_{}", key);
         if (key == selected_channel) {
             if (select_param_index <= 0 && plugin_params.has(color)) {
                 plugin_params.remove(color);
@@ -417,8 +451,11 @@ protected:
             UpdateValues();
         }
 
-        if (!plugin_params.has(color) || (
-                stoi(plugin_params[color]["color"]) == 0x00ffffff && !previous_plugin_params.has(color)
+        if (
+            !plugin_params.has(color)
+            || (
+                stoi(plugin_params[color]["color"]) == 0x00ffffff
+                && !previous_plugin_params.has(color)
             )
         ) {
             return false;
@@ -429,7 +466,7 @@ protected:
     }
 
     bool IsSelectDirty(const int key) {
-        const std::string select = "select_" + std::to_string(key);
+        const std::string select = fmt::format("select_{}", key);
         if (key == selected_channel) {
             if (select_param_index <= 0 && plugin_params.has(select)) {
                 plugin_params.remove(select);
@@ -449,7 +486,7 @@ protected:
     }
 
     bool isFaderDirty(const int key) {
-        const std::string fader = "fader_" + std::to_string(key);
+        const std::string fader = fmt::format("fader_{}", key);
         if (key == selected_channel) {
             if (select_param_index <= 0 && plugin_params.has(fader)) {
                 plugin_params.remove(fader);
@@ -598,9 +635,9 @@ protected:
     }
 
     void HandleResetChannel() {
-        const std::string select = "select_" + std::to_string(selected_channel);
-        const std::string fader = "fader_" + std::to_string(selected_channel);
-        const std::string color = "color_" + std::to_string(selected_channel);
+        const std::string select = fmt::format("select_{}", selected_channel);
+        const std::string fader = fmt::format("fader_{}", selected_channel);
+        const std::string color = fmt::format("color_{}", selected_channel);
 
         if (previous_plugin_params.has(select) && !previous_plugin_params[select]["param"].empty()) {
             plugin_params.set(select, previous_plugin_params[select]);
@@ -641,10 +678,10 @@ protected:
         nb_channels += 1;
 
         for (int i = nb_channels - 1; i >= selected_channel; i--) {
-            select = "select_" + std::to_string(i);
-            fader = "fader_" + std::to_string(i);
-            next_select = "select_" + std::to_string(i + 1);
-            next_fader = "fader_" + std::to_string(i + 1);
+            select = fmt::format("select_{}", i);
+            fader = fmt::format("fader_{}", i);
+            next_select = fmt::format("select_{}", i + 1);
+            next_fader = fmt::format("fader_{}", i + 1);
 
             if (plugin_params.has(select)) {
                 plugin_params.set(next_select, plugin_params[select]);
@@ -659,8 +696,8 @@ protected:
             }
         }
 
-        select = "select_" + std::to_string(selected_channel);
-        fader = "fader_" + std::to_string(selected_channel);
+        select = fmt::format("select_{}", selected_channel);
+        fader = fmt::format("fader_{}", selected_channel);
 
         if (plugin_params.has(select)) {
             plugin_params.remove(select);
@@ -677,8 +714,8 @@ protected:
     }
 
     void HandleDeleteChannelById(const int index) {
-        std::string select = "select_" + std::to_string(index);
-        std::string fader = "fader_" + std::to_string(index);
+        std::string select = fmt::format("select_{}", index);
+        std::string fader = fmt::format("fader_{}", index);
 
         if (plugin_params.has(select)) {
             plugin_params.remove(select);
@@ -695,10 +732,10 @@ protected:
         }
 
         for (int i = index; i <= nb_channels; i++) {
-            select = "select_" + std::to_string(i);
-            fader = "fader_" + std::to_string(i);
-            const std::string next_select = "select_" + std::to_string(i + 1);
-            const std::string next_fader = "fader_" + std::to_string(i + 1);
+            select = fmt::format("select_{}", i);
+            fader = fmt::format("fader_{}", i);
+            const std::string next_select = fmt::format("select_{}", i + 1);
+            const std::string next_fader = fmt::format("fader_{}", i + 1);
 
             if (plugin_params.has(next_select)) {
                 plugin_params.set(select, plugin_params[next_select]);
@@ -723,10 +760,10 @@ protected:
         const int from_id = to > from ? from : from + 1;
         const int to_id = to < from ? to : to + 1;
 
-        const std::string select = "select_" + std::to_string(to_id);
-        const std::string fader = "fader_" + std::to_string(to_id);
-        const std::string from_select = "select_" + std::to_string(from_id);
-        const std::string from_fader = "fader_" + std::to_string(from_id);
+        const std::string select = fmt::format("select_{}", to_id);
+        const std::string fader = fmt::format("fader_{}", to_id);
+        const std::string from_select = fmt::format("select_{}", from_id);
+        const std::string from_fader = fmt::format("fader_{}", from_id);
 
         this->HandleAddChannelAfter(to_id - 1);
 
