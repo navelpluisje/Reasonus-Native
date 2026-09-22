@@ -243,6 +243,10 @@ protected:
             nb_channels = max(std::stoi(group_id) + 1, nb_channels);
         }
 
+        if (nb_channels == 0) {
+            HandleAddChannelAfter(-1);
+        }
+
         selected_plugin_params_error = false;
         if (!GetPluginParams()) {
             selected_plugin_params_error = true;
@@ -332,15 +336,14 @@ protected:
                                    ? stoi(plugin_params[color_key]["show"])
                                    : settings->GetPluginMapDefaultColorMode();
         } else {
-            plugin_params[color_key]["color"] = "16777215";
-            plugin_params[color_key]["show"] = std::to_string(settings->GetPluginMapDefaultColorMode());
-
-            previous_plugin_params[color_key]["color"] = "16777215";
-            previous_plugin_params[color_key]["show"] = std::to_string(settings->GetPluginMapDefaultColorMode());
-
             group_color = 0x00ffffff;
             previous_group_color = 0x00ffffff;
             group_color_show = settings->GetPluginMapDefaultColorMode();
+
+            if (!previous_plugin_params.has(color_key)) {
+                previous_plugin_params[color_key]["color"] = std::to_string(0x00ffffff);
+                previous_plugin_params[color_key]["show"] = std::to_string(settings->GetPluginMapDefaultColorMode());
+            }
         }
 
         if (plugin_params.has(select_key)) {
@@ -368,20 +371,17 @@ protected:
                 previous_select_param_index = select_param_index;
             }
         } else {
-            plugin_params[select_key]["name"] = "";
-            plugin_params[select_key]["steps"] = "0";
-            plugin_params[select_key]["param"] = "0";
-            plugin_params[select_key]["uninvert-label"] = "0";
-
-            previous_plugin_params[select_key]["name"] = "";
-            previous_plugin_params[select_key]["steps"] = "0";
-            previous_plugin_params[select_key]["param"] = "0";
-            previous_plugin_params[select_key]["uninvert-label"] = "0";
-
             select_name = "";
             select_nb_steps = 0;
             select_param_index = 0;
             select_uninvert_label = 0;
+
+            if (!previous_plugin_params.has(select_key)) {
+                previous_plugin_params[select_key]["param"] = "-1";
+                previous_plugin_params[select_key]["name"] = "";
+                previous_plugin_params[select_key]["steps"] = "0";
+                previous_plugin_params[select_key]["uninvert-label"] = "0";
+            }
         }
 
         if (plugin_params.has(fader_key)) {
@@ -407,29 +407,27 @@ protected:
                 fader_param_index = static_cast<int>(iterator - param_data.begin());
             }
         } else {
-            plugin_params[select_key]["name"] = "";
-            plugin_params[select_key]["param"] = "0";
-            plugin_params[select_key]["uninvert-label"] = "0";
-
-            previous_plugin_params[select_key]["name"] = "";
-            previous_plugin_params[select_key]["param"] = "0";
-            previous_plugin_params[select_key]["uninvert-label"] = "0";
-
             fader_name = "";
             fader_param_index = 0;
             fader_uninvert_label = 0;
+
+            if (!previous_plugin_params.has(fader_key)) {
+                previous_plugin_params[fader_key]["param"] = "-1";
+                previous_plugin_params[fader_key]["name"] = "";
+                previous_plugin_params[fader_key]["uninvert-label"] = "0";
+            }
         }
     }
 
     void UpdateValues() {
-        if (select_param_index > 0) {
+        if (select_param_index > -1) {
             plugin_params[select_key]["name"] = select_name;
             plugin_params[select_key]["steps"] = std::to_string(select_nb_steps);
             plugin_params[select_key]["param"] = std::to_string(std::get<0>(param_data[select_param_index]));
             plugin_params[select_key]["uninvert-label"] = std::to_string(select_uninvert_label);
         }
 
-        if (fader_param_index > 0) {
+        if (fader_param_index > -1) {
             plugin_params[fader_key]["name"] = fader_name;
             plugin_params[fader_key]["param"] = std::to_string(std::get<0>(param_data[fader_param_index]));
             plugin_params[fader_key]["uninvert-label"] = std::to_string(fader_uninvert_label);
@@ -532,6 +530,7 @@ protected:
             ExtractPluginNameFromFile(plugins[selected_developer][plugin_index]),
             ExtractPluginTypeFromFile(plugins[selected_developer][plugin_index])
         )) {
+            selected_plugin = -1;
             SetPluginFolders();
         }
     }
@@ -651,7 +650,7 @@ protected:
             plugin_params.remove(fader);
         }
 
-        if (previous_plugin_params.has(color) && !previous_plugin_params[color]["param"].empty()) {
+        if (previous_plugin_params.has(color) && !previous_plugin_params[color]["color"].empty()) {
             plugin_params.set(color, previous_plugin_params[color]);
         } else {
             plugin_params.remove(color);
@@ -716,12 +715,16 @@ protected:
     void HandleDeleteChannelById(const int index) {
         std::string select = fmt::format("select_{}", index);
         std::string fader = fmt::format("fader_{}", index);
+        std::string color = fmt::format("color_{}", index);
 
         if (plugin_params.has(select)) {
             plugin_params.remove(select);
         }
         if (plugin_params.has(fader)) {
             plugin_params.remove(fader);
+        }
+        if (plugin_params.has(color)) {
+            plugin_params.remove(color);
         }
 
         nb_channels -= 1;
@@ -734,19 +737,30 @@ protected:
         for (int i = index; i <= nb_channels; i++) {
             select = fmt::format("select_{}", i);
             fader = fmt::format("fader_{}", i);
+            color = fmt::format("color_{}", i);
             const std::string next_select = fmt::format("select_{}", i + 1);
             const std::string next_fader = fmt::format("fader_{}", i + 1);
+            const std::string next_color = fmt::format("color_{}", i + 1);
+
+            if (plugin_params.has(next_color)) {
+                plugin_params.set(color, plugin_params[next_color]);
+            } else {
+                plugin_params.remove(color);
+                previous_plugin_params.remove(color);
+            }
 
             if (plugin_params.has(next_select)) {
                 plugin_params.set(select, plugin_params[next_select]);
             } else {
                 plugin_params.remove(select);
+                previous_plugin_params.remove(select);
             }
 
             if (plugin_params.has(next_fader)) {
                 plugin_params.set(fader, plugin_params[next_fader]);
             } else {
                 plugin_params.remove(fader);
+                previous_plugin_params.remove(fader);
             }
         }
         PopulateFields();
@@ -1190,6 +1204,7 @@ public :
     void RenderInformationBar() {
         double space_x;
         double space_y;
+        const bool dirty = IsGroupDirty(selected_channel);
 
         UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
         if (ImGui::BeginChild(m_ctx, "information_bar", 0.0, 54.0,
@@ -1225,6 +1240,7 @@ public :
                 assets,
                 IconUndo,
                 "mapping-reset-group",
+                !dirty,
                 ButtonThemeAccent,
                 std::bind(&CSurf_FP_8_PluginMappingPage::HandleResetChannel, this)
             );
@@ -1259,6 +1275,7 @@ public :
                 assets,
                 IconDelete,
                 "mapping-delete",
+                nb_channels < 2,
                 ButtonThemeAccent,
                 std::bind(&CSurf_FP_8_PluginMappingPage::HandleDeleteChannel, this)
             );
