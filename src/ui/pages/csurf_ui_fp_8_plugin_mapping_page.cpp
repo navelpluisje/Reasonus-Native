@@ -507,6 +507,19 @@ protected:
         return plugin_dirty;
     }
 
+    bool HasDirtyGroup() {
+        bool dirty = false;
+
+        for (int i = 0; i < nb_channels; i++) {
+            if (IsGroupDirty(i)) {
+                dirty = true;
+                break;
+            }
+        }
+
+        return dirty;
+    }
+
     bool DirtyCheck() {
         if (changed_items > 0) {
             const int res = MB(
@@ -670,8 +683,10 @@ protected:
     void HandleAddChannelAfter(int index) {
         std::string select;
         std::string fader;
+        std::string color;
         std::string next_select;
         std::string next_fader;
+        std::string next_color;
 
         selected_channel = index + 1;
         nb_channels += 1;
@@ -679,30 +694,50 @@ protected:
         for (int i = nb_channels - 1; i >= selected_channel; i--) {
             select = fmt::format("select_{}", i);
             fader = fmt::format("fader_{}", i);
+            color = fmt::format("color_{}", i);
             next_select = fmt::format("select_{}", i + 1);
             next_fader = fmt::format("fader_{}", i + 1);
+            next_color = fmt::format("color_{}", i + 1);
 
             if (plugin_params.has(select)) {
                 plugin_params.set(next_select, plugin_params[select]);
+                previous_plugin_params.set(next_select, previous_plugin_params[select]);
             } else {
                 plugin_params.remove(next_select);
+                previous_plugin_params.remove(next_select);
             }
 
             if (plugin_params.has(fader)) {
                 plugin_params.set(next_fader, plugin_params[fader]);
+                previous_plugin_params.set(next_fader, previous_plugin_params[fader]);
             } else {
                 plugin_params.remove(next_fader);
+                previous_plugin_params.remove(next_fader);
+            }
+
+            if (plugin_params.has(color)) {
+                plugin_params.set(next_color, plugin_params[color]);
+                previous_plugin_params.set(next_color, previous_plugin_params[color]);
+            } else {
+                previous_plugin_params.remove(next_color);
             }
         }
 
         select = fmt::format("select_{}", selected_channel);
         fader = fmt::format("fader_{}", selected_channel);
+        color = fmt::format("color_{}", selected_channel);
 
         if (plugin_params.has(select)) {
             plugin_params.remove(select);
+            previous_plugin_params.remove(select);
         }
         if (plugin_params.has(fader)) {
             plugin_params.remove(fader);
+            previous_plugin_params.remove(fader);
+        }
+        if (plugin_params.has(color)) {
+            plugin_params.remove(color);
+            previous_plugin_params.remove(color);
         }
 
         HandleChannelClick(selected_channel);
@@ -719,12 +754,15 @@ protected:
 
         if (plugin_params.has(select)) {
             plugin_params.remove(select);
+            previous_plugin_params.remove(select);
         }
         if (plugin_params.has(fader)) {
             plugin_params.remove(fader);
+            previous_plugin_params.remove(fader);
         }
         if (plugin_params.has(color)) {
             plugin_params.remove(color);
+            previous_plugin_params.remove(color);
         }
 
         nb_channels -= 1;
@@ -744,6 +782,7 @@ protected:
 
             if (plugin_params.has(next_color)) {
                 plugin_params.set(color, plugin_params[next_color]);
+                previous_plugin_params.set(color, previous_plugin_params[next_color]);
             } else {
                 plugin_params.remove(color);
                 previous_plugin_params.remove(color);
@@ -751,6 +790,7 @@ protected:
 
             if (plugin_params.has(next_select)) {
                 plugin_params.set(select, plugin_params[next_select]);
+                previous_plugin_params.set(select, previous_plugin_params[next_select]);
             } else {
                 plugin_params.remove(select);
                 previous_plugin_params.remove(select);
@@ -758,12 +798,18 @@ protected:
 
             if (plugin_params.has(next_fader)) {
                 plugin_params.set(fader, plugin_params[next_fader]);
+                previous_plugin_params.set(fader, previous_plugin_params[next_fader]);
             } else {
                 plugin_params.remove(fader);
                 previous_plugin_params.remove(fader);
             }
         }
         PopulateFields();
+
+        // When no dirty groups, we save the changes
+        if (!HasDirtyGroup()) {
+            Save();
+        }
     }
 
     void HandleGroupDrop(const int from, const int to) // NOLINT(*-identifier-length)
@@ -776,21 +822,35 @@ protected:
 
         const std::string select = fmt::format("select_{}", to_id);
         const std::string fader = fmt::format("fader_{}", to_id);
+        const std::string color = fmt::format("color_{}", to_id);
         const std::string from_select = fmt::format("select_{}", from_id);
         const std::string from_fader = fmt::format("fader_{}", from_id);
+        const std::string from_color = fmt::format("color_{}", from_id);
 
         this->HandleAddChannelAfter(to_id - 1);
 
         if (plugin_params.has(from_select)) {
             plugin_params.set(select, plugin_params[from_select]);
+            previous_plugin_params.set(select, previous_plugin_params[from_select]);
         } else {
             plugin_params.remove(select);
+            previous_plugin_params.remove(select);
         }
 
         if (plugin_params.has(from_fader)) {
             plugin_params.set(fader, plugin_params[from_fader]);
+            previous_plugin_params.set(fader, previous_plugin_params[from_fader]);
         } else {
             plugin_params.remove(fader);
+            previous_plugin_params.remove(fader);
+        }
+
+        if (plugin_params.has(from_color)) {
+            plugin_params.set(color, plugin_params[from_color]);
+            previous_plugin_params.set(color, previous_plugin_params[from_color]);
+        } else {
+            plugin_params.remove(color);
+            previous_plugin_params.remove(color);
         }
 
         selected_channel = to;
