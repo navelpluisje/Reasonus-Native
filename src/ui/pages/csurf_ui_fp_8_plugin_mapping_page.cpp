@@ -513,7 +513,9 @@ protected:
         for (int i = 0; i < nb_channels; i++) {
             if (IsGroupDirty(i)) {
                 dirty = true;
+                logInteger("Dirty", i);
                 break;
+            } else {
             }
         }
 
@@ -769,6 +771,12 @@ protected:
 
         if (selected_channel == nb_channels) {
             HandleChannelClick(selected_channel - 1);
+
+            // When no dirty groups, we save the changes
+            if (!HasDirtyGroup()) {
+                Save();
+            }
+
             return;
         }
 
