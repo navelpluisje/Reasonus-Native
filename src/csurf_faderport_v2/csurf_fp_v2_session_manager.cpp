@@ -41,7 +41,6 @@ class CSurf_FP_V2_SessionManager // NOLINT(*-use-internal-linkage)
     CSurf_Button *nextButton;
 
 protected:
-
     void SetButtonValues() const {
         // With shift engaged, blink the selected button
         const Btn_Value valueOn = context->GetShiftLeft() && !settings->GetDistractionFreeMode()
@@ -90,8 +89,12 @@ protected:
 
         const std::string actionId = ini["functions"][key];
         if (actionId == "0") {
-            const int result = MB("There is no action assigned to this function.\nDo you want to assign an action?",
-                                  "No action assigned", 1);
+            const int result = MB(
+                "There is no action assigned to this function.\nDo you want to assign an action?",
+                "No action assigned",
+                1
+            );
+
             if (result == 1) {
                 if (!ReaSonusV2ControlPanel::control_panel_open) {
                     ToggleFPV2ControlPanel(ReaSonusV2ControlPanel::FUNCTIONS_PAGE);
@@ -326,12 +329,12 @@ public:
                 break;
             case Section:
                 context->GetShiftLeft()
-                    ? Main_OnCommandAsyncEx(40625, 0, nullptr) // Time selection: Set start point
+                    ? Main_OnCommandAsyncEx(40625, 0, nullptr)                // Time selection: Set start point
                     : Main_OnCommandStringEx("_SWS_SELPREVMORR", 0, nullptr); // SWS: Goto/select previous marker/region
                 break;
             case Marker:
                 context->GetShiftLeft()
-                    ? Main_OnCommandAsyncEx(40029, 0, nullptr) // Edit: Undo
+                    ? Main_OnCommandAsyncEx(40029, 0, nullptr)                // Edit: Undo
                     : Main_OnCommandStringEx("_SWS_SELPREVMORR", 0, nullptr); // SWS: Goto/select previous marker/region
                 break;
         }
@@ -366,7 +369,7 @@ public:
                 break;
             case Section:
                 context->GetShiftLeft()
-                    ? Main_OnCommandAsyncEx(40626, 0, nullptr) // Time selection: Set end point
+                    ? Main_OnCommandAsyncEx(40626, 0, nullptr)                // Time selection: Set end point
                     : Main_OnCommandStringEx("_SWS_SELNEXTMORR", 0, nullptr); // SWS: Goto/select next marker/region
 
                 break;
@@ -393,7 +396,7 @@ public:
                 break;
             case Scroll:
                 context->GetShiftLeft()
-                    ? Main_OnCommandAsyncEx(40141, 0, nullptr) // View: Scroll view left
+                    ? Main_OnCommandAsyncEx(40141, 0, nullptr)  // View: Scroll view left
                     : Main_OnCommandAsyncEx(40139, 0, nullptr); // View: Scroll view up
                 break;
             case Master:
@@ -405,7 +408,7 @@ public:
             case Section:
             case Marker:
                 context->GetShiftLeft()
-                    ? Main_OnCommandAsyncEx(40105, 0, nullptr) // View: Move cursor right one pixel
+                    ? Main_OnCommandAsyncEx(40105, 0, nullptr)  // View: Move cursor right one pixel
                     : Main_OnCommandAsyncEx(41044, 0, nullptr); // Move edit cursor forward one beat
                 break;
         }
@@ -426,7 +429,7 @@ public:
                 break;
             case Scroll:
                 context->GetShiftLeft()
-                    ? Main_OnCommandAsyncEx(40140, 0, nullptr) // View: Scroll view right
+                    ? Main_OnCommandAsyncEx(40140, 0, nullptr)  // View: Scroll view right
                     : Main_OnCommandAsyncEx(40138, 0, nullptr); // View: Scroll view down
                 break;
             case Master:
@@ -461,12 +464,13 @@ public:
                 break;
             case Zoom:
                 context->GetShiftLeft()
-                    ? Main_OnCommandAsyncEx(40113, 0, nullptr) // View: Toggle track zoom to maximum height
+                    ? Main_OnCommandAsyncEx(40113, 0, nullptr)  // View: Toggle track zoom to maximum height
                     : Main_OnCommandAsyncEx(40110, 0, nullptr); // View: Toggle track zoom to minimum height
                 break;
             case Scroll:
                 context->GetShiftLeft()
-                    ? Main_OnCommandStringEx("_SWS_HSCROLLPLAY50", 0, nullptr) // SWS: Horizontal scroll to put play cursor at 50%
+                    ? Main_OnCommandStringEx("_SWS_HSCROLLPLAY50", 0, nullptr)
+                    // SWS: Horizontal scroll to put play cursor at 50%
                     : Main_OnCommandAsyncEx(40913, 0, nullptr); // Track: Vertical scroll selected tracks into view
                 break;
             case Master:
@@ -476,12 +480,12 @@ public:
                 break;
             case Click:
                 context->GetShiftLeft()
-                    ? Main_OnCommandAsyncEx(40363, 0, nullptr) // Options: Show metronome/pre-roll settings
+                    ? Main_OnCommandAsyncEx(40363, 0, nullptr)  // Options: Show metronome/pre-roll settings
                     : Main_OnCommandAsyncEx(40364, 0, nullptr); // Options: Toggle metronome
                 break;
             case Section:
                 context->GetShiftLeft()
-                    ? Main_OnCommandAsyncEx(40615, 0, nullptr) // Markers: Delete region near cursor
+                    ? Main_OnCommandAsyncEx(40615, 0, nullptr)  // Markers: Delete region near cursor
                     : Main_OnCommandAsyncEx(40306, 0, nullptr); // Markers: Insert region from time selection and edit
                 break;
             case Marker:

@@ -1,6 +1,8 @@
 #ifndef CSURF_FP_8_PLUGINS_MANAGER_C_
 #define CSURF_FP_8_PLUGINS_MANAGER_C_
 
+#include <algorithm>
+
 #include "csurf_fp_8_channel_manager.hpp"
 #include "../shared/csurf_plugin_utils.hpp"
 
@@ -9,7 +11,7 @@ class CSurf_FP_8_PluginsManager : public CSurf_FP_8_ChannelManager {
     int current_plugin = 0;
 
 protected:
-    void GetFaderValue(MediaTrack *media_track, int *fader_value, int *value_bar_value) const {
+    void GetFaderValue(MediaTrack *media_track, int *fader_value, int *value_bar_value) const { // NOLINT(*-convert-member-functions-to-static)
         int panMode = 0;
         double volume = 0.0;
         double pan1 = 0.0;
@@ -22,8 +24,16 @@ protected:
         *value_bar_value = static_cast<int>(panToNormalized(pan1) * 127);
     }
 
-    std::string GetBypassedText(const bool bypassed) const {
+    [[nodiscard]] std::string GetBypassedText(const bool bypassed) const { // NOLINT(*-convert-member-functions-to-static)
         return bypassed ? "Bypassed" : "Enabled";
+    }
+
+    [[nodiscard]] int GetPluginIndex(const int index) const {
+        const bool control_input_plugins = settings->HasPluginInputControl() && context->GetArm();
+
+        return context->GetChannelManagerItemIndex(nb_track_items[index] - 1) + (
+                   control_input_plugins ? 0x1000000 : 0
+               );
     }
 
 public:
@@ -41,6 +51,7 @@ public:
 
     void UpdateTracks(const bool force_update) override {
         nb_plugins = 0;
+        const bool control_input_plugins = settings->HasPluginInputControl() && context->GetArm();
         const WDL_PtrList<MediaTrack> media_tracks = navigator->GetBankTracks();
         const bool respect_slots = settings->PluginsShouldRespectSlots();
 
@@ -53,9 +64,11 @@ public:
                 media_track = media_tracks.Get(i);
             }
 
-            const int _nb_track_plugins = DAW::GetTrackFxCount(media_track, respect_slots);
-            nb_track_items[i] = _nb_track_plugins;
+            const int _nb_track_plugins = control_input_plugins
+                                              ? TrackFX_GetRecCount(media_track)
+                                              : DAW::GetTrackFxCount(media_track, respect_slots);
 
+            nb_track_items[i] = _nb_track_plugins;
             nb_plugins = std::max(_nb_track_plugins, nb_plugins);
         }
 
@@ -68,7 +81,6 @@ public:
 
             int fader_value = 0;
             int value_bar_value = 0;
-
             if (context->GetMasterFaderMode() && i == context->GetNbChannels() - 1) {
                 media_track = GetMasterTrack(nullptr);
             } else {
@@ -181,7 +193,7 @@ public:
         }
 
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
-        const int plugin_index = context->GetChannelManagerItemIndex(nb_track_items[index] - 1);
+        const int plugin_index = GetPluginIndex(index);
 
         if (context->GetShiftChannelLeft()) {
             TrackFX_SetOffline(media_track, plugin_index, !DAW::GetTrackFxOffline(media_track, plugin_index));
@@ -204,6 +216,7 @@ public:
 
         // If the current plugin window is open, close it
         // Otherwise Close all other open windows and open the plugin window
+
         if (DAW::GetTrackFxPanelOpen(media_track, plugin_index)) {
             TrackFX_Show(media_track, plugin_index, 0);
             TrackFX_Show(media_track, plugin_index, 2);

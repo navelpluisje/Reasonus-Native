@@ -25,6 +25,14 @@ protected:
         return bypassed ? "Bypassed" : "Enabled";
     }
 
+    [[nodiscard]] int GetPluginIndex(const int index) const {
+        const bool control_input_plugins = settings->HasPluginInputControl() && context->GetArm();
+
+        return context->GetChannelManagerItemIndex() + index + (
+                   control_input_plugins ? 0x1000000 : 0
+               );
+    }
+
 public:
     CSurf_FP_8_TrackPluginsManager(
         const std::vector<CSurf_FP_8_Track *> &tracks,
@@ -54,7 +62,9 @@ public:
 
         for (int i = 0; i < context->GetNbChannels(); i++) {
             MediaTrack *media_track;
-            const int plugin_index = context->GetChannelManagerItemIndex() + i;
+            const int display_index = context->GetChannelManagerItemIndex() + i;
+            const int plugin_index = GetPluginIndex(i);
+
             int fader_value = 0;
             int valuebar_value = 0;
 
@@ -130,9 +140,12 @@ public:
         if (value == 0) {
             return;
         }
+        const bool control_input_plugins = settings->HasPluginInputControl() && context->GetArm();
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
 
-        if (context->GetArm()) {
+        if (control_input_plugins && context->GetShiftChannelLeft()) {
+            DAW::SetUniqueSelectedTrack(media_track);
+        } else if (context->GetArm()) {
             CSurf_SetSurfaceRecArm(
                 media_track,
                 CSurf_OnRecArmChange(media_track, static_cast<int>(!DAW::IsTrackArmed(media_track))),
@@ -179,7 +192,7 @@ public:
             media_track = GetMasterTrack(nullptr);
         }
 
-        const int plugin_index = context->GetChannelManagerItemIndex() + index;
+        const int plugin_index = GetPluginIndex(index);
 
         if (DAW::GetTrackFxPanelOpen(media_track, plugin_index)) {
             TrackFX_Show(media_track, plugin_index, 0);

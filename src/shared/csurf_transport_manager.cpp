@@ -1,12 +1,12 @@
 #include "csurf_transport_manager.hpp"
 
 #include "csurf_daw.hpp"
-#include "../controls/csurf_button.hpp"
-#include "../shared/csurf_utils.hpp"
-#include "../shared/csurf_context.cpp"
-#include "../ui/windows/csurf_ui_fp_8_control_panel.hpp"
 #include "csurf_faderport_ui_imgui_utils.hpp"
+#include "../controls/csurf_button.hpp"
+#include "../shared/csurf_context.cpp"
+#include "../shared/csurf_utils.hpp"
 #include "../ui/pages/csurf_ui_fp_v2_control_panel.hpp"
+#include "../ui/windows/csurf_ui_fp_8_control_panel.hpp"
 
 void CSurf_TransportManager::SetButtonValues(const bool force) const {
     playButton->SetValue(ButtonBlinkOnOff(isPaused, isPlaying), force);
@@ -15,7 +15,7 @@ void CSurf_TransportManager::SetButtonValues(const bool force) const {
     repeatButton->SetValue(isRepeat ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
     rewindButton->SetValue(ButtonBlinkOnOff(isRewinding && isFastFwdRwd, isRewinding), force);
     forwardButton->SetValue(ButtonBlinkOnOff(isForwarding && isFastFwdRwd, isForwarding), force);
-};
+}
 
 void CSurf_TransportManager::StopRewindOrForward() {
     isFastFwdRwd = false;
@@ -81,9 +81,9 @@ void CSurf_TransportManager::SetForwardingState() {
     isForwarding = true;
 }
 
-void CSurf_TransportManager::handleFootSwitchKey(const std::string &key) const {
+void CSurf_TransportManager::handleFunctionKey(const std::string &key, const FunctionTypes type) const {
     const std::string device = context->GetNbChannels() > 1 ? FP_8 : FP_V2;
-    const std::string action_id = settings->GetFunction(key, true);
+    const std::string action_id = settings->GetFunction(key, type);
 
     if (action_id == "0") {
         const int result = MB("There is no action assigned to this function.\nDo you want to assign an action?",
@@ -190,8 +190,20 @@ void CSurf_TransportManager::HandleRewindButton(const int value) {
         return;
     }
 
+    if (context->GetShiftRight()) {
+        handleFunctionKey("2", FUNCTION_TRANSPORT);
+        return;
+    }
+
     if (context->GetShiftLeft()) {
-        CSurf_GoStart();
+        const std::string action_id = settings->GetFunction("1", FUNCTION_TRANSPORT);
+
+        if (action_id == "0") {
+            CSurf_GoStart();
+        } else {
+            handleFunctionKey("1", FUNCTION_TRANSPORT);
+        }
+
         return;
     }
     SetPause();
@@ -203,8 +215,20 @@ void CSurf_TransportManager::HandleForwardButton(const int value) {
         return;
     }
 
+    if (context->GetShiftRight()) {
+        handleFunctionKey("4", FUNCTION_TRANSPORT);
+        return;
+    }
+
     if (context->GetShiftLeft()) {
-        CSurf_GoEnd();
+        const std::string action_id = settings->GetFunction("3", FUNCTION_TRANSPORT);
+
+        if (action_id == "0") {
+            CSurf_GoEnd();
+        } else {
+            handleFunctionKey("3", FUNCTION_TRANSPORT);
+        }
+
         return;
     }
 
@@ -218,11 +242,11 @@ void CSurf_TransportManager::HandleFootSwitchClick(const int value) const {
     }
 
     if (context->GetShiftChannelRight()) {
-        handleFootSwitchKey("3");
+        handleFunctionKey("3", FUNCTION_FOOTSWITCH);
     } else if (context->GetShiftChannelLeft()) {
-        handleFootSwitchKey("2");
+        handleFunctionKey("2", FUNCTION_FOOTSWITCH);
     } else {
-        handleFootSwitchKey("1");
+        handleFunctionKey("1", FUNCTION_FOOTSWITCH);
     }
 }
 

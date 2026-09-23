@@ -97,13 +97,20 @@ void ReaSonusSettings::SetAndSaveSetting(const std::string &group, const std::st
     StoreSettings();
 }
 
-void ReaSonusSettings::SetFunction(const std::string &index, const std::string &value, const bool is_footswitch) {
-    const std::string group = is_footswitch ? "footswitch" : "functions";
-    SetSetting(group, index, value);
+void ReaSonusSettings::SetFunction(
+    const std::string &index,
+    const std::string &value,
+    const FunctionTypes function_type
+) {
+    SetSetting(GetFunctionType(function_type), index, value);
 }
 
-void ReaSonusSettings::SetAndSaveFuntion(const std::string &key, const std::string &value, const bool is_footswitch) {
-    SetFunction(key, value, is_footswitch);
+void ReaSonusSettings::SetAndSaveFuntion(
+    const std::string &key,
+    const std::string &value,
+    const FunctionTypes function_types
+) {
+    SetFunction(key, value, function_types);
     StoreSettings();
 }
 
@@ -115,10 +122,8 @@ std::string ReaSonusSettings::GetSetting(const std::string &group, const std::st
     return default_value;
 }
 
-std::string ReaSonusSettings::GetFunction(const std::string &key, const bool is_footswitch) {
-    const std::string group = is_footswitch ? "footswitch" : "functions";
-
-    return GetSetting(group, key, "0");
+std::string ReaSonusSettings::GetFunction(const std::string &key, const FunctionTypes function_type) {
+    return GetSetting(GetFunctionType(function_type), key, "0");
 }
 
 bool ReaSonusSettings::StoreSettings() {
@@ -192,6 +197,10 @@ int ReaSonusSettings::GetLatchPreviewActionCode() {
 
 int ReaSonusSettings::GetpluginStepSize() {
     return stoi(settings["surface"]["plugin-step-size"]);
+}
+
+bool ReaSonusSettings::HasPluginInputControl() {
+    return stoi(settings["surface"]["plugin-has-input-control"]) > 0;
 }
 
 int ReaSonusSettings::GetTrackDisplay() {
