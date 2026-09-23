@@ -126,7 +126,7 @@ std::string GetSendModeString(const int sendMode) {
         case 3:
             return "Post-FX";
         default:
-            return "Post-Fdr";
+            return "";
     }
 }
 

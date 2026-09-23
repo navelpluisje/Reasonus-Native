@@ -11,7 +11,8 @@
 
 enum Features {
     FEATURE_PINNED_TRACKS,
-    FEATURE_EXTENSION_DATA
+    FEATURE_EXTENSION_DATA,
+    FEATURE_SLOTS
 };
 
 enum PAN_MODES {
@@ -44,6 +45,7 @@ enum SEND_SEND_MODES {
 static std::map<Features, double> feature_versions = { // NOLINT(*-statically-constructed-objects, *-throwing-static-initialization)
     {FEATURE_PINNED_TRACKS, 7.46},
     {FEATURE_EXTENSION_DATA, 7.79},
+    {FEATURE_SLOTS, 7.75},
 };
 
 class DAW {
@@ -371,6 +373,38 @@ public:
     static void ToggleTrackFxBypass(MediaTrack *media_track);
 
     /**
+     * Get the number of plugons for the given track. When `slots` is set to true,
+     * it will count the number of slots used,
+     * @param media_track The track to get the number of plugins fpr
+     * @param slots Wether or not to keet slots in account
+     * @return Thenumber of pugins for the given track
+     */
+    static int GetTrackFxCount(MediaTrack *media_track, bool slots);
+
+    /**
+     * Get the track fx index of the fx with the corresponding slot index.
+     * @param media_track The track to get the fx inex for
+     * @param _slot_index The slot index to check
+     * @return
+     */
+    static int GetTrackFxIndexBySlotIndex(MediaTrack *media_track, int _slot_index);
+
+    /**
+     * Check if there are any muted sends for the given slot
+     * @param _slot_index The slot index to check for muted sends
+     * @return
+     */
+    static bool SlotHasNoBypassedTrackFx(int _slot_index);
+
+    /**
+     * Toggle all plugin bypasses for the given slot. When all plugins are bypassed, they will all get active.
+     * If some or none of the plugins are bypassed, all plugins will be bypassed
+     * @param _slot_index The slot index to toggle the nute for
+     * @return
+     */
+    static void ToggleTrackFxBypassForSlot(int _slot_index);
+
+    /**
      * Get the parameter name of the parameter with the given values
      * @param media_track The track where we want the plugin param for
      * @param fx_index The index on the plugin
@@ -575,6 +609,45 @@ public:
      * @return The name of the destination of the send
      */
     static std::string GetTrackSendName(MediaTrack *media_track, int send);
+
+    /**
+     * Get the number of sends for the given track. When `slots` is set to true,
+     * it will count the number of slots used,
+     * @param media_track The track to get the number of plugins fpr
+     * @param slots Wether or not to keep slots in account
+     * @return Thenumber of pugins for the given track
+     */
+    static int GetTrackSendCount(MediaTrack *media_track, bool slots);
+
+    /**
+     * Get the track send index of the send with the corresponding slot index.
+     * @param media_track The track to get the send index for
+     * @param _slot_index The slot index to check
+     * @param add_hardware Whether to add the hardware count for the sends index
+     * @param is_hardware Set to treu when the slot is a hardware out
+     * @return
+     */
+    static int GetTrackSendIndexBySlotIndex(
+        MediaTrack *media_track,
+        int _slot_index,
+        bool add_hardware,
+        bool *is_hardware
+    );
+
+    /**
+     * Check if there are any muted sends for the given slot
+     * @param _slot_index The slot index to check for muted sends
+     * @return
+     */
+    static bool SlotHasNoMutedSend(int _slot_index);
+
+    /**
+     * Toggle all send mutes. When all sends are muted, they will all get unmuted.
+     * If some or none sends are muted, mute all the sends
+     * @param _slot_index The slot index to toggle the nute for
+     * @return
+     */
+    static void ToggleSendMuteForSlot(int _slot_index);
 
     /**
      * Get the send mode for the given send
