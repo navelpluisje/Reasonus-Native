@@ -115,9 +115,11 @@ protected:
     }
 
     std::string GetPluginPath() {
-        return createPathName({
-            plugin_folder_path, developers[selected_developer], plugins[selected_developer][selected_plugin]
-        });
+        if (selected_plugin > -1) {
+            return createPathName({
+                plugin_folder_path, developers[selected_developer], plugins[selected_developer][selected_plugin]
+            });
+        }
 
         return "";
     }
