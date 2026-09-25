@@ -118,6 +118,8 @@ protected:
         return createPathName({
             plugin_folder_path, developers[selected_developer], plugins[selected_developer][selected_plugin]
         });
+
+        return "";
     }
 
     std::string GetPluginSavePath() {
@@ -197,8 +199,12 @@ protected:
     bool SetPluginData() {
         plugin_dirty = false;
         bool plugin_type_error = false;
-
         const std::string plugin_path = GetPluginPath();
+
+        if (plugin_path == "") {
+            return false;
+        }
+
         const mINI::INIFile file(plugin_path);
         file.read(plugin_params);
         ValidatePluginData();
