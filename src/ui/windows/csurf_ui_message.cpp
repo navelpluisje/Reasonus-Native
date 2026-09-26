@@ -90,37 +90,50 @@ void ReaSonusMessage::Frame() {
         }
 
         UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
-        if (ImGui::BeginChild(m_ctx, "actions_container", 0.0, 0.0,
-                              ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY)) {
+        if (ImGui::BeginChild(
+            m_ctx,
+            "actions_container",
+            0.0,
+            0.0,
+            ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
+        )) {
             ReaSonusPageTitle(m_ctx, assets, "ReaSonus Native New Version: " + std::string(GIT_VERSION), false);
             ImGui::PushTextWrapPos(m_ctx, 0.0);
 
             ImGui::Text(m_ctx, "This release is a bugfix release:");
             ImGui::BulletText(
-                m_ctx, "Fixed issue where the sends did not work proper when a hardware out was in the list");
+                m_ctx, "Fixed issue where plugin mapping values were not saved correct");
 
-            ReaSonusPageTitle(m_ctx, assets, "Version 0.10.0", true);
-            ImGui::Text(m_ctx, "This release is focussed on plugin mappings. Changes made contain:");
-            ImGui::BulletText(m_ctx, "Ability to add plugin mappings in the ReaSonus Control Panel");
-            ImGui::BulletText(m_ctx, "Ability to delete plugin mappings");
+            ReaSonusPageTitle(m_ctx, assets, "Version 0.11.0, 0.11.1", true);
+            ImGui::Text(m_ctx, "Forgot to update these during the previous release. But here they are:");
             ImGui::BulletText(
                 m_ctx,
-                "Option to set the color of a mapping group (will be set to the select button)"
+                "Single Point Automation; With single point automation you set an envelope point while touching the fader. You can then adjust the fader to where you want it to be and release it. On release another envelope point will get set. This will reduce the amount of automation points. Check the Automation settings in the reaSonus Control Panel for settings and info. (Implementation for the FaderPort V2 is on the road map)");
+            ImGui::BulletText(
+                m_ctx,
+                "Able to create project specific filters; The custom filters can now also be stored per project. Above the filter list select `Project Filter`. The filters added here will be saved in the project. This way you can also add custom filters to project templates ");
+            ImGui::BulletText(
+                m_ctx,
+                "Add option to set colors to custom filters; You can now set a color per filter. This makes selecting filters from your list a bit easier. "
             );
             ImGui::BulletText(
                 m_ctx,
-                "Plugin caching (this will cache the parameters and its value) for more performant plugin mapping"
+                "Add option to set custom colors to the automation buttons: In the Automation settings in the ReaSonus Control Panel select the colors you like for use with the automation buttons. This way you can align them better with your Reaper theme colors. "
             );
             ImGui::BulletText(
                 m_ctx,
-                "Plugin parameter filtering to reduce tha length of the parameters list"
+                "Overhaul of the settings page; Added an extra tab for automation, moved some settings around and implemented a better grouping for a better overview (Implementation for the FaderPort V2 is on the road map)"
+            );
+            ImGui::BulletText(
+                m_ctx,
+                "Add extension info for the new extension screen in the REAPER settings (from v7.79)"
             );
             ImGui::Text(m_ctx, " ");
             ImGui::Text(m_ctx, "Check the documentation for more info on these changes");
             ImGui::TextLinkOpenURL(
                 m_ctx,
-                "Documentation about Plugin Mapping",
-                "https://navelpluisje.github.io/reasonus/control-panel/plugin-mapping/"
+                "Documentation about Single Point Automation",
+                "https://reasonus.net/documentation/faderport8/#automation"
             );
 
             ImGui::PopTextWrapPos(m_ctx);
