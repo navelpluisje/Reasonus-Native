@@ -189,6 +189,7 @@ bool SetIntConfigVar(const std::string &var_name, int value);
  * @return false
  */
 bool hasBit(int val, int key);
+
 bool hasBit(const std::array<uint64_t, 2> val, const int key);
 
 /**
@@ -199,6 +200,7 @@ bool hasBit(const std::array<uint64_t, 2> val, const int key);
  * @return The modified integer
  */
 int clearBit(int val, int key);
+
 std::array<uint64_t, 2> clearBit(const std::array<uint64_t, 2> val, const int key);
 
 /**
@@ -539,5 +541,12 @@ void disableMidiOut(int index, bool persist);
  * @return
  */
 bool writeReaperIni(std::string section, std::string key, std::string value);
+
+/**
+ * Convert a uint64_t array to a numeric value, cast to a string. This can be used to convert an integer upto 128 bits to a string
+ * @param value The uint64_t array to convert to a numeric string
+ * @return The string representation of the array value
+ */
+std::string uint64ArrayToyToString(std::array<uint64_t, 2> value);
 
 #endif // CSURF_UTILS_H_

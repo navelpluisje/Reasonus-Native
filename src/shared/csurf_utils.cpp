@@ -81,7 +81,7 @@ bool hasBit(const std::array<uint64_t, 2> val, const int key) {
 }
 
 std::array<uint64_t, 2> clearBit(const std::array<uint64_t, 2> val, const int key) {
-    std::array<uint64_t, 2> result = {0,0};
+    std::array<uint64_t, 2> result = {0, 0};
     if (key < 64) {
         result[0] = val[0] & ~(1ULL << key);
         result[1] = val[1];
@@ -546,8 +546,8 @@ void disableMidiIn(const int index, const bool persist) {
     midiins_all.SetValue(new_midiins_all_value);
 
     if (persist) {
-        // writeReaperIni("REAPER", "midiins", fmt::format("{}", new_midiins_value));
-        // writeReaperIni("REAPER", "midiins_all", fmt::format("{}", new_midiins_all_value));
+        writeReaperIni("REAPER", "midiins", uint64ArrayToyToString(new_midiins_value));
+        writeReaperIni("REAPER", "midiins_all", uint64ArrayToyToString(new_midiins_all_value));
     }
 }
 
@@ -563,7 +563,7 @@ void disableMidiOut(const int index, const bool persist) {
     midiouts.SetValue(new_value);
 
     if (persist) {
-        // writeReaperIni("REAPER", "midiouts", fmt::format("{}", new_value));
+        writeReaperIni("REAPER", "midiouts", uint64ArrayToyToString(new_value));
     }
 }
 
@@ -594,3 +594,20 @@ bool writeReaperIni(std::string section, std::string key, std::string value) { /
     return true;
 }
 
+std::string uint64ArrayToyToString(const std::array<uint64_t, 2> value) {
+    std::string result;
+    uint64_t high = value[1];
+    uint64_t low = value[0];
+
+    while (low > 0) {
+        result = static_cast<char>('0' + (low % 10)) + result;
+        low /= 10;
+    }
+
+    while (high > 0) {
+        result = static_cast<char>('0' + (high % 10)) + result;
+        high /= 10;
+    }
+
+    return result;
+}
