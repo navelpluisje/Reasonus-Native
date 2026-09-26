@@ -78,7 +78,7 @@ class CSurf_FP_8_PluginMappingPage : public CSurf_UI_PageContent // NOLINT(*-use
 
     std::string fader_key;
     std::string fader_name;
-    int fader_param_index{};
+    int fader_param_index = -1;
     int fader_uninvert_label = 0;
 
     std::vector<std::string> invert_labels = {"Inverted", "Not inverted"};
@@ -115,9 +115,13 @@ protected:
     }
 
     std::string GetPluginPath() {
-        return createPathName({
-            plugin_folder_path, developers[selected_developer], plugins[selected_developer][selected_plugin]
-        });
+        if (selected_plugin > -1) {
+            return createPathName({
+                plugin_folder_path, developers[selected_developer], plugins[selected_developer][selected_plugin]
+            });
+        }
+
+        return "";
     }
 
     std::string GetPluginSavePath() {
@@ -138,10 +142,10 @@ protected:
                 continue;
             }
 
-            if (section.rfind("color_", 0) == 0
-            ) {
+            if (section != "color_" && section.rfind("color_", 0) == 0) {
                 if (
-                    !plugin_params[section].has("color")
+                    !plugin_params.has(section)
+                    || !plugin_params[section].has("color")
                     || plugin_params[section]["color"].empty()
                 ) {
                     plugin_params[section]["color"] = std::to_string(0x00ffffff);
@@ -150,7 +154,18 @@ protected:
                 continue;
             }
 
-            if (!plugin_params[section].has("uninvert-label") || plugin_params[section]["uninvert-label"].empty()) {
+            if (
+                section == "select_"
+                || section == "fader_"
+                || section == "color_"
+            ) {
+                modified = true;
+                plugin_params.remove(section);
+            } else if (
+                !plugin_params.has(section)
+                || !plugin_params[section].has("uninvert-label")
+                || plugin_params[section]["uninvert-label"].empty()
+            ) {
                 modified = true;
                 plugin_params[section]["uninvert-label"] = "0";
                 previous_plugin_params[section]["uninvert-label"] = "0";
@@ -186,8 +201,12 @@ protected:
     bool SetPluginData() {
         plugin_dirty = false;
         bool plugin_type_error = false;
-
         const std::string plugin_path = GetPluginPath();
+
+        if (plugin_path == "") {
+            return false;
+        }
+
         const mINI::INIFile file(plugin_path);
         file.read(plugin_params);
         ValidatePluginData();
@@ -222,8 +241,7 @@ protected:
         selected_plugin_filename_has_type = true;
         selected_plugin_type_mismatch = false;
 
-        for (const auto &[fst, snd]: plugin_params) {
-            const std::string section = fst;
+        for (const auto &[section, snd]: plugin_params) {
             const std::string group_id = split(section, "_").back();
 
             if (!isInteger(group_id)) {
@@ -231,6 +249,10 @@ protected:
             }
 
             nb_channels = max(std::stoi(group_id) + 1, nb_channels);
+        }
+
+        if (nb_channels == 0) {
+            HandleAddChannelAfter(-1);
         }
 
         selected_plugin_params_error = false;
@@ -310,8 +332,8 @@ protected:
 
     void PopulateFields() {
         select_key = fmt::format("select_{}", selected_channel);
-        fader_key = fmt::format("fader_", selected_channel);
-        color_key = fmt::format("color_", selected_channel);
+        fader_key = fmt::format("fader_{}", selected_channel);
+        color_key = fmt::format("color_{}", selected_channel);
 
         if (plugin_params.has(color_key)) {
             group_color = plugin_params[color_key].has("color")
@@ -325,6 +347,11 @@ protected:
             group_color = 0x00ffffff;
             previous_group_color = 0x00ffffff;
             group_color_show = settings->GetPluginMapDefaultColorMode();
+
+            if (!previous_plugin_params.has(color_key)) {
+                previous_plugin_params[color_key]["color"] = std::to_string(0x00ffffff);
+                previous_plugin_params[color_key]["show"] = std::to_string(settings->GetPluginMapDefaultColorMode());
+            }
         }
 
         if (plugin_params.has(select_key)) {
@@ -356,6 +383,13 @@ protected:
             select_nb_steps = 0;
             select_param_index = 0;
             select_uninvert_label = 0;
+
+            if (!previous_plugin_params.has(select_key)) {
+                previous_plugin_params[select_key]["param"] = "-1";
+                previous_plugin_params[select_key]["name"] = "";
+                previous_plugin_params[select_key]["steps"] = "0";
+                previous_plugin_params[select_key]["uninvert-label"] = "0";
+            }
         }
 
         if (plugin_params.has(fader_key)) {
@@ -384,18 +418,24 @@ protected:
             fader_name = "";
             fader_param_index = 0;
             fader_uninvert_label = 0;
+
+            if (!previous_plugin_params.has(fader_key)) {
+                previous_plugin_params[fader_key]["param"] = "-1";
+                previous_plugin_params[fader_key]["name"] = "";
+                previous_plugin_params[fader_key]["uninvert-label"] = "0";
+            }
         }
     }
 
     void UpdateValues() {
-        if (select_param_index > 0) {
+        if (select_param_index > -1) {
             plugin_params[select_key]["name"] = select_name;
             plugin_params[select_key]["steps"] = std::to_string(select_nb_steps);
             plugin_params[select_key]["param"] = std::to_string(std::get<0>(param_data[select_param_index]));
             plugin_params[select_key]["uninvert-label"] = std::to_string(select_uninvert_label);
         }
 
-        if (fader_param_index > 0) {
+        if (fader_param_index > -1) {
             plugin_params[fader_key]["name"] = fader_name;
             plugin_params[fader_key]["param"] = std::to_string(std::get<0>(param_data[fader_param_index]));
             plugin_params[fader_key]["uninvert-label"] = std::to_string(fader_uninvert_label);
@@ -408,7 +448,7 @@ protected:
     }
 
     bool IsColorDirty(const int key) {
-        const std::string color = "color_" + std::to_string(key);
+        const std::string color = fmt::format("color_{}", key);
         if (key == selected_channel) {
             if (select_param_index <= 0 && plugin_params.has(color)) {
                 plugin_params.remove(color);
@@ -417,8 +457,11 @@ protected:
             UpdateValues();
         }
 
-        if (!plugin_params.has(color) || (
-                stoi(plugin_params[color]["color"]) == 0x00ffffff && !previous_plugin_params.has(color)
+        if (
+            !plugin_params.has(color)
+            || (
+                stoi(plugin_params[color]["color"]) == 0x00ffffff
+                && !previous_plugin_params.has(color)
             )
         ) {
             return false;
@@ -429,7 +472,7 @@ protected:
     }
 
     bool IsSelectDirty(const int key) {
-        const std::string select = "select_" + std::to_string(key);
+        const std::string select = fmt::format("select_{}", key);
         if (key == selected_channel) {
             if (select_param_index <= 0 && plugin_params.has(select)) {
                 plugin_params.remove(select);
@@ -449,7 +492,7 @@ protected:
     }
 
     bool isFaderDirty(const int key) {
-        const std::string fader = "fader_" + std::to_string(key);
+        const std::string fader = fmt::format("fader_{}", key);
         if (key == selected_channel) {
             if (select_param_index <= 0 && plugin_params.has(fader)) {
                 plugin_params.remove(fader);
@@ -470,6 +513,21 @@ protected:
     bool IsGroupDirty(const int key) {
         plugin_dirty = IsColorDirty(key) || IsSelectDirty(key) || isFaderDirty(key);
         return plugin_dirty;
+    }
+
+    bool HasDirtyGroup() {
+        bool dirty = false;
+
+        for (int i = 0; i < nb_channels; i++) {
+            if (IsGroupDirty(i)) {
+                dirty = true;
+                logInteger("Dirty", i);
+                break;
+            } else {
+            }
+        }
+
+        return dirty;
     }
 
     bool DirtyCheck() {
@@ -495,6 +553,7 @@ protected:
             ExtractPluginNameFromFile(plugins[selected_developer][plugin_index]),
             ExtractPluginTypeFromFile(plugins[selected_developer][plugin_index])
         )) {
+            selected_plugin = -1;
             SetPluginFolders();
         }
     }
@@ -598,9 +657,9 @@ protected:
     }
 
     void HandleResetChannel() {
-        const std::string select = "select_" + std::to_string(selected_channel);
-        const std::string fader = "fader_" + std::to_string(selected_channel);
-        const std::string color = "color_" + std::to_string(selected_channel);
+        const std::string select = fmt::format("select_{}", selected_channel);
+        const std::string fader = fmt::format("fader_{}", selected_channel);
+        const std::string color = fmt::format("color_{}", selected_channel);
 
         if (previous_plugin_params.has(select) && !previous_plugin_params[select]["param"].empty()) {
             plugin_params.set(select, previous_plugin_params[select]);
@@ -614,7 +673,7 @@ protected:
             plugin_params.remove(fader);
         }
 
-        if (previous_plugin_params.has(color) && !previous_plugin_params[color]["param"].empty()) {
+        if (previous_plugin_params.has(color) && !previous_plugin_params[color]["color"].empty()) {
             plugin_params.set(color, previous_plugin_params[color]);
         } else {
             plugin_params.remove(color);
@@ -634,39 +693,61 @@ protected:
     void HandleAddChannelAfter(int index) {
         std::string select;
         std::string fader;
+        std::string color;
         std::string next_select;
         std::string next_fader;
+        std::string next_color;
 
         selected_channel = index + 1;
         nb_channels += 1;
 
         for (int i = nb_channels - 1; i >= selected_channel; i--) {
-            select = "select_" + std::to_string(i);
-            fader = "fader_" + std::to_string(i);
-            next_select = "select_" + std::to_string(i + 1);
-            next_fader = "fader_" + std::to_string(i + 1);
+            select = fmt::format("select_{}", i);
+            fader = fmt::format("fader_{}", i);
+            color = fmt::format("color_{}", i);
+            next_select = fmt::format("select_{}", i + 1);
+            next_fader = fmt::format("fader_{}", i + 1);
+            next_color = fmt::format("color_{}", i + 1);
 
             if (plugin_params.has(select)) {
                 plugin_params.set(next_select, plugin_params[select]);
+                previous_plugin_params.set(next_select, previous_plugin_params[select]);
             } else {
                 plugin_params.remove(next_select);
+                previous_plugin_params.remove(next_select);
             }
 
             if (plugin_params.has(fader)) {
                 plugin_params.set(next_fader, plugin_params[fader]);
+                previous_plugin_params.set(next_fader, previous_plugin_params[fader]);
             } else {
                 plugin_params.remove(next_fader);
+                previous_plugin_params.remove(next_fader);
+            }
+
+            if (plugin_params.has(color)) {
+                plugin_params.set(next_color, plugin_params[color]);
+                previous_plugin_params.set(next_color, previous_plugin_params[color]);
+            } else {
+                previous_plugin_params.remove(next_color);
             }
         }
 
-        select = "select_" + std::to_string(selected_channel);
-        fader = "fader_" + std::to_string(selected_channel);
+        select = fmt::format("select_{}", selected_channel);
+        fader = fmt::format("fader_{}", selected_channel);
+        color = fmt::format("color_{}", selected_channel);
 
         if (plugin_params.has(select)) {
             plugin_params.remove(select);
+            previous_plugin_params.remove(select);
         }
         if (plugin_params.has(fader)) {
             plugin_params.remove(fader);
+            previous_plugin_params.remove(fader);
+        }
+        if (plugin_params.has(color)) {
+            plugin_params.remove(color);
+            previous_plugin_params.remove(color);
         }
 
         HandleChannelClick(selected_channel);
@@ -677,42 +758,74 @@ protected:
     }
 
     void HandleDeleteChannelById(const int index) {
-        std::string select = "select_" + std::to_string(index);
-        std::string fader = "fader_" + std::to_string(index);
+        std::string select = fmt::format("select_{}", index);
+        std::string fader = fmt::format("fader_{}", index);
+        std::string color = fmt::format("color_{}", index);
 
         if (plugin_params.has(select)) {
             plugin_params.remove(select);
+            previous_plugin_params.remove(select);
         }
         if (plugin_params.has(fader)) {
             plugin_params.remove(fader);
+            previous_plugin_params.remove(fader);
+        }
+        if (plugin_params.has(color)) {
+            plugin_params.remove(color);
+            previous_plugin_params.remove(color);
         }
 
         nb_channels -= 1;
 
         if (selected_channel == nb_channels) {
             HandleChannelClick(selected_channel - 1);
+
+            // When no dirty groups, we save the changes
+            if (!HasDirtyGroup()) {
+                Save();
+            }
+
             return;
         }
 
         for (int i = index; i <= nb_channels; i++) {
-            select = "select_" + std::to_string(i);
-            fader = "fader_" + std::to_string(i);
-            const std::string next_select = "select_" + std::to_string(i + 1);
-            const std::string next_fader = "fader_" + std::to_string(i + 1);
+            select = fmt::format("select_{}", i);
+            fader = fmt::format("fader_{}", i);
+            color = fmt::format("color_{}", i);
+            const std::string next_select = fmt::format("select_{}", i + 1);
+            const std::string next_fader = fmt::format("fader_{}", i + 1);
+            const std::string next_color = fmt::format("color_{}", i + 1);
+
+            if (plugin_params.has(next_color)) {
+                plugin_params.set(color, plugin_params[next_color]);
+                previous_plugin_params.set(color, previous_plugin_params[next_color]);
+            } else {
+                plugin_params.remove(color);
+                previous_plugin_params.remove(color);
+            }
 
             if (plugin_params.has(next_select)) {
                 plugin_params.set(select, plugin_params[next_select]);
+                previous_plugin_params.set(select, previous_plugin_params[next_select]);
             } else {
                 plugin_params.remove(select);
+                previous_plugin_params.remove(select);
             }
 
             if (plugin_params.has(next_fader)) {
                 plugin_params.set(fader, plugin_params[next_fader]);
+                previous_plugin_params.set(fader, previous_plugin_params[next_fader]);
             } else {
                 plugin_params.remove(fader);
+                previous_plugin_params.remove(fader);
             }
         }
         PopulateFields();
+
+        // When no dirty groups, we save the changes
+        if (!HasDirtyGroup()) {
+            Save();
+        }
     }
 
     void HandleGroupDrop(const int from, const int to) // NOLINT(*-identifier-length)
@@ -723,23 +836,37 @@ protected:
         const int from_id = to > from ? from : from + 1;
         const int to_id = to < from ? to : to + 1;
 
-        const std::string select = "select_" + std::to_string(to_id);
-        const std::string fader = "fader_" + std::to_string(to_id);
-        const std::string from_select = "select_" + std::to_string(from_id);
-        const std::string from_fader = "fader_" + std::to_string(from_id);
+        const std::string select = fmt::format("select_{}", to_id);
+        const std::string fader = fmt::format("fader_{}", to_id);
+        const std::string color = fmt::format("color_{}", to_id);
+        const std::string from_select = fmt::format("select_{}", from_id);
+        const std::string from_fader = fmt::format("fader_{}", from_id);
+        const std::string from_color = fmt::format("color_{}", from_id);
 
         this->HandleAddChannelAfter(to_id - 1);
 
         if (plugin_params.has(from_select)) {
             plugin_params.set(select, plugin_params[from_select]);
+            previous_plugin_params.set(select, previous_plugin_params[from_select]);
         } else {
             plugin_params.remove(select);
+            previous_plugin_params.remove(select);
         }
 
         if (plugin_params.has(from_fader)) {
             plugin_params.set(fader, plugin_params[from_fader]);
+            previous_plugin_params.set(fader, previous_plugin_params[from_fader]);
         } else {
             plugin_params.remove(fader);
+            previous_plugin_params.remove(fader);
+        }
+
+        if (plugin_params.has(from_color)) {
+            plugin_params.set(color, plugin_params[from_color]);
+            previous_plugin_params.set(color, previous_plugin_params[from_color]);
+        } else {
+            plugin_params.remove(color);
+            previous_plugin_params.remove(color);
         }
 
         selected_channel = to;
@@ -1153,6 +1280,7 @@ public :
     void RenderInformationBar() {
         double space_x;
         double space_y;
+        const bool dirty = IsGroupDirty(selected_channel);
 
         UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
         if (ImGui::BeginChild(m_ctx, "information_bar", 0.0, 54.0,
@@ -1188,6 +1316,7 @@ public :
                 assets,
                 IconUndo,
                 "mapping-reset-group",
+                !dirty,
                 ButtonThemeAccent,
                 std::bind(&CSurf_FP_8_PluginMappingPage::HandleResetChannel, this)
             );
@@ -1222,6 +1351,7 @@ public :
                 assets,
                 IconDelete,
                 "mapping-delete",
+                nb_channels < 2,
                 ButtonThemeAccent,
                 std::bind(&CSurf_FP_8_PluginMappingPage::HandleDeleteChannel, this)
             );

@@ -386,7 +386,7 @@ std::string DAW::GetTrackFxSurfaceEnabled(MediaTrack *media_track, const int fxI
 }
 
 bool DAW::GetTrackFxPanelOpen(MediaTrack *media_track, const int fxIndex) {
-    if (TrackFX_GetCount(media_track) < 1) {
+    if (TrackFX_GetCount(media_track) < 1 && fxIndex < 0x1000000) {
         return false;
     }
     return TrackFX_GetOpen(media_track, fxIndex);

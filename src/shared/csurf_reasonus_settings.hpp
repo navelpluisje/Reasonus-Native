@@ -6,6 +6,12 @@
 #include <mini/ini.h>
 #include "../shared/csurf_utils.hpp"
 
+enum FunctionTypes {
+    FUNCTION_DEFAULT,
+    FUNCTION_FOOTSWITCH,
+    FUNCTION_TRANSPORT,
+};
+
 class ReaSonusSettings {
     // Private Constructor
     explicit ReaSonusSettings(std::string _device);
@@ -63,6 +69,10 @@ class ReaSonusSettings {
         {"functions", "2", "0"},
         {"functions", "3", "0"},
         {"functions", "4", "0"},
+        {"transport", "1", "0"},
+        {"transport", "2", "0"},
+        {"transport", "3", "0"},
+        {"transport", "4", "0"},
         {"footswitch", "1", "0"},
         {"footswitch", "2", "0"},
         {"footswitch", "3", "0"},
@@ -96,6 +106,7 @@ class ReaSonusSettings {
         {"surface", "time-code", "2"},
         {"surface", "track-color-brightness", "25"},
         {"surface", "plugin-step-size", "1"},
+        {"surface", "plugin-has-input-control", "0"},
         {"surface", "plugin-map-param-clear", "0"},
         {"surface", "plugin-map-default-color-mode", "1"},
         {
@@ -136,6 +147,19 @@ class ReaSonusSettings {
         {"filters", "use-custom-color", "0"},
         {"filters", "project-filters", "0"},
     };
+
+    static std::string GetFunctionType(const FunctionTypes function_type) {
+        switch (function_type) {
+            case FUNCTION_FOOTSWITCH:
+                return "footswitch";
+
+            case FUNCTION_TRANSPORT:
+                return "transport";
+
+            default:
+                return "functions";
+        }
+    }
 
 public:
     ReaSonusSettings(const ReaSonusSettings &obj) = delete;
@@ -193,18 +217,26 @@ public:
      *
      * @param index index of the function to store
      * @param value The actual value to write
-     * @param is_footswitch Wether or not if the function is for the foot switch
+     * @param function_type function type where the function belomgs
      */
-    void SetFunction(const std::string &index, const std::string &value, bool is_footswitch = false);
+    void SetFunction(
+        const std::string &index,
+        const std::string &value,
+        FunctionTypes function_type = FUNCTION_DEFAULT
+    );
 
     /**
      * @brief Set a Setting and save them to the ini file
      *
      * @param key index of the function to store
      * @param value The actual value to write
-     * @param is_footswitch Wether or not if the function is for the foot switch
+     * @param function_types Function type to set the function for
      */
-    void SetAndSaveFuntion(const std::string &key, const std::string &value, bool is_footswitch = false);
+    void SetAndSaveFuntion(
+        const std::string &key,
+        const std::string &value,
+        FunctionTypes function_types = FUNCTION_DEFAULT
+    );
 
     /**
      * @brief Get the Setting vy its group and key
@@ -220,10 +252,10 @@ public:
      * @brief Get the Setting vy its group and key
      *
      * @param key The actual value to write
-     * @param is_footswitch Wether or not if the function is for the foot switch
+     * @param function_type
      * @return std::string
      */
-    std::string GetFunction(const std::string &key, bool is_footswitch = false);
+    std::string GetFunction(const std::string &key, FunctionTypes function_type);
 
     /**
      * @brief Save the current settng sobeject to the file
@@ -281,6 +313,8 @@ public:
     bool GetAutomationSingleButtonBlink();
 
     int GetpluginStepSize();
+
+    bool HasPluginInputControl();
 
     int GetTrackDisplay();
 

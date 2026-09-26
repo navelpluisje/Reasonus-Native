@@ -65,6 +65,7 @@ class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-in
     bool setting_untouch_after_learn;
     int setting_plugin_step_size;
     bool setting_plugin_map_param_clear;
+    bool setting_plugin_has_input_control;
     int setting_plugin_map_color_mode;
 
     // Displays
@@ -836,6 +837,13 @@ public:
                     i18n->t("settings", "plugin-step-size.tooltip"),
                     "%d");
 
+                RenderInfoCheckbox(
+                    m_ctx,
+                    assets,
+                    i18n->t("settings", "plugin-has-input-control.label"),
+                    &setting_plugin_has_input_control,
+                    i18n->t("settings", "plugin-has-input-control.tooltip"));
+
                 ImGui::EndChild(m_ctx);
             }
             UiStyledElements::PopReaSonusGroupStyle(m_ctx);
@@ -1087,6 +1095,7 @@ public:
         settings->SetSetting("surface", "time-code", time_code_indexes[setting_time_code]);
         settings->SetSetting("surface", "plugin-step-size", setting_plugin_step_size);
         settings->SetSetting("surface", "plugin-map-param-clear", setting_plugin_map_param_clear);
+        settings->SetSetting("surface", "plugin-has-input-control", setting_plugin_has_input_control);
         settings->SetSetting("surface", "plugin-map-default-color-mode", setting_plugin_map_color_mode);
         settings->SetSetting("surface", "instant-multi-select-filter", setting_instant_multi_select_filter);
         settings->SetSetting("surface", "mute-master-on-fwd-rwd", setting_mute_master_on_fwd_rwd);
@@ -1142,6 +1151,7 @@ public:
         setting_plugin_step_size = settings->GetpluginStepSize();
         setting_track_color_brightness = settings->GetTrackColorBrightness();
         setting_plugin_map_param_clear = settings->ShouldClearParamInput();
+        setting_plugin_has_input_control = settings->HasPluginInputControl();
         setting_plugin_map_color_mode = settings->GetPluginMapDefaultColorMode();
         setting_track_display = settings->GetTrackDisplay();
         setting_track_value_line_value = settings->GetTrackDisplayLineValues();
