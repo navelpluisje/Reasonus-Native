@@ -189,6 +189,7 @@ bool SetIntConfigVar(const std::string &var_name, int value);
  * @return false
  */
 bool hasBit(int val, int key);
+bool hasBit(const std::array<uint64_t, 2> val, const int key);
 
 /**
  * @brief Set the bit with index key to 0
@@ -197,8 +198,8 @@ bool hasBit(int val, int key);
  * @param key The index to set to 0
  * @return The modified integer
  */
-template<typename T>
-T clearBit(T val, int key);
+int clearBit(int val, int key);
+std::array<uint64_t, 2> clearBit(const std::array<uint64_t, 2> val, const int key);
 
 /**
  * @brief Get the normalized value of the volume to send to the device faders
