@@ -31,320 +31,336 @@ extern REAPER_PLUGIN_HINSTANCE g_hInst;
 ReaSonusSettings *ReaSonusSettings::instanceV2Ptr = nullptr;
 
 class CSurf_FaderPortV2 : public IReaperControlSurface {
-  int m_midi_in_dev, m_midi_out_dev;
-  midi_Output *m_midiout;
-  midi_Input *m_midiin;
+    int m_midi_in_dev, m_midi_out_dev;
+    midi_Output *m_midiout;
+    midi_Input *m_midiin;
 
-  CSurf_Context *context;
-  CSurf_FP_V2_SessionManager *sessionManager;
-  CSurf_FP_V2_Navigator *trackNavigator;
-  CSurf_FP_V2_TrackManager *trackManager;
-  CSurf_TransportManager *transportManager;
-  CSurf_FP_V2_AutomationManager *automationManager;
-  CSurf_FP_V2_GeneralControlManager *generalControlManager;
+    CSurf_Context *context;
+    CSurf_FP_V2_SessionManager *sessionManager;
+    CSurf_FP_V2_Navigator *trackNavigator;
+    CSurf_FP_V2_TrackManager *trackManager;
+    CSurf_TransportManager *transportManager;
+    CSurf_FP_V2_AutomationManager *automationManager;
+    CSurf_FP_V2_GeneralControlManager *generalControlManager;
 
-  DWORD surface_update_lastrun;
-  DWORD surface_update_keepalive;
-  DWORD surface_update_settings_check;
+    DWORD surface_update_lastrun;
+    DWORD surface_update_keepalive;
+    DWORD surface_update_settings_check;
 
-  I18n *i18n = I18n::GetInstance();
-  ReaSonusSettings *settings = ReaSonusSettings::GetInstance(FP_V2);
+    I18n *i18n = I18n::GetInstance();
+    ReaSonusSettings *settings = ReaSonusSettings::GetInstance(FP_V2);
 
-  char configtmp[1024];
+    char configtmp[1024];
 
-  void OnMIDIEvent(const MIDI_event_t *evt) const {
-    /**
-     * Fader values
-     */
-    if (evt->midi_message[0] == FADER_1) {
-      trackManager->HandleFaderMove(evt->midi_message[2], evt->midi_message[1]);
+    void OnMIDIEvent(const MIDI_event_t *evt) const {
+        /**
+         * Fader values
+         */
+        if (evt->midi_message[0] == FADER_1) {
+            trackManager->HandleFaderMove(evt->midi_message[2], evt->midi_message[1]);
+        }
+
+        /**
+         * ENCODERS
+         */
+        else if (evt->midi_message[0] == MIDI_MESSAGE_ENCODER) {
+            if (evt->midi_message[1] == ENCODER_PAN) {
+                sessionManager->HandleSessionNavEncoderChange(evt->midi_message[2]);
+            }
+        }
+
+        /**
+         * BUTTONS
+         */
+        else if (evt->midi_message[0] == MIDI_MESSAGE_BUTTON) {
+            /**
+             * Fader Touch
+             */
+            if (evt->midi_message[1] == FADER_TOUCH_1) {
+                trackManager->HandleFaderTouch(evt->midi_message[2]);
+                trackNavigator->SetIsTouched(evt->midi_message[2] > 0);
+            }
+
+            /**
+             * Track Mute Buttons
+             */
+            else if (evt->midi_message[1] == BTN_MUTE_1) {
+                trackManager->HandleMuteClick(1, evt->midi_message[2]);
+            }
+            /**
+             * Track Solo Buttons
+             */
+            else if (evt->midi_message[1] == BTN_SOLO_1) {
+                trackManager->HandleSoloClick(1, evt->midi_message[2]);
+            } else if (evt->midi_message[1] == BTN_ARM) {
+                trackManager->HandleArmClick(1, evt->midi_message[2]);
+            } else if (evt->midi_message[1] == BTN_BYPASS) {
+                trackManager->HandleBypassClick(1, evt->midi_message[2]);
+            }
+
+            /**
+             * Transport Buttons
+             */
+            else if (evt->midi_message[1] == BTN_PLAY) {
+                transportManager->HandlePlayButton(evt->midi_message[2]);
+            } else if (evt->midi_message[1] == BTN_STOP) {
+                transportManager->HandleStopButton(evt->midi_message[2]);
+            } else if (evt->midi_message[1] == BTN_RECORD) {
+                transportManager->HandleRecordButton(evt->midi_message[2]);
+            } else if (evt->midi_message[1] == BTN_REWIND) {
+                transportManager->HandleRewindButton(evt->midi_message[2]);
+            } else if (evt->midi_message[1] == BTN_FORWARD) {
+                transportManager->HandleForwardButton(evt->midi_message[2]);
+            } else if (evt->midi_message[1] == BTN_LOOP) {
+                transportManager->HandleRepeatButton(evt->midi_message[2]);
+            }
+
+            /**
+             * Footswitch
+             */
+            else if (evt->midi_message[1] == BTN_FOOTSWITCH) {
+                transportManager->HandleFootSwitchClick(evt->midi_message[2]);
+            }
+
+            /**
+             * General Control Management
+             */
+            else if (evt->midi_message[1] == BTN_SHIFT_LEFT) {
+                generalControlManager->HandleShiftButton(evt->midi_message[2]);
+                sessionManager->Refresh();
+            }
+
+            /**
+             * Automation Management
+             */
+            else if (evt->midi_message[1] == BTN_TOUCH) {
+                automationManager->HandleTouchButton(evt->midi_message[2]);
+            } else if (evt->midi_message[1] == BTN_WRITE) {
+                automationManager->HandleWriteButton(evt->midi_message[2]);
+            } else if (evt->midi_message[1] == BTN_READ) {
+                automationManager->HandleReadButton(evt->midi_message[2]);
+            }
+
+            /**
+             * Session Manager Buttons
+             */
+            else if (evt->midi_message[1] == BTN_LINK) {
+                sessionManager->HandleLinkButton(evt->midi_message[2]);
+            } else if (evt->midi_message[1] == BTN_PAN) {
+                sessionManager->HandlePanButton(evt->midi_message[2]);
+            } else if (evt->midi_message[1] == BTN_CHANNEL) {
+                sessionManager->HandleChannelButton(evt->midi_message[2]);
+            } else if (evt->midi_message[1] == BTN_ZOOM) {
+                // sessionManager->HandleZoomButton(evt->midi_message[2]);
+            } else if (evt->midi_message[1] == BTN_SCROLL) {
+                sessionManager->HandleScrollButton(evt->midi_message[2]);
+            } else if (evt->midi_message[1] == BTN_MASTER) {
+                sessionManager->HandleMasterButton(evt->midi_message[2]);
+            } else if (evt->midi_message[1] == BTN_CLICK) {
+                sessionManager->HandleClickButton(evt->midi_message[2]);
+            } else if (evt->midi_message[1] == BTN_SECTION) {
+                sessionManager->HandleSectionButton(evt->midi_message[2]);
+            } else if (evt->midi_message[1] == BTN_MARKER) {
+                sessionManager->HandleMarkerButton(evt->midi_message[2]);
+            } else if (evt->midi_message[1] == BTN_NEXT) {
+                sessionManager->HandleNextButton(evt->midi_message[2]);
+            } else if (evt->midi_message[1] == BTN_PREV) {
+                sessionManager->HandlePrevButton(evt->midi_message[2]);
+            } else if (evt->midi_message[1] == ENCODER_CLICK_PAN) {
+                sessionManager->HandleEncoderClick(evt->midi_message[2]);
+            }
+        }
     }
 
-    /**
-     * ENCODERS
-     */
-    else if (evt->midi_message[0] == MIDI_MESSAGE_ENCODER) {
-      if (evt->midi_message[1] == ENCODER_PAN) {
-        sessionManager->HandleSessionNavEncoderChange(evt->midi_message[2]);
-      }
+    void updateSettings() const {
+        i18n->SetLanguage(DAW::GetExtState(EXT_STATE_KEY_UI_LANGUAGE, "en-US"));
+        settings->UpdateSettings();
     }
-
-    /**
-     * BUTTONS
-     */
-    else if (evt->midi_message[0] == MIDI_MESSAGE_BUTTON) {
-      /**
-       * Fader Touch
-       */
-      if (evt->midi_message[1] == FADER_TOUCH_1) {
-        trackManager->HandleFaderTouch(evt->midi_message[2]);
-        trackNavigator->SetIsTouched(evt->midi_message[2] > 0);
-      }
-
-      /**
-       * Track Mute Buttons
-       */
-      else if (evt->midi_message[1] == BTN_MUTE_1) {
-        trackManager->HandleMuteClick(1, evt->midi_message[2]);
-      }
-      /**
-       * Track Solo Buttons
-       */
-      else if (evt->midi_message[1] == BTN_SOLO_1) {
-        trackManager->HandleSoloClick(1, evt->midi_message[2]);
-      } else if (evt->midi_message[1] == BTN_ARM) {
-        trackManager->HandleArmClick(1, evt->midi_message[2]);
-      } else if (evt->midi_message[1] == BTN_BYPASS) {
-        trackManager->HandleBypassClick(1, evt->midi_message[2]);
-      }
-
-      /**
-       * Transport Buttons
-       */
-      else if (evt->midi_message[1] == BTN_PLAY) {
-        transportManager->HandlePlayButton(evt->midi_message[2]);
-      } else if (evt->midi_message[1] == BTN_STOP) {
-        transportManager->HandleStopButton(evt->midi_message[2]);
-      } else if (evt->midi_message[1] == BTN_RECORD) {
-        transportManager->HandleRecordButton(evt->midi_message[2]);
-      } else if (evt->midi_message[1] == BTN_REWIND) {
-        transportManager->HandleRewindButton(evt->midi_message[2]);
-      } else if (evt->midi_message[1] == BTN_FORWARD) {
-        transportManager->HandleForwardButton(evt->midi_message[2]);
-      } else if (evt->midi_message[1] == BTN_LOOP) {
-        transportManager->HandleRepeatButton(evt->midi_message[2]);
-      }
-
-      /**
-       * Footswitch
-       */
-      else if (evt->midi_message[1] == BTN_FOOTSWITCH) {
-        transportManager->HandleFootSwitchClick(evt->midi_message[2]);
-      }
-
-      /**
-       * General Control Management
-       */
-      else if (evt->midi_message[1] == BTN_SHIFT_LEFT) {
-        generalControlManager->HandleShiftButton(evt->midi_message[2]);
-        sessionManager->Refresh();
-      }
-
-      /**
-       * Automation Management
-       */
-      else if (evt->midi_message[1] == BTN_TOUCH) {
-        automationManager->HandleTouchButton(evt->midi_message[2]);
-      } else if (evt->midi_message[1] == BTN_WRITE) {
-        automationManager->HandleWriteButton(evt->midi_message[2]);
-      } else if (evt->midi_message[1] == BTN_READ) {
-        automationManager->HandleReadButton(evt->midi_message[2]);
-      }
-
-      /**
-       * Session Manager Buttons
-       */
-      else if (evt->midi_message[1] == BTN_LINK) {
-        sessionManager->HandleLinkButton(evt->midi_message[2]);
-      } else if (evt->midi_message[1] == BTN_PAN) {
-        sessionManager->HandlePanButton(evt->midi_message[2]);
-      } else if (evt->midi_message[1] == BTN_CHANNEL) {
-        sessionManager->HandleChannelButton(evt->midi_message[2]);
-      } else if (evt->midi_message[1] == BTN_ZOOM) {
-        // sessionManager->HandleZoomButton(evt->midi_message[2]);
-      } else if (evt->midi_message[1] == BTN_SCROLL) {
-        sessionManager->HandleScrollButton(evt->midi_message[2]);
-      } else if (evt->midi_message[1] == BTN_MASTER) {
-        sessionManager->HandleMasterButton(evt->midi_message[2]);
-      } else if (evt->midi_message[1] == BTN_CLICK) {
-        sessionManager->HandleClickButton(evt->midi_message[2]);
-      } else if (evt->midi_message[1] == BTN_SECTION) {
-        sessionManager->HandleSectionButton(evt->midi_message[2]);
-      } else if (evt->midi_message[1] == BTN_MARKER) {
-        sessionManager->HandleMarkerButton(evt->midi_message[2]);
-      } else if (evt->midi_message[1] == BTN_NEXT) {
-        sessionManager->HandleNextButton(evt->midi_message[2]);
-      } else if (evt->midi_message[1] == BTN_PREV) {
-        sessionManager->HandlePrevButton(evt->midi_message[2]);
-      } else if (evt->midi_message[1] == ENCODER_CLICK_PAN) {
-        sessionManager->HandleEncoderClick(evt->midi_message[2]);
-      }
-    }
-  }
-
-  void updateSettings() const {
-    i18n->SetLanguage(DAW::GetExtState(EXT_STATE_KEY_UI_LANGUAGE, "en-US"));
-    settings->UpdateSettings();
-  }
 
 public:
-  CSurf_FaderPortV2(const int indev, const int outdev, int *errStats) {
-    (void) indev;
-    (void) outdev;
+    CSurf_FaderPortV2(const int indev, const int outdev, int *errStats) {
+        (void) indev;
+        (void) outdev;
 
-    /**
-     * First we check if we have the ini file. If not we create it with default values
-     */
-    if (std::string(GIT_VERSION).compare(DAW::GetExtState(EXT_STATE_KEY_VERSION, "")) != 0) {
-      DAW::SetExtState(EXT_STATE_KEY_VERSION, GIT_VERSION, true);
-      I18n::checkLocalesFiles();
-    }
-
-    m_midi_in_dev = settings->GetMidiInput();
-    m_midi_out_dev = settings->GetMidiOutput();
-
-    surface_update_lastrun = 0;
-
-    // create midi hardware access
-    m_midiin = m_midi_in_dev >= 0 ? CreateMIDIInput(m_midi_in_dev) : nullptr;
-    m_midiout = m_midi_out_dev >= 0 ? CreateMIDIOutput(m_midi_out_dev, false, nullptr) : nullptr;
-
-    context = new CSurf_Context(1);
-    updateSettings();
-
-    trackNavigator = new CSurf_FP_V2_Navigator(context);
-    generalControlManager = new CSurf_FP_V2_GeneralControlManager(context, trackNavigator, m_midiout);
-    sessionManager = new CSurf_FP_V2_SessionManager(context, trackNavigator, m_midiout);
-    trackManager = new CSurf_FP_V2_TrackManager(context, trackNavigator, m_midiout);
-    transportManager = new CSurf_TransportManager(context, m_midiout);
-    automationManager = new CSurf_FP_V2_AutomationManager(context, trackNavigator, m_midiout);
-
-    if (errStats) {
-      if (m_midi_in_dev >= 0 && !m_midiin) {
-        *errStats |= 1;
-      }
-
-      if (m_midi_out_dev >= 0 && !m_midiout) {
-        *errStats |= 2;
-      }
-    }
-
-    if (m_midiin) {
-      m_midiin->start();
-    }
-
-    if (m_midiout) {
-      m_midiout->Send(0xb0, 0x00, 0x06, -1);
-      m_midiout->Send(0xb0, 0x20, 0x27, -1);
-    }
-  }
-
-  ~CSurf_FaderPortV2() override {
-    if (m_midiout) {
-      for (int x = 0; x < 0x30; x++) // lights out§
-        m_midiout->Send(0xa0, x, 0x00, -1);
-
-      Sleep(5);
-    }
-
-    DELETE_ASYNC(m_midiout);
-    DELETE_ASYNC(m_midiin);
-  }
-
-  const char *GetTypeString() override {
-    return "REASONUS_FADERPORT_V2";
-  }
-
-  const char *GetDescString() override {
-    snprintf(configtmp, 100, "ReaSonus FaderPort V2 (dev %d, %d)", m_midi_in_dev, m_midi_out_dev);
-    return configtmp;
-  }
-
-  // string of configuration data
-  const char *GetConfigString() override {
-    snprintf(configtmp, 100, "0 0 %d %d", m_midi_in_dev, m_midi_out_dev);
-
-    return configtmp;
-  }
-
-  void CloseNoReset() override {
-    DELETE_ASYNC(m_midiout);
-    DELETE_ASYNC(m_midiin);
-    m_midiout = nullptr;
-    m_midiin = nullptr;
-  }
-
-  bool GetTouchState(MediaTrack *media_track, const int is_pan) override {
-    return trackNavigator->IsTrackTouched(media_track, is_pan);
-  }
-
-  void Run() override {
-    if (m_midiin) {
-      m_midiin->SwapBufsPrecise(GetTickCount(), 0.0);
-      int l = 0;
-      MIDI_eventlist *list = m_midiin->GetReadBuf();
-      MIDI_event_t *evts;
-
-      while ((evts = list->EnumItems(&l))) {
-        OnMIDIEvent(evts);
-      }
-    }
-
-    if (m_midiout) {
-      const DWORD now = GetTickCount();
-      if (now - surface_update_lastrun >= 10) {
-        trackManager->UpdateTrack();
-        generalControlManager->Update();
-        sessionManager->Update();
-        transportManager->Update();
-        automationManager->Update();
-
-        surface_update_lastrun = now;
-      }
-
-      if (now - surface_update_keepalive >= 990) {
-        surface_update_keepalive = now;
-        m_midiout->Send(0xa0, 0x00, 0x00, -1);
-      }
-
-      /**
-       * every 1500 ms we check if the settings have been saved.
-       * If so, we updet the settings in the context
-       *
-       */
-      if (now - surface_update_settings_check >= 1500) {
-        surface_update_settings_check = now;
-        const std::string is_saved = DAW::GetExtState(EXT_STATE_KEY_SAVED_SETTINGS, "");
-
-        if (is_saved.compare(EXT_STATE_VALUE_TRUE) == 0) {
-          updateSettings();
-          DAW::SetExtState(EXT_STATE_KEY_SAVED_SETTINGS, EXT_STATE_VALUE_FALSE, false);
+        /**
+         * First we check if we have the ini file. If not we create it with default values
+         */
+        if (std::string(GIT_VERSION).compare(DAW::GetExtState(EXT_STATE_KEY_VERSION, "")) != 0) {
+            DAW::SetExtState(EXT_STATE_KEY_VERSION, GIT_VERSION, true);
+            I18n::checkLocalesFiles();
         }
-      }
+
+        m_midi_in_dev = settings->GetMidiInput();
+        m_midi_out_dev = settings->GetMidiOutput();
+
+        surface_update_lastrun = 0;
+
+        // create midi hardware access
+        m_midiin = m_midi_in_dev >= 0 ? CreateMIDIInput(m_midi_in_dev) : nullptr;
+        m_midiout = m_midi_out_dev >= 0 ? CreateMIDIOutput(m_midi_out_dev, false, nullptr) : nullptr;
+
+        context = new CSurf_Context(1);
+        updateSettings();
+
+        trackNavigator = new CSurf_FP_V2_Navigator(context);
+        generalControlManager = new CSurf_FP_V2_GeneralControlManager(context, trackNavigator, m_midiout);
+        sessionManager = new CSurf_FP_V2_SessionManager(context, trackNavigator, m_midiout);
+        trackManager = new CSurf_FP_V2_TrackManager(context, trackNavigator, m_midiout);
+        transportManager = new CSurf_TransportManager(context, m_midiout);
+        automationManager = new CSurf_FP_V2_AutomationManager(context, trackNavigator, m_midiout);
+
+        if (errStats) {
+            if (m_midi_in_dev >= 0 && !m_midiin) {
+                *errStats |= 1;
+            }
+
+            if (m_midi_out_dev >= 0 && !m_midiout) {
+                *errStats |= 2;
+            }
+        }
+
+        /**
+         * Check if the midi in or out is enabled an show a message to disable them
+         */
+        if (!isMidiInDeviceDisabled(m_midi_in_dev) || !isMidiOutDeviceDisabled(m_midi_out_dev)) {
+            const int result = MB(
+                "The MIDI input and/or output is not disabled. Do you want to disable them permanently?\n\nClick Yes to disable them permanent (recommended)\n\nClick No to disable them for the duration of the REAPER session\n\nClick Cancel otherwise. ReaSonus might in this case not work 100% as intended",
+                "ReaSonus MIDI Error",
+                3
+            );
+
+            if (result != 2) {
+                disableMidiIn(m_midi_in_dev, result == 6);
+                disableMidiOut(m_midi_out_dev, result == 6);
+            }
+        }
+
+        if (m_midiin != nullptr) {
+            m_midiin->start();
+        }
+
+        if (m_midiout != nullptr) {
+            m_midiout->Send(0xb0, 0x00, 0x06, -1);
+            m_midiout->Send(0xb0, 0x20, 0x27, -1);
+        }
     }
-  }
 
-  void SetTrackListChange() override {
-    trackNavigator->UpdateOffset();
-  }
+    ~CSurf_FaderPortV2() override {
+        if (m_midiout != nullptr) {
+            for (int x = 0; x < 0x30; x++) // lights out
+                m_midiout->Send(0xa0, x, 0x00, -1);
 
-  void OnTrackSelection(MediaTrack *media_track) override {
-    const int track_index = stoi(DAW::GetTrackIndex(media_track));
+            Sleep(5);
+        }
 
-    // Master track returns -1. Do not do anyting right now
-    if (track_index < 0) {
-      return;
+        DELETE_ASYNC(m_midiout);
+        DELETE_ASYNC(m_midiin);
     }
 
-    if (!settings->GetControlHiddenTracks() && DAW::IsTrackVisible(media_track)) {
-      trackNavigator->SetOffsetByTrack(media_track);
-    } else if (settings->GetControlHiddenTracks()) {
-      trackNavigator->SetOffset(track_index - 1);
+    const char *GetTypeString() override {
+        return "REASONUS_FADERPORT_V2";
     }
-  }
+
+    const char *GetDescString() override {
+        snprintf(configtmp, 100, "ReaSonus FaderPort V2 (dev %d, %d)", m_midi_in_dev, m_midi_out_dev);
+        return configtmp;
+    }
+
+    // string of configuration data
+    const char *GetConfigString() override {
+        snprintf(configtmp, 100, "0 0 %d %d", m_midi_in_dev, m_midi_out_dev);
+
+        return configtmp;
+    }
+
+    void CloseNoReset() override {
+        DELETE_ASYNC(m_midiout);
+        DELETE_ASYNC(m_midiin);
+        m_midiout = nullptr;
+        m_midiin = nullptr;
+    }
+
+    bool GetTouchState(MediaTrack *media_track, const int is_pan) override {
+        return trackNavigator->IsTrackTouched(media_track, is_pan);
+    }
+
+    void Run() override {
+        if (m_midiin != nullptr) {
+            m_midiin->SwapBufsPrecise(GetTickCount(), 0.0);
+            int l = 0;
+            MIDI_eventlist *list = m_midiin->GetReadBuf();
+            MIDI_event_t *evts;
+
+            while ((evts = list->EnumItems(&l))) {
+                OnMIDIEvent(evts);
+            }
+        }
+
+        if (m_midiout) {
+            const DWORD now = GetTickCount();
+            if (now - surface_update_lastrun >= 10) {
+                trackManager->UpdateTrack();
+                generalControlManager->Update();
+                sessionManager->Update();
+                transportManager->Update();
+                automationManager->Update();
+
+                surface_update_lastrun = now;
+            }
+
+            if (now - surface_update_keepalive >= 990) {
+                surface_update_keepalive = now;
+                m_midiout->Send(0xa0, 0x00, 0x00, -1);
+            }
+
+            /**
+             * every 1500 ms we check if the settings have been saved.
+             * If so, we updet the settings in the context
+             *
+             */
+            if (now - surface_update_settings_check >= 1500) {
+                surface_update_settings_check = now;
+                const std::string is_saved = DAW::GetExtState(EXT_STATE_KEY_SAVED_SETTINGS, "");
+
+                if (is_saved.compare(EXT_STATE_VALUE_TRUE) == 0) {
+                    updateSettings();
+                    DAW::SetExtState(EXT_STATE_KEY_SAVED_SETTINGS, EXT_STATE_VALUE_FALSE, false);
+                }
+            }
+        }
+    }
+
+    void SetTrackListChange() override {
+        trackNavigator->UpdateOffset();
+    }
+
+    void OnTrackSelection(MediaTrack *media_track) override {
+        const int track_index = stoi(DAW::GetTrackIndex(media_track));
+
+        // Master track returns -1. Do not do anyting right now
+        if (track_index < 0) {
+            return;
+        }
+
+        if (!settings->GetControlHiddenTracks() && DAW::IsTrackVisible(media_track)) {
+            trackNavigator->SetOffsetByTrack(media_track);
+        } else if (settings->GetControlHiddenTracks()) {
+            trackNavigator->SetOffset(track_index - 1);
+        }
+    }
 };
 
 static IReaperControlSurface *createFuncV2(const char *type_string, const char *configString, int *errStats) {
-  (void) type_string;
-  std::array<int, 4> parms = {};
-  parseParms(configString, parms);
+    (void) type_string;
+    std::array<int, 4> parms = {};
+    parseParms(configString, parms);
 
-  return new CSurf_FaderPortV2(parms[2], parms[3], errStats);
+    return new CSurf_FaderPortV2(parms[2], parms[3], errStats);
 }
 
 reaper_csurf_reg_t csurf_faderport_v2_reg = {
-  "REASONUS_FADERPORT_V2",
-  "ReaSonus FaderPort V2",
-  createFuncV2,
-  CSURF_FP_V2_UI_INIT::CreateInitDialog,
+    "REASONUS_FADERPORT_V2",
+    "ReaSonus FaderPort V2",
+    createFuncV2,
+    CSURF_FP_V2_UI_INIT::CreateInitDialog,
 };
