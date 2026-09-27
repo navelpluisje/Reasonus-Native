@@ -60,17 +60,20 @@ STYLE DS_CONTROL | WS_CHILD
 CAPTION "ReaSonus FaderPort Native"
 FONT 8, "MS Shell Dlg"
 BEGIN
+    // MIDI connections info
     GROUPBOX "Surface", IDC_GROUP_SURFACE, 10, 5, 190, 43
     COMBOBOX IDC_COMBO_SURFACE, 55, 25, 135, 14, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT "Surface", IDC_STATIC, 20, 26, 28, 10
     GROUPBOX "MIDI Connections", IDC_GROUP_MIDI_DEVICES, 10, 65, 190, 63
-    GROUPBOX "MIDI Connections", IDC_GROUP_MIDI_DEVICES_LARGE, 10, 65, 190, 119
+    GROUPBOX "MIDI Connections", IDC_GROUP_MIDI_DEVICES_LARGE, 10, 65, 190, 138
     COMBOBOX IDC_COMBO_MIDI_IN, 55, 85, 135, 14, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT "MIDI In", IDC_STATIC, 20, 86, 28, 10
     COMBOBOX IDC_COMBO_MIDI_OUT, 55, 105, 135, 14, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT "MIDI Out", IDC_STATIC, 20, 106, 31, 10
     LTEXT "The MIDI device is not disabled.", IDC_MIDI_DISABLED_1, 20, 136, 176, 10
     LTEXT "Depending on your MIDI setup, this might cause unexpected behaviour. \r\nIs this the case, then please disable the controller in both MIDI inputs and MIDI outputs", IDC_MIDI_DISABLED_2, 20, 146, 170, 50
+    PUSHBUTTON "More Info", IDC_BUTTON_INSTALL, 20, 181, 62, 16
+    // More info block
     GROUPBOX "Other Info", IDC_GROUP_SETTINGS, 210, 5, 140, 198
     LTEXT "Open the ReaSonus documentation", IDC_STATIC, 220, 25, 110, 10
     PUSHBUTTON "Documentation", IDC_BUTTON_DOCUMENTATION, 220, 39, 80, 16
@@ -90,14 +93,17 @@ STYLE DS_CONTROL | WS_CHILD
 CAPTION "ReaSonus FaderPort Native V2"
 FONT 8, "MS Shell Dlg"
 BEGIN
+    // MIDI connections info
     GROUPBOX "MIDI Connections", IDC_GROUP_MIDI_DEVICES, 10, 5, 190, 63
-    GROUPBOX "MIDI Connections", IDC_GROUP_MIDI_DEVICES_LARGE, 10, 5, 190, 119
+    GROUPBOX "MIDI Connections", IDC_GROUP_MIDI_DEVICES_LARGE, 10, 5, 190, 139
     COMBOBOX IDC_COMBO_MIDI_IN, 55, 25, 135, 14, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT "MIDI In", IDC_STATIC, 20, 26, 28, 10
     COMBOBOX IDC_COMBO_MIDI_OUT, 55, 45, 135, 14, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT "MIDI Out", IDC_STATIC, 20, 46, 31, 10
     LTEXT "The MIDI device is not disabled.", IDC_MIDI_DISABLED_1, 20, 76, 176, 60
     LTEXT "Depending on your MIDI setup, this might cause unexpected behaviour. \r\nIs this the case, then please disable the controller in both MIDI inputs and MIDI outputs", IDC_MIDI_DISABLED_2, 20, 86, 170, 50
+    PUSHBUTTON "More Info", IDC_BUTTON_INSTALL, 20, 121, 62, 16
+    // More info block
     GROUPBOX "Other Info", IDC_GROUP_SETTINGS, 210, 5, 140, 198
     LTEXT "Open the ReaSonus documentation", IDC_STATIC, 220, 25, 110, 10
     PUSHBUTTON "Documentation", IDC_BUTTON_DOCUMENTATION, 220, 39, 80, 16

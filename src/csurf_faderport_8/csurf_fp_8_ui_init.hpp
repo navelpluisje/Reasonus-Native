@@ -31,11 +31,13 @@ namespace CSURF_FP_8_UI_INIT {
                 SetDlgItemText(hwndDlg, IDC_MIDI_DISABLED_1, "The MIDI In and Out device is not disabled.");
             }
 
-§            ShowWindow(GetDlgItem(hwndDlg, IDC_GROUP_MIDI_DEVICES_LARGE), SW_SHOW);
+            ShowWindow(GetDlgItem(hwndDlg, IDC_GROUP_MIDI_DEVICES_LARGE), SW_SHOW);
+            ShowWindow(GetDlgItem(hwndDlg, IDC_BUTTON_INSTALL), SW_SHOW);
             ShowWindow(GetDlgItem(hwndDlg, IDC_MIDI_DISABLED_1), SW_SHOW);
             ShowWindow(GetDlgItem(hwndDlg, IDC_MIDI_DISABLED_2), SW_SHOW);
         } else {
             ShowWindow(GetDlgItem(hwndDlg, IDC_GROUP_MIDI_DEVICES_LARGE), SW_HIDE);
+            ShowWindow(GetDlgItem(hwndDlg, IDC_BUTTON_INSTALL), SW_HIDE);
             ShowWindow(GetDlgItem(hwndDlg, IDC_MIDI_DISABLED_1), SW_HIDE);
             ShowWindow(GetDlgItem(hwndDlg, IDC_MIDI_DISABLED_2), SW_HIDE);
         }
@@ -118,6 +120,7 @@ namespace CSURF_FP_8_UI_INIT {
                 SetDlgItemText(hwndDlg, IDC_VERSION, GIT_VERSION);
 
                 ShowWindow(GetDlgItem(hwndDlg, IDC_GROUP_MIDI_DEVICES_LARGE), SW_HIDE);
+                ShowWindow(GetDlgItem(hwndDlg, IDC_BUTTON_INSTALL), SW_HIDE);
                 ShowWindow(GetDlgItem(hwndDlg, IDC_MIDI_DISABLED_1), SW_HIDE);
                 ShowWindow(GetDlgItem(hwndDlg, IDC_MIDI_DISABLED_2), SW_HIDE);
 
@@ -174,6 +177,11 @@ namespace CSURF_FP_8_UI_INIT {
 
                     case IDC_BUTTON_COFFEE: {
                         SystemOpenURL("https://buymeacoffee.com/navelpluisje");
+                        break;
+                    }
+
+                    case IDC_BUTTON_INSTALL: {
+                        SystemOpenURL("https://reasonus.net/documentation/#installation");
                         break;
                     }
 
