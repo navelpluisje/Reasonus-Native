@@ -1,18 +1,18 @@
 #include <array>
 #include "../csurf_ui_page_content.hpp"
-#include "../components/csurf_ui_checkbox.hpp"
-#include "../components/csurf_ui_int_input.hpp"
-#include "../components/csurf_ui_combo_input.hpp"
-#include "../../shared/csurf.h"
 #include "../../i18n/i18n.hpp"
-#include "../utils/csurf_ui_button_width.hpp"
+#include "../../shared/csurf.h"
 #include "../../shared/csurf_daw.hpp"
-#include "../windows/csurf_ui_fp_8_control_panel.hpp"
 #include "../../shared/csurf_reasonus_settings.hpp"
-#include "../components/csurf_ui_image_combo_input.hpp"
-#include "../components/csurf_ui_color_picker.hpp"
-#include "../components/csurf_ui_page_title.hpp"
 #include "../components/csurf_ui_automation_point_shape.hpp"
+#include "../components/csurf_ui_checkbox.hpp"
+#include "../components/csurf_ui_color_picker.hpp"
+#include "../components/csurf_ui_combo_input.hpp"
+#include "../components/csurf_ui_image_combo_input.hpp"
+#include "../components/csurf_ui_int_input.hpp"
+#include "../components/csurf_ui_page_title.hpp"
+#include "../utils/csurf_ui_button_width.hpp"
+#include "../windows/csurf_ui_fp_8_control_panel.hpp"
 
 class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-internal-linkage)
     I18n *i18n = I18n::GetInstance();
@@ -38,6 +38,7 @@ class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-in
     bool setting_filter_project_filters;
     bool setting_master_fader_mode;
     bool setting_mute_master_on_fwd_rwd;
+    bool setting_sends_respect_slots;
 
     // Automation
     bool setting_use_automation_colors;
@@ -62,6 +63,7 @@ class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-in
 
     // Plugins
     bool setting_disable_plugins;
+    bool setting_plugin_respect_slots;
     bool setting_untouch_after_learn;
     int setting_plugin_step_size;
     bool setting_plugin_map_param_clear;
@@ -597,6 +599,33 @@ public:
 
                 ImGui::EndChild(m_ctx);
             }
+
+            // Once we have more items under sends/receives, this has to be set around the `setting_sends_respect_slots` setting
+            if (DAW::VersionHasFeature(FEATURE_SLOTS)) {
+                if (ImGui::BeginChild(
+                    m_ctx,
+                    "sends-settings",
+                    0.0,
+                    0.0,
+                    ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
+                )) {
+                    ReaSonusPageTitle(
+                        m_ctx,
+                        assets,
+                        i18n->t("settings", "sends-receives-group.label"),
+                        true
+                    );
+
+                    RenderInfoCheckbox(
+                        m_ctx,
+                        assets,
+                        i18n->t("settings", "sends-respect-slots.label"),
+                        &setting_sends_respect_slots,
+                        i18n->t("settings", "sends-respect-slots.tooltip")
+                    );
+                    ImGui::EndChild(m_ctx);
+                }
+            }
             UiStyledElements::PopReaSonusGroupStyle(m_ctx);
             ImGui::EndGroup(m_ctx);
 
@@ -818,14 +847,26 @@ public:
                     assets,
                     i18n->t("settings", "plugin-control.label"),
                     &setting_disable_plugins,
-                    i18n->t("settings", "plugin-control.tooltip"));
+                    i18n->t("settings", "plugin-control.tooltip")
+                );
+
+                if (DAW::VersionHasFeature(FEATURE_SLOTS)) {
+                    RenderInfoCheckbox(
+                        m_ctx,
+                        assets,
+                        i18n->t("settings", "plugin-respect-slots.label"),
+                        &setting_plugin_respect_slots,
+                        i18n->t("settings", "plugin-respect-slots.tooltip")
+                    );
+                }
 
                 RenderInfoCheckbox(
                     m_ctx,
                     assets,
                     i18n->t("settings", "untouch-after-learn.label"),
                     &setting_untouch_after_learn,
-                    i18n->t("settings", "untouch-after-learn.tooltip"));
+                    i18n->t("settings", "untouch-after-learn.tooltip")
+                );
 
                 RenderinfoIntInput(
                     m_ctx,
@@ -835,7 +876,8 @@ public:
                     1,
                     settings->GetSurface(),
                     i18n->t("settings", "plugin-step-size.tooltip"),
-                    "%d");
+                    "%d"
+                );
 
                 RenderInfoCheckbox(
                     m_ctx,
@@ -1088,12 +1130,14 @@ public:
         settings->SetSetting("surface", "mute-solo-momentary", setting_momentary_mute_solo);
         settings->SetSetting("surface", "overwrite-time-code", setting_overwrite_time_code);
         settings->SetSetting("surface", "track-color-brightness", setting_track_color_brightness);
+        settings->SetSetting("surface", "sends-respect-slots", setting_sends_respect_slots);
         settings->SetSetting("surface", "latch-preview-action", setting_latch_preview_action_enable);
         settings->SetSetting("surface", "latch-preview-action-code",
                              latch_preview_action_indexes[setting_latch_preview_action]);
         settings->SetSetting("surface", "automation-colors", join(setting_automation_colors, ","));
         settings->SetSetting("surface", "time-code", time_code_indexes[setting_time_code]);
         settings->SetSetting("surface", "plugin-step-size", setting_plugin_step_size);
+        settings->SetSetting("surface", "plugin-respect-slots", setting_plugin_respect_slots);
         settings->SetSetting("surface", "plugin-map-param-clear", setting_plugin_map_param_clear);
         settings->SetSetting("surface", "plugin-has-input-control", setting_plugin_has_input_control);
         settings->SetSetting("surface", "plugin-map-default-color-mode", setting_plugin_map_color_mode);
@@ -1147,9 +1191,11 @@ public:
         setting_overwrite_time_code = settings->GetOverwriteTimeCode();
         setting_latch_preview_action_enable = settings->GetLatchPreviewActionEnabled();
         setting_use_automation_colors = settings->UseAutomationColors();
+        setting_sends_respect_slots = settings->SendsShouldRespectSlots();
         setting_automation_colors = settings->GetAutomationColorsArray();
         setting_plugin_step_size = settings->GetpluginStepSize();
         setting_track_color_brightness = settings->GetTrackColorBrightness();
+        setting_plugin_respect_slots = settings->PluginsShouldRespectSlots();
         setting_plugin_map_param_clear = settings->ShouldClearParamInput();
         setting_plugin_has_input_control = settings->HasPluginInputControl();
         setting_plugin_map_color_mode = settings->GetPluginMapDefaultColorMode();

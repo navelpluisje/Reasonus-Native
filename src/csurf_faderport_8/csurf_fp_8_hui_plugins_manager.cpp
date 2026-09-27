@@ -53,6 +53,7 @@ public:
         nb_plugins = 0;
         const bool control_input_plugins = settings->HasPluginInputControl() && context->GetArm();
         const WDL_PtrList<MediaTrack> media_tracks = navigator->GetBankTracks();
+        const bool respect_slots = settings->PluginsShouldRespectSlots();
 
         for (int i = 0; i < context->GetNbChannels(); i++) {
             MediaTrack *media_track;
@@ -65,7 +66,7 @@ public:
 
             const int _nb_track_plugins = control_input_plugins
                                               ? TrackFX_GetRecCount(media_track)
-                                              : TrackFX_GetCount(media_track);
+                                              : DAW::GetTrackFxCount(media_track, respect_slots);
 
             nb_track_items[i] = _nb_track_plugins;
             nb_plugins = std::max(_nb_track_plugins, nb_plugins);
@@ -76,22 +77,28 @@ public:
 
         for (int i = 0; i < context->GetNbChannels(); i++) {
             MediaTrack *media_track;
-            int fader_value = 0, value_bar_value = 0;
-            const int display_index = context->GetChannelManagerItemIndex(nb_track_items[i] - 1);
-            const int plugin_index = GetPluginIndex(i);
+            const CSurf_FP_8_Track *track = tracks.at(i);
 
-            CSurf_FP_8_Track *track = tracks.at(i);
+            int fader_value = 0;
+            int value_bar_value = 0;
             if (context->GetMasterFaderMode() && i == context->GetNbChannels() - 1) {
                 media_track = GetMasterTrack(nullptr);
             } else {
                 media_track = media_tracks.Get(i);
             }
 
-            if (!media_track) {
+            if (media_track == nullptr) {
                 track->ClearTrack(true, force_update);
                 continue;
             }
 
+            const int slot_index = context->GetChannelManagerItemIndex(
+                respect_slots ? nb_plugins : nb_track_items[i] - 1
+            );
+
+            const int plugin_index = respect_slots
+                                         ? DAW::GetTrackFxIndexBySlotIndex(media_track, slot_index)
+                                         : slot_index;
             SetTrackColors(media_track, DAW::IsTrackSelected(media_track), false);
             GetFaderValue(media_track, &fader_value, &value_bar_value);
 
@@ -103,7 +110,7 @@ public:
                     NON_INVERT,
                     force_update
                 );
-                track->SetDisplayLine(\
+                track->SetDisplayLine(
                     1,
                     ALIGN_LEFT,
                     DAW::GetTrackFxName(media_track, plugin_index, false).c_str(),
@@ -120,7 +127,7 @@ public:
                 track->SetDisplayLine(
                     3,
                     ALIGN_CENTER,
-                    Progress(display_index + 1, nb_track_items[i]).c_str(),
+                    Progress(slot_index + 1, respect_slots ? nb_plugins : nb_track_items[i]).c_str(),
                     NON_INVERT,
                     force_update
                 );
@@ -138,7 +145,16 @@ public:
                 track->SetDisplayLine(0, ALIGN_LEFT, DAW::GetTrackName(media_track).c_str(), NON_INVERT, force_update);
                 track->SetDisplayLine(1, ALIGN_LEFT, "No Fx", INVERT, force_update);
                 track->SetDisplayLine(2, ALIGN_CENTER, "", NON_INVERT, force_update);
-                track->SetDisplayLine(3, ALIGN_CENTER, "", NON_INVERT, force_update);
+                // When in slot mode, we always show th eprogress
+                track->SetDisplayLine(
+                    3,
+                    ALIGN_CENTER,
+                    respect_slots
+                        ? Progress(slot_index + 1, respect_slots ? nb_plugins : nb_track_items[i]).c_str()
+                        : "",
+                    NON_INVERT,
+                    force_update
+                );
                 track->SetMuteButtonValue(BTN_VALUE_OFF, force_update);
                 track->SetSoloButtonValue(BTN_VALUE_OFF, force_update);
             }
@@ -190,12 +206,17 @@ public:
         if (value == 0) {
             return;
         }
+        const bool respect_slots = settings->PluginsShouldRespectSlots();
 
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
-        const int plugin_index = GetPluginIndex(index);
+        const int slot_index = context->GetChannelManagerItemIndex(nb_track_items[index] - 1);
+        const int plugin_index = respect_slots
+                                     ? DAW::GetTrackFxIndexBySlotIndex(media_track, slot_index)
+                                     : slot_index;
 
         // If the current plugin window is open, close it
         // Otherwise Close all other open windows and open the plugin window
+
         if (DAW::GetTrackFxPanelOpen(media_track, plugin_index)) {
             TrackFX_Show(media_track, plugin_index, 0);
             TrackFX_Show(media_track, plugin_index, 2);
