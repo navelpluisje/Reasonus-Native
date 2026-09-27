@@ -26,13 +26,13 @@ public:
 
     MediaTrack *GetControllerTrack();
 
-    bool IsTrackTouched(MediaTrack *media_track, int is_pan);
+    bool IsTrackTouched(const MediaTrack *media_track, int is_pan);
 
     void SetOffset(int offset);
 
     void SetOffsetByTrack(MediaTrack *media_track);
 
-    int GetOffset();
+    int GetOffset() const;
 
     void IncrementOffset(int count);
 
@@ -44,13 +44,13 @@ public:
 
     MediaTrack *GetPreviousTrack();
 
-    bool HasTracksWithSolo();
+    bool HasTracksWithSolo() const;
 
-    bool HasTracksWithMute();
+    bool HasTracksWithMute() const;
 
-    bool HasArmedTracks();
+    bool HasArmedTracks() const;
 
-    bool HasAllArmedTracks();
+    bool HasAllArmedTracks() const;
 
     void SetIsTouched(bool value);
 };

@@ -29,5 +29,6 @@ inline auto EXT_STATE_KEY_SAVED_SETTINGS = "saved_settings";
 inline auto EXT_STATE_KEY_UI_LANGUAGE = "language";
 inline auto EXT_STATE_KEY_VERSION = "version";
 inline auto FP_TRACK_OFFSET = "FP_TRACK_OFFSET";
+inline auto FP_V2_CONTROLLED_TRACK = "FP_V2_CONTROLLED_TRACK";
 
 #endif

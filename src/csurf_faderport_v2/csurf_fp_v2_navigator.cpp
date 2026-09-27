@@ -1,5 +1,16 @@
 #include "csurf_fp_v2_navigator.hpp"
+#include "../shared/csurf.h"
 #include "../shared/csurf_daw.hpp"
+
+void CSurf_FP_V2_Navigator::UpdateMixerPosition()
+{
+    MediaTrack *media_track = GetControllerTrack();
+    if (media_track)
+    {
+        SetMixerScroll(media_track);
+        DAW::SetTcpScroll(media_track);
+    }
+}
 
 void CSurf_FP_V2_Navigator::GetAllControllableTracks(WDL_PtrList<MediaTrack> &tracks, bool &hasSolo, bool &hasMute)
 {
@@ -9,13 +20,13 @@ void CSurf_FP_V2_Navigator::GetAllControllableTracks(WDL_PtrList<MediaTrack> &tr
     bool _arm = false;
     bool _all_armed = true;
 
-    for (int i = 0; i < CountTracks(0); i++)
+    for (int i = 0; i < CountTracks(nullptr); i++)
     {
-        MediaTrack *media_track = GetTrack(0, i);
-        bool visible = DAW::IsTrackVisible(media_track);
-        int solo = DAW::IsTrackSoloed(media_track);
-        bool mute = DAW::IsTrackMuted(media_track);
-        bool armed = DAW::IsTrackArmed(media_track);
+        MediaTrack *media_track = GetTrack(nullptr, i);
+        const bool visible = DAW::IsTrackVisible(media_track);
+        const int solo = DAW::IsTrackSoloed(media_track);
+        const bool mute = DAW::IsTrackMuted(media_track);
+        const bool armed = DAW::IsTrackArmed(media_track);
 
         if (solo > 0 && !_solo)
         {
@@ -42,31 +53,26 @@ void CSurf_FP_V2_Navigator::GetAllControllableTracks(WDL_PtrList<MediaTrack> &tr
             tracks.Add(media_track);
         }
     }
+
     hasSolo = _solo;
     hasMute = _mute;
     hasArmed = _arm;
     hasAllArmed = _all_armed;
 }
 
-void CSurf_FP_V2_Navigator::UpdateMixerPosition()
-{
-    MediaTrack *media_track = GetControllerTrack();
-    if (media_track)
-    {
-        SetMixerScroll(media_track);
-        DAW::SetTcpScroll(media_track);
-    }
-};
-
-CSurf_FP_V2_Navigator::CSurf_FP_V2_Navigator(CSurf_Context *context) : context(context) {};
+CSurf_FP_V2_Navigator::CSurf_FP_V2_Navigator(
+    CSurf_Context *context
+    ) : context(context), hasSolo(false), hasMute(false), hasArmed(false), hasAllArmed(false), isTouched(false) {}
 
 MediaTrack *CSurf_FP_V2_Navigator::GetControllerTrack()
 {
     if (context->GetMasterFaderMode())
     {
-        return GetMasterTrack(0);
+        DAW::SetExtState(FP_V2_CONTROLLED_TRACK, -1, false);
+        return GetMasterTrack(nullptr);
     }
 
+    DAW::SetExtState(FP_V2_CONTROLLED_TRACK, track_offset, false);
     GetAllControllableTracks(tracks, hasSolo, hasMute);
 
     if (DAW::IsTrackSelected(tracks.Get(track_offset)))
@@ -77,7 +83,7 @@ MediaTrack *CSurf_FP_V2_Navigator::GetControllerTrack()
     return nullptr;
 }
 
-bool CSurf_FP_V2_Navigator::IsTrackTouched(MediaTrack *media_track, int is_pan)
+bool CSurf_FP_V2_Navigator::IsTrackTouched(const MediaTrack *media_track, const int is_pan)
 {
     if (media_track != GetControllerTrack() || context->GetLastTouchedFxMode())
     {
@@ -92,13 +98,13 @@ bool CSurf_FP_V2_Navigator::IsTrackTouched(MediaTrack *media_track, int is_pan)
     return false;
 }
 
-void CSurf_FP_V2_Navigator::SetOffset(int offset)
+void CSurf_FP_V2_Navigator::SetOffset(const int offset)
 {
     if (tracks.GetSize() == 0 || offset < 0)
     {
         track_offset = 0;
     }
-    else if (offset > (tracks.GetSize() - context->GetNbChannels()))
+    else if (offset > tracks.GetSize() - context->GetNbChannels())
     {
         track_offset = tracks.GetSize() - context->GetNbChannels();
     }
@@ -110,11 +116,11 @@ void CSurf_FP_V2_Navigator::SetOffset(int offset)
 
 void CSurf_FP_V2_Navigator::SetOffsetByTrack(MediaTrack *media_track)
 {
-    int trackId = stoi(DAW::GetTrackIndex(media_track));
+    const int trackId = stoi(DAW::GetTrackIndex(media_track));
 
     for (int i = 0; tracks.GetSize(); i++)
     {
-        int id = stoi(DAW::GetTrackIndex(tracks.Get(i)));
+        const int id = stoi(DAW::GetTrackIndex(tracks.Get(i)));
 
         if (trackId == id)
         {
@@ -124,14 +130,13 @@ void CSurf_FP_V2_Navigator::SetOffsetByTrack(MediaTrack *media_track)
     }
 }
 
-int CSurf_FP_V2_Navigator::GetOffset()
-{
+int CSurf_FP_V2_Navigator::GetOffset() const {
     return track_offset;
 }
 
-void CSurf_FP_V2_Navigator::IncrementOffset(int count)
+void CSurf_FP_V2_Navigator::IncrementOffset(const int count)
 {
-    if ((track_offset + count) <= (tracks.GetSize() - context->GetNbChannels()))
+    if (track_offset + count <= tracks.GetSize() - context->GetNbChannels())
     {
         track_offset += count;
     }
@@ -146,9 +151,9 @@ void CSurf_FP_V2_Navigator::IncrementOffset(int count)
     UpdateMixerPosition();
 }
 
-void CSurf_FP_V2_Navigator::DecrementOffset(int count)
+void CSurf_FP_V2_Navigator::DecrementOffset(const int count)
 {
-    if ((track_offset - count) >= 0)
+    if (track_offset - count >= 0)
     {
         track_offset -= count;
     }
@@ -163,8 +168,8 @@ void CSurf_FP_V2_Navigator::UpdateOffset()
 {
     GetAllControllableTracks(tracks, hasSolo, hasMute);
 
-    MediaTrack *media_track = ::GetSelectedTrack(0, 0);
-    track_offset = (int)::GetMediaTrackInfo_Value(media_track, "IP_TRACKNUMBER") - 1;
+    MediaTrack *media_track = GetSelectedTrack(nullptr, 0);
+    track_offset = static_cast<int>(GetMediaTrackInfo_Value(media_track, "IP_TRACKNUMBER")) - 1;
 }
 
 MediaTrack *CSurf_FP_V2_Navigator::GetNextTrack()
@@ -207,27 +212,23 @@ MediaTrack *CSurf_FP_V2_Navigator::GetPreviousTrack()
     return media_track;
 }
 
-bool CSurf_FP_V2_Navigator::HasTracksWithSolo()
-{
+bool CSurf_FP_V2_Navigator::HasTracksWithSolo() const {
     return hasSolo;
-};
+}
 
-bool CSurf_FP_V2_Navigator::HasTracksWithMute()
-{
+bool CSurf_FP_V2_Navigator::HasTracksWithMute() const {
     return hasMute;
-};
+}
 
-bool CSurf_FP_V2_Navigator::HasArmedTracks()
-{
+bool CSurf_FP_V2_Navigator::HasArmedTracks() const {
     return hasArmed;
-};
+}
 
-bool CSurf_FP_V2_Navigator::HasAllArmedTracks()
-{
+bool CSurf_FP_V2_Navigator::HasAllArmedTracks() const {
     return hasAllArmed;
-};
+}
 
-void CSurf_FP_V2_Navigator::SetIsTouched(bool value)
+void CSurf_FP_V2_Navigator::SetIsTouched(const bool value)
 {
     isTouched = value;
 }
