@@ -150,8 +150,7 @@ namespace CSURF_FP_V2_UI_INIT {
                     }
 
                     default:
-
-                    break;
+						break;
                 }
 
             case WM_USER + 1024: {
@@ -176,6 +175,7 @@ namespace CSURF_FP_V2_UI_INIT {
             }
 
             default:
+				break;
         }
         return 0;
     }
