@@ -318,22 +318,6 @@ public:
             }
         }
 
-        /**
-         * Check if the midi in or out is enabled an show a message to disable them
-         */
-        if (!isMidiInDeviceDisabled(m_midi_in_dev) || !isMidiOutDeviceDisabled(m_midi_out_dev)) {
-            const int result = MB(
-                "The MIDI input and/or output is not disabled. Do you want to disable them permanently?\n\nClick Yes to disable them permanent (recommended)\n\nClick No to disable them for the duration of the REAPER session\n\nClick Cancel otherwise. ReaSonus might in this case not work 100% as intended",
-                "ReaSonus MIDI Error",
-                3
-            );
-
-            if (result != 2) {
-                disableMidiIn(m_midi_in_dev, result == 6);
-                disableMidiOut(m_midi_out_dev, result == 6);
-            }
-        }
-
         if (m_midiin != nullptr) {
             m_midiin->start();
         }

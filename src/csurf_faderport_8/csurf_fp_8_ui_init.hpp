@@ -1,21 +1,21 @@
 #ifndef CSURF_FP_8_UI_INIT_H_
 #define CSURF_FP_8_UI_INIT_H_
 
+#include <config.h>
 #include <string>
 #include <mini/ini.h>
 #include <WDL/win32_utf8.h>
-#include <config.h>
-#include "../shared/csurf_utils.hpp"
-#include "../shared/csurf_faderport_ui_utils.hpp"
 #include "../resource.h"
+#include "../shared/csurf_faderport_ui_utils.hpp"
+#include "../shared/csurf_utils.hpp"
 
 extern HWND g_hwnd;
 extern REAPER_PLUGIN_HINSTANCE g_hInst;
 
 namespace CSURF_FP_8_UI_INIT {
-    mINI::INIStructure ini;
+    inline mINI::INIStructure ini;
 
-    static void HandleMidiMessage(HWND hwndDlg, const int indev, const int outdev) {
+    static void HandleMidiMessage(const HWND hwndDlg, const int indev, const int outdev) {
         const bool indev_disabled = isMidiInDeviceDisabled(indev);
         const bool outdev_disabled = isMidiOutDeviceDisabled(outdev);
 
@@ -31,21 +31,17 @@ namespace CSURF_FP_8_UI_INIT {
                 SetDlgItemText(hwndDlg, IDC_MIDI_DISABLED_1, "The MIDI In and Out device is not disabled.");
             }
 
-            SetDlgItemText(hwndDlg, IDC_MIDI_DISABLED_2, "This is needed to make ReaSonus function properly.");
-
-            ShowWindow(GetDlgItem(hwndDlg, IDC_BUTTON_DISABLE_DEVICES), SW_SHOW);
-            ShowWindow(GetDlgItem(hwndDlg, IDC_GROUP_MIDI_DEVICES_LARGE), SW_SHOW);
+§            ShowWindow(GetDlgItem(hwndDlg, IDC_GROUP_MIDI_DEVICES_LARGE), SW_SHOW);
             ShowWindow(GetDlgItem(hwndDlg, IDC_MIDI_DISABLED_1), SW_SHOW);
             ShowWindow(GetDlgItem(hwndDlg, IDC_MIDI_DISABLED_2), SW_SHOW);
         } else {
-            ShowWindow(GetDlgItem(hwndDlg, IDC_BUTTON_DISABLE_DEVICES), SW_HIDE);
             ShowWindow(GetDlgItem(hwndDlg, IDC_GROUP_MIDI_DEVICES_LARGE), SW_HIDE);
             ShowWindow(GetDlgItem(hwndDlg, IDC_MIDI_DISABLED_1), SW_HIDE);
             ShowWindow(GetDlgItem(hwndDlg, IDC_MIDI_DISABLED_2), SW_HIDE);
         }
     }
 
-    static WDL_DLGRET dlgProc(HWND hwndDlg, const UINT uMsg, const WPARAM wParam, const LPARAM lParam) {
+    static WDL_DLGRET dlgProc(const HWND hwndDlg, const UINT uMsg, const WPARAM wParam, const LPARAM lParam) {
         switch (uMsg) {
             case WM_INITDIALOG: {
                 const mINI::INIFile file(GetReaSonusIniPath(FP_8));
@@ -121,7 +117,6 @@ namespace CSURF_FP_8_UI_INIT {
 
                 SetDlgItemText(hwndDlg, IDC_VERSION, GIT_VERSION);
 
-                ShowWindow(GetDlgItem(hwndDlg, IDC_BUTTON_DISABLE_DEVICES), SW_HIDE);
                 ShowWindow(GetDlgItem(hwndDlg, IDC_GROUP_MIDI_DEVICES_LARGE), SW_HIDE);
                 ShowWindow(GetDlgItem(hwndDlg, IDC_MIDI_DISABLED_1), SW_HIDE);
                 ShowWindow(GetDlgItem(hwndDlg, IDC_MIDI_DISABLED_2), SW_HIDE);
@@ -182,29 +177,6 @@ namespace CSURF_FP_8_UI_INIT {
                         break;
                     }
 
-                    case IDC_BUTTON_DISABLE_DEVICES: {
-                        LRESULT combo_value = SendDlgItemMessage(hwndDlg, IDC_COMBO_MIDI_IN, CB_GETCURSEL, 0, 0);
-                        if (combo_value != CB_ERR) {
-                            auto indev = static_cast<int>(
-                                SendDlgItemMessage(hwndDlg, IDC_COMBO_MIDI_IN, CB_GETITEMDATA, combo_value, 0)
-                            );
-                            disableMidiIn(indev, true);
-                        }
-
-                        combo_value = SendDlgItemMessage(hwndDlg, IDC_COMBO_MIDI_OUT, CB_GETCURSEL, 0, 0);
-                        if (combo_value != CB_ERR) {
-                            auto outdev = static_cast<int>(
-                                SendDlgItemMessage(hwndDlg, IDC_COMBO_MIDI_OUT, CB_GETITEMDATA, combo_value, 0)
-                            );
-                            disableMidiOut(outdev, true);
-                        }
-
-                        ShowWindow(GetDlgItem(hwndDlg, IDC_BUTTON_DISABLE_DEVICES), SW_HIDE);
-                        ShowWindow(GetDlgItem(hwndDlg, IDC_GROUP_MIDI_DEVICES_LARGE), SW_HIDE);
-                        ShowWindow(GetDlgItem(hwndDlg, IDC_MIDI_DISABLED_1), SW_HIDE);
-                        ShowWindow(GetDlgItem(hwndDlg, IDC_MIDI_DISABLED_2), SW_HIDE);
-                    }
-
                     default: ;
                 }
                 break;
@@ -242,9 +214,9 @@ namespace CSURF_FP_8_UI_INIT {
             default: ;
         }
         return 0;
-    };
+    }
 
-    static HWND CreateInitDialog(const char *type_string, HWND parent, const char *initConfigString) {
+    static HWND CreateInitDialog(const char *type_string, const HWND parent, const char *initConfigString) {
         (void) type_string;
         return CreateDialogParam(
             g_hInst,

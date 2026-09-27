@@ -540,78 +540,8 @@ bool isMidiInDeviceDisabled(const int index) {
     return !hasBit(midi_inputs, index);
 }
 
-void disableMidiIn(const int index, const bool persist) {
-    ConfigVar<std::array<uint64_t, 2>> midiins("midiins");
-    const auto new_midiins_value = clearBit(midiins.GetValue(), index);
-    midiins.SetValue(new_midiins_value);
-
-    ConfigVar<std::array<uint64_t, 2>> midiins_all("midiins_all");
-    const auto new_midiins_all_value = clearBit(midiins_all.GetValue(), index);
-    midiins_all.SetValue(new_midiins_all_value);
-
-    if (persist) {
-        writeReaperIni("REAPER", "midiins", uint64ArrayToyToString(new_midiins_value));
-        writeReaperIni("REAPER", "midiins_all", uint64ArrayToyToString(new_midiins_all_value));
-    }
-}
-
 bool isMidiOutDeviceDisabled(const int index) {
     const std::array<uint64_t, 2> midi_outputs = ConfigVar<std::array<uint64_t, 2>>("midiouts");
 
     return !hasBit(midi_outputs, index);
-}
-
-void disableMidiOut(const int index, const bool persist) {
-    ConfigVar<std::array<uint64_t, 2>> midiouts("midiouts");
-    const auto new_value = clearBit(midiouts.GetValue(), index);
-    midiouts.SetValue(new_value);
-
-    if (persist) {
-        writeReaperIni("REAPER", "midiouts", uint64ArrayToyToString(new_value));
-    }
-}
-
-bool writeReaperIni(std::string section, std::string key, std::string value) { // NOLINT(*-unnecessary-value-param)
-    mINI::INIStructure data;
-    const mINI::INIFile file(GetReaperIniPath());
-
-    if (!file.read(data)) {
-        return false;
-    }
-
-    /**
-     * If va;ue is the same, we just return true;
-     */
-    if (data.get(section).has(key) && data[section][key] == value) {
-        data.clear();
-        return true;
-    }
-
-    data[section][key] = value;
-
-    if (!file.write(data, true)) {
-        MB("Error while writing the reaper ini file", "ReaSonus Settings Error", 0);
-        return false;
-    }
-
-    data.clear();
-    return true;
-}
-
-std::string uint64ArrayToyToString(const std::array<uint64_t, 2> value) {
-    std::string result;
-    uint64_t high = value[1];
-    uint64_t low = value[0];
-
-    while (low > 0) {
-        result = static_cast<char>('0' + (low % 10)) + result;
-        low /= 10;
-    }
-
-    while (high > 0) {
-        result = static_cast<char>('0' + (high % 10)) + result;
-        high /= 10;
-    }
-
-    return result;
 }
