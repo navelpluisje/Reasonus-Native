@@ -73,6 +73,29 @@ bool hasBit(const int val, const int key) {
     return (val & 1 << key) != 0;
 }
 
+bool hasBit(const std::array<uint64_t, 2> val, const int key) {
+    if (key < 64) {
+        return (val[0] & 1ULL << key) != 0;
+    }
+    return (val[1] & 1ULL << (key - 64)) != 0;
+}
+
+std::array<uint64_t, 2> clearBit(const std::array<uint64_t, 2> val, const int key) {
+    std::array<uint64_t, 2> result = {0, 0};
+    if (key < 64) {
+        result[0] = val[0] & ~(1ULL << key);
+        result[1] = val[1];
+    } else {
+        result[0] = val[0];
+        result[1] = val[1] & ~(1ULL << (key - 64));
+    }
+    return result;
+}
+
+int clearBit(const int val, const int key) {
+    return val & ~(1 << key);
+}
+
 double volToNormalized(const double vol) {
     const double normalized_volume = DB2SLIDER(VAL2DB(vol)) / 1000.0;
     if (normalized_volume < 0.0) {
@@ -158,6 +181,10 @@ std::string GetReaSonusFolderPath() {
 
 std::string GetReaSonusIniPath(const std::string &device) {
     return createPathName({GetReaSonusFolderPath(), device + ".ini"});
+}
+
+std::string GetReaperIniPath() {
+    return createPathName({GetResourcePath(), "reaper.ini"});
 }
 
 std::string GetReaSonusZonesPath() {
@@ -505,4 +532,16 @@ bool toBool(const std::string &value) {
     iss >> std::boolalpha >> result;
 
     return result;
+}
+
+bool isMidiInDeviceDisabled(const int index) {
+    const std::array<uint64_t, 2> midi_inputs = ConfigVar<std::array<uint64_t, 2>>("midiins");
+
+    return !hasBit(midi_inputs, index);
+}
+
+bool isMidiOutDeviceDisabled(const int index) {
+    const std::array<uint64_t, 2> midi_outputs = ConfigVar<std::array<uint64_t, 2>>("midiouts");
+
+    return !hasBit(midi_outputs, index);
 }

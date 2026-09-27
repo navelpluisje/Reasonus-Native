@@ -2,7 +2,6 @@
 #define CSURF_TRANSPORT_MANAGER_C_
 
 #include "../controls/csurf_button.hpp"
-#include "../shared/csurf_utils.hpp"
 #include "../shared/csurf_context.cpp"
 #include "../shared/csurf_reasonus_settings.hpp"
 

@@ -89,6 +89,7 @@ struct ConfigVar {
             addr = get_config_var(var_name.c_str(), &size);
         }
 
+        key = var_name;
         m_addr = static_cast<T *>(addr);
 
         if (size != sizeof(T)) {
@@ -105,11 +106,16 @@ struct ConfigVar {
         return true;
     }
 
+    T GetValue() {
+        return *m_addr;
+    }
+
     operator T() {
         return *m_addr;
     }
 
 private:
+    std::string key;
     T *m_addr;
 };
 
@@ -193,6 +199,19 @@ bool SetIntConfigVar(const std::string &var_name, int value);
  */
 bool hasBit(int val, int key);
 
+bool hasBit(const std::array<uint64_t, 2> val, const int key);
+
+/**
+ * @brief Set the bit with index key to 0
+ *
+ * @param val The value to edit
+ * @param key The index to set to 0
+ * @return The modified integer
+ */
+int clearBit(int val, int key);
+
+std::array<uint64_t, 2> clearBit(const std::array<uint64_t, 2> val, const int key);
+
 /**
  * @brief Get the normalized value of the volume to send to the device faders
  *
@@ -256,6 +275,8 @@ std::string GetAutomationString(int automationMode);
 std::string GetReaSonusFolderPath();
 
 std::string GetReaSonusIniPath(const std::string &device);
+
+std::string GetReaperIniPath();
 
 std::string GetReaSonusZonesPath();
 
@@ -492,5 +513,19 @@ bool toBool(double value);
  * @return
  */
 bool toBool(const std::string &value);
+
+/**
+ *
+ * @param index The index of the midi in device
+ * @return true when the midi in device is disabled
+ */
+bool isMidiInDeviceDisabled(int index);
+
+/**
+ *
+ * @param index The index of the midi out device
+ * @return true when the midi out device is disabled
+ */
+bool isMidiOutDeviceDisabled(int index);
 
 #endif // CSURF_UTILS_H_
