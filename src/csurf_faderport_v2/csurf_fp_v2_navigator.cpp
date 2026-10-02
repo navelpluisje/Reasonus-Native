@@ -68,11 +68,11 @@ MediaTrack *CSurf_FP_V2_Navigator::GetControllerTrack()
 {
     if (context->GetMasterFaderMode())
     {
-        DAW::SetExtState(FP_V2_CONTROLLED_TRACK, -1, false);
+        DAW::SetExtState(EXT_STATE_FP_V2_CONTROLLED_TRACK, -1, false);
         return GetMasterTrack(nullptr);
     }
 
-    DAW::SetExtState(FP_V2_CONTROLLED_TRACK, track_offset, false);
+    DAW::SetExtState(EXT_STATE_FP_V2_CONTROLLED_TRACK, track_offset, false);
     GetAllControllableTracks(tracks, hasSolo, hasMute);
 
     if (DAW::IsTrackSelected(tracks.Get(track_offset)))

@@ -2,6 +2,7 @@
 #include <array>
 #include <utility>
 #include "../shared/csurf_utils.hpp"
+#include "../shared/csurf_daw.hpp"
 
 ReaSonusSettings::ReaSonusSettings(std::string _device) {
     device = std::move(_device);
@@ -33,7 +34,7 @@ void ReaSonusSettings::ReadAndCreateIni(mINI::INIStructure &data) const {
             }
         }
         if (!file.generate(data, true)) {
-            MB("Error while creating the ini file. Please contact via the forum", "ReaSonus Error", 0);
+            MB("Error while creating the ini file. Please contact via the forum", "ReaSonus Error", MB_TYPE_OK);
         }
     } else {
         ValidateReaSonusIni(file, data);
@@ -128,7 +129,7 @@ bool ReaSonusSettings::StoreSettings() {
     const mINI::INIFile file(GetReaSonusIniPath(device));
 
     if (!file.write(settings, true)) {
-        MB("Error while writing the settings file", "ReaSonus Settings Error", 0);
+        MB("Error while writing the settings file", "ReaSonus Settings Error", MB_TYPE_OK);
         return false;
     }
 

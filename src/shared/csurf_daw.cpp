@@ -778,7 +778,7 @@ void DAW::InitializeEnvelope(TrackEnvelope *env, const double position, const do
         replace(envelope_chunk, "ARM 0", "ARM 1");
 
         if (!SetEnvelopeStateChunk(env, envelope_chunk.c_str(), false)) {
-            MB("Something went wrong while setting the envelope to visible and active", "ReaSonus Error", 0);
+            MB("Something went wrong while setting the envelope to visible and active", "ReaSonus Error", MB_TYPE_OK);
         }
     }
 }
@@ -791,7 +791,7 @@ void DAW::DisableEnvelope(TrackEnvelope *env) {
         replace(envelope_chunk, "ACT 1", "ACT 0");
 
         if (!SetEnvelopeStateChunk(env, envelope_chunk.c_str(), false)) {
-            MB("Something went wrong while disabling the envelope", "ReaSonus Error", 0);
+            MB("Something went wrong while disabling the envelope", "ReaSonus Error", MB_TYPE_OK);
         }
     }
 }
@@ -804,7 +804,7 @@ void DAW::EnableEnvelope(TrackEnvelope *env) {
         replace(envelope_chunk, "ACT 0", "ACT 1");
 
         if (!SetEnvelopeStateChunk(env, envelope_chunk.c_str(), false)) {
-            MB("Something went wrong while enabling the envelope", "ReaSonus Error", 0);
+            MB("Something went wrong while enabling the envelope", "ReaSonus Error", MB_TYPE_OK);
         }
     }
 }

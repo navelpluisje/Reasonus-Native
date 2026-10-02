@@ -260,9 +260,26 @@ class CSurf_FaderPort : public IReaperControlSurface {
     }
   }
 
-  void updateSettings() const {
+  void UpdateSettings() const {
     i18n->SetLanguage(DAW::GetExtState(EXT_STATE_KEY_UI_LANGUAGE, "en-US"));
     settings->UpdateSettings();
+  }
+
+  void SetPluginControl(int track_index, int plugin_index) {
+    MediaTrack *media_track = GetTrack(nullptr, track_index);
+
+    // First clean up all open fx windows and then open the plugin in a floating window
+    Main_OnCommandStringEx("_REASONUS_CLOSE_ALL_FLOATING_FX_WINDOWS_COMMAND", 0, nullptr);
+    // SWS/S&M: Close all floating FX and chanin windows
+    TrackFX_Show(media_track, plugin_index, SHOW_FLAG_SHOW_WINDOW);
+    // faderManager->HandlePluginsButtonClick(127, false);
+    faderManager->ChangeChannelMode(PluginControlMode);
+
+    context->SetPluginEditTrack(media_track);
+    context->SetPluginEditPluginId(plugin_index);
+    if (PluginUtils::hasPluginConfigFile(context->GetPluginEditTrack(), context->GetPluginEditPluginId())) {
+      faderManager->ChangeChannelMode(PluginControlMode);
+    }
   }
 
 public:
@@ -289,7 +306,7 @@ public:
     m_midiout = m_midi_out_dev >= 0 ? CreateMIDIOutput(m_midi_out_dev, false, nullptr) : nullptr;
 
     context = new CSurf_Context(settings->GetSurface());
-    updateSettings();
+    UpdateSettings();
 
     for (int i = 0; i < context->GetNbChannels(); i++) {
       auto *track = new CSurf_FP_8_Track(i, context, m_midiout);
@@ -453,10 +470,18 @@ public:
         std::string const is_saved = DAW::GetExtState(EXT_STATE_KEY_SAVED_SETTINGS, "");
 
         if (is_saved == EXT_STATE_VALUE_TRUE) {
-          updateSettings();
+          UpdateSettings();
           DAW::SetExtState(EXT_STATE_KEY_SAVED_SETTINGS, EXT_STATE_VALUE_FALSE, false);
         }
       }
+
+      if (!DAW::GetExtState(EXT_STATE_FP_PLUGIN_CONTROL, "").empty()) {
+        // Set the correct values to open the plugin control
+        const std::vector<std::string> plugin_ids = split(DAW::GetExtState(EXT_STATE_FP_PLUGIN_CONTROL, ""), ":");
+        SetPluginControl(stoi(plugin_ids[0]), stoi(plugin_ids[1]));
+        DAW::SetExtState(EXT_STATE_FP_PLUGIN_CONTROL, "", false);
+      }
+
     }
   }
 

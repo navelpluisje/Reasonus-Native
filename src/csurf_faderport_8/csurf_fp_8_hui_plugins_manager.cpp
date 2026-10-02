@@ -197,15 +197,15 @@ public:
         // If the current plugin window is open, close it
         // Otherwise Close all other open windows and open the plugin window
         if (DAW::GetTrackFxPanelOpen(media_track, plugin_index)) {
-            TrackFX_Show(media_track, plugin_index, 0);
-            TrackFX_Show(media_track, plugin_index, 2);
+            TrackFX_Show(media_track, plugin_index, SHOW_FLAG_HIDE_CHAIN);
+            TrackFX_Show(media_track, plugin_index, SHOW_FLAG_HIDE_WINDOW);
             context->SetPluginEditTrack(nullptr);
             context->SetPluginEditPluginId(-1);
         } else {
             // First clean up all open fx windows and then open the plugin in a floating window
             Main_OnCommandStringEx("_REASONUS_CLOSE_ALL_FLOATING_FX_WINDOWS_COMMAND", 0, nullptr);
             // SWS/S&M: Close all floating FX and chanin windows
-            TrackFX_Show(media_track, plugin_index, 3);
+            TrackFX_Show(media_track, plugin_index, SHOW_FLAG_SHOW_WINDOW);
             context->SetPluginEditTrack(media_track);
             context->SetPluginEditPluginId(plugin_index);
             // We need to check if the plugin is available and then set the correct manager

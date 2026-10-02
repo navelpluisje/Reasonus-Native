@@ -493,7 +493,7 @@ void CSurf_FP_8_Navigator::PublishOffset() {
     // this cycle, regardless of which code path changed it. Lets external
     // tools (e.g. ReaScripts) follow the surface's banking exactly.
     if (track_offset != last_published_offset) {
-      DAW::SetExtState(FP_TRACK_OFFSET, track_offset, false);
+      DAW::SetExtState(EXT_STATE_FP_TRACK_OFFSET, track_offset, false);
       last_published_offset = track_offset;
     }
 }
