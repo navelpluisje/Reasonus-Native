@@ -656,10 +656,19 @@ bool DAW::HasTrackHardwareOut(MediaTrack *media_track, const int send) {
     return GetSetTrackSendInfo(media_track, SEND_MODE_HARDWARE, send, "P_DESTTRACK", nullptr) == nullptr;
 }
 
-std::string DAW::GetTrackSendName(MediaTrack *media_track, const int send) {
+std::string DAW::GetTrackSendName(MediaTrack *media_track, const int send, const bool is_hardware_out) {
     char buffer[256]; // NOLINT(*-avoid-c-arrays)
+    int hardware_count = 0;
 
-    if (::GetTrackSendName(media_track, send, buffer, sizeof buffer)) {
+    if (send < 0) {
+        return "No Send";
+    }
+
+    if (!is_hardware_out) {
+        hardware_count = GetTrackNumSends(media_track, SEND_MODE_HARDWARE);
+    }
+
+    if (::GetTrackSendName(media_track, send + hardware_count, buffer, sizeof buffer)) {
         return buffer;
     }
 
@@ -681,12 +690,12 @@ int DAW::GetTrackSendIndexBySlotIndex(
     MediaTrack *media_track,
     const int _slot_index,
     const bool add_hardware,
-    bool *is_hardware
+    bool *is_hardware_out
 ) {
     const int hardware_count = GetTrackNumSends(media_track, SEND_MODE_HARDWARE);
     const int sends_count = GetTrackNumSends(media_track, SEND_MODE_SEND);
     int send_index = -1;
-    *is_hardware = false;
+    *is_hardware_out = false;
 
     for (auto i = 0; i < hardware_count; i++) {
         const int hardware_slot_index = static_cast<int>(GetTrackSendInfo_Value(
@@ -708,7 +717,7 @@ int DAW::GetTrackSendIndexBySlotIndex(
     }
 
     if (send_index != -1) {
-        *is_hardware = true;
+        *is_hardware_out = true;
         return send_index;
     }
 
@@ -735,12 +744,13 @@ int DAW::GetTrackSendIndexBySlotIndex(
 
 bool DAW::SlotHasNoMutedSend(const int _slot_index) {
     bool result = true;
-    bool dummy;
+    bool is_hardware_out;
+
     for (int i = 0; i < GetNumTracks(); i++) {
         MediaTrack *media_track = GetTrack(nullptr, i);
-        const int send_index = GetTrackSendIndexBySlotIndex(media_track, _slot_index, true, &dummy);
+        const int send_index = GetTrackSendIndexBySlotIndex(media_track, _slot_index, true, &is_hardware_out);
 
-        if (send_index > -1 && GetTrackSendMute(media_track, send_index)) {
+        if (send_index > -1 && GetTrackSendMute(media_track, send_index, is_hardware_out)) {
             result = false;
             break;
         }
@@ -758,8 +768,9 @@ void DAW::ToggleSendMuteForSlot(int _slot_index) {
 
     for (int i = 0; i < GetNumTracks(); i++) {
         MediaTrack *media_track = GetTrack(nullptr, i);
-        bool is_hardware = false;
-        const int send_index = GetTrackSendIndexBySlotIndex(media_track, _slot_index, false, &is_hardware);
+        bool is_hardware_out = false;
+
+        const int send_index = GetTrackSendIndexBySlotIndex(media_track, _slot_index, false, &is_hardware_out);
 
         if (send_index == -1) {
             continue;
@@ -767,7 +778,7 @@ void DAW::ToggleSendMuteForSlot(int _slot_index) {
 
         SetTrackSendInfo_Value(
             media_track,
-            is_hardware ? SEND_MODE_HARDWARE : SEND_MODE_SEND,
+            is_hardware_out ? SEND_MODE_HARDWARE : SEND_MODE_SEND,
             send_index,
             "B_MUTE",
             new_value
@@ -784,7 +795,7 @@ int DAW::GetTrackSendAutoMode(MediaTrack *media_track, const int send) {
 }
 
 std::string DAW::GetTrackSurfaceSendMode(MediaTrack *media_track, const int send) {
-    if (GetTrackSendName(media_track, send) == "No Dest") {
+    if (GetTrackSendName(media_track, send, false) == "No Dest") {
         return "";
     }
 
@@ -795,48 +806,63 @@ std::string DAW::GetTrackSurfaceSendAutoMode(MediaTrack *media_track, const int 
     return GetAutomationString(GetTrackSendAutoMode(media_track, send));
 }
 
-bool DAW::GetTrackSendMute(MediaTrack *media_track, const int send) {
-    bool send_mute = false;
-    GetTrackSendUIMute(media_track, send, &send_mute);
-
-    return send_mute;
+bool DAW::GetTrackSendMute(MediaTrack *media_track, const int send, const bool is_hardware_out) {
+    return toBool(GetTrackSendInfo_Value(
+        media_track,
+        is_hardware_out ? SEND_MODE_HARDWARE : SEND_MODE_SEND,
+        send,
+        "B_MUTE"
+    ));
 }
 
-void DAW::ToggleTrackSendMute(MediaTrack *media_track, const int send) {
+void DAW::ToggleTrackSendMute(MediaTrack *media_track, const int send, const bool is_hardware_out) {
     SetTrackSendInfo_Value(
         media_track,
-        SEND_MODE_SEND,
+        is_hardware_out ? SEND_MODE_HARDWARE : SEND_MODE_SEND,
         send,
         "B_MUTE",
-        toDouble(!GetTrackSendMute(media_track, send))
+        toDouble(!GetTrackSendMute(media_track, send, is_hardware_out))
     );
 }
 
-bool DAW::GetTrackSendPhase(MediaTrack *media_track, const int send) {
-    return toBool(GetTrackSendInfo_Value(media_track, 0, send, "B_PHASE"));
+bool DAW::GetTrackSendPhase(MediaTrack *media_track, const int send, const bool is_hardware_out) {
+    return toBool(GetTrackSendInfo_Value(
+        media_track,
+        is_hardware_out ? SEND_MODE_HARDWARE : SEND_MODE_SEND,
+        send,
+        "B_PHASE"
+    ));
 }
 
-void DAW::ToggleTrackSendPhase(MediaTrack *media_track, const int send) {
+void DAW::ToggleTrackSendPhase(MediaTrack *media_track, const int send, const bool is_hardware_out) {
     SetTrackSendInfo_Value(
         media_track,
-        SEND_MODE_SEND,
+        is_hardware_out ? SEND_MODE_HARDWARE : SEND_MODE_SEND,
         send,
         "B_PHASE",
-        toDouble(!GetTrackSendPhase(media_track, send))
+        toDouble(!GetTrackSendPhase(media_track, send, is_hardware_out))
     );
 }
 
-bool DAW::GetTrackSendMono(MediaTrack *media_track, const int send) {
+bool DAW::GetTrackSendMono(MediaTrack *media_track, const int send, const bool is_hardware_out) {
+    if (is_hardware_out) {
+        return false;
+    }
+
     return toBool(GetTrackSendInfo_Value(media_track, SEND_MODE_SEND, send, "B_MONO"));
 }
 
-void DAW::ToggleTrackSendMono(MediaTrack *media_track, const int send) {
+void DAW::ToggleTrackSendMono(MediaTrack *media_track, const int send, const bool is_hardware_out) {
+    if (is_hardware_out) {
+        return;
+    }
+    
     SetTrackSendInfo_Value(
         media_track,
         SEND_MODE_SEND,
         send,
         "B_MONO",
-        toDouble(!GetTrackSendMono(media_track, send))
+        toDouble(!GetTrackSendMono(media_track, send, is_hardware_out))
     );
 }
 
@@ -854,23 +880,23 @@ void DAW::SetNextTrackSendMode(MediaTrack *media_track, const int send) {
     );
 }
 
-void DAW::SetTrackSendVolume(MediaTrack *media_track, const int send, const double volume) {
+void DAW::SetTrackSendVolume(MediaTrack *media_track, const int send, const double volume, const bool is_hardware_out) {
     SetTrackSendInfo_Value(
         media_track,
-        SEND_MODE_SEND,
+        is_hardware_out ? SEND_MODE_HARDWARE : SEND_MODE_SEND,
         send,
         "D_VOL",
-        CSurf_OnSendVolumeChange(media_track, send, volume, false)
+        volume
     );
 }
 
-void DAW::SetTrackSendPan(MediaTrack *media_track, const int send, const double pan) {
+void DAW::SetTrackSendPan(MediaTrack *media_track, const int send, const double pan, const bool is_hardware_out) {
     SetTrackSendInfo_Value(
         media_track,
-        SEND_MODE_SEND,
+        is_hardware_out ? SEND_MODE_HARDWARE : SEND_MODE_SEND,
         send,
         "D_PAN",
-        CSurf_OnSendPanChange(media_track, send, pan, false)
+        pan
     );
 }
 

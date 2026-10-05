@@ -102,7 +102,7 @@ public:
                     track->SetDisplayLine(
                         1,
                         ALIGN_LEFT,
-                        DAW::GetTrackSendName(sends_track, send_index).c_str(),
+                        DAW::GetTrackSendName(sends_track, send_index, false).c_str(),
                         INVERT,
                         force_update
                     );
@@ -154,13 +154,13 @@ public:
             track->SetSelectButtonValue(BTN_VALUE_ON, force_update);
             track->SetMuteButtonValue(
                 ButtonBlinkOnOff(
-                    context->GetShiftChannelLeft() && DAW::GetTrackSendMute(sends_track, send_index),
-                    DAW::GetTrackSendMute(sends_track, send_index),
+                    context->GetShiftChannelLeft() && DAW::GetTrackSendMute(sends_track, send_index, false),
+                    DAW::GetTrackSendMute(sends_track, send_index, false),
                     settings->GetDistractionFreeMode()),
                 force_update);
             track->SetSoloButtonValue(
-                (context->GetShiftChannelLeft() && DAW::GetTrackSendMono(sends_track, send_index))
-                || (!context->GetShiftChannelLeft() && DAW::GetTrackSendPhase(sends_track, send_index))
+                (context->GetShiftChannelLeft() && DAW::GetTrackSendMono(sends_track, send_index, false))
+                || (!context->GetShiftChannelLeft() && DAW::GetTrackSendPhase(sends_track, send_index, false))
                     ? BTN_VALUE_ON
                     : BTN_VALUE_OFF,
                 force_update
@@ -215,7 +215,7 @@ public:
         if (context->GetShiftChannelLeft()) {
             DAW::SetNextTrackSendMode(send_track, send_index);
         } else {
-            DAW::ToggleTrackSendMute(send_track, send_index);
+            DAW::ToggleTrackSendMute(send_track, send_index, false);
         }
     }
 
@@ -228,9 +228,9 @@ public:
         const int send_index = context->GetChannelManagerItemIndex() + index;
 
         if (context->GetShiftChannelLeft()) {
-            DAW::ToggleTrackSendMono(send_track, send_index);
+            DAW::ToggleTrackSendMono(send_track, send_index, false);
         } else {
-            DAW::ToggleTrackSendPhase(send_track, send_index);
+            DAW::ToggleTrackSendPhase(send_track, send_index, false);
         }
     }
 
@@ -275,9 +275,9 @@ public:
         const int send_index = context->GetChannelManagerItemIndex() + index;
 
         if (context->GetShiftChannelLeft()) {
-            DAW::SetTrackSendPan(send_track, send_index, normalizedToPan(int14ToNormalized(msb, lsb)));
+            DAW::SetTrackSendPan(send_track, send_index, normalizedToPan(int14ToNormalized(msb, lsb)), false);
         } else {
-            DAW::SetTrackSendVolume(send_track, send_index, int14ToVol(msb, lsb));
+            DAW::SetTrackSendVolume(send_track, send_index, int14ToVol(msb, lsb), false);
         }
     }
 };

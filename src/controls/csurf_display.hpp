@@ -16,9 +16,9 @@ protected:
     midi_Output *m_midiout;
     int device_id;
 
-    void SendValue(int line);
+    void SendValue(int line) const;
 
-    void SendMode();
+    void SendMode() const;
 
 public:
     CSurf_Display(int channel, midi_Output *m_midiout, int device_id) : channel(channel), m_midiout(m_midiout), device_id(device_id) {};

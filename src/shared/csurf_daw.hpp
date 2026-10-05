@@ -606,9 +606,10 @@ public:
      * Get the name of the destination of the send at the given index for the given track
      * @param media_track The track where we want the send for
      * @param send The index of the send track
+     * @param is_hardware_out Set to treu when the slot is a hardware out
      * @return The name of the destination of the send
      */
-    static std::string GetTrackSendName(MediaTrack *media_track, int send);
+    static std::string GetTrackSendName(MediaTrack *media_track, int send, bool is_hardware_out);
 
     /**
      * Get the number of sends for the given track. When `slots` is set to true,
@@ -624,14 +625,14 @@ public:
      * @param media_track The track to get the send index for
      * @param _slot_index The slot index to check
      * @param add_hardware Whether to add the hardware count for the sends index
-     * @param is_hardware Set to treu when the slot is a hardware out
+     * @param is_hardware_out Set to treu when the slot is a hardware out
      * @return
      */
     static int GetTrackSendIndexBySlotIndex(
         MediaTrack *media_track,
         int _slot_index,
         bool add_hardware,
-        bool *is_hardware
+        bool *is_hardware_out
     );
 
     /**
@@ -706,46 +707,52 @@ public:
      * Get the mute state for the given send
      * @param media_track The track where we want the send for
      * @param send The mute state of the send track
+     * @param is_hardware_out Is it a hardware slot or a send slot
      * @return Whether mute is engaged
      */
-    static bool GetTrackSendMute(MediaTrack *media_track, int send);
+    static bool GetTrackSendMute(MediaTrack *media_track, int send, bool is_hardware_out);
 
     /**
      * Toggle the mute state for the given send
      * @param media_track The track for the send we need
      * @param send The index on the send
+     * @param is_hardware_out Is it a hardware slot or a send slot
      */
-    static void ToggleTrackSendMute(MediaTrack *media_track, int send);
+    static void ToggleTrackSendMute(MediaTrack *media_track, int send, bool is_hardware_out);
 
     /**
      * Get the phase state for the given send
      * @param media_track The track where we want the send for
      * @param send The phase state of the send track
+     * @param is_hardware_out Is it a hardware slot or a send slot
      * @return whether phase is engaged
      */
-    static bool GetTrackSendPhase(MediaTrack *media_track, int send);
+    static bool GetTrackSendPhase(MediaTrack *media_track, int send, bool is_hardware_out);
 
     /**
      * Toggle the phase state for the given send
      * @param media_track The track for the send we need
      * @param send The index on the send
+     * @param is_hardware_out Is it a hardware slot or a send slot
      */
-    static void ToggleTrackSendPhase(MediaTrack *media_track, int send);
+    static void ToggleTrackSendPhase(MediaTrack *media_track, int send, bool is_hardware_out);
 
     /**
      * Get the mono state for the given send
      * @param media_track The track where we want the send for
      * @param send The mute state of the send track
-     * @return Whether mono is engaged
+     * @param is_hardware_out Is it a hardware slot or a send slot
+     * @return Whether mono is engaged, always false on hardware as this doe not have mono available
      */
-    static bool GetTrackSendMono(MediaTrack *media_track, int send);
+    static bool GetTrackSendMono(MediaTrack *media_track, int send, bool is_hardware_out);
 
     /**
      * Toggle the mono state for the given send
      * @param media_track The track for the send we need
      * @param send The index on the send
+     * @param is_hardware_out Is it a hardware slot or a send slot
      */
-    static void ToggleTrackSendMono(MediaTrack *media_track, int send);
+    static void ToggleTrackSendMono(MediaTrack *media_track, int send, bool is_hardware_out);
 
     /**
      * ??
@@ -767,16 +774,18 @@ public:
      * @param media_track The track for the send we need
      * @param send The index on the send
      * @param volume The volume to set
+     * @param is_hardware_out Is it a hardware slot or a send slot
      */
-    static void SetTrackSendVolume(MediaTrack *media_track, int send, double volume);
+    static void SetTrackSendVolume(MediaTrack *media_track, int send, double volume, bool is_hardware_out);
 
     /**
      * Set the volume for the given send
      * @param media_track The track for the send we need
      * @param send The index on the send
      * @param pan The pan value to set
+     * @param is_hardware_out Is it a hardware slot or a send slot
      */
-    static void SetTrackSendPan(MediaTrack *media_track, int send, double pan);
+    static void SetTrackSendPan(MediaTrack *media_track, int send, double pan, bool is_hardware_out);
 
     static TrackEnvelope *GetTrackSendEnvelope(
         MediaTrack *media_track,
