@@ -62,6 +62,27 @@ protected:
         return slot_index - hardware_count;
     }
 
+    std::string GetLine3Content(
+        const int slot_index,
+        const int display_index
+    ) const {
+        const bool respect_slots = settings->SendsShouldRespectSlots();
+        if (!respect_slots) {
+            if (nb_track_items[display_index] == 0) {
+                return "";
+            }
+            return Progress(slot_index + 1, nb_track_items[display_index]);
+        }
+        if (display_index < context->GetNbChannels() - 2) {
+            return "";
+        }
+        if (display_index == context->GetNbChannels() - 2) {
+            return "Slot:";
+        }
+
+        return Progress(slot_index + 1, nb_sends);
+    }
+
 public:
     CSurf_FP_8_SendsManager(
         const std::vector<CSurf_FP_8_Track *> &tracks,
@@ -158,19 +179,20 @@ public:
                 faderport_channel->SetDisplayLine(
                     2,
                     ALIGN_CENTER,
-                    is_hardware_out ? "" : DAW::GetTrackSurfaceSendMode(media_track, send_index).c_str(),
+                    is_hardware_out ? "Hw out" : DAW::GetTrackSurfaceSendMode(media_track, send_index).c_str(),
                     NON_INVERT,
                     force_update
                 );
             } else {
-                faderport_channel->SetDisplayLine(1, ALIGN_LEFT, "No Sends", INVERT, force_update);
+                faderport_channel->SetDisplayLine(1, ALIGN_LEFT, "", NON_INVERT, force_update);
                 faderport_channel->SetDisplayLine(2, ALIGN_CENTER, "", NON_INVERT, force_update);
             }
 
             faderport_channel->SetDisplayLine(
                 3,
                 ALIGN_CENTER,
-                Progress(slot_index + 1, respect_slots ? nb_sends : nb_track_items[i]).c_str(),
+                GetLine3Content(slot_index, i).c_str(),
+                // send_index > -1 ? Progress(slot_index + 1, respect_slots ? nb_sends : nb_track_items[i]).c_str() : "",
                 NON_INVERT,
                 force_update
             );
