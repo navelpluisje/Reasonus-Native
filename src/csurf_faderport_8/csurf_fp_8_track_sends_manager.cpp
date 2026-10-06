@@ -230,8 +230,11 @@ public:
         }
 
         if (context->GetShiftChannelRight()) {
+            bool is_hardware_out;
             MediaTrack *selected_track = GetSelectedTrack(nullptr, 0);
-            RemoveTrackSend(selected_track, SEND_MODE_SEND, context->GetChannelManagerItemIndex() + index);
+            const int send_index = GetSendIndex(selected_track, index, &is_hardware_out);
+
+            RemoveTrackSend(selected_track, is_hardware_out ? SEND_MODE_HARDWARE : SEND_MODE_SEND, send_index);
             return;
         }
 
@@ -243,13 +246,14 @@ public:
             return;
         }
 
+        bool is_hardware_out;
         MediaTrack *send_track = GetSelectedTrack(nullptr, 0);
-        const int send_index = context->GetChannelManagerItemIndex() + index;
+        const int send_index = GetSendIndex(send_track, index, &is_hardware_out);
 
         if (context->GetShiftChannelLeft()) {
             DAW::SetNextTrackSendMode(send_track, send_index);
         } else {
-            DAW::ToggleTrackSendMute(send_track, send_index, false);
+            DAW::ToggleTrackSendMute(send_track, send_index, is_hardware_out);
         }
     }
 
@@ -258,13 +262,14 @@ public:
             return;
         }
 
+        bool is_hardware_out;
         MediaTrack *send_track = GetSelectedTrack(nullptr, 0);
-        const int send_index = context->GetChannelManagerItemIndex() + index;
+        const int send_index = GetSendIndex(send_track, index, &is_hardware_out);
 
         if (context->GetShiftChannelLeft()) {
-            DAW::ToggleTrackSendMono(send_track, send_index, false);
+            DAW::ToggleTrackSendMono(send_track, send_index, is_hardware_out);
         } else {
-            DAW::ToggleTrackSendPhase(send_track, send_index, false);
+            DAW::ToggleTrackSendPhase(send_track, send_index, is_hardware_out);
         }
     }
 
@@ -305,13 +310,24 @@ public:
     }
 
     void HandleFaderMove(const int index, const int msb, const int lsb) override {
+        bool is_hardware_out;
         MediaTrack *send_track = GetSelectedTrack(nullptr, 0);
-        const int send_index = context->GetChannelManagerItemIndex() + index;
+        const int send_index = GetSendIndex(send_track, index, &is_hardware_out);
 
         if (context->GetShiftChannelLeft()) {
-            DAW::SetTrackSendPan(send_track, send_index, normalizedToPan(int14ToNormalized(msb, lsb)), false);
+            DAW::SetTrackSendPan(
+                send_track,
+                send_index,
+                normalizedToPan(int14ToNormalized(msb, lsb)),
+                is_hardware_out
+            );
         } else {
-            DAW::SetTrackSendVolume(send_track, send_index, int14ToVol(msb, lsb), false);
+            DAW::SetTrackSendVolume(
+                send_track,
+                send_index,
+                int14ToVol(msb, lsb),
+                is_hardware_out
+            );
         }
     }
 };

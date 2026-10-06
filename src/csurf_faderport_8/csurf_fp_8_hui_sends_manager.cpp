@@ -192,7 +192,6 @@ public:
                 3,
                 ALIGN_CENTER,
                 GetLine3Content(slot_index, i).c_str(),
-                // send_index > -1 ? Progress(slot_index + 1, respect_slots ? nb_sends : nb_track_items[i]).c_str() : "",
                 NON_INVERT,
                 force_update
             );
@@ -343,10 +342,19 @@ public:
         const int send_index = GetSendIndex(media_track, index, false, &is_hardware_out);
 
         if (context->GetShiftChannelLeft()) {
-            DAW::SetTrackSendPan(media_track, send_index, normalizedToPan(int14ToNormalized(msb, lsb)),
-                                 is_hardware_out);
+            DAW::SetTrackSendPan(
+                media_track,
+                send_index,
+                normalizedToPan(int14ToNormalized(msb, lsb)),
+                is_hardware_out
+            );
         } else {
-            DAW::SetTrackSendVolume(media_track, send_index, int14ToVol(msb, lsb), is_hardware_out);
+            DAW::SetTrackSendVolume(
+                media_track,
+                send_index,
+                int14ToVol(msb, lsb),
+                is_hardware_out
+            );
         }
     }
 };
