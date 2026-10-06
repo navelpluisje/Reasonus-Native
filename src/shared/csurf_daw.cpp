@@ -786,24 +786,34 @@ void DAW::ToggleSendMuteForSlot(int _slot_index) {
     }
 }
 
-int DAW::GetTrackSendMode(MediaTrack *media_track, const int send) {
-    return static_cast<int>(GetTrackSendInfo_Value(media_track, SEND_MODE_SEND, send, "I_SENDMODE"));
+int DAW::GetTrackSendMode(MediaTrack *media_track, const int send, const bool is_hardware_out) {
+    return static_cast<int>(GetTrackSendInfo_Value(
+        media_track,
+        is_hardware_out ? SEND_MODE_HARDWARE : SEND_MODE_SEND,
+        send,
+        "I_SENDMODE"
+    ));
 }
 
-int DAW::GetTrackSendAutoMode(MediaTrack *media_track, const int send) {
-    return static_cast<int>(GetTrackSendInfo_Value(media_track, SEND_MODE_SEND, send, "I_AUTOMODE"));
+int DAW::GetTrackSendAutoMode(MediaTrack *media_track, const int send, const bool is_hardware_out) {
+    return static_cast<int>(GetTrackSendInfo_Value(
+        media_track,
+        is_hardware_out ? SEND_MODE_HARDWARE : SEND_MODE_SEND,
+        send,
+        "I_AUTOMODE"
+    ));
 }
 
-std::string DAW::GetTrackSurfaceSendMode(MediaTrack *media_track, const int send) {
+std::string DAW::GetTrackSurfaceSendMode(MediaTrack *media_track, const int send, const bool is_hardware_out) {
     if (GetTrackSendName(media_track, send, false) == "No Dest") {
         return "";
     }
 
-    return GetSendModeString(GetTrackSendMode(media_track, send));
+    return GetSendModeString(GetTrackSendMode(media_track, send, is_hardware_out));
 }
 
-std::string DAW::GetTrackSurfaceSendAutoMode(MediaTrack *media_track, const int send) {
-    return GetAutomationString(GetTrackSendAutoMode(media_track, send));
+std::string DAW::GetTrackSurfaceSendAutoMode(MediaTrack *media_track, const int send, const bool is_hardware_out) {
+    return GetAutomationString(GetTrackSendAutoMode(media_track, send, is_hardware_out));
 }
 
 bool DAW::GetTrackSendMute(MediaTrack *media_track, const int send, const bool is_hardware_out) {
@@ -856,7 +866,7 @@ void DAW::ToggleTrackSendMono(MediaTrack *media_track, const int send, const boo
     if (is_hardware_out) {
         return;
     }
-    
+
     SetTrackSendInfo_Value(
         media_track,
         SEND_MODE_SEND,
@@ -866,17 +876,17 @@ void DAW::ToggleTrackSendMono(MediaTrack *media_track, const int send, const boo
     );
 }
 
-int DAW::GetNextTrackSendMode(MediaTrack *media_track, const int send) {
-    return sendModes[(GetTrackSendMode(media_track, send) + 1) % 4];
+int DAW::GetNextTrackSendMode(MediaTrack *media_track, const int send, const bool is_hardware_out) {
+    return sendModes[(GetTrackSendMode(media_track, send, is_hardware_out) + 1) % 4];
 }
 
-void DAW::SetNextTrackSendMode(MediaTrack *media_track, const int send) {
+void DAW::SetNextTrackSendMode(MediaTrack *media_track, const int send, const bool is_hardware_out) {
     SetTrackSendInfo_Value(
         media_track,
-        SEND_MODE_SEND,
+        is_hardware_out ? SEND_MODE_HARDWARE : SEND_MODE_SEND,
         send,
         "I_SENDMODE",
-        GetNextTrackSendMode(media_track, send)
+        GetNextTrackSendMode(media_track, send, is_hardware_out)
     );
 }
 

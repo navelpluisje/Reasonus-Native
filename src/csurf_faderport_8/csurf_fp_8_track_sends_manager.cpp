@@ -57,7 +57,62 @@ protected:
         return slot_index - hardware_count;
     }
 
-    std::string GetLine3Content(MediaTrack *media_track, const int index) const {
+    std::string GetLine3Content(
+        MediaTrack *media_track,
+        const int send_index,
+        const bool is_hardware_out
+    ) const {
+        const auto send_value = is_hardware_out
+                                    ? static_cast<DisplaySendValue>(settings->GetSendDisplayValueHardware())
+                                    : static_cast<DisplaySendValue>(settings->GetSendDisplayValueSend());
+
+        switch (send_value) {
+            case DISPLAY_SEND_VALUE_VOLUME:
+                return GetVolumeString(GetTrackSendInfo_Value(
+                    media_track,
+                    is_hardware_out ? SEND_MODE_HARDWARE : SEND_MODE_SEND,
+                    send_index,
+                    "D_VOL"
+                ));
+
+            case DISPLAY_SEND_VALUE_PAN:
+                return GetPan1String(GetTrackSendInfo_Value(
+                    media_track,
+                    is_hardware_out ? SEND_MODE_HARDWARE : SEND_MODE_SEND,
+                    send_index,
+                    "D_PAN"
+                ));
+
+            case DISPLAY_SEND_VALUE_MUTE:
+                return DAW::GetTrackSendMute(media_track, send_index, is_hardware_out)
+                           ? "Muted"
+                           : "";
+
+            case DISPLAY_SEND_VALUE_PHASE:
+                return DAW::GetTrackSendPhase(media_track, send_index, is_hardware_out)
+                           ? "Phase Rev"
+                           : "";
+
+            case DISPLAY_SEND_VALUE_MONO:
+                return DAW::GetTrackSendMono(media_track, send_index, is_hardware_out)
+                           ? "Mono"
+                           : "Stereo";
+
+            case DISPLAY_SEND_VALUE_SEND_MODE:
+                return DAW::GetTrackSurfaceSendMode(media_track, send_index, is_hardware_out);
+
+            case DISPLAY_SEND_VALUE_AUTO_MODE:
+                return DAW::GetTrackSurfaceSendAutoMode(media_track, send_index, is_hardware_out);
+
+            case DISPLAY_SEND_VALUE_FIXED:
+                return is_hardware_out ? "Hw out" : "";
+
+            default:
+                return "";
+        }
+    }
+
+    std::string GetLine4Content(MediaTrack *media_track, const int index) const {
         if (index < context->GetNbChannels() - 2) {
             return "";
         }
@@ -150,7 +205,7 @@ public:
                 faderport_channel->SetDisplayLine(
                     2,
                     ALIGN_CENTER,
-                    is_hardware_out ? "Hw out" : DAW::GetTrackSurfaceSendMode(sends_track, send_index).c_str(),
+                    GetLine3Content(sends_track, send_index, is_hardware_out).c_str(),
                     NON_INVERT,
                     force_update
                 );
@@ -162,8 +217,7 @@ public:
             faderport_channel->SetDisplayLine(
                 3,
                 ALIGN_CENTER,
-                GetLine3Content(sends_track, i).c_str(),
-                //DAW::GetTrackSurfaceSendAutoMode(sends_track, send_index).c_str(),
+                GetLine4Content(sends_track, i).c_str(),
                 NON_INVERT,
                 force_update
             );
@@ -251,7 +305,7 @@ public:
         const int send_index = GetSendIndex(send_track, index, &is_hardware_out);
 
         if (context->GetShiftChannelLeft()) {
-            DAW::SetNextTrackSendMode(send_track, send_index);
+            DAW::SetNextTrackSendMode(send_track, send_index, is_hardware_out);
         } else {
             DAW::ToggleTrackSendMute(send_track, send_index, is_hardware_out);
         }

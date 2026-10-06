@@ -12,7 +12,8 @@
 enum Features {
     FEATURE_PINNED_TRACKS,
     FEATURE_EXTENSION_DATA,
-    FEATURE_SLOTS
+    FEATURE_SLOTS,
+    FEATURE_PRE_RECEIVE
 };
 
 enum PAN_MODES {
@@ -23,11 +24,11 @@ enum PAN_MODES {
     /**
      * @brief Width and pan control
      */
-    PAN_MODE_STEREO_PAN = 5,
+    PAN_MODE_STEREO_PAN  = 5,
     /**
      * @brief Left and right pan
      */
-    PAN_MODE_DUAL_PAN = 6,
+    PAN_MODE_DUAL_PAN    = 6,
 };
 
 enum SEND_MODES {
@@ -46,6 +47,7 @@ static std::map<Features, double> feature_versions = { // NOLINT(*-statically-co
     {FEATURE_PINNED_TRACKS, 7.46},
     {FEATURE_EXTENSION_DATA, 7.79},
     {FEATURE_SLOTS, 7.75},
+    {FEATURE_PRE_RECEIVE, 7.78},
 };
 
 class DAW {
@@ -654,18 +656,20 @@ public:
      * Get the send mode for the given send
      * @param media_track The track where we want the send for
      * @param send The index of the send track
+     * @param is_hardware_out
      * @return The send mode:
      * - 0 = post-fader,
      * - 1 = pre-fx,
      * - 2 = post-fx (deprecated),
      * - 3 = post-fx
      */
-    static int GetTrackSendMode(MediaTrack *media_track, int send);
+    static int GetTrackSendMode(MediaTrack *media_track, int send, bool is_hardware_out);
 
     /**
      * Get the send automation mode for the given send
      * @param media_track The track where we want the send for
      * @param send The index of the send track
+     * @param is_hardware_out
      * @return The send automation mode:
      * - -1 = use track automode,
      * - 0 = trim/off,
@@ -674,12 +678,13 @@ public:
      * - 3 = write,
      * - 4 = latch
      */
-    static int GetTrackSendAutoMode(MediaTrack *media_track, int send);
+    static int GetTrackSendAutoMode(MediaTrack *media_track, int send, bool is_hardware_out);
 
     /**
      * Get the string representation for send mode for the given send
      * @param media_track The track where we want the send for
      * @param send The index of the send track
+     * @param is_hardware_out
      * @return The send mode:
      * - 0 = Post-Fdr,
      * - 1 = Pre-FX,
@@ -687,12 +692,13 @@ public:
      * - 3 = Post-FX,
      * - others: Post-Fdr
      */
-    static std::string GetTrackSurfaceSendMode(MediaTrack *media_track, int send);
+    static std::string GetTrackSurfaceSendMode(MediaTrack *media_track, int send, bool is_hardware_out);
 
     /**
      * Get the string representation of the send automation mode for the given send
      * @param media_track The track where we want the send for
      * @param send The index of the send track
+     * @param is_hardware_out
      * @return The send automation mode:
      * - -1 = Track,
      * - 0 = Trim,
@@ -701,7 +707,7 @@ public:
      * - 3 = Write,
      * - 4 = Latch,
      */
-    static std::string GetTrackSurfaceSendAutoMode(MediaTrack *media_track, int send);
+    static std::string GetTrackSurfaceSendAutoMode(MediaTrack *media_track, int send, bool is_hardware_out);
 
     /**
      * Get the mute state for the given send
@@ -758,16 +764,18 @@ public:
      * ??
      * @param media_track The track where we want the send for
      * @param send The mute state of the send track
+     * @param is_hardware_out
      * @return Whether mono ois engaged
      */
-    static int GetNextTrackSendMode(MediaTrack *media_track, int send);
+    static int GetNextTrackSendMode(MediaTrack *media_track, int send, bool is_hardware_out);
 
     /**
      * ??
      * @param media_track The track for the send we need
      * @param send The index on the send
+     * @param is_hardware_out
      */
-    static void SetNextTrackSendMode(MediaTrack *media_track, int send);
+    static void SetNextTrackSendMode(MediaTrack *media_track, int send, bool is_hardware_out);
 
     /**
      * Set the volume for the given send
