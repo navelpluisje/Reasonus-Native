@@ -131,6 +131,8 @@ class ReaSonusSettings {
         {"displays", "track-invert", "0,0,0,0"},
         {"displays", "track-value-bar-mode", "1"},
         {"displays", "track-value-bar-value", "0"},
+        {"displays", "send-value-send", "0"},
+        {"displays", "send-value-hardware", "0"},
 
         {"functions", "5", "0"},
         {"functions", "6", "0"},
@@ -329,6 +331,10 @@ public:
     int GetTrackValueBarMode();
 
     int GetTrackValueBarValue();
+
+    int GetSendDisplayValueSend();
+
+    int GetSendDisplayValueHardware();
 
     int GetSurface();
 

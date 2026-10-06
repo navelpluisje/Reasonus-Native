@@ -227,6 +227,14 @@ int ReaSonusSettings::GetTrackValueBarValue() {
     return stoi(settings["displays"]["track-value-bar-value"]);
 }
 
+int ReaSonusSettings::GetSendDisplayValueSend() {
+    return stoi(settings["displays"]["send-value-send"]);
+}
+
+int ReaSonusSettings::GetSendDisplayValueHardware() {
+    return stoi(settings["displays"]["send-value-hardware"]);
+}
+
 int ReaSonusSettings::GetSurface() {
     return stoi(settings["surface"]["surface"]);
 }

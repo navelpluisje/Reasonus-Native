@@ -81,6 +81,8 @@ class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-in
     int setting_track_valuebar_value;
     bool setting_overwrite_time_code;
     int setting_time_code;
+    int setting_display_send_value_send;
+    int setting_display_send_value_hardware;
 
     std::vector<ReaSonusComboInputRow *> display_line_value_combo;
     std::vector<ReaSonusComboInputRow *> display_line_alignment_combo;
@@ -92,6 +94,8 @@ class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-in
     ReaSonusInfoComboInputRow *latch_preview_action_combo;
     ReaSonusInfoComboInputRow *plugin_mapping_default_color_mode;
     ReaSonusComboInputRow *automation_single_point_shape;
+    ReaSonusComboInputRow *display_send_third_line_combo;
+    ReaSonusComboInputRow *display_hardware_third_line_combo;
 
     int latch_preview_action_indexes[8] = {42013, 42014, 42015, 42016, 42017, 41160, 41161, 41162};
     std::vector<std::string> latch_preview_action_names = {
@@ -163,6 +167,17 @@ class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-in
         i18n->t("settings", "display-track.option.display-value-volume"),
         i18n->t("settings", "display-track.option.display-value-pan-1"),
         i18n->t("settings", "display-track.option.display-value-pan-2"),
+    };
+
+    std::vector<std::string> send_display_values = {
+        i18n->t("settings", "display-send.option.display-value-volume"),
+        i18n->t("settings", "display-send.option.display-value-pan"),
+        i18n->t("settings", "display-send.option.display-value-mute"),
+        i18n->t("settings", "display-send.option.display-value-phase"),
+        i18n->t("settings", "display-send.option.display-value-mono"),
+        i18n->t("settings", "display-send.option.display-value-send-mode"),
+        i18n->t("settings", "display-send.option.display-value-auto-mode"),
+        i18n->t("settings", "display-send.option.display-value-fixed"),
     };
 
     std::vector<std::string> plugin_map_color_mode_labels = {
@@ -293,6 +308,26 @@ public:
             "automation-single-point-shape",
             automation_mode_shape_labels,
             &setting_single_point_mode_shape
+        );
+
+        display_send_third_line_combo = new ReaSonusComboInputRow(
+            m_ctx,
+            assets,
+            "Send third line",
+            "display-send-third-line",
+            send_display_values,
+            &setting_display_send_value_send,
+            150
+        );
+
+        display_hardware_third_line_combo = new ReaSonusComboInputRow(
+            m_ctx,
+            assets,
+            "Hardware third line",
+            "display-hardware-third-line",
+            send_display_values,
+            &setting_display_send_value_hardware,
+            150
         );
     }
 
@@ -1049,10 +1084,34 @@ public:
 
             ImGui::SameLine(m_ctx);
 
+            ImGui::BeginGroup(m_ctx);
             UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
             if (ImGui::BeginChild(
                 m_ctx,
-                "settings-colors",
+                "settings-send-display",
+                0.0,
+                0.0,
+                ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
+            )) {
+                ReaSonusPageTitle(
+                    m_ctx,
+                    assets,
+                    i18n->t("settings", "display-send.label"),
+                    true
+                );
+
+                ImGui::PushTextWrapPos(m_ctx, 0.0);
+                ImGui::Text(m_ctx, i18n->t("settings", "display-send.description").c_str());
+                ImGui::PopTextWrapPos(m_ctx);
+
+                display_send_third_line_combo->Render();
+                display_hardware_third_line_combo->Render();
+
+                ImGui::EndChild(m_ctx);
+            }
+            if (ImGui::BeginChild(
+                m_ctx,
+                "settings-time-code",
                 0.0,
                 0.0,
                 ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
@@ -1079,6 +1138,7 @@ public:
                 ImGui::EndChild(m_ctx);
             }
             UiStyledElements::PopReaSonusGroupStyle(m_ctx);
+            ImGui::EndGroup(m_ctx);
 
             ImGui::EndTabItem(m_ctx);
         }
@@ -1157,6 +1217,10 @@ public:
         settings->SetSetting("displays", "track-invert", join(setting_track_value_line_invert, ","));
         settings->SetSetting("displays", "track-value-bar-mode", setting_track_valuebar_mode);
         settings->SetSetting("displays", "track-value-bar-value", setting_track_valuebar_value);
+
+        settings->SetSetting("displays", "send-value-send", setting_display_send_value_send);
+        settings->SetSetting("displays", "send-value-hardware", setting_display_send_value_hardware);
+
         settings->SetSetting("surface", "reasonus-color-palette", join(settings_plugin_color_palette, ","));
         settings->SetSetting("filters", "use-custom-color", setting_filter_custom_color);
         settings->SetSetting("filters", "project-filters", setting_filter_project_filters);
@@ -1205,6 +1269,8 @@ public:
         setting_track_value_line_invert = settings->GetTrackDisplayInvertValues();
         setting_track_valuebar_mode = settings->GetTrackValueBarMode();
         setting_track_valuebar_value = settings->GetTrackValueBarValue();
+        setting_display_send_value_send = settings->GetSendDisplayValueSend();
+        setting_display_send_value_hardware = settings->GetSendDisplayValueHardware();
         setting_instant_multi_select_filter = settings->ShouldMultiFilterApplyInstant();
         setting_mute_master_on_fwd_rwd = settings->ShouldMuteMasterOnFwdRwd();
         settings_initial_plugin_color_palette = settings->GetPluginColorPalette();
