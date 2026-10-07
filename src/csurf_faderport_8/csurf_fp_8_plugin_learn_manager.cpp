@@ -83,22 +83,32 @@ public:
             std::string paramKey = getParamKey("Select_", paramIndex);
 
             if (plugin_mapping_ini.has(paramKey)) {
-                track->SetDisplayLine(0, ALIGN_CENTER, plugin_mapping_ini[paramKey]["name"].c_str(), INVERT,
-                                      force_update);
+                track->SetDisplayLine(
+                    DISPLAY_LINE_1,
+                    ALIGN_CENTER,
+                    plugin_mapping_ini[paramKey]["name"].c_str(),
+                    INVERT,
+                    force_update
+                );
             } else {
-                track->SetDisplayLine(0, ALIGN_CENTER, "Free", INVERT, force_update);
+                track->SetDisplayLine(DISPLAY_LINE_1, ALIGN_CENTER, "Free", INVERT, force_update);
             }
 
             paramKey = getParamKey("Fader_", paramIndex);
             if (plugin_mapping_ini.has(paramKey)) {
-                track->SetDisplayLine(2, ALIGN_CENTER, plugin_mapping_ini[paramKey]["name"].c_str(), INVERT,
-                                      force_update);
+                track->SetDisplayLine(
+                    DISPLAY_LINE_3,
+                    ALIGN_CENTER,
+                    plugin_mapping_ini[paramKey]["name"].c_str(),
+                    INVERT,
+                    force_update
+                );
             } else {
-                track->SetDisplayLine(2, ALIGN_CENTER, "Free", INVERT, force_update);
+                track->SetDisplayLine(DISPLAY_LINE_3, ALIGN_CENTER, "Free", INVERT, force_update);
             }
 
-            track->SetDisplayLine(1, ALIGN_CENTER, "", NON_INVERT, true);
-            track->SetDisplayLine(3, ALIGN_CENTER, "", NON_INVERT, true);
+            track->SetDisplayLine(DISPLAY_LINE_2, ALIGN_CENTER, "", NON_INVERT, true);
+            track->SetDisplayLine(DISPLAY_LINE_4, ALIGN_CENTER, "", NON_INVERT, true);
         }
     }
 

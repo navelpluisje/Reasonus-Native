@@ -156,7 +156,7 @@ public:
             // Handle the displays
             faderport_channel->SetDisplayMode(DISPLAY_MODE_2, force_update);
             faderport_channel->SetDisplayLine(
-                0,
+                DISPLAY_LINE_1,
                 ALIGN_CENTER,
                 DAW::GetTrackName(media_track).c_str(),
                 NON_INVERT,
@@ -165,14 +165,14 @@ public:
 
             if (add_receive_enabled) {
                 faderport_channel->SetDisplayLine(
-                    1,
+                    DISPLAY_LINE_2,
                     ALIGN_LEFT,
                     ("Trk: " + DAW::GetTrackIndex(add_receive_track)).c_str(),
                     INVERT,
                     force_update
                 );
                 faderport_channel->SetDisplayLine(
-                    2,
+                    DISPLAY_LINE_3,
                     ALIGN_CENTER,
                     DAW::GetTrackName(add_receive_track).c_str(),
                     INVERT,
@@ -180,26 +180,26 @@ public:
                 );
             } else if (DAW::HasTrackReceive(media_track, receive_index)) {
                 faderport_channel->SetDisplayLine(
-                    1,
+                    DISPLAY_LINE_2,
                     ALIGN_LEFT,
                     DAW::GetTrackReceiveSrcName(media_track, receive_index).c_str(),
                     INVERT,
                     force_update
                 );
                 faderport_channel->SetDisplayLine(
-                    2,
+                    DISPLAY_LINE_3,
                     ALIGN_CENTER,
                     GetLine3Content(media_track, receive_index).c_str(),
                     NON_INVERT,
                     force_update
                 );
             } else {
-                faderport_channel->SetDisplayLine(1, ALIGN_LEFT, "", NON_INVERT, force_update);
-                faderport_channel->SetDisplayLine(2, ALIGN_CENTER, "", NON_INVERT, force_update);
+                faderport_channel->SetDisplayLine(DISPLAY_LINE_2, ALIGN_LEFT, "", NON_INVERT, force_update);
+                faderport_channel->SetDisplayLine(DISPLAY_LINE_3, ALIGN_CENTER, "", NON_INVERT, force_update);
             }
 
             faderport_channel->SetDisplayLine(
-                3,
+                DISPLAY_LINE_4,
                 ALIGN_CENTER,
                 GetLine4Content(receive_index, i).c_str(),
                 NON_INVERT,
