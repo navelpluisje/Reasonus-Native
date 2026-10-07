@@ -3,8 +3,7 @@
 
 #include "csurf_fp_8_track.hpp"
 
-class CSurf_FP_8_LastTouchedFXManager
-{
+class CSurf_FP_8_LastTouchedFXManager {
 protected:
     CSurf_FP_8_Track *track;
     CSurf_Context *context;
@@ -18,7 +17,9 @@ protected:
 
 public:
     CSurf_FP_8_LastTouchedFXManager(CSurf_FP_8_Track *track, CSurf_Context *context, midi_Output *m_midiout);
-    ~CSurf_FP_8_LastTouchedFXManager() {};
+
+    ~CSurf_FP_8_LastTouchedFXManager() {
+    };
 
     void UpdateTrack(bool force_update);
 
@@ -28,12 +29,11 @@ public:
 
     void HandleSoloClick(int index) const;
 
-    void HandleFaderTouch() const;
+    void HandleFaderTouch(int _, int value) const;
 
     void HandleFaderMove(int msb, int lsb) const;
 
-    void resetLastTouchedFxEnabled()
-    {
+    void resetLastTouchedFxEnabled() {
         hasLastTouchedFxEnabled = false;
     };
 };

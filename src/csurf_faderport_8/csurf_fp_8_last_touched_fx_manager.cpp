@@ -12,9 +12,9 @@ CSurf_FP_8_LastTouchedFXManager::CSurf_FP_8_LastTouchedFXManager(
 
 void CSurf_FP_8_LastTouchedFXManager::UpdateTrack(bool force_update) {
     int track_number = -1;
-    int fx_number = -1;
-    int param_number = -1;
-    const char *track_name = "";
+    int plugin_index = -1;
+    int param_index = -1;
+    auto track_name = "";
     char fxName[256];
     char paramName[256];
     char paramValueString[256];
@@ -24,23 +24,23 @@ void CSurf_FP_8_LastTouchedFXManager::UpdateTrack(bool force_update) {
         force_update = true;
     }
 
-    if (GetLastTouchedFX(&track_number, &fx_number, &param_number)) {
+    if (GetLastTouchedFX(&track_number, &plugin_index, &param_index)) {
         // Somehow this prevents reaper from crashing while selecting link mode.
         // TODO: finsd a better way for this
         char buffer[250];
-        snprintf(buffer, sizeof(buffer), "Zone -- %d\n", param_number);
+        snprintf(buffer, sizeof(buffer), "Zone -- %d\n", param_index);
 
         if (MediaTrack *media_track = GetTrack(nullptr, track_number - 1)) {
             track_name = static_cast<const char *>(GetSetMediaTrackInfo(media_track, "P_NAME", nullptr));
-            TrackFX_GetFXName(media_track, fx_number, fxName, sizeof(fxName));
-            TrackFX_GetParamName(media_track, fx_number, param_number, paramName, std::size(paramName));
+            TrackFX_GetFXName(media_track, plugin_index, fxName, sizeof(fxName));
+            TrackFX_GetParamName(media_track, plugin_index, param_index, paramName, std::size(paramName));
             TrackFX_GetFormattedParamValue(
-                media_track, fx_number,
-                param_number,
+                media_track, plugin_index,
+                param_index,
                 paramValueString,
                 std::size(paramValueString)
             );
-            paramValue = TrackFX_GetParamNormalized(media_track, fx_number, param_number);
+            paramValue = TrackFX_GetParamNormalized(media_track, plugin_index, param_index);
         }
     } else {
         track_name = "No Track";
@@ -57,21 +57,21 @@ void CSurf_FP_8_LastTouchedFXManager::UpdateTrack(bool force_update) {
     track->SetDisplayLine(
         1,
         ALIGN_LEFT,
-        param_number < 0 ? "No Param" : PluginUtils::StripPluginNamePrefixes(fxName).c_str(),
+        param_index < 0 ? "No Param" : PluginUtils::StripPluginNamePrefixes(fxName).c_str(),
         INVERT,
         force_update
     );
     track->SetDisplayLine(
         2,
         ALIGN_LEFT,
-        param_number < 0 ? "  " : std::string(paramName).c_str(),
+        param_index < 0 ? "  " : std::string(paramName).c_str(),
         NON_INVERT,
         force_update
     );
     track->SetDisplayLine(
         3,
         ALIGN_CENTER,
-        param_number < 0 ? "  " : paramValueString,
+        param_index < 0 ? "  " : paramValueString,
         NON_INVERT,
         force_update
     );
@@ -96,17 +96,32 @@ void CSurf_FP_8_LastTouchedFXManager::HandleSoloClick(const int index) const {
     (void) index;
 };
 
-void CSurf_FP_8_LastTouchedFXManager::HandleFaderTouch() const {
+void CSurf_FP_8_LastTouchedFXManager::HandleFaderTouch(int _, const int value) const {
+    if (value > 0) {
+        return;
+    }
+    if (context->GetLastTouchedFxMode()) {
+        int track_number = -1;
+        int plugin_index = -1;
+        int param_index = -1;
+
+        // Tell REAPER we do not alter the automatiuon anymore
+        if (GetLastTouchedFX(&track_number, &plugin_index, &param_index)) {
+            if (MediaTrack *media_track = GetTrack(nullptr, track_number - 1)) {
+                TrackFX_EndParamEdit(media_track, plugin_index, param_index);
+            }
+        }
+    }
 };
 
 void CSurf_FP_8_LastTouchedFXManager::HandleFaderMove(const int msb, const int lsb) const {
-    int trackNumber = -1;
-    int fxNumber = -1;
-    int paramNumber = -1;
+    int track_number = -1;
+    int plugin_index = -1;
+    int param_index = -1;
 
-    if (GetLastTouchedFX(&trackNumber, &fxNumber, &paramNumber)) {
-        if (MediaTrack *media_track = GetTrack(0, trackNumber - 1)) {
-            TrackFX_SetParamNormalized(media_track, fxNumber, paramNumber, int14ToNormalized(msb, lsb));
+    if (GetLastTouchedFX(&track_number, &plugin_index, &param_index)) {
+        if (MediaTrack *media_track = GetTrack(0, track_number - 1)) {
+            TrackFX_SetParamNormalized(media_track, plugin_index, param_index, int14ToNormalized(msb, lsb));
         }
     }
 };
