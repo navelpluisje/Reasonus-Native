@@ -169,20 +169,33 @@ public:
         context->SetChannelManagerItemsCount(nb_sends);
         current_send = context->GetChannelManagerItemIndex();
 
+        ShowConsoleMsg("");
         for (int i = 0; i < context->GetNbChannels(); i++) {
             bool is_hardware_out;
             const CSurf_FP_8_Track *faderport_channel = tracks.at(i);
             MediaTrack *media_track = media_tracks.Get(i);
 
+            const int slot_index = context->GetChannelManagerItemIndex(
+                respect_slots ? nb_sends : nb_track_items[i] - 1
+            );
+
             if (media_track == nullptr) {
                 faderport_channel->ClearTrack(true, force_update);
+
+                if (i >= context->GetNbChannels() - 2) {
+                    faderport_channel->SetDisplayMode(DISPLAY_MODE_2, force_update);
+                    faderport_channel->SetDisplayLine(
+                        3,
+                        ALIGN_CENTER,
+                        GetLine4Content(slot_index, i).c_str(),
+                        NON_INVERT,
+                        force_update
+                    );
+                }
                 continue;
             }
 
             const int send_index = GetSendIndex(media_track, i, false, &is_hardware_out);
-            const int slot_index = context->GetChannelManagerItemIndex(
-                respect_slots ? nb_sends : nb_track_items[i] - 1
-            );
             const bool add_send_enabled = context->GetAddSendReceiveMode() == i;
 
             if (add_send_enabled) {

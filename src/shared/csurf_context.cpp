@@ -288,12 +288,24 @@ public:
     void IncrementChannelmanagerItemIndex(const int val) {
         if (channelManagerItemIndex + val + (channelManagerType == Hui ? 0 : nbChannels) < channelManagerItemsCount) {
             channelManagerItemIndex += val;
+        } else if (
+            channelManagerType == Hui
+            && settings->PluginsShouldRespectSlots()
+            && (channelMode == SendMode || channelMode == PluginMode)
+        ) {
+            channelManagerItemIndex = 0;
         }
     }
 
     void DecrementChannelManagerItemIndex(const int val) {
         if (channelManagerItemIndex - val >= 0) {
             channelManagerItemIndex -= val;
+        } else if (
+            channelManagerType == Hui
+            && settings->PluginsShouldRespectSlots()
+            && (channelMode == SendMode || channelMode == PluginMode)
+        ) {
+            channelManagerItemIndex = channelManagerItemsCount - 1;
         }
     }
 
