@@ -169,7 +169,6 @@ public:
         context->SetChannelManagerItemsCount(nb_sends);
         current_send = context->GetChannelManagerItemIndex();
 
-        ShowConsoleMsg("");
         for (int i = 0; i < context->GetNbChannels(); i++) {
             bool is_hardware_out;
             const CSurf_FP_8_Track *faderport_channel = tracks.at(i);
@@ -185,7 +184,7 @@ public:
                 if (i >= context->GetNbChannels() - 2) {
                     faderport_channel->SetDisplayMode(DISPLAY_MODE_2, force_update);
                     faderport_channel->SetDisplayLine(
-                        3,
+                        DISPLAY_LINE_4,
                         ALIGN_CENTER,
                         GetLine4Content(slot_index, i).c_str(),
                         NON_INVERT,
@@ -214,7 +213,7 @@ public:
             // Handle the displays
             faderport_channel->SetDisplayMode(DISPLAY_MODE_2, force_update);
             faderport_channel->SetDisplayLine(
-                0,
+                DISPLAY_LINE_1,
                 ALIGN_CENTER,
                 DAW::GetTrackName(media_track).c_str(),
                 NON_INVERT,
@@ -223,14 +222,14 @@ public:
 
             if (add_send_enabled) {
                 faderport_channel->SetDisplayLine(
-                    1,
+                    DISPLAY_LINE_2,
                     ALIGN_LEFT,
                     ("Trk: " + DAW::GetTrackIndex(add_send_track)).c_str(),
                     INVERT,
                     force_update
                 );
                 faderport_channel->SetDisplayLine(
-                    2,
+                    DISPLAY_LINE_3,
                     ALIGN_CENTER,
                     DAW::GetTrackName(add_send_track).c_str(),
                     INVERT,
@@ -238,26 +237,26 @@ public:
                 );
             } else if (send_index > -1) {
                 faderport_channel->SetDisplayLine(
-                    1,
+                    DISPLAY_LINE_2,
                     ALIGN_LEFT,
                     DAW::GetTrackSendName(media_track, send_index, is_hardware_out).c_str(),
                     INVERT,
                     force_update
                 );
                 faderport_channel->SetDisplayLine(
-                    2,
+                    DISPLAY_LINE_3,
                     ALIGN_CENTER,
                     GetLine3Content(media_track, send_index, is_hardware_out).c_str(),
                     NON_INVERT,
                     force_update
                 );
             } else {
-                faderport_channel->SetDisplayLine(1, ALIGN_LEFT, "", NON_INVERT, force_update);
-                faderport_channel->SetDisplayLine(2, ALIGN_CENTER, "", NON_INVERT, force_update);
+                faderport_channel->SetDisplayLine(DISPLAY_LINE_2, ALIGN_LEFT, "", NON_INVERT, force_update);
+                faderport_channel->SetDisplayLine(DISPLAY_LINE_3, ALIGN_CENTER, "", NON_INVERT, force_update);
             }
 
             faderport_channel->SetDisplayLine(
-                3,
+                DISPLAY_LINE_4,
                 ALIGN_CENTER,
                 GetLine4Content(slot_index, i).c_str(),
                 NON_INVERT,

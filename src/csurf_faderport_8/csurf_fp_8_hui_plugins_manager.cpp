@@ -36,6 +36,27 @@ protected:
                );
     }
 
+    std::string GetLine4Content(
+        const int slot_index,
+        const int display_index
+    ) const {
+        const bool respect_slots = settings->SendsShouldRespectSlots();
+        if (!respect_slots) {
+            if (nb_track_items[display_index] == 0) {
+                return "";
+            }
+            return Progress(slot_index + 1, nb_track_items[display_index]);
+        }
+        if (display_index < context->GetNbChannels() - 2) {
+            return "";
+        }
+        if (display_index == context->GetNbChannels() - 2) {
+            return "Slot:";
+        }
+
+        return Progress(slot_index + 1, nb_plugins);
+    }
+
 public:
     CSurf_FP_8_PluginsManager(
         const std::vector<CSurf_FP_8_Track *> &tracks,
@@ -77,7 +98,7 @@ public:
 
         for (int i = 0; i < context->GetNbChannels(); i++) {
             MediaTrack *media_track;
-            const CSurf_FP_8_Track *track = tracks.at(i);
+            const CSurf_FP_8_Track *faderport_channel = tracks.at(i);
 
             int fader_value = 0;
             int value_bar_value = 0;
@@ -87,14 +108,25 @@ public:
                 media_track = media_tracks.Get(i);
             }
 
-            if (media_track == nullptr) {
-                track->ClearTrack(true, force_update);
-                continue;
-            }
-
             const int slot_index = context->GetChannelManagerItemIndex(
                 respect_slots ? nb_plugins : nb_track_items[i] - 1
             );
+
+            if (media_track == nullptr) {
+                faderport_channel->ClearTrack(true, force_update);
+
+                if (i >= context->GetNbChannels() - 2) {
+                    faderport_channel->SetDisplayMode(DISPLAY_MODE_2, force_update);
+                    faderport_channel->SetDisplayLine(
+                        DISPLAY_LINE_4,
+                        ALIGN_CENTER,
+                        GetLine4Content(slot_index, i).c_str(),
+                        NON_INVERT,
+                        force_update
+                    );
+                }
+                continue;
+            }
 
             const int plugin_index = respect_slots
                                          ? DAW::GetTrackFxIndexBySlotIndex(media_track, slot_index)
@@ -103,69 +135,65 @@ public:
             GetFaderValue(media_track, &fader_value, &value_bar_value);
 
             if (DAW::HasTrackFx(media_track, plugin_index)) {
-                track->SetDisplayLine(
-                    0,
+                faderport_channel->SetDisplayLine(
+                    DISPLAY_LINE_1,
                     ALIGN_LEFT,
                     DAW::GetTrackName(media_track).c_str(),
                     NON_INVERT,
                     force_update
                 );
-                track->SetDisplayLine(
-                    1,
+                faderport_channel->SetDisplayLine(
+                    DISPLAY_LINE_2,
                     ALIGN_LEFT,
                     DAW::GetTrackFxName(media_track, plugin_index, false).c_str(),
                     INVERT,
                     force_update
                 );
-                track->SetDisplayLine(
-                    2,
+                faderport_channel->SetDisplayLine(
+                    DISPLAY_LINE_3,
                     ALIGN_CENTER,
                     DAW::GetTrackFxSurfaceEnabled(media_track, plugin_index).c_str(),
                     NON_INVERT,
                     force_update
                 );
-                track->SetDisplayLine(
-                    3,
-                    ALIGN_CENTER,
-                    Progress(slot_index + 1, respect_slots ? nb_plugins : nb_track_items[i]).c_str(),
-                    NON_INVERT,
-                    force_update
-                );
-                track->SetMuteButtonValue(
+                faderport_channel->SetMuteButtonValue(
                     ButtonBlinkOnOff(
                         context->GetShiftChannelLeft() && !DAW::GetTrackFxEnabled(media_track, plugin_index),
                         !DAW::GetTrackFxEnabled(media_track, plugin_index),
                         settings->GetDistractionFreeMode()));
-                track->SetSoloButtonValue(
+                faderport_channel->SetSoloButtonValue(
                     ButtonBlinkOnOff(
                         DAW::GetTrackFxPanelOpen(media_track, plugin_index),
                         PluginUtils::hasPluginConfigFile(media_track, plugin_index),
                         settings->GetDistractionFreeMode()));
             } else {
-                track->SetDisplayLine(0, ALIGN_LEFT, DAW::GetTrackName(media_track).c_str(), NON_INVERT, force_update);
-                track->SetDisplayLine(1, ALIGN_LEFT, "No Fx", INVERT, force_update);
-                track->SetDisplayLine(2, ALIGN_CENTER, "", NON_INVERT, force_update);
-                // When in slot mode, we always show th eprogress
-                track->SetDisplayLine(
-                    3,
-                    ALIGN_CENTER,
-                    respect_slots
-                        ? Progress(slot_index + 1, respect_slots ? nb_plugins : nb_track_items[i]).c_str()
-                        : "",
-                    NON_INVERT,
+                faderport_channel->SetDisplayLine(
+                    DISPLAY_LINE_1,
+                    ALIGN_LEFT,
+                    DAW::GetTrackName(media_track).c_str(), NON_INVERT,
                     force_update
                 );
-                track->SetMuteButtonValue(BTN_VALUE_OFF, force_update);
-                track->SetSoloButtonValue(BTN_VALUE_OFF, force_update);
+                faderport_channel->SetDisplayLine(DISPLAY_LINE_2, ALIGN_LEFT, "", NON_INVERT, force_update);
+                faderport_channel->SetDisplayLine(DISPLAY_LINE_3, ALIGN_CENTER, "", NON_INVERT, force_update);
+                faderport_channel->SetMuteButtonValue(BTN_VALUE_OFF, force_update);
+                faderport_channel->SetSoloButtonValue(BTN_VALUE_OFF, force_update);
             }
 
-            track->SetTrackColor(color, force_update);
-            track->SetSelectButtonValue(BTN_VALUE_ON, force_update);
-            track->SetFaderValue(fader_value, force_update);
-            track->SetValueBarMode(VALUEBAR_MODE_BIPOLAR);
-            track->SetValueBarValue(value_bar_value);
+            faderport_channel->SetDisplayLine(
+                DISPLAY_LINE_4,
+                ALIGN_CENTER,
+                GetLine4Content(slot_index, i).c_str(),
+                NON_INVERT,
+                force_update
+            );
 
-            track->SetDisplayMode(DISPLAY_MODE_2, force_update);
+            faderport_channel->SetTrackColor(color, force_update);
+            faderport_channel->SetSelectButtonValue(BTN_VALUE_ON, force_update);
+            faderport_channel->SetFaderValue(fader_value, force_update);
+            faderport_channel->SetValueBarMode(VALUEBAR_MODE_BIPOLAR);
+            faderport_channel->SetValueBarValue(value_bar_value);
+
+            faderport_channel->SetDisplayMode(DISPLAY_MODE_2, force_update);
         }
     }
 

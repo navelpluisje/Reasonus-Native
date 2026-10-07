@@ -170,7 +170,7 @@ public:
                 faderport_channel->SetDisplayLine(0, ALIGN_LEFT, "", NON_INVERT, force_update);
             } else {
                 faderport_channel->SetDisplayLine(
-                    0,
+                    DISPLAY_LINE_1,
                     ALIGN_LEFT,
                     DAW::GetTrackName(media_track).c_str(),
                     sends_track == media_track ? INVERT : NON_INVERT,
@@ -181,14 +181,14 @@ public:
             // Handle the displays
             if (add_send_enabled) {
                 faderport_channel->SetDisplayLine(
-                    1,
+                    DISPLAY_LINE_2,
                     ALIGN_LEFT,
                     ("Trk: " + DAW::GetTrackIndex(add_send_track)).c_str(),
                     INVERT,
                     force_update
                 );
                 faderport_channel->SetDisplayLine(
-                    2,
+                    DISPLAY_LINE_3,
                     ALIGN_CENTER,
                     DAW::GetTrackName(add_send_track).c_str(),
                     INVERT,
@@ -196,26 +196,26 @@ public:
                 );
             } else if (send_index > -1) {
                 faderport_channel->SetDisplayLine(
-                    1,
+                    DISPLAY_LINE_2,
                     ALIGN_LEFT,
                     DAW::GetTrackSendName(sends_track, send_index, is_hardware_out).c_str(),
                     INVERT,
                     force_update
                 );
                 faderport_channel->SetDisplayLine(
-                    2,
+                    DISPLAY_LINE_3,
                     ALIGN_CENTER,
                     GetLine3Content(sends_track, send_index, is_hardware_out).c_str(),
                     NON_INVERT,
                     force_update
                 );
             } else {
-                faderport_channel->SetDisplayLine(1, ALIGN_LEFT, "", NON_INVERT, force_update);
-                faderport_channel->SetDisplayLine(2, ALIGN_CENTER, "", NON_INVERT, force_update);
+                faderport_channel->SetDisplayLine(DISPLAY_LINE_2, ALIGN_LEFT, "", NON_INVERT, force_update);
+                faderport_channel->SetDisplayLine(DISPLAY_LINE_3, ALIGN_CENTER, "", NON_INVERT, force_update);
             }
 
             faderport_channel->SetDisplayLine(
-                3,
+                DISPLAY_LINE_4,
                 ALIGN_CENTER,
                 GetLine4Content(sends_track, i).c_str(),
                 NON_INVERT,
@@ -238,7 +238,12 @@ public:
             }
 
             faderport_channel->SetTrackColor(color, force_update);
-            faderport_channel->SetSelectButtonValue(BTN_VALUE_ON, force_update);
+            faderport_channel->SetSelectButtonValue(
+                media_track == nullptr
+                    ? BTN_VALUE_OFF
+                    : BTN_VALUE_ON,
+                force_update
+            );
             faderport_channel->SetMuteButtonValue(
                 ButtonBlinkOnOff(
                     context->GetShiftChannelLeft() && DAW::GetTrackSendMute(sends_track, send_index, is_hardware_out),
