@@ -62,13 +62,12 @@ public:
 
         for (int i = 0; i < context->GetNbChannels(); i++) {
             MediaTrack *media_track;
-            const int display_index = context->GetChannelManagerItemIndex() + i;
             const int plugin_index = GetPluginIndex(i);
+            const CSurf_FP_8_Track *faderport_channel = tracks.at(i);
 
             int fader_value = 0;
             int valuebar_value = 0;
 
-            const CSurf_FP_8_Track *track = tracks.at(i);
             if (context->GetMasterFaderMode() && i == context->GetNbChannels() - 1) {
                 media_track = GetMasterTrack(nullptr);
             } else {
@@ -79,10 +78,10 @@ public:
             GetFaderValue(media_track, &fader_value, &valuebar_value);
 
             if (media_track == nullptr) {
-                track->SetDisplayLine(0, ALIGN_LEFT, "", NON_INVERT);
+                faderport_channel->SetDisplayLine(0, ALIGN_LEFT, "", NON_INVERT);
             } else {
-                track->SetDisplayLine(
-                    0,
+                faderport_channel->SetDisplayLine(
+                    DISPLAY_LINE_1,
                     ALIGN_LEFT,
                     DAW::GetTrackName(media_track).c_str(),
                     plugin_track == media_track ? INVERT : NON_INVERT,
@@ -91,48 +90,54 @@ public:
             }
 
             if (DAW::HasTrackFx(plugin_track, plugin_index)) {
-                track->SetDisplayLine(
-                    1,
+                faderport_channel->SetDisplayLine(
+                    DISPLAY_LINE_2,
                     ALIGN_LEFT,
                     DAW::GetTrackFxName(plugin_track, plugin_index, false).c_str(),
                     INVERT,
                     force_update
                 );
-                track->SetDisplayLine(
-                    2,
+                faderport_channel->SetDisplayLine(
+                    DISPLAY_LINE_3,
                     ALIGN_CENTER,
                     DAW::GetTrackFxSurfaceEnabled(plugin_track, plugin_index).c_str(),
                     NON_INVERT,
                     force_update
                 );
-                track->SetDisplayLine(3, ALIGN_CENTER, "", NON_INVERT, force_update);
-                track->SetMuteButtonValue(
+                faderport_channel->SetDisplayLine(DISPLAY_LINE_4, ALIGN_CENTER, "", NON_INVERT, force_update);
+
+                faderport_channel->SetMuteButtonValue(
                     ButtonBlinkOnOff(
                         context->GetShiftChannelLeft() && !DAW::GetTrackFxEnabled(plugin_track, plugin_index),
                         !DAW::GetTrackFxEnabled(plugin_track, plugin_index),
                         settings->GetDistractionFreeMode()),
                     force_update);
-                track->SetSoloButtonValue(
+                faderport_channel->SetSoloButtonValue(
                     ButtonBlinkOnOff(
                         DAW::GetTrackFxPanelOpen(plugin_track, plugin_index),
                         PluginUtils::hasPluginConfigFile(plugin_track, plugin_index),
                         settings->GetDistractionFreeMode()),
                     force_update);
             } else {
-                track->SetDisplayLine(1, ALIGN_LEFT, "No Fx", INVERT, force_update);
-                track->SetDisplayLine(2, ALIGN_CENTER, "", NON_INVERT, force_update);
-                track->SetDisplayLine(3, ALIGN_CENTER, "", NON_INVERT, force_update);
-                track->SetMuteButtonValue(BTN_VALUE_OFF, force_update);
-                track->SetSoloButtonValue(BTN_VALUE_OFF, force_update);
+                faderport_channel->SetDisplayLine(DISPLAY_LINE_2, ALIGN_LEFT, "", NON_INVERT, force_update);
+                faderport_channel->SetDisplayLine(DISPLAY_LINE_3, ALIGN_CENTER, "", NON_INVERT, force_update);
+                faderport_channel->SetDisplayLine(DISPLAY_LINE_4, ALIGN_CENTER, "", NON_INVERT, force_update);
+                faderport_channel->SetMuteButtonValue(BTN_VALUE_OFF, force_update);
+                faderport_channel->SetSoloButtonValue(BTN_VALUE_OFF, force_update);
             }
 
-            track->SetTrackColor(color, force_update);
-            track->SetSelectButtonValue(BTN_VALUE_ON, force_update);
-            track->SetFaderValue(fader_value, force_update);
-            track->SetValueBarMode(VALUEBAR_MODE_BIPOLAR);
-            track->SetValueBarValue(valuebar_value);
+            faderport_channel->SetTrackColor(color, force_update);
+            faderport_channel->SetSelectButtonValue(
+                media_track == nullptr
+                    ? BTN_VALUE_OFF
+                    : BTN_VALUE_ON,
+                force_update
+            );
+            faderport_channel->SetFaderValue(fader_value, force_update);
+            faderport_channel->SetValueBarMode(VALUEBAR_MODE_BIPOLAR);
+            faderport_channel->SetValueBarValue(valuebar_value);
 
-            track->SetDisplayMode(DISPLAY_MODE_2, force_update);
+            faderport_channel->SetDisplayMode(DISPLAY_MODE_2, force_update);
         }
     }
 

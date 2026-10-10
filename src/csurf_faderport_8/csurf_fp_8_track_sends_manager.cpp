@@ -12,12 +12,22 @@ protected:
         int *fader_value,
         int *value_bar_value,
         double *_pan,
-        std::string *pan_str
+        std::string *pan_str,
+        const bool is_hardware_out
     ) const {
-        double volume = 0.0;
-        double pan = 0.0;
+        const double volume = GetTrackSendInfo_Value(
+            media_track,
+            is_hardware_out ? SEND_MODE_HARDWARE : SEND_MODE_SEND,
+            send_index,
+            "D_VOL"
+        );
+        const double pan = GetTrackSendInfo_Value(
+            media_track,
+            is_hardware_out ? SEND_MODE_HARDWARE : SEND_MODE_SEND,
+            send_index,
+            "D_PAN"
+        );
 
-        GetTrackSendUIVolPan(media_track, send_index, &volume, &pan);
         *pan_str = GetPan1String(pan);
         *_pan = pan;
 
@@ -28,6 +38,89 @@ protected:
             *fader_value = static_cast<int>(volToNormalized(volume) * 16383.0);
             *value_bar_value = static_cast<int>(panToNormalized(pan) * 127);
         }
+    }
+
+    int GetSendIndex(MediaTrack *media_track, const int slot_index, bool *is_hardware_out) const {
+        const int hardware_count = GetTrackNumSends(media_track, SEND_MODE_HARDWARE);
+        const int sends_count = GetTrackNumSends(media_track, SEND_MODE_SEND);
+
+        if (hardware_count + sends_count <= slot_index) {
+            return -1;
+        }
+
+        if (slot_index < hardware_count) {
+            *is_hardware_out = true;
+            return slot_index;
+        }
+
+        *is_hardware_out = false;
+        return slot_index - hardware_count;
+    }
+
+    std::string GetLine3Content(
+        MediaTrack *media_track,
+        const int send_index,
+        const bool is_hardware_out
+    ) const {
+        const auto send_value = is_hardware_out
+                                    ? static_cast<DisplaySendValue>(settings->GetSendDisplayValueHardware())
+                                    : static_cast<DisplaySendValue>(settings->GetSendDisplayValueSend());
+
+        switch (send_value) {
+            case DISPLAY_SEND_VALUE_VOLUME:
+                return GetVolumeString(GetTrackSendInfo_Value(
+                    media_track,
+                    is_hardware_out ? SEND_MODE_HARDWARE : SEND_MODE_SEND,
+                    send_index,
+                    "D_VOL"
+                ));
+
+            case DISPLAY_SEND_VALUE_PAN:
+                return GetPan1String(GetTrackSendInfo_Value(
+                    media_track,
+                    is_hardware_out ? SEND_MODE_HARDWARE : SEND_MODE_SEND,
+                    send_index,
+                    "D_PAN"
+                ));
+
+            case DISPLAY_SEND_VALUE_MUTE:
+                return DAW::GetTrackSendMute(media_track, send_index, is_hardware_out)
+                           ? "Muted"
+                           : "";
+
+            case DISPLAY_SEND_VALUE_PHASE:
+                return DAW::GetTrackSendPhase(media_track, send_index, is_hardware_out)
+                           ? "Phase Rev"
+                           : "";
+
+            case DISPLAY_SEND_VALUE_MONO:
+                return DAW::GetTrackSendMono(media_track, send_index, is_hardware_out)
+                           ? "Mono"
+                           : "Stereo";
+
+            case DISPLAY_SEND_VALUE_SEND_MODE:
+                return DAW::GetTrackSurfaceSendMode(media_track, send_index, is_hardware_out);
+
+            case DISPLAY_SEND_VALUE_AUTO_MODE:
+                return DAW::GetTrackSurfaceSendAutoMode(media_track, send_index, is_hardware_out);
+
+            case DISPLAY_SEND_VALUE_FIXED:
+                return is_hardware_out ? "Hw out" : "";
+
+            default:
+                return "";
+        }
+    }
+
+    std::string GetLine4Content(MediaTrack *media_track, const int index) const {
+        if (index < context->GetNbChannels() - 2) {
+            return "";
+        }
+        if (index == context->GetNbChannels() - 2) {
+            return fmt::format("Sends: {}", GetTrackNumSends(media_track, SEND_MODE_SEND));
+        }
+
+        return fmt::format("Hardw: {}", GetTrackNumSends(media_track, SEND_MODE_HARDWARE));
     }
 
 public:
@@ -53,8 +146,13 @@ public:
         context->SetChannelManagerItemsCount(GetTrackNumSends(sends_track, 0));
 
         for (int i = 0; i < context->GetNbChannels(); i++) {
-            const int send_index = context->GetChannelManagerItemIndex() + i;
+            bool is_hardware_out;
+            const CSurf_FP_8_Track *faderport_channel = tracks.at(i);
+            MediaTrack *media_track = media_tracks.Get(i);
+
+            const int send_index = GetSendIndex(sends_track, i, &is_hardware_out);
             const bool add_send_enabled = context->GetAddSendReceiveMode() == i;
+
             if (add_send_enabled) {
                 add_send_track = GetTrack(nullptr, context->GetCurrentSelectedSendReceive());
             }
@@ -62,19 +160,17 @@ public:
             int fader_value = 0;
             int value_bar_value = 0;
             double pan = 0.0;
+            std::string pan_str;
 
-            CSurf_FP_8_Track *track = tracks.at(i);
-            MediaTrack *media_track = media_tracks.Get(i);
             SetTrackColors(media_track, DAW::IsTrackSelected(media_track), false);
 
-            std::string pan_str;
-            GetFaderValue(sends_track, send_index, &fader_value, &value_bar_value, &pan, &pan_str);
+            GetFaderValue(sends_track, send_index, &fader_value, &value_bar_value, &pan, &pan_str, is_hardware_out);
 
             if (!media_track) {
-                track->SetDisplayLine(0, ALIGN_LEFT, "", NON_INVERT, force_update);
+                faderport_channel->SetDisplayLine(0, ALIGN_LEFT, "", NON_INVERT, force_update);
             } else {
-                track->SetDisplayLine(
-                    0,
+                faderport_channel->SetDisplayLine(
+                    DISPLAY_LINE_1,
                     ALIGN_LEFT,
                     DAW::GetTrackName(media_track).c_str(),
                     sends_track == media_track ? INVERT : NON_INVERT,
@@ -82,91 +178,88 @@ public:
                 );
             }
 
-            if (DAW::HasTrackSend(sends_track, send_index) || DAW::HasTrackHardwareOut(sends_track, send_index)) {
-                if (add_send_enabled) {
-                    track->SetDisplayLine(
-                        1,
-                        ALIGN_LEFT,
-                        ("Trk: " + DAW::GetTrackIndex(add_send_track)).c_str(),
-                        INVERT,
-                        force_update
-                    );
-                    track->SetDisplayLine(
-                        2,
-                        ALIGN_CENTER,
-                        DAW::GetTrackName(add_send_track).c_str(),
-                        INVERT,
-                        force_update
-                    );
-                } else {
-                    track->SetDisplayLine(
-                        1,
-                        ALIGN_LEFT,
-                        DAW::GetTrackSendName(sends_track, send_index).c_str(),
-                        INVERT,
-                        force_update
-                    );
-                    track->SetDisplayLine(
-                        2,
-                        ALIGN_CENTER,
-                        DAW::GetTrackSurfaceSendMode(sends_track, send_index).c_str(),
-                        NON_INVERT,
-                        force_update
-                    );
-                }
-                track->SetDisplayLine(
-                    3,
+            // Handle the displays
+            if (add_send_enabled) {
+                faderport_channel->SetDisplayLine(
+                    DISPLAY_LINE_2,
+                    ALIGN_LEFT,
+                    ("Trk: " + DAW::GetTrackIndex(add_send_track)).c_str(),
+                    INVERT,
+                    force_update
+                );
+                faderport_channel->SetDisplayLine(
+                    DISPLAY_LINE_3,
                     ALIGN_CENTER,
-                    DAW::GetTrackSurfaceSendAutoMode(sends_track, send_index).c_str(),
+                    DAW::GetTrackName(add_send_track).c_str(),
+                    INVERT,
+                    force_update
+                );
+            } else if (send_index > -1) {
+                faderport_channel->SetDisplayLine(
+                    DISPLAY_LINE_2,
+                    ALIGN_LEFT,
+                    DAW::GetTrackSendName(sends_track, send_index, is_hardware_out).c_str(),
+                    INVERT,
+                    force_update
+                );
+                faderport_channel->SetDisplayLine(
+                    DISPLAY_LINE_3,
+                    ALIGN_CENTER,
+                    GetLine3Content(sends_track, send_index, is_hardware_out).c_str(),
                     NON_INVERT,
                     force_update
                 );
-                track->SetFaderValue(fader_value, force_update);
-                track->SetValueBarMode(context->GetShiftChannelLeft() ? VALUEBAR_MODE_FILL : VALUEBAR_MODE_BIPOLAR);
-                track->SetValueBarValue(value_bar_value);
             } else {
-                if (add_send_enabled) {
-                    track->SetDisplayLine(
-                        1,
-                        ALIGN_LEFT,
-                        ("Trk: " + DAW::GetTrackIndex(add_send_track)).c_str(),
-                        INVERT,
-                        force_update
-                    );
-                    track->SetDisplayLine(
-                        2,
-                        ALIGN_CENTER,
-                        DAW::GetTrackName(add_send_track).c_str(),
-                        INVERT,
-                        force_update
-                    );
-                } else {
-                    track->SetDisplayLine(1, ALIGN_LEFT, "No Sends", INVERT, force_update);
-                    track->SetDisplayLine(2, ALIGN_CENTER, "", NON_INVERT, force_update);
-                }
-                track->SetDisplayLine(3, ALIGN_CENTER, "", NON_INVERT, force_update);
-                track->SetFaderValue(0, force_update);
-                track->SetValueBarMode(VALUEBAR_MODE_FILL);
-                track->SetValueBarValue(0);
+                faderport_channel->SetDisplayLine(DISPLAY_LINE_2, ALIGN_LEFT, "", NON_INVERT, force_update);
+                faderport_channel->SetDisplayLine(DISPLAY_LINE_3, ALIGN_CENTER, "", NON_INVERT, force_update);
             }
 
-            track->SetTrackColor(color, force_update);
-            track->SetSelectButtonValue(BTN_VALUE_ON, force_update);
-            track->SetMuteButtonValue(
+            faderport_channel->SetDisplayLine(
+                DISPLAY_LINE_4,
+                ALIGN_CENTER,
+                GetLine4Content(sends_track, i).c_str(),
+                NON_INVERT,
+                force_update
+            );
+
+            // Set the fader and valuebar values
+            if (send_index > -1) {
+                faderport_channel->SetFaderValue(fader_value, force_update);
+                faderport_channel->SetValueBarMode(
+                    context->GetShiftChannelLeft()
+                        ? VALUEBAR_MODE_FILL
+                        : VALUEBAR_MODE_BIPOLAR
+                );
+                faderport_channel->SetValueBarValue(value_bar_value);
+            } else {
+                faderport_channel->SetFaderValue(0, force_update);
+                faderport_channel->SetValueBarMode(VALUEBAR_MODE_FILL);
+                faderport_channel->SetValueBarValue(0);
+            }
+
+            faderport_channel->SetTrackColor(color, force_update);
+            faderport_channel->SetSelectButtonValue(
+                media_track == nullptr
+                    ? BTN_VALUE_OFF
+                    : BTN_VALUE_ON,
+                force_update
+            );
+            faderport_channel->SetMuteButtonValue(
                 ButtonBlinkOnOff(
-                    context->GetShiftChannelLeft() && DAW::GetTrackSendMute(sends_track, send_index),
-                    DAW::GetTrackSendMute(sends_track, send_index),
+                    context->GetShiftChannelLeft() && DAW::GetTrackSendMute(sends_track, send_index, is_hardware_out),
+                    DAW::GetTrackSendMute(sends_track, send_index, is_hardware_out),
                     settings->GetDistractionFreeMode()),
-                force_update);
-            track->SetSoloButtonValue(
-                (context->GetShiftChannelLeft() && DAW::GetTrackSendMono(sends_track, send_index))
-                || (!context->GetShiftChannelLeft() && DAW::GetTrackSendPhase(sends_track, send_index))
+                force_update
+            );
+            faderport_channel->SetSoloButtonValue(
+                (context->GetShiftChannelLeft() && DAW::GetTrackSendMono(sends_track, send_index, is_hardware_out))
+                || (!context->GetShiftChannelLeft() && DAW::GetTrackSendPhase(sends_track, send_index, is_hardware_out))
                     ? BTN_VALUE_ON
                     : BTN_VALUE_OFF,
                 force_update
             );
 
-            track->SetDisplayMode(DISPLAY_MODE_2, force_update);
+            faderport_channel->SetDisplayMode(DISPLAY_MODE_2, force_update);
         }
     }
 
@@ -196,8 +289,11 @@ public:
         }
 
         if (context->GetShiftChannelRight()) {
+            bool is_hardware_out;
             MediaTrack *selected_track = GetSelectedTrack(nullptr, 0);
-            RemoveTrackSend(selected_track, SEND_MODE_SEND, context->GetChannelManagerItemIndex() + index);
+            const int send_index = GetSendIndex(selected_track, index, &is_hardware_out);
+
+            RemoveTrackSend(selected_track, is_hardware_out ? SEND_MODE_HARDWARE : SEND_MODE_SEND, send_index);
             return;
         }
 
@@ -209,13 +305,14 @@ public:
             return;
         }
 
+        bool is_hardware_out;
         MediaTrack *send_track = GetSelectedTrack(nullptr, 0);
-        const int send_index = context->GetChannelManagerItemIndex() + index;
+        const int send_index = GetSendIndex(send_track, index, &is_hardware_out);
 
         if (context->GetShiftChannelLeft()) {
-            DAW::SetNextTrackSendMode(send_track, send_index);
+            DAW::SetNextTrackSendMode(send_track, send_index, is_hardware_out);
         } else {
-            DAW::ToggleTrackSendMute(send_track, send_index);
+            DAW::ToggleTrackSendMute(send_track, send_index, is_hardware_out);
         }
     }
 
@@ -224,13 +321,14 @@ public:
             return;
         }
 
+        bool is_hardware_out;
         MediaTrack *send_track = GetSelectedTrack(nullptr, 0);
-        const int send_index = context->GetChannelManagerItemIndex() + index;
+        const int send_index = GetSendIndex(send_track, index, &is_hardware_out);
 
         if (context->GetShiftChannelLeft()) {
-            DAW::ToggleTrackSendMono(send_track, send_index);
+            DAW::ToggleTrackSendMono(send_track, send_index, is_hardware_out);
         } else {
-            DAW::ToggleTrackSendPhase(send_track, send_index);
+            DAW::ToggleTrackSendPhase(send_track, send_index, is_hardware_out);
         }
     }
 
@@ -271,13 +369,24 @@ public:
     }
 
     void HandleFaderMove(const int index, const int msb, const int lsb) override {
+        bool is_hardware_out;
         MediaTrack *send_track = GetSelectedTrack(nullptr, 0);
-        const int send_index = context->GetChannelManagerItemIndex() + index;
+        const int send_index = GetSendIndex(send_track, index, &is_hardware_out);
 
         if (context->GetShiftChannelLeft()) {
-            DAW::SetTrackSendPan(send_track, send_index, normalizedToPan(int14ToNormalized(msb, lsb)));
+            DAW::SetTrackSendPan(
+                send_track,
+                send_index,
+                normalizedToPan(int14ToNormalized(msb, lsb)),
+                is_hardware_out
+            );
         } else {
-            DAW::SetTrackSendVolume(send_track, send_index, int14ToVol(msb, lsb));
+            DAW::SetTrackSendVolume(
+                send_track,
+                send_index,
+                int14ToVol(msb, lsb),
+                is_hardware_out
+            );
         }
     }
 };

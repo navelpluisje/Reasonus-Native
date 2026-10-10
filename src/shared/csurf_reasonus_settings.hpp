@@ -104,8 +104,10 @@ class ReaSonusSettings {
         {"surface", "fader-reset", "0"},
         {"surface", "overwrite-time-code", "1"},
         {"surface", "time-code", "2"},
+        {"surface", "sends-respect-slots", "0"},
         {"surface", "track-color-brightness", "25"},
         {"surface", "plugin-step-size", "1"},
+        {"surface", "plugin-respect-slots", "0"},
         {"surface", "plugin-has-input-control", "0"},
         {"surface", "plugin-map-param-clear", "0"},
         {"surface", "plugin-map-default-color-mode", "1"},
@@ -129,6 +131,8 @@ class ReaSonusSettings {
         {"displays", "track-invert", "0,0,0,0"},
         {"displays", "track-value-bar-mode", "1"},
         {"displays", "track-value-bar-value", "0"},
+        {"displays", "send-value-send", "0"},
+        {"displays", "send-value-hardware", "0"},
 
         {"functions", "5", "0"},
         {"functions", "6", "0"},
@@ -328,6 +332,10 @@ public:
 
     int GetTrackValueBarValue();
 
+    int GetSendDisplayValueSend();
+
+    int GetSendDisplayValueHardware();
+
     int GetSurface();
 
     int GetMidiInput();
@@ -335,6 +343,10 @@ public:
     int GetMidiOutput();
 
     bool ShouldClearParamInput();
+
+    bool PluginsShouldRespectSlots();
+
+    bool SendsShouldRespectSlots();
 
     int GetPluginMapDefaultColorMode();
 

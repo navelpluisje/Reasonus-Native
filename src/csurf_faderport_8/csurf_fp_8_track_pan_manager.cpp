@@ -72,7 +72,7 @@ public:
             std::string str_pan_1;
             std::string str_pan_2;
 
-            const CSurf_FP_8_Track *track = tracks.at(i);
+            const CSurf_FP_8_Track *faderport_channel = tracks.at(i);
 
             if (context->GetMasterFaderMode() && i == context->GetNbChannels() - 1) {
                 media_track = GetMasterTrack(nullptr);
@@ -82,7 +82,7 @@ public:
             }
 
             if (media_track == nullptr || (CountTracks(nullptr) < i && !is_master_track)) {
-                track->ClearTrack(true, force_update);
+                faderport_channel->ClearTrack(true, force_update);
                 continue;
             }
 
@@ -93,26 +93,55 @@ public:
             const bool is_selected = (context->GetArm() && is_armed) || (!context->GetArm() && track_selected);
 
             SetTrackColors(media_track, is_selected, true);
-            track->SetTrackColor(color, force_update);
+            faderport_channel->SetTrackColor(color, force_update);
 
-            track->SetSelectButtonValue(!context->GetArm() && is_armed && !settings->GetDistractionFreeMode()
-                                            ? BTN_VALUE_BLINK
-                                            : BTN_VALUE_ON,
-                                        force_update);
-            track->SetMuteButtonValue(DAW::IsTrackMuted(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, force_update);
-            track->SetSoloButtonValue(DAW::IsTrackSoloed(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, force_update);
+            faderport_channel->SetSelectButtonValue(
+                !context->GetArm() && is_armed && !settings->GetDistractionFreeMode()
+                    ? BTN_VALUE_BLINK
+                    : BTN_VALUE_ON,
+                force_update);
+            faderport_channel->SetMuteButtonValue(
+                DAW::IsTrackMuted(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF,
+                force_update
+            );
+            faderport_channel->SetSoloButtonValue(
+                DAW::IsTrackSoloed(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF,
+                force_update
+            );
 
-            track->SetFaderValue(fader_value, force_update);
-            track->SetValueBarMode(VALUEBAR_MODE_FILL);
-            track->SetValueBarValue(value_bar_value);
+            faderport_channel->SetFaderValue(fader_value, force_update);
+            faderport_channel->SetValueBarMode(VALUEBAR_MODE_FILL);
+            faderport_channel->SetValueBarValue(value_bar_value);
 
-            track->SetDisplayMode(DISPLAY_MODE_2, force_update);
-            track->SetDisplayLine(0, ALIGN_CENTER, DAW::GetTrackName(media_track).c_str(), NON_INVERT, force_update);
-            track->SetDisplayLine(1, ALIGN_CENTER, DAW::GetTrackIndex(media_track).c_str(), NON_INVERT, force_update);
-            track->SetDisplayLine(2, ALIGN_CENTER, str_pan_1.c_str(),
-                                  context->IsChannelMode(PanMode1) ? INVERT : NON_INVERT, force_update);
-            track->SetDisplayLine(3, ALIGN_CENTER, str_pan_2.c_str(),
-                                  context->IsChannelMode(PanMode2) ? INVERT : NON_INVERT, force_update);
+            faderport_channel->SetDisplayMode(DISPLAY_MODE_2, force_update);
+            faderport_channel->SetDisplayLine(
+                DISPLAY_LINE_1,
+                ALIGN_CENTER,
+                DAW::GetTrackName(media_track).c_str(),
+                NON_INVERT,
+                force_update
+            );
+            faderport_channel->SetDisplayLine(
+                DISPLAY_LINE_2,
+                ALIGN_CENTER,
+                DAW::GetTrackIndex(media_track).c_str(),
+                NON_INVERT,
+                force_update
+            );
+            faderport_channel->SetDisplayLine(
+                DISPLAY_LINE_3,
+                ALIGN_CENTER,
+                str_pan_1.c_str(),
+                context->IsChannelMode(PanMode1) ? INVERT : NON_INVERT,
+                force_update
+            );
+            faderport_channel->SetDisplayLine(
+                DISPLAY_LINE_4,
+                ALIGN_CENTER,
+                str_pan_2.c_str(),
+                context->IsChannelMode(PanMode2) ? INVERT : NON_INVERT,
+                force_update
+            );
         }
     }
 

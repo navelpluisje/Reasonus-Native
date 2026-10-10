@@ -1,6 +1,8 @@
 #include "csurf_reasonus_settings.hpp"
 #include <array>
 #include <utility>
+
+#include "csurf_daw.hpp"
 #include "../shared/csurf_utils.hpp"
 
 ReaSonusSettings::ReaSonusSettings(std::string _device) {
@@ -225,6 +227,14 @@ int ReaSonusSettings::GetTrackValueBarValue() {
     return stoi(settings["displays"]["track-value-bar-value"]);
 }
 
+int ReaSonusSettings::GetSendDisplayValueSend() {
+    return stoi(settings["displays"]["send-value-send"]);
+}
+
+int ReaSonusSettings::GetSendDisplayValueHardware() {
+    return stoi(settings["displays"]["send-value-hardware"]);
+}
+
 int ReaSonusSettings::GetSurface() {
     return stoi(settings["surface"]["surface"]);
 }
@@ -239,6 +249,17 @@ int ReaSonusSettings::GetMidiOutput() {
 
 bool ReaSonusSettings::ShouldClearParamInput() {
     return stoi(settings["surface"]["plugin-map-param-clear"]) > 0;
+}
+
+bool ReaSonusSettings::PluginsShouldRespectSlots() {
+    if (!DAW::VersionHasFeature(FEATURE_SLOTS)) {
+        return false;
+    }
+    return stoi(settings["surface"]["plugin-respect-slots"]) > 0;
+}
+
+bool ReaSonusSettings::SendsShouldRespectSlots() {
+    return stoi(settings["surface"]["sends-respect-slots"]) > 0;
 }
 
 int ReaSonusSettings::GetPluginMapDefaultColorMode() {
