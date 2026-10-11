@@ -98,7 +98,7 @@ public:
         CSurf_FP_8_Navigator *navigator,
         CSurf_Context *context,
         midi_Output *m_midiout) : CSurf_FP_8_ChannelManager(tracks, navigator, context, m_midiout) {
-        context->ResetChannelManagerItemIndex();
+        context->ResetChannelManagerItemIndex(ReceiveMode);
         context->SetChannelManagerType(Hui);
         CSurf_FP_8_ReceivesManager::UpdateTracks(true);
     }
@@ -125,11 +125,11 @@ public:
             }
         }
 
-        context->SetChannelManagerItemsCount(nb_receives);
-        current_receive = context->GetChannelManagerItemIndex();
+        context->SetChannelManagerItemsCount(ReceiveMode, nb_receives);
+        current_receive = context->GetChannelManagerItemIndex(ReceiveMode);
 
         for (int i = 0; i < context->GetNbChannels(); i++) {
-            const int receive_index = context->GetChannelManagerItemIndex(nb_track_items[i] - 1);
+            const int receive_index = context->GetChannelManagerItemIndex(ReceiveMode, nb_track_items[i] - 1);
             const bool add_receive_enabled = context->GetAddSendReceiveMode() == i;
 
             if (add_receive_enabled) {
@@ -266,6 +266,7 @@ public:
 
         if (context->GetShiftChannelRight()) {
             const int receive_index = context->GetChannelManagerItemIndex(
+                ReceiveMode,
                 GetTrackNumSends(media_track, SEND_MODE_RECEIVE) - 1
             );
             RemoveTrackSend(media_track, SEND_MODE_RECEIVE, receive_index);
@@ -281,7 +282,7 @@ public:
         }
 
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
-        const int receive_index = context->GetChannelManagerItemIndex(nb_track_items[index] - 1);
+        const int receive_index = context->GetChannelManagerItemIndex(ReceiveMode, nb_track_items[index] - 1);
 
         if (context->GetShiftChannelLeft()) {
             DAW::SetNextTrackReceiveMode(media_track, receive_index);
@@ -296,7 +297,7 @@ public:
         }
 
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
-        const int receive_index = context->GetChannelManagerItemIndex(nb_track_items[index] - 1);
+        const int receive_index = context->GetChannelManagerItemIndex(ReceiveMode, nb_track_items[index] - 1);
 
         if (context->GetShiftChannelLeft()) {
             DAW::ToggleTrackReceiveMono(media_track, receive_index);
@@ -307,7 +308,7 @@ public:
 
     void HandleFaderMove(const int index, const int msb, const int lsb) override {
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
-        const int receive_index = context->GetChannelManagerItemIndex(nb_track_items[index] - 1);
+        const int receive_index = context->GetChannelManagerItemIndex(ReceiveMode, nb_track_items[index] - 1);
 
         if (context->GetShiftChannelLeft()) {
             DAW::SetTrackReceivePan(media_track, receive_index, normalizedToPan(int14ToNormalized(msb, lsb)));

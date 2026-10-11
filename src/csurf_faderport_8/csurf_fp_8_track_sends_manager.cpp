@@ -129,8 +129,8 @@ public:
         CSurf_FP_8_Navigator *navigator,
         CSurf_Context *context,
         midi_Output *m_midiout) : CSurf_FP_8_ChannelManager(tracks, navigator, context, m_midiout) {
-        context->ResetChannelManagerItemIndex();
-        context->ResetChannelManagerItemsCount();
+        context->ResetChannelManagerItemIndex(TrackSendMode);
+        context->ResetChannelManagerItemsCount(TrackSendMode);
         context->SetChannelManagerType(Track);
         context->SetAddSendReceiveMode(-1);
 
@@ -143,7 +143,7 @@ public:
         const WDL_PtrList<MediaTrack> media_tracks = navigator->GetBankTracks();
         MediaTrack *sends_track = GetSelectedTrack(nullptr, 0);
         MediaTrack *add_send_track;
-        context->SetChannelManagerItemsCount(GetTrackNumSends(sends_track, 0));
+        context->SetChannelManagerItemsCount(TrackSendMode, GetTrackNumSends(sends_track, 0));
 
         for (int i = 0; i < context->GetNbChannels(); i++) {
             bool is_hardware_out;
@@ -341,7 +341,7 @@ public:
          * Therefore some fo the values are inverted as well, to make it mork as it should
          */
         if (HasSinglePointAutomation(media_track, index, value)) {
-            const int send_index = context->GetChannelManagerItemIndex() + index;
+            const int send_index = context->GetChannelManagerItemIndex(TrackSendMode) + index;
             const std::string chunk_name = context->GetShiftLeft() ? "<PANENV" : "<VOLENV";
             double volume = 0.0;
             double pan = 0.0;

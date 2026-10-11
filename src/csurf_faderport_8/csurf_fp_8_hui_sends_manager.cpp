@@ -45,7 +45,7 @@ protected:
 
     int GetSendIndex(MediaTrack *media_track, const int index, const bool add_hardware, bool *is_hardware_out) const {
         const bool respect_slots = settings->SendsShouldRespectSlots();
-        const int slot_index = context->GetChannelManagerItemIndex(nb_track_items[index] - 1);
+        const int slot_index = context->GetChannelManagerItemIndex(SendMode, nb_track_items[index] - 1);
 
         if (respect_slots) {
             return DAW::GetTrackSendIndexBySlotIndex(media_track, slot_index, add_hardware, is_hardware_out);
@@ -122,19 +122,12 @@ protected:
         const int display_index
     ) const {
         const bool respect_slots = settings->SendsShouldRespectSlots();
-        if (!respect_slots) {
-            if (nb_track_items[display_index] == 0) {
-                return "";
-            }
-            return Progress(slot_index + 1, nb_track_items[display_index]);
-        }
-        if (display_index < context->GetNbChannels() - 2) {
+        if (nb_track_items[display_index] == 0) {
             return "";
         }
-        if (display_index == context->GetNbChannels() - 2) {
-            return "Slot:";
+        if (!respect_slots) {
+            return Progress(slot_index + 1, nb_track_items[display_index]);
         }
-
         return Progress(slot_index + 1, nb_sends);
     }
 
@@ -144,7 +137,7 @@ public:
         CSurf_FP_8_Navigator *navigator,
         CSurf_Context *context,
         midi_Output *m_midiout) : CSurf_FP_8_ChannelManager(tracks, navigator, context, m_midiout) {
-        context->ResetChannelManagerItemIndex();
+        context->ResetChannelManagerItemIndex(SendMode);
         context->SetChannelManagerType(Hui);
         context->SetAddSendReceiveMode(-1);
         CSurf_FP_8_SendsManager::UpdateTracks(true);
@@ -166,8 +159,8 @@ public:
             nb_sends = std::max(_nb_track_sends, nb_sends);
         }
 
-        context->SetChannelManagerItemsCount(nb_sends);
-        current_send = context->GetChannelManagerItemIndex();
+        context->SetChannelManagerItemsCount(SendMode, nb_sends);
+        current_send = context->GetChannelManagerItemIndex(SendMode);
 
         for (int i = 0; i < context->GetNbChannels(); i++) {
             bool is_hardware_out;
@@ -175,6 +168,7 @@ public:
             MediaTrack *media_track = media_tracks.Get(i);
 
             const int slot_index = context->GetChannelManagerItemIndex(
+                SendMode,
                 respect_slots ? nb_sends : nb_track_items[i] - 1
             );
 
@@ -374,7 +368,7 @@ public:
          * Therefore some fo the values are inverted as well, to make it mork as it should
          */
         if (HasSinglePointAutomation(media_track, index, value)) {
-            const int send_index = context->GetChannelManagerItemIndex(nb_track_items[index] - 1);
+            const int send_index = context->GetChannelManagerItemIndex(SendMode, nb_track_items[index] - 1);
             const std::string chunk_name = context->GetShiftLeft() ? "<PANENV" : "<VOLENV";
             double volume = 0.0;
             double pan = 0.0;

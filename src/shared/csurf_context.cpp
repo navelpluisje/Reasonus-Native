@@ -2,6 +2,7 @@
 #define CSURF_CONTEXT_H_
 
 #include <array>
+#include <map>
 #include "csurf_context_resources.hpp"
 #include "csurf_utils.hpp"
 #include "csurf_reasonus_settings.hpp"
@@ -39,8 +40,8 @@ class CSurf_Context // NOLINT(*-use-internal-linkage)
     bool panPushModePan;
 
     // Channel manager
-    int channelManagerItemIndex = 0;
-    int channelManagerItemsCount = 0;
+    std::map<ChannelMode, int> channelManagerItemIndex;
+    std::map<ChannelMode, int> channelManagerItemsCount;
 
     // Plugin Edit fields
     MediaTrack *pluginEditTrack;
@@ -279,54 +280,57 @@ public:
     /**************************************************************************
      * Channel manager Item
      **************************************************************************/
-    void UpdateChannelManagerItemIndex(const int val) {
+    void UpdateChannelManagerItemIndex(const ChannelMode channel_mode, const int val) {
         val < 0
-            ? DecrementChannelManagerItemIndex(abs(val))
-            : IncrementChannelmanagerItemIndex(val);
+            ? DecrementChannelManagerItemIndex(channel_mode, abs(val))
+            : IncrementChannelmanagerItemIndex(channel_mode, val);
     }
 
-    void IncrementChannelmanagerItemIndex(const int val) {
-        if (channelManagerItemIndex + val + (channelManagerType == Hui ? 0 : nbChannels) < channelManagerItemsCount) {
-            channelManagerItemIndex += val;
+    void IncrementChannelmanagerItemIndex(const ChannelMode channel_mode, const int val) {
+        if (
+            channelManagerItemIndex[channel_mode] + val + (channelManagerType == Hui ? 0 : nbChannels)
+            < channelManagerItemsCount[channel_mode]
+        ) {
+            channelManagerItemIndex[channel_mode] += val;
         } else if (
             channelManagerType == Hui
             && settings->PluginsShouldRespectSlots()
             && (channelMode == SendMode || channelMode == PluginMode)
         ) {
-            channelManagerItemIndex = 0;
+            channelManagerItemIndex[channel_mode] = 0;
         }
     }
 
-    void DecrementChannelManagerItemIndex(const int val) {
-        if (channelManagerItemIndex - val >= 0) {
-            channelManagerItemIndex -= val;
+    void DecrementChannelManagerItemIndex(const ChannelMode channel_mode, const int val) {
+        if (channelManagerItemIndex[channel_mode] - val >= 0) {
+            channelManagerItemIndex[channel_mode] -= val;
         } else if (
             channelManagerType == Hui
             && settings->PluginsShouldRespectSlots()
             && (channelMode == SendMode || channelMode == PluginMode)
         ) {
-            channelManagerItemIndex = channelManagerItemsCount - 1;
+            channelManagerItemIndex[channel_mode] = channelManagerItemsCount[channel_mode] - 1;
         }
     }
 
-    void ResetChannelManagerItemIndex() {
-        channelManagerItemIndex = 0;
+    void ResetChannelManagerItemIndex(const ChannelMode channel_mode) {
+        channelManagerItemIndex[channel_mode] = 0;
     }
 
-    [[nodiscard]] int GetChannelManagerItemIndex() const {
-        return channelManagerItemIndex;
+    [[nodiscard]] int GetChannelManagerItemIndex(const ChannelMode channel_mode) {
+        return channelManagerItemIndex[channel_mode];
     }
 
-    [[nodiscard]] int GetChannelManagerItemIndex(const int max) const {
-        return max < channelManagerItemIndex ? max : channelManagerItemIndex;
+    [[nodiscard]] int GetChannelManagerItemIndex(const ChannelMode channel_mode, const int max) {
+        return max < channelManagerItemIndex[channel_mode] ? max : channelManagerItemIndex[channel_mode];
     }
 
-    void SetChannelManagerItemsCount(const int count) {
-        channelManagerItemsCount = count;
+    void SetChannelManagerItemsCount(const ChannelMode channel_mode, const int count) {
+        channelManagerItemsCount[channel_mode] = count;
     }
 
-    void ResetChannelManagerItemsCount() {
-        channelManagerItemsCount = 0;
+    void ResetChannelManagerItemsCount(const ChannelMode channel_mode) {
+        channelManagerItemsCount[channel_mode] = 0;
     }
 
     static int GetPluginMaxGroupCount() {

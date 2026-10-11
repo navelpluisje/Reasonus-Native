@@ -71,8 +71,8 @@ public:
         CSurf_Context *context,
         midi_Output *m_midiout
     ) : CSurf_FP_8_ChannelManager(tracks, navigator, context, m_midiout) {
-        context->ResetChannelManagerItemIndex();
-        context->SetChannelManagerItemsCount(CSurf_Context::GetPluginMaxGroupCount());
+        context->ResetChannelManagerItemIndex(PluginControlMode);
+        context->SetChannelManagerItemsCount(PluginControlMode, CSurf_Context::GetPluginMaxGroupCount());
         GetCurrentPlugin();
         CSurf_FP_8_PluginControlManager::UpdateTracks(true);
         color = ButtonColorWhiteDim;
@@ -87,7 +87,7 @@ public:
 
         for (int i = 0; i < context->GetNbChannels(); i++) {
             const bool display_step_size = editStepSize && i == 0;
-            const int filter_index = context->GetChannelManagerItemIndex() + i;
+            const int filter_index = context->GetChannelManagerItemIndex(PluginControlMode) + i;
             std::string param_key = getParamKey("Select_", filter_index);
             const CSurf_FP_8_Track *track = tracks.at(i);
 
@@ -214,7 +214,7 @@ public:
             return;
         }
 
-        const int control_index = context->GetChannelManagerItemIndex() + index;
+        const int control_index = context->GetChannelManagerItemIndex(PluginControlMode) + index;
         MediaTrack *media_track = context->GetPluginEditTrack();
         const int plugin_id = context->GetPluginEditPluginId();
         const std::string param_key = getParamKey("Select_", control_index);
@@ -252,7 +252,7 @@ public:
     }
 
     void HandleFaderTouch(const int index, const int value) override {
-        const int item_index = context->GetChannelManagerItemIndex() + index;
+        const int item_index = context->GetChannelManagerItemIndex(PluginControlMode) + index;
         const int plugin_index = context->GetPluginEditPluginId();
         const std::string param_key = getParamKey("Fader_", item_index);
         if (!ini.has(param_key)) {
@@ -301,7 +301,7 @@ public:
     }
 
     void HandleFaderMove(const int index, const int msb, const int lsb) override {
-        const int control_index = context->GetChannelManagerItemIndex() + index;
+        const int control_index = context->GetChannelManagerItemIndex(PluginControlMode) + index;
         const int plugin_id = context->GetPluginEditPluginId();
 
         const std::string param_key = getParamKey("Fader_", control_index);
