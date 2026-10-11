@@ -243,7 +243,7 @@ public:
             }
 
             if (settings->PluginsShouldRespectSlots() && !is_receive_mode) {
-                const int slot_index = context->GetChannelManagerItemIndex(99);
+                const int slot_index = context->GetChannelManagerItemIndex(TrackReceiveMode, 99);
                 SetTrackSendInfo_Value(src_track, SEND_MODE_SEND, send_receive_index, "I_SLOT_HINT", slot_index);
             }
 
@@ -302,12 +302,12 @@ public:
             case PanEncoderPanMode:
             case PanEncoderMixMode:
             case PanEncoderPluginEditMode:
-                context->UpdateChannelManagerItemIndex(hasBit(value, 6) ? -1 : 1);
+                context->UpdateChannelManagerItemIndex(context->GetChannelMode(), hasBit(value, 6) ? -1 : 1);
                 break;
 
             case PanEncoderPluginControlMode:
                 const int stepSize = stoi(settings->GetSetting("surface", "plugin-step-size", "1"));
-                context->UpdateChannelManagerItemIndex(hasBit(value, 6) ? 0 - stepSize : stepSize);
+                context->UpdateChannelManagerItemIndex(PluginControlMode, hasBit(value, 6) ? 0 - stepSize : stepSize);
                 break;
         }
     }
@@ -344,7 +344,7 @@ public:
 
         if (context->GetShiftLeft()) {
             if (context->GetChannelMode() == SendMode && settings->SendsShouldRespectSlots()) {
-                DAW::ToggleSendMuteForSlot(context->GetChannelManagerItemIndex(99));
+                DAW::ToggleSendMuteForSlot(context->GetChannelManagerItemIndex(TrackReceiveMode, 99));
             }
         } else {
             Main_OnCommandAsyncEx(40339, 0, nullptr); // Track: Unmute all tracks
@@ -358,7 +358,7 @@ public:
 
         if (context->GetShiftLeft()) {
             if (context->GetChannelMode() == PluginMode && settings->PluginsShouldRespectSlots()) {
-                DAW::ToggleTrackFxBypassForSlot(context->GetChannelManagerItemIndex(99));
+                DAW::ToggleTrackFxBypassForSlot(context->GetChannelManagerItemIndex(TrackReceiveMode, 99));
             } else {
                 Main_OnCommandAsyncEx(40344, 0, nullptr); // Track: Toggle FX bypass on all tracks
             }

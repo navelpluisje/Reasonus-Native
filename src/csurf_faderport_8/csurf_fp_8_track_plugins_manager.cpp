@@ -28,7 +28,7 @@ protected:
     [[nodiscard]] int GetPluginIndex(const int index) const {
         const bool control_input_plugins = settings->HasPluginInputControl() && context->GetArm();
 
-        return context->GetChannelManagerItemIndex() + index + (
+        return context->GetChannelManagerItemIndex(TrackPluginMode) + index + (
                    control_input_plugins ? 0x1000000 : 0
                );
     }
@@ -40,15 +40,15 @@ public:
         CSurf_Context *context,
         midi_Output *m_midiout) : CSurf_FP_8_ChannelManager(tracks, navigator, context, m_midiout
     ) {
-        context->ResetChannelManagerItemIndex();
-        context->ResetChannelManagerItemsCount();
+        context->ResetChannelManagerItemIndex(TrackPluginMode);
+        context->ResetChannelManagerItemsCount(TrackPluginMode);
         CSurf_FP_8_TrackPluginsManager::UpdateTracks(true);
     }
 
     ~CSurf_FP_8_TrackPluginsManager() override = default;
 
     void UpdateTracks(const bool force_update) override {
-        current_plugin = context->GetChannelManagerItemIndex();
+        current_plugin = context->GetChannelManagerItemIndex(TrackPluginMode);
 
         const WDL_PtrList<MediaTrack> media_tracks = navigator->GetBankTracks();
         MediaTrack *plugin_track = GetSelectedTrack(nullptr, 0);
@@ -58,7 +58,7 @@ public:
         ) {
             plugin_track = GetMasterTrack(nullptr);
         }
-        context->SetChannelManagerItemsCount(TrackFX_GetCount(plugin_track));
+        context->SetChannelManagerItemsCount(TrackPluginMode, TrackFX_GetCount(plugin_track));
 
         for (int i = 0; i < context->GetNbChannels(); i++) {
             MediaTrack *media_track;
@@ -175,7 +175,7 @@ public:
             media_track = GetMasterTrack(nullptr);
         }
 
-        const int plugin_index = context->GetChannelManagerItemIndex() + index;
+        const int plugin_index = context->GetChannelManagerItemIndex(TrackPluginMode) + index;
 
         if (context->GetShiftChannelLeft()) {
             TrackFX_SetOffline(media_track, plugin_index, !DAW::GetTrackFxOffline(media_track, plugin_index));

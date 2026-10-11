@@ -28,12 +28,16 @@ protected:
         return bypassed ? "Bypassed" : "Enabled";
     }
 
-    [[nodiscard]] int GetPluginIndex(const int index) const {
+    [[nodiscard]] int GetPluginIndex(MediaTrack *media_track, const int index) const {
+        const bool respect_slots = settings->SendsShouldRespectSlots();
         const bool control_input_plugins = settings->HasPluginInputControl() && context->GetArm();
 
-        return context->GetChannelManagerItemIndex(nb_track_items[index] - 1) + (
-                   control_input_plugins ? 0x1000000 : 0
-               );
+        const int slot_index = context->GetChannelManagerItemIndex(PluginMode, nb_track_items[index] - 1);
+        const int plugin_index = respect_slots
+                                     ? DAW::GetTrackFxIndexBySlotIndex(media_track, slot_index)
+                                     : slot_index;
+
+        return plugin_index + (control_input_plugins ? 0x1000000 : 0);
     }
 
     std::string GetLine4Content(
@@ -41,19 +45,12 @@ protected:
         const int display_index
     ) const {
         const bool respect_slots = settings->SendsShouldRespectSlots();
-        if (!respect_slots) {
-            if (nb_track_items[display_index] == 0) {
-                return "";
-            }
-            return Progress(slot_index + 1, nb_track_items[display_index]);
-        }
-        if (display_index < context->GetNbChannels() - 2) {
+        if (nb_track_items[display_index] == 0) {
             return "";
         }
-        if (display_index == context->GetNbChannels() - 2) {
-            return "Slot:";
+        if (!respect_slots) {
+            return Progress(slot_index + 1, nb_track_items[display_index]);
         }
-
         return Progress(slot_index + 1, nb_plugins);
     }
 
@@ -63,7 +60,9 @@ public:
         CSurf_FP_8_Navigator *navigator,
         CSurf_Context *context,
         midi_Output *m_midiout) : CSurf_FP_8_ChannelManager(tracks, navigator, context, m_midiout) {
-        context->ResetChannelManagerItemIndex();
+        if (context->GetPreviousChannelMode() != PluginControlMode) {
+            context->ResetChannelManagerItemIndex(PluginMode);
+        }
         context->SetChannelManagerType(Hui);
         CSurf_FP_8_PluginsManager::UpdateTracks(true);
     }
@@ -93,8 +92,8 @@ public:
             nb_plugins = std::max(_nb_track_plugins, nb_plugins);
         }
 
-        context->SetChannelManagerItemsCount(nb_plugins);
-        current_plugin = context->GetChannelManagerItemIndex();
+        context->SetChannelManagerItemsCount(PluginMode, nb_plugins);
+        current_plugin = context->GetChannelManagerItemIndex(PluginMode);
 
         for (int i = 0; i < context->GetNbChannels(); i++) {
             MediaTrack *media_track;
@@ -109,6 +108,7 @@ public:
             }
 
             const int slot_index = context->GetChannelManagerItemIndex(
+                PluginMode,
                 respect_slots ? nb_plugins : nb_track_items[i] - 1
             );
 
@@ -221,7 +221,7 @@ public:
         }
 
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
-        const int plugin_index = GetPluginIndex(index);
+        const int plugin_index = GetPluginIndex(media_track, index);
 
         if (context->GetShiftChannelLeft()) {
             TrackFX_SetOffline(media_track, plugin_index, !DAW::GetTrackFxOffline(media_track, plugin_index));
@@ -234,17 +234,12 @@ public:
         if (value == 0) {
             return;
         }
-        const bool respect_slots = settings->PluginsShouldRespectSlots();
 
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
-        const int slot_index = context->GetChannelManagerItemIndex(nb_track_items[index] - 1);
-        const int plugin_index = respect_slots
-                                     ? DAW::GetTrackFxIndexBySlotIndex(media_track, slot_index)
-                                     : slot_index;
+        const int plugin_index = GetPluginIndex(media_track, index);
 
         // If the current plugin window is open, close it
         // Otherwise Close all other open windows and open the plugin window
-
         if (DAW::GetTrackFxPanelOpen(media_track, plugin_index)) {
             TrackFX_Show(media_track, plugin_index, 0);
             TrackFX_Show(media_track, plugin_index, 2);
