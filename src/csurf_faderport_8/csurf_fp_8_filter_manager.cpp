@@ -89,8 +89,8 @@ public:
         midi_Output *m_midiout
     ) : CSurf_FP_8_ChannelManager(std::move(tracks), navigator, context, m_midiout) {
         hasLastTouchedFxEnabled = false;
-        context->ResetChannelManagerItemIndex();
-        context->ResetChannelManagerItemsCount();
+        context->ResetChannelManagerItemIndex(MixMode);
+        context->ResetChannelManagerItemsCount(MixMode);
         GetFilters();
         CSurf_FP_8_FilterManager::UpdateTracks(true);
     }
@@ -99,10 +99,10 @@ public:
 
     void UpdateTracks(const bool force_update) override {
         const WDL_PtrList<MediaTrack> media_tracks = navigator->GetBankTracks();
-        context->SetChannelManagerItemsCount(static_cast<int>(filters.size()) + 1);
+        context->SetChannelManagerItemsCount(MixMode, static_cast<int>(filters.size()) + 1);
 
         for (int i = 0; i < context->GetNbChannels(); i++) {
-            const int filter_index = context->GetChannelManagerItemIndex() + i;
+            const int filter_index = context->GetChannelManagerItemIndex(MixMode) + i;
             int fader_value = 0;
             int valuebar_value = 0;
             std::string strPan1;
@@ -151,7 +151,7 @@ public:
             return;
         }
 
-        const int filter_index = context->GetChannelManagerItemIndex() + index;
+        const int filter_index = context->GetChannelManagerItemIndex(MixMode) + index;
 
         if (context->GetShiftChannelLeft()) {
             if (!ReaSonus8ControlPanel::control_panel_open

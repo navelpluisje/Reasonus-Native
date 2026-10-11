@@ -14,7 +14,7 @@ static int SYSEX_END = 0xf7;
 
 enum DisplayActions {
     DISPLAY_ACTION_DISPLAY = 0x12,
-    DISPLAY_ACTION_MODE = 0x13,
+    DISPLAY_ACTION_MODE    = 0x13,
 };
 
 enum DisplayMode {
@@ -106,7 +106,7 @@ enum DisplayLines {
 
 enum Inverted {
     NON_INVERT = 0,
-    INVERT = 4
+    INVERT     = 4
 };
 
 enum DisplayValue {
@@ -121,5 +121,15 @@ enum DisplayValue {
     DISPLAY_VALUE_FX_STATE,
 };
 
+enum DisplaySendValue {
+    DISPLAY_SEND_VALUE_VOLUME,
+    DISPLAY_SEND_VALUE_PAN,
+    DISPLAY_SEND_VALUE_MUTE,
+    DISPLAY_SEND_VALUE_PHASE,
+    DISPLAY_SEND_VALUE_MONO,
+    DISPLAY_SEND_VALUE_SEND_MODE,
+    DISPLAY_SEND_VALUE_AUTO_MODE,
+    DISPLAY_SEND_VALUE_FIXED,
+};
 
 #endif

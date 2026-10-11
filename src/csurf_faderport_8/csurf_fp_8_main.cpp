@@ -2,6 +2,7 @@
 #include <vector>
 #include <array>
 #include <reaper_plugin.h>
+// ReSharper disable once CppUnusedIncludeDirective
 #include <WDL/wdltypes.h> // might be unnecessary in future
 #include <reaper_plugin_functions.h>
 #include "../controls/csurf_button.hpp"
@@ -260,10 +261,10 @@ class CSurf_FaderPort : public IReaperControlSurface {
     }
   }
 
-  void UpdateSettings() const {
-    i18n->SetLanguage(DAW::GetExtState(EXT_STATE_KEY_UI_LANGUAGE, "en-US"));
-    settings->UpdateSettings();
-  }
+    void UpdateSettings() const {
+        i18n->SetLanguage(DAW::GetExtState(EXT_STATE_KEY_UI_LANGUAGE, "en-US"));
+        settings->UpdateSettings();
+    }
 
   void SetPluginControl(int track_index, int plugin_index) {
     MediaTrack *media_track = GetTrack(nullptr, track_index);

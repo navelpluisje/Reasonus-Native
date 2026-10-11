@@ -71,8 +71,8 @@ public:
         CSurf_Context *context,
         midi_Output *m_midiout
     ) : CSurf_FP_8_ChannelManager(tracks, navigator, context, m_midiout) {
-        context->ResetChannelManagerItemIndex();
-        context->SetChannelManagerItemsCount(CSurf_Context::GetPluginMaxGroupCount());
+        context->ResetChannelManagerItemIndex(PluginControlMode);
+        context->SetChannelManagerItemsCount(PluginControlMode, CSurf_Context::GetPluginMaxGroupCount());
         GetCurrentPlugin();
         CSurf_FP_8_PluginControlManager::UpdateTracks(true);
         color = ButtonColorWhiteDim;
@@ -87,7 +87,7 @@ public:
 
         for (int i = 0; i < context->GetNbChannels(); i++) {
             const bool display_step_size = editStepSize && i == 0;
-            const int filter_index = context->GetChannelManagerItemIndex() + i;
+            const int filter_index = context->GetChannelManagerItemIndex(PluginControlMode) + i;
             std::string param_key = getParamKey("Select_", filter_index);
             const CSurf_FP_8_Track *track = tracks.at(i);
 
@@ -106,7 +106,13 @@ public:
             if (ini.has(param_key) && !ini[param_key]["param"].empty()) {
                 const Inverted inverted = GetLabelInvertState(param_key);
 
-                track->SetDisplayLine(0, ALIGN_CENTER, ini[param_key]["name"].c_str(), inverted, force_update);
+                track->SetDisplayLine(
+                    DISPLAY_LINE_1,
+                    ALIGN_CENTER,
+                    ini[param_key]["name"].c_str(),
+                    inverted,
+                    force_update
+                );
                 const std::string formatted_param_value = DAW::GetTrackFxFormattedParamValue(
                     media_track,
                     plugin_id,
@@ -114,10 +120,16 @@ public:
                     stoi(ini[param_key]["param"])
                 );
                 track->SetSelectButtonValue(color_show_mode == 3 ? BTN_VALUE_OFF : BTN_VALUE_ON, force_update);
-                track->SetDisplayLine(1, ALIGN_CENTER, formatted_param_value.c_str(), NON_INVERT, force_update);
+                track->SetDisplayLine(
+                    DISPLAY_LINE_2,
+                    ALIGN_CENTER,
+                    formatted_param_value.c_str(),
+                    NON_INVERT,
+                    force_update
+                );
             } else {
-                track->SetDisplayLine(0, ALIGN_CENTER, "", NON_INVERT, force_update);
-                track->SetDisplayLine(1, ALIGN_CENTER, "", NON_INVERT, true);
+                track->SetDisplayLine(DISPLAY_LINE_1, ALIGN_CENTER, "", NON_INVERT, force_update);
+                track->SetDisplayLine(DISPLAY_LINE_2, ALIGN_CENTER, "", NON_INVERT, true);
                 track->SetSelectButtonValue(color_show_mode == 2 ? BTN_VALUE_ON : BTN_VALUE_OFF, force_update);
             }
 
@@ -126,13 +138,26 @@ public:
                 if (!display_step_size) {
                     const Inverted inverted = GetLabelInvertState(param_key);
 
-                    track->SetDisplayLine(2, ALIGN_CENTER, ini[param_key]["name"].c_str(), inverted, force_update);
+                    track->SetDisplayLine(
+                        DISPLAY_LINE_3,
+                        ALIGN_CENTER,
+                        ini[param_key]["name"].c_str(),
+                        inverted,
+                        force_update
+                    );
+
                     const std::string formatted_param_value = DAW::GetTrackFxFormattedParamValue(
                         media_track,
                         plugin_id,
                         stoi(ini[param_key]["param"])
                     );
-                    track->SetDisplayLine(3, ALIGN_CENTER, formatted_param_value.c_str(), NON_INVERT, force_update);
+                    track->SetDisplayLine(
+                        DISPLAY_LINE_4,
+                        ALIGN_CENTER,
+                        formatted_param_value.c_str(),
+                        NON_INVERT,
+                        force_update
+                    );
                 }
 
                 const double value = TrackFX_GetParamNormalized(media_track, plugin_id, stoi(ini[param_key]["param"]));
@@ -141,8 +166,8 @@ public:
                 track->SetValueBarValue(static_cast<int>(value * 127.0));
             } else {
                 if (!display_step_size) {
-                    track->SetDisplayLine(2, ALIGN_CENTER, "", NON_INVERT, force_update);
-                    track->SetDisplayLine(3, ALIGN_CENTER, "", NON_INVERT, true);
+                    track->SetDisplayLine(DISPLAY_LINE_3, ALIGN_CENTER, "", NON_INVERT, force_update);
+                    track->SetDisplayLine(DISPLAY_LINE_4, ALIGN_CENTER, "", NON_INVERT, true);
                 }
                 track->SetFaderValue(0, force_update);
                 track->SetValueBarMode(VALUEBAR_MODE_OFF);
@@ -150,8 +175,14 @@ public:
             }
 
             if (display_step_size) {
-                track->SetDisplayLine(2, ALIGN_CENTER, "Step size", INVERT, force_update);
-                track->SetDisplayLine(3, ALIGN_CENTER, std::to_string(stepSize).c_str(), INVERT, force_update);
+                track->SetDisplayLine(DISPLAY_LINE_3, ALIGN_CENTER, "Step size", INVERT, force_update);
+                track->SetDisplayLine(
+                    DISPLAY_LINE_4,
+                    ALIGN_CENTER,
+                    std::to_string(stepSize).c_str(),
+                    INVERT,
+                    force_update
+                );
             }
         }
     }
@@ -183,7 +214,7 @@ public:
             return;
         }
 
-        const int control_index = context->GetChannelManagerItemIndex() + index;
+        const int control_index = context->GetChannelManagerItemIndex(PluginControlMode) + index;
         MediaTrack *media_track = context->GetPluginEditTrack();
         const int plugin_id = context->GetPluginEditPluginId();
         const std::string param_key = getParamKey("Select_", control_index);
@@ -221,7 +252,7 @@ public:
     }
 
     void HandleFaderTouch(const int index, const int value) override {
-        const int item_index = context->GetChannelManagerItemIndex() + index;
+        const int item_index = context->GetChannelManagerItemIndex(PluginControlMode) + index;
         const int plugin_index = context->GetPluginEditPluginId();
         const std::string param_key = getParamKey("Fader_", item_index);
         if (!ini.has(param_key)) {
@@ -270,7 +301,7 @@ public:
     }
 
     void HandleFaderMove(const int index, const int msb, const int lsb) override {
-        const int control_index = context->GetChannelManagerItemIndex() + index;
+        const int control_index = context->GetChannelManagerItemIndex(PluginControlMode) + index;
         const int plugin_id = context->GetPluginEditPluginId();
 
         const std::string param_key = getParamKey("Fader_", control_index);
