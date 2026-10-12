@@ -6,33 +6,33 @@ std::map<int, bool> GetSibblingTracks(std::map<int, bool> tracks)
 {
     std::map<int, bool> response;
 
-    for (auto const &track : tracks)
+    for (const auto &[track_index, _] : tracks)
     {
-        MediaTrack *media_track = GetTrack(0, track.first);
-        int nbTracks = CountTracks(0);
-        int startDepth = GetTrackDepth(media_track);
-        int trackDepth = startDepth;
-        int trackId;
+        MediaTrack *media_track = GetTrack(nullptr, track_index);
+        const int nb_tracks = CountTracks(nullptr);
+        const int start_depth = GetTrackDepth(media_track);
+        int track_depth = start_depth;
+        int track_id;
 
-        if (trackDepth == 0)
+        if (track_depth == 0)
         {
-            trackId = 0;
+            track_id = 0;
         }
         else
         {
             MediaTrack *parent_track = GetParentTrack(media_track);
-            trackId = (int)GetMediaTrackInfo_Value(parent_track, "IP_TRACKNUMBER");
+            track_id = static_cast<int>(GetMediaTrackInfo_Value(parent_track, "IP_TRACKNUMBER"));
         }
 
-        while (trackDepth >= startDepth && trackId < nbTracks)
+        while (track_depth >= start_depth && track_id < nb_tracks)
         {
-            MediaTrack *current_track = GetTrack(0, trackId);
-            trackDepth = GetTrackDepth(current_track);
-            if (trackDepth == startDepth)
+            MediaTrack *current_track = GetTrack(nullptr, track_id);
+            track_depth = GetTrackDepth(current_track);
+            if (track_depth == start_depth)
             {
-                response[trackId] = true;
+                response[track_id] = true;
             }
-            trackId += 1;
+            track_id += 1;
         }
     }
 
@@ -43,11 +43,11 @@ std::map<int, bool> GetParentTracks(std::map<int, bool> tracks)
 {
     std::map<int, bool> response;
 
-    for (auto const &track : tracks)
+    for (const auto &[track_index, _] : tracks)
     {
-        MediaTrack *media_track = GetTrack(0, track.first);
+        MediaTrack *media_track = GetTrack(nullptr, track_index);
         int track_depth = GetTrackDepth(media_track);
-        int track_id = track.first - 1;
+        int track_id = track_index - 1;
 
         if (track_depth == 0)
         {
@@ -56,10 +56,10 @@ std::map<int, bool> GetParentTracks(std::map<int, bool> tracks)
 
         while (track_depth > 0)
         {
-            MediaTrack *current_track = GetTrack(0, track_id);
-            int current_track_depth = GetTrackDepth(current_track);
+            MediaTrack *current_track = GetTrack(nullptr, track_id);
+            const int current_track_depth = GetTrackDepth(current_track);
 
-            if ((int)GetMediaTrackInfo_Value(current_track, "I_FOLDERDEPTH") == 1 && current_track_depth < track_depth)
+            if (static_cast<int>(GetMediaTrackInfo_Value(current_track, "I_FOLDERDEPTH")) == 1 && current_track_depth < track_depth)
             {
                 response[track_id] = true;
                 track_depth = current_track_depth;
@@ -75,20 +75,20 @@ std::map<int, bool> GetChildTracks(std::map<int, bool> tracks)
 {
     std::map<int, bool> response;
 
-    for (auto const &track : tracks)
+    for (const auto &[track_index, _] : tracks)
     {
-        MediaTrack *media_track = GetTrack(0, track.first);
+        MediaTrack *media_track = GetTrack(nullptr, track_index);
 
         // The track is a parent, so has children. Now add all the children to the result
-        if ((int)GetMediaTrackInfo_Value(media_track, "I_FOLDERDEPTH") == 1)
+        if (static_cast<int>(GetMediaTrackInfo_Value(media_track, "I_FOLDERDEPTH")) == 1)
         {
             int folderDepth = 1;
-            int trackId = track.first + 1;
+            int trackId = track_index + 1;
 
             while (folderDepth > 0)
             {
-                MediaTrack *child_track = GetTrack(0, trackId);
-                int depth = (int)GetMediaTrackInfo_Value(child_track, "I_FOLDERDEPTH");
+                MediaTrack *child_track = GetTrack(nullptr, trackId);
+                const int depth = static_cast<int>(GetMediaTrackInfo_Value(child_track, "I_FOLDERDEPTH"));
                 response[trackId] = true;
                 folderDepth += depth;
                 trackId += 1;
@@ -107,11 +107,11 @@ std::map<int, bool> GetCustomFilterTracks(mINI::INIMap<std::string> filter)
     std::map<int, bool> sibblingTracks;
 
     bool stop = false;
-    for (int i = 0; i < CountTracks(0); i++)
+    for (int i = 0; i < CountTracks(nullptr); i++)
     {
         if (!stop)
         {
-            MediaTrack *media_track = GetTrack(0, i);
+            MediaTrack *media_track = GetTrack(nullptr, i);
             std::string trackName = DAW::GetTrackName(media_track);
             bool isChild = GetTrackDepth(media_track) > 0;
 
@@ -149,7 +149,7 @@ std::map<int, bool> GetCustomFilterTracks(mINI::INIMap<std::string> filter)
     return tracks;
 }
 
-bool FuzzyMatch(std::string track_name, std::string matches, bool case_insensitive)
+bool FuzzyMatch(std::string track_name, std::string matches, const bool case_insensitive)
 {
     bool match = false;
 
@@ -161,7 +161,7 @@ bool FuzzyMatch(std::string track_name, std::string matches, bool case_insensiti
 
     for (const std::string &val : split(matches, ","))
     {
-        std::string::size_type found = track_name.find(val);
+        const std::string::size_type found = track_name.find(val);
         match = match || found != std::string::npos;
     }
 
@@ -172,7 +172,7 @@ std::map<int, bool> GetAllTracksBase()
 {
     std::map<int, bool> result;
 
-    for (int i = 0; i < CountTracks(0); i++)
+    for (int i = 0; i < CountTracks(nullptr); i++)
     {
         result[i] = false;
     }

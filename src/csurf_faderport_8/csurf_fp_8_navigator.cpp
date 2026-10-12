@@ -227,8 +227,10 @@ void CSurf_FP_8_Navigator::HandleTracksAreVcaFilter() {
     SetOffset(0);
 }
 
-void CSurf_FP_8_Navigator::HandleTracksCustomFilter(const std::string &filter_name, const bool &project_filter) {
-    const mINI::INIMap<std::string> filter = project_filter ? project_state->GetFilter(filter_name) : settings->GetFilter(filter_name);   
+void CSurf_FP_8_Navigator::HandleTracksCustomFilter(const std::string &filter_key, const bool &project_filter) {
+    const mINI::INIMap<std::string> filter = project_filter
+                                                 ? project_state->GetFilter(filter_key)
+                                                 : settings->GetFilter(filter_key);
 
     std::map<int, bool> custom_filter_tracks = GetCustomFilterTracks(filter);
     std::map<int, bool> allTracks = GetAllTracksBase();
@@ -445,8 +447,16 @@ void CSurf_FP_8_Navigator::HandleFilter(const NavigatorFilter filter) {
     }
 }
 
-void CSurf_FP_8_Navigator::HandleCustomFilter(const std::string &filterName, const bool & projectFilter) {
-    HandleTracksCustomFilter(filterName, projectFilter);
+void CSurf_FP_8_Navigator::HandleCustomFilterByKey(const std::string &filter_key, const bool &project_filter) {
+    HandleTracksCustomFilter(filter_key, project_filter);
+}
+
+void CSurf_FP_8_Navigator::HandleCustomFilterByName(const std::string &filter_name) {
+    const std::string filter_key = settings->GetFilterKeyByName(filter_name);
+
+    if (!filter_key.empty()) {
+        HandleTracksCustomFilter(filter_key, false);
+    }
 }
 
 void CSurf_FP_8_Navigator::SetTrackTouched(const int index, const bool value) {
@@ -493,7 +503,7 @@ void CSurf_FP_8_Navigator::PublishOffset() {
     // this cycle, regardless of which code path changed it. Lets external
     // tools (e.g. ReaScripts) follow the surface's banking exactly.
     if (track_offset != last_published_offset) {
-      DAW::SetExtState(FP_TRACK_OFFSET, track_offset, false);
-      last_published_offset = track_offset;
+        DAW::SetExtState(EXT_STATE_FP_TRACK_OFFSET, track_offset, false);
+        last_published_offset = track_offset;
     }
 }
