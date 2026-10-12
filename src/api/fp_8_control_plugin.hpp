@@ -5,10 +5,8 @@
 #include "../shared/csurf.h"
 #include "../shared/csurf_utils.hpp"
 
-namespace REASONUS_API
-{
-    void ControlFP8Plugin(MediaTrack *media_track, int plugin_index)
-    {
+namespace REASONUS_API {
+    inline void FP8ControlPlugin(MediaTrack *media_track, int plugin_index) {
         // Get the track index (zero-based)
         const int track_index = stoi(DAW::GetTrackIndex(media_track)) - 1;
 
@@ -20,8 +18,7 @@ namespace REASONUS_API
         }
     }
 
-    auto defstring_ControlFP8Plugin =
-        "void\0MediaTrack*,int\0media_track,plugin_index\0"
-        "Start copntrolling the passed plugin with the controler";
-
+    inline auto defstring_FP8ControlPlugin =
+            "void\0MediaTrack*,int\0media_track,plugin_index\0"
+            "Start controlling the plugin on the given track with the given plugin id with the controler";
 }

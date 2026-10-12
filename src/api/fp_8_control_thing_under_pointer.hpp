@@ -8,8 +8,7 @@
 #include "../shared/csurf_utils.hpp"
 
 namespace REASONUS_API {
-    void ControlFP8ThingUnderPointer() {
-        ShowConsoleMsg("test");
+    inline void FP8ControlThingUnderPointer() {
         char info_buffer[256];
         int pointer_x = 0;
         int pointer_y = 0;
@@ -64,7 +63,7 @@ namespace REASONUS_API {
         DAW::SetExtState(EXT_STATE_FP_PLUGIN_CONTROL, "", false);
     }
 
-    auto defstring_ControlFP8ThingUnderPointer =
+    inline auto defstring_FP8ControlThingUnderPointer =
             "void\0\0\0"
             "Trigger action under mouse pointer for both mcp and tcp:\n"
             "  - Plugin list, filled slot: Start controlling plugin from the controller\n"
@@ -72,5 +71,5 @@ namespace REASONUS_API {
             "  - FX select button: Open Plugin mode on the controler\n"
             "  - Sends list, any slot: Open Sends mode on the controler\n"
             "  - Pan or Width button: Open Pan mode on the controler\n"
-            "  - Ony other point in mct/tcp: Open Track mode on the controler\n";
+            "  - Ony other point in mcp/tcp: Open Track mode on the controler\n";
 }

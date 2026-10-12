@@ -483,6 +483,21 @@ mINI::INIMap<std::string> ReaSonusSettings::GetFilter(const int index) {
     return GetFilter(GetFilterKeyByIndex(index));
 }
 
+std::string ReaSonusSettings::GetFilterKeyByName(const std::string &name) {
+    std::string filter_key;
+
+    for (int i = 0; i < GetNumberOfFilters(); i++) {
+        if (
+            settings[settings["filters"][std::to_string(i)]]["name"] == name
+        ) {
+            filter_key = settings["filters"][std::to_string(i)];
+            break;
+        }
+    }
+
+    return filter_key;
+}
+
 std::array<int, 4> ReaSonusSettings::ConvertDisplayValues(const std::string &settings_value) {
     const std::string delimiter = ",";
     std::array<int, 4> value;

@@ -4,31 +4,43 @@
 #include <WDL/wdltypes.h>
 #include <reaper_plugin_functions.h>
 #include "get_reasonus_version.hpp"
-#include "get_fp_8_track_offset.hpp"
-#include "get_fp_v2_controlled_track.hpp"
-#include "trigger_fp_8_plugin_control.hpp"
-#include "trigger_fp_8_thing_under_pointer.hpp"
+#include "fp_8_get_track_offset.hpp"
+#include "fp_v2_get_controlled_track.hpp"
+#include "fp_8_control_plugin.hpp"
+#include "fp_8_control_thing_under_pointer.hpp"
+#include "fp_8_filter_by_name.hpp"
 
 namespace REASONUS_API {
     void Register() {
-        plugin_register("API_ReaSonus_GetVersion", reinterpret_cast<void*>(GetReasonusVersion));
-        plugin_register("APIdef_ReaSonus_GetVersion", (void*)defstring_GetReasonusVersion);
-        plugin_register("APIvararg_ReaSonus_GetVersion", reinterpret_cast<void*>(&InvokeReaScriptAPI<&GetReasonusVersion>));
+        plugin_register("API_ReaSonus_GetVersion", reinterpret_cast<void *>(GetReasonusVersion));
+        plugin_register("APIdef_ReaSonus_GetVersion", (void *) defstring_GetReasonusVersion);
+        plugin_register("APIvararg_ReaSonus_GetVersion",
+                        reinterpret_cast<void *>(&InvokeReaScriptAPI<&GetReasonusVersion>));
 
-        plugin_register("API_ReaSonus_GetFP8TrackOffset", reinterpret_cast<void*>(GetFP8TrackOffset));
-        plugin_register("APIdef_ReaSonus_GetFP8TrackOffset", (void*)defstring_GetFP8TrackOffset);
-        plugin_register("APIvararg_ReaSonus_GetFP8TrackOffset", reinterpret_cast<void*>(&InvokeReaScriptAPI<&GetFP8TrackOffset>));
+        plugin_register("API_ReaSonus_FPv2_GetControlledTrack", reinterpret_cast<void *>(FPv2GetControlledTrack));
+        plugin_register("APIdef_ReaSonus_FPv2_GetControlledTrack", (void *) defstring_FPv2GetControlledTrack);
+        plugin_register("APIvararg_ReaSonus_FPv2_GetControlledTrack",
+                        reinterpret_cast<void *>(&InvokeReaScriptAPI<&FPv2GetControlledTrack>));
 
-        plugin_register("API_ReaSonus_GetFPv2ControlledTrack", reinterpret_cast<void*>(GetFPv2ControlledTrack));
-        plugin_register("APIdef_ReaSonus_GetFPv2ControlledTrack", (void*)defstring_GetFPv2ControlledTrack);
-        plugin_register("APIvararg_ReaSonus_GetFPv2ControlledTrack", reinterpret_cast<void*>(&InvokeReaScriptAPI<&GetFPv2ControlledTrack>));
+        plugin_register("API_ReaSonus_FP8_GetTrackOffset", reinterpret_cast<void *>(FP8GetTrackOffset));
+        plugin_register("APIdef_ReaSonus_FP8_GetTrackOffset", (void *) defstring_FP8GetTrackOffset);
+        plugin_register("APIvararg_ReaSonus_FP8_GetTrackOffset",
+                        reinterpret_cast<void *>(&InvokeReaScriptAPI<&FP8GetTrackOffset>));
 
-        plugin_register("API_ReaSonus_ControlFP8Plugin", reinterpret_cast<void*>(ControlFP8Plugin));
-        plugin_register("APIdef_ReaSonus_ControlFP8Plugin", (void*)defstring_ControlFP8Plugin);
-        plugin_register("APIvararg_ReaSonus_ControlFP8Plugin", reinterpret_cast<void*>(&InvokeReaScriptAPI<&ControlFP8Plugin>));
+        plugin_register("API_ReaSonus_FP8_ControlPlugin", reinterpret_cast<void *>(FP8ControlPlugin));
+        plugin_register("APIdef_ReaSonus_FP8_ControlPlugin", (void *) defstring_FP8ControlPlugin);
+        plugin_register("APIvararg_ReaSonus_FP8_ControlPlugin",
+                        reinterpret_cast<void *>(&InvokeReaScriptAPI<&FP8ControlPlugin>));
 
-        plugin_register("API_ReaSonus_ControlFP8ThingUnderPointer", reinterpret_cast<void*>(ControlFP8ThingUnderPointer));
-        plugin_register("APIdef_ReaSonus_ControlFP8ThingUnderPointer", (void*)defstring_ControlFP8ThingUnderPointer);
-        plugin_register("APIvararg_ReaSonus_ControlFP8ThingUnderPointer", reinterpret_cast<void*>(&InvokeReaScriptAPI<&ControlFP8ThingUnderPointer>));
+        plugin_register("API_ReaSonus_FP8_ControlThingUnderPointer",
+                        reinterpret_cast<void *>(FP8ControlThingUnderPointer));
+        plugin_register("APIdef_ReaSonus_FP8_ControlThingUnderPointer", (void *) defstring_FP8ControlThingUnderPointer);
+        plugin_register("APIvararg_ReaSonus_FP8_ControlThingUnderPointer",
+                        reinterpret_cast<void *>(&InvokeReaScriptAPI<&FP8ControlThingUnderPointer>));
+
+        plugin_register("API_ReaSonus_FP8_FilterbyName", reinterpret_cast<void *>(FP8FilterbyName));
+        plugin_register("APIdef_ReaSonus_FP8_FilterbyName", (void *) defstring_FP8FilterbyName);
+        plugin_register("APIvararg_ReaSonus_FP8_FilterbyName",
+                        reinterpret_cast<void *>(&InvokeReaScriptAPI<&FP8FilterbyName>));
     }
 }

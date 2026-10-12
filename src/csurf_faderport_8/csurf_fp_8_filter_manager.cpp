@@ -173,7 +173,7 @@ public:
                         navigator->HandleFilter(TrackCustomMultiSelectFilter);
                     }
                 } else {
-                    navigator->HandleCustomFilter(filters.at(filter_index).id, filters.at(filter_index).project);
+                    navigator->HandleCustomFilterByKey(filters.at(filter_index).id, filters.at(filter_index).project);
                 }
             } else {
                 const int result = MB(

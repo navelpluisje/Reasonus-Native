@@ -394,6 +394,8 @@ public:
 
     mINI::INIMap<std::string> GetFilter(int index);
 
+    std::string GetFilterKeyByName(const std::string &name);
+
     static std::array<int, 4> ConvertDisplayValues(const std::string &settings_value);
 };
 
