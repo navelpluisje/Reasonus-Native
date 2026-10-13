@@ -121,7 +121,7 @@ private:
 
 struct DoubleClickState {
     bool active = false; // NOLINT(*-non-private-member-variables-in-classes)
-    int start = 0;      // NOLINT(*-non-private-member-variables-in-classes)
+    int start = 0;       // NOLINT(*-non-private-member-variables-in-classes)
     int clicks = 0;      // NOLINT(*-non-private-member-variables-in-classes)
 
     void SetValue(const bool value) {
@@ -357,6 +357,14 @@ std::string ltrim(const std::string &value);
  * @return
  */
 std::string rtrim(const std::string &value);
+
+/**
+ * Check is a string starts with the given value
+ * @param value Tha value to check the prefix for
+ * @param prefix The prefix thevalue should start with
+ * @return True if the value starts with the prefix
+ */
+bool startsWith(std::string value, std::string prefix);
 
 /**
  * Left trim the givven string. This will remove all spaces at the end and start of a string
