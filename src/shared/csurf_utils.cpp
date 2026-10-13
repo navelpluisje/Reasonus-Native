@@ -141,15 +141,15 @@ std::string Progress(const int current, const int total) {
 
 std::string GetSendModeString(const int sendMode) {
     switch (sendMode) {
-        case 0:
+        case SEND_POST_FADER:
             return "Post-Fdr";
-        case 1:
+        case SEND_PRE_FX:
             return "Pre-FX";
         case 2:
-        case 3:
+        case SEND_POST_FX:
             return "Post-FX";
         default:
-            return "Post-Fdr";
+            return "";
     }
 }
 

@@ -177,9 +177,10 @@ protected:
             const int res = MB(
                 i18n->t("filters", "popup.unsaved.message").c_str(),
                 i18n->t("filters", "popup.unsaved.title").c_str(),
-                4);
+                MB_TYPE_YES_NO
+            );
 
-            if (res == 6) {
+            if (res == MB_RETURN_YES) {
                 Save();
             } else if (new_filter) {
                 // When a new filter was added, but user does not want to save it, we remove it from the list again
@@ -268,7 +269,7 @@ protected:
             MB(
                 i18n->t("filters", "popup.no-saved-project.message").c_str(),
                 i18n->t("filters", "popup.no-saved-project.title").c_str(),
-                0
+                MB_TYPE_OK
             );
 
             return;

@@ -22,14 +22,15 @@
 #include "actions/action_ui_fp_v2_display_widget.hpp"
 #include "actions/action_ui_plugin_type_mapping.hpp"
 #include "ui/pages/csurf_ui_function_keys.hpp"
+#include "api/api.hpp"
 // ReSharper disable once CppUnusedIncludeDirective
 #include "resource.h"
 #include "shared/csurf.h"
 #include "shared/csurf_daw.hpp"
 
 extern reaper_csurf_reg_t
-        csurf_faderport_8_reg,
-        csurf_faderport_v2_reg;
+    csurf_faderport_8_reg,
+    csurf_faderport_v2_reg;
 
 /**
  * Set some initial values
@@ -45,9 +46,9 @@ HWND g_hwnd;
 reaper_plugin_info_t *g_reaper_plugin_info;
 
 extern "C" {
-    REAPER_PLUGIN_DLL_EXPORT auto REAPER_PLUGIN_ENTRYPOINT(
-        REAPER_PLUGIN_HINSTANCE hInstance, reaper_plugin_info_t *reaper_plugin_info) -> int {
-        g_hInst = hInstance;
+  REAPER_PLUGIN_DLL_EXPORT auto REAPER_PLUGIN_ENTRYPOINT(
+    REAPER_PLUGIN_HINSTANCE hInstance, reaper_plugin_info_t *reaper_plugin_info) -> int {
+    g_hInst = hInstance;
 
         /**
          * reaper_plugin_info is not available, so no need to run.
@@ -77,35 +78,33 @@ extern "C" {
             ACTION_UI_TRANSLATIONS_EDITOR::Unregister();
             ACTION_UI_FP_V2_DISPLAY_WIDGET::Unregister();
 
-            return 0;
-        }
+      return 0;
+    }
 
-        g_hwnd = reaper_plugin_info->hwnd_main;
-        g_reaper_plugin_info = reaper_plugin_info;
+    g_hwnd = reaper_plugin_info->hwnd_main;
+    g_reaper_plugin_info = reaper_plugin_info;
 
-        if (reaper_plugin_info != nullptr) {
-            // First, import REAPER's C++ API functions for use in this extension.
-            //		Load all listed API functions at once.
-            if (REAPERAPI_LoadAPI(reaper_plugin_info->GetFunc) != 0) {
-                // This is the WIN32 / swell MessageBox, not REAPER's API MB.  This should create a separate window that is listed in the taskbar,
-                //		and more easily visible behind REAPER's splash screen.
-                MessageBox(nullptr,
-                           "Unable to import default API functions.\n\nNOTE:\nThis extension requires REAPER v7.40 or higher.",
-                           "ERROR: ReaSonus Native", 0);
-                return 0;
-            }
-            //		Load each of the undocumented functions.
-            if (!(*reinterpret_cast<void **>(&CoolSB_GetScrollInfo) = reaper_plugin_info->GetFunc(
-                      "CoolSB_GetScrollInfo"))) {
-                MessageBox(nullptr, "Unable to import CoolSB_GetScrollInfo function.", "ERROR: ReaSonus Native", 0);
-                return 0;
-            }
-            if (!(*reinterpret_cast<void **>(&CoolSB_SetScrollPos) = reaper_plugin_info->
-                  GetFunc("CoolSB_SetScrollPos"))) {
-                MessageBox(nullptr, "Unable to import CoolSB_SetScrollPos function.", "ERROR: ReaSonus Native", 0);
-                return 0;
-            }
-        }
+    if (reaper_plugin_info != nullptr) {
+      // First, import REAPER's C++ API functions for use in this extension.
+      //		Load all listed API functions at once.
+      if (REAPERAPI_LoadAPI(reaper_plugin_info->GetFunc) != 0) {
+        // This is the WIN32 / swell MessageBox, not REAPER's API MB.  This should create a separate window that is listed in the taskbar,
+        //		and more easily visible behind REAPER's splash screen.
+        MessageBox(nullptr,
+                   "Unable to import default API functions.\n\nNOTE:\nThis extension requires REAPER v7.40 or higher.",
+                   "ERROR: ReaSonus Native", 0);
+        return 0;
+      }
+      //		Load each of the undocumented functions.
+      if (!(*reinterpret_cast<void **>(&CoolSB_GetScrollInfo) = reaper_plugin_info->GetFunc("CoolSB_GetScrollInfo"))) {
+        MessageBox(nullptr, "Unable to import CoolSB_GetScrollInfo function.", "ERROR: ReaSonus Native", 0);
+        return 0;
+      }
+      if (!(*reinterpret_cast<void **>(&CoolSB_SetScrollPos) = reaper_plugin_info->GetFunc("CoolSB_SetScrollPos"))) {
+        MessageBox(nullptr, "Unable to import CoolSB_SetScrollPos function.", "ERROR: ReaSonus Native", 0);
+        return 0;
+      }
+    }
 
         ACTION_CLOSE_ALL_FLOATING_FX_WINDOWS::Register();
         ACTION_FP_8_SETTING_DISABLE_PLUGINS::Register();
@@ -128,19 +127,19 @@ extern "C" {
         ACTION_UI_TRANSLATIONS_EDITOR::Register();
         ACTION_UI_FP_V2_DISPLAY_WIDGET::Register();
 
-        reaper_plugin_info->Register("csurf", &csurf_faderport_8_reg);
-        reaper_plugin_info->Register("csurf", &csurf_faderport_v2_reg);
+    reaper_plugin_info->Register("csurf", &csurf_faderport_8_reg);
+    reaper_plugin_info->Register("csurf", &csurf_faderport_v2_reg);
 
-        if (DAW::VersionHasFeature(FEATURE_EXTENSION_DATA)) {
-            const std::string version = GIT_VERSION;
-            const std::string name = "ReaSonus Native (" + version + ")";
-            plugin_register("ext_name", (void *) name.c_str());
-            plugin_register("ext_url", (void *) "https://reasonus.net/");
-            plugin_register("ext_vendor", (void *) "Navelpluisje");
-        }
-
-        return 1;
+    if (DAW::VersionHasFeature(FEATURE_EXTENSION_DATA)) {
+      const std::string version = GIT_VERSION;
+      const std::string name = "ReaSonus Native (" + version + ")";
+      plugin_register("ext_name", (void *) name.c_str());
+      plugin_register("ext_url", (void *) "https://reasonus.net/");
+      plugin_register("ext_vendor", (void *) "Navelpluisje");
     }
+
+    return 1;
+  }
 };
 
 // import the resources. Note: if you do not have these files, run "php WDL/swell/mac_resgen.php res.rc" from this directory
