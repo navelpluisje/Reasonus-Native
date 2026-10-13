@@ -173,16 +173,16 @@ public:
                         navigator->HandleFilter(TrackCustomMultiSelectFilter);
                     }
                 } else {
-                    navigator->HandleCustomFilter(filters.at(filter_index).id, filters.at(filter_index).project);
+                    navigator->HandleCustomFilterByKey(filters.at(filter_index).id, filters.at(filter_index).project);
                 }
             } else {
                 const int result = MB(
                     "There is no filter for this button. Do you want to add a new filter?",
                     "No filter",
-                    1
+                    MB_TYPE_OK_CANCEL
                 );
 
-                if (result == 1) {
+                if (result == MB_RETURN_OK) {
                     ToggleFP8ControlPanel(ReaSonus8ControlPanel::FILTERS_PAGE);
                 }
             }
