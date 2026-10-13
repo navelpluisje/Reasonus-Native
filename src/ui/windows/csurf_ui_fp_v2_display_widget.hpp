@@ -23,6 +23,8 @@ private:
 
     void SetDisplayValues();
 
+    int GetHighlightColor();
+
     static void Loop();
 
     CSurf_UI_Assets *assets;
