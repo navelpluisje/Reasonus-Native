@@ -94,7 +94,7 @@ void ReaSonusFpV2DisplayWidget::SetDisplayValues() {
         case FP_V2_WIDGET_MASTER_MODE: {
             GetTrackUIPan(GetMasterTrack(nullptr), &pan1, &pan2, &pan_mode);
             display_values[0] = "Master";
-            display_values[1] = DAW::GetTrackIndex(media_track);
+            display_values[1] = "";
             display_values[2] = GetVolumeString(DAW::GetTrackVolume(media_track));
             display_values[3] = GetPan2String(pan2, pan_mode).empty()
                                     ? GetPan1String(pan1, pan_mode)
