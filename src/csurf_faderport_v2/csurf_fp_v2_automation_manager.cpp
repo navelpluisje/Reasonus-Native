@@ -1,8 +1,8 @@
 #ifndef CSURF_AUTOMATION_MANAGER_C_
 #define CSURF_AUTOMATION_MANAGER_C_
 
-#include "../controls/csurf_color_button.hpp"
 #include "csurf_fp_v2_navigator.hpp"
+#include "../controls/csurf_color_button.hpp"
 #include "../shared/csurf_reasonus_settings.hpp"
 
 class CSurf_FP_V2_AutomationManager {
@@ -19,7 +19,7 @@ protected:
 
     int channelAutomationMode;
 
-    bool isAutomationMode(int automationMode, bool not_selected) {
+    bool isAutomationMode(const int automationMode, const bool not_selected) const {
         if (not_selected) {
             return false;
         }
@@ -27,7 +27,7 @@ protected:
         return channelAutomationMode == automationMode;
     }
 
-    void SetButtonValue(bool not_selected) {
+    void SetButtonValue(const bool not_selected) const {
         if (context->GetShiftLeft()) {
             touchButton->SetValue(isAutomationMode(AUTOMATION_LATCH, not_selected) ? BTN_VALUE_ON : BTN_VALUE_OFF);
             writeButton->SetValue(isAutomationMode(AUTOMATION_TRIM, not_selected) ? BTN_VALUE_ON : BTN_VALUE_OFF);
@@ -40,7 +40,7 @@ protected:
         readButton->SetValue(isAutomationMode(AUTOMATION_READ, not_selected) ? BTN_VALUE_ON : BTN_VALUE_OFF);
     }
 
-    void SetButtonColors() {
+    void SetButtonColors() const {
         if (context->GetShiftLeft()) {
             touchButton->SetColor(
                 settings->GetAutomationColor(
@@ -89,24 +89,25 @@ public:
     CSurf_FP_V2_AutomationManager(
         CSurf_Context *context,
         CSurf_FP_V2_Navigator *navigator,
-        midi_Output *m_midiout) : context(context), navigator(navigator), m_midiout(m_midiout) {
+        midi_Output *m_midiout
+    ) : context(context), navigator(navigator), m_midiout(m_midiout) {
         readButton = new CSurf_ColorButton(ButtonColorGreen, BTN_READ, BTN_VALUE_OFF, m_midiout);
         writeButton = new CSurf_ColorButton(ButtonColorRed, BTN_WRITE, BTN_VALUE_OFF, m_midiout);
         touchButton = new CSurf_ColorButton(ButtonColorYellow, BTN_TOUCH, BTN_VALUE_OFF, m_midiout);
-    };
+    }
 
     ~CSurf_FP_V2_AutomationManager() {
-    };
+    }
 
     void Update() {
         MediaTrack *media_track = navigator->GetControllerTrack();
-        channelAutomationMode = ::GetTrackAutomationMode(media_track);
+        channelAutomationMode = GetTrackAutomationMode(media_track);
 
         SetButtonColors();
         SetButtonValue(media_track == nullptr);
-    };
+    }
 
-    void HandleTouchButton(int value) {
+    void HandleTouchButton(const int value) const {
         if (value == 0) {
             return;
         }
@@ -118,9 +119,9 @@ public:
             return;
         }
         SetTrackAutomationMode(media_track, AUTOMATION_TOUCH);
-    };
+    }
 
-    void HandleWriteButton(int value) {
+    void HandleWriteButton(const int value) const {
         if (value == 0) {
             return;
         }
@@ -132,9 +133,9 @@ public:
             return;
         }
         SetTrackAutomationMode(media_track, AUTOMATION_WRITE);
-    };
+    }
 
-    void HandleReadButton(int value) {
+    void HandleReadButton(const int value) const {
         if (value == 0) {
             return;
         }
@@ -142,16 +143,16 @@ public:
         MediaTrack *media_track = navigator->GetControllerTrack();
 
         if (context->GetShiftLeft()) {
-            if (::GetTrackAutomationMode(media_track) == AUTOMATION_PREVIEW && settings->
+            if (GetTrackAutomationMode(media_track) == AUTOMATION_PREVIEW && settings->
                 GetLatchPreviewActionEnabled()) {
-                ::Main_OnCommandAsyncEx(settings->GetLatchPreviewActionCode(), 0, 0);
+                Main_OnCommandAsyncEx(settings->GetLatchPreviewActionCode(), 0, nullptr);
             } else {
                 SetTrackAutomationMode(media_track, AUTOMATION_PREVIEW);
             }
             return;
         }
         SetTrackAutomationMode(media_track, AUTOMATION_READ);
-    };
+    }
 };
 
 #endif

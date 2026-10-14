@@ -359,7 +359,7 @@ public:
                 ReaSonusPageTitle(
                     m_ctx,
                     assets,
-                    i18n->t("settings", "global-group.label"),
+                    i18n->t("settings", "controller-group.label"),
                     true
                 );
 
