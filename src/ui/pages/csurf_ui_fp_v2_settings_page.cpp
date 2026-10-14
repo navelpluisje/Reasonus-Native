@@ -28,6 +28,20 @@ class CSurf_FP_V2_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-i
     bool setting_latch_preview_action_enable;
     int setting_latch_preview_action;
 
+    // Automation
+    bool setting_use_automation_colors;
+    std::array<int, 7> setting_automation_colors;
+    std::vector<std::string> setting_automation_trim_labels = {
+        "Latch",
+        "Trim",
+        "Off",
+        "Touch",
+        "Write",
+        "Read",
+        "Single",
+    };
+    int prev_automation_trim_color;
+
     std::vector<int> settings_plugin_color_palette;
     std::vector<int> settings_initial_plugin_color_palette;
 
@@ -94,74 +108,76 @@ public:
 
             if (ImGui::BeginChild(m_ctx, "settings-automation-left", width / 2 - 8, 0.0, ImGui::ChildFlags_None)) {
                 UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
-                // if (ImGui::BeginChild(
-                //     m_ctx,
-                //     "automation-color-settings",
-                //     0.0,
-                //     0.0,
-                //     ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
-                // )) {
-                //     ReaSonusPageTitle(
-                //         m_ctx,
-                //         assets,
-                //         i18n->t("settings", "automation-color-group.label"),
-                //         true
-                //     );
-                //
-                //     RenderInfoCheckbox(
-                //         m_ctx,
-                //         assets,
-                //         i18n->t("settings", "use-automation-color.label"),
-                //         &setting_use_automation_colors,
-                //         i18n->t("settings", "use-automation-color.tooltip"));
-                //
-                //     ImGui::BeginDisabled(m_ctx, !setting_use_automation_colors);
-                //     ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + 26);
-                //     ImGui::BeginGroup(m_ctx);
-                //     for (int i = 0; i < 6; i++) {
-                //         ImGui::BeginGroup(m_ctx);
-                //         ReaSonusColorPicker(
-                //             m_ctx,
-                //             assets,
-                //             setting_automation_trim_labels[i],
-                //             &setting_automation_colors[i],
-                //             prev_automation_trim_color,
-                //             plugin_color_palette,
-                //             50,
-                //             32
-                //         );
-                //         ImGui::CalcTextSize(m_ctx, setting_automation_trim_labels[i].c_str(), &width, &height);
-                //         ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + (50 - width) / 2);
-                //         ImGui::Text(m_ctx, setting_automation_trim_labels[i].c_str());
-                //         ImGui::EndGroup(m_ctx);
-                //
-                //         if ((i + 1) % 6 != 0) {
-                //             ImGui::SameLine(m_ctx);
-                //         }
-                //     }
-                //     ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + 58);
-                //     ImGui::BeginGroup(m_ctx);
-                //     ReaSonusColorPicker(
-                //         m_ctx,
-                //         assets,
-                //         setting_automation_trim_labels[6],
-                //         &setting_automation_colors[6],
-                //         prev_automation_trim_color,
-                //         plugin_color_palette,
-                //         50,
-                //         32
-                //     );
-                //     ImGui::CalcTextSize(m_ctx, setting_automation_trim_labels[6].c_str(), &width, &height);
-                //     ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + (50 - width) / 2);
-                //     ImGui::Text(m_ctx, setting_automation_trim_labels[6].c_str());
-                //     ImGui::EndGroup(m_ctx);
-                //
-                //     ImGui::EndGroup(m_ctx);
-                //
-                //     ImGui::EndDisabled(m_ctx);
-                //
-                //     ImGui::EndChild(m_ctx);
-                // }
+                if (ImGui::BeginChild(
+                    m_ctx,
+                    "automation-color-settings",
+                    0.0,
+                    0.0,
+                    ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
+                )) {
+                    ReaSonusPageTitle(
+                        m_ctx,
+                        assets,
+                        i18n->t("settings", "automation-color-group.label"),
+                        true
+                    );
+
+                    RenderInfoCheckbox(
+                        m_ctx,
+                        assets,
+                        i18n->t("settings", "use-automation-color.label"),
+                        &setting_use_automation_colors,
+                        i18n->t("settings", "use-automation-color.tooltip")
+                    );
+
+                    ImGui::BeginDisabled(m_ctx, !setting_use_automation_colors);
+                    ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + 26);
+
+                    ImGui::BeginGroup(m_ctx);
+                    for (int i = 0; i < 6; i++) {
+                        ImGui::BeginGroup(m_ctx);
+                        ReaSonusColorPicker(
+                            m_ctx,
+                            assets,
+                            setting_automation_trim_labels[i],
+                            &setting_automation_colors[i],
+                            prev_automation_trim_color,
+                            plugin_color_palette,
+                            48,
+                            32
+                        );
+                        ImGui::CalcTextSize(m_ctx, setting_automation_trim_labels[i].c_str(), &width, &height);
+                        ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + (50 - width) / 2);
+                        ImGui::Text(m_ctx, setting_automation_trim_labels[i].c_str());
+                        ImGui::EndGroup(m_ctx);
+
+                        if ((i + 1) % 6 != 0) {
+                            ImGui::SameLine(m_ctx);
+                        }
+                    }
+                    ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + 58);
+                    ImGui::BeginGroup(m_ctx);
+                    ReaSonusColorPicker(
+                        m_ctx,
+                        assets,
+                        setting_automation_trim_labels[6],
+                        &setting_automation_colors[6],
+                        prev_automation_trim_color,
+                        plugin_color_palette,
+                        50,
+                        32
+                    );
+                    ImGui::CalcTextSize(m_ctx, setting_automation_trim_labels[6].c_str(), &width, &height);
+                    ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + (50 - width) / 2);
+                    ImGui::Text(m_ctx, setting_automation_trim_labels[6].c_str());
+                    ImGui::EndGroup(m_ctx);
+
+                    ImGui::EndGroup(m_ctx);
+
+                    ImGui::EndDisabled(m_ctx);
+
+                    ImGui::EndChild(m_ctx);
+                }
 
                 if (ImGui::BeginChild(
                     m_ctx,
@@ -481,6 +497,8 @@ public:
         settings->SetSetting("surface", "latch-preview-action-code",
                              latch_preview_action_indexes[setting_latch_preview_action]);
         settings->SetSetting("surface", "reasonus-color-palette", join(settings_plugin_color_palette, ","));
+        settings->SetSetting("surface", "use-automation-colors", setting_use_automation_colors);
+        settings->SetSetting("surface", "automation-colors", join(setting_automation_colors, ","));
 
         if (settings->StoreSettings()) {
             DAW::SetExtState(EXT_STATE_KEY_SAVED_SETTINGS, EXT_STATE_VALUE_TRUE, false);
@@ -503,6 +521,8 @@ public:
         setting_latch_preview_action_enable = settings->GetLatchPreviewActionEnabled();
         settings_initial_plugin_color_palette = settings->GetPluginColorPalette();
         settings_plugin_color_palette = settings->GetPluginColorPalette();
+        setting_use_automation_colors = settings->UseAutomationColors();
+        setting_automation_colors = settings->GetAutomationColorsArray();
 
         auto iterator = std::find(
             latch_preview_action_indexes.begin(),

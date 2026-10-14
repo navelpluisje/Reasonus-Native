@@ -69,6 +69,8 @@ class ReaSonusSettings {
             "surface", "reasonus-color-palette",
             join(palette_colors_theme, ",") + "," + join(palette_colors_default, ",")
         },
+        {"surface", "use-automation-colors", "0"},
+        {"surface", "automation-colors", join(automation_colors, ",")},
 
         {"functions", "1", "0"},
         {"functions", "2", "0"},
@@ -120,8 +122,6 @@ class ReaSonusSettings {
         {"surface", "plugin-map-default-color-mode", "1"},
         {"surface", "instant-multi-select-filter", "0"},
         {"surface", "mute-master-on-fwd-rwd", "0"},
-        {"surface", "use-automation-colors", "0"},
-        {"surface", "automation-colors", join(automation_colors, ",")},
         {"surface", "use-automation-point-touch", "0"},
         {"surface", "overwrite-automation-point-shape", "0"},
         {"surface", "automation-point-shape", "0"},
