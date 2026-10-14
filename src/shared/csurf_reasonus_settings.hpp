@@ -65,14 +65,21 @@ class ReaSonusSettings {
         {"surface", "mute-solo-momentary", "0"},
         {"surface", "latch-preview-action", "0"},
         {"surface", "latch-preview-action-code", "42013"},
+        {
+            "surface", "reasonus-color-palette",
+            join(palette_colors_theme, ",") + "," + join(palette_colors_default, ",")
+        },
+
         {"functions", "1", "0"},
         {"functions", "2", "0"},
         {"functions", "3", "0"},
         {"functions", "4", "0"},
+
         {"transport", "1", "0"},
         {"transport", "2", "0"},
         {"transport", "3", "0"},
         {"transport", "4", "0"},
+
         {"footswitch", "1", "0"},
         {"footswitch", "2", "0"},
         {"footswitch", "3", "0"},
@@ -111,10 +118,6 @@ class ReaSonusSettings {
         {"surface", "plugin-has-input-control", "0"},
         {"surface", "plugin-map-param-clear", "0"},
         {"surface", "plugin-map-default-color-mode", "1"},
-        {
-            "surface", "reasonus-color-palette",
-            join(palette_colors_theme, ",") + "," + join(palette_colors_default, ",")
-        },
         {"surface", "instant-multi-select-filter", "0"},
         {"surface", "mute-master-on-fwd-rwd", "0"},
         {"surface", "use-automation-colors", "0"},
