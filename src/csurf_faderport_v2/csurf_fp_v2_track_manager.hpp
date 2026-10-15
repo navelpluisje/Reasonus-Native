@@ -3,9 +3,9 @@
 
 #include "csurf_fp_v2_navigator.hpp"
 #include "csurf_fp_v2_track.hpp"
+#include "../shared/csurf_single_point_automation_item.hpp"
 
-class CSurf_FP_V2_TrackManager
-{
+class CSurf_FP_V2_TrackManager {
     CSurf_FP_V2_Navigator *navigator;
     CSurf_Context *context;
     midi_Output *m_midiout;
@@ -21,9 +21,22 @@ class CSurf_FP_V2_TrackManager
 
     bool forceUpdate = false;
 
-protected:
+    std::vector<SinglePointAutomationItem *> single_point_automation = {nullptr};
 
+protected:
     void GetFaderValue(MediaTrack *media_track, int *faderValue) const;
+
+    bool HasSinglePointAutomation(MediaTrack *media_track, int value) const;
+
+    void HandleSinglePointAutomation(
+        MediaTrack *media_track,
+        int value,
+        const std::string &chunk_name,
+        double point_value,
+        SinglePointAutomationType spa_type,
+        int item_index = -1,
+        int sub_item_index = -1
+    );
 
 public:
     CSurf_FP_V2_TrackManager(
@@ -31,8 +44,7 @@ public:
         CSurf_FP_V2_Navigator *navigator,
         midi_Output *m_midiout);
 
-    ~CSurf_FP_V2_TrackManager()
-    {
+    ~CSurf_FP_V2_TrackManager() {
         delete navigator;
         delete context;
         delete m_midiout;
@@ -50,9 +62,7 @@ public:
 
     void HandleBypassClick(int index, int value) const;
 
-    static void HandleFaderTouch(const int value) {
-        (void)value;
-    }
+    void HandleFaderTouch(int value);
 
     void HandleFaderMove(int msb, int lsb) const;
 };

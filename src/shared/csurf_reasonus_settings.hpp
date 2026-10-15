@@ -72,6 +72,12 @@ class ReaSonusSettings {
         {"surface", "use-automation-colors", "0"},
         {"surface", "automation-colors", join(automation_colors, ",")},
 
+        {"surface", "use-automation-point-touch", "0"},
+        {"surface", "overwrite-automation-point-shape", "0"},
+        {"surface", "automation-point-shape", "0"},
+        {"surface", "automation-single-bezier-tension", "0"},
+        {"surface", "automation-single-button-blink", "1"},
+
         {"functions", "1", "0"},
         {"functions", "2", "0"},
         {"functions", "3", "0"},
@@ -122,11 +128,6 @@ class ReaSonusSettings {
         {"surface", "plugin-map-default-color-mode", "1"},
         {"surface", "instant-multi-select-filter", "0"},
         {"surface", "mute-master-on-fwd-rwd", "0"},
-        {"surface", "use-automation-point-touch", "0"},
-        {"surface", "overwrite-automation-point-shape", "0"},
-        {"surface", "automation-point-shape", "0"},
-        {"surface", "automation-single-bezier-tension", "0"},
-        {"surface", "automation-single-button-blink", "1"},
 
         {"displays", "track", "8"},
         {"displays", "track-lines", "0,4,1,2"},

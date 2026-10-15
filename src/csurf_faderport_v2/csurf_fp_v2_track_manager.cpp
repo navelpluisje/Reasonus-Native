@@ -1,7 +1,73 @@
 #include "csurf_fp_v2_track_manager.hpp"
+#include <fmt/format.h>
 #include "../shared/csurf_daw.hpp"
 
 constexpr int MOMENTARY_TIMEOUT = 500;
+
+bool CSurf_FP_V2_TrackManager::HasSinglePointAutomation(
+    MediaTrack *media_track,
+    const int value
+) const {
+    return GetTrackAutomationMode(media_track) == AUTOMATION_TRIM
+           && context->IsSinglePointAutomationEnabled()
+           && (value != 0 || single_point_automation.at(0) != nullptr);
+}
+
+void CSurf_FP_V2_TrackManager::HandleSinglePointAutomation(
+    MediaTrack *media_track,
+    const int value,
+    const std::string &chunk_name,
+    const double point_value,
+    const SinglePointAutomationType spa_type,
+    const int item_index,
+    const int sub_item_index
+) {
+    if (single_point_automation.at(0) == nullptr && value > 0) {
+        switch (spa_type) {
+            case SPA_Plugin: {
+                single_point_automation.at(0) = new SinglePointAutomationItem(
+                    media_track,
+                    chunk_name,
+                    point_value,
+                    spa_type,
+                    item_index,
+                    sub_item_index
+                );
+                break;
+            }
+
+            case SPA_Send: {
+                single_point_automation.at(0) = new SinglePointAutomationItem(
+                    media_track,
+                    chunk_name,
+                    point_value,
+                    spa_type,
+                    item_index
+                );
+                break;
+            }
+
+            default:
+                single_point_automation.at(0) = new SinglePointAutomationItem(
+                    media_track,
+                    chunk_name,
+                    point_value,
+                    spa_type
+                );
+        }
+    }
+
+    if (single_point_automation.at(0) != nullptr && value > 0) {
+        single_point_automation.at(0)->InsertStartPoint(point_value);
+        return;
+    }
+
+    if (single_point_automation.at(0) != nullptr) {
+        single_point_automation.at(0)->InsertEndPoint(point_value, chunk_name);
+    }
+
+    single_point_automation.at(0) = nullptr;
+}
 
 void CSurf_FP_V2_TrackManager::GetFaderValue(MediaTrack *media_track, int *faderValue) const {
     double volume = 0.0;
@@ -195,6 +261,61 @@ void CSurf_FP_V2_TrackManager::HandleBypassClick(int index, const int value) con
     context->GetShiftLeft()
         ? Main_OnCommandAsyncEx(40344, 0, nullptr) // Track: Toggle FX bypass on all tracks
         : DAW::ToggleTrackFxBypass(media_track);   // Track: Toggle FX bypass for selected tracks
+}
+
+void CSurf_FP_V2_TrackManager::HandleFaderTouch(const int value) {
+    if (!context->GetLastTouchedFxMode()) {
+        return;
+    }
+
+    int track_number = -1;
+    int plugin_index = -1;
+    int plugin_param_index = -1;
+
+    if (!GetLastTouchedFX(&track_number, &plugin_index, &plugin_param_index)) {
+        return;
+    }
+
+    MediaTrack *media_track = GetTrack(nullptr, track_number - 1);
+    if (media_track == nullptr) {
+        return;
+    }
+
+    /**
+     * Check if we have the proper conditions to continue with Single point automation
+     * All pan related values (except for width) are displayed reversed.
+     * Therefore some fo the values are inverted as well, to make it mork as it should
+     */
+    if (HasSinglePointAutomation(media_track, value)) {
+        double parameter_value = 0.0;
+        double dummy;
+
+        // Get the value to write for the automation
+        if (value > 0) {
+            // We need to set it to read first to get the actual volume of the envelope
+            SetTrackAutomationMode(media_track, AUTOMATION_READ);
+            parameter_value = TrackFX_GetParam(media_track, track_number, plugin_param_index, &dummy, &dummy);
+            SetTrackAutomationMode(media_track, AUTOMATION_TRIM);
+        } else {
+            parameter_value = TrackFX_GetParam(media_track, track_number, plugin_param_index, &dummy, &dummy);
+        }
+
+        HandleSinglePointAutomation(
+            media_track,
+            value,
+            fmt::format("{}_{}_{}", 0, track_number, plugin_param_index),
+            parameter_value,
+            SPA_Plugin,
+            track_number,
+            plugin_param_index
+        );
+    } else {
+        if (value > 0 || media_track == nullptr) {
+            return;
+        }
+        // Tell REAPER we do not alter the automatiuon anymore
+        TrackFX_EndParamEdit(media_track, track_number, plugin_param_index);
+    }
 }
 
 void CSurf_FP_V2_TrackManager::HandleFaderMove(const int msb, const int lsb) const {
