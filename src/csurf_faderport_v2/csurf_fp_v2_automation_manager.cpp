@@ -129,7 +129,15 @@ public:
         MediaTrack *media_track = navigator->GetControllerTrack();
 
         if (context->GetShiftLeft()) {
-            SetTrackAutomationMode(media_track, AUTOMATION_TRIM);
+            if (
+                GetTrackAutomationMode(media_track) == AUTOMATION_TRIM
+                && !context->IsSinglePointAutomationEnabled()
+            ) {
+                context->SetSinglePointAutomation(true);
+            } else {
+                context->SetSinglePointAutomation(false);
+                SetTrackAutomationMode(media_track, AUTOMATION_TRIM);
+            }
             return;
         }
         SetTrackAutomationMode(media_track, AUTOMATION_WRITE);

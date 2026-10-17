@@ -36,17 +36,6 @@ void CSurf_FP_V2_TrackManager::HandleSinglePointAutomation(
                 break;
             }
 
-            case SPA_Send: {
-                single_point_automation.at(0) = new SinglePointAutomationItem(
-                    media_track,
-                    chunk_name,
-                    point_value,
-                    spa_type,
-                    item_index
-                );
-                break;
-            }
-
             default:
                 single_point_automation.at(0) = new SinglePointAutomationItem(
                     media_track,
@@ -97,55 +86,53 @@ CSurf_FP_V2_TrackManager::CSurf_FP_V2_TrackManager(
 void CSurf_FP_V2_TrackManager::UpdateTrack() {
     MediaTrack *media_track = navigator->GetControllerTrack();
 
-    int faderValue = 0;
+    int fader_value = 0;
 
     if (media_track == nullptr || CountTracks(nullptr) < 1) {
         ClearTrack();
-        forceUpdate = false;
+        force_update = false;
         return;
     }
 
     const bool isArmed = DAW::IsTrackArmed(media_track);
 
-    GetFaderValue(media_track, &faderValue);
+    GetFaderValue(media_track, &fader_value);
 
     if (context->GetShiftLeft()) {
-        track->SetMuteButtonValue(navigator->HasTracksWithMute() ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
-        track->SetSoloButtonValue(navigator->HasTracksWithSolo() ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
+        track->SetMuteButtonValue(navigator->HasTracksWithMute() ? BTN_VALUE_ON : BTN_VALUE_OFF, force_update);
+        track->SetSoloButtonValue(navigator->HasTracksWithSolo() ? BTN_VALUE_ON : BTN_VALUE_OFF, force_update);
     } else {
-        track->SetMuteButtonValue(DAW::IsTrackMuted(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
-        track->SetSoloButtonValue(DAW::IsTrackSoloed(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, forceUpdate);
+        track->SetMuteButtonValue(DAW::IsTrackMuted(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, force_update);
+        track->SetSoloButtonValue(DAW::IsTrackSoloed(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, force_update);
     }
 
-    track->SetArmButtonValue(
-        navigator->HasAllArmedTracks()
-            ? BTN_VALUE_BLINK
-            : isArmed // NOLINT(*-avoid-nested-conditional-operator)
-                  ? BTN_VALUE_ON
-                  : BTN_VALUE_OFF,
-        forceUpdate
-    );
+    track->SetArmButtonValue(navigator->HasAllArmedTracks()
+                                 ? BTN_VALUE_BLINK
+                                 : isArmed // NOLINT(*-avoid-nested-conditional-operator)
+                                       ? BTN_VALUE_ON
+                                       : BTN_VALUE_OFF,
+                             force_update);
     track->SetBypassButtonValue(DAW::GetTrackFxBypassed(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF);
 
     if (context->GetLastTouchedFxMode()) {
-        double paramValue = 0.0;
-        int trackNumber = -1;
-        int fxNumber = -1;
-        int paramNumber = -1;
+        double param_value = 0.0;
+        int track_number = -1;
+        int plugin_index = -1;
+        int param_index = -1;
 
-        GetLastTouchedFX(&trackNumber, &fxNumber, &paramNumber);
-        if (MediaTrack *_media_track = GetTrack(nullptr, trackNumber - 1)) {
-            paramValue = TrackFX_GetParamNormalized(_media_track, fxNumber, paramNumber);
-            track->SetFaderValue(static_cast<int>(paramValue * 16383.0), forceUpdate);
+        GetLastTouchedFX(&track_number, &plugin_index, &param_index);
+        if (MediaTrack *_media_track = GetTrack(nullptr, track_number - 1)) {
+            param_value = TrackFX_GetParamNormalized(_media_track, plugin_index, param_index);
+            track->SetFaderValue(static_cast<int>(param_value * 16383.0), force_update);
         }
     } else {
         if (!context->GetFaderDisabled() || !settings->GetCanDisableFader()) {
-            track->SetFaderValue(faderValue, forceUpdate);
+            track->SetFaderValue(fader_value, force_update);
         }
     }
 
     hasLastTouchedFxEnabled = context->GetLastTouchedFxMode();
-    forceUpdate = false;
+    force_update = false;
 }
 
 void CSurf_FP_V2_TrackManager::ClearTrack() const {
@@ -153,7 +140,7 @@ void CSurf_FP_V2_TrackManager::ClearTrack() const {
     track->SetSoloButtonValue(BTN_VALUE_OFF);
     track->SetArmButtonValue(BTN_VALUE_OFF);
 
-    track->SetFaderValue(0, forceUpdate);
+    track->SetFaderValue(0, force_update);
 }
 
 // ReSharper disable once CppParameterMayBeConst
@@ -263,6 +250,24 @@ void CSurf_FP_V2_TrackManager::HandleBypassClick(int index, const int value) con
         : DAW::ToggleTrackFxBypass(media_track);   // Track: Toggle FX bypass for selected tracks
 }
 
+// void CSurf_FP_V2_TrackManager::HandleFaderTouch(const int value) const {
+//     if (value > 0) {
+//         return;
+//     }
+//     if (context->GetLastTouchedFxMode()) {
+//         int track_number = -1;
+//         int plugin_index = -1;
+//         int param_index = -1;
+//
+//         // Tell REAPER we do not alter the automatiuon anymore
+//         if (GetLastTouchedFX(&track_number, &plugin_index, &param_index)) {
+//             if (MediaTrack *media_track = GetTrack(nullptr, track_number - 1)) {
+//                 TrackFX_EndParamEdit(media_track, plugin_index, param_index);
+//             }
+//         }
+//     }
+// }
+//
 void CSurf_FP_V2_TrackManager::HandleFaderTouch(const int value) {
     if (!context->GetLastTouchedFxMode()) {
         return;
@@ -320,13 +325,13 @@ void CSurf_FP_V2_TrackManager::HandleFaderTouch(const int value) {
 
 void CSurf_FP_V2_TrackManager::HandleFaderMove(const int msb, const int lsb) const {
     if (context->GetLastTouchedFxMode()) {
-        int trackNumber = -1;
-        int fxNumber = -1;
-        int paramNumber = -1;
+        int track_number = -1;
+        int plugin_index = -1;
+        int param_index = -1;
 
-        if (GetLastTouchedFX(&trackNumber, &fxNumber, &paramNumber)) {
-            if (MediaTrack *media_track = GetTrack(nullptr, trackNumber - 1)) {
-                TrackFX_SetParamNormalized(media_track, fxNumber, paramNumber, int14ToNormalized(msb, lsb));
+        if (GetLastTouchedFX(&track_number, &plugin_index, &param_index)) {
+            if (MediaTrack *media_track = GetTrack(nullptr, track_number - 1)) {
+                TrackFX_SetParamNormalized(media_track, plugin_index, param_index, int14ToNormalized(msb, lsb));
             }
         }
         return;

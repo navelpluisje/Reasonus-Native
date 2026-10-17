@@ -19,7 +19,7 @@ class CSurf_FP_V2_TrackManager {
 
     ButtonColor color;
 
-    bool forceUpdate = false;
+    bool force_update = false;
 
     std::vector<SinglePointAutomationItem *> single_point_automation = {nullptr};
 

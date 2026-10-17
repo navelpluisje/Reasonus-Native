@@ -168,7 +168,7 @@ public:
                             setting_automation_trim_labels[i],
                             &setting_automation_colors[i],
                             prev_automation_trim_color,
-                            plugin_color_palette,
+                            settings_plugin_color_palette,
                             48,
                             32
                         );
@@ -181,7 +181,7 @@ public:
                             ImGui::SameLine(m_ctx);
                         }
                     }
-                    ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + 58);
+                    ImGui::SetCursorPosX(m_ctx, ImGui::GetCursorPosX(m_ctx) + 56);
                     ImGui::BeginGroup(m_ctx);
                     ReaSonusColorPicker(
                         m_ctx,
@@ -189,8 +189,8 @@ public:
                         setting_automation_trim_labels[6],
                         &setting_automation_colors[6],
                         prev_automation_trim_color,
-                        plugin_color_palette,
-                        50,
+                        settings_plugin_color_palette,
+                        48,
                         32
                     );
                     ImGui::CalcTextSize(m_ctx, setting_automation_trim_labels[6].c_str(), &width, &height);
@@ -445,7 +445,7 @@ public:
                     ReaSonusTooltip(
                         m_ctx,
                         assets,
-                        i18n->t("settings", "color-palette.tooltip"),
+                        i18n->t("settings", "color-palette-v2.tooltip"),
                         "color-picker-tooltip",
                         0,
                         -3
