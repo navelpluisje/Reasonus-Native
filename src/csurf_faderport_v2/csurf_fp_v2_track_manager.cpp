@@ -10,7 +10,7 @@ bool CSurf_FP_V2_TrackManager::HasSinglePointAutomation(
 ) const {
     return GetTrackAutomationMode(media_track) == AUTOMATION_TRIM
            && context->IsSinglePointAutomationEnabled()
-           && (value != 0 || single_point_automation.at(0) != nullptr);
+           && (value != 0 || single_point_automation != nullptr);
 }
 
 void CSurf_FP_V2_TrackManager::HandleSinglePointAutomation(
@@ -22,10 +22,10 @@ void CSurf_FP_V2_TrackManager::HandleSinglePointAutomation(
     const int item_index,
     const int sub_item_index
 ) {
-    if (single_point_automation.at(0) == nullptr && value > 0) {
+    if (single_point_automation == nullptr && value > 0) {
         switch (spa_type) {
             case SPA_Plugin: {
-                single_point_automation.at(0) = new SinglePointAutomationItem(
+                single_point_automation = new SinglePointAutomationItem(
                     media_track,
                     chunk_name,
                     point_value,
@@ -37,7 +37,7 @@ void CSurf_FP_V2_TrackManager::HandleSinglePointAutomation(
             }
 
             default:
-                single_point_automation.at(0) = new SinglePointAutomationItem(
+                single_point_automation = new SinglePointAutomationItem(
                     media_track,
                     chunk_name,
                     point_value,
@@ -46,16 +46,16 @@ void CSurf_FP_V2_TrackManager::HandleSinglePointAutomation(
         }
     }
 
-    if (single_point_automation.at(0) != nullptr && value > 0) {
-        single_point_automation.at(0)->InsertStartPoint(point_value);
+    if (single_point_automation != nullptr && value > 0) {
+        single_point_automation->InsertStartPoint(point_value);
         return;
     }
 
-    if (single_point_automation.at(0) != nullptr) {
-        single_point_automation.at(0)->InsertEndPoint(point_value, chunk_name);
+    if (single_point_automation != nullptr) {
+        single_point_automation->InsertEndPoint(point_value, chunk_name);
     }
 
-    single_point_automation.at(0) = nullptr;
+    single_point_automation = nullptr;
 }
 
 void CSurf_FP_V2_TrackManager::GetFaderValue(MediaTrack *media_track, int *faderValue) const {
@@ -299,19 +299,19 @@ void CSurf_FP_V2_TrackManager::HandleFaderTouch(const int value) {
         if (value > 0) {
             // We need to set it to read first to get the actual volume of the envelope
             SetTrackAutomationMode(media_track, AUTOMATION_READ);
-            parameter_value = TrackFX_GetParam(media_track, track_number, plugin_param_index, &dummy, &dummy);
+            parameter_value = TrackFX_GetParam(media_track, plugin_index, plugin_param_index, &dummy, &dummy);
             SetTrackAutomationMode(media_track, AUTOMATION_TRIM);
         } else {
-            parameter_value = TrackFX_GetParam(media_track, track_number, plugin_param_index, &dummy, &dummy);
+            parameter_value = TrackFX_GetParam(media_track, plugin_index, plugin_param_index, &dummy, &dummy);
         }
 
         HandleSinglePointAutomation(
             media_track,
             value,
-            fmt::format("{}_{}_{}", 0, track_number, plugin_param_index),
+            fmt::format("{}_{}_{}", 0, plugin_index, plugin_param_index),
             parameter_value,
             SPA_Plugin,
-            track_number,
+            plugin_index,
             plugin_param_index
         );
     } else {

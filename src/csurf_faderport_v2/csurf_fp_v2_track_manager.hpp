@@ -21,7 +21,7 @@ class CSurf_FP_V2_TrackManager {
 
     bool force_update = false;
 
-    std::vector<SinglePointAutomationItem *> single_point_automation = {nullptr};
+    SinglePointAutomationItem *single_point_automation = nullptr;
 
 protected:
     void GetFaderValue(MediaTrack *media_track, int *faderValue) const;
