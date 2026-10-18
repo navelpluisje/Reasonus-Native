@@ -1,15 +1,19 @@
 #include "csurf_fp_v2_track_manager.hpp"
 #include <fmt/format.h>
+
+#include "db2val.h"
 #include "../shared/csurf_daw.hpp"
 
 constexpr int MOMENTARY_TIMEOUT = 500;
 
 bool CSurf_FP_V2_TrackManager::HasSinglePointAutomation(
     MediaTrack *media_track,
-    const int value
+    const int value,
+    const bool last_touched_param
 ) const {
-    return GetTrackAutomationMode(media_track) == AUTOMATION_TRIM
-           && context->IsSinglePointAutomationEnabled()
+    return (last_touched_param || GetTrackAutomationMode(media_track) == AUTOMATION_TRIM)
+           && settings->UseAutomationSinglePoint()
+           && (last_touched_param || context->IsSinglePointAutomationEnabled())
            && (value != 0 || single_point_automation != nullptr);
 }
 
@@ -56,6 +60,92 @@ void CSurf_FP_V2_TrackManager::HandleSinglePointAutomation(
     }
 
     single_point_automation = nullptr;
+}
+
+void CSurf_FP_V2_TrackManager::HandleTrackFaderTouch(const int value) {
+    MediaTrack *media_track = navigator->GetControllerTrack();
+
+    if (GetTrackAutomationMode(media_track) == AUTOMATION_TOUCH) {
+        touch_start = value > 0 ? 1 : 0;
+        if (touch_start > 0) {
+            DAW::SetTrackVolume(media_track, DAW::GetTrackVolume(media_track));
+        }
+    }
+
+    /**
+     * Check if we have the proper conditions to continue with Single point automation
+     */
+    if (HasSinglePointAutomation(media_track, value, false)) {
+        // Get the value to write for the automation
+        double volume;
+        // The slider max value in the REAPER settings has effect on the value to get and write for the automation
+        // That's why we need the decibel offset and use it to determine the actual value to write to the automation.
+        const double fader_offset = 12 - DAW::GetSliderMaxVolume();
+
+        if (value > 0) {
+            // We need to set it to read first to get the actual volume of the envelope
+            SetTrackAutomationMode(media_track, AUTOMATION_READ);
+            volume = DB2SLIDER(VAL2DB(DAW::GetTrackVolume(media_track)) - fader_offset);
+            SetTrackAutomationMode(media_track, AUTOMATION_TRIM);
+        } else {
+            volume = DB2SLIDER(VAL2DB(DAW::GetTrackVolume(media_track)) - fader_offset);
+        }
+
+        HandleSinglePointAutomation(media_track, value, "<VOLENV2", volume, SPA_Track);
+    }
+}
+
+void CSurf_FP_V2_TrackManager::HandleLastTouchedFaderTouch(const int value) {
+    int track_number = -1;
+    int plugin_index = -1;
+    int plugin_param_index = -1;
+
+    if (!GetLastTouchedFX(&track_number, &plugin_index, &plugin_param_index)) {
+        return;
+    }
+
+    MediaTrack *media_track = GetTrack(nullptr, track_number - 1);
+    if (media_track == nullptr) {
+        return;
+    }
+
+    /**
+     * Check if we have the proper conditions to continue with Single point automation
+     * All pan related values (except for width) are displayed reversed.
+     * Therefore some fo the values are inverted as well, to make it mork as it should
+     */
+    if (HasSinglePointAutomation(media_track, value, true)) {
+        double parameter_value = 0.0;
+        double dummy;
+
+        // Get the value to write for the automation
+        if (value > 0) {
+            previous_automation_mode = GetTrackAutomationMode(media_track);
+            // We need to set it to read first to get the actual volume of the envelope
+            SetTrackAutomationMode(media_track, AUTOMATION_READ);
+            parameter_value = TrackFX_GetParam(media_track, plugin_index, plugin_param_index, &dummy, &dummy);
+            SetTrackAutomationMode(media_track, AUTOMATION_TRIM);
+        } else {
+            parameter_value = TrackFX_GetParam(media_track, plugin_index, plugin_param_index, &dummy, &dummy);
+            SetTrackAutomationMode(media_track, previous_automation_mode);
+        }
+
+        HandleSinglePointAutomation(
+            media_track,
+            value,
+            fmt::format("{}_{}_{}", 0, plugin_index, plugin_param_index),
+            parameter_value,
+            SPA_Plugin,
+            plugin_index,
+            plugin_param_index
+        );
+    } else {
+        if (value > 0 || media_track == nullptr) {
+            return;
+        }
+        // Tell REAPER we do not alter the automation anymore
+        TrackFX_EndParamEdit(media_track, track_number, plugin_param_index);
+    }
 }
 
 void CSurf_FP_V2_TrackManager::GetFaderValue(MediaTrack *media_track, int *faderValue) const {
@@ -250,77 +340,13 @@ void CSurf_FP_V2_TrackManager::HandleBypassClick(int index, const int value) con
         : DAW::ToggleTrackFxBypass(media_track);   // Track: Toggle FX bypass for selected tracks
 }
 
-// void CSurf_FP_V2_TrackManager::HandleFaderTouch(const int value) const {
-//     if (value > 0) {
-//         return;
-//     }
-//     if (context->GetLastTouchedFxMode()) {
-//         int track_number = -1;
-//         int plugin_index = -1;
-//         int param_index = -1;
-//
-//         // Tell REAPER we do not alter the automatiuon anymore
-//         if (GetLastTouchedFX(&track_number, &plugin_index, &param_index)) {
-//             if (MediaTrack *media_track = GetTrack(nullptr, track_number - 1)) {
-//                 TrackFX_EndParamEdit(media_track, plugin_index, param_index);
-//             }
-//         }
-//     }
-// }
-//
 void CSurf_FP_V2_TrackManager::HandleFaderTouch(const int value) {
-    if (!context->GetLastTouchedFxMode()) {
+    if (context->GetLastTouchedFxMode()) {
+        HandleLastTouchedFaderTouch(value);
         return;
     }
 
-    int track_number = -1;
-    int plugin_index = -1;
-    int plugin_param_index = -1;
-
-    if (!GetLastTouchedFX(&track_number, &plugin_index, &plugin_param_index)) {
-        return;
-    }
-
-    MediaTrack *media_track = GetTrack(nullptr, track_number - 1);
-    if (media_track == nullptr) {
-        return;
-    }
-
-    /**
-     * Check if we have the proper conditions to continue with Single point automation
-     * All pan related values (except for width) are displayed reversed.
-     * Therefore some fo the values are inverted as well, to make it mork as it should
-     */
-    if (HasSinglePointAutomation(media_track, value)) {
-        double parameter_value = 0.0;
-        double dummy;
-
-        // Get the value to write for the automation
-        if (value > 0) {
-            // We need to set it to read first to get the actual volume of the envelope
-            SetTrackAutomationMode(media_track, AUTOMATION_READ);
-            parameter_value = TrackFX_GetParam(media_track, plugin_index, plugin_param_index, &dummy, &dummy);
-            SetTrackAutomationMode(media_track, AUTOMATION_TRIM);
-        } else {
-            parameter_value = TrackFX_GetParam(media_track, plugin_index, plugin_param_index, &dummy, &dummy);
-        }
-
-        HandleSinglePointAutomation(
-            media_track,
-            value,
-            fmt::format("{}_{}_{}", 0, plugin_index, plugin_param_index),
-            parameter_value,
-            SPA_Plugin,
-            plugin_index,
-            plugin_param_index
-        );
-    } else {
-        if (value > 0 || media_track == nullptr) {
-            return;
-        }
-        // Tell REAPER we do not alter the automatiuon anymore
-        TrackFX_EndParamEdit(media_track, track_number, plugin_param_index);
-    }
+    HandleTrackFaderTouch(value);
 }
 
 void CSurf_FP_V2_TrackManager::HandleFaderMove(const int msb, const int lsb) const {

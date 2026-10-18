@@ -19,6 +19,8 @@ class CSurf_FP_V2_TrackManager {
 
     ButtonColor color;
 
+    bool touch_start = false;
+    int previous_automation_mode;
     bool force_update = false;
 
     SinglePointAutomationItem *single_point_automation = nullptr;
@@ -26,7 +28,7 @@ class CSurf_FP_V2_TrackManager {
 protected:
     void GetFaderValue(MediaTrack *media_track, int *faderValue) const;
 
-    bool HasSinglePointAutomation(MediaTrack *media_track, int value) const;
+    bool HasSinglePointAutomation(MediaTrack *media_track, int value, bool last_touched_param) const;
 
     void HandleSinglePointAutomation(
         MediaTrack *media_track,
@@ -37,6 +39,10 @@ protected:
         int item_index = -1,
         int sub_item_index = -1
     );
+
+    void HandleTrackFaderTouch(int value);
+
+    void HandleLastTouchedFaderTouch(int value);
 
 public:
     CSurf_FP_V2_TrackManager(
