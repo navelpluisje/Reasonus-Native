@@ -25,12 +25,20 @@ protected:
         return bypassed ? "Bypassed" : "Enabled";
     }
 
-    [[nodiscard]] int GetPluginIndex(const int index) const {
+    [[nodiscard]] int GetPluginIndex(MediaTrack *media_track, const int index) const {
+        const bool respect_slots = settings->SendsShouldRespectSlots();
         const bool control_input_plugins = settings->HasPluginInputControl() && context->GetArm();
 
-        return context->GetChannelManagerItemIndex(TrackPluginMode) + index + (
-                   control_input_plugins ? 0x1000000 : 0
-               );
+        const int nb_track_items = control_input_plugins
+                                       ? TrackFX_GetRecCount(media_track)
+                                       : DAW::GetTrackFxCount(media_track, respect_slots);
+
+        const int slot_index = context->GetChannelManagerItemIndex(TrackPluginMode, nb_track_items - 1);
+        const int plugin_index = respect_slots
+                                     ? DAW::GetTrackFxIndexBySlotIndex(media_track, slot_index + index)
+                                     : slot_index;
+
+        return plugin_index + (control_input_plugins ? 0x1000000 : 0);
     }
 
 public:
@@ -52,17 +60,20 @@ public:
 
         const WDL_PtrList<MediaTrack> media_tracks = navigator->GetBankTracks();
         MediaTrack *plugin_track = GetSelectedTrack(nullptr, 0);
-        if (plugin_track == nullptr
+
+        if (
+            plugin_track == nullptr
             && context->GetMasterFaderMode()
             && DAW::IsTrackSelected(GetMasterTrack(nullptr))
         ) {
             plugin_track = GetMasterTrack(nullptr);
         }
+
         context->SetChannelManagerItemsCount(TrackPluginMode, TrackFX_GetCount(plugin_track));
 
         for (int i = 0; i < context->GetNbChannels(); i++) {
             MediaTrack *media_track;
-            const int plugin_index = GetPluginIndex(i);
+            const int plugin_index = GetPluginIndex(plugin_track, i);
             const CSurf_FP_8_Track *faderport_channel = tracks.at(i);
 
             int fader_value = 0;
@@ -175,7 +186,7 @@ public:
             media_track = GetMasterTrack(nullptr);
         }
 
-        const int plugin_index = context->GetChannelManagerItemIndex(TrackPluginMode) + index;
+        const int plugin_index = GetPluginIndex(media_track, index);
 
         if (context->GetShiftChannelLeft()) {
             TrackFX_SetOffline(media_track, plugin_index, !DAW::GetTrackFxOffline(media_track, plugin_index));
@@ -197,7 +208,7 @@ public:
             media_track = GetMasterTrack(nullptr);
         }
 
-        const int plugin_index = GetPluginIndex(index);
+        const int plugin_index = GetPluginIndex(media_track, index);
 
         if (DAW::GetTrackFxPanelOpen(media_track, plugin_index)) {
             TrackFX_Show(media_track, plugin_index, 0);

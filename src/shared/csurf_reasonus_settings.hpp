@@ -124,6 +124,8 @@ class ReaSonusSettings {
         {"surface", "automation-point-shape", "0"},
         {"surface", "automation-single-bezier-tension", "0"},
         {"surface", "automation-single-button-blink", "1"},
+        {"surface", "start-with-track-send-mode", "0"},
+        {"surface", "start-with-track-plugin-mode", "0"},
 
         {"displays", "track", "8"},
         {"displays", "track-lines", "0,4,1,2"},
@@ -353,6 +355,10 @@ public:
     std::vector<int> GetPluginColorPalette();
 
     bool ShouldMuteMasterOnFwdRwd();
+
+    bool ShouldStartWithTrackSendMode();
+
+    bool ShouldStartWithTrackPluginMode();
 
     /**
      * Settings for the FaderPort 2
