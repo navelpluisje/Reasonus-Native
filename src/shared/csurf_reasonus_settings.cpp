@@ -278,6 +278,14 @@ bool ReaSonusSettings::ShouldMuteMasterOnFwdRwd() {
     return stoi(settings["surface"]["mute-master-on-fwd-rwd"]) > 0;
 }
 
+bool ReaSonusSettings::ShouldStartWithTrackSendMode() {
+    return stoi(settings["surface"]["start-with-track-send-mode"]) > 0;
+}
+
+bool ReaSonusSettings::ShouldStartWithTrackPluginMode() {
+    return stoi(settings["surface"]["start-with-track-plugin-mode"]) > 0;
+}
+
 bool ReaSonusSettings::UseAutomationColors() {
     return settings["surface"]["use-automation-colors"] == "1";
 }

@@ -40,13 +40,16 @@ protected:
         }
     }
 
-    int GetSendIndex(MediaTrack *media_track, const int slot_index, bool *is_hardware_out) const {
-        const int hardware_count = GetTrackNumSends(media_track, SEND_MODE_HARDWARE);
-        const int sends_count = GetTrackNumSends(media_track, SEND_MODE_SEND);
+    int GetSendIndex(MediaTrack *media_track, const int index, const bool add_hardware, bool *is_hardware_out) const {
+        const bool respect_slots = settings->SendsShouldRespectSlots();
+        const int nb_track_items = GetTrackNumSends(media_track, 0);
+        const int slot_index = context->GetChannelManagerItemIndex(TrackSendMode, nb_track_items - 1);
 
-        if (hardware_count + sends_count <= slot_index) {
-            return -1;
+        if (respect_slots) {
+            return DAW::GetTrackSendIndexBySlotIndex(media_track, slot_index + index, add_hardware, is_hardware_out);
         }
+
+        const int hardware_count = GetTrackNumSends(media_track, SEND_MODE_HARDWARE);
 
         if (slot_index < hardware_count) {
             *is_hardware_out = true;
@@ -150,7 +153,7 @@ public:
             const CSurf_FP_8_Track *faderport_channel = tracks.at(i);
             MediaTrack *media_track = media_tracks.Get(i);
 
-            const int send_index = GetSendIndex(sends_track, i, &is_hardware_out);
+            const int send_index = GetSendIndex(sends_track, i, false, &is_hardware_out);
             const bool add_send_enabled = context->GetAddSendReceiveMode() == i;
 
             if (add_send_enabled) {
@@ -291,7 +294,7 @@ public:
         if (context->GetShiftChannelRight()) {
             bool is_hardware_out;
             MediaTrack *selected_track = GetSelectedTrack(nullptr, 0);
-            const int send_index = GetSendIndex(selected_track, index, &is_hardware_out);
+            const int send_index = GetSendIndex(selected_track, index, false, &is_hardware_out);
 
             RemoveTrackSend(selected_track, is_hardware_out ? SEND_MODE_HARDWARE : SEND_MODE_SEND, send_index);
             return;
@@ -307,7 +310,7 @@ public:
 
         bool is_hardware_out;
         MediaTrack *send_track = GetSelectedTrack(nullptr, 0);
-        const int send_index = GetSendIndex(send_track, index, &is_hardware_out);
+        const int send_index = GetSendIndex(send_track, index, false, &is_hardware_out);
 
         if (context->GetShiftChannelLeft()) {
             DAW::SetNextTrackSendMode(send_track, send_index, is_hardware_out);
@@ -323,7 +326,7 @@ public:
 
         bool is_hardware_out;
         MediaTrack *send_track = GetSelectedTrack(nullptr, 0);
-        const int send_index = GetSendIndex(send_track, index, &is_hardware_out);
+        const int send_index = GetSendIndex(send_track, index, false, &is_hardware_out);
 
         if (context->GetShiftChannelLeft()) {
             DAW::ToggleTrackSendMono(send_track, send_index, is_hardware_out);
@@ -371,7 +374,7 @@ public:
     void HandleFaderMove(const int index, const int msb, const int lsb) override {
         bool is_hardware_out;
         MediaTrack *send_track = GetSelectedTrack(nullptr, 0);
-        const int send_index = GetSendIndex(send_track, index, &is_hardware_out);
+        const int send_index = GetSendIndex(send_track, index, false, &is_hardware_out);
 
         if (context->GetShiftChannelLeft()) {
             DAW::SetTrackSendPan(
