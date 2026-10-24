@@ -89,9 +89,10 @@ void ReaSonusTranslationEditor::GetLanguageList() {
 
     for (const auto &entry: std::filesystem::recursive_directory_iterator(path)) {
         if (entry.is_regular_file() && !entry.is_symlink()) {
-            std::filesystem::path path(entry.path());
-            if (path.has_extension() && path.extension() == ".ini") {
-                language_list.push_back((split(path.filename().u8string(), ".").at(0)));
+            std::filesystem::path file_path(entry.path());
+
+            if (file_path.has_extension() && file_path.extension() == ".ini") {
+                language_list.push_back((split(file_path.filename().u8string(), ".").at(0)));
             }
         }
     }
