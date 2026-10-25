@@ -2,7 +2,6 @@
 #define CSURF_TRANSPORT_MANAGER_C_
 
 #include "../controls/csurf_button.hpp"
-#include "../shared/csurf_utils.hpp"
 #include "../shared/csurf_context.cpp"
 #include "../shared/csurf_reasonus_settings.hpp"
 
@@ -41,7 +40,7 @@ class CSurf_TransportManager {
 
     void SetForwardingState();
 
-    void handleFootSwitchKey(const std::string &key) const;
+    void handleFunctionKey(const std::string &key, FunctionTypes type) const;
 
 public:
     CSurf_TransportManager(CSurf_Context *context, midi_Output *m_midiout);

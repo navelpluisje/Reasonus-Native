@@ -9,6 +9,8 @@
 #include <reaper_plugin_functions.h>
 #include <mini/ini.h>
 
+#include "fmt/format.h"
+
 constexpr char PATH_SEPARATOR =
 #ifdef _WIN32
         '\\';
@@ -19,7 +21,7 @@ constexpr char PATH_SEPARATOR =
 const std::string PREFIX_SEPARATOR = ": ";
 
 constexpr int TOGGLE_SPEED = 150;
-constexpr int DOUBLE_CLICK_SPEED = 750;
+constexpr int DOUBLE_CLICK_SPEED = 300;
 
 const std::string FP_V2 = "FP_V2";
 const std::string FP_8 = "FP";
@@ -87,6 +89,7 @@ struct ConfigVar {
             addr = get_config_var(var_name.c_str(), &size);
         }
 
+        key = var_name;
         m_addr = static_cast<T *>(addr);
 
         if (size != sizeof(T)) {
@@ -103,21 +106,33 @@ struct ConfigVar {
         return true;
     }
 
+    T GetValue() {
+        return *m_addr;
+    }
+
     operator T() {
         return *m_addr;
     }
 
 private:
+    std::string key;
     T *m_addr;
 };
 
 struct DoubleClickState {
     bool active = false; // NOLINT(*-non-private-member-variables-in-classes)
-    int start = 0;       // NOLINT(*-non-private-member-variables-in-classes)
+    int start = 0;      // NOLINT(*-non-private-member-variables-in-classes)
     int clicks = 0;      // NOLINT(*-non-private-member-variables-in-classes)
 
     void SetValue(const bool value) {
         const int time = GetTickCount();
+
+        // Check if the double click has been timed out and reset values
+        if (time - start > DOUBLE_CLICK_SPEED && clicks > 0) {
+            active = false;
+            start = 0;
+            clicks = 0;
+        }
 
         if (value && start > 0 && clicks == 1) {
             if (time - start < DOUBLE_CLICK_SPEED) {
@@ -126,8 +141,8 @@ struct DoubleClickState {
                 clicks = 0;
             } else {
                 active = false;
-                start = time;
-                clicks = 1;
+                start = 0;
+                clicks = 0;
             }
             return;
         }
@@ -138,7 +153,7 @@ struct DoubleClickState {
             return;
         }
 
-        if (start == 0 && value && clicks == 0) {
+        if (value && start == 0 && clicks == 0) {
             clicks += 1;
             start = time;
             active = false;
@@ -183,6 +198,19 @@ bool SetIntConfigVar(const std::string &var_name, int value);
  * @return false
  */
 bool hasBit(int val, int key);
+
+bool hasBit(const std::array<uint64_t, 2> val, const int key);
+
+/**
+ * @brief Set the bit with index key to 0
+ *
+ * @param val The value to edit
+ * @param key The index to set to 0
+ * @return The modified integer
+ */
+int clearBit(int val, int key);
+
+std::array<uint64_t, 2> clearBit(const std::array<uint64_t, 2> val, const int key);
 
 /**
  * @brief Get the normalized value of the volume to send to the device faders
@@ -247,6 +275,8 @@ std::string GetAutomationString(int automationMode);
 std::string GetReaSonusFolderPath();
 
 std::string GetReaSonusIniPath(const std::string &device);
+
+std::string GetReaperIniPath();
 
 std::string GetReaSonusZonesPath();
 
@@ -483,5 +513,19 @@ bool toBool(double value);
  * @return
  */
 bool toBool(const std::string &value);
+
+/**
+ *
+ * @param index The index of the midi in device
+ * @return true when the midi in device is disabled
+ */
+bool isMidiInDeviceDisabled(int index);
+
+/**
+ *
+ * @param index The index of the midi out device
+ * @return true when the midi out device is disabled
+ */
+bool isMidiOutDeviceDisabled(int index);
 
 #endif // CSURF_UTILS_H_

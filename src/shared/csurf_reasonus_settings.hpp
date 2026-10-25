@@ -6,6 +6,12 @@
 #include <mini/ini.h>
 #include "../shared/csurf_utils.hpp"
 
+enum FunctionTypes {
+    FUNCTION_DEFAULT,
+    FUNCTION_FOOTSWITCH,
+    FUNCTION_TRANSPORT,
+};
+
 class ReaSonusSettings {
     // Private Constructor
     explicit ReaSonusSettings(std::string _device);
@@ -59,10 +65,15 @@ class ReaSonusSettings {
         {"surface", "mute-solo-momentary", "0"},
         {"surface", "latch-preview-action", "0"},
         {"surface", "latch-preview-action-code", "42013"},
+
         {"functions", "1", "0"},
         {"functions", "2", "0"},
         {"functions", "3", "0"},
         {"functions", "4", "0"},
+
+        {"transport", "1", "0"},
+        {"transport", "2", "0"},
+
         {"footswitch", "1", "0"},
         {"footswitch", "2", "0"},
         {"footswitch", "3", "0"},
@@ -94,8 +105,11 @@ class ReaSonusSettings {
         {"surface", "fader-reset", "0"},
         {"surface", "overwrite-time-code", "1"},
         {"surface", "time-code", "2"},
+        {"surface", "sends-respect-slots", "0"},
         {"surface", "track-color-brightness", "25"},
         {"surface", "plugin-step-size", "1"},
+        {"surface", "plugin-respect-slots", "0"},
+        {"surface", "plugin-has-input-control", "0"},
         {"surface", "plugin-map-param-clear", "0"},
         {"surface", "plugin-map-default-color-mode", "1"},
         {
@@ -111,6 +125,8 @@ class ReaSonusSettings {
         {"surface", "automation-point-shape", "0"},
         {"surface", "automation-single-bezier-tension", "0"},
         {"surface", "automation-single-button-blink", "1"},
+        {"surface", "start-with-track-send-mode", "0"},
+        {"surface", "start-with-track-plugin-mode", "0"},
 
         {"displays", "track", "8"},
         {"displays", "track-lines", "0,4,1,2"},
@@ -118,6 +134,8 @@ class ReaSonusSettings {
         {"displays", "track-invert", "0,0,0,0"},
         {"displays", "track-value-bar-mode", "1"},
         {"displays", "track-value-bar-value", "0"},
+        {"displays", "send-value-send", "0"},
+        {"displays", "send-value-hardware", "0"},
 
         {"functions", "5", "0"},
         {"functions", "6", "0"},
@@ -132,10 +150,26 @@ class ReaSonusSettings {
         {"functions", "15", "0"},
         {"functions", "16", "0"},
 
+        {"transport", "3", "0"},
+        {"transport", "4", "0"},
+
         {"filters", "nb-filters", "0"},
         {"filters", "use-custom-color", "0"},
         {"filters", "project-filters", "0"},
     };
+
+    static std::string GetFunctionType(const FunctionTypes function_type) {
+        switch (function_type) {
+            case FUNCTION_FOOTSWITCH:
+                return "footswitch";
+
+            case FUNCTION_TRANSPORT:
+                return "transport";
+
+            default:
+                return "functions";
+        }
+    }
 
 public:
     ReaSonusSettings(const ReaSonusSettings &obj) = delete;
@@ -193,18 +227,26 @@ public:
      *
      * @param index index of the function to store
      * @param value The actual value to write
-     * @param is_footswitch Wether or not if the function is for the foot switch
+     * @param function_type function type where the function belomgs
      */
-    void SetFunction(const std::string &index, const std::string &value, bool is_footswitch = false);
+    void SetFunction(
+        const std::string &index,
+        const std::string &value,
+        FunctionTypes function_type = FUNCTION_DEFAULT
+    );
 
     /**
      * @brief Set a Setting and save them to the ini file
      *
      * @param key index of the function to store
      * @param value The actual value to write
-     * @param is_footswitch Wether or not if the function is for the foot switch
+     * @param function_types Function type to set the function for
      */
-    void SetAndSaveFuntion(const std::string &key, const std::string &value, bool is_footswitch = false);
+    void SetAndSaveFuntion(
+        const std::string &key,
+        const std::string &value,
+        FunctionTypes function_types = FUNCTION_DEFAULT
+    );
 
     /**
      * @brief Get the Setting vy its group and key
@@ -220,10 +262,10 @@ public:
      * @brief Get the Setting vy its group and key
      *
      * @param key The actual value to write
-     * @param is_footswitch Wether or not if the function is for the foot switch
+     * @param function_type
      * @return std::string
      */
-    std::string GetFunction(const std::string &key, bool is_footswitch = false);
+    std::string GetFunction(const std::string &key, FunctionTypes function_type);
 
     /**
      * @brief Save the current settng sobeject to the file
@@ -282,6 +324,8 @@ public:
 
     int GetpluginStepSize();
 
+    bool HasPluginInputControl();
+
     int GetTrackDisplay();
 
     std::array<int, 4> GetTrackDisplayLineValues();
@@ -294,6 +338,10 @@ public:
 
     int GetTrackValueBarValue();
 
+    int GetSendDisplayValueSend();
+
+    int GetSendDisplayValueHardware();
+
     int GetSurface();
 
     int GetMidiInput();
@@ -302,11 +350,19 @@ public:
 
     bool ShouldClearParamInput();
 
+    bool PluginsShouldRespectSlots();
+
+    bool SendsShouldRespectSlots();
+
     int GetPluginMapDefaultColorMode();
 
     std::vector<int> GetPluginColorPalette();
 
     bool ShouldMuteMasterOnFwdRwd();
+
+    bool ShouldStartWithTrackSendMode();
+
+    bool ShouldStartWithTrackPluginMode();
 
     /**
      * Settings for the FaderPort 2

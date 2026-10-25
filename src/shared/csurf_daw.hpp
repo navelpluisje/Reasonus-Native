@@ -11,7 +11,9 @@
 
 enum Features {
     FEATURE_PINNED_TRACKS,
-    FEATURE_EXTENSION_DATA
+    FEATURE_EXTENSION_DATA,
+    FEATURE_SLOTS,
+    FEATURE_PRE_RECEIVE
 };
 
 enum PAN_MODES {
@@ -22,11 +24,11 @@ enum PAN_MODES {
     /**
      * @brief Width and pan control
      */
-    PAN_MODE_STEREO_PAN = 5,
+    PAN_MODE_STEREO_PAN  = 5,
     /**
      * @brief Left and right pan
      */
-    PAN_MODE_DUAL_PAN = 6,
+    PAN_MODE_DUAL_PAN    = 6,
 };
 
 enum SEND_MODES {
@@ -44,6 +46,8 @@ enum SEND_SEND_MODES {
 static std::map<Features, double> feature_versions = { // NOLINT(*-statically-constructed-objects, *-throwing-static-initialization)
     {FEATURE_PINNED_TRACKS, 7.46},
     {FEATURE_EXTENSION_DATA, 7.79},
+    {FEATURE_SLOTS, 7.75},
+    {FEATURE_PRE_RECEIVE, 7.78},
 };
 
 class DAW {
@@ -371,6 +375,38 @@ public:
     static void ToggleTrackFxBypass(MediaTrack *media_track);
 
     /**
+     * Get the number of plugons for the given track. When `slots` is set to true,
+     * it will count the number of slots used,
+     * @param media_track The track to get the number of plugins fpr
+     * @param slots Wether or not to keet slots in account
+     * @return Thenumber of pugins for the given track
+     */
+    static int GetTrackFxCount(MediaTrack *media_track, bool slots);
+
+    /**
+     * Get the track fx index of the fx with the corresponding slot index.
+     * @param media_track The track to get the fx inex for
+     * @param _slot_index The slot index to check
+     * @return
+     */
+    static int GetTrackFxIndexBySlotIndex(MediaTrack *media_track, int _slot_index);
+
+    /**
+     * Check if there are any muted sends for the given slot
+     * @param _slot_index The slot index to check for muted sends
+     * @return
+     */
+    static bool SlotHasNoBypassedTrackFx(int _slot_index);
+
+    /**
+     * Toggle all plugin bypasses for the given slot. When all plugins are bypassed, they will all get active.
+     * If some or none of the plugins are bypassed, all plugins will be bypassed
+     * @param _slot_index The slot index to toggle the nute for
+     * @return
+     */
+    static void ToggleTrackFxBypassForSlot(int _slot_index);
+
+    /**
      * Get the parameter name of the parameter with the given values
      * @param media_track The track where we want the plugin param for
      * @param fx_index The index on the plugin
@@ -572,26 +608,68 @@ public:
      * Get the name of the destination of the send at the given index for the given track
      * @param media_track The track where we want the send for
      * @param send The index of the send track
+     * @param is_hardware_out Set to treu when the slot is a hardware out
      * @return The name of the destination of the send
      */
-    static std::string GetTrackSendName(MediaTrack *media_track, int send);
+    static std::string GetTrackSendName(MediaTrack *media_track, int send, bool is_hardware_out);
+
+    /**
+     * Get the number of sends for the given track. When `slots` is set to true,
+     * it will count the number of slots used,
+     * @param media_track The track to get the number of plugins fpr
+     * @param slots Wether or not to keep slots in account
+     * @return Thenumber of pugins for the given track
+     */
+    static int GetTrackSendCount(MediaTrack *media_track, bool slots);
+
+    /**
+     * Get the track send index of the send with the corresponding slot index.
+     * @param media_track The track to get the send index for
+     * @param _slot_index The slot index to check
+     * @param add_hardware Whether to add the hardware count for the sends index
+     * @param is_hardware_out Set to treu when the slot is a hardware out
+     * @return
+     */
+    static int GetTrackSendIndexBySlotIndex(
+        MediaTrack *media_track,
+        int _slot_index,
+        bool add_hardware,
+        bool *is_hardware_out
+    );
+
+    /**
+     * Check if there are any muted sends for the given slot
+     * @param _slot_index The slot index to check for muted sends
+     * @return
+     */
+    static bool SlotHasNoMutedSend(int _slot_index);
+
+    /**
+     * Toggle all send mutes. When all sends are muted, they will all get unmuted.
+     * If some or none sends are muted, mute all the sends
+     * @param _slot_index The slot index to toggle the nute for
+     * @return
+     */
+    static void ToggleSendMuteForSlot(int _slot_index);
 
     /**
      * Get the send mode for the given send
      * @param media_track The track where we want the send for
      * @param send The index of the send track
+     * @param is_hardware_out
      * @return The send mode:
      * - 0 = post-fader,
      * - 1 = pre-fx,
      * - 2 = post-fx (deprecated),
      * - 3 = post-fx
      */
-    static int GetTrackSendMode(MediaTrack *media_track, int send);
+    static int GetTrackSendMode(MediaTrack *media_track, int send, bool is_hardware_out);
 
     /**
      * Get the send automation mode for the given send
      * @param media_track The track where we want the send for
      * @param send The index of the send track
+     * @param is_hardware_out
      * @return The send automation mode:
      * - -1 = use track automode,
      * - 0 = trim/off,
@@ -600,12 +678,13 @@ public:
      * - 3 = write,
      * - 4 = latch
      */
-    static int GetTrackSendAutoMode(MediaTrack *media_track, int send);
+    static int GetTrackSendAutoMode(MediaTrack *media_track, int send, bool is_hardware_out);
 
     /**
      * Get the string representation for send mode for the given send
      * @param media_track The track where we want the send for
      * @param send The index of the send track
+     * @param is_hardware_out
      * @return The send mode:
      * - 0 = Post-Fdr,
      * - 1 = Pre-FX,
@@ -613,12 +692,13 @@ public:
      * - 3 = Post-FX,
      * - others: Post-Fdr
      */
-    static std::string GetTrackSurfaceSendMode(MediaTrack *media_track, int send);
+    static std::string GetTrackSurfaceSendMode(MediaTrack *media_track, int send, bool is_hardware_out);
 
     /**
      * Get the string representation of the send automation mode for the given send
      * @param media_track The track where we want the send for
      * @param send The index of the send track
+     * @param is_hardware_out
      * @return The send automation mode:
      * - -1 = Track,
      * - 0 = Trim,
@@ -627,83 +707,93 @@ public:
      * - 3 = Write,
      * - 4 = Latch,
      */
-    static std::string GetTrackSurfaceSendAutoMode(MediaTrack *media_track, int send);
+    static std::string GetTrackSurfaceSendAutoMode(MediaTrack *media_track, int send, bool is_hardware_out);
 
     /**
      * Get the mute state for the given send
      * @param media_track The track where we want the send for
      * @param send The mute state of the send track
+     * @param is_hardware_out Is it a hardware slot or a send slot
      * @return Whether mute is engaged
      */
-    static bool GetTrackSendMute(MediaTrack *media_track, int send);
+    static bool GetTrackSendMute(MediaTrack *media_track, int send, bool is_hardware_out);
 
     /**
      * Toggle the mute state for the given send
      * @param media_track The track for the send we need
      * @param send The index on the send
+     * @param is_hardware_out Is it a hardware slot or a send slot
      */
-    static void ToggleTrackSendMute(MediaTrack *media_track, int send);
+    static void ToggleTrackSendMute(MediaTrack *media_track, int send, bool is_hardware_out);
 
     /**
      * Get the phase state for the given send
      * @param media_track The track where we want the send for
      * @param send The phase state of the send track
+     * @param is_hardware_out Is it a hardware slot or a send slot
      * @return whether phase is engaged
      */
-    static bool GetTrackSendPhase(MediaTrack *media_track, int send);
+    static bool GetTrackSendPhase(MediaTrack *media_track, int send, bool is_hardware_out);
 
     /**
      * Toggle the phase state for the given send
      * @param media_track The track for the send we need
      * @param send The index on the send
+     * @param is_hardware_out Is it a hardware slot or a send slot
      */
-    static void ToggleTrackSendPhase(MediaTrack *media_track, int send);
+    static void ToggleTrackSendPhase(MediaTrack *media_track, int send, bool is_hardware_out);
 
     /**
      * Get the mono state for the given send
      * @param media_track The track where we want the send for
      * @param send The mute state of the send track
-     * @return Whether mono is engaged
+     * @param is_hardware_out Is it a hardware slot or a send slot
+     * @return Whether mono is engaged, always false on hardware as this doe not have mono available
      */
-    static bool GetTrackSendMono(MediaTrack *media_track, int send);
+    static bool GetTrackSendMono(MediaTrack *media_track, int send, bool is_hardware_out);
 
     /**
      * Toggle the mono state for the given send
      * @param media_track The track for the send we need
      * @param send The index on the send
+     * @param is_hardware_out Is it a hardware slot or a send slot
      */
-    static void ToggleTrackSendMono(MediaTrack *media_track, int send);
+    static void ToggleTrackSendMono(MediaTrack *media_track, int send, bool is_hardware_out);
 
     /**
      * ??
      * @param media_track The track where we want the send for
      * @param send The mute state of the send track
+     * @param is_hardware_out
      * @return Whether mono ois engaged
      */
-    static int GetNextTrackSendMode(MediaTrack *media_track, int send);
+    static int GetNextTrackSendMode(MediaTrack *media_track, int send, bool is_hardware_out);
 
     /**
      * ??
      * @param media_track The track for the send we need
      * @param send The index on the send
+     * @param is_hardware_out
      */
-    static void SetNextTrackSendMode(MediaTrack *media_track, int send);
+    static void SetNextTrackSendMode(MediaTrack *media_track, int send, bool is_hardware_out);
 
     /**
      * Set the volume for the given send
      * @param media_track The track for the send we need
      * @param send The index on the send
      * @param volume The volume to set
+     * @param is_hardware_out Is it a hardware slot or a send slot
      */
-    static void SetTrackSendVolume(MediaTrack *media_track, int send, double volume);
+    static void SetTrackSendVolume(MediaTrack *media_track, int send, double volume, bool is_hardware_out);
 
     /**
      * Set the volume for the given send
      * @param media_track The track for the send we need
      * @param send The index on the send
      * @param pan The pan value to set
+     * @param is_hardware_out Is it a hardware slot or a send slot
      */
-    static void SetTrackSendPan(MediaTrack *media_track, int send, double pan);
+    static void SetTrackSendPan(MediaTrack *media_track, int send, double pan, bool is_hardware_out);
 
     static TrackEnvelope *GetTrackSendEnvelope(
         MediaTrack *media_track,

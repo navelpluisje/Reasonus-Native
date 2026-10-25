@@ -13,7 +13,7 @@ class CSurf_FP_8_PluginLearnManager : public CSurf_FP_8_ChannelManager {
 
 protected:
     [[nodiscard]] std::string getParamKey(const std::string &prefix, const int index) const {
-        const std::string controlIndex = std::to_string(context->GetChannelManagerItemIndex() + index);
+        const std::string controlIndex = std::to_string(context->GetChannelManagerItemIndex(PluginEditMode) + index);
         return prefix + controlIndex;
     }
 
@@ -43,8 +43,8 @@ public:
         CSurf_FP_8_Navigator *navigator,
         CSurf_Context *context,
         midi_Output *m_midiout) : CSurf_FP_8_ChannelManager(tracks, navigator, context, m_midiout) {
-        context->ResetChannelManagerItemIndex();
-        context->SetChannelManagerItemsCount(CSurf_Context::GetPluginMaxGroupCount());
+        context->ResetChannelManagerItemIndex(PluginEditMode);
+        context->SetChannelManagerItemsCount(PluginEditMode, CSurf_Context::GetPluginMaxGroupCount());
         GetCurrentPlugin();
         CSurf_FP_8_PluginLearnManager::UpdateTracks(true);
         color = ButtonColorWhiteDim;
@@ -66,7 +66,7 @@ public:
         updateCount += 1;
 
         for (int i = 0; i < context->GetNbChannels(); i++) {
-            const int paramIndex = context->GetChannelManagerItemIndex() + i;
+            const int paramIndex = context->GetChannelManagerItemIndex(PluginEditMode) + i;
             const CSurf_FP_8_Track *track = tracks.at(i);
             track->SetTrackColor(color);
 
@@ -83,22 +83,32 @@ public:
             std::string paramKey = getParamKey("Select_", paramIndex);
 
             if (plugin_mapping_ini.has(paramKey)) {
-                track->SetDisplayLine(0, ALIGN_CENTER, plugin_mapping_ini[paramKey]["name"].c_str(), INVERT,
-                                      force_update);
+                track->SetDisplayLine(
+                    DISPLAY_LINE_1,
+                    ALIGN_CENTER,
+                    plugin_mapping_ini[paramKey]["name"].c_str(),
+                    INVERT,
+                    force_update
+                );
             } else {
-                track->SetDisplayLine(0, ALIGN_CENTER, "Free", INVERT, force_update);
+                track->SetDisplayLine(DISPLAY_LINE_1, ALIGN_CENTER, "Free", INVERT, force_update);
             }
 
             paramKey = getParamKey("Fader_", paramIndex);
             if (plugin_mapping_ini.has(paramKey)) {
-                track->SetDisplayLine(2, ALIGN_CENTER, plugin_mapping_ini[paramKey]["name"].c_str(), INVERT,
-                                      force_update);
+                track->SetDisplayLine(
+                    DISPLAY_LINE_3,
+                    ALIGN_CENTER,
+                    plugin_mapping_ini[paramKey]["name"].c_str(),
+                    INVERT,
+                    force_update
+                );
             } else {
-                track->SetDisplayLine(2, ALIGN_CENTER, "Free", INVERT, force_update);
+                track->SetDisplayLine(DISPLAY_LINE_3, ALIGN_CENTER, "Free", INVERT, force_update);
             }
 
-            track->SetDisplayLine(1, ALIGN_CENTER, "", NON_INVERT, true);
-            track->SetDisplayLine(3, ALIGN_CENTER, "", NON_INVERT, true);
+            track->SetDisplayLine(DISPLAY_LINE_2, ALIGN_CENTER, "", NON_INVERT, true);
+            track->SetDisplayLine(DISPLAY_LINE_4, ALIGN_CENTER, "", NON_INVERT, true);
         }
     }
 
@@ -129,7 +139,7 @@ public:
         if (value == 0) {
             return;
         }
-        const int controlIndex = context->GetChannelManagerItemIndex() + index;
+        const int controlIndex = context->GetChannelManagerItemIndex(PluginEditMode) + index;
         const int pluginId = context->GetPluginEditPluginId();
         int trackId, itemNumber, takeId, _pluginId, paramId;
 
@@ -184,7 +194,7 @@ public:
 
     void HandleFaderTouch(const int index, const int value) override {
         (void) value;
-        const int controlIndex = context->GetChannelManagerItemIndex() + index;
+        const int controlIndex = context->GetChannelManagerItemIndex(PluginEditMode) + index;
         const int pluginId = context->GetPluginEditPluginId();
         int trackId, itemNumber, takeId, _pluginId, paramId;
 

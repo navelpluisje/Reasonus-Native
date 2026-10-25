@@ -6,6 +6,7 @@
 #include <string>
 #include "../csurf_ui_styles_elements.hpp"
 #include "../csurf_ui_colors.hpp"
+#include "../csurf_ui_assets.hpp"
 
 static void ReaSonusSimpleTooltip(
     ImGui_Context *m_ctx,
@@ -20,8 +21,7 @@ static void ReaSonusSimpleTooltip(
             tooltip_id.c_str(),
             0.0,
             0.0,
-            ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY |
-            ImGui::ChildFlags_AutoResizeX
+            ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY | ImGui::ChildFlags_AutoResizeX
         )) {
             ImGui::PushTextWrapPos(m_ctx, 350);
             ImGui::PushFont(m_ctx, assets->GetMainFont(), 13);

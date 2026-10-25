@@ -34,7 +34,7 @@ extern reaper_csurf_reg_t
  * Set some initial values
  */
 bool CSurf_UI_FunctionKeysPage::querying_actions = false;
-FunctionTypes CSurf_UI_FunctionKeysPage::selected_type = TypeFunction;
+FunctionTypes CSurf_UI_FunctionKeysPage::selected_type = FUNCTION_DEFAULT;
 int CSurf_UI_FunctionKeysPage::selected_function = -1;
 int CSurf_UI_FunctionKeysPage::selected_action = -1;
 
