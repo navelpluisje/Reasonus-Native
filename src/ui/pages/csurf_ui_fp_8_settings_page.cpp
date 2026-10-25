@@ -39,6 +39,7 @@ class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-in
     bool setting_master_fader_mode;
     bool setting_mute_master_on_fwd_rwd;
     bool setting_sends_respect_slots;
+    bool setting_start_with_track_send_mode;
 
     // Automation
     bool setting_use_automation_colors;
@@ -64,6 +65,7 @@ class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-in
     // Plugins
     bool setting_disable_plugins;
     bool setting_plugin_respect_slots;
+    bool setting_start_with_track_plugin_mode;
     bool setting_untouch_after_learn;
     int setting_plugin_step_size;
     bool setting_plugin_map_param_clear;
@@ -658,6 +660,14 @@ public:
                         &setting_sends_respect_slots,
                         i18n->t("settings", "sends-respect-slots.tooltip")
                     );
+
+                    RenderInfoCheckbox(
+                        m_ctx,
+                        assets,
+                        i18n->t("settings", "start-with-track-send-mode.label"),
+                        &setting_start_with_track_send_mode,
+                        i18n->t("settings", "start-with-track-send-mode.tooltip")
+                    );
                     ImGui::EndChild(m_ctx);
                 }
             }
@@ -894,6 +904,14 @@ public:
                         i18n->t("settings", "plugin-respect-slots.tooltip")
                     );
                 }
+
+                RenderInfoCheckbox(
+                    m_ctx,
+                    assets,
+                    i18n->t("settings", "start-with-track-plugin-mode.label"),
+                    &setting_start_with_track_plugin_mode,
+                    i18n->t("settings", "start-with-track-plugin-mode.tooltip")
+                );
 
                 RenderInfoCheckbox(
                     m_ctx,
@@ -1204,6 +1222,8 @@ public:
         settings->SetSetting("surface", "instant-multi-select-filter", setting_instant_multi_select_filter);
         settings->SetSetting("surface", "mute-master-on-fwd-rwd", setting_mute_master_on_fwd_rwd);
         settings->SetSetting("surface", "use-automation-colors", setting_use_automation_colors);
+        settings->SetSetting("surface", "start-with-track-send-mode", setting_start_with_track_send_mode);
+        settings->SetSetting("surface", "start-with-track-plugin-mode", setting_start_with_track_plugin_mode);
 
         settings->SetSetting("surface", "use-automation-single-point", setting_use_single_point_mode);
         settings->SetSetting("surface", "overwrite-automation-point-shape", setting_overwrite_single_point_shape);
@@ -1283,6 +1303,8 @@ public:
         setting_single_point_mode_shape = settings->GetAutomationPointShape();
         setting_single_bezier_tension = settings->GetAutomationSingleBezierTension();
         setting_single_point_button_blink = settings->GetAutomationSingleButtonBlink();
+        setting_start_with_track_send_mode = settings->ShouldStartWithTrackSendMode();
+        setting_start_with_track_plugin_mode = settings->ShouldStartWithTrackPluginMode();
 
         int *const iterator = std::find(
             latch_preview_action_indexes,

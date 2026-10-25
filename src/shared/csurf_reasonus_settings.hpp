@@ -65,14 +65,15 @@ class ReaSonusSettings {
         {"surface", "mute-solo-momentary", "0"},
         {"surface", "latch-preview-action", "0"},
         {"surface", "latch-preview-action-code", "42013"},
+
         {"functions", "1", "0"},
         {"functions", "2", "0"},
         {"functions", "3", "0"},
         {"functions", "4", "0"},
+
         {"transport", "1", "0"},
         {"transport", "2", "0"},
-        {"transport", "3", "0"},
-        {"transport", "4", "0"},
+
         {"footswitch", "1", "0"},
         {"footswitch", "2", "0"},
         {"footswitch", "3", "0"},
@@ -124,6 +125,8 @@ class ReaSonusSettings {
         {"surface", "automation-point-shape", "0"},
         {"surface", "automation-single-bezier-tension", "0"},
         {"surface", "automation-single-button-blink", "1"},
+        {"surface", "start-with-track-send-mode", "0"},
+        {"surface", "start-with-track-plugin-mode", "0"},
 
         {"displays", "track", "8"},
         {"displays", "track-lines", "0,4,1,2"},
@@ -146,6 +149,9 @@ class ReaSonusSettings {
         {"functions", "14", "0"},
         {"functions", "15", "0"},
         {"functions", "16", "0"},
+
+        {"transport", "3", "0"},
+        {"transport", "4", "0"},
 
         {"filters", "nb-filters", "0"},
         {"filters", "use-custom-color", "0"},
@@ -353,6 +359,10 @@ public:
     std::vector<int> GetPluginColorPalette();
 
     bool ShouldMuteMasterOnFwdRwd();
+
+    bool ShouldStartWithTrackSendMode();
+
+    bool ShouldStartWithTrackPluginMode();
 
     /**
      * Settings for the FaderPort 2
