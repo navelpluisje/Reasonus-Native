@@ -26,13 +26,12 @@ void CSurf_UI_FunctionKeysPage::Reset() {
 
     transport.push_back(settings->GetFunction("1", FUNCTION_TRANSPORT));
     transport.push_back(settings->GetFunction("2", FUNCTION_TRANSPORT));
-    transport.push_back(settings->GetFunction("3", FUNCTION_TRANSPORT));
-    transport.push_back(settings->GetFunction("4", FUNCTION_TRANSPORT));
 
     functions.push_back(settings->GetFunction("1", FUNCTION_DEFAULT));
     functions.push_back(settings->GetFunction("2", FUNCTION_DEFAULT));
     functions.push_back(settings->GetFunction("3", FUNCTION_DEFAULT));
     functions.push_back(settings->GetFunction("4", FUNCTION_DEFAULT));
+
     if (device == FP_8) {
         functions.push_back(settings->GetFunction("5", FUNCTION_DEFAULT));
         functions.push_back(settings->GetFunction("6", FUNCTION_DEFAULT));
@@ -46,6 +45,9 @@ void CSurf_UI_FunctionKeysPage::Reset() {
         functions.push_back(settings->GetFunction("14", FUNCTION_DEFAULT));
         functions.push_back(settings->GetFunction("15", FUNCTION_DEFAULT));
         functions.push_back(settings->GetFunction("16", FUNCTION_DEFAULT));
+
+        transport.push_back(settings->GetFunction("3", FUNCTION_TRANSPORT));
+        transport.push_back(settings->GetFunction("4", FUNCTION_TRANSPORT));
     }
 }
 
@@ -56,13 +58,12 @@ void CSurf_UI_FunctionKeysPage::Save() {
 
     settings->SetFunction("1", transport[0], FUNCTION_TRANSPORT);
     settings->SetFunction("2", transport[1], FUNCTION_TRANSPORT);
-    settings->SetFunction("3", transport[2], FUNCTION_TRANSPORT);
-    settings->SetFunction("4", transport[3], FUNCTION_TRANSPORT);
 
     settings->SetFunction("1", functions[0], FUNCTION_DEFAULT);
     settings->SetFunction("2", functions[1], FUNCTION_DEFAULT);
     settings->SetFunction("3", functions[2], FUNCTION_DEFAULT);
     settings->SetFunction("4", functions[3], FUNCTION_DEFAULT);
+
     if (device == FP_8) {
         settings->SetFunction("5", functions[4], FUNCTION_DEFAULT);
         settings->SetFunction("6", functions[5], FUNCTION_DEFAULT);
@@ -76,6 +77,9 @@ void CSurf_UI_FunctionKeysPage::Save() {
         settings->SetFunction("14", functions[13], FUNCTION_DEFAULT);
         settings->SetFunction("15", functions[14], FUNCTION_DEFAULT);
         settings->SetFunction("16", functions[15], FUNCTION_DEFAULT);
+
+        settings->SetFunction("3", transport[2], FUNCTION_TRANSPORT);
+        settings->SetFunction("4", transport[3], FUNCTION_TRANSPORT);
     }
 
     if (settings->StoreSettings()) {
@@ -127,9 +131,10 @@ void CSurf_UI_FunctionKeysPage::RenderFunction(
     int index,
     CSurf_UI_FunctionKeysPage &page,
     CSurf_UI_Assets *assets,
-    FunctionTypes type
+    FunctionTypes type,
+    std::string device
 ) {
-    int actionId;
+    int actionId = -1;
     std::string type_name;
     std::string type_label;
     double x_width;
@@ -147,10 +152,18 @@ void CSurf_UI_FunctionKeysPage::RenderFunction(
             type_label = page.i18n->t("functions", "footswitch.label." + std::to_string(index));
             break;
         case FUNCTION_TRANSPORT:
+            if (device != FP_8 && index > 1) {
+                break;
+            }
+
             actionId = stoi(page.transport[index]);
             type_name = "transport";
             type_label = page.i18n->t("functions", "transport.label." + std::to_string(index));
             break;
+    }
+
+    if (actionId == -1) {
+        return;
     }
 
     const char *fullName = kbd_getTextFromCmd(actionId, nullptr);
@@ -249,7 +262,7 @@ void CSurf_UI_FunctionKeysPage::RenderFunctionTab(
                 for (int i = start_index; i < start_index + count; i++) {
                     if (ImGui::TableNextColumn(m_ctx)) {
                         UiStyledElements::PushReaSonusFunctionActionStyle(m_ctx);
-                        RenderFunction(m_ctx, i, *this, assets, type);
+                        RenderFunction(m_ctx, i, *this, assets, type, device);
                         UiStyledElements::PopReaSonusFunctionActionStyle(m_ctx);
                     }
                 }
