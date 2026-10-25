@@ -14,6 +14,6 @@ namespace REASONUS_API {
     }
 
     inline auto defstring_FP8FilterbyName =
-            "void\0char*\0filter_name\0"
-            "Trigger a custom filter by its name.";
+            "void\0char*\0filterName\0"
+            "Trigger a custom filter by its name. The API only supports global filters";
 }

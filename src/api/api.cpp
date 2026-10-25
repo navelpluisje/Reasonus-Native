@@ -9,6 +9,7 @@
 #include "fp_8_control_plugin.hpp"
 #include "fp_8_control_thing_under_pointer.hpp"
 #include "fp_8_filter_by_name.hpp"
+#include "fp_8_set_fader_mode.hpp"
 
 namespace REASONUS_API {
     void Register() {
@@ -42,5 +43,10 @@ namespace REASONUS_API {
         plugin_register("APIdef_ReaSonus_FP8_FilterbyName", (void *) defstring_FP8FilterbyName);
         plugin_register("APIvararg_ReaSonus_FP8_FilterbyName",
                         reinterpret_cast<void *>(&InvokeReaScriptAPI<&FP8FilterbyName>));
+
+        plugin_register("API_ReaSonus_FP8_SetFaderMode", reinterpret_cast<void *>(FP8SetFaderMode));
+        plugin_register("APIdef_ReaSonus_FP8_SetFaderMode", (void *) defstring_FP8SetFaderMode);
+        plugin_register("APIvararg_ReaSonus_FP8_SetFaderMode",
+                        reinterpret_cast<void *>(&InvokeReaScriptAPI<&FP8SetFaderMode>));
     }
 }

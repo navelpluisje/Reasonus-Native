@@ -19,6 +19,8 @@ class ReaSonusApi {
 
     void HandleFilterByName() const;
 
+    void HandleSetFaderMode() const;
+
 public:
     explicit ReaSonusApi(CSurf_Context *context);
 

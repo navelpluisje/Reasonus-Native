@@ -69,6 +69,25 @@ void ReaSonusApi::HandleFilterByName() const {
     }
 }
 
+void ReaSonusApi::HandleSetFaderMode() const {
+    if (!DAW::GetExtState(EXT_STATE_FP_FADER_MODE, "").empty()) {
+        // Set the correct values to open the plugin control
+        const std::vector<std::string> fader_mode_ids = split(
+            DAW::GetExtState(EXT_STATE_FP_FADER_MODE, ""),
+            ":"
+        );
+
+        if (fader_mode_ids[0] == "0") {
+            faderManager->ChangeChannelMode(static_cast<ChannelMode>(0));
+        } else if (stoi(fader_mode_ids[0]) > 0 && fader_mode_ids.size() > 1) {
+            MediaTrack *media_track = GetTrack(nullptr, stoi(fader_mode_ids[1]));
+            DAW::SetUniqueSelectedTrack(media_track);
+            faderManager->ChangeChannelMode(static_cast<ChannelMode>(stoi(fader_mode_ids[0])));
+        }
+        DAW::SetExtState(EXT_STATE_FP_FADER_MODE, "", false);
+    }
+}
+
 ReaSonusApi::ReaSonusApi(CSurf_Context *context) : context(context), faderManager(nullptr), trackNavigator(nullptr) {
 }
 
@@ -87,4 +106,5 @@ void ReaSonusApi::HandleApi() const {
     HandleSendMode();
     HandlePanMode();
     HandleFilterByName();
+    HandleSetFaderMode();
 }

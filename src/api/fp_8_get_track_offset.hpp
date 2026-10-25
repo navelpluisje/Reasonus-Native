@@ -12,5 +12,5 @@ namespace REASONUS_API {
 
     inline auto defstring_FP8GetTrackOffset =
             "int\0\0\0"
-            "Get the track offset for the FaderPort 8 or 16";
+            "Get the track offset for the FaderPort 8 or 16. This is not the index of the first track on the controller as it does not count hidden tracks";
 }
