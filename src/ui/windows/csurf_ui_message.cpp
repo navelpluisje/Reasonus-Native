@@ -100,40 +100,37 @@ void ReaSonusMessage::Frame() {
             ReaSonusPageTitle(m_ctx, assets, "ReaSonus Native New Version: " + std::string(GIT_VERSION), false);
             ImGui::PushTextWrapPos(m_ctx, 0.0);
 
-            ImGui::Text(m_ctx, "This release is a bugfix release:");
+            ImGui::Text(m_ctx, "This release has the following changes:");
             ImGui::BulletText(
-                m_ctx, "Fixed issue where plugin mapping values were not saved correct");
+                m_ctx,
+                "Respect plugin and send slots. This can be enabled in the settings under the Controller and Plugin Control tabs");
 
-            ReaSonusPageTitle(m_ctx, assets, "Version 0.11.0, 0.11.1", true);
-            ImGui::Text(m_ctx, "Forgot to update these during the previous release. But here they are:");
             ImGui::BulletText(
                 m_ctx,
-                "Single Point Automation; With single point automation you set an envelope point while touching the fader. You can then adjust the fader to where you want it to be and release it. On release another envelope point will get set. This will reduce the amount of automation points. Check the Automation settings in the reaSonus Control Panel for settings and info. (Implementation for the FaderPort V2 is on the road map)");
+                "MIDI device disable check: Added MIDI-device disabled check in the setup window (REAPER settings)");
+
             ImGui::BulletText(
                 m_ctx,
-                "Able to create project specific filters; The custom filters can now also be stored per project. Above the filter list select `Project Filter`. The filters added here will be saved in the project. This way you can also add custom filters to project templates ");
+                "Settings to start with track mode for send, receive and plugin control. This can be enabled in the settings under the Controller and Plugin Control tabs");
+
             ImGui::BulletText(
                 m_ctx,
-                "Add option to set colors to custom filters; You can now set a color per filter. This makes selecting filters from your list a bit easier. "
-            );
+                "Custom Forward and Rewind actions. In the ReaSonus Control Panel  under the Function Keys you can now set custom actions for the Forward and Rewind buttons");
+
             ImGui::BulletText(
                 m_ctx,
-                "Add option to set custom colors to the automation buttons: In the Automation settings in the ReaSonus Control Panel select the colors you like for use with the automation buttons. This way you can align them better with your Reaper theme colors. "
-            );
+                "Control input plugins: Added the option to control the input plugins");
+
             ImGui::BulletText(
                 m_ctx,
-                "Overhaul of the settings page; Added an extra tab for automation, moved some settings around and implemented a better grouping for a better overview (Implementation for the FaderPort V2 is on the road map)"
-            );
-            ImGui::BulletText(
-                m_ctx,
-                "Add extension info for the new extension screen in the REAPER settings (from v7.79)"
-            );
+                "3th line  in Send mode configurable. In the ReaSonus Control pannel under Settings > Displays, you can now set the value for the third line in send mode");
+
             ImGui::Text(m_ctx, " ");
             ImGui::Text(m_ctx, "Check the documentation for more info on these changes");
             ImGui::TextLinkOpenURL(
                 m_ctx,
-                "Documentation about Single Point Automation",
-                "https://reasonus.net/documentation/faderport8/#automation"
+                "Check out the documentation for more info",
+                "https://reasonus.net/documentation"
             );
 
             ImGui::PopTextWrapPos(m_ctx);

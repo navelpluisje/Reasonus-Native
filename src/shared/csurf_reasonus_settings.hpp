@@ -65,14 +65,15 @@ class ReaSonusSettings {
         {"surface", "mute-solo-momentary", "0"},
         {"surface", "latch-preview-action", "0"},
         {"surface", "latch-preview-action-code", "42013"},
+
         {"functions", "1", "0"},
         {"functions", "2", "0"},
         {"functions", "3", "0"},
         {"functions", "4", "0"},
+
         {"transport", "1", "0"},
         {"transport", "2", "0"},
-        {"transport", "3", "0"},
-        {"transport", "4", "0"},
+
         {"footswitch", "1", "0"},
         {"footswitch", "2", "0"},
         {"footswitch", "3", "0"},
@@ -148,6 +149,9 @@ class ReaSonusSettings {
         {"functions", "14", "0"},
         {"functions", "15", "0"},
         {"functions", "16", "0"},
+
+        {"transport", "3", "0"},
+        {"transport", "4", "0"},
 
         {"filters", "nb-filters", "0"},
         {"filters", "use-custom-color", "0"},
