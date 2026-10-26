@@ -30,5 +30,5 @@ namespace REASONUS_API {
             "  - 6: ReceiveMode Trackmode\n"
             "  - 7: PanMode1\n"
             "  - 8: PanMode2\n"
-            "More on HUI and trackmode in the <a href=\"https://reasonus.net/documentation/faderport8/#hui-or-track-mode\" target=\"_blank\">documentation</a>  \n";
+            "More on HUI and trackmode in the <a href=\"https://reasonus.net/documentation/faderport8/#hui-or-track-mode\" target=\"_blank\">documentation</a>";
 }

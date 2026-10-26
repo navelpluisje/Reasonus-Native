@@ -1,7 +1,6 @@
 #include "api.hpp"
 
 #include "reaper_vararg.hpp"
-#include <WDL/wdltypes.h>
 #include <reaper_plugin_functions.h>
 #include "get_reasonus_version.hpp"
 #include "fp_8_get_track_offset.hpp"
@@ -10,6 +9,11 @@
 #include "fp_8_control_thing_under_pointer.hpp"
 #include "fp_8_filter_by_name.hpp"
 #include "fp_8_set_fader_mode.hpp"
+#include "fp_8_set_fader_mode_track.hpp"
+#include "fp_8_set_fader_mode_plugin.hpp"
+#include "fp_8_set_fader_mode_send.hpp"
+#include "fp_8_set_fader_mode_receive.hpp"
+#include "fp_8_set_fader_mode_pan.hpp"
 
 namespace REASONUS_API {
     void Register() {
@@ -48,5 +52,30 @@ namespace REASONUS_API {
         plugin_register("APIdef_ReaSonus_FP8_SetFaderMode", (void *) defstring_FP8SetFaderMode);
         plugin_register("APIvararg_ReaSonus_FP8_SetFaderMode",
                         reinterpret_cast<void *>(&InvokeReaScriptAPI<&FP8SetFaderMode>));
+
+        plugin_register("API_ReaSonus_FP8_SetFaderModeTrack", reinterpret_cast<void *>(FP8SetFaderModeTrack));
+        plugin_register("APIdef_ReaSonus_FP8_SetFaderModeTrack", (void *) defstring_FP8SetFaderModeTrack);
+        plugin_register("APIvararg_ReaSonus_FP8_SetFaderModeTrack",
+                        reinterpret_cast<void *>(&InvokeReaScriptAPI<&FP8SetFaderModeTrack>));
+
+        plugin_register("API_ReaSonus_FP8_SetFaderModePlugin", reinterpret_cast<void *>(FP8SetFaderModePlugin));
+        plugin_register("APIdef_ReaSonus_FP8_SetFaderModePlugin", (void *) defstring_FP8SetFaderModePlugin);
+        plugin_register("APIvararg_ReaSonus_FP8_SetFaderModePlugin",
+                        reinterpret_cast<void *>(&InvokeReaScriptAPI<&FP8SetFaderModePlugin>));
+
+        plugin_register("API_ReaSonus_FP8_SetFaderModeSend", reinterpret_cast<void *>(FP8SetFaderModeSend));
+        plugin_register("APIdef_ReaSonus_FP8_SetFaderModeSend", (void *) defstring_FP8SetFaderModeSend);
+        plugin_register("APIvararg_ReaSonus_FP8_SetFaderModeSend",
+                        reinterpret_cast<void *>(&InvokeReaScriptAPI<&FP8SetFaderModeSend>));
+
+        plugin_register("API_ReaSonus_FP8_SetFaderModeReceive", reinterpret_cast<void *>(FP8SetFaderModeReceive));
+        plugin_register("APIdef_ReaSonus_FP8_SetFaderModeReceive", (void *) defstring_FP8SetFaderModeReceive);
+        plugin_register("APIvararg_ReaSonus_FP8_SetFaderModeReceive",
+                        reinterpret_cast<void *>(&InvokeReaScriptAPI<&FP8SetFaderModeReceive>));
+
+        plugin_register("API_ReaSonus_FP8_SetFaderModePan", reinterpret_cast<void *>(FP8SetFaderModePan));
+        plugin_register("APIdef_ReaSonus_FP8_SetFaderModePan", (void *) defstring_FP8SetFaderModePan);
+        plugin_register("APIvararg_ReaSonus_FP8_SetFaderModePan",
+                        reinterpret_cast<void *>(&InvokeReaScriptAPI<&FP8SetFaderModePan>));
     }
 }
