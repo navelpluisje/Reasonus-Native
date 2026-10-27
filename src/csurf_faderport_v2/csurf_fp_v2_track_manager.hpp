@@ -42,7 +42,7 @@ protected:
 
     void HandleTrackFaderTouch(int value);
 
-    void HandleLastTouchedFaderTouch(int value);
+    void HandleLastTouchedParamFaderTouch(int value);
 
 public:
     CSurf_FP_V2_TrackManager(

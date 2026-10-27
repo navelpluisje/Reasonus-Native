@@ -95,7 +95,7 @@ void CSurf_FP_V2_TrackManager::HandleTrackFaderTouch(const int value) {
     }
 }
 
-void CSurf_FP_V2_TrackManager::HandleLastTouchedFaderTouch(const int value) {
+void CSurf_FP_V2_TrackManager::HandleLastTouchedParamFaderTouch(const int value) {
     int track_number = -1;
     int plugin_index = -1;
     int plugin_param_index = -1;
@@ -342,7 +342,7 @@ void CSurf_FP_V2_TrackManager::HandleBypassClick(int index, const int value) con
 
 void CSurf_FP_V2_TrackManager::HandleFaderTouch(const int value) {
     if (context->GetLastTouchedFxMode()) {
-        HandleLastTouchedFaderTouch(value);
+        HandleLastTouchedParamFaderTouch(value);
         return;
     }
 
