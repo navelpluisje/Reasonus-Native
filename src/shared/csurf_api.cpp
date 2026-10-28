@@ -8,10 +8,8 @@ void ReaSonusApi::SetPluginControl(const int track_index, const int plugin_index
 
     // First clean up all open fx windows and then open the plugin in a floating window
     Main_OnCommandStringEx("_REASONUS_CLOSE_ALL_FLOATING_FX_WINDOWS_COMMAND", 0, nullptr);
-    // SWS/S&M: Close all floating FX and chanin windows
+    // SWS/S&M: Close all floating FX and chain windows
     TrackFX_Show(media_track, plugin_index, SHOW_FLAG_SHOW_WINDOW);
-    // faderManager->HandlePluginsButtonClick(127, false);
-    faderManager->ChangeChannelMode(PluginControlMode);
 
     context->SetPluginEditTrack(media_track);
     context->SetPluginEditPluginId(plugin_index);

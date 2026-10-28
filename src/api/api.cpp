@@ -43,10 +43,10 @@ namespace REASONUS_API {
         plugin_register("APIvararg_ReaSonus_FP8_ControlThingUnderPointer",
                         reinterpret_cast<void *>(&InvokeReaScriptAPI<&FP8ControlThingUnderPointer>));
 
-        plugin_register("API_ReaSonus_FP8_FilterbyName", reinterpret_cast<void *>(FP8FilterbyName));
-        plugin_register("APIdef_ReaSonus_FP8_FilterbyName", (void *) defstring_FP8FilterbyName);
-        plugin_register("APIvararg_ReaSonus_FP8_FilterbyName",
-                        reinterpret_cast<void *>(&InvokeReaScriptAPI<&FP8FilterbyName>));
+        plugin_register("API_ReaSonus_FP8_FilterByName", reinterpret_cast<void *>(FP8FilterByName));
+        plugin_register("APIdef_ReaSonus_FP8_FilterByName", (void *) defstring_FP8FilterByName);
+        plugin_register("APIvararg_ReaSonus_FP8_FilterByName",
+                        reinterpret_cast<void *>(&InvokeReaScriptAPI<&FP8FilterByName>));
 
         plugin_register("API_ReaSonus_FP8_SetFaderMode", reinterpret_cast<void *>(FP8SetFaderMode));
         plugin_register("APIdef_ReaSonus_FP8_SetFaderMode", (void *) defstring_FP8SetFaderMode);
