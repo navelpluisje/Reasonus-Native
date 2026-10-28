@@ -5,6 +5,7 @@
 
 #include "../../lib/reaper-sdk/sdk/reaper_plugin_functions.h"
 #include "../shared/csurf.h"
+#include "../shared/csurf_context_resources.hpp"
 #include "../shared/csurf_utils.hpp"
 
 namespace REASONUS_API {
@@ -23,7 +24,8 @@ namespace REASONUS_API {
         // Cast the info buffer to a string to make it easier to get data from
         const std::string pointer_info = info_buffer;
 
-        if (std::regex_match(pointer_info, std::regex("(tcp|mcp).(fxlist\\s[0-9]{1,5}\\sfx:[0-9]{1,5})"))) {
+        if (std::regex_match(pointer_info, std::regex("(tcp|mcp).(fxlist\\s[0-9]{1,5}\\sfx:[0-9]{1,5})")) ||
+            std::regex_match(pointer_info, std::regex("(tcp|mcp).(fxparm\\s[0-9]{1,5}\\sfx:[0-9]{1,5})"))) {
             const std::vector<std::string> pointer_info_parts = split(pointer_info, ":");
             std::string plugin_index = pointer_info_parts.size() > 1 ? pointer_info_parts.back() : "";
 
@@ -37,25 +39,34 @@ namespace REASONUS_API {
             return;
         }
 
-        // Check if the pointer is avove the tcp or mcp's send list
+        // Check if the pointer is above the tcp or mcp's fx list
         if (std::regex_match(pointer_info, std::regex("(tcp|mcp).(fx)(.*)"))) {
             DAW::SetExtState(EXT_STATE_FP_PLUGIN_CONTROL, "true", false);
             return;
         }
 
-        // Check if the pointer is avove the tcp or mcp's send list
+        // Check if the pointer is above the tcp or mcp's send list
         if (std::regex_match(pointer_info, std::regex("(tcp|mcp).(sendlist|io)(.*)"))) {
             DAW::SetExtState(EXT_STATE_FP_SENDS_CONTROL, "true", false);
             return;
         }
 
-        // Check if the pointer is avove the tcp or mcp's send list
+        // Check if the pointer is above the tcp or mcp's pan control
         if (std::regex_match(pointer_info, std::regex("(tcp|mcp).(pan|width)(.*)"))) {
             DAW::SetExtState(EXT_STATE_FP_PAN_CONTROL, "true", false);
             return;
         }
 
+        // Check if the pointer is above the tcp or mcp's volume control
+        if (std::regex_match(pointer_info, std::regex("(tcp|mcp).(volume)(.*)"))) {
+            // Switch to track mode
+            DAW::SetExtState(EXT_STATE_FP_FADER_MODE, std::to_string(TrackMode), false);
+            return;
+        }
+
+        // Check if the pointer is above the tcp or mcp's area without controls
         if (std::regex_match(pointer_info, std::regex("(tcp|mcp)"))) {
+            // Select a track
             DAW::SetUniqueSelectedTrack(media_track);
             return;
         }
@@ -67,9 +78,10 @@ namespace REASONUS_API {
             "void\0\0\0"
             "Trigger action under mouse pointer for both mcp and tcp:\n"
             "  - Plugin list, filled slot: Start controlling plugin from the controller\n"
-            "  - Plugin list, empty slot: Open Plugin mode on the controler\n"
-            "  - FX select button: Open Plugin mode on the controler\n"
-            "  - Sends list, any slot: Open Sends mode on the controler\n"
-            "  - Pan or Width button: Open Pan mode on the controler\n"
-            "  - Ony other point in mcp/tcp: Open Track mode on the controler\n";
+            "  - Plugin list, empty slot: Open Plugin mode on the controller\n"
+            "  - FX select button: Open Plugin mode on the controller\n"
+            "  - Sends list, any slot: Open Sends mode on the controller\n"
+            "  - Pan or Width control: Open Pan mode on the controller\n"
+            "  - Volume control: Open Track mode on the controller\n"
+            "  - Any other point in mcp/tcp: Select a track\n";
 }
