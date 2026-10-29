@@ -42,7 +42,8 @@ public:
         const std::vector<CSurf_FP_8_Track *> &tracks,
         CSurf_FP_8_Navigator *navigator,
         CSurf_Context *context,
-        midi_Output *m_midiout) : CSurf_FP_8_ChannelManager(tracks, navigator, context, m_midiout) {
+        midi_Output *m_midiout
+    ) : CSurf_FP_8_ChannelManager(tracks, navigator, context, m_midiout) {
         context->ResetChannelManagerItemIndex(PluginEditMode);
         context->SetChannelManagerItemsCount(PluginEditMode, CSurf_Context::GetPluginMaxGroupCount());
         GetCurrentPlugin();
