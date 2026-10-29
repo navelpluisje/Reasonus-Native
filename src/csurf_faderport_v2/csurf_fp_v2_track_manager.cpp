@@ -114,16 +114,20 @@ void CSurf_FP_V2_TrackManager::HandleMuteClick(int index, const int value) {
 
     if (value == 0 && settings->GetMuteSoloMomentary()) {
         if (now - mute_start > MOMENTARY_TIMEOUT) {
-            CSurf_SetSurfaceMute(media_track,
-                                 CSurf_OnMuteChange(media_track, static_cast<int>(!DAW::IsTrackMuted(media_track))),
-                                 nullptr);
+            CSurf_SetSurfaceMute(
+                media_track,
+                CSurf_OnMuteChange(media_track, static_cast<int>(!DAW::IsTrackMuted(media_track))),
+                nullptr
+            );
         }
         mute_start = 0;
     } else if (value > 0) {
         mute_start = now;
-        CSurf_SetSurfaceMute(media_track,
-                             CSurf_OnMuteChange(media_track, static_cast<int>(!DAW::IsTrackMuted(media_track))),
-                             nullptr);
+        CSurf_SetSurfaceMute(
+            media_track,
+            CSurf_OnMuteChange(media_track, static_cast<int>(!DAW::IsTrackMuted(media_track))),
+            nullptr
+        );
     }
 }
 
@@ -143,16 +147,20 @@ void CSurf_FP_V2_TrackManager::HandleSoloClick(int index, const int value) {
 
     if (value == 0 && settings->GetMuteSoloMomentary()) {
         if (now - solo_start > MOMENTARY_TIMEOUT) {
-            CSurf_SetSurfaceSolo(media_track,
-                                 CSurf_OnSoloChange(media_track, static_cast<int>(!DAW::IsTrackSoloed(media_track))),
-                                 nullptr);
+            CSurf_SetSurfaceSolo(
+                media_track,
+                CSurf_OnSoloChange(media_track, static_cast<int>(!DAW::IsTrackSoloed(media_track))),
+                nullptr
+            );
         }
         solo_start = 0;
     } else if (value > 0) {
         solo_start = now;
-        CSurf_SetSurfaceSolo(media_track,
-                             CSurf_OnSoloChange(media_track, static_cast<int>(!DAW::IsTrackSoloed(media_track))),
-                             nullptr);
+        CSurf_SetSurfaceSolo(
+            media_track,
+            CSurf_OnSoloChange(media_track, static_cast<int>(!DAW::IsTrackSoloed(media_track))),
+            nullptr
+        );
     }
 }
 
@@ -174,9 +182,11 @@ void CSurf_FP_V2_TrackManager::HandleArmClick(int index, const int value) const 
         return;
     }
 
-    CSurf_SetSurfaceRecArm(media_track,
-                           CSurf_OnRecArmChange(media_track, static_cast<int>(!DAW::IsTrackArmed(media_track))),
-                           nullptr);
+    CSurf_SetSurfaceRecArm(
+        media_track,
+        CSurf_OnRecArmChange(media_track, static_cast<int>(!DAW::IsTrackArmed(media_track))),
+        nullptr
+    );
 }
 
 // ReSharper disable once CppParameterMayBeConst
@@ -210,10 +220,16 @@ void CSurf_FP_V2_TrackManager::HandleFaderMove(const int msb, const int lsb) con
     MediaTrack *media_track = navigator->GetControllerTrack();
 
     if (context->GetShiftLeft()) {
-        CSurf_SetSurfacePan(media_track,
-                            CSurf_OnPanChange(media_track, normalizedToPan(int14ToNormalized(msb, lsb)), false),
-                            nullptr);
+        CSurf_SetSurfacePan(
+            media_track,
+            CSurf_OnPanChange(media_track, normalizedToPan(int14ToNormalized(msb, lsb)), false),
+            nullptr
+        );
     } else {
-        CSurf_SetSurfaceVolume(media_track, CSurf_OnVolumeChange(media_track, int14ToVol(msb, lsb), false), nullptr);
+        CSurf_SetSurfaceVolume(
+            media_track,
+            CSurf_OnVolumeChange(media_track, int14ToVol(msb, lsb), false),
+            nullptr
+        );
     }
 }
