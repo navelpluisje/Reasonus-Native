@@ -1,12 +1,13 @@
 #include <array>
-#include <string>
-#include <vector>
-#include <reaper_plugin.h>
 // ReSharper disable once CppUnusedIncludeDirective
 #include <WDL/wdltypes.h> // might be unnecessary in future
 #include <reaper_plugin_functions.h>
+#include <reaper_plugin.h>
+#include <string>
+#include <vector>
 #include "../controls/csurf_button.hpp"
 #include "../shared/csurf.h"
+#include "../shared/csurf_api.hpp"
 #include "../shared/csurf_transport_manager.hpp"
 #include "../shared/csurf_utils.hpp"
 #include "../i18n/i18n.hpp"
@@ -44,6 +45,7 @@ class CSurf_FaderPort : public IReaperControlSurface {
     CSurf_FP_8_AutomationManager *automationManager;
     CSurf_FP_8_GeneralControlManager *generalControlManager;
     CSurf_FP_8_LastTouchedFXManager *lastTouchedFxManager;
+    ReaSonusApi *reasonusApi;
 
     std::vector<CSurf_FP_8_Track *> tracks;
     CSurf_FP_8_Track *lastTouchedFxTrack;
@@ -263,7 +265,7 @@ class CSurf_FaderPort : public IReaperControlSurface {
         }
     }
 
-    void updateSettings() const {
+    void UpdateSettings() const {
         i18n->SetLanguage(DAW::GetExtState(EXT_STATE_KEY_UI_LANGUAGE, "en-US"));
         settings->UpdateSettings();
     }
@@ -292,7 +294,7 @@ public:
         m_midiout = m_midi_out_dev >= 0 ? CreateMIDIOutput(m_midi_out_dev, false, nullptr) : nullptr;
 
         context = new CSurf_Context(settings->GetSurface());
-        updateSettings();
+        UpdateSettings();
 
         for (int i = 0; i < context->GetNbChannels(); i++) {
             auto *track = new CSurf_FP_8_Track(i, context, m_midiout);
@@ -308,6 +310,7 @@ public:
         automationManager = new CSurf_FP_8_AutomationManager(context, faderManager, m_midiout);
         generalControlManager = new CSurf_FP_8_GeneralControlManager(context, trackNavigator, faderManager, m_midiout);
         lastTouchedFxManager = new CSurf_FP_8_LastTouchedFXManager(lastTouchedFxTrack, context, m_midiout);
+        reasonusApi = new ReaSonusApi(context, faderManager, trackNavigator);
 
         if (errStats != nullptr && *errStats > 0) {
             if (m_midi_in_dev >= 0 && m_midiin == nullptr) {
@@ -456,10 +459,11 @@ public:
                 std::string const is_saved = DAW::GetExtState(EXT_STATE_KEY_SAVED_SETTINGS, "");
 
                 if (is_saved == EXT_STATE_VALUE_TRUE) {
-                    updateSettings();
+                    UpdateSettings();
                     DAW::SetExtState(EXT_STATE_KEY_SAVED_SETTINGS, EXT_STATE_VALUE_FALSE, false);
                 }
             }
+            reasonusApi->HandleApi();
         }
     }
 
