@@ -19,6 +19,8 @@ class ReaSonusApi {
 
     void HandleFilterByName() const;
 
+    void HandleFilterByType() const;
+
     void HandleSetFaderMode() const;
 
 public:

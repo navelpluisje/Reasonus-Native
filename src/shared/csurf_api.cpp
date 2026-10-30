@@ -67,6 +67,16 @@ void ReaSonusApi::HandleFilterByName() const {
     }
 }
 
+void ReaSonusApi::HandleFilterByType() const {
+    if (!DAW::GetExtState(EXT_STATE_FP_FILTER_BY_TYPE, "").empty()) {
+        const std::string filter = DAW::GetExtState(EXT_STATE_FP_FILTER_BY_TYPE, "");
+
+        trackNavigator->HandleFilter(static_cast<NavigatorFilter>(stoi(filter)));
+
+        DAW::SetExtState(EXT_STATE_FP_FILTER_BY_TYPE, "", false);
+    }
+}
+
 void ReaSonusApi::HandleSetFaderMode() const {
     if (!DAW::GetExtState(EXT_STATE_FP_FADER_MODE, "").empty()) {
         // Set the correct values to open the plugin control
@@ -104,5 +114,6 @@ void ReaSonusApi::HandleApi() const {
     HandleSendMode();
     HandlePanMode();
     HandleFilterByName();
+    HandleFilterByType();
     HandleSetFaderMode();
 }

@@ -245,10 +245,16 @@ void CSurf_FP_8_Navigator::HandleTrackCustomMultiSelectFilter() {
     std::map<int, bool> all_tracks = GetAllTracksBase();
     std::map<int, bool> filter_tracks;
     std::map<int, bool> tmp_tracks;
+    const int project_filters = project_state->GetNumberOfFilters();
+    mINI::INIMap<std::string> filter;
 
     for (const int filter_index: selected_filters) {
         tmp_tracks.clear();
-        const mINI::INIMap<std::string> filter = settings->GetFilter(filter_index);
+        if (filter_index < project_filters) {
+            filter = project_state->GetFilter(filter_index);
+        } else {
+            filter = settings->GetFilter(filter_index - project_filters);
+        }
         tmp_tracks = GetCustomFilterTracks(filter);
         filter_tracks.insert(tmp_tracks.begin(), tmp_tracks.end());
     }
@@ -407,7 +413,18 @@ bool CSurf_FP_8_Navigator::HasTracksWithMute() const {
     return has_mute;
 }
 
+NavigatorFilter CSurf_FP_8_Navigator::GetTrackFilter() const {
+    return track_filter;
+}
+
+void CSurf_FP_8_Navigator::SetTrackFilter(const NavigatorFilter filter) {
+    track_filter = filter;
+}
+
 void CSurf_FP_8_Navigator::HandleFilter(const NavigatorFilter filter) {
+    track_filter = filter;
+    SetMultiSelectFilter(filter == TrackCustomMultiSelectFilter);
+
     switch (filter) {
         case TrackSendsFilter:
             HandleTracksWithSendsFilter();

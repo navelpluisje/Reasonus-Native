@@ -7,57 +7,9 @@
 #include "../shared/csurf_context.cpp"
 #include "../shared/csurf_project_state.hpp"
 
-enum NavigatorFilter {
-    /**
-     * @brief Select all tracks in the project
-     */
-    TrackAllFilter,
-    /**
-     * @brief Select all tracks that have sends
-     */
-    TrackSendsFilter,
-    /**
-     * @brief Select all tracks that have receives
-     */
-    TrackReceivesFilter,
-    /**
-     * @brief Select all tracks that have a hardware output
-     */
-    TrackHarwareOutputFilter,
-    /**
-     * @brief Select all tracks that have a virtual instrument
-     */
-    TrackInstrumentsFilter,
-    /**
-     * @brief Select all tracks that have one or more effects
-     */
-    TrackEffectsFilter,
-    /**
-     * @brief Select all tracks that are a folder on top level
-     */
-    TrackTopFoldersFilter,
-    /**
-     * @brief Select all tracks that are a folder
-     */
-    TrackAllFoldersFilter,
-    /**
-     * @brief Select all tracks that have a media item with MIDI
-     */
-    TrackWithMidiFilter,
-    /**
-     * @brief Select all tracks that have a media item with Audio
-     */
-    TrackWithAudioFilter,
-    /**
-     * @brief Select all tracks that are a VCA Lead
-     */
-    TrackIsVcaFilter,
-    TrackCustomFilter,
-    TrackCustomMultiSelectFilter,
-};
-
 class CSurf_FP_8_Navigator {
     int track_offset = 0;
+    NavigatorFilter track_filter;
     CSurf_Context *context;
     ReaSonusSettings *settings = ReaSonusSettings::GetInstance(FP_8);
     ProjectState *project_state = ProjectState::GetInstance();
@@ -147,6 +99,10 @@ public:
     [[nodiscard]] bool HasTracksWithSolo() const;
 
     [[nodiscard]] bool HasTracksWithMute() const;
+
+    NavigatorFilter GetTrackFilter() const;
+
+    void SetTrackFilter(NavigatorFilter filter);
 
     void HandleFilter(NavigatorFilter filter);
 
