@@ -7,7 +7,7 @@
 #include "fp_v2_get_controlled_track.hpp"
 #include "fp_8_control_plugin.hpp"
 #include "fp_8_control_thing_under_pointer.hpp"
-#include "fp_8_filter_by_name.hpp"
+#include "fp_8_set_track_filter_by_name.hpp"
 #include "fp_8_set_fader_mode.hpp"
 #include "fp_8_set_fader_mode_track.hpp"
 #include "fp_8_set_fader_mode_plugin.hpp"
@@ -55,10 +55,10 @@ namespace REASONUS_API {
         plugin_register("APIvararg_ReaSonus_FP8_ControlThingUnderPointer",
                         reinterpret_cast<void *>(&InvokeReaScriptAPI<&FP8ControlThingUnderPointer>));
 
-        plugin_register("API_ReaSonus_FP8_FilterByName", reinterpret_cast<void *>(FP8FilterByName));
-        plugin_register("APIdef_ReaSonus_FP8_FilterByName", (void *) defstring_FP8FilterByName);
+        plugin_register("API_ReaSonus_FP8_FilterByName", reinterpret_cast<void *>(FP8SetTrackFilterByName));
+        plugin_register("APIdef_ReaSonus_FP8_FilterByName", (void *) defstring_FP8SetTrackFilterByName);
         plugin_register("APIvararg_ReaSonus_FP8_FilterByName",
-                        reinterpret_cast<void *>(&InvokeReaScriptAPI<&FP8FilterByName>));
+                        reinterpret_cast<void *>(&InvokeReaScriptAPI<&FP8SetTrackFilterByName>));
 
         plugin_register("API_ReaSonus_FP8_SetFaderMode", reinterpret_cast<void *>(FP8SetFaderMode));
         plugin_register("APIdef_ReaSonus_FP8_SetFaderMode", (void *) defstring_FP8SetFaderMode);
