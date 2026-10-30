@@ -1,65 +1,15 @@
 #ifndef CSURF_FP_8_NAVIGATOR_H_
 #define CSURF_FP_8_NAVIGATOR_H_
 
-#include <WDL/ptrlist.h>
 #include <map>
+#include <WDL/ptrlist.h>
 #include "../shared/csurf_reasonus_settings.hpp"
-// #include <reaper_plugin.h>
-// #include "../shared/csurf_utils.hpp"
 #include "../shared/csurf_context.cpp"
 #include "../shared/csurf_project_state.hpp"
 
-enum NavigatorFilter {
-    /**
-     * @brief Select all tracks in the project
-     */
-    TrackAllFilter,
-    /**
-     * @brief Select all tracks that have sends
-     */
-    TrackSendsFilter,
-    /**
-     * @brief Select all tracks that have receives
-     */
-    TrackReceivesFilter,
-    /**
-     * @brief Select all tracks that have a hardware output
-     */
-    TrackHarwareOutputFilter,
-    /**
-     * @brief Select all tracks that have a virtual instrument
-     */
-    TrackInstrumentsFilter,
-    /**
-     * @brief Select all tracks that have one or more effects
-     */
-    TrackEffectsFilter,
-    /**
-     * @brief Select all tracks that are a folder on top level
-     */
-    TrackTopFoldersFilter,
-    /**
-     * @brief Select all tracks that are a folder
-     */
-    TrackAllFoldersFilter,
-    /**
-     * @brief Select all tracks that have a media item with MIDI
-     */
-    TrackWithMidiFilter,
-    /**
-     * @brief Select all tracks that have a media item with Audio
-     */
-    TrackWithAudioFilter,
-    /**
-     * @brief Select all tracks that are a VCA Lead
-     */
-    TrackIsVcaFilter,
-    TrackCustomFilter,
-    TrackCustomMultiSelectFilter,
-};
-
 class CSurf_FP_8_Navigator {
     int track_offset = 0;
+    NavigatorFilter track_filter;
     CSurf_Context *context;
     ReaSonusSettings *settings = ReaSonusSettings::GetInstance(FP_8);
     ProjectState *project_state = ProjectState::GetInstance();
@@ -117,7 +67,7 @@ class CSurf_FP_8_Navigator {
 
     void HandleTracksAreVcaFilter();
 
-    void HandleTracksCustomFilter(const std::string &filter_name, const bool &project_filter);
+    void HandleTracksCustomFilter(const std::string &filter_key, const bool &project_filter);
 
     void HandleTrackCustomMultiSelectFilter();
 
@@ -150,9 +100,15 @@ public:
 
     [[nodiscard]] bool HasTracksWithMute() const;
 
+    NavigatorFilter GetTrackFilter() const;
+
+    void SetTrackFilter(NavigatorFilter filter);
+
     void HandleFilter(NavigatorFilter filter);
 
-    void HandleCustomFilter(const std::string &filterName, const bool &projectFilter);
+    void HandleCustomFilterByKey(const std::string &filter_key, const bool &project_filter);
+
+    void HandleCustomFilterByName(const std::string &filter_name);
 
     void SetTrackTouched(int index, bool value);
 
