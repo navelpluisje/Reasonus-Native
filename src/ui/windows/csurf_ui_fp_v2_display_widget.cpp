@@ -1,15 +1,14 @@
+#include "csurf_ui_fp_v2_display_widget.hpp"
 #include <string>
 #include "csurf_ui_plugin_type_mapping.hpp"
-#include "csurf_ui_fp_v2_display_widget.hpp"
 #include "../csurf_ui_colors.hpp"
 #include "../csurf_ui_vars.hpp"
-#include "../components/csurf_ui_button_bar.hpp"
-#include "../../shared/csurf_utils.hpp"
+#include "../../csurf_faderport_8/csurf_fp_8_channel_manager_resources.hpp"
 #include "../../shared/csurf.h"
 #include "../../shared/csurf_daw.hpp"
+#include "../../shared/csurf_utils.hpp"
+#include "../components/csurf_ui_button_bar.hpp"
 #include "../utils/csurf_ui_text_align.hpp"
-
-#include "../../csurf_faderport_8/csurf_fp_8_channel_manager_resources.hpp"
 
 constexpr auto g_name{"ReaSonus Native Display Widget"};
 
@@ -19,11 +18,11 @@ static void reportError(const ImGui_Error &e) {
     ShowMessageBox(e.what(), g_name, 0);
 }
 
-ReaSonusFpV2DisplayWidget::ReaSonusFpV2DisplayWidget()
-    : m_ctx{} {
+ReaSonusFpV2DisplayWidget::ReaSonusFpV2DisplayWidget() : m_ctx{} {
     ImGui::init(plugin_getapi);
     m_ctx = ImGui::CreateContext(g_name);
     assets = new CSurf_UI_Assets(m_ctx);
+    media_track = nullptr;
 
     plugin_register("timer", reinterpret_cast<void *>(&Loop));
 }
@@ -133,7 +132,7 @@ void ReaSonusFpV2DisplayWidget::SetDisplayValues() {
     }
 }
 
-int ReaSonusFpV2DisplayWidget::GetHighlightColor() {
+int ReaSonusFpV2DisplayWidget::GetHighlightColor() const {
     const auto widget_mode = static_cast<FP_V2_WIDGET_MODE>(stoi(DAW::GetExtState(
         EXT_STATE_FP_V2_WIDGET_MODE,
         std::to_string(FP_V2_WIDGET_TRACK_MODE)
@@ -151,6 +150,27 @@ int ReaSonusFpV2DisplayWidget::GetHighlightColor() {
 
         default:
             return UI_COLORS::Accent_50;
+    }
+}
+
+std::string ReaSonusFpV2DisplayWidget::GetWidgetTitle() const {
+    const auto widget_mode = static_cast<FP_V2_WIDGET_MODE>(stoi(DAW::GetExtState(
+        EXT_STATE_FP_V2_WIDGET_MODE,
+        std::to_string(FP_V2_WIDGET_TRACK_MODE)
+    )));
+
+    switch (widget_mode) {
+        case FP_V2_WIDGET_TRACK_MODE:
+            return "Track";
+
+        case FP_V2_WIDGET_MASTER_MODE:
+            return "Master";
+
+        case FP_V2_WIDGET_PARAM_MODE:
+            return "Parameter";
+
+        default:
+            return "Track";
     }
 }
 
@@ -202,16 +222,26 @@ void ReaSonusFpV2DisplayWidget::Frame() {
         ImGui::WindowFlags_NoCollapse | ImGui::WindowFlags_TopMost
     )) {
         ImGui::GetContentRegionAvail(m_ctx, &available_width, &available_height);
-        double font_size = available_width / 176 * 18;
+        const double zoom = available_width / 176;
+        double font_size = zoom * 18;
         if (!ImGui::IsWindowDocked(m_ctx)) {
             if (available_width < 120) {
                 ImGui::SetWindowSizeEx(m_ctx, g_name, 176, 190);
             }
         }
 
+        // Set the widget title
+        ImGui::PushFont(m_ctx, assets->GetMainFont(), font_size * 0.8);
+        ImGui::PushStyleColor(m_ctx, ImGui::Col_Text, GetHighlightColor());
+        ImGui::Text(m_ctx, GetWidgetTitle().c_str());
+        ImGui::PopStyleColor(m_ctx);
+        ImGui::PopFont(m_ctx);
+
+        // Create the actual widget
         ImGui::PushFont(m_ctx, assets->GetMainFont(), font_size);
         UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
         ImGui::PushStyleColor(m_ctx, ImGui::Col_Border, GetHighlightColor());
+
         if (ImGui::BeginChild(m_ctx, "wrapper", 0.0, 0.0, ImGui::ChildFlags_FrameStyle)) {
             if (ImGui::BeginChild(m_ctx, "logo", 0.0, 0.0, ImGui::ChildFlags_None)) {
                 ImGui::GetContentRegionAvail(m_ctx, &available_width, &available_height);

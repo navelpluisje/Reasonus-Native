@@ -2,7 +2,9 @@
 #define CSURF_FP_TRANSLATION_EDITOR_H_
 
 #include <array>
+#include <memory>
 #include <reaper_imgui_functions.h>
+#include <reaper_plugin.h>
 #include <string>
 #include "../csurf_ui_assets.hpp"
 
@@ -23,7 +25,9 @@ private:
 
     void SetDisplayValues();
 
-    int GetHighlightColor();
+    [[nodiscard]] int GetHighlightColor() const;
+
+    [[nodiscard]] std::string GetWidgetTitle() const;
 
     static void Loop();
 

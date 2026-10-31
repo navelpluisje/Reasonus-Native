@@ -1,6 +1,6 @@
 #include "csurf_fp_v2_track_manager.hpp"
-#include "../shared/csurf_daw.hpp"
 #include "../shared/csurf.h"
+#include "../shared/csurf_daw.hpp"
 
 constexpr int MOMENTARY_TIMEOUT = 500;
 
