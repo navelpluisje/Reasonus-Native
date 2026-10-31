@@ -125,10 +125,6 @@ void ReaSonusFpV2DisplayWidget::SetDisplayValues() {
             }
             break;
         }
-
-        default:
-
-
     }
 }
 
