@@ -172,8 +172,14 @@ void CSurf_FP_8_FaderManager::HandlePluginsButtonClick(const int value, const bo
     context->SetPluginEditPluginId(-1);
     const bool cameFromPlugin = context->IsChannelMode(PluginEditMode) || context->IsChannelMode(PluginControlMode);
 
-    if ((!context->IsChannelMode(PluginMode) && !track && !cameFromPlugin) || (
-            context->GetPreviousPluginChannelMode() == PluginMode && cameFromPlugin)) {
+    if (
+        !context->IsChannelMode(PluginMode)
+        && !context->IsChannelMode(TrackPluginMode)
+        && settings->ShouldStartWithTrackPluginMode()
+    ) {
+        SetChannelMode(TrackPluginMode, true);
+    } else if ((!context->IsChannelMode(PluginMode) && !track && !cameFromPlugin) || (
+                   context->GetPreviousPluginChannelMode() == PluginMode && cameFromPlugin)) {
         context->SetPreviousPluginChannelMode(PluginMode);
         SetChannelMode(PluginMode, true);
     } else {
@@ -190,13 +196,25 @@ void CSurf_FP_8_FaderManager::HandleSendButtonClick(const int value, const bool 
     context->SetPluginEditPluginId(-1);
 
     if (context->GetShiftChannelLeft()) {
-        if (!context->IsChannelMode(ReceiveMode) && !track) {
+        if (
+            !context->IsChannelMode(ReceiveMode)
+            && !context->IsChannelMode(TrackReceiveMode)
+            && settings->ShouldStartWithTrackSendMode()
+        ) {
+            SetChannelMode(TrackReceiveMode, true);
+        } else if (!context->IsChannelMode(ReceiveMode) && !track) {
             SetChannelMode(ReceiveMode, true);
         } else {
             SetChannelMode(TrackReceiveMode, true);
         }
     } else {
-        if (!context->IsChannelMode(SendMode) && !track) {
+        if (
+            !context->IsChannelMode(SendMode)
+            && !context->IsChannelMode(TrackSendMode)
+            && settings->ShouldStartWithTrackSendMode()
+        ) {
+            SetChannelMode(TrackSendMode, true);
+        } else if (!context->IsChannelMode(SendMode) && !track) {
             SetChannelMode(SendMode, true);
         } else {
             SetChannelMode(TrackSendMode, true);

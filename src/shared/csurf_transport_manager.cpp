@@ -195,7 +195,7 @@ void CSurf_TransportManager::HandleRewindButton(const int value) {
     }
 
     if (context->GetShiftRight()) {
-        handleFunctionKey("2", FUNCTION_TRANSPORT);
+        handleFunctionKey("3", FUNCTION_TRANSPORT);
         return;
     }
 
@@ -225,12 +225,12 @@ void CSurf_TransportManager::HandleForwardButton(const int value) {
     }
 
     if (context->GetShiftLeft()) {
-        const std::string action_id = settings->GetFunction("3", FUNCTION_TRANSPORT);
+        const std::string action_id = settings->GetFunction("2", FUNCTION_TRANSPORT);
 
         if (action_id == "0") {
             CSurf_GoEnd();
         } else {
-            handleFunctionKey("3", FUNCTION_TRANSPORT);
+            handleFunctionKey("2", FUNCTION_TRANSPORT);
         }
 
         return;
