@@ -101,8 +101,12 @@ protected:
 
         const std::string actionId = ini["functions"][key];
         if (actionId == "0") {
-            const int result = MB("There is no action assigned to this function.\nDo you want to assign an action?",
-                                  "No action assigned", 1);
+            const int result = MB(
+                "There is no action assigned to this function.\nDo you want to assign an action?",
+                "No action assigned",
+                1
+            );
+
             if (result == 1) {
                 if (!ReaSonusV2ControlPanel::control_panel_open) {
                     ToggleFPV2ControlPanel(ReaSonusV2ControlPanel::FUNCTIONS_PAGE);

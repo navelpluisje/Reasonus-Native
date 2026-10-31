@@ -140,7 +140,7 @@ public:
             std::string strPan1;
             std::string strPan2;
 
-            const CSurf_FP_8_Track *track = tracks.at(i);
+            const CSurf_FP_8_Track *faderport_channel = tracks.at(i);
 
             if (context->GetMasterFaderMode() && i == context->GetNbChannels() - 1) {
                 media_track = GetMasterTrack(nullptr);
@@ -153,13 +153,14 @@ public:
                 const int index = context->GetNbChannels() - (static_cast<int>(time_code.size()) + i);
 
                 if (index < 1) {
-                    track->ClearTrack(false, force_update);
-                    track->SetDisplayMode(DISPLAY_MODE_0, force_update);
-                    track->SetDisplayLine(0, ALIGN_LEFT, "", NON_INVERT, force_update);
-                    track->SetDisplayLine(1, ALIGN_CENTER, "", NON_INVERT, force_update);
-                    track->SetDisplayLine(2, ALIGN_CENTER, time_code.at(abs(index)).c_str(), INVERT, force_update);
+                    faderport_channel->ClearTrack(false, force_update);
+                    faderport_channel->SetDisplayMode(DISPLAY_MODE_0, force_update);
+                    faderport_channel->SetDisplayLine(0, ALIGN_LEFT, "", NON_INVERT, force_update);
+                    faderport_channel->SetDisplayLine(1, ALIGN_CENTER, "", NON_INVERT, force_update);
+                    faderport_channel->SetDisplayLine(2, ALIGN_CENTER, time_code.at(abs(index)).c_str(), INVERT,
+                                                      force_update);
                 } else {
-                    track->ClearTrack(true, force_update);
+                    faderport_channel->ClearTrack(true, force_update);
                 }
                 continue;
             }
@@ -171,47 +172,49 @@ public:
             const bool is_selected = (context->GetArm() && is_armed) || (!context->GetArm() && track_selected);
 
             SetTrackColors(media_track, is_selected, true);
-            track->SetTrackColor(color, force_update);
+            faderport_channel->SetTrackColor(color, force_update);
             // If the track is armed always blink as an indication it is armed
-            track->SetSelectButtonValue(
+            faderport_channel->SetSelectButtonValue(
                 !context->GetArm() && is_armed && !settings->GetDistractionFreeMode()
                     ? BTN_VALUE_BLINK
                     : BTN_VALUE_ON,
                 force_update
             );
-            track->SetMuteButtonValue(DAW::IsTrackMuted(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, force_update);
-            track->SetSoloButtonValue(DAW::IsTrackSoloed(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, force_update);
+            faderport_channel->SetMuteButtonValue(DAW::IsTrackMuted(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF,
+                                                  force_update);
+            faderport_channel->SetSoloButtonValue(DAW::IsTrackSoloed(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF,
+                                                  force_update);
 
-            track->SetFaderValue(fader_value, force_update || has_touch_mode);
+            faderport_channel->SetFaderValue(fader_value, force_update || has_touch_mode);
 
             // Get value bar type and value type
-            track->SetValueBarMode(context->GetArm() ? VALUEBAR_MODE_FILL : valuebar_mode);
-            track->SetValueBarValue(valuebar_value);
+            faderport_channel->SetValueBarMode(context->GetArm() ? VALUEBAR_MODE_FILL : valuebar_mode);
+            faderport_channel->SetValueBarValue(valuebar_value);
 
             if (is_master_track) {
-                track->SetDisplayMode(DISPLAY_MODE_2, force_update);
-                track->SetDisplayLine(
+                faderport_channel->SetDisplayMode(DISPLAY_MODE_2, force_update);
+                faderport_channel->SetDisplayLine(
                     DISPLAY_LINE_1,
                     ALIGN_CENTER,
                     DAW::GetTrackName(media_track).c_str(),
                     NON_INVERT,
                     force_update
                 );
-                track->SetDisplayLine(
+                faderport_channel->SetDisplayLine(
                     DISPLAY_LINE_2,
                     ALIGN_CENTER,
                     DAW::GetTrackIndex(media_track).c_str(),
                     NON_INVERT,
                     force_update
                 );
-                track->SetDisplayLine(
+                faderport_channel->SetDisplayLine(
                     DISPLAY_LINE_3,
                     ALIGN_CENTER,
                     strPan1.c_str(),
                     NON_INVERT,
                     force_update
                 );
-                track->SetDisplayLine(
+                faderport_channel->SetDisplayLine(
                     DISPLAY_LINE_4,
                     ALIGN_CENTER,
                     strPan2.c_str(),
@@ -219,29 +222,29 @@ public:
                     force_update
                 );
             } else if (context->GetArm() && is_armed) {
-                track->SetDisplayMode(DISPLAY_MODE_2, force_update);
-                track->SetDisplayLine(
+                faderport_channel->SetDisplayMode(DISPLAY_MODE_2, force_update);
+                faderport_channel->SetDisplayLine(
                     DISPLAY_LINE_1,
                     ALIGN_CENTER,
                     DAW::GetTrackName(media_track).c_str(),
                     NON_INVERT,
                     force_update
                 );
-                track->SetDisplayLine(
+                faderport_channel->SetDisplayLine(
                     DISPLAY_LINE_2,
                     ALIGN_CENTER,
                     DAW::GetTrackInputName(media_track).c_str(),
                     NON_INVERT,
                     force_update
                 );
-                track->SetDisplayLine(
+                faderport_channel->SetDisplayLine(
                     DISPLAY_LINE_3,
                     ALIGN_CENTER,
                     DAW::GetTrackMonitorMode(media_track).c_str(),
                     NON_INVERT,
                     force_update
                 );
-                track->SetDisplayLine(
+                faderport_channel->SetDisplayLine(
                     DISPLAY_LINE_4,
                     ALIGN_CENTER,
                     DAW::GetTrackRecordingMode(media_track).c_str(),
@@ -249,26 +252,26 @@ public:
                     force_update
                 );
             } else {
-                track->SetVuMeterValue(DAW::GetTrackSurfacePeakInfo(media_track), true);
+                faderport_channel->SetVuMeterValue(DAW::GetTrackSurfacePeakInfo(media_track), true);
                 const int index = context->GetNbBankChannels() - (static_cast<int>(time_code.size()) + i);
 
                 if (index < 1) {
-                    track->SetDisplayMode(DISPLAY_MODE_0, force_update);
-                    track->SetDisplayLine(
+                    faderport_channel->SetDisplayMode(DISPLAY_MODE_0, force_update);
+                    faderport_channel->SetDisplayLine(
                         DISPLAY_LINE_1,
                         ALIGN_LEFT,
                         DAW::GetTrackName(media_track).c_str(),
                         NON_INVERT,
                         force_update
                     );
-                    track->SetDisplayLine(
+                    faderport_channel->SetDisplayLine(
                         DISPLAY_LINE_2,
                         ALIGN_CENTER,
                         DAW::GetTrackIndex(media_track).c_str(),
                         NON_INVERT,
                         force_update
                     );
-                    track->SetDisplayLine(
+                    faderport_channel->SetDisplayLine(
                         DISPLAY_LINE_3, ALIGN_CENTER,
                         time_code.at(abs(index)).c_str(),
                         INVERT,
@@ -277,8 +280,9 @@ public:
                 } else {
                     // Just the reular track layout.
                     // Get display mode and display line options.
-                    track->SetDisplayMode(static_cast<DisplayMode>(settings->GetTrackDisplay()), force_update);
-                    track->SetDisplayLine(
+                    faderport_channel->SetDisplayMode(static_cast<DisplayMode>(settings->GetTrackDisplay()),
+                                                      force_update);
+                    faderport_channel->SetDisplayLine(
                         DISPLAY_LINE_1,
                         static_cast<Alignment>(display_align_values[DISPLAY_LINE_1]),
                         GetDisplayLineValue(
@@ -288,7 +292,7 @@ public:
                         display_invert_values[DISPLAY_LINE_1] > 0 ? INVERT : NON_INVERT,
                         force_update
                     );
-                    track->SetDisplayLine(
+                    faderport_channel->SetDisplayLine(
                         DISPLAY_LINE_2,
                         static_cast<Alignment>(display_align_values[DISPLAY_LINE_2]),
                         GetDisplayLineValue(
@@ -298,7 +302,7 @@ public:
                         display_invert_values[DISPLAY_LINE_2] > 0 ? INVERT : NON_INVERT,
                         force_update
                     );
-                    track->SetDisplayLine(
+                    faderport_channel->SetDisplayLine(
                         DISPLAY_LINE_3,
                         static_cast<Alignment>(display_align_values[DISPLAY_LINE_3]),
                         GetDisplayLineValue(
@@ -308,7 +312,7 @@ public:
                         display_invert_values[DISPLAY_LINE_3] > 0 ? INVERT : NON_INVERT,
                         force_update
                     );
-                    track->SetDisplayLine(
+                    faderport_channel->SetDisplayLine(
                         DISPLAY_LINE_4,
                         static_cast<Alignment>(display_align_values[DISPLAY_LINE_4]),
                         GetDisplayLineValue(

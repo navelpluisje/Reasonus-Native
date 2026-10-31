@@ -1,6 +1,8 @@
 #include "csurf_reasonus_settings.hpp"
 #include <array>
 #include <utility>
+
+#include "csurf_daw.hpp"
 #include "../shared/csurf_utils.hpp"
 
 ReaSonusSettings::ReaSonusSettings(std::string _device) {
@@ -95,13 +97,20 @@ void ReaSonusSettings::SetAndSaveSetting(const std::string &group, const std::st
     StoreSettings();
 }
 
-void ReaSonusSettings::SetFunction(const std::string &index, const std::string &value, const bool is_footswitch) {
-    const std::string group = is_footswitch ? "footswitch" : "functions";
-    SetSetting(group, index, value);
+void ReaSonusSettings::SetFunction(
+    const std::string &index,
+    const std::string &value,
+    const FunctionTypes function_type
+) {
+    SetSetting(GetFunctionType(function_type), index, value);
 }
 
-void ReaSonusSettings::SetAndSaveFuntion(const std::string &key, const std::string &value, const bool is_footswitch) {
-    SetFunction(key, value, is_footswitch);
+void ReaSonusSettings::SetAndSaveFuntion(
+    const std::string &key,
+    const std::string &value,
+    const FunctionTypes function_types
+) {
+    SetFunction(key, value, function_types);
     StoreSettings();
 }
 
@@ -113,10 +122,8 @@ std::string ReaSonusSettings::GetSetting(const std::string &group, const std::st
     return default_value;
 }
 
-std::string ReaSonusSettings::GetFunction(const std::string &key, const bool is_footswitch) {
-    const std::string group = is_footswitch ? "footswitch" : "functions";
-
-    return GetSetting(group, key, "0");
+std::string ReaSonusSettings::GetFunction(const std::string &key, const FunctionTypes function_type) {
+    return GetSetting(GetFunctionType(function_type), key, "0");
 }
 
 bool ReaSonusSettings::StoreSettings() {
@@ -192,6 +199,10 @@ int ReaSonusSettings::GetpluginStepSize() {
     return stoi(settings["surface"]["plugin-step-size"]);
 }
 
+bool ReaSonusSettings::HasPluginInputControl() {
+    return stoi(settings["surface"]["plugin-has-input-control"]) > 0;
+}
+
 int ReaSonusSettings::GetTrackDisplay() {
     return stoi(settings["displays"]["track"]);
 }
@@ -216,6 +227,14 @@ int ReaSonusSettings::GetTrackValueBarValue() {
     return stoi(settings["displays"]["track-value-bar-value"]);
 }
 
+int ReaSonusSettings::GetSendDisplayValueSend() {
+    return stoi(settings["displays"]["send-value-send"]);
+}
+
+int ReaSonusSettings::GetSendDisplayValueHardware() {
+    return stoi(settings["displays"]["send-value-hardware"]);
+}
+
 int ReaSonusSettings::GetSurface() {
     return stoi(settings["surface"]["surface"]);
 }
@@ -232,6 +251,17 @@ bool ReaSonusSettings::ShouldClearParamInput() {
     return stoi(settings["surface"]["plugin-map-param-clear"]) > 0;
 }
 
+bool ReaSonusSettings::PluginsShouldRespectSlots() {
+    if (!DAW::VersionHasFeature(FEATURE_SLOTS)) {
+        return false;
+    }
+    return stoi(settings["surface"]["plugin-respect-slots"]) > 0;
+}
+
+bool ReaSonusSettings::SendsShouldRespectSlots() {
+    return stoi(settings["surface"]["sends-respect-slots"]) > 0;
+}
+
 int ReaSonusSettings::GetPluginMapDefaultColorMode() {
     return stoi(settings["surface"]["plugin-map-default-color-mode"]);
 }
@@ -246,6 +276,14 @@ std::vector<int> ReaSonusSettings::GetPluginColorPalette() {
 
 bool ReaSonusSettings::ShouldMuteMasterOnFwdRwd() {
     return stoi(settings["surface"]["mute-master-on-fwd-rwd"]) > 0;
+}
+
+bool ReaSonusSettings::ShouldStartWithTrackSendMode() {
+    return stoi(settings["surface"]["start-with-track-send-mode"]) > 0;
+}
+
+bool ReaSonusSettings::ShouldStartWithTrackPluginMode() {
+    return stoi(settings["surface"]["start-with-track-plugin-mode"]) > 0;
 }
 
 bool ReaSonusSettings::UseAutomationColors() {

@@ -1,5 +1,6 @@
 #include "csurf_context.hpp"
 #include <array>
+#include <map>
 #include "csurf_context_resources.hpp"
 #include "csurf_reasonus_settings.hpp"
 #include "csurf_utils.hpp"
@@ -195,42 +196,45 @@ bool CSurf_Context::GetPanPushMode() const {
 /**************************************************************************
  * Channel manager Item
  **************************************************************************/
-void CSurf_Context::UpdateChannelManagerItemIndex(const int val) {
+void CSurf_Context::UpdateChannelManagerItemIndex(const ChannelMode channel_mode, const int val) {
     val < 0
-        ? DecrementChannelManagerItemIndex(abs(val))
-        : IncrementChannelmanagerItemIndex(val);
+        ? DecrementChannelManagerItemIndex(channel_mode, abs(val))
+        : IncrementChannelmanagerItemIndex(channel_mode, val);
 }
 
-void CSurf_Context::IncrementChannelmanagerItemIndex(const int val) {
-    if (channelManagerItemIndex + val + (channelManagerType == Hui ? 0 : nbChannels) < channelManagerItemsCount) {
-        channelManagerItemIndex += val;
+void CSurf_Context::IncrementChannelmanagerItemIndex(const ChannelMode channel_mode, const int val) {
+    if (
+        channelManagerItemIndex[channel_mode] + val + (channelManagerType == Hui ? 0 : nbChannels) <
+        channelManagerItemsCount[channel_mode]
+    ) {
+        channelManagerItemIndex[channel_mode] += val;
     }
 }
 
-void CSurf_Context::DecrementChannelManagerItemIndex(const int val) {
-    if (channelManagerItemIndex - val >= 0) {
-        channelManagerItemIndex -= val;
+void CSurf_Context::DecrementChannelManagerItemIndex(const ChannelMode channel_mode, const int val) {
+    if (channelManagerItemIndex[channel_mode] - val >= 0) {
+        channelManagerItemIndex[channel_mode] -= val;
     }
 }
 
-void CSurf_Context::ResetChannelManagerItemIndex() {
-    channelManagerItemIndex = 0;
+void CSurf_Context::ResetChannelManagerItemIndex(const ChannelMode channel_mode) {
+    channelManagerItemIndex[channel_mode] = 0;
 }
 
-int CSurf_Context::GetChannelManagerItemIndex() const {
-    return channelManagerItemIndex;
+int CSurf_Context::GetChannelManagerItemIndex(const ChannelMode channel_mode) {
+    return channelManagerItemIndex[channel_mode];
 }
 
-int CSurf_Context::GetChannelManagerItemIndex(const int max) const {
-    return max < channelManagerItemIndex ? max : channelManagerItemIndex;
+int CSurf_Context::GetChannelManagerItemIndex(const ChannelMode channel_mode, const int max) {
+    return max < channelManagerItemIndex[channel_mode] ? max : channelManagerItemIndex[channel_mode];
 }
 
-void CSurf_Context::SetChannelManagerItemsCount(const int count) {
-    channelManagerItemsCount = count;
+void CSurf_Context::SetChannelManagerItemsCount(const ChannelMode channel_mode, const int count) {
+    channelManagerItemsCount[channel_mode] = count;
 }
 
-void CSurf_Context::ResetChannelManagerItemsCount() {
-    channelManagerItemsCount = 0;
+void CSurf_Context::ResetChannelManagerItemsCount(const ChannelMode channel_mode) {
+    channelManagerItemsCount[channel_mode] = 0;
 }
 
 int CSurf_Context::GetPluginMaxGroupCount() {

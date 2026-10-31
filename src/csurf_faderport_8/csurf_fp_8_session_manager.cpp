@@ -1,12 +1,12 @@
 #ifndef CSURF_FP_8_SESSION_MANAGER_C_
 #define CSURF_FP_8_SESSION_MANAGER_C_
 
-#include "../ui/windows/csurf_ui_fp_8_control_panel.hpp"
 #include "csurf_fp_8_navigator.hpp"
 #include "../controls/csurf_button.hpp"
-#include "../shared/csurf_reasonus_settings.hpp"
 #include "../shared/csurf_faderport_ui_imgui_utils.hpp"
+#include "../shared/csurf_reasonus_settings.hpp"
 #include "../shared/csurf_session_manager_actions.hpp"
+#include "../ui/windows/csurf_ui_fp_8_control_panel.hpp"
 
 enum SessionTypes {
     Channel,
@@ -19,15 +19,12 @@ enum SessionTypes {
     Marker,
 };
 
-const int TO_FUNCTION = 8;
+constexpr int TO_FUNCTION = 8;
 
 class CSurf_FP_8_SessionManager {
-protected:
     CSurf_Context *context;
-    midi_Output *m_midiout;
     CSurf_FP_8_Navigator *trackNavigator;
     SessionTypes session_type = Channel;
-    bool handleFunctionKeys = false;
 
     ReaSonusSettings *settings = ReaSonusSettings::GetInstance(FP_8);
 
@@ -42,29 +39,32 @@ protected:
     CSurf_Button *prevButton;
     CSurf_Button *nextButton;
 
-    void SetButtonValues(bool force = false) {
+protected:
+    void SetButtonValues(const bool force = false) const {
         // With shift engaged, blink the selected button
-        Btn_Value valueOn = context->GetShiftLeft() && !settings->GetControlHiddenTracks()
-                                ? BTN_VALUE_BLINK
-                                : BTN_VALUE_ON;
+        const Btn_Value valueOn = context->GetShiftLeft() && !settings->GetControlHiddenTracks()
+                                      ? BTN_VALUE_BLINK
+                                      : BTN_VALUE_ON;
 
         channelButton->SetValue(session_type == Channel ? valueOn : BTN_VALUE_OFF, force);
         zoomButton->SetValue(session_type == Zoom ? valueOn : BTN_VALUE_OFF, force);
         scrollButton->SetValue(session_type == Scroll ? valueOn : BTN_VALUE_OFF, force);
         bankButton->SetValue(session_type == Bank ? valueOn : BTN_VALUE_OFF, force);
-        masterButton->SetValue((context->GetMasterFaderMode() || session_type == Master) ? valueOn : BTN_VALUE_OFF,
+        masterButton->SetValue(context->GetMasterFaderMode() || session_type == Master ? valueOn : BTN_VALUE_OFF,
                                force);
         clickButton->SetValue(session_type == Click ? valueOn : BTN_VALUE_OFF, force);
         sectionButton->SetValue(session_type == Section ? valueOn : BTN_VALUE_OFF, force);
         markerButton->SetValue(session_type == Marker ? valueOn : BTN_VALUE_OFF, force);
     }
 
-    void handleFunctionKey(std::string key) {
-        std::string actionId = settings->GetFunction(key);
+    void handleFunctionKey(const std::string &key) const {
+        const std::string actionId = settings->GetFunction(key, FUNCTION_DEFAULT);
         if (actionId == "0") {
-            int result = ShowMessageBox(
+            const int result = ShowMessageBox(
                 "There is no action assigned to this function.\nDo you want to assign an action?", "No action assigned",
-                1);
+                1
+            );
+
             if (result == 1) {
                 if (!ReaSonus8ControlPanel::control_panel_open) {
                     ToggleFP8ControlPanel(ReaSonus8ControlPanel::FUNCTIONS_PAGE);
@@ -84,7 +84,8 @@ public:
     CSurf_FP_8_SessionManager(
         CSurf_Context *context,
         CSurf_FP_8_Navigator *trackNavigator,
-        midi_Output *m_midiout) : context(context), m_midiout(m_midiout), trackNavigator(trackNavigator) {
+        midi_Output *m_midiout
+    ) : context(context), trackNavigator(trackNavigator) {
         channelButton = new CSurf_Button(BTN_CHANNEL, BTN_VALUE_ON, m_midiout);
         zoomButton = new CSurf_Button(BTN_ZOOM, BTN_VALUE_OFF, m_midiout);
         scrollButton = new CSurf_Button(BTN_SCROLL, BTN_VALUE_OFF, m_midiout);
@@ -97,19 +98,18 @@ public:
         nextButton = new CSurf_Button(BTN_NEXT, BTN_VALUE_OFF, m_midiout);
     }
 
-    ~CSurf_FP_8_SessionManager() {
-    };
+    ~CSurf_FP_8_SessionManager() = default;
 
-    void Refresh(bool force = false) {
+    void Refresh(const bool force = false) const {
         SetButtonValues(force);
     }
 
-    void SelectSession(SessionTypes _session_type) {
+    void SelectSession(const SessionTypes _session_type) {
         session_type = _session_type;
         SetButtonValues();
     }
 
-    void HandleChannelButton(int value) {
+    void HandleChannelButton(const int value) {
         if (value == 0) {
             return;
         }
@@ -126,7 +126,7 @@ public:
         SetButtonValues();
     }
 
-    void HandleZoomButton(int value) {
+    void HandleZoomButton(const int value) {
         if (value == 0) {
             return;
         }
@@ -143,7 +143,7 @@ public:
         SetButtonValues();
     }
 
-    void HandleScrollButton(int value) {
+    void HandleScrollButton(const int value) {
         if (value == 0) {
             return;
         }
@@ -160,7 +160,7 @@ public:
         SetButtonValues();
     }
 
-    void HandleBankButton(int value) {
+    void HandleBankButton(const int value) {
         if (value == 0) {
             return;
         }
@@ -177,7 +177,7 @@ public:
         SetButtonValues();
     }
 
-    void HandleMasterButton(int value) {
+    void HandleMasterButton(const int value) {
         if (value == 0) {
             return;
         }
@@ -200,7 +200,7 @@ public:
         SetButtonValues();
     }
 
-    void HandleClickButton(int value) {
+    void HandleClickButton(const int value) {
         if (value == 0) {
             return;
         }
@@ -217,7 +217,7 @@ public:
         SetButtonValues();
     }
 
-    void HandleSectionButton(int value) {
+    void HandleSectionButton(const int value) {
         if (value == 0) {
             return;
         }
@@ -232,13 +232,13 @@ public:
         }
         // Once selected and repressing it again, it will create a region from the time selection
         if (session_type == Section) {
-            Main_OnCommandAsyncEx(40306, 0, 0); // Markers: Insert region from time selection and edit...
+            Main_OnCommandAsyncEx(40306, 0, nullptr); // Markers: Insert region from time selection and edit...
         }
         session_type = Section;
         SetButtonValues();
     }
 
-    void HandleMarkerButton(int value) {
+    void HandleMarkerButton(const int value) {
         if (value == 0) {
             return;
         }
@@ -255,8 +255,8 @@ public:
         SetButtonValues();
     }
 
-    void HandlePrevButton(int value) {
-        if (!value) {
+    void HandlePrevButton(const int value) const {
+        if (value == 0) {
             prevButton->SetValue(BTN_VALUE_OFF);
             return;
         }
@@ -290,7 +290,7 @@ public:
                 break;
             case Section:
                 context->GetShiftLeft()
-                    ? Main_OnCommandAsyncEx(40625, 0, nullptr) // Time selection: Set start point
+                    ? Main_OnCommandAsyncEx(40625, 0, nullptr)                // Time selection: Set start point
                     : Main_OnCommandStringEx("_SWS_SELPREVMORR", 0, nullptr); // SWS: Goto/select previous marker/region
                 break;
             case Marker:
@@ -299,8 +299,8 @@ public:
         }
     }
 
-    void HandleNextButton(int value) {
-        if (!value) {
+    void HandleNextButton(const int value) const {
+        if (value == 0) {
             nextButton->SetValue(BTN_VALUE_OFF);
             return;
         }
@@ -333,7 +333,7 @@ public:
                 break;
             case Section:
                 context->GetShiftLeft()
-                    ? Main_OnCommandAsyncEx(40626, 0, nullptr) // Time selection: Set end point
+                    ? Main_OnCommandAsyncEx(40626, 0, nullptr)                // Time selection: Set end point
                     : Main_OnCommandStringEx("_SWS_SELNEXTMORR", 0, nullptr); // SWS: Goto/select next marker/region
                 break;
             case Marker:
@@ -342,7 +342,7 @@ public:
         }
     }
 
-    void HandleEncoderIncrement(int value) {
+    void HandleEncoderIncrement(const int value) const {
         switch (session_type) {
             case Channel:
                 trackNavigator->IncrementOffset(context->GetShiftLeft() ? context->GetNbBankChannels() : 1);
@@ -354,7 +354,7 @@ public:
                 break;
             case Scroll:
                 context->GetShiftLeft()
-                    ? Main_OnCommandAsyncEx(40141, 0, nullptr) // View: Scroll view left
+                    ? Main_OnCommandAsyncEx(40141, 0, nullptr)  // View: Scroll view left
                     : Main_OnCommandAsyncEx(40139, 0, nullptr); // View: Scroll view up
                 break;
             case Bank:
@@ -381,13 +381,13 @@ public:
                 break;
             case Marker:
                 context->GetShiftLeft()
-                    ? Main_OnCommandAsyncEx(40105, 0, nullptr) // View: Move cursor right one pixel
+                    ? Main_OnCommandAsyncEx(40105, 0, nullptr)  // View: Move cursor right one pixel
                     : Main_OnCommandAsyncEx(41044, 0, nullptr); // Move edit cursor forward one beat
                 break;
         }
     }
 
-    void HandleEncoderDecrement(int value) {
+    void HandleEncoderDecrement(const int value) const {
         switch (session_type) {
             case Channel:
                 trackNavigator->DecrementOffset(context->GetShiftLeft() ? context->GetNbBankChannels() : 1);
@@ -399,7 +399,7 @@ public:
                 break;
             case Scroll:
                 context->GetShiftLeft()
-                    ? Main_OnCommandAsyncEx(40140, 0, nullptr) // View: Scroll view right
+                    ? Main_OnCommandAsyncEx(40140, 0, nullptr)  // View: Scroll view right
                     : Main_OnCommandAsyncEx(40138, 0, nullptr); // View: Scroll view down
                 break;
             case Bank:
@@ -418,25 +418,25 @@ public:
                 break;
             case Section:
                 context->GetShiftLeft()
-                    ? Main_OnCommandAsyncEx(40104, 0, 0)
+                    ? Main_OnCommandAsyncEx(40104, 0, nullptr)
                     // View: Move cursor left one pixel, View: Move cursor right one pixel
                     : context->GetShiftRight()
-                          ? Main_OnCommandAsyncEx(40102, 0, 0)
+                          ? Main_OnCommandAsyncEx(40102, 0, nullptr)
                           // Time selection: Move cursor left, creating time selection, Time selection: Move cursor left, creating time selection
-                          : Main_OnCommandAsyncEx(41045, 0, 0);
+                          : Main_OnCommandAsyncEx(41045, 0, nullptr);
                 // Move edit cursor back one beat, Move edit cursor forward one beat
                 break;
             case Marker:
                 context->GetShiftLeft()
-                    ? Main_OnCommandAsyncEx(40104, 0, 0)
+                    ? Main_OnCommandAsyncEx(40104, 0, nullptr)
                     // View: Move cursor left one pixel, View: Move cursor right one pixel
-                    : Main_OnCommandAsyncEx(41045, 0, 0);
+                    : Main_OnCommandAsyncEx(41045, 0, nullptr);
                 // Move edit cursor back one beat, Move edit cursor forward one beat
                 break;
         }
     }
 
-    void HandleEncoderClick(int value) {
+    void HandleEncoderClick(const int value) const {
         if (value == 0) {
             return;
         }
@@ -446,7 +446,7 @@ public:
                 break;
             case Zoom:
                 context->GetShiftLeft()
-                    ? Main_OnCommandAsyncEx(40113, 0, nullptr) // View: Toggle track zoom to maximum height
+                    ? Main_OnCommandAsyncEx(40113, 0, nullptr)  // View: Toggle track zoom to maximum height
                     : Main_OnCommandAsyncEx(40110, 0, nullptr); // View: Toggle track zoom to minimum height
                 break;
             case Scroll:
@@ -465,7 +465,7 @@ public:
                 break;
             case Click:
                 context->GetShiftLeft()
-                    ? Main_OnCommandAsyncEx(40363, 0, nullptr) // Options: Show metronome/pre-roll settings
+                    ? Main_OnCommandAsyncEx(40363, 0, nullptr)  // Options: Show metronome/pre-roll settings
                     : Main_OnCommandAsyncEx(40364, 0, nullptr); // Options: Toggle metronome
                 break;
             case Section:
@@ -480,14 +480,14 @@ public:
                 context->GetShiftLeft()
                     ? Main_OnCommandAsyncEx(40171, 0, nullptr) // Markers: Insert and/or edit marker at current position
                     : context->GetShiftRight()
-                          ? Main_OnCommandAsyncEx(40613, 0, nullptr) // Markers: Delete marker near cursor
+                          ? Main_OnCommandAsyncEx(40613, 0, nullptr)  // Markers: Delete marker near cursor
                           : Main_OnCommandAsyncEx(40157, 0, nullptr); // Markers: Insert marker at current position
 
                 break;
         }
     }
 
-    void HandleSessionNavEncoderChange(int value) {
+    void HandleSessionNavEncoderChange(const int value) const {
         if (hasBit(value, 6)) {
             HandleEncoderDecrement(value - 64);
         } else {

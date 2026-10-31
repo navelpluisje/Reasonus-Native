@@ -2,13 +2,13 @@
 #define CSURF_CONTEXT_H_
 
 #include <array>
+#include <map>
 #include <string>
 #include "csurf_context_resources.hpp"
 #include "csurf_reasonus_settings.hpp"
 #include "reaper_plugin.h"
 
-class CSurf_Context // NOLINT(*-use-internal-linkage)
-{
+class CSurf_Context {
     /**
      * @brief Number of channels
      */
@@ -40,8 +40,8 @@ class CSurf_Context // NOLINT(*-use-internal-linkage)
     bool panPushModePan;
 
     // Channel manager
-    int channelManagerItemIndex = 0;
-    int channelManagerItemsCount = 0;
+    std::map<ChannelMode, int> channelManagerItemIndex;
+    std::map<ChannelMode, int> channelManagerItemsCount;
 
     // Plugin Edit fields
     MediaTrack *pluginEditTrack;
@@ -169,21 +169,29 @@ public:
     /**************************************************************************
      * Channel manager Item
      **************************************************************************/
-    void UpdateChannelManagerItemIndex(int val);
+    void UpdateChannelManagerItemIndex(ChannelMode channel_mode, int val);
 
-    void IncrementChannelmanagerItemIndex(int val);
+    void IncrementChannelmanagerItemIndex(ChannelMode channel_mode, int val);
 
-    void DecrementChannelManagerItemIndex(int val);
+    void DecrementChannelManagerItemIndex(ChannelMode channel_mode, int val);
+
+    void ResetChannelManagerItemIndex(ChannelMode channel_mode);
+
+    int GetChannelManagerItemIndex(ChannelMode channel_mode);
+
+    int GetChannelManagerItemIndex(ChannelMode channel_mode, int max);
 
     void ResetChannelManagerItemIndex();
 
-    [[nodiscard]] int GetChannelManagerItemIndex() const;
+    [[nodiscard]] int GetChannelManagerItemIndex(ChannelMode channel_mode) const;
 
-    [[nodiscard]] int GetChannelManagerItemIndex(int max) const;
+    [[nodiscard]] int GetChannelManagerItemIndex(ChannelMode channel_mode, int max) const;
 
-    void SetChannelManagerItemsCount(int count);
+    void SetChannelManagerItemsCount(ChannelMode channel_mode, int count);
 
     void ResetChannelManagerItemsCount();
+
+    void ResetChannelManagerItemsCount(ChannelMode channel_mode);
 
     static int GetPluginMaxGroupCount();
 
