@@ -6,7 +6,7 @@
 #include "../controls/csurf_display.hpp"
 #include "../controls/csurf_fader.hpp"
 #include "../controls/csurf_valuebar.hpp"
-#include "../shared/csurf_context.cpp"
+#include "../shared/csurf_context.hpp"
 #include "../controls/csurf_vu_meter.hpp"
 
 inline Btn_Types SelectButtons[16] = {

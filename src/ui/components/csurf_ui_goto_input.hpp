@@ -5,14 +5,14 @@
 #include <string>
 #include "../csurf_ui_styles_elements.hpp"
 #include "csurf_ui_icon_button.hpp"
-#include "../../shared/csurf_context.cpp"
+#include "../../shared/csurf_context.hpp"
 
 static void ReaSonusGoToInput(ImGui_Context *m_ctx, CSurf_UI_Assets *assets, int *value, const int max_value) {
     double modal_x;
     double modal_y;
     ImGui::GetCursorScreenPos(m_ctx, &modal_x, &modal_y);
 
-    static char str_value[255]; // NOLINT(*-avoid-c-arrays)
+    static char str_value[255];                            // NOLINT(*-avoid-c-arrays)
     strcpy(str_value, std::to_string(*value + 1).c_str()); // NOLINT(*-security.insecureAPI.strcpy)
 
     UiStyledElements::PushReaSonusFieldGroupStyle(m_ctx);
