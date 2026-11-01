@@ -39,8 +39,9 @@ public:
     }
 
     void HandleShiftButton(const int value) {
-        shiftState.SetValue(value > 0);
-        context->SetShiftLeft(shiftState.IsActive());
+        if (value > 0) {
+            context->SetShiftLeft(!context->GetShiftLeft());
+        }
 
         SetButtonValue();
     }
