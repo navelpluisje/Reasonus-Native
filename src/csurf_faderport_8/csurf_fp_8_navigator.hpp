@@ -1,8 +1,8 @@
 #ifndef CSURF_FP_8_NAVIGATOR_H_
 #define CSURF_FP_8_NAVIGATOR_H_
 
-#include <WDL/ptrlist.h>
 #include <map>
+#include <WDL/ptrlist.h>
 #include "../shared/csurf_reasonus_settings.hpp"
 #include "../shared/csurf_context.hpp"
 #include "../shared/csurf_project_state.hpp"
@@ -115,7 +115,7 @@ class CSurf_FP_8_Navigator {
 
     void HandleTracksAreVcaFilter();
 
-    void HandleTracksCustomFilter(const std::string &filter_name, const bool &project_filter);
+    void HandleTracksCustomFilter(const std::string &filter_key, const bool &project_filter);
 
     void HandleTrackCustomMultiSelectFilter();
 
@@ -150,7 +150,9 @@ public:
 
     void HandleFilter(NavigatorFilter filter);
 
-    void HandleCustomFilter(const std::string &filterName, const bool &projectFilter);
+    void HandleCustomFilterByKey(const std::string &filter_key, const bool &project_filter);
+
+    void HandleCustomFilterByName(const std::string &filter_name);
 
     void SetTrackTouched(int index, bool value);
 
