@@ -5,12 +5,9 @@
 #include "../controls/csurf_color_button.hpp"
 #include "../controls/csurf_display.hpp"
 #include "../controls/csurf_fader.hpp"
-#include "../controls/csurf_valuebar.hpp"
-#include "../shared/csurf_context.cpp"
-#include "../controls/csurf_vu_meter.hpp"
+#include "../shared/csurf_context.hpp"
 
-class CSurf_FP_V2_Track
-{
+class CSurf_FP_V2_Track {
 protected:
     CSurf_Context *context;
 
@@ -22,6 +19,7 @@ protected:
 
 public:
     CSurf_FP_V2_Track(CSurf_Context *_context, midi_Output *m_midiout);
+
     ~CSurf_FP_V2_Track();
 
     void ClearTrack();

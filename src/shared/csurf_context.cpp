@@ -1,465 +1,366 @@
-#ifndef CSURF_CONTEXT_H_
-#define CSURF_CONTEXT_H_
-
+#include "csurf_context.hpp"
 #include <array>
 #include <map>
 #include "csurf_context_resources.hpp"
-#include "csurf_utils.hpp"
 #include "csurf_reasonus_settings.hpp"
+#include "csurf_utils.hpp"
+#include "reaper_plugin.h"
+#include "reaper_plugin_functions.h"
 
-class CSurf_Context // NOLINT(*-use-internal-linkage)
-{
-    /**
-     * @brief Number of channels
-     */
-    int nbChannels;
-    std::string device;
-
-    // Shift keys
-    bool shift_left;
-    bool shift_left_locked;
-    bool shift_right;
-    bool shift_right_locked;
-    bool arm;
-
-    // track mode show the time code in the displays
-    bool show_time_code;
-
-    // Last touched fx
-    bool last_touched_fx_mode;
-
-    // Make the fader control the master track for the FaderPort V2
-    bool master_fader_mode;
-
-    // Set the track id that has the add send mode. -1 is unselected
-    int add_send_receive_mode = -1;
-    int current_selected_send_receive = 0;
-
-    // Pan encoder modes
-    PanEncoderMode panEncoderMode = PanEncoderTrackPanMode;
-    bool panPushModePan;
-
-    // Channel manager
-    std::map<ChannelMode, int> channelManagerItemIndex;
-    std::map<ChannelMode, int> channelManagerItemsCount;
-
-    // Plugin Edit fields
-    MediaTrack *pluginEditTrack;
-    int pluginEditPluginId;
-    int pluginEditParamId;
-
-    // disable fader on v2
-    bool fader_disabled;
-
-    // Single Point Automation
-    bool single_point_automation;
-
-    ChannelMode channelMode;
-    ChannelMode previousChannelMode = TrackMode;
-    ChannelMode previousPluginChannelMode = TrackMode;
-    ChannelManagerType channelManagerType{};
-
-    ReaSonusSettings *settings;
-
-public:
-    explicit CSurf_Context(const int nbChannels) : nbChannels(nbChannels) {
-        if (nbChannels == 1) {
-            device = FP_V2;
-        } else {
-            device = FP_8;
-        }
-        settings = ReaSonusSettings::GetInstance(device);
-        shift_left = false;
-        last_touched_fx_mode = false;
-        shift_left_locked = false;
-        shift_right = false;
-        shift_right_locked = false;
-        arm = false;
-        show_time_code = false;
-        master_fader_mode = false;
-        panPushModePan = true;
-        fader_disabled = false;
-        pluginEditPluginId = 0;
-        pluginEditParamId = 0;
-
-        channelMode = TrackMode;
-        single_point_automation = false;
+CSurf_Context::CSurf_Context(const int nbChannels) : nbChannels(nbChannels) {
+    if (nbChannels == 1) {
+        device = FP_V2;
+    } else {
+        device = FP_8;
     }
+    settings = ReaSonusSettings::GetInstance(device);
+    shift_left = false;
+    last_touched_fx_mode = false;
+    shift_left_locked = false;
+    shift_right = false;
+    shift_right_locked = false;
+    arm = false;
+    show_time_code = false;
+    master_fader_mode = false;
+    panPushModePan = true;
+    fader_disabled = false;
+    pluginEditPluginId = 0;
+    pluginEditParamId = 0;
+    pluginEditTrack = nullptr;
 
-    ~CSurf_Context() = default;
+    channelMode = TrackMode;
+    single_point_automation = false;
+}
 
-    /**************************************************************************
-     * Modifiers
-     **************************************************************************/
-    void SetShiftLeft(const bool val) {
-        if (settings->GetSwapShiftButtons()) {
-            shift_right = val;
-        } else {
-            shift_left = val;
-        }
+/**************************************************************************
+ * Modifiers
+ **************************************************************************/
+void CSurf_Context::SetShiftLeft(const bool val) {
+    if (settings->GetSwapShiftButtons()) {
+        shift_right = val;
+    } else {
+        shift_left = val;
     }
+}
 
-    void SetShiftLeftLocked(const bool val) {
-        if (settings->GetSwapShiftButtons()) {
-            shift_right_locked = val;
-        } else {
-            shift_left_locked = val;
-        }
+void CSurf_Context::SetShiftLeftLocked(const bool val) {
+    if (settings->GetSwapShiftButtons()) {
+        shift_right_locked = val;
+    } else {
+        shift_left_locked = val;
     }
+}
 
-    [[nodiscard]] bool GetShiftChannelLeft() const {
-        if (!shift_left_locked) {
-            return shift_left;
-        }
-
-        return !shift_left;
-    }
-
-    [[nodiscard]] bool GetShiftLeft() const {
+bool CSurf_Context::GetShiftChannelLeft() const {
+    if (!shift_left_locked) {
         return shift_left;
     }
 
-    void SetShiftRight(const bool val) {
-        if (settings->GetSwapShiftButtons()) {
-            shift_left = val;
-        } else {
-            shift_right = val;
-        }
+    return !shift_left;
+}
+
+bool CSurf_Context::GetShiftLeft() const {
+    return shift_left;
+}
+
+void CSurf_Context::SetShiftRight(const bool val) {
+    if (settings->GetSwapShiftButtons()) {
+        shift_left = val;
+    } else {
+        shift_right = val;
     }
+}
 
-    void SetShiftRightLocked(const bool val) {
-        if (settings->GetSwapShiftButtons()) {
-            shift_left_locked = val;
-        } else {
-            shift_right_locked = val;
-        }
+void CSurf_Context::SetShiftRightLocked(const bool val) {
+    if (settings->GetSwapShiftButtons()) {
+        shift_left_locked = val;
+    } else {
+        shift_right_locked = val;
     }
+}
 
-    [[nodiscard]] bool GetShiftChannelRight() const {
-        if (!shift_right_locked) {
-            return shift_right;
-        }
-
-        return !shift_right;
-    }
-
-    [[nodiscard]] bool GetShiftRight() const {
+bool CSurf_Context::GetShiftChannelRight() const {
+    if (!shift_right_locked) {
         return shift_right;
     }
 
-    void SetArm(const bool val) {
-        arm = val;
+    return !shift_right;
+}
+
+bool CSurf_Context::GetShiftRight() const {
+    return shift_right;
+}
+
+void CSurf_Context::SetArm(const bool val) {
+    arm = val;
+}
+
+bool CSurf_Context::GetArm() const {
+    return arm;
+}
+
+/**************************************************************************
+ * Pan mode
+ **************************************************************************/
+void CSurf_Context::SetPanEncoderMode(const PanEncoderMode val) {
+    panEncoderMode = val;
+}
+
+PanEncoderMode CSurf_Context::GetPanEncoderMode() const {
+    return panEncoderMode;
+}
+
+/**************************************************************************
+ * Display the timecode
+ **************************************************************************/
+void CSurf_Context::SetShowTimeCode(const bool value) {
+    show_time_code = value;
+}
+
+void CSurf_Context::ToggleShowTimeCode() {
+    show_time_code = !show_time_code;
+}
+
+bool CSurf_Context::GetShowTimeCode() const {
+    return show_time_code;
+}
+
+/**************************************************************************
+ * Last touched Fx param control
+ **************************************************************************/
+void CSurf_Context::ToggleLastTouchedFxMode() {
+    SetLastTouchedFxMode(!last_touched_fx_mode);
+}
+
+void CSurf_Context::SetLastTouchedFxMode(const bool value) {
+    if (value) {
+        master_fader_mode = false;
+    }
+    last_touched_fx_mode = value;
+}
+
+bool CSurf_Context::GetLastTouchedFxMode() const {
+    return last_touched_fx_mode;
+}
+
+/**************************************************************************
+ * Master Fader mode
+ **************************************************************************/
+void CSurf_Context::ToggleMasterFaderMode() {
+    SetMasterFaderMode(!master_fader_mode);
+}
+
+void CSurf_Context::SetMasterFaderMode(const bool value) {
+    if (value) {
+        last_touched_fx_mode = false;
+    }
+    master_fader_mode = value;
+}
+
+bool CSurf_Context::GetMasterFaderMode() const {
+    if (nbChannels > 1) {
+        return master_fader_mode && settings->GetMasterFaderModeEnabled();
     }
 
-    [[nodiscard]] bool GetArm() const {
-        return arm;
+    return master_fader_mode;
+}
+
+/**************************************************************************
+ * Number of device channels
+ **************************************************************************/
+void CSurf_Context::SetNbChannels(const int count) {
+    nbChannels = count;
+}
+
+int CSurf_Context::GetNbChannels() const {
+    // TODO: Should be only nbChannels
+    return last_touched_fx_mode ? nbChannels - 1 : nbChannels;
+}
+
+int CSurf_Context::GetNbBankChannels() const {
+    return last_touched_fx_mode || master_fader_mode ? nbChannels - 1 : nbChannels;
+}
+
+void CSurf_Context::TogglePanPushMode() {
+    panPushModePan = !panPushModePan;
+}
+
+void CSurf_Context::ResetPanPushMode() {
+    panPushModePan = true;
+}
+
+bool CSurf_Context::GetPanPushMode() const {
+    return panPushModePan;
+}
+
+/**************************************************************************
+ * Channel manager Item
+ **************************************************************************/
+void CSurf_Context::UpdateChannelManagerItemIndex(const ChannelMode channel_mode, const int val) {
+    val < 0
+        ? DecrementChannelManagerItemIndex(channel_mode, abs(val))
+        : IncrementChannelmanagerItemIndex(channel_mode, val);
+}
+
+void CSurf_Context::IncrementChannelmanagerItemIndex(const ChannelMode channel_mode, const int val) {
+    if (
+        channelManagerItemIndex[channel_mode] + val + (channelManagerType == Hui ? 0 : nbChannels) <
+        channelManagerItemsCount[channel_mode]
+    ) {
+        channelManagerItemIndex[channel_mode] += val;
     }
+}
 
-    /**************************************************************************
-     * Pan mode
-     **************************************************************************/
-    void SetPanEncoderMode(const PanEncoderMode val) {
-        panEncoderMode = val;
+void CSurf_Context::DecrementChannelManagerItemIndex(const ChannelMode channel_mode, const int val) {
+    if (channelManagerItemIndex[channel_mode] - val >= 0) {
+        channelManagerItemIndex[channel_mode] -= val;
     }
+}
 
-    [[nodiscard]] PanEncoderMode GetPanEncoderMode() const {
-        return panEncoderMode;
-    }
+void CSurf_Context::ResetChannelManagerItemIndex(const ChannelMode channel_mode) {
+    channelManagerItemIndex[channel_mode] = 0;
+}
 
-    /**************************************************************************
-     * Display the timecode
-     **************************************************************************/
-    void SetShowTimeCode(const bool value) {
-        show_time_code = value;
-    }
+int CSurf_Context::GetChannelManagerItemIndex(const ChannelMode channel_mode) {
+    return channelManagerItemIndex[channel_mode];
+}
 
-    void ToggleShowTimeCode() {
-        show_time_code = !show_time_code;
-    }
+int CSurf_Context::GetChannelManagerItemIndex(const ChannelMode channel_mode, const int max) {
+    return max < channelManagerItemIndex[channel_mode] ? max : channelManagerItemIndex[channel_mode];
+}
 
-    [[nodiscard]] bool GetShowTimeCode() const {
-        return show_time_code;
-    }
+void CSurf_Context::SetChannelManagerItemsCount(const ChannelMode channel_mode, const int count) {
+    channelManagerItemsCount[channel_mode] = count;
+}
 
-    /**************************************************************************
-     * Last touched Fx param control
-     **************************************************************************/
-    void ToggleLastTouchedFxMode() {
-        SetLastTouchedFxMode(!last_touched_fx_mode);
-    }
+void CSurf_Context::ResetChannelManagerItemsCount(const ChannelMode channel_mode) {
+    channelManagerItemsCount[channel_mode] = 0;
+}
 
-    /**
-     * @brief Set the Last Touched FX Mode. If value is true, reset master fader mode
-     *
-     * @param value
-     */
-    void SetLastTouchedFxMode(const bool value) {
-        if (value) {
-            master_fader_mode = false;
-        }
-        last_touched_fx_mode = value;
-    }
+int CSurf_Context::GetPluginMaxGroupCount() {
+    return 1024;
+}
 
-    [[nodiscard]] bool GetLastTouchedFxMode() const {
-        return last_touched_fx_mode;
-    }
+/**************************************************************************
+ * Channel modes
+ **************************************************************************/
+bool CSurf_Context::IsChannelMode(const ChannelMode _channelMode) const {
+    return channelMode == _channelMode;
+}
 
-    /**************************************************************************
-     * Master Fader mode
-     **************************************************************************/
-    /**
-     * @brief Toggle the master fader mode
-     */
-    void ToggleMasterFaderMode() {
-        SetMasterFaderMode(!master_fader_mode);
-    }
+void CSurf_Context::SetChannelMode(const ChannelMode _channelMode) {
+    previousChannelMode = channelMode;
+    channelMode = _channelMode;
+}
 
-    /**
-     * @brief Set the Master Fader Mode. If value is true, reset last touched Fx mode
-     *
-     * @param value
-     */
-    void SetMasterFaderMode(const bool value) {
-        if (value) {
-            last_touched_fx_mode = false;
-        }
-        master_fader_mode = value;
-    }
+ChannelMode CSurf_Context::GetChannelMode() const {
+    return channelMode;
+}
 
-    [[nodiscard]] bool GetMasterFaderMode() const {
-        if (nbChannels > 1) {
-            return master_fader_mode && settings->GetMasterFaderModeEnabled();
-        }
+ChannelMode CSurf_Context::GetPreviousChannelMode() const {
+    return previousChannelMode;
+}
 
-        return master_fader_mode;
-    }
+void CSurf_Context::SetPreviousPluginChannelMode(const ChannelMode _channelMode) {
+    previousPluginChannelMode = _channelMode;
+}
 
-    /**************************************************************************
-     * Number of device channels
-     **************************************************************************/
-    /**
-     * @brief Set the Nb Channels. These are the nb of faders on the FaderPort
-     *
-     * @param count The number of faders
-     */
-    void SetNbChannels(const int count) {
-        nbChannels = count;
-    }
+ChannelMode CSurf_Context::GetPreviousPluginChannelMode() const {
+    return previousPluginChannelMode;
+}
 
-    /**
-     * @brief Get the Nb Channels. These are the actual number if faders
-     *
-     * @return int The number of faders
-     */
-    [[nodiscard]] int GetNbChannels() const {
-        // TODO: Should be only nbChannels
-        return last_touched_fx_mode ? nbChannels - 1 : nbChannels;
-    }
+void CSurf_Context::SetPluginEditTrack(MediaTrack *track) {
+    pluginEditTrack = track;
+}
 
-    /**
-     * @brief Get the Nb Bank Channels. When lastTouchedFxMode is set, this will be 1 less the the actual fader count
-     *
-     * @return int The number of bank channels
-     */
-    [[nodiscard]] int GetNbBankChannels() const {
-        return last_touched_fx_mode || master_fader_mode ? nbChannels - 1 : nbChannels;
-    }
+MediaTrack *CSurf_Context::GetPluginEditTrack() const {
+    return pluginEditTrack;
+}
 
-    void TogglePanPushMode() {
-        panPushModePan = !panPushModePan;
-    }
+void CSurf_Context::SetPluginEditPluginId(const int pluginId) {
+    pluginEditPluginId = pluginId;
+}
 
-    void ResetPanPushMode() {
-        panPushModePan = true;
-    }
+int CSurf_Context::GetPluginEditPluginId() const {
+    return pluginEditPluginId;
+}
 
-    [[nodiscard]] bool GetPanPushMode() const {
-        return panPushModePan;
-    }
+void CSurf_Context::SetPluginEditParamId(const int pluginId) {
+    pluginEditParamId = pluginId;
+}
 
-    /**************************************************************************
-     * Channel manager Item
-     **************************************************************************/
-    void UpdateChannelManagerItemIndex(const ChannelMode channel_mode, const int val) {
-        val < 0
-            ? DecrementChannelManagerItemIndex(channel_mode, abs(val))
-            : IncrementChannelmanagerItemIndex(channel_mode, val);
-    }
+int CSurf_Context::GetPluginEditParamId() const {
+    return pluginEditParamId;
+}
 
-    void IncrementChannelmanagerItemIndex(const ChannelMode channel_mode, const int val) {
-        if (
-            channelManagerItemIndex[channel_mode] + val + (channelManagerType == Hui ? 0 : nbChannels)
-            < channelManagerItemsCount[channel_mode]
-        ) {
-            channelManagerItemIndex[channel_mode] += val;
-        } else if (
-            channelManagerType == Hui
-            && settings->PluginsShouldRespectSlots()
-            && (channelMode == SendMode || channelMode == PluginMode)
-        ) {
-            channelManagerItemIndex[channel_mode] = 0;
-        }
-    }
+/**************************************************************************
+ * Add Send mode
+ **************************************************************************/
+void CSurf_Context::SetAddSendReceiveMode(const int value) {
+    add_send_receive_mode = value;
+}
 
-    void DecrementChannelManagerItemIndex(const ChannelMode channel_mode, const int val) {
-        if (channelManagerItemIndex[channel_mode] - val >= 0) {
-            channelManagerItemIndex[channel_mode] -= val;
-        } else if (
-            channelManagerType == Hui
-            && settings->PluginsShouldRespectSlots()
-            && (channelMode == SendMode || channelMode == PluginMode)
-        ) {
-            channelManagerItemIndex[channel_mode] = channelManagerItemsCount[channel_mode] - 1;
-        }
-    }
+int CSurf_Context::GetAddSendReceiveMode() const {
+    return add_send_receive_mode;
+}
 
-    void ResetChannelManagerItemIndex(const ChannelMode channel_mode) {
-        channelManagerItemIndex[channel_mode] = 0;
-    }
+void CSurf_Context::SetCurrentSelectedSendReceive(const int value) {
+    current_selected_send_receive = minmax(0, value, CountTracks(nullptr) - 1);
+}
 
-    [[nodiscard]] int GetChannelManagerItemIndex(const ChannelMode channel_mode) {
-        return channelManagerItemIndex[channel_mode];
-    }
+void CSurf_Context::IncrementCurrentSelectedSendReceive() {
+    SetCurrentSelectedSendReceive(current_selected_send_receive + 1);
+}
 
-    [[nodiscard]] int GetChannelManagerItemIndex(const ChannelMode channel_mode, const int max) {
-        return max < channelManagerItemIndex[channel_mode] ? max : channelManagerItemIndex[channel_mode];
-    }
+void CSurf_Context::DecrementCurrentSelectedSendReceive() {
+    SetCurrentSelectedSendReceive(current_selected_send_receive - 1);
+}
 
-    void SetChannelManagerItemsCount(const ChannelMode channel_mode, const int count) {
-        channelManagerItemsCount[channel_mode] = count;
-    }
+int CSurf_Context::GetCurrentSelectedSendReceive() const {
+    return current_selected_send_receive;
+}
 
-    void ResetChannelManagerItemsCount(const ChannelMode channel_mode) {
-        channelManagerItemsCount[channel_mode] = 0;
-    }
+/**************************************************************************
+ * Channel manager type
+ **************************************************************************/
+void CSurf_Context::SetChannelManagerType(const ChannelManagerType type) {
+    channelManagerType = type;
+}
 
-    static int GetPluginMaxGroupCount() {
-        return 1024;
-    }
+void CSurf_Context::SetFaderDisabled(const bool value) {
+    fader_disabled = value;
+}
 
-    /**************************************************************************
-     * Channel modes
-     **************************************************************************/
-    [[nodiscard]] bool IsChannelMode(const ChannelMode _channelMode) const {
-        return channelMode == _channelMode;
-    }
+bool CSurf_Context::GetFaderDisabled() const {
+    return fader_disabled;
+}
 
-    void SetChannelMode(const ChannelMode _channelMode) {
-        previousChannelMode = channelMode;
-        channelMode = _channelMode;
-    }
+/**************************************************************************
+ * Single Point Automation
+ **************************************************************************/
+void CSurf_Context::SetSinglePointAutomation(const bool value) {
+    single_point_automation = value;
+}
 
-    [[nodiscard]] ChannelMode GetChannelMode() const {
-        return channelMode;
-    }
+bool CSurf_Context::IsSinglePointAutomationEnabled() const {
+    return single_point_automation;
+}
 
-    [[nodiscard]] ChannelMode GetPreviousChannelMode() const {
-        return previousChannelMode;
-    }
+/**************************************************************************
+ * Settings
+ **************************************************************************/
+std::string CSurf_Context::GetSetting(const std::string &group, const std::string &key) const {
+    return settings->GetSetting(group, key);
+}
 
-    void SetPreviousPluginChannelMode(const ChannelMode _channelMode) {
-        previousPluginChannelMode = _channelMode;
-    }
+std::array<int, 4> CSurf_Context::GetDisplayLineValues() const {
+    return settings->GetTrackDisplayLineValues();
+}
 
-    [[nodiscard]] ChannelMode GetPreviousPluginChannelMode() const {
-        return previousPluginChannelMode;
-    }
+std::array<int, 4> CSurf_Context::GetDisplayAlignValues() const {
+    return settings->GetTrackDisplayAlignValues();
+}
 
-    void SetPluginEditTrack(MediaTrack *track) {
-        pluginEditTrack = track;
-    }
-
-    [[nodiscard]] MediaTrack *GetPluginEditTrack() const {
-        return pluginEditTrack;
-    }
-
-    void SetPluginEditPluginId(const int pluginId) {
-        pluginEditPluginId = pluginId;
-    }
-
-    [[nodiscard]] int GetPluginEditPluginId() const {
-        return pluginEditPluginId;
-    }
-
-    void SetPluginEditParamId(const int pluginId) {
-        pluginEditParamId = pluginId;
-    }
-
-    [[nodiscard]] int GetPluginEditParamId() const {
-        return pluginEditParamId;
-    }
-
-    /**************************************************************************
-     * Add Send mode
-     **************************************************************************/
-    void SetAddSendReceiveMode(const int value) {
-        add_send_receive_mode = value;
-    }
-
-    [[nodiscard]] int GetAddSendReceiveMode() const {
-        return add_send_receive_mode;
-    }
-
-    void SetCurrentSelectedSendReceive(const int value) {
-        current_selected_send_receive = minmax(0, value, CountTracks(nullptr) - 1);
-    }
-
-    void IncrementCurrentSelectedSendReceive() {
-        SetCurrentSelectedSendReceive(current_selected_send_receive + 1);
-    }
-
-    void DecrementCurrentSelectedSendReceive() {
-        SetCurrentSelectedSendReceive(current_selected_send_receive - 1);
-    }
-
-    [[nodiscard]] int GetCurrentSelectedSendReceive() const {
-        return current_selected_send_receive;
-    }
-
-    /**************************************************************************
-     * Channel manager type
-     **************************************************************************/
-    void SetChannelManagerType(const ChannelManagerType type) {
-        channelManagerType = type;
-    }
-
-    void SetFaderDisabled(const bool value) {
-        fader_disabled = value;
-    }
-
-    [[nodiscard]] bool GetFaderDisabled() const {
-        return fader_disabled;
-    }
-
-    /**************************************************************************
-     * Single Point Automation
-     **************************************************************************/
-    void SetSinglePointAutomation(const bool value) {
-        single_point_automation = value;
-    }
-
-    [[nodiscard]] bool IsSinglePointAutomationEnabled() const {
-        return single_point_automation;
-    }
-
-    /**************************************************************************
-     * Settings
-     **************************************************************************/
-    [[nodiscard]] std::string GetSetting(const std::string &group, const std::string &key) const {
-        return settings->GetSetting(group, key);
-    }
-
-    [[nodiscard]] std::array<int, 4> GetDisplayLineValues() const {
-        return settings->GetTrackDisplayLineValues();
-    }
-
-    [[nodiscard]] std::array<int, 4> GetDisplayAlignValues() const {
-        return settings->GetTrackDisplayAlignValues();
-    }
-
-    [[nodiscard]] std::array<int, 4> GetDisplayInvertValues() const {
-        return settings->GetTrackDisplayInvertValues();
-    }
-};
-
-#endif
+std::array<int, 4> CSurf_Context::GetDisplayInvertValues() const {
+    return settings->GetTrackDisplayInvertValues();
+}
