@@ -4,8 +4,7 @@
 #include "csurf_fp_v2_navigator.hpp"
 #include "csurf_fp_v2_track.hpp"
 
-class CSurf_FP_V2_TrackManager
-{
+class CSurf_FP_V2_TrackManager {
     CSurf_FP_V2_Navigator *navigator;
     CSurf_Context *context;
     midi_Output *m_midiout;
@@ -19,10 +18,9 @@ class CSurf_FP_V2_TrackManager
 
     ButtonColor color;
 
-    bool forceUpdate = false;
+    bool force_update = false;
 
 protected:
-
     void GetFaderValue(MediaTrack *media_track, int *faderValue) const;
 
 public:
@@ -31,8 +29,7 @@ public:
         CSurf_FP_V2_Navigator *navigator,
         midi_Output *m_midiout);
 
-    ~CSurf_FP_V2_TrackManager()
-    {
+    ~CSurf_FP_V2_TrackManager() {
         delete navigator;
         delete context;
         delete m_midiout;
@@ -50,9 +47,7 @@ public:
 
     void HandleBypassClick(int index, int value) const;
 
-    static void HandleFaderTouch(const int value) {
-        (void)value;
-    }
+    void HandleFaderTouch(int value) const;
 
     void HandleFaderMove(int msb, int lsb) const;
 };

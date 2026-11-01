@@ -1,7 +1,7 @@
 #ifndef REASONUSNATIVE_CSURF_API_HPP
 #define REASONUSNATIVE_CSURF_API_HPP
 
-#include "./csurf_context.cpp"
+#include "./csurf_context.hpp"
 #include "../csurf_faderport_8/csurf_fp_8_fader_manager.hpp"
 
 class ReaSonusApi {

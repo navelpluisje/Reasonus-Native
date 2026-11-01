@@ -1,14 +1,16 @@
-
 #ifndef CSURF_SESSION_MANAGER_V2_C_
 #define CSURF_SESSION_MANAGER_V2_C_
 
+#include "csurf_fp_v2_navigator.hpp"
 #include "../controls/csurf_button.hpp"
 #include "../controls/csurf_color_button.hpp"
-#include "../shared/csurf_session_manager_actions.hpp"
-#include "csurf_fp_v2_navigator.hpp"
+#include "../shared/csurf_context.hpp"
 #include "../shared/csurf_daw.hpp"
-#include "../ui/pages/csurf_ui_fp_v2_control_panel.hpp"
 #include "../shared/csurf_faderport_ui_imgui_utils.hpp"
+#include "../shared/csurf_reasonus_settings.hpp"
+#include "../shared/csurf_session_manager_actions.hpp"
+#include "../shared/csurf_utils.hpp"
+#include "../ui/pages/csurf_ui_fp_v2_control_panel.hpp"
 
 enum SessionTypes // NOLINT(*-use-internal-linkage)
 {
@@ -53,19 +55,29 @@ protected:
                 : context->GetLastTouchedFxMode() // NOLINT(*-avoid-nested-conditional-operator)
                       ? valueOn
                       : BTN_VALUE_OFF);
-        panButton->SetValue(ReaSonusV2ControlPanel::control_panel_open && context->GetShiftLeft()
-                                ? BTN_VALUE_ON
-                                : session_type == Pan // NOLINT(*-avoid-nested-conditional-operator)
-                                      ? valueOn
-                                      : BTN_VALUE_OFF);
-        channelButton->SetValue(session_type == Channel
-                                    ? valueOn
-                                    : BTN_VALUE_OFF);
-        scrollButton->SetValue(session_type == Scroll
-                                   ? valueOn
-                                   : session_type == Zoom // NOLINT(*-avoid-nested-conditional-operator)
-                                         ? BTN_VALUE_ON
-                                         : BTN_VALUE_OFF);
+
+        panButton->SetValue(
+            ReaSonusV2ControlPanel::control_panel_open && context->GetShiftLeft()
+                ? BTN_VALUE_ON
+                : session_type == Pan // NOLINT(*-avoid-nested-conditional-operator)
+                      ? valueOn
+                      : BTN_VALUE_OFF
+        );
+
+        channelButton->SetValue(
+            session_type == Channel
+                ? valueOn
+                : BTN_VALUE_OFF
+        );
+
+        scrollButton->SetValue(
+            session_type == Scroll
+                ? valueOn
+                : session_type == Zoom // NOLINT(*-avoid-nested-conditional-operator)
+                      ? BTN_VALUE_ON
+                      : BTN_VALUE_OFF
+        );
+
         masterButton->SetValue(session_type == Master ? valueOn : BTN_VALUE_OFF);
         clickButton->SetValue(session_type == Click ? valueOn : BTN_VALUE_OFF);
         sectionButton->SetValue(session_type == Section ? valueOn : BTN_VALUE_OFF);
@@ -175,13 +187,11 @@ public:
         if (context->GetShiftLeft()) {
             double newValue = static_cast<int>(panToNormalized(pan2) * 127.0) + val;
             newValue = minmax(0.0, newValue, 127.0);
-            SetMediaTrackInfo_Value(media_track, pan_mode != PAN_MODE_DUAL_PAN ? "D_WIDTH" : "D_DUALPANR",
-                                    normalizedToPan(newValue / 127));
+            DAW::SetTrackPan2(media_track, normalizedToPan(newValue / 127));
         } else {
             double newValue = static_cast<int>(panToNormalized(pan1) * 127.0) + val;
             newValue = minmax(0.0, newValue, 127.0);
-            SetMediaTrackInfo_Value(media_track, pan_mode != PAN_MODE_DUAL_PAN ? "D_PAN" : "D_DUALPANL",
-                                    normalizedToPan(newValue / 127));
+            DAW::SetTrackPan1(media_track, normalizedToPan(newValue / 127));
         }
     }
 
