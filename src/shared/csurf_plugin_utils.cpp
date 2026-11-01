@@ -87,6 +87,10 @@ std::string PluginUtils::StripPluginChannelPostfix(char const *name) {
 }
 
 std::string PluginUtils::ExtractDeveloperName(const std::string &plugin_name) {
+    if (startsWith(plugin_name, "JS: ")) {
+        return "JSFX";
+    }
+
     const std::vector<std::string> plugin_name_parts = split(plugin_name, " (");
     std::string developer;
     const int max_index = static_cast<int>(plugin_name_parts.size()) - 1;
@@ -107,6 +111,10 @@ std::string PluginUtils::ExtractDeveloperName(const std::string &plugin_name) {
 }
 
 std::string PluginUtils::ExtractPluginName(const std::string &plugin_name) {
+    if (startsWith(plugin_name, "JS: ")) {
+        return StripPluginNamePrefixes(plugin_name.c_str());
+    }
+
     const std::string developer = ExtractDeveloperName(plugin_name);
 
     std::vector<std::string> plugin_name_parts = split(
@@ -266,12 +274,6 @@ std::vector<PluginMeta> PluginUtils::ExtractInstalledPluginMeta(
             const std::string short_name = ExtractPluginName(orig_plugin_name);
             const std::string cat_name = createCategoryName(orig_plugin_name, plugin_type);
 
-            if (plugin_type == "js") {
-                // TODO: We need to implement a better way of dealing with JS plugins. They diifer in some ways and need some more attention
-                continue;
-                // developer = "js";
-            }
-
             installed_plugins_ini["plugin_" + std::to_string(index)];
             installed_plugins_ini["plugin_" + std::to_string(index)]["developer"] = developer;
             installed_plugins_ini["plugin_" + std::to_string(index)]["orig_plugin_name"] = orig_plugin_name;
@@ -333,7 +335,8 @@ std::vector<std::string> PluginUtils::GetPluginTypes() {
         "clap",
         "clapi",
         "lv2",
-        "lv2i"
+        "lv2i",
+        "js"
     };
 
     return plugin_types;
@@ -350,7 +353,8 @@ std::map<std::string, std::string> PluginUtils::GetPluginTypesMap() {
         {"clap", "C"},
         {"clapi", "Ci"},
         {"lv2", "L"},
-        {"lv2i", "Li"}
+        {"lv2i", "Li"},
+        {"js", "Js"}
     };
 
     return plugin_types_map;
@@ -377,7 +381,8 @@ int PluginUtils::GetPluginTypeBgColors(const std::string &plugin_type) {
         {"clap", UI_COLORS::Grey},
         {"clapi", UI_COLORS::Grey},
         {"lv2", UI_COLORS::Olive},
-        {"lv2i", UI_COLORS::Olive}
+        {"lv2i", UI_COLORS::Olive},
+        {"js", UI_COLORS::Blue}
     };
 
     if (bg_colors.find(plugin_type) == bg_colors.end()) {
@@ -398,7 +403,8 @@ int PluginUtils::GetPluginTypeFgColors(const std::string &plugin_type) {
         {"clap", UI_COLORS::White},
         {"clapi", UI_COLORS::White},
         {"lv2", UI_COLORS::Main_18},
-        {"lv2i", UI_COLORS::Main_18}
+        {"lv2i", UI_COLORS::Main_18},
+        {"js", UI_COLORS::White}
     };
 
     if (fg_colors.find(plugin_type) == fg_colors.end()) {
@@ -463,12 +469,12 @@ bool PluginUtils::ReadCreatePluginMappingFileByOrigPluginName(
     const std::string &orig_plugin_name,
     mINI::INIStructure &plugin_mapping_ini
 ) {
-    const std::string full_name = PluginUtils::StripPluginNamePrefixes(orig_plugin_name.c_str());
-    const std::string plugin_name = PluginUtils::ExtractPluginName(orig_plugin_name);
-    const std::string plugin_type = PluginUtils::ExtractPluginType(orig_plugin_name);
-    const std::string plugin_developer = PluginUtils::ExtractDeveloperName(orig_plugin_name);
+    const std::string full_name = StripPluginNamePrefixes(orig_plugin_name.c_str());
+    const std::string plugin_name = ExtractPluginName(orig_plugin_name);
+    const std::string plugin_type = ExtractPluginType(orig_plugin_name);
+    const std::string plugin_developer = ExtractDeveloperName(orig_plugin_name);
 
-    std::string file_name = PluginUtils::GetReaSonusPluginMappingFilePath(
+    std::string file_name = GetReaSonusPluginMappingFilePath(
         plugin_developer, plugin_name, plugin_type, true);
     const mINI::INIFile file(file_name);
 

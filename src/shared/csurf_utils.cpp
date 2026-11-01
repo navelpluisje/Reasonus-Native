@@ -207,7 +207,7 @@ bool isInteger(const std::string &value) {
     if (value.empty()) {
         return false;
     }
-    
+
     char *pointer;
     strtol(value.c_str(), &pointer, 10);
     return *pointer == 0;
@@ -328,6 +328,10 @@ std::string ltrim(const std::string &value) {
 std::string rtrim(const std::string &value) {
     const std::regex trailing_whitespaces("\\s+$");
     return std::regex_replace(value, trailing_whitespaces, "");
+}
+
+bool startsWith(const std::string value, const std::string prefix) {
+    return value.rfind(prefix, 0) == 0;
 }
 
 int minmax(const int min, const int value, const int max) {
