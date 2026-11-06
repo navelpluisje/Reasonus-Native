@@ -41,7 +41,8 @@ public:
         int index,
         CSurf_UI_FunctionKeysPage &page,
         CSurf_UI_Assets *assets,
-        FunctionTypes type = FUNCTION_DEFAULT
+        FunctionTypes type = FUNCTION_DEFAULT,
+        std::string device = FP_8
     );
 
     void RenderFunctionTab(

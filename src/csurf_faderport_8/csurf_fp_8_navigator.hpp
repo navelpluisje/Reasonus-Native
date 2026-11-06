@@ -4,9 +4,7 @@
 #include <WDL/ptrlist.h>
 #include <map>
 #include "../shared/csurf_reasonus_settings.hpp"
-// #include <reaper_plugin.h>
-// #include "../shared/csurf_utils.hpp"
-#include "../shared/csurf_context.cpp"
+#include "../shared/csurf_context.hpp"
 #include "../shared/csurf_project_state.hpp"
 
 enum NavigatorFilter {

@@ -153,6 +153,9 @@ class ReaSonusSettings {
         {"functions", "15", "0"},
         {"functions", "16", "0"},
 
+        {"transport", "3", "0"},
+        {"transport", "4", "0"},
+
         {"filters", "nb-filters", "0"},
         {"filters", "use-custom-color", "0"},
         {"filters", "project-filters", "0"},

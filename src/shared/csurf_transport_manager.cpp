@@ -3,7 +3,7 @@
 #include "csurf_daw.hpp"
 #include "csurf_faderport_ui_imgui_utils.hpp"
 #include "../controls/csurf_button.hpp"
-#include "../shared/csurf_context.cpp"
+#include "../shared/csurf_context.hpp"
 #include "../shared/csurf_utils.hpp"
 #include "../ui/pages/csurf_ui_fp_v2_control_panel.hpp"
 #include "../ui/windows/csurf_ui_fp_8_control_panel.hpp"
@@ -191,7 +191,7 @@ void CSurf_TransportManager::HandleRewindButton(const int value) {
     }
 
     if (context->GetShiftRight()) {
-        handleFunctionKey("2", FUNCTION_TRANSPORT);
+        handleFunctionKey("3", FUNCTION_TRANSPORT);
         return;
     }
 
@@ -221,12 +221,12 @@ void CSurf_TransportManager::HandleForwardButton(const int value) {
     }
 
     if (context->GetShiftLeft()) {
-        const std::string action_id = settings->GetFunction("3", FUNCTION_TRANSPORT);
+        const std::string action_id = settings->GetFunction("2", FUNCTION_TRANSPORT);
 
         if (action_id == "0") {
             CSurf_GoEnd();
         } else {
-            handleFunctionKey("3", FUNCTION_TRANSPORT);
+            handleFunctionKey("2", FUNCTION_TRANSPORT);
         }
 
         return;

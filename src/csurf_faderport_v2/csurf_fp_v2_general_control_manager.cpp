@@ -3,7 +3,7 @@
 
 #include "csurf_fp_v2_navigator.hpp"
 #include "../controls/csurf_button.hpp"
-#include "../shared/csurf_context.cpp"
+#include "../shared/csurf_context.hpp"
 
 class CSurf_FP_V2_GeneralControlManager {
 protected:

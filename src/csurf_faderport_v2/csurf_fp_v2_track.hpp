@@ -5,7 +5,7 @@
 #include "../controls/csurf_color_button.hpp"
 #include "../controls/csurf_display.hpp"
 #include "../controls/csurf_fader.hpp"
-#include "../shared/csurf_context.cpp"
+#include "../shared/csurf_context.hpp"
 
 class CSurf_FP_V2_Track {
 protected:
