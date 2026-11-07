@@ -86,9 +86,13 @@ void CSurf_TransportManager::handleFunctionKey(const std::string &key, const Fun
     const std::string action_id = settings->GetFunction(key, type);
 
     if (action_id == "0") {
-        const int result = MB("There is no action assigned to this function.\nDo you want to assign an action?",
-                              "No action assigned", 1);
-        if (result == 1) {
+        const int result = MB(
+        "There is no action assigned to this function.\nDo you want to assign an action?",
+          "No action assigned",
+          MB_TYPE_OK_CANCEL
+        );
+
+        if (result == MB_RETURN_OK) {
             if (device == FP_8) {
                 if (!ReaSonus8ControlPanel::control_panel_open) {
                     ToggleFP8ControlPanel(ReaSonus8ControlPanel::FUNCTIONS_PAGE);

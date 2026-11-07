@@ -1,4 +1,5 @@
 #include "action_close_all_floating_fx_windows.hpp"
+#include "../shared/csurf_daw.hpp"
 
 #define STRINGIZE_DEF(x) #x
 #define STRINGIZE(x) STRINGIZE_DEF(x)
@@ -19,17 +20,17 @@ namespace ACTION_CLOSE_ALL_FLOATING_FX_WINDOWS
     // gets called via callback or timer
     void MainFunctionOfMyPlugin()
     {
-        int nb_tracks = ::GetNumTracks();
+        const int nb_tracks = GetNumTracks();
 
         for (int i = 0; i < nb_tracks; i++)
         {
-            MediaTrack *media_track = ::GetTrack(0, i);
-            int nb_plugins = ::TrackFX_GetCount(media_track);
+            MediaTrack *media_track = GetTrack(nullptr, i);
+            const int nb_plugins = TrackFX_GetCount(media_track);
 
             for (int j = 0; j < nb_plugins; j++)
             {
-                ::TrackFX_Show(media_track, j, 0);
-                ::TrackFX_Show(media_track, j, 2);
+                TrackFX_Show(media_track, j, SHOW_FLAG_HIDE_CHAIN);
+                TrackFX_Show(media_track, j, SHOW_FLAG_HIDE_WINDOW);
             }
         }
     }

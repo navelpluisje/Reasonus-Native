@@ -1,13 +1,14 @@
 #ifndef CSURF_FP_UI_FILTER_LIST_BOX_H_
 #define CSURF_FP_UI_FILTER_LIST_BOX_H_
 
+#include <functional>
 #include <reaper_imgui_functions.h>
 #include <string>
 #include <vector>
-#include <functional>
 
 #include "csurf_ui_filter_selectable.hpp"
 #include "../csurf_ui_styles_elements.hpp"
+#include "../../shared/csurf_utils.hpp"
 
 /**
  * @brief Create a listbox with
@@ -27,7 +28,7 @@ class ReaSonusFilterListBox {
     ImGui_Context *m_ctx;
     const CSurf_UI_Assets *assets;
     const std::string element_id;
-    const std::vector<std::string> &items;
+    std::vector<std::string> &items;
     const std::vector<int> &colors;
     int *selected_item;
     const bool sortable;
@@ -42,7 +43,7 @@ public:
         ImGui_Context *m_ctx,
         const CSurf_UI_Assets *assets,
         const std::string &element_id,
-        const std::vector<std::string> &items,
+        std::vector<std::string> &items,
         const std::vector<int> &colors,
         int *selected_item,
         const std::function<void(int index)> &remove_callback,
@@ -79,7 +80,7 @@ public:
                     ReaSonusFilterSelectable(
                         m_ctx,
                         assets,
-                        items[i],
+                        replace(items[i], "++", " "),
                         (colors[i] << 8) + 255,
                         i,
                         selected_item,
