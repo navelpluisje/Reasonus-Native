@@ -242,6 +242,12 @@ void CSurf_FP_8_Navigator::HandleTracksCustomFilter(const std::string &filter_ke
 }
 
 void CSurf_FP_8_Navigator::HandleTrackCustomMultiSelectFilter() {
+    // Filter list is empty, so show everything
+    if (selected_filters.size() == 0) {
+        HandleAllTracksFilter();
+        return;
+    }
+
     std::map<int, bool> all_tracks = GetAllTracksBase();
     std::map<int, bool> filter_tracks;
     std::map<int, bool> tmp_tracks;

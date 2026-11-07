@@ -221,6 +221,7 @@ public:
             if (trackFilter != TrackCustomMultiSelectFilter || context->GetChannelMode() != MixMode) {
                 mixAllButton->SetColor(ButtonColorGreen);
                 faderManager->HandleMixAllButtonClick();
+                trackFilter = TrackCustomMultiSelectFilter;
             } else {
                 trackNavigator->HandleFilter(TrackCustomMultiSelectFilter);
                 faderManager->ResetMixButtonClick();
