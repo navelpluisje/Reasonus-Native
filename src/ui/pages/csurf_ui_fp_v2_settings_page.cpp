@@ -20,6 +20,7 @@ class CSurf_FP_V2_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-i
     bool endless_track_scroll;
     bool setting_latch_preview_action_enable;
     int setting_latch_preview_action;
+    bool setting_momentary_fwd_rwd;
 
     std::vector<std::string> language_names;
     ReaSonusSettings *settings = ReaSonusSettings::GetInstance(FP_V2);
@@ -164,6 +165,14 @@ public:
                 latch_preview_action_combo->Render();
             }
 
+            RenderInfoCheckbox(
+                m_ctx,
+                assets,
+                i18n->t("settings", "momentary-fwd-rwd.label"),
+                &setting_momentary_fwd_rwd,
+                i18n->t("settings", "momentary-fwd-rwd.tooltip")
+            );
+
             UiStyledElements::PopReaSonusSettingsContentStyle(m_ctx);
             ImGui::EndChild(m_ctx);
         }
@@ -178,6 +187,7 @@ public:
         settings->SetSetting("surface", "latch-preview-action", setting_latch_preview_action_enable);
         settings->SetSetting("surface", "latch-preview-action-code",
                              latch_preview_action_indexes[setting_latch_preview_action]);
+        settings->SetSetting("surface", "momentary-fwd-rwd", setting_momentary_fwd_rwd);
 
         if (settings->StoreSettings()) {
             DAW::SetExtState(EXT_STATE_KEY_SAVED_SETTINGS, EXT_STATE_VALUE_TRUE, false);
@@ -198,6 +208,7 @@ public:
         can_disable_fader = settings->GetCanDisableFader();
         endless_track_scroll = settings->GetEndlessTrackScroll();
         setting_latch_preview_action_enable = settings->GetLatchPreviewActionEnabled();
+        setting_momentary_fwd_rwd = settings->HasMomentaryFwdRwd();
 
         auto iterator = std::find(
             latch_preview_action_indexes.begin(),
