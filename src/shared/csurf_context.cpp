@@ -7,6 +7,8 @@
 #include "reaper_plugin.h"
 #include "reaper_plugin_functions.h"
 
+int CSurf_Context::MOMENTARY_TIMEOUT = 500;
+
 CSurf_Context::CSurf_Context(const int nbChannels) : nbChannels(nbChannels) {
     if (nbChannels == 1) {
         device = FP_V2;

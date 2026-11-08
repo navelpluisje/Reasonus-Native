@@ -1177,7 +1177,7 @@ std::vector<std::string> DAW::GetProjectTime(const bool overwrite_time_code, con
         proj_time_mode = GetProjectTimeMode();
     }
 
-    int const play_state = GetPlayStateEx(nullptr);
+    const auto play_state = static_cast<PLAY_STATES>(GetPlayStateEx(nullptr));
     bool const is_playing = hasBit(play_state, 0);
 
     if (is_playing) {

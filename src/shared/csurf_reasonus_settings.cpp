@@ -286,6 +286,10 @@ bool ReaSonusSettings::ShouldStartWithTrackPluginMode() {
     return stoi(settings["surface"]["start-with-track-plugin-mode"]) > 0;
 }
 
+bool ReaSonusSettings::HasMomentaryFwdRwd() {
+    return stoi(settings["surface"]["momentary-fwd-rwd"]) > 0;
+}
+
 bool ReaSonusSettings::UseAutomationColors() {
     return settings["surface"]["use-automation-colors"] == "1";
 }

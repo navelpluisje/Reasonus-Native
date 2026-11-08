@@ -65,6 +65,7 @@ class ReaSonusSettings {
         {"surface", "mute-solo-momentary", "0"},
         {"surface", "latch-preview-action", "0"},
         {"surface", "latch-preview-action-code", "42013"},
+        {"surface", "momentary-fwd-rwd", "0"},
 
         {"functions", "1", "0"},
         {"functions", "2", "0"},
@@ -363,6 +364,8 @@ public:
     bool ShouldStartWithTrackSendMode();
 
     bool ShouldStartWithTrackPluginMode();
+
+    bool HasMomentaryFwdRwd();
 
     /**
      * Settings for the FaderPort 2

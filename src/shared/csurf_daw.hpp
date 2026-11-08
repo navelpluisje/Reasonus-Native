@@ -43,6 +43,13 @@ enum SEND_SEND_MODES {
     SEND_POST_FX    = 3,
 };
 
+enum PLAY_STATES {
+    PLAY_STATE_STOPPED   = 0,
+    PLAY_STATE_PLAYING   = 1,
+    PLAY_STATE_PAUSED    = 2,
+    PLAY_STATE_RECORDING = 4,
+};
+
 static std::map<Features, double> feature_versions = { // NOLINT(*-statically-constructed-objects, *-throwing-static-initialization)
     {FEATURE_PINNED_TRACKS, 7.46},
     {FEATURE_EXTENSION_DATA, 7.79},

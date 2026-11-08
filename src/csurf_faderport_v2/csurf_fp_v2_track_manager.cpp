@@ -1,7 +1,7 @@
 #include "csurf_fp_v2_track_manager.hpp"
 #include "../shared/csurf_daw.hpp"
 
-constexpr int MOMENTARY_TIMEOUT = 500;
+// constexpr int MOMENTARY_TIMEOUT = 500;
 
 void CSurf_FP_V2_TrackManager::GetFaderValue(MediaTrack *media_track, int *faderValue) const {
     double volume = 0.0;
@@ -104,7 +104,7 @@ void CSurf_FP_V2_TrackManager::HandleMuteClick(int index, const int value) {
     MediaTrack *media_track = navigator->GetControllerTrack();
 
     if (value == 0 && settings->GetMuteSoloMomentary()) {
-        if (now - mute_start > MOMENTARY_TIMEOUT) {
+        if (now - mute_start > CSurf_Context::MOMENTARY_TIMEOUT) {
             CSurf_SetSurfaceMute(
                 media_track,
                 CSurf_OnMuteChange(media_track, static_cast<int>(!DAW::IsTrackMuted(media_track))),
@@ -137,7 +137,7 @@ void CSurf_FP_V2_TrackManager::HandleSoloClick(int index, const int value) {
     MediaTrack *media_track = navigator->GetControllerTrack();
 
     if (value == 0 && settings->GetMuteSoloMomentary()) {
-        if (now - solo_start > MOMENTARY_TIMEOUT) {
+        if (now - solo_start > CSurf_Context::MOMENTARY_TIMEOUT) {
             CSurf_SetSurfaceSolo(
                 media_track,
                 CSurf_OnSoloChange(media_track, static_cast<int>(!DAW::IsTrackSoloed(media_track))),
