@@ -498,35 +498,42 @@ public:
                     ? DAW::EditSave()
                     : resetPan();
                 break;
+
             case Flip:
             case Channel:
                 break;
+
             case Zoom:
                 context->GetShiftLeft()
                     ? Main_OnCommandAsyncEx(40113, 0, nullptr)  // View: Toggle track zoom to maximum height
                     : Main_OnCommandAsyncEx(40110, 0, nullptr); // View: Toggle track zoom to minimum height
                 break;
+
             case Scroll:
                 context->GetShiftLeft()
                     ? Main_OnCommandStringEx("_SWS_HSCROLLPLAY50", 0, nullptr)
                     // SWS: Horizontal scroll to put play cursor at 50%
                     : Main_OnCommandAsyncEx(40913, 0, nullptr); // Track: Vertical scroll selected tracks into view
                 break;
+
             case Master:
                 context->GetShiftLeft()
                     ? DAW::EditSave()
                     : resetPan();
                 break;
+
             case Click:
                 context->GetShiftLeft()
                     ? Main_OnCommandAsyncEx(40363, 0, nullptr)  // Options: Show metronome/pre-roll settings
                     : Main_OnCommandAsyncEx(40364, 0, nullptr); // Options: Toggle metronome
                 break;
+
             case Section:
                 context->GetShiftLeft()
                     ? Main_OnCommandAsyncEx(40615, 0, nullptr)  // Markers: Delete region near cursor
                     : Main_OnCommandAsyncEx(40306, 0, nullptr); // Markers: Insert region from time selection and edit
                 break;
+
             case Marker:
                 context->GetShiftLeft()
                     ? Main_OnCommandAsyncEx(40613, 0, nullptr) // Markers: Delete marker near cursor
