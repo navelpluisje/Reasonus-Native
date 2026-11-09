@@ -28,6 +28,9 @@ class CSurf_Context {
     // Last touched fx
     bool last_touched_fx_mode;
 
+    // Pan flipp mode
+    bool pan_flip_mode;
+
     // Make the fader control the master track for the FaderPort V2
     bool master_fader_mode;
 
@@ -252,6 +255,13 @@ public:
     void SetSinglePointAutomation(bool value);
 
     [[nodiscard]] bool IsSinglePointAutomationEnabled() const;
+
+    /**************************************************************************
+     * Pan Flip Mode for the V2
+     **************************************************************************/
+    void SetPanFlipMode(bool value);
+
+    [[nodiscard]] bool IsPanFlipMode() const;
 
     /**************************************************************************
      * Settings

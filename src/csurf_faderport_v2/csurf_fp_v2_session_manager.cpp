@@ -15,6 +15,7 @@
 enum SessionTypes // NOLINT(*-use-internal-linkage)
 {
     Pan,
+    Flip,
     Channel,
     Zoom,
     Scroll,
@@ -153,8 +154,9 @@ public:
     }
 
     void SetSession(const SessionTypes _session_type) {
-        session_type = _session_type;
+        context->SetPanFlipMode(_session_type == Flip);
         context->SetMasterFaderMode(_session_type == Master);
+        session_type = _session_type;
     }
 
     void resetPan() const {
@@ -221,7 +223,7 @@ public:
         }
 
         if (context->GetShiftLeft()) {
-            ToggleFPV2ControlPanel(ReaSonusV2ControlPanel::FUNCTIONS_PAGE);
+            SetSession(Flip);
             return;
         }
         SetSession(Pan);
@@ -320,6 +322,7 @@ public:
 
         switch (session_type) {
             case Pan:
+            case Flip:
             case Channel:
             case Master:
             case Scroll:
@@ -360,6 +363,7 @@ public:
 
         switch (session_type) {
             case Pan:
+            case Flip:
             case Channel:
             case Scroll:
             case Master:
@@ -367,22 +371,25 @@ public:
                     ? DAW::EditRedo()
                     : DAW::SetUniqueSelectedTrack(trackNavigator->GetNextTrack());
                 break;
+
             case Zoom:
                 context->GetShiftLeft()
                     ? Main_OnCommandAsyncEx(40111, 0, nullptr) // View: Zoom in vertical
                     : Main_OnCommandAsyncEx(1012, 0, nullptr); // View: Zoom in horizontal
                 break;
+
             case Click:
                 context->GetShiftLeft()
                     ? DAW::EditRedo()
                     : Main_OnCommandAsyncEx(42457, 0, nullptr); // Options: Set metronome speed to 2x
                 break;
+
             case Section:
                 context->GetShiftLeft()
                     ? Main_OnCommandAsyncEx(40626, 0, nullptr)                // Time selection: Set end point
                     : Main_OnCommandStringEx("_SWS_SELNEXTMORR", 0, nullptr); // SWS: Goto/select next marker/region
-
                 break;
+
             case Marker:
                 context->GetShiftLeft()
                     ? DAW::EditRedo()
@@ -396,25 +403,32 @@ public:
             case Pan:
                 IncrementPan(value);
                 break;
+
+            case Flip:
             case Channel:
                 Main_OnCommandAsyncEx(40285, 0, nullptr); // Track: Go to next track
                 break;
+
             case Zoom:
                 context->GetShiftLeft()
                     ? Main_OnCommandAsyncEx(40111, 0, nullptr) // View: Zoom in vertical
                     : Main_OnCommandAsyncEx(1012, 0, nullptr); // View: Zoom in horizontal
                 break;
+
             case Scroll:
                 context->GetShiftLeft()
                     ? Main_OnCommandAsyncEx(40141, 0, nullptr)  // View: Scroll view left
                     : Main_OnCommandAsyncEx(40139, 0, nullptr); // View: Scroll view up
                 break;
+
             case Master:
                 IncrementPan(value);
                 break;
+
             case Click:
                 IncrementMetronomeVolume();
                 break;
+
             case Section:
             case Marker:
                 context->GetShiftLeft()
@@ -429,25 +443,32 @@ public:
             case Pan:
                 DecrementPan(value);
                 break;
+
+            case Flip:
             case Channel:
                 Main_OnCommandAsyncEx(40286, 0, nullptr); // Track: Go to previous track
                 break;
+
             case Zoom:
                 context->GetShiftLeft()
                     ? Main_OnCommandAsyncEx(40112, 0, nullptr) // View: Zoom out vertical
                     : Main_OnCommandAsyncEx(1011, 0, nullptr); // View: Zoom out horizontal
                 break;
+
             case Scroll:
                 context->GetShiftLeft()
                     ? Main_OnCommandAsyncEx(40140, 0, nullptr)  // View: Scroll view right
                     : Main_OnCommandAsyncEx(40138, 0, nullptr); // View: Scroll view down
                 break;
+
             case Master:
                 DecrementPan(value);
                 break;
+
             case Click:
                 DecrementMetronomeVolume();
                 break;
+
             case Section:
             case Marker:
                 context->GetShiftLeft()

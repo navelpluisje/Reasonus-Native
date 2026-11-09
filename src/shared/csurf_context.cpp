@@ -347,6 +347,17 @@ bool CSurf_Context::IsSinglePointAutomationEnabled() const {
 }
 
 /**************************************************************************
+ * Pan Flip Mode for the V2
+ **************************************************************************/
+void CSurf_Context::SetPanFlipMode(const bool value) {
+    pan_flip_mode = value;
+}
+
+bool CSurf_Context::IsPanFlipMode() const {
+    return pan_flip_mode;
+}
+
+/**************************************************************************
  * Settings
  **************************************************************************/
 std::string CSurf_Context::GetSetting(const std::string &group, const std::string &key) const {

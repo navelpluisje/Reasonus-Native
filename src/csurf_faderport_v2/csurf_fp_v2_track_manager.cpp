@@ -228,6 +228,16 @@ void CSurf_FP_V2_TrackManager::HandleFaderMove(const int msb, const int lsb) con
 
     MediaTrack *media_track = navigator->GetControllerTrack();
 
+    if (context->IsPanFlipMode()) {
+        if (context->GetShiftLeft()) {
+            DAW::SetTrackPan2(media_track, normalizedToPan(int14ToNormalized(msb, lsb)));
+            return;
+        }
+
+        DAW::SetTrackPan1(media_track, normalizedToPan(int14ToNormalized(msb, lsb)));
+        return;
+    }
+
     if (context->GetShiftLeft()) {
         CSurf_SetSurfacePan(
             media_track,
