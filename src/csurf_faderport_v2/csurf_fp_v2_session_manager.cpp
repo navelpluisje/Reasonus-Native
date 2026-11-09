@@ -55,10 +55,11 @@ protected:
                 ? BTN_VALUE_ON
                 : context->GetLastTouchedFxMode() // NOLINT(*-avoid-nested-conditional-operator)
                       ? valueOn
-                      : BTN_VALUE_OFF);
+                      : BTN_VALUE_OFF
+        );
 
         panButton->SetValue(
-            ReaSonusV2ControlPanel::control_panel_open && context->GetShiftLeft()
+            context->IsPanFlipMode()
                 ? BTN_VALUE_ON
                 : session_type == Pan // NOLINT(*-avoid-nested-conditional-operator)
                       ? valueOn
@@ -91,7 +92,13 @@ protected:
 
         channelButton->SetColor(context->GetShiftLeft() && context->GetFaderDisabled() ? ButtonColorYellow : color);
         linkButton->SetColor(context->GetShiftLeft() ? ButtonColorYellow : ButtonColorGreen);
-        panButton->SetColor(context->GetShiftLeft() ? ButtonColorYellow : ButtonColorWhite);
+        panButton->SetColor(
+            context->GetShiftLeft()
+                ? ButtonColorYellow
+                : context->IsPanFlipMode()
+                      ? ButtonColorYellow
+                      : ButtonColorWhite
+        );
         scrollButton->SetColor(session_type == Zoom ? ButtonColorYellow : ButtonColorWhite);
     }
 
@@ -144,13 +151,13 @@ public:
     ~CSurf_FP_V2_SessionManager() = default;
 
     void Refresh() const {
-        SetButtonValues();
         SetButtonColors();
+        SetButtonValues();
     }
 
     void Update() const {
-        SetButtonValues();
         SetButtonColors();
+        SetButtonValues();
     }
 
     void SetSession(const SessionTypes _session_type) {
@@ -491,6 +498,7 @@ public:
                     ? DAW::EditSave()
                     : resetPan();
                 break;
+            case Flip:
             case Channel:
                 break;
             case Zoom:
