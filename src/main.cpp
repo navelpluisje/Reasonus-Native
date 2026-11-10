@@ -21,6 +21,7 @@
 #include "actions/action_fp_v2_setting_momentary_mute_solo.hpp"
 #include "actions/action_ui_plugin_type_mapping.hpp"
 #include "ui/pages/csurf_ui_function_keys.hpp"
+#include "api/api.hpp"
 // ReSharper disable once CppUnusedIncludeDirective
 #include "resource.h"
 #include "shared/csurf.h"
@@ -45,14 +46,17 @@ reaper_plugin_info_t *g_reaper_plugin_info;
 
 extern "C" {
   REAPER_PLUGIN_DLL_EXPORT auto REAPER_PLUGIN_ENTRYPOINT(
-    REAPER_PLUGIN_HINSTANCE hInstance, reaper_plugin_info_t *reaper_plugin_info) -> int {
+    REAPER_PLUGIN_HINSTANCE hInstance,
+    reaper_plugin_info_t *reaper_plugin_info
+  ) -> int {
     g_hInst = hInstance;
 
     /**
      * reaper_plugin_info is not available, so no need to run.
      */
     if (
-      reaper_plugin_info == nullptr || reaper_plugin_info->caller_version != REAPER_PLUGIN_VERSION
+      reaper_plugin_info == nullptr
+      || reaper_plugin_info->caller_version != REAPER_PLUGIN_VERSION
       || !reaper_plugin_info->GetFunc
     ) {
       ACTION_CLOSE_ALL_FLOATING_FX_WINDOWS::Unregister();
@@ -129,10 +133,13 @@ extern "C" {
     if (DAW::VersionHasFeature(FEATURE_EXTENSION_DATA)) {
       const std::string version = GIT_VERSION;
       const std::string name = "ReaSonus Native (" + version + ")";
+
       plugin_register("ext_name", (void *) name.c_str());
       plugin_register("ext_url", (void *) "https://reasonus.net/");
       plugin_register("ext_vendor", (void *) "Navelpluisje");
     }
+
+    REASONUS_API::Register();
 
     return 1;
   }
