@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 
-#include "../../lib/reaper-sdk/sdk/reaper_plugin_functions.h"
+#include "reaper_plugin_functions.h"
 #include "../shared/csurf.h"
 #include "../shared/csurf_utils.hpp"
 
@@ -19,6 +19,6 @@ namespace REASONUS_API {
     }
 
     inline auto defstring_FP8ControlPlugin =
-            "void\0MediaTrack*,int\0media_track,plugin_index\0"
+            "void\0MediaTrack*,int\0track,pluginIndex\0"
             "Start controlling the plugin on the given track with the given plugin id with the controler";
 }

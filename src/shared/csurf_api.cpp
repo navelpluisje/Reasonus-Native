@@ -8,10 +8,8 @@ void ReaSonusApi::SetPluginControl(const int track_index, const int plugin_index
 
     // First clean up all open fx windows and then open the plugin in a floating window
     Main_OnCommandStringEx("_REASONUS_CLOSE_ALL_FLOATING_FX_WINDOWS_COMMAND", 0, nullptr);
-    // SWS/S&M: Close all floating FX and chanin windows
+    // SWS/S&M: Close all floating FX and chain windows
     TrackFX_Show(media_track, plugin_index, SHOW_FLAG_SHOW_WINDOW);
-    // faderManager->HandlePluginsButtonClick(127, false);
-    faderManager->ChangeChannelMode(PluginControlMode);
 
     context->SetPluginEditTrack(media_track);
     context->SetPluginEditPluginId(plugin_index);
@@ -69,6 +67,35 @@ void ReaSonusApi::HandleFilterByName() const {
     }
 }
 
+void ReaSonusApi::HandleFilterByType() const {
+    if (!DAW::GetExtState(EXT_STATE_FP_FILTER_BY_TYPE, "").empty()) {
+        const std::string filter = DAW::GetExtState(EXT_STATE_FP_FILTER_BY_TYPE, "");
+
+        trackNavigator->HandleFilter(static_cast<NavigatorFilter>(stoi(filter)));
+
+        DAW::SetExtState(EXT_STATE_FP_FILTER_BY_TYPE, "", false);
+    }
+}
+
+void ReaSonusApi::HandleSetFaderMode() const {
+    if (!DAW::GetExtState(EXT_STATE_FP_FADER_MODE, "").empty()) {
+        // Set the correct values to open the plugin control
+        const std::vector<std::string> fader_mode_ids = split(
+            DAW::GetExtState(EXT_STATE_FP_FADER_MODE, ""),
+            ":"
+        );
+
+        if (fader_mode_ids[0] == "0") {
+            faderManager->ChangeChannelMode(static_cast<ChannelMode>(0));
+        } else if (stoi(fader_mode_ids[0]) > 0 && fader_mode_ids.size() > 1) {
+            MediaTrack *media_track = GetTrack(nullptr, stoi(fader_mode_ids[1]));
+            DAW::SetUniqueSelectedTrack(media_track);
+            faderManager->ChangeChannelMode(static_cast<ChannelMode>(stoi(fader_mode_ids[0])));
+        }
+        DAW::SetExtState(EXT_STATE_FP_FADER_MODE, "", false);
+    }
+}
+
 ReaSonusApi::ReaSonusApi(CSurf_Context *context) : context(context), faderManager(nullptr), trackNavigator(nullptr) {
 }
 
@@ -87,4 +114,6 @@ void ReaSonusApi::HandleApi() const {
     HandleSendMode();
     HandlePanMode();
     HandleFilterByName();
+    HandleFilterByType();
+    HandleSetFaderMode();
 }

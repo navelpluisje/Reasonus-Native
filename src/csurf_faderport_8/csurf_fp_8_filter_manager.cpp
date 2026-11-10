@@ -105,26 +105,34 @@ public:
             const int filter_index = context->GetChannelManagerItemIndex(MixMode) + i;
             int fader_value = 0;
             int valuebar_value = 0;
-            std::string strPan1;
-            std::string strPan2;
+            std::string str_pan1;
+            std::string str_pan2;
 
             const CSurf_FP_8_Track *track = tracks.at(i);
             MediaTrack *media_track = media_tracks.Get(i);
-            const bool filterExist = filter_index < static_cast<int>(filters.size());
+            std::string filater_label = "Filter";
+            const bool filter_exist = filter_index < static_cast<int>(filters.size());
+            bool filter_selected = false;
+            const bool is_multi_select_filter = navigator->GetMultiSelectFilter();
+
+            if (is_multi_select_filter) {
+                filter_selected = navigator->HasFilter(filter_index);
+                filater_label = filter_selected ? "Active" : "Disabled";
+            }
 
             // If the existing slot has a filter and use filter color is set to true, use the filter color.
-            if (settings->UseFilterColor() && filterExist) {
+            if (settings->UseFilterColor() && filter_exist) {
                 color.SetColor(filters[filter_index].color, false);
             } else {
                 // If there is no custom color then default is white, otherwise inactive color is black.
-                ButtonColor button_color = filterExist ? ButtonColorWhite : ButtonColorBlack;
+                const ButtonColor button_color = filter_exist ? ButtonColorWhite : ButtonColorBlack;
                 color.SetColor(button_color);
             }
 
-            GetFaderValue(media_track, &fader_value, &valuebar_value, &strPan1, &strPan2);
+            GetFaderValue(media_track, &fader_value, &valuebar_value, &str_pan1, &str_pan2);
 
             track->SetTrackColor(color);
-            track->SetSelectButtonValue(filterExist ? BTN_VALUE_ON : BTN_VALUE_OFF, force_update);
+            track->SetSelectButtonValue(filter_selected ? BTN_VALUE_ON : BTN_VALUE_OFF, force_update);
             track->SetMuteButtonValue(DAW::IsTrackMuted(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, force_update);
             track->SetSoloButtonValue(DAW::IsTrackSoloed(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF, force_update);
             track->SetFaderValue(fader_value, force_update);
@@ -135,11 +143,18 @@ public:
             track->SetDisplayLine(0, ALIGN_CENTER, DAW::GetTrackName(media_track).c_str(), NON_INVERT, force_update);
 
             if (filter_index < static_cast<int>(filters.size())) {
-                track->SetDisplayLine(1, ALIGN_CENTER, "Filter", INVERT, force_update);
-                track->SetDisplayLine(2, ALIGN_CENTER, filters.at(filter_index).name.c_str(), NON_INVERT, force_update);
-                track->SetDisplayLine(3, ALIGN_CENTER, "", NON_INVERT, force_update);
+                const std::vector<std::string> name_parts = split(filters.at(filter_index).name, "++");
+                track->SetDisplayLine(1, ALIGN_CENTER, filater_label.c_str(), INVERT, force_update);
+                track->SetDisplayLine(2, ALIGN_CENTER, name_parts[0].c_str(), NON_INVERT, force_update);
+                track->SetDisplayLine(
+                    3,
+                    ALIGN_CENTER,
+                    name_parts.size() > 1 ? name_parts[1].c_str() : "",
+                    NON_INVERT,
+                    force_update
+                );
             } else {
-                track->SetDisplayLine(1, ALIGN_CENTER, "No Fltr", INVERT, force_update);
+                track->SetDisplayLine(1, ALIGN_CENTER, "Empty", INVERT, force_update);
                 track->SetDisplayLine(2, ALIGN_CENTER, "", NON_INVERT, force_update);
                 track->SetDisplayLine(3, ALIGN_CENTER, "Create", NON_INVERT, force_update);
             }

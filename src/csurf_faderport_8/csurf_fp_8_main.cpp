@@ -431,6 +431,7 @@ public:
                 transportManager->Update(force_update);
                 automationManager->Update(force_update);
                 generalControlManager->Update(force_update);
+                mixManager->Update(force_update);
 
                 if (force_update) {
                     mixManager->Refresh(force_update);
