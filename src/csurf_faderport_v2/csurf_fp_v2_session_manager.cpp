@@ -10,7 +10,7 @@
 #include "../shared/csurf_reasonus_settings.hpp"
 #include "../shared/csurf_session_manager_actions.hpp"
 #include "../shared/csurf_utils.hpp"
-#include "../ui/pages/csurf_ui_fp_v2_control_panel.hpp"
+#include "../ui/windows/csurf_ui_fp_v2_control_panel.hpp"
 
 enum SessionTypes // NOLINT(*-use-internal-linkage)
 {
@@ -104,10 +104,10 @@ protected:
             const int result = MB(
                 "There is no action assigned to this function.\nDo you want to assign an action?",
                 "No action assigned",
-                1
+                MB_TYPE_OK_CANCEL
             );
 
-            if (result == 1) {
+            if (result == MB_RETURN_OK) {
                 if (!ReaSonusV2ControlPanel::control_panel_open) {
                     ToggleFPV2ControlPanel(ReaSonusV2ControlPanel::FUNCTIONS_PAGE);
                 }

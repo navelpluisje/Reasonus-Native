@@ -1,5 +1,14 @@
 #include "csurf_fp_v2_navigator.hpp"
+#include "../shared/csurf.h"
 #include "../shared/csurf_daw.hpp"
+
+void CSurf_FP_V2_Navigator::UpdateMixerPosition() {
+    MediaTrack *media_track = GetControllerTrack();
+    if (media_track) {
+        SetMixerScroll(media_track);
+        DAW::SetTcpScroll(media_track);
+    }
+}
 
 void CSurf_FP_V2_Navigator::GetAllControllableTracks(WDL_PtrList<MediaTrack> &tracks, bool &hasSolo, bool &hasMute) {
     tracks.Empty();
@@ -35,18 +44,11 @@ void CSurf_FP_V2_Navigator::GetAllControllableTracks(WDL_PtrList<MediaTrack> &tr
             tracks.Add(media_track);
         }
     }
+
     hasSolo = _solo;
     hasMute = _mute;
     hasArmed = _arm;
     hasAllArmed = _all_armed;
-}
-
-void CSurf_FP_V2_Navigator::UpdateMixerPosition() {
-    MediaTrack *media_track = GetControllerTrack();
-    if (media_track) {
-        SetMixerScroll(media_track);
-        DAW::SetTcpScroll(media_track);
-    }
 }
 
 CSurf_FP_V2_Navigator::CSurf_FP_V2_Navigator(
@@ -56,9 +58,11 @@ CSurf_FP_V2_Navigator::CSurf_FP_V2_Navigator(
 
 MediaTrack *CSurf_FP_V2_Navigator::GetControllerTrack() {
     if (context->GetMasterFaderMode()) {
+        DAW::SetExtState(EXT_STATE_FP_V2_CONTROLLED_TRACK, -1, false);
         return GetMasterTrack(nullptr);
     }
 
+    DAW::SetExtState(EXT_STATE_FP_V2_CONTROLLED_TRACK, track_offset, false);
     GetAllControllableTracks(tracks, hasSolo, hasMute);
 
     if (DAW::IsTrackSelected(tracks.Get(track_offset))) {

@@ -43,6 +43,32 @@ enum SEND_SEND_MODES {
     SEND_POST_FX    = 3,
 };
 
+enum SHOW_FLAGS {
+    SHOW_FLAG_HIDE_CHAIN  = 0,
+    SHOW_FLAG_SHOW_CHAIN  = 1,
+    SHOW_FLAG_HIDE_WINDOW = 2,
+    SHOW_FLAG_SHOW_WINDOW = 3,
+};
+
+enum MESSAGE_BOX_TYPES {
+    MB_TYPE_OK                 = 0,
+    MB_TYPE_OK_CANCEL          = 1,
+    MB_TYPE_ABORT_RETRY_IGNORE = 2,
+    MB_TYPE_YES_NO_CANCEL      = 3,
+    MB_TYPE_YES_NO             = 4,
+    MB_TYPE_RETRY_CANCEL       = 5,
+};
+
+enum MESSAGE_BOX_RETURN {
+    MB_RETURN_OK     = 1,
+    MB_RETURN_CANCEL = 2,
+    MB_RETURN_ABORT  = 3,
+    MB_RETURN_RETRY  = 4,
+    MB_RETURN_IGNORE = 5,
+    MB_RETURN_YES    = 6,
+    MB_RETURN_NO     = 7,
+};
+
 static std::map<Features, double> feature_versions = { // NOLINT(*-statically-constructed-objects, *-throwing-static-initialization)
     {FEATURE_PINNED_TRACKS, 7.46},
     {FEATURE_EXTENSION_DATA, 7.79},

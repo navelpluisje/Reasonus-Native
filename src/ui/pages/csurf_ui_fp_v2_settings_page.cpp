@@ -1,5 +1,5 @@
 #include <array>
-#include "csurf_ui_fp_v2_control_panel.hpp"
+#include "../windows/csurf_ui_fp_v2_control_panel.hpp"
 #include "../csurf_ui_page_content.hpp"
 #include "../../i18n/i18n.hpp"
 #include "../../shared/csurf.h"
