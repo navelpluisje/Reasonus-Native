@@ -1,7 +1,7 @@
 #include "csurf_fp_v2_track_manager.hpp"
 #include <fmt/format.h>
 
-#include "db2val.h"
+#include <WDL/db2val.h>
 #include "../shared/csurf_daw.hpp"
 
 constexpr int MOMENTARY_TIMEOUT = 500;
