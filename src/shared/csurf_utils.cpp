@@ -295,6 +295,16 @@ std::string replaceAll(std::string str, const std::string &search, const std::st
     return str;
 }
 
+std::string sanitizeFileName(std::string str) {
+    const std::vector<std::string> chars_to_remove = {"\\", ":", "/", "*", "?", "\"", "<", ">", "|", ","};
+
+    for (auto character: chars_to_remove) {
+        str = replaceAll(str, character, "-");
+    }
+
+    return str;
+}
+
 void logInteger(const char *key, const int value, const std::string &base) {
     const std::string result = fmt::format("{}: {:" + base + "}\n", key, value);
     ShowConsoleMsg(result.c_str());

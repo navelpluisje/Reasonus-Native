@@ -59,7 +59,8 @@ public:
         const std::vector<CSurf_FP_8_Track *> &tracks,
         CSurf_FP_8_Navigator *navigator,
         CSurf_Context *context,
-        midi_Output *m_midiout) : CSurf_FP_8_ChannelManager(tracks, navigator, context, m_midiout) {
+        midi_Output *m_midiout
+    ) : CSurf_FP_8_ChannelManager(tracks, navigator, context, m_midiout) {
         if (context->GetPreviousChannelMode() != PluginControlMode) {
             context->ResetChannelManagerItemIndex(PluginMode);
         }

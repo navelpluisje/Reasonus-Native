@@ -323,6 +323,8 @@ std::string replace(std::string &str, const std::string &search, const std::stri
 
 std::string replaceAll(std::string str, const std::string &search, const std::string &replace);
 
+std::string sanitizeFileName(std::string str);
+
 /**
  *
  * @param key The key to identify the variable to display
