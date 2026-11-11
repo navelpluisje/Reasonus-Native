@@ -207,7 +207,7 @@ bool isInteger(const std::string &value) {
     if (value.empty()) {
         return false;
     }
-    
+
     char *pointer;
     strtol(value.c_str(), &pointer, 10);
     return *pointer == 0;
@@ -295,6 +295,16 @@ std::string replaceAll(std::string str, const std::string &search, const std::st
     return str;
 }
 
+std::string sanitizeFileName(std::string str) {
+    const std::vector<std::string> chars_to_remove = {"\\", ":", "/", "*", "?", "\"", "<", ">", "|", ","};
+
+    for (auto character: chars_to_remove) {
+        str = replaceAll(str, character, "-");
+    }
+
+    return str;
+}
+
 void logInteger(const char *key, const int value, const std::string &base) {
     const std::string result = fmt::format("{}: {:" + base + "}\n", key, value);
     ShowConsoleMsg(result.c_str());
@@ -328,6 +338,10 @@ std::string ltrim(const std::string &value) {
 std::string rtrim(const std::string &value) {
     const std::regex trailing_whitespaces("\\s+$");
     return std::regex_replace(value, trailing_whitespaces, "");
+}
+
+bool startsWith(const std::string value, const std::string prefix) {
+    return value.rfind(prefix, 0) == 0;
 }
 
 int minmax(const int min, const int value, const int max) {
