@@ -51,6 +51,7 @@ class CSurf_FP_V2_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-i
 
     std::vector<int> settings_plugin_color_palette;
     std::vector<int> settings_initial_plugin_color_palette;
+    bool setting_momentary_fwd_rwd;
 
     std::vector<std::string> language_names;
     ReaSonusSettings *settings = ReaSonusSettings::GetInstance(FP_V2);
@@ -416,6 +417,14 @@ public:
                     i18n->t("settings", "endless_track_scroll.label"),
                     &endless_track_scroll,
                     i18n->t("settings", "endless_track_scroll.tooltip"));
+
+                RenderInfoCheckbox(
+                    m_ctx,
+                    assets,
+                    i18n->t("settings", "momentary-fwd-rwd.label"),
+                    &setting_momentary_fwd_rwd,
+                    i18n->t("settings", "momentary-fwd-rwd.tooltip")
+                );
 
                 ImGui::EndChild(m_ctx);
             }

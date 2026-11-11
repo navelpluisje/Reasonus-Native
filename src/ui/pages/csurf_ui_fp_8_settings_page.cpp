@@ -40,6 +40,7 @@ class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-in
     bool setting_mute_master_on_fwd_rwd;
     bool setting_sends_respect_slots;
     bool setting_start_with_track_send_mode;
+    bool setting_momentary_fwd_rwd;
 
     // Automation
     bool setting_use_automation_colors;
@@ -638,21 +639,21 @@ public:
             }
 
             // Once we have more items under sends/receives, this has to be set around the `setting_sends_respect_slots` setting
-            if (DAW::VersionHasFeature(FEATURE_SLOTS)) {
-                if (ImGui::BeginChild(
+            if (ImGui::BeginChild(
+                m_ctx,
+                "sends-settings",
+                0.0,
+                0.0,
+                ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
+            )) {
+                ReaSonusPageTitle(
                     m_ctx,
-                    "sends-settings",
-                    0.0,
-                    0.0,
-                    ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
-                )) {
-                    ReaSonusPageTitle(
-                        m_ctx,
-                        assets,
-                        i18n->t("settings", "sends-receives-group.label"),
-                        true
-                    );
+                    assets,
+                    i18n->t("settings", "sends-receives-group.label"),
+                    true
+                );
 
+                if (DAW::VersionHasFeature(FEATURE_SLOTS)) {
                     RenderInfoCheckbox(
                         m_ctx,
                         assets,
@@ -660,16 +661,40 @@ public:
                         &setting_sends_respect_slots,
                         i18n->t("settings", "sends-respect-slots.tooltip")
                     );
-
-                    RenderInfoCheckbox(
-                        m_ctx,
-                        assets,
-                        i18n->t("settings", "start-with-track-send-mode.label"),
-                        &setting_start_with_track_send_mode,
-                        i18n->t("settings", "start-with-track-send-mode.tooltip")
-                    );
-                    ImGui::EndChild(m_ctx);
                 }
+
+                RenderInfoCheckbox(
+                    m_ctx,
+                    assets,
+                    i18n->t("settings", "start-with-track-send-mode.label"),
+                    &setting_start_with_track_send_mode,
+                    i18n->t("settings", "start-with-track-send-mode.tooltip")
+                );
+                ImGui::EndChild(m_ctx);
+            }
+
+            if (ImGui::BeginChild(
+                m_ctx,
+                "transport-settings",
+                0.0,
+                0.0,
+                ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
+            )) {
+                ReaSonusPageTitle(
+                    m_ctx,
+                    assets,
+                    i18n->t("settings", "transport-group.label"),
+                    true
+                );
+
+                RenderInfoCheckbox(
+                    m_ctx,
+                    assets,
+                    i18n->t("settings", "momentary-fwd-rwd.label"),
+                    &setting_momentary_fwd_rwd,
+                    i18n->t("settings", "momentary-fwd-rwd.tooltip")
+                );
+                ImGui::EndChild(m_ctx);
             }
             UiStyledElements::PopReaSonusGroupStyle(m_ctx);
             ImGui::EndGroup(m_ctx);
@@ -1224,6 +1249,7 @@ public:
         settings->SetSetting("surface", "use-automation-colors", setting_use_automation_colors);
         settings->SetSetting("surface", "start-with-track-send-mode", setting_start_with_track_send_mode);
         settings->SetSetting("surface", "start-with-track-plugin-mode", setting_start_with_track_plugin_mode);
+        settings->SetSetting("surface", "momentary-fwd-rwd", setting_momentary_fwd_rwd);
 
         settings->SetSetting("surface", "use-automation-single-point", setting_use_single_point_mode);
         settings->SetSetting("surface", "overwrite-automation-point-shape", setting_overwrite_single_point_shape);
@@ -1305,6 +1331,7 @@ public:
         setting_single_point_button_blink = settings->GetAutomationSingleButtonBlink();
         setting_start_with_track_send_mode = settings->ShouldStartWithTrackSendMode();
         setting_start_with_track_plugin_mode = settings->ShouldStartWithTrackPluginMode();
+        setting_momentary_fwd_rwd = settings->HasMomentaryFwdRwd();
 
         int *const iterator = std::find(
             latch_preview_action_indexes,
