@@ -1,5 +1,6 @@
 target_sources(${PROJECT_NAME}
         PRIVATE
+        csurf_api.cpp
         csurf_context.cpp
         csurf_daw.cpp
         csurf_transport_manager.cpp

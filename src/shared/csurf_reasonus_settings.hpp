@@ -65,6 +65,18 @@ class ReaSonusSettings {
         {"surface", "mute-solo-momentary", "0"},
         {"surface", "latch-preview-action", "0"},
         {"surface", "latch-preview-action-code", "42013"},
+        {
+            "surface", "reasonus-color-palette",
+            join(palette_colors_theme, ",") + "," + join(palette_colors_default, ",")
+        },
+        {"surface", "use-automation-colors", "0"},
+        {"surface", "automation-colors", join(automation_colors, ",")},
+
+        {"surface", "use-automation-point-touch", "0"},
+        {"surface", "overwrite-automation-point-shape", "0"},
+        {"surface", "automation-point-shape", "0"},
+        {"surface", "automation-single-bezier-tension", "0"},
+        {"surface", "automation-single-button-blink", "1"},
         {"surface", "momentary-fwd-rwd", "0"},
 
         {"functions", "1", "0"},
@@ -406,6 +418,8 @@ public:
     mINI::INIMap<std::string> GetFilter(const std::string &key);
 
     mINI::INIMap<std::string> GetFilter(int index);
+
+    std::string GetFilterKeyByName(const std::string &name);
 
     static std::array<int, 4> ConvertDisplayValues(const std::string &settings_value);
 };

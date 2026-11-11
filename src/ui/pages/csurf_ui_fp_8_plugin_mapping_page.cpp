@@ -535,14 +535,14 @@ protected:
             const int res = MB(
                 i18n->t("mapping", "popup.unsaved.message").c_str(),
                 i18n->t("mapping", "popup.unsaved.title").c_str(),
-                3
+                MB_TYPE_YES_NO_CANCEL
             );
 
-            if (res == 6) {
+            if (res == MB_RETURN_YES) {
                 Save();
             }
 
-            return res != 2;
+            return res != MB_RETURN_CANCEL;
         }
         return true;
     }

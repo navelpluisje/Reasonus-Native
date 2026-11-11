@@ -1,7 +1,7 @@
 #include <utility>
 
 #include "./csurf_ui_function_keys.hpp"
-#include "csurf_ui_fp_v2_control_panel.hpp"
+#include "../windows/csurf_ui_fp_v2_control_panel.hpp"
 #include "../csurf_ui_colors.hpp"
 #include "../csurf_ui_styles_elements.hpp"
 #include "../components/csurf_ui_tooltip.hpp"

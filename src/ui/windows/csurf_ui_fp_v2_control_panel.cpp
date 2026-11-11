@@ -1,13 +1,13 @@
-#include "../pages/csurf_ui_fp_v2_control_panel.hpp"
-#include "../pages/csurf_ui_fp_v2_settings_page.cpp"
-#include "../pages/csurf_ui_about.cpp"
-#include "../pages/csurf_ui_function_keys.hpp"
+#include "csurf_ui_fp_v2_control_panel.hpp"
+#include "../csurf_ui_assets.hpp"
 #include "../csurf_ui_colors.hpp"
 #include "../csurf_ui_vars.hpp"
+#include "../components/csurf_ui_button_bar.hpp"
 #include "../components/csurf_ui_menu_button.hpp"
 #include "../components/csurf_ui_page_title.hpp"
-#include "../components/csurf_ui_button_bar.hpp"
-#include "../csurf_ui_assets.hpp"
+#include "../pages/csurf_ui_about.cpp"
+#include "../pages/csurf_ui_fp_v2_settings_page.cpp"
+#include "../pages/csurf_ui_function_keys.hpp"
 
 constexpr auto g_name{"ReaSonus Native V2 Control Panel"};
 
@@ -147,7 +147,7 @@ void ReaSonusV2ControlPanel::Frame() // NOLINT(*-function-cognitive-complexity)
     PushReaSonusColors(m_ctx);
     PushReaSonusStyle(m_ctx);
     ImGui::PushFont(m_ctx, assets->GetMainFont(), FontSizeDefault);
-    ImGui::SetNextWindowSize(m_ctx, 1024, 440, ImGui::Cond_Once);
+    ImGui::SetNextWindowSize(m_ctx, 1024, 624, ImGui::Cond_Once);
     bool open{true};
 
     if (ImGui::Begin(m_ctx, g_name, &open, ImGui::WindowFlags_NoCollapse | ImGui::WindowFlags_NoResize)) {
