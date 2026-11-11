@@ -18,23 +18,23 @@ protected:
     CSurf_Fader *fader;
 
 public:
-    CSurf_FP_V2_Track(CSurf_Context *_context, midi_Output *m_midiout);
+    CSurf_FP_V2_Track(CSurf_Context *context, midi_Output *m_midiout);
 
     ~CSurf_FP_V2_Track();
 
-    void ClearTrack();
+    void ClearTrack() const;
 
     void SetTrackColor(ButtonColor color);
 
-    void SetSoloButtonValue(Btn_Value value, bool force = false);
+    void SetSoloButtonValue(Btn_Value value, bool force = false) const;
 
-    void SetMuteButtonValue(Btn_Value value, bool force = false);
+    void SetMuteButtonValue(Btn_Value value, bool force = false) const;
 
-    void SetArmButtonValue(Btn_Value value, bool force = false);
+    void SetArmButtonValue(Btn_Value value, bool force = false) const;
 
-    void SetBypassButtonValue(Btn_Value value, bool force = false);
+    void SetBypassButtonValue(Btn_Value value, bool force = false) const;
 
-    void SetFaderValue(int value, bool force = false);
+    void SetFaderValue(int value, bool force = false) const;
 };
 
 #endif

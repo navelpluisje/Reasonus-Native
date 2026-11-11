@@ -65,6 +65,18 @@ class ReaSonusSettings {
         {"surface", "mute-solo-momentary", "0"},
         {"surface", "latch-preview-action", "0"},
         {"surface", "latch-preview-action-code", "42013"},
+        {
+            "surface", "reasonus-color-palette",
+            join(palette_colors_theme, ",") + "," + join(palette_colors_default, ",")
+        },
+        {"surface", "use-automation-colors", "0"},
+        {"surface", "automation-colors", join(automation_colors, ",")},
+
+        {"surface", "use-automation-point-touch", "0"},
+        {"surface", "overwrite-automation-point-shape", "0"},
+        {"surface", "automation-point-shape", "0"},
+        {"surface", "automation-single-bezier-tension", "0"},
+        {"surface", "automation-single-button-blink", "1"},
 
         {"functions", "1", "0"},
         {"functions", "2", "0"},
@@ -73,6 +85,8 @@ class ReaSonusSettings {
 
         {"transport", "1", "0"},
         {"transport", "2", "0"},
+        {"transport", "3", "0"},
+        {"transport", "4", "0"},
 
         {"footswitch", "1", "0"},
         {"footswitch", "2", "0"},
@@ -112,19 +126,8 @@ class ReaSonusSettings {
         {"surface", "plugin-has-input-control", "0"},
         {"surface", "plugin-map-param-clear", "0"},
         {"surface", "plugin-map-default-color-mode", "1"},
-        {
-            "surface", "reasonus-color-palette",
-            join(palette_colors_theme, ",") + "," + join(palette_colors_default, ",")
-        },
         {"surface", "instant-multi-select-filter", "0"},
         {"surface", "mute-master-on-fwd-rwd", "0"},
-        {"surface", "use-automation-colors", "0"},
-        {"surface", "automation-colors", join(automation_colors, ",")},
-        {"surface", "use-automation-point-touch", "0"},
-        {"surface", "overwrite-automation-point-shape", "0"},
-        {"surface", "automation-point-shape", "0"},
-        {"surface", "automation-single-bezier-tension", "0"},
-        {"surface", "automation-single-button-blink", "1"},
         {"surface", "start-with-track-send-mode", "0"},
         {"surface", "start-with-track-plugin-mode", "0"},
 
