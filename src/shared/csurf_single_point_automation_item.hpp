@@ -6,10 +6,11 @@
 #ifndef REASONUSNATIVE_CSURF_SINGLE_POINT_AUTOMATION_ITEM_HPP
 #define REASONUSNATIVE_CSURF_SINGLE_POINT_AUTOMATION_ITEM_HPP
 
-// ReSharper disable once CppUnusedIncludeDirective
-#include <WDL/wdltypes.h> // might be unnecessary in future
+#include <WDL/wdltypes.h> // might be unnecessary in future NOLINT(*-include-cleaner)
 #include <reaper_plugin_functions.h>
+#include <reaper_plugin.h>
 
+#include <string>
 #include <utility>
 #include "csurf_daw.hpp"
 

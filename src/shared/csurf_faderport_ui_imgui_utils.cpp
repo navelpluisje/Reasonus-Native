@@ -1,5 +1,5 @@
 #include "csurf_faderport_ui_imgui_utils.hpp"
-#include "../ui/pages/csurf_ui_fp_v2_control_panel.hpp"
+#include "../ui/windows/csurf_ui_fp_v2_control_panel.hpp"
 #include "../ui/windows/csurf_ui_fp_8_control_panel.hpp"
 
 void ToggleFP8ControlPanel(const int page_index) {

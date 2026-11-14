@@ -3,6 +3,7 @@
 
 #include "csurf_fp_v2_navigator.hpp"
 #include "csurf_fp_v2_track.hpp"
+#include "../shared/csurf_single_point_automation_item.hpp"
 
 class CSurf_FP_V2_TrackManager {
     CSurf_FP_V2_Navigator *navigator;
@@ -18,10 +19,30 @@ class CSurf_FP_V2_TrackManager {
 
     ButtonColor color;
 
+    bool touch_start = false;
+    int previous_automation_mode;
     bool force_update = false;
+
+    SinglePointAutomationItem *single_point_automation = nullptr;
 
 protected:
     void GetFaderValue(MediaTrack *media_track, int *faderValue) const;
+
+    bool HasSinglePointAutomation(MediaTrack *media_track, int value, bool last_touched_param) const;
+
+    void HandleSinglePointAutomation(
+        MediaTrack *media_track,
+        int value,
+        const std::string &chunk_name,
+        double point_value,
+        SinglePointAutomationType spa_type,
+        int item_index = -1,
+        int sub_item_index = -1
+    );
+
+    void HandleTrackFaderTouch(int value);
+
+    void HandleLastTouchedParamFaderTouch(int value);
 
 public:
     CSurf_FP_V2_TrackManager(
@@ -47,7 +68,7 @@ public:
 
     void HandleBypassClick(int index, int value) const;
 
-    void HandleFaderTouch(int value) const;
+    void HandleFaderTouch(int value);
 
     void HandleFaderMove(int msb, int lsb) const;
 };
