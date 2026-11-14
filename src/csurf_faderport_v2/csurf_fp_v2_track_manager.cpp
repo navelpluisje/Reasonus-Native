@@ -2,6 +2,7 @@
 #include <fmt/format.h>
 
 #include <WDL/db2val.h>
+#include "../shared/csurf.h"
 #include "../shared/csurf_daw.hpp"
 
 constexpr int MOMENTARY_TIMEOUT = 500;
@@ -175,6 +176,14 @@ CSurf_FP_V2_TrackManager::CSurf_FP_V2_TrackManager(
 
 void CSurf_FP_V2_TrackManager::UpdateTrack() {
     MediaTrack *media_track = navigator->GetControllerTrack();
+
+    if (context->GetMasterFaderMode()) {
+        DAW::SetExtState(EXT_STATE_FP_V2_WIDGET_MODE, FP_V2_WIDGET_MASTER_MODE, false);
+    } else if (context->GetLastTouchedFxMode()) {
+        DAW::SetExtState(EXT_STATE_FP_V2_WIDGET_MODE, FP_V2_WIDGET_PARAM_MODE, false);
+    } else {
+        DAW::SetExtState(EXT_STATE_FP_V2_WIDGET_MODE, FP_V2_WIDGET_TRACK_MODE, false);
+    }
 
     int fader_value = 0;
 
