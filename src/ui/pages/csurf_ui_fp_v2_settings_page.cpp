@@ -534,6 +534,7 @@ public:
         settings->SetSetting("surface", "reasonus-color-palette", join(settings_plugin_color_palette, ","));
         settings->SetSetting("surface", "use-automation-colors", setting_use_automation_colors);
         settings->SetSetting("surface", "automation-colors", join(setting_automation_colors, ","));
+        settings->SetSetting("surface", "momentary-fwd-rwd", setting_momentary_fwd_rwd);
 
         settings->SetSetting("surface", "use-automation-single-point", setting_use_single_point_mode);
         settings->SetSetting("surface", "overwrite-automation-point-shape", setting_overwrite_single_point_shape);
@@ -564,6 +565,7 @@ public:
         settings_plugin_color_palette = settings->GetPluginColorPalette();
         setting_use_automation_colors = settings->UseAutomationColors();
         setting_automation_colors = settings->GetAutomationColorsArray();
+        setting_momentary_fwd_rwd = settings->HasMomentaryFwdRwd();
 
         setting_use_single_point_mode = settings->UseAutomationSinglePoint();
         setting_overwrite_single_point_shape = settings->OverwriteAutomationPointShape();

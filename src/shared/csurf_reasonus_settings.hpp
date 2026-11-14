@@ -77,7 +77,7 @@ class ReaSonusSettings {
         {"surface", "automation-point-shape", "0"},
         {"surface", "automation-single-bezier-tension", "0"},
         {"surface", "automation-single-button-blink", "1"},
-        {"surface", "momentary-fwd-rwd", "0"},
+        {"surface", "momentary-fwd-rwd", "1"},
 
         {"functions", "1", "0"},
         {"functions", "2", "0"},
