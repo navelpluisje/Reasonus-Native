@@ -19,6 +19,7 @@
 #include "actions/action_fp_v2_setting_disable_fader_move.hpp"
 #include "actions/action_fp_v2_setting_endless_track_scroll.hpp"
 #include "actions/action_fp_v2_setting_momentary_mute_solo.hpp"
+#include "actions/action_ui_fp_v2_display_widget.hpp"
 #include "actions/action_ui_plugin_type_mapping.hpp"
 #include "ui/pages/csurf_ui_function_keys.hpp"
 #include "api/api.hpp"
@@ -130,7 +131,8 @@ extern "C" {
         ACTION_UI_FP_V2_CONTROL_PANEL::Register();
         ACTION_UI_PLUGIN_TYPE_MAPPING::Register();
         ACTION_UI_TRANSLATIONS_EDITOR::Register();
-
+        ACTION_UI_FP_V2_DISPLAY_WIDGET::Register();
+  
         reaper_plugin_info->Register("csurf", &csurf_faderport_8_reg);
         reaper_plugin_info->Register("csurf", &csurf_faderport_v2_reg);
 

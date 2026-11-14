@@ -8,4 +8,5 @@ target_sources(${PROJECT_NAME}
         csurf_ui_assets.cpp
         windows/csurf_ui_plugin_type_mapping.cpp
         windows/csurf_ui_message.cpp
+        windows/csurf_ui_fp_v2_display_widget.cpp
 )
