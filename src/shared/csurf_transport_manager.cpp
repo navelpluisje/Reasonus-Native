@@ -87,9 +87,9 @@ void CSurf_TransportManager::handleFunctionKey(const std::string &key, const Fun
 
     if (action_id == "0") {
         const int result = MB(
-        "There is no action assigned to this function.\nDo you want to assign an action?",
-          "No action assigned",
-          MB_TYPE_OK_CANCEL
+            "There is no action assigned to this function.\nDo you want to assign an action?",
+            "No action assigned",
+            MB_TYPE_OK_CANCEL
         );
 
         if (result == MB_RETURN_OK) {
@@ -240,7 +240,7 @@ void CSurf_TransportManager::HandleRewindButton(const int value) {
 
     const int now = static_cast<int>(GetTickCount());
 
-    if (settings->HasMomentaryFwdRwd()) {
+    if (settings->GetTransportFwdRwdButtonTapAction()) {
         if (value == 0) {
             StopRewindOrForward();
             ResetPlayState();
@@ -284,20 +284,28 @@ void CSurf_TransportManager::HandleForwardButton(const int value) {
 
     const int now = static_cast<int>(GetTickCount());
 
-    if (settings->HasMomentaryFwdRwd()) {
+    if (settings->GetTransportFwdRwdButtonTapAction()) {
         if (value == 0) {
+            const bool short_press = now - fwd_started < 200;
+
+            // if (short_press && settings->HasMomentaryFwdRwdNextMeasure()) {
+            //     StopRewindOrForward();
+            //     ResetPlayState();
+            //     Main_OnCommandAsyncEx(41040, 0, nullptr);
+            // } else if (short_press) {
+            //     return;
+            // }
+
             StopRewindOrForward();
             ResetPlayState();
-
-            if (now - fwd_started < 200) {
-                Main_OnCommandAsyncEx(41040, 0, nullptr);
-            }
             fwd_started = 0;
         } else {
-            fwd_started = now;
-            SetPreviousPlayState();
-            SetPause();
+            if (fwd_started == 0) {
+                SetPreviousPlayState();
+                SetPause();
+            }
             SetForwardingState();
+            fwd_started = now;
         }
         return;
     }

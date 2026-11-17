@@ -3,8 +3,8 @@
 #include <utility>
 
 #include "csurf_daw.hpp"
+#include "reaper_plugin_functions.h"
 #include "../shared/csurf_utils.hpp"
-#include "../shared/csurf_daw.hpp"
 
 ReaSonusSettings::ReaSonusSettings(std::string _device) {
     device = std::move(_device);
@@ -287,8 +287,16 @@ bool ReaSonusSettings::ShouldStartWithTrackPluginMode() {
     return stoi(settings["surface"]["start-with-track-plugin-mode"]) > 0;
 }
 
-bool ReaSonusSettings::HasMomentaryFwdRwd() {
-    return stoi(settings["surface"]["momentary-fwd-rwd"]) > 0;
+int ReaSonusSettings::GetTransportFwdRwdButtonTapAction() {
+    return stoi(settings["surface"]["transport-fwd-rwd-button-hold"]);
+}
+
+int ReaSonusSettings::GetTransportFwdRwdButtonHoldAction() {
+    return stoi(settings["surface"]["transport-fwd-rwd-button-tap"]);
+}
+
+int ReaSonusSettings::GetTransportFwdRwdDefaultTempo() {
+    return stoi(settings["surface"]["transport-fwd-rwd-default-tempo"]);
 }
 
 bool ReaSonusSettings::UseAutomationColors() {

@@ -1,4 +1,5 @@
 #include <array>
+#include "csurf_ui_settings_page.hpp"
 #include "../csurf_ui_page_content.hpp"
 #include "../../i18n/i18n.hpp"
 #include "../../shared/csurf.h"
@@ -14,7 +15,7 @@
 #include "../utils/csurf_ui_button_width.hpp"
 #include "../windows/csurf_ui_fp_8_control_panel.hpp"
 
-class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-internal-linkage)
+class CSurf_FP_8_SettingsPage : public CSurf_SettingsPage { // NOLINT(*-use-internal-linkage)
     I18n *i18n = I18n::GetInstance();
 
     int selected_tab = -1;
@@ -40,20 +41,12 @@ class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-in
     bool setting_mute_master_on_fwd_rwd;
     bool setting_sends_respect_slots;
     bool setting_start_with_track_send_mode;
-    bool setting_momentary_fwd_rwd;
+    int setting_transport_fwd_rwd_button_tap_action;
+    int setting_transport_fwd_rwd_button_hold_action;
+    int setting_transport_fwd_rwd_default_tempo;
 
     // Automation
     bool setting_use_automation_colors;
-    std::array<int, 7> setting_automation_colors;
-    std::vector<std::string> setting_automation_trim_labels = {
-        "Latch",
-        "Trim",
-        "Off",
-        "Touch",
-        "Write",
-        "Read",
-        "Single",
-    };
     int prev_automation_trim_color;
     bool setting_latch_preview_action_enable;
     int setting_latch_preview_action;
@@ -96,114 +89,17 @@ class CSurf_FP_8_SettingsPage : public CSurf_UI_PageContent { // NOLINT(*-use-in
     ReaSonusInfoComboInputRow *time_code_combo;
     ReaSonusInfoComboInputRow *latch_preview_action_combo;
     ReaSonusInfoComboInputRow *plugin_mapping_default_color_mode;
+    ReaSonusInfoComboInputRow *transport_fwd_rwd_button_tap_combo;
+    ReaSonusInfoComboInputRow *transport_fwd_rwd_button_hold_combo;
     ReaSonusComboInputRow *automation_single_point_shape;
     ReaSonusComboInputRow *display_send_third_line_combo;
     ReaSonusComboInputRow *display_hardware_third_line_combo;
-
-    int latch_preview_action_indexes[8] = {42013, 42014, 42015, 42016, 42017, 41160, 41161, 41162};
-    std::vector<std::string> latch_preview_action_names = {
-        "actively-writing envelopes to time selection",
-        "actively-writing envelopes from cursor to start of project",
-        "actively-writing envelopes from cursor to end of project",
-        "actively-writing envelopes from cursor to first touch position",
-        "actively-writing envelopes to entire envelope",
-        "all writing envelopes to time selection",
-        "all writing envelopes from cursor to start of project",
-        "all writing envelopes from cursor to end of project",
-    };
-
-    int time_code_indexes[6] = {0, 2, 3, 4, 5, 8};
-    std::vector<std::string> time_code_names = {
-        i18n->t("settings", "timecode-list.option.time"),          // Time
-        i18n->t("settings", "timecode-list.option.beats"),         // "Beats",
-        i18n->t("settings", "timecode-list.option.seconds"),       // "Seconds",
-        i18n->t("settings", "timecode-list.option.samples"),       // "Samples",
-        i18n->t("settings", "timecode-list.option.hr-min-sec-fr"), // "Hr:Min:Sec:Fr",
-        i18n->t("settings", "timecode-list.option.frames"),        // "Abs. Frames"
-    };
-
-    std::array<int, 9> track_display_lines = {3, 3, 4, 2, 2, 3, 3, 3, 3};
-    std::vector<std::string> track_display_names = {
-        i18n->t("settings", "display-track.option.display-mode-0"), // "Small, Small, Large (No VU)"
-        i18n->t("settings", "display-track.option.display-mode-1"), // "Large, Small, Small (No VU)"
-        i18n->t("settings", "display-track.option.display-mode-2"), // "Small, Small, Small, Small (No VU)"
-        i18n->t("settings", "display-track.option.display-mode-3"), // "Large, Large  (No VU)"
-        i18n->t("settings", "display-track.option.display-mode-4"), // "Large, Large"
-        i18n->t("settings", "display-track.option.display-mode-5"), // "Small, Small, Large"
-        i18n->t("settings", "display-track.option.display-mode-6"), // "Small, Large, Small (No VU)"
-        i18n->t("settings", "display-track.option.display-mode-7"), // "Large, Small, Small"
-        i18n->t("settings", "display-track.option.display-mode-8"), // "Small, Large, Small"
-    };
-
-    std::vector<std::string> track_display_values = {
-        i18n->t("settings", "display-track.option.display-value-name"),
-        i18n->t("settings", "display-track.option.display-value-volume"),
-        i18n->t("settings", "display-track.option.display-value-pan-1"),
-        i18n->t("settings", "display-track.option.display-value-pan-2"),
-        i18n->t("settings", "display-track.option.display-value-track-nb"),
-        i18n->t("settings", "display-track.option.display-value-phase"),
-        i18n->t("settings", "display-track.option.display-value-armed"),
-        i18n->t("settings", "display-track.option.display-value-automation"),
-        i18n->t("settings", "display-track.option.display-value-fx-state"),
-    };
-
-    std::vector<std::string> track_display_alignments = {
-        i18n->t("settings", "display-track.option.display-align-center"),
-        i18n->t("settings", "display-track.option.display-align-left"),
-        i18n->t("settings", "display-track.option.display-align-right"),
-    };
-
-    std::vector<std::string> track_display_invert = {
-        i18n->t("settings", "display-track.option.display-invert-no"),
-        i18n->t("settings", "display-track.option.display-invert-yes"),
-    };
-
-    std::vector<std::string> track_valuebar_modees = {
-        i18n->t("settings", "display-track.option.value-bar-normal"),
-        i18n->t("settings", "display-track.option.value-bar-bipolar"),
-        i18n->t("settings", "display-track.option.value-bar-fill"),
-        i18n->t("settings", "display-track.option.value-bar-spread"),
-        i18n->t("settings", "display-track.option.value-bar-off"),
-    };
-
-    std::vector<std::string> track_valuebar_values = {
-        i18n->t("settings", "display-track.option.display-value-volume"),
-        i18n->t("settings", "display-track.option.display-value-pan-1"),
-        i18n->t("settings", "display-track.option.display-value-pan-2"),
-    };
-
-    std::vector<std::string> send_display_values = {
-        i18n->t("settings", "display-send.option.display-value-volume"),
-        i18n->t("settings", "display-send.option.display-value-pan"),
-        i18n->t("settings", "display-send.option.display-value-mute"),
-        i18n->t("settings", "display-send.option.display-value-phase"),
-        i18n->t("settings", "display-send.option.display-value-mono"),
-        i18n->t("settings", "display-send.option.display-value-send-mode"),
-        i18n->t("settings", "display-send.option.display-value-auto-mode"),
-        i18n->t("settings", "display-send.option.display-value-fixed"),
-    };
-
-    std::vector<std::string> plugin_map_color_mode_labels = {
-        i18n->t("mapping", "edit.color.show.combo.hide"),
-        i18n->t("mapping", "edit.color.show.combo.show"),
-        i18n->t("mapping", "edit.color.show.combo.bright"),
-        i18n->t("mapping", "edit.color.show.combo.dimmed"),
-    };
-
-    std::vector<std::string> automation_mode_shape_labels = {
-        i18n->t("settings", "automation-single.point.shape.linear"),
-        i18n->t("settings", "automation-single.point.shape.square"),
-        i18n->t("settings", "automation-single.point.shape.slow-start-end"),
-        i18n->t("settings", "automation-single.point.shape.fast-start"),
-        i18n->t("settings", "automation-single.point.shape.fast-end"),
-        i18n->t("settings", "automation-single.point.shape.bezier"),
-    };
 
 public:
     CSurf_FP_8_SettingsPage( // NOLINT(*-pro-type-member-init)
         ImGui_Context *m_ctx,
         CSurf_UI_Assets *assets
-    ) : CSurf_UI_PageContent(m_ctx, assets) {
+    ) : CSurf_SettingsPage(m_ctx, assets) {
         i18n = I18n::GetInstance();
         settings = ReaSonusSettings::GetInstance(FP_8);
 
@@ -331,6 +227,26 @@ public:
             send_display_values,
             &setting_display_send_value_hardware,
             150
+        );
+
+        transport_fwd_rwd_button_tap_combo = new ReaSonusInfoComboInputRow(
+            m_ctx,
+            assets,
+            i18n->t("settings", "transport-fwd-rwd-button-tap.label"),
+            "transport-fwd-rwd-button-tap",
+            transport_fwd_rwd_button_tap_options,
+            &setting_transport_fwd_rwd_button_tap_action,
+            replaceAll(i18n->t("settings", "transport-fwd-rwd-button-tap.tooltip"), "\\n", "\n")
+        );
+
+        transport_fwd_rwd_button_hold_combo = new ReaSonusInfoComboInputRow(
+            m_ctx,
+            assets,
+            i18n->t("settings", "transport-fwd-rwd-button-hold.label"),
+            "transport-fwd-rwd-button-hold",
+            transport_fwd_rwd_button_hold_options,
+            &setting_transport_fwd_rwd_button_hold_action,
+            replaceAll(i18n->t("settings", "transport-fwd-rwd-button-hold.tooltip"), "\\n", "\n")
         );
     }
 
@@ -551,14 +467,15 @@ public:
                         5,
                         100,
                         i18n->t("settings", "track-color-brightness.tooltip"),
-                        "%d%%");
+                        "%d%%"
+                    );
 
                     ImGui::EndChild(m_ctx);
                 }
 
                 if (ImGui::BeginChild(
                     m_ctx,
-                    "custom-filter-settings",
+                    "master-settings",
                     0.0,
                     0.0,
                     ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
@@ -566,32 +483,24 @@ public:
                     ReaSonusPageTitle(
                         m_ctx,
                         assets,
-                        i18n->t("settings", "custom-filter-group.label"),
+                        i18n->t("settings", "master-group.label"),
                         true
                     );
 
                     RenderInfoCheckbox(
                         m_ctx,
                         assets,
-                        i18n->t("settings", "instant-multi-select-filter.label"),
-                        &setting_instant_multi_select_filter,
-                        i18n->t("settings", "instant-multi-select-filter.tooltip")
+                        i18n->t("settings", "master-fader.label"),
+                        &setting_master_fader_mode,
+                        i18n->t("settings", "master-fader.tooltip")
                     );
 
                     RenderInfoCheckbox(
                         m_ctx,
                         assets,
-                        i18n->t("settings", "filter-use-custom-color.label"),
-                        &setting_filter_custom_color,
-                        i18n->t("settings", "filter-use-custom-color.tooltip")
-                    );
-
-                    RenderInfoCheckbox(
-                        m_ctx,
-                        assets,
-                        i18n->t("settings", "filter-use-project-filters.label"),
-                        &setting_filter_project_filters,
-                        i18n->t("settings", "filter-use-project-filters.tooltip")
+                        i18n->t("settings", "mute-master-on-fwd-rwd.label"),
+                        &setting_mute_master_on_fwd_rwd,
+                        i18n->t("settings", "mute-master-on-fwd-rwd.tooltip")
                     );
 
                     ImGui::EndChild(m_ctx);
@@ -605,38 +514,6 @@ public:
             ImGui::SameLine(m_ctx);
             ImGui::BeginGroup(m_ctx);
             UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
-            if (ImGui::BeginChild(
-                m_ctx,
-                "master-settings",
-                0.0,
-                0.0,
-                ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
-            )) {
-                ReaSonusPageTitle(
-                    m_ctx,
-                    assets,
-                    i18n->t("settings", "master-group.label"),
-                    true
-                );
-
-                RenderInfoCheckbox(
-                    m_ctx,
-                    assets,
-                    i18n->t("settings", "master-fader.label"),
-                    &setting_master_fader_mode,
-                    i18n->t("settings", "master-fader.tooltip")
-                );
-
-                RenderInfoCheckbox(
-                    m_ctx,
-                    assets,
-                    i18n->t("settings", "mute-master-on-fwd-rwd.label"),
-                    &setting_mute_master_on_fwd_rwd,
-                    i18n->t("settings", "mute-master-on-fwd-rwd.tooltip")
-                );
-
-                ImGui::EndChild(m_ctx);
-            }
 
             // Once we have more items under sends/receives, this has to be set around the `setting_sends_respect_slots` setting
             if (ImGui::BeginChild(
@@ -687,13 +564,20 @@ public:
                     true
                 );
 
-                RenderInfoCheckbox(
+                transport_fwd_rwd_button_tap_combo->Render();
+                transport_fwd_rwd_button_hold_combo->Render();
+
+                RenderinfoIntInput(
                     m_ctx,
                     assets,
-                    i18n->t("settings", "momentary-fwd-rwd.label"),
-                    &setting_momentary_fwd_rwd,
-                    i18n->t("settings", "momentary-fwd-rwd.tooltip")
+                    i18n->t("settings", "transport-fwd-rwd-default-tempo.label"),
+                    &setting_transport_fwd_rwd_default_tempo,
+                    1,
+                    10,
+                    i18n->t("settings", "transport-fwd-rwd-default-tempo.tooltip"),
+                    "%d%"
                 );
+
                 ImGui::EndChild(m_ctx);
             }
             UiStyledElements::PopReaSonusGroupStyle(m_ctx);
@@ -881,6 +765,69 @@ public:
 
             UiStyledElements::PopReaSonusGroupStyle(m_ctx);
             ImGui::EndGroup(m_ctx);
+
+            ImGui::EndTabItem(m_ctx);
+        }
+        UiStyledElements::PopReaSonusTabStyle(m_ctx);
+    }
+
+    void RenderFiltersTab(const int tab_index) {
+        double width;
+        double height;
+
+        UiStyledElements::PushReaSonusTabStyle(m_ctx, selected_tab == tab_index);
+        if (ImGui::BeginTabItem(m_ctx, i18n->t("settings", "tab.filters").c_str())) {
+            selected_tab = tab_index;
+            ImGui::SetCursorPosY(m_ctx, ImGui::GetCursorPosY(m_ctx) + 16);
+            ImGui::GetContentRegionAvail(m_ctx, &width, &height);
+
+            if (ImGui::BeginChild(m_ctx, "settings-display-left", width / 2 - 8, 0.0, ImGui::ChildFlags_None)) {
+                UiStyledElements::PushReaSonusGroupStyle(m_ctx, false);
+                if (ImGui::BeginChild(
+                    m_ctx,
+                    "filter-settings",
+                    0.0,
+                    0.0,
+                    ImGui::ChildFlags_FrameStyle | ImGui::ChildFlags_AutoResizeY
+                )) {
+                    ReaSonusPageTitle(
+                        m_ctx,
+                        assets,
+                        i18n->t("settings", "custom-filter-group.label"),
+                        true
+                    );
+
+                    RenderInfoCheckbox(
+                        m_ctx,
+                        assets,
+                        i18n->t("settings", "instant-multi-select-filter.label"),
+                        &setting_instant_multi_select_filter,
+                        i18n->t("settings", "instant-multi-select-filter.tooltip")
+                    );
+
+                    RenderInfoCheckbox(
+                        m_ctx,
+                        assets,
+                        i18n->t("settings", "filter-use-custom-color.label"),
+                        &setting_filter_custom_color,
+                        i18n->t("settings", "filter-use-custom-color.tooltip")
+                    );
+
+                    RenderInfoCheckbox(
+                        m_ctx,
+                        assets,
+                        i18n->t("settings", "filter-use-project-filters.label"),
+                        &setting_filter_project_filters,
+                        i18n->t("settings", "filter-use-project-filters.tooltip")
+                    );
+
+                    ImGui::EndChild(m_ctx);
+                }
+
+                UiStyledElements::PopReaSonusGroupStyle(m_ctx);
+
+                ImGui::EndChild(m_ctx);
+            }
 
             ImGui::EndTabItem(m_ctx);
         }
@@ -1208,6 +1155,7 @@ public:
                 RenderGlobalTab(0);
                 RenderControllerTab(1);
                 RenderAutomationTab(3);
+                RenderFiltersTab(5);
                 RenderPluginsTab(2);
                 RenderDisplayTab(4);
 
@@ -1249,7 +1197,9 @@ public:
         settings->SetSetting("surface", "use-automation-colors", setting_use_automation_colors);
         settings->SetSetting("surface", "start-with-track-send-mode", setting_start_with_track_send_mode);
         settings->SetSetting("surface", "start-with-track-plugin-mode", setting_start_with_track_plugin_mode);
-        settings->SetSetting("surface", "momentary-fwd-rwd", setting_momentary_fwd_rwd);
+        settings->SetSetting("surface", "transport-fwd-rwd-button-tap", setting_transport_fwd_rwd_button_tap_action);
+        settings->SetSetting("surface", "transport-fwd-rwd-button-hold", setting_transport_fwd_rwd_button_hold_action);
+        settings->SetSetting("surface", "transport-fwd-rwd-default-tempo", setting_transport_fwd_rwd_default_tempo);
 
         settings->SetSetting("surface", "use-automation-single-point", setting_use_single_point_mode);
         settings->SetSetting("surface", "overwrite-automation-point-shape", setting_overwrite_single_point_shape);
@@ -1331,29 +1281,31 @@ public:
         setting_single_point_button_blink = settings->GetAutomationSingleButtonBlink();
         setting_start_with_track_send_mode = settings->ShouldStartWithTrackSendMode();
         setting_start_with_track_plugin_mode = settings->ShouldStartWithTrackPluginMode();
-        setting_momentary_fwd_rwd = settings->HasMomentaryFwdRwd();
+        setting_transport_fwd_rwd_button_tap_action = settings->GetTransportFwdRwdButtonTapAction();
+        setting_transport_fwd_rwd_button_hold_action = settings->GetTransportFwdRwdButtonHoldAction();
+        setting_transport_fwd_rwd_default_tempo = settings->GetTransportFwdRwdDefaultTempo();
 
-        int *const iterator = std::find(
-            latch_preview_action_indexes,
-            latch_preview_action_indexes + 8,
+        const auto iterator = std::find(
+            latch_preview_action_indexes.begin(),
+            latch_preview_action_indexes.end(),
             settings->GetLatchPreviewActionCode()
         );
 
-        if (iterator != latch_preview_action_indexes + 8) {
+        if (iterator != latch_preview_action_indexes.end()) {
             setting_latch_preview_action = static_cast<int>(
-                std::distance(latch_preview_action_indexes, iterator)
+                std::distance(latch_preview_action_indexes.begin(), iterator)
             );
         }
 
-        int *const time_code_iterator = std::find(
-            time_code_indexes,
-            time_code_indexes + 6,
+        auto time_code_iterator = std::find(
+            time_code_indexes.begin(),
+            time_code_indexes.end(),
             settings->GetSurfaceTimeCode()
         );
 
-        if (time_code_iterator != time_code_indexes + 6) {
+        if (time_code_iterator != time_code_indexes.end()) {
             setting_time_code = static_cast<int>(
-                std::distance(time_code_indexes, time_code_iterator)
+                std::distance(time_code_indexes.begin(), time_code_iterator)
             );
         }
     }

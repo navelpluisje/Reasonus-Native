@@ -77,7 +77,9 @@ class ReaSonusSettings {
         {"surface", "automation-point-shape", "0"},
         {"surface", "automation-single-bezier-tension", "0"},
         {"surface", "automation-single-button-blink", "1"},
-        {"surface", "momentary-fwd-rwd", "1"},
+        {"surface", "transport-fwd-rwd-button-hold", "0"},
+        {"surface", "transport-fwd-rwd-button-tap", "0"},
+        {"surface", "transport-fwd-rwd-default-tempo", "3"},
 
         {"functions", "1", "0"},
         {"functions", "2", "0"},
@@ -142,7 +144,7 @@ class ReaSonusSettings {
         {"surface", "start-with-track-plugin-mode", "0"},
 
         {"displays", "track", "8"},
-        {"displays", "track-lines", "0,4,1,2"},
+        {"displays", "track-lines", "0,4,2,3"},
         {"displays", "track-alignment", "1,0,0,0"},
         {"displays", "track-invert", "0,0,0,0"},
         {"displays", "track-value-bar-mode", "1"},
@@ -377,7 +379,11 @@ public:
 
     bool ShouldStartWithTrackPluginMode();
 
-    bool HasMomentaryFwdRwd();
+    int GetTransportFwdRwdButtonTapAction();
+
+    int GetTransportFwdRwdButtonHoldAction();
+
+    int GetTransportFwdRwdDefaultTempo();
 
     /**
      * Settings for the FaderPort 2
