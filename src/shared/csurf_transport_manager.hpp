@@ -13,6 +13,7 @@ class CSurf_TransportManager {
     bool is_stopped = false;
     bool is_repeat = false;
     bool is_forwarding = false;
+    bool forwarding_active = false;
     bool is_rewinding = false;
     bool is_fast_fwdRwd = false;
 
@@ -33,7 +34,7 @@ class CSurf_TransportManager {
 
     void SetButtonValues(bool force) const;
 
-    void StopRewindOrForward();
+    void StopRewindOrForward(bool skip_reset_playstate = false);
 
     void HandleRewind() const;
 

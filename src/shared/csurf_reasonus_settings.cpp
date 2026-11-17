@@ -288,11 +288,11 @@ bool ReaSonusSettings::ShouldStartWithTrackPluginMode() {
 }
 
 int ReaSonusSettings::GetTransportFwdRwdButtonTapAction() {
-    return stoi(settings["surface"]["transport-fwd-rwd-button-hold"]);
+    return stoi(settings["surface"]["transport-fwd-rwd-button-tap"]);
 }
 
 int ReaSonusSettings::GetTransportFwdRwdButtonHoldAction() {
-    return stoi(settings["surface"]["transport-fwd-rwd-button-tap"]);
+    return stoi(settings["surface"]["transport-fwd-rwd-button-hold"]);
 }
 
 int ReaSonusSettings::GetTransportFwdRwdDefaultTempo() {

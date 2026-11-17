@@ -17,14 +17,22 @@ void CSurf_TransportManager::SetButtonValues(const bool force) const {
     forward_button->SetValue(ButtonBlinkOnOff(is_forwarding && is_fast_fwdRwd, is_forwarding), force);
 }
 
-void CSurf_TransportManager::StopRewindOrForward() {
-    is_fast_fwdRwd = false;
+void CSurf_TransportManager::StopRewindOrForward(bool skip_reset_playstate) {
     is_forwarding = false;
     is_rewinding = false;
+    fwd_started = 0;
+    rwd_started = 0;
+    forwarding_active = false;
 
     if (context->GetSetting("surface", "mute-master-on-fwd-rwd") != "0") {
         DAW::SetTrackMuted(GetMasterTrack(nullptr), false);
     }
+
+    if (skip_reset_playstate) {
+        return;
+    }
+
+    ResetPlayState();
 }
 
 void CSurf_TransportManager::HandleRewind() const {
@@ -59,10 +67,9 @@ void CSurf_TransportManager::SetRewindingState() {
     }
 
     if (is_rewinding) {
-        is_fast_fwdRwd = !is_fast_fwdRwd;
         return;
     }
-    is_fast_fwdRwd = false;
+
     is_forwarding = false;
     is_rewinding = true;
 }
@@ -73,10 +80,9 @@ void CSurf_TransportManager::SetForwardingState() {
     }
 
     if (is_forwarding) {
-        is_fast_fwdRwd = !is_fast_fwdRwd;
         return;
     }
-    is_fast_fwdRwd = false;
+
     is_rewinding = false;
     is_forwarding = true;
 }
@@ -243,7 +249,7 @@ void CSurf_TransportManager::HandleRewindButton(const int value) {
     if (settings->GetTransportFwdRwdButtonTapAction()) {
         if (value == 0) {
             StopRewindOrForward();
-            ResetPlayState();
+            // ResetPlayState();
 
             if (now - rwd_started < 200) {
                 Main_OnCommandAsyncEx(41041, 0, nullptr);
@@ -284,35 +290,44 @@ void CSurf_TransportManager::HandleForwardButton(const int value) {
 
     const int now = static_cast<int>(GetTickCount());
 
-    if (settings->GetTransportFwdRwdButtonTapAction()) {
-        if (value == 0) {
-            const bool short_press = now - fwd_started < 200;
+    if (value == 0) {
+        const bool short_press = now - fwd_started < 200;
 
-            // if (short_press && settings->HasMomentaryFwdRwdNextMeasure()) {
-            //     StopRewindOrForward();
-            //     ResetPlayState();
-            //     Main_OnCommandAsyncEx(41040, 0, nullptr);
-            // } else if (short_press) {
-            //     return;
-            // }
-
-            StopRewindOrForward();
-            ResetPlayState();
-            fwd_started = 0;
-        } else {
-            if (fwd_started == 0) {
-                SetPreviousPlayState();
-                SetPause();
+        if (
+            (short_press && settings->GetTransportFwdRwdButtonTapAction() == 0)
+            || (!short_press && settings->GetTransportFwdRwdButtonHoldAction() == 2)
+        ) {
+            if (is_forwarding && forwarding_active) {
+                StopRewindOrForward();
+                return;
             }
-            SetForwardingState();
-            fwd_started = now;
-        }
-        return;
-    }
 
-    if (value > 0) {
+            forwarding_active = true;
+            return;
+        }
+
+        if (
+            (short_press && settings->GetTransportFwdRwdButtonTapAction() == 1)
+            || (!short_press && settings->GetTransportFwdRwdButtonHoldAction() == 1)
+        ) {
+            StopRewindOrForward();
+            Main_OnCommandAsyncEx(41040, 0, nullptr);
+            return;
+        }
+
+        if (!short_press && settings->GetTransportFwdRwdButtonHoldAction() == 0) {
+            StopRewindOrForward();
+            return;
+        }
+
+        if (short_press) {
+            StopRewindOrForward();
+        }
+    } else {
+        SetForwardingState();
         SetPause();
         SetForwardingState();
+        fwd_started = now;
     }
 }
 
@@ -331,5 +346,5 @@ void CSurf_TransportManager::HandleFootSwitchClick(const int value) const {
 }
 
 void CSurf_TransportManager::HandlePlayStateChange() {
-    StopRewindOrForward();
+    StopRewindOrForward(true);
 }
