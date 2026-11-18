@@ -17,7 +17,7 @@ void CSurf_TransportManager::SetButtonValues(const bool force) const {
     forward_button->SetValue(ButtonBlinkOnOff(is_forwarding && is_fast_fwdRwd, is_forwarding), force);
 }
 
-void CSurf_TransportManager::StopRewindOrForward(bool skip_reset_playstate) {
+void CSurf_TransportManager::StopRewindOrForward(const bool skip_reset_playstate) {
     is_forwarding = false;
     is_rewinding = false;
     fwd_started = 0;
@@ -29,6 +29,8 @@ void CSurf_TransportManager::StopRewindOrForward(bool skip_reset_playstate) {
         DAW::SetTrackMuted(GetMasterTrack(nullptr), false);
     }
 
+    context->StopTransportSeek();
+
     if (skip_reset_playstate) {
         return;
     }
@@ -37,21 +39,17 @@ void CSurf_TransportManager::StopRewindOrForward(bool skip_reset_playstate) {
 }
 
 void CSurf_TransportManager::HandleRewind() const {
-    CSurf_OnRew(0);
+    const int speed = context->GetTransportSeekSpeed();
 
-    if (is_fast_fwdRwd) {
-        CSurf_OnRew(0);
-        CSurf_OnRew(0);
+    for (int i = 0; i < speed; i++) {
         CSurf_OnRew(0);
     }
 }
 
 void CSurf_TransportManager::HandleForward() const {
-    CSurf_OnFwd(0);
+    const int speed = context->GetTransportSeekSpeed();
 
-    if (is_fast_fwdRwd) {
-        CSurf_OnFwd(0);
-        CSurf_OnFwd(0);
+    for (int i = 0; i < speed; i++) {
         CSurf_OnFwd(0);
     }
 }
@@ -71,6 +69,8 @@ void CSurf_TransportManager::SetRewindingState() {
         return;
     }
 
+    context->StartTransportSeek();
+    SetPreviousPlayState();
     is_forwarding = false;
     is_rewinding = true;
 }
@@ -84,6 +84,8 @@ void CSurf_TransportManager::SetForwardingState() {
         return;
     }
 
+    context->StartTransportSeek();
+    SetPreviousPlayState();
     is_rewinding = false;
     is_forwarding = true;
 }

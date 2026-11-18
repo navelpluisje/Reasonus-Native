@@ -54,6 +54,9 @@ class CSurf_Context {
     // Single Point Automation
     bool single_point_automation;
 
+    // Transport seek speed
+    int transport_seek_speed;
+
     ChannelMode channelMode;
     ChannelMode previousChannelMode = TrackMode;
     ChannelMode previousPluginChannelMode = TrackMode;
@@ -264,6 +267,19 @@ public:
     [[nodiscard]] std::array<int, 4> GetDisplayAlignValues() const;
 
     [[nodiscard]] std::array<int, 4> GetDisplayInvertValues() const;
+
+    /**************************************************************************
+    * Transport Seek Speed
+    **************************************************************************/
+    int GetTransportSeekSpeed() const;
+
+    void StartTransportSeek();
+
+    void StopTransportSeek();
+
+    void IncrementTransportSeekSpeed();
+
+    void DecrementTransportSeekSpeed();
 };
 
 #endif

@@ -263,6 +263,11 @@ public:
 
         prevButton->SetValue(BTN_VALUE_ON);
 
+        if (context->GetTransportSeekSpeed() > 0) {
+            context->DecrementTransportSeekSpeed();
+            return;
+        }
+
         switch (session_type) {
             case Channel:
                 trackNavigator->DecrementOffset(context->GetShiftLeft() ? context->GetNbBankChannels() : 1);
@@ -307,6 +312,11 @@ public:
 
         nextButton->SetValue(BTN_VALUE_ON);
 
+        if (context->GetTransportSeekSpeed() > 0) {
+            context->IncrementTransportSeekSpeed();
+            return;
+        }
+
         switch (session_type) {
             case Channel:
                 trackNavigator->IncrementOffset(context->GetShiftLeft() ? context->GetNbBankChannels() : 1);
@@ -343,6 +353,11 @@ public:
     }
 
     void HandleEncoderIncrement(const int value) const {
+        if (context->GetTransportSeekSpeed() > 0) {
+            context->IncrementTransportSeekSpeed();
+            return;
+        }
+
         switch (session_type) {
             case Channel:
                 trackNavigator->IncrementOffset(context->GetShiftLeft() ? context->GetNbBankChannels() : 1);
@@ -388,6 +403,11 @@ public:
     }
 
     void HandleEncoderDecrement(const int value) const {
+        if (context->GetTransportSeekSpeed() > 0) {
+            context->DecrementTransportSeekSpeed();
+            return;
+        }
+
         switch (session_type) {
             case Channel:
                 trackNavigator->DecrementOffset(context->GetShiftLeft() ? context->GetNbBankChannels() : 1);

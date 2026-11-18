@@ -366,3 +366,26 @@ std::array<int, 4> CSurf_Context::GetDisplayAlignValues() const {
 std::array<int, 4> CSurf_Context::GetDisplayInvertValues() const {
     return settings->GetTrackDisplayInvertValues();
 }
+
+/**************************************************************************
+* Transport Seek Speed
+**************************************************************************/
+int CSurf_Context::GetTransportSeekSpeed() const {
+    return transport_seek_speed;
+}
+
+void CSurf_Context::StartTransportSeek() {
+    transport_seek_speed = settings->GetTransportFwdRwdDefaultTempo();
+}
+
+void CSurf_Context::StopTransportSeek() {
+    transport_seek_speed = 0;
+}
+
+void CSurf_Context::IncrementTransportSeekSpeed() {
+    transport_seek_speed = min(transport_seek_speed + 1, 10);
+}
+
+void CSurf_Context::DecrementTransportSeekSpeed() {
+    transport_seek_speed = max(transport_seek_speed - 1, 1);
+}
