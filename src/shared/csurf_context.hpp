@@ -277,6 +277,8 @@ public:
 
     void StopTransportSeek();
 
+    void SetTransportSeekSpeed(int speed);
+
     void IncrementTransportSeekSpeed();
 
     void DecrementTransportSeekSpeed();

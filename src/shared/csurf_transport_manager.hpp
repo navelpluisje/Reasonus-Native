@@ -49,6 +49,9 @@ class CSurf_TransportManager {
 
     void handleFunctionKey(const std::string &key, FunctionTypes type) const;
 
+    /**
+     * Store the playstate during seeking to be able to get to this playstate when stopping seek
+     */
     void SetPreviousPlayState();
 
     void ResetPlayState() const;

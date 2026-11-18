@@ -382,6 +382,10 @@ void CSurf_Context::StopTransportSeek() {
     transport_seek_speed = 0;
 }
 
+void CSurf_Context::SetTransportSeekSpeed(const int speed) {
+    transport_seek_speed = min(speed, 10);
+}
+
 void CSurf_Context::IncrementTransportSeekSpeed() {
     transport_seek_speed = min(transport_seek_speed + 1, 10);
 }

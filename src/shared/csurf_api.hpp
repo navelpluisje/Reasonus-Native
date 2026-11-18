@@ -23,6 +23,8 @@ class ReaSonusApi {
 
     void HandleSetFaderMode() const;
 
+    void HandleTransportSeekSpeed() const;
+
 public:
     explicit ReaSonusApi(CSurf_Context *context);
 

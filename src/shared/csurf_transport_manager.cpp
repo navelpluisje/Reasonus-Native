@@ -274,12 +274,10 @@ void CSurf_TransportManager::HandleRewindButton(const int value) {
             return;
         }
 
-        if (!short_press && settings->GetTransportFwdRwdButtonHoldAction() == 0) {
-            StopRewindOrForward();
-            return;
-        }
-
-        if (short_press) {
+        if (
+            (!short_press && settings->GetTransportFwdRwdButtonHoldAction() == 0)
+            || short_press
+        ) {
             StopRewindOrForward();
         }
     } else {
@@ -334,12 +332,10 @@ void CSurf_TransportManager::HandleForwardButton(const int value) {
             return;
         }
 
-        if (!short_press && settings->GetTransportFwdRwdButtonHoldAction() == 0) {
-            StopRewindOrForward();
-            return;
-        }
-
-        if (short_press) {
+        if (
+            (!short_press && settings->GetTransportFwdRwdButtonHoldAction() == 0)
+            || short_press
+        ) {
             StopRewindOrForward();
         }
     } else {

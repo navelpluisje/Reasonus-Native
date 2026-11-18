@@ -96,6 +96,22 @@ void ReaSonusApi::HandleSetFaderMode() const {
     }
 }
 
+void ReaSonusApi::HandleTransportSeekSpeed() const {
+    if (DAW::GetExtState(EXT_STATE_FP_TRANSPORT_SEEK_SPEED, "").empty()) {
+        return;
+    }
+
+    std::string speed = DAW::GetExtState(EXT_STATE_FP_TRANSPORT_SEEK_SPEED, "");
+    if (speed == "-1") {
+        context->DecrementTransportSeekSpeed();
+    } else if (speed == "0") {
+        context->IncrementTransportSeekSpeed();
+    } else {
+        context->SetTransportSeekSpeed(stoi(speed));
+    }
+    DAW::SetExtState(EXT_STATE_FP_TRANSPORT_SEEK_SPEED, "", false);
+}
+
 ReaSonusApi::ReaSonusApi(CSurf_Context *context) : context(context), faderManager(nullptr), trackNavigator(nullptr) {
 }
 
@@ -116,4 +132,5 @@ void ReaSonusApi::HandleApi() const {
     HandleFilterByName();
     HandleFilterByType();
     HandleSetFaderMode();
+    HandleTransportSeekSpeed();
 }
