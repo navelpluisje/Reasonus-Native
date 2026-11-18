@@ -14,6 +14,7 @@ class CSurf_TransportManager {
     bool is_repeat = false;
     bool is_forwarding = false;
     bool forwarding_active = false;
+    bool rewinding_active = false;
     bool is_rewinding = false;
     bool is_fast_fwdRwd = false;
 

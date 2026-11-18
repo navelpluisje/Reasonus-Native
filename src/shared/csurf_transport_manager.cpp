@@ -23,6 +23,7 @@ void CSurf_TransportManager::StopRewindOrForward(bool skip_reset_playstate) {
     fwd_started = 0;
     rwd_started = 0;
     forwarding_active = false;
+    rewinding_active = false;
 
     if (context->GetSetting("surface", "mute-master-on-fwd-rwd") != "0") {
         DAW::SetTrackMuted(GetMasterTrack(nullptr), false);
@@ -246,27 +247,43 @@ void CSurf_TransportManager::HandleRewindButton(const int value) {
 
     const int now = static_cast<int>(GetTickCount());
 
-    if (settings->GetTransportFwdRwdButtonTapAction()) {
-        if (value == 0) {
-            StopRewindOrForward();
-            // ResetPlayState();
+    if (value == 0) {
+        const bool short_press = now - fwd_started < 200;
 
-            if (now - rwd_started < 200) {
-                Main_OnCommandAsyncEx(41041, 0, nullptr);
+        if (
+            (short_press && settings->GetTransportFwdRwdButtonTapAction() == 0)
+            || (!short_press && settings->GetTransportFwdRwdButtonHoldAction() == 2)
+        ) {
+            if (is_rewinding && rewinding_active) {
+                StopRewindOrForward();
+                return;
             }
-            rwd_started = 0;
-        } else {
-            rwd_started = now;
-            SetPreviousPlayState();
-            SetPause();
-            SetRewindingState();
-        }
-        return;
-    }
 
-    if (value > 0) {
+            rewinding_active = true;
+            return;
+        }
+
+        if (
+            (short_press && settings->GetTransportFwdRwdButtonTapAction() == 1)
+            || (!short_press && settings->GetTransportFwdRwdButtonHoldAction() == 1)
+        ) {
+            StopRewindOrForward();
+            Main_OnCommandAsyncEx(41041, 0, nullptr);
+            return;
+        }
+
+        if (!short_press && settings->GetTransportFwdRwdButtonHoldAction() == 0) {
+            StopRewindOrForward();
+            return;
+        }
+
+        if (short_press) {
+            StopRewindOrForward();
+        }
+    } else {
         SetPause();
         SetRewindingState();
+        fwd_started = now;
     }
 }
 
@@ -324,7 +341,6 @@ void CSurf_TransportManager::HandleForwardButton(const int value) {
             StopRewindOrForward();
         }
     } else {
-        SetForwardingState();
         SetPause();
         SetForwardingState();
         fwd_started = now;
