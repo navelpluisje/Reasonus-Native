@@ -318,6 +318,11 @@ public:
 
         prevButton->SetValue(BTN_VALUE_ON);
 
+        if (context->GetTransportSeekSpeed() > 0) {
+            context->DecrementTransportSeekSpeed();
+            return;
+        }
+
         switch (session_type) {
             case Pan:
             case Channel:
@@ -358,6 +363,11 @@ public:
 
         nextButton->SetValue(BTN_VALUE_ON);
 
+        if (context->GetTransportSeekSpeed() > 0) {
+            context->IncrementTransportSeekSpeed();
+            return;
+        }
+
         switch (session_type) {
             case Pan:
             case Channel:
@@ -392,6 +402,11 @@ public:
     }
 
     void HandleEncoderIncrement(const int value) const {
+        if (context->GetTransportSeekSpeed() > 0) {
+            context->IncrementTransportSeekSpeed();
+            return;
+        }
+
         switch (session_type) {
             case Pan:
                 IncrementPan(value);
@@ -425,6 +440,11 @@ public:
     }
 
     void HandleEncoderDecrement(const int value) const {
+        if (context->GetTransportSeekSpeed() > 0) {
+            context->DecrementTransportSeekSpeed();
+            return;
+        }
+
         switch (session_type) {
             case Pan:
                 DecrementPan(value);

@@ -101,7 +101,7 @@ void ReaSonusApi::HandleTransportSeekSpeed() const {
         return;
     }
 
-    std::string speed = DAW::GetExtState(EXT_STATE_FP_TRANSPORT_SEEK_SPEED, "");
+    const std::string speed = DAW::GetExtState(EXT_STATE_FP_TRANSPORT_SEEK_SPEED, "");
     if (speed == "-1") {
         context->DecrementTransportSeekSpeed();
     } else if (speed == "0") {
@@ -125,12 +125,14 @@ ReaSonusApi::ReaSonusApi(
 ReaSonusApi::~ReaSonusApi() {
 }
 
-void ReaSonusApi::HandleApi() const {
-    HandlePluginControl();
-    HandleSendMode();
-    HandlePanMode();
-    HandleFilterByName();
-    HandleFilterByType();
-    HandleSetFaderMode();
+void ReaSonusApi::HandleApi(const std::string &device) const {
+    if (device == FP_8) {
+        HandlePluginControl();
+        HandleSendMode();
+        HandlePanMode();
+        HandleFilterByName();
+        HandleFilterByType();
+        HandleSetFaderMode();
+    }
     HandleTransportSeekSpeed();
 }

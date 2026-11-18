@@ -32,7 +32,7 @@ public:
 
     ~ReaSonusApi();
 
-    void HandleApi() const;
+    void HandleApi(const std::string &device) const;
 };
 
 #endif //REASONUSNATIVE_CSURF_API_HPP

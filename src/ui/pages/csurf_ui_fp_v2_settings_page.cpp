@@ -9,6 +9,7 @@
 #include "../components/csurf_ui_checkbox.hpp"
 #include "../components/csurf_ui_color_picker.hpp"
 #include "../components/csurf_ui_combo_input.hpp"
+#include "../components/csurf_ui_int_input.hpp"
 #include "../components/csurf_ui_page_title.hpp"
 #include "../utils/csurf_ui_button_width.hpp"
 #include "../windows/csurf_ui_fp_v2_control_panel.hpp"
@@ -42,13 +43,16 @@ class CSurf_FP_V2_SettingsPage : public CSurf_SettingsPage { // NOLINT(*-use-int
 
     std::vector<int> settings_plugin_color_palette;
     std::vector<int> settings_initial_plugin_color_palette;
-    bool setting_transport_fwd_rwd_button_tap_action;
-    bool setting_transport_fwd_rwd_button_hold_action;
+    int setting_transport_fwd_rwd_button_tap_action;
+    int setting_transport_fwd_rwd_button_hold_action;
+    int setting_transport_fwd_rwd_default_tempo;
 
     std::vector<std::string> language_names;
     ReaSonusSettings *settings = ReaSonusSettings::GetInstance(FP_V2);
     ReaSonusInfoComboInputRow *language_select_combo;
     ReaSonusInfoComboInputRow *latch_preview_action_combo;
+    ReaSonusInfoComboInputRow *transport_fwd_rwd_button_tap_combo;
+    ReaSonusInfoComboInputRow *transport_fwd_rwd_button_hold_combo;
     ReaSonusComboInputRow *automation_single_point_shape;
 
 public:
@@ -89,6 +93,26 @@ public:
             "automation-single-point-shape",
             automation_mode_shape_labels,
             &setting_single_point_mode_shape
+        );
+
+        transport_fwd_rwd_button_tap_combo = new ReaSonusInfoComboInputRow(
+            m_ctx,
+            assets,
+            i18n->t("settings", "transport-fwd-rwd-button-tap.label"),
+            "transport-fwd-rwd-button-tap",
+            transport_fwd_rwd_button_tap_options,
+            &setting_transport_fwd_rwd_button_tap_action,
+            replaceAll(i18n->t("settings", "transport-fwd-rwd-button-tap.tooltip"), "\\n", "\n")
+        );
+
+        transport_fwd_rwd_button_hold_combo = new ReaSonusInfoComboInputRow(
+            m_ctx,
+            assets,
+            i18n->t("settings", "transport-fwd-rwd-button-hold.label"),
+            "transport-fwd-rwd-button-hold",
+            transport_fwd_rwd_button_hold_options,
+            &setting_transport_fwd_rwd_button_hold_action,
+            replaceAll(i18n->t("settings", "transport-fwd-rwd-button-hold.tooltip"), "\\n", "\n")
         );
     }
 
@@ -483,23 +507,19 @@ public:
                         true
                     );
 
-                    RenderInfoCheckbox(
-                        m_ctx,
-                        assets,
-                        i18n->t("settings", "transport-fwd-rwd-button-hold.label"),
-                        &setting_transport_fwd_rwd_button_tap_action,
-                        i18n->t("settings", "transport-fwd-rwd-button-hold.tooltip")
-                    );
+                    transport_fwd_rwd_button_tap_combo->Render();
+                    transport_fwd_rwd_button_hold_combo->Render();
 
-                    ImGui::BeginDisabled(m_ctx, !setting_transport_fwd_rwd_button_tap_action);
-                    RenderInfoCheckbox(
+                    RenderinfoIntInput(
                         m_ctx,
                         assets,
-                        i18n->t("settings", "transport-fwd-rwd-button-tap.label"),
-                        &setting_transport_fwd_rwd_button_hold_action,
-                        i18n->t("settings", "transport-fwd-rwd-button-tap.tooltip")
+                        i18n->t("settings", "transport-fwd-rwd-default-tempo.label"),
+                        &setting_transport_fwd_rwd_default_tempo,
+                        1,
+                        10,
+                        i18n->t("settings", "transport-fwd-rwd-default-tempo.tooltip"),
+                        "%d%"
                     );
-                    ImGui::EndDisabled(m_ctx);
 
                     ImGui::EndChild(m_ctx);
                 }
@@ -554,8 +574,9 @@ public:
         settings->SetSetting("surface", "reasonus-color-palette", join(settings_plugin_color_palette, ","));
         settings->SetSetting("surface", "use-automation-colors", setting_use_automation_colors);
         settings->SetSetting("surface", "automation-colors", join(setting_automation_colors, ","));
-        settings->SetSetting("surface", "transport-fwd-rwd-button-hold", setting_transport_fwd_rwd_button_tap_action);
-        settings->SetSetting("surface", "transport-fwd-rwd-button-tap", setting_transport_fwd_rwd_button_hold_action);
+        settings->SetSetting("surface", "transport-fwd-rwd-button-tap", setting_transport_fwd_rwd_button_tap_action);
+        settings->SetSetting("surface", "transport-fwd-rwd-button-hold", setting_transport_fwd_rwd_button_hold_action);
+        settings->SetSetting("surface", "transport-fwd-rwd-default-tempo", setting_transport_fwd_rwd_default_tempo);
 
         settings->SetSetting("surface", "use-automation-single-point", setting_use_single_point_mode);
         settings->SetSetting("surface", "overwrite-automation-point-shape", setting_overwrite_single_point_shape);
@@ -588,6 +609,7 @@ public:
         setting_automation_colors = settings->GetAutomationColorsArray();
         setting_transport_fwd_rwd_button_tap_action = settings->GetTransportFwdRwdButtonTapAction();
         setting_transport_fwd_rwd_button_hold_action = settings->GetTransportFwdRwdButtonHoldAction();
+        setting_transport_fwd_rwd_default_tempo = settings->GetTransportFwdRwdDefaultTempo();
 
         setting_use_single_point_mode = settings->UseAutomationSinglePoint();
         setting_overwrite_single_point_shape = settings->OverwriteAutomationPointShape();

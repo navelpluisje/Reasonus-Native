@@ -464,7 +464,7 @@ public:
                     DAW::SetExtState(EXT_STATE_KEY_SAVED_SETTINGS, EXT_STATE_VALUE_FALSE, false);
                 }
             }
-            reasonusApi->HandleApi();
+            reasonusApi->HandleApi(FP_8);
         }
     }
 

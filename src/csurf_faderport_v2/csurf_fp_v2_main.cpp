@@ -14,6 +14,7 @@
 #include <reaper_plugin_functions.h>
 #include "../controls/csurf_button.hpp"
 #include "../shared/csurf.h"
+#include "../shared/csurf_api.hpp"
 #include "../shared/csurf_transport_manager.hpp"
 #include "../shared/csurf_utils.hpp"
 #include "../shared/csurf_daw.hpp"
@@ -42,6 +43,7 @@ class CSurf_FaderPortV2 : public IReaperControlSurface {
     CSurf_TransportManager *transportManager;
     CSurf_FP_V2_AutomationManager *automationManager;
     CSurf_FP_V2_GeneralControlManager *generalControlManager;
+    ReaSonusApi *reasonusApi;
 
     DWORD surface_update_lastrun;
     DWORD surface_update_keepalive;
@@ -208,6 +210,7 @@ public:
         trackManager = new CSurf_FP_V2_TrackManager(context, trackNavigator, m_midiout);
         transportManager = new CSurf_TransportManager(context, m_midiout);
         automationManager = new CSurf_FP_V2_AutomationManager(context, trackNavigator, m_midiout);
+        reasonusApi = new ReaSonusApi(context, nullptr, nullptr);
 
         if (errStats) {
             if (m_midi_in_dev >= 0 && !m_midiin) {
@@ -311,6 +314,7 @@ public:
                     DAW::SetExtState(EXT_STATE_KEY_SAVED_SETTINGS, EXT_STATE_VALUE_FALSE, false);
                 }
             }
+            reasonusApi->HandleApi(FP_V2);
         }
     }
 
