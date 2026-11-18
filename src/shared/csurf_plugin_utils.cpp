@@ -26,10 +26,7 @@ std::string PluginUtils::GetReaSonusPluginMappingFilePath(
         createPathIfNotExist(path);
     }
 
-    std::string name = plugin_name;
-    if (plugin_type == "js") {
-        name = sanitizeFileName(plugin_name);
-    }
+    const std::string name = sanitizeFileName(plugin_name);
 
     return createPathName({path, name + "." + plugin_type + ".ini"});
 }
@@ -46,7 +43,9 @@ std::string PluginUtils::GetReaSonusPluginCacheFilePath(
         createPathIfNotExist(path);
     }
 
-    return createPathName({path, plugin_name + "." + plugin_type + ".ini"});
+    const std::string name = sanitizeFileName(plugin_name);
+
+    return createPathName({path, name + "." + plugin_type + ".ini"});
 }
 
 std::string PluginUtils::StripPluginName(const std::string &plugin_name) {
