@@ -1027,6 +1027,8 @@ public:
      */
     static std::string GetExtState(const std::string &key, std::string default_value);
 
+    static int GetExtState(const std::string &key, int default_value);
+
     /**
      * Set the value to the Ext state with the given key
      * @param key The key to store the value under

@@ -18,6 +18,10 @@ void CSurf_TransportManager::SetButtonValues(const bool force) const {
 }
 
 void CSurf_TransportManager::StopRewindOrForward(const bool skip_reset_playstate) {
+    if (!is_rewinding && !is_forwarding) {
+        return;
+    }
+
     is_forwarding = false;
     is_rewinding = false;
     fwd_started = 0;
@@ -85,7 +89,6 @@ void CSurf_TransportManager::SetForwardingState() {
     }
 
     context->StartTransportSeek();
-    SetPreviousPlayState();
     is_rewinding = false;
     is_forwarding = true;
 }
@@ -137,11 +140,15 @@ void CSurf_TransportManager::SetPreviousPlayState() {
 void CSurf_TransportManager::ResetPlayState() const {
     switch (previous_play_state) {
         case PLAY_STATE_PLAYING:
-            CSurf_OnPlay();
+            if (!is_playing) {
+                CSurf_OnPlay();
+            }
             break;
 
         case PLAY_STATE_PAUSED:
-            CSurf_OnPause();
+            if (!is_paused) {
+                CSurf_OnPause();
+            }
             break;
 
         case PLAY_STATE_RECORDING:
@@ -243,7 +250,6 @@ void CSurf_TransportManager::HandleRewindButton(const int value) {
         } else {
             handleFunctionKey("1", FUNCTION_TRANSPORT);
         }
-
         return;
     }
 
@@ -281,6 +287,9 @@ void CSurf_TransportManager::HandleRewindButton(const int value) {
             StopRewindOrForward();
         }
     } else {
+        if (!is_rewinding) {
+            SetPreviousPlayState();
+        }
         SetPause();
         SetRewindingState();
         fwd_started = now;
@@ -339,6 +348,9 @@ void CSurf_TransportManager::HandleForwardButton(const int value) {
             StopRewindOrForward();
         }
     } else {
+        if (!is_forwarding) {
+            SetPreviousPlayState();
+        }
         SetPause();
         SetForwardingState();
         fwd_started = now;
@@ -360,5 +372,7 @@ void CSurf_TransportManager::HandleFootSwitchClick(const int value) const {
 }
 
 void CSurf_TransportManager::HandlePlayStateChange() {
-    StopRewindOrForward(true);
+    if (is_forwarding || is_rewinding) {
+        StopRewindOrForward(true);
+    }
 }

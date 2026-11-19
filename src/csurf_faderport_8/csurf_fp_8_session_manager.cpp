@@ -457,7 +457,7 @@ public:
     }
 
     void HandleEncoderClick(const int value) const {
-        if (value == 0) {
+        if (context->GetTransportSeekSpeed() > 0 || value == 0) {
             return;
         }
 

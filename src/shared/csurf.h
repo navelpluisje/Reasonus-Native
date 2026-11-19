@@ -25,8 +25,13 @@ extern HWND g_hwnd;
 inline auto EXT_STATE_VALUE_FALSE = "0";
 inline auto EXT_STATE_VALUE_TRUE = "1";
 inline auto EXT_STATE_SECTION = "ReaSonus";
+inline auto EXT_STATE_SEEK_SPEED = "SEEK_SPEED";
 inline auto EXT_STATE_KEY_SAVED_SETTINGS = "saved_settings";
 inline auto EXT_STATE_KEY_UI_LANGUAGE = "language";
+
+/**
+ * The keys below are for use with the API
+ */
 inline auto EXT_STATE_KEY_VERSION = "version";
 inline auto EXT_STATE_FP_TRACK_OFFSET = "FP_TRACK_OFFSET";
 inline auto EXT_STATE_FP_V2_CONTROLLED_TRACK = "FP_V2_CONTROLLED_TRACK";
