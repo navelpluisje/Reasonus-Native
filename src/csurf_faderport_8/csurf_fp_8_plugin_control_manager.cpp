@@ -103,7 +103,7 @@ public:
 
             track->SetDisplayMode(DISPLAY_MODE_2, force_update);
 
-            if (ini.has(param_key) && !ini[param_key]["param"].empty()) {
+            if (ini.has(param_key) && !ini[param_key]["param"].empty() && !ini[param_key]["name"].empty()) {
                 const Inverted inverted = GetLabelInvertState(param_key);
 
                 track->SetDisplayLine(
@@ -134,7 +134,7 @@ public:
             }
 
             param_key = getParamKey("Fader_", filter_index);
-            if (ini.has(param_key) && !ini[param_key]["param"].empty()) {
+            if (ini.has(param_key) && !ini[param_key]["param"].empty() && !ini[param_key]["name"].empty()) {
                 if (!display_step_size) {
                     const Inverted inverted = GetLabelInvertState(param_key);
 
