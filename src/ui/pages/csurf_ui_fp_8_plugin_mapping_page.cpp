@@ -288,8 +288,12 @@ protected:
         param_names.push_back(i18n->t("mapping", "edit.select.param.first-item"));
         param_data.emplace_back(-1, i18n->t("mapping", "edit.select.param.first-item"), 0);
 
-        const std::string developer_name = PluginUtils::ExtractDeveloperName(plugin_params["global"]["origname"]);
-        const std::string plugin_name = PluginUtils::ExtractPluginName(plugin_params["global"]["origname"]);
+        const std::string developer_name = plugin_params["global"]["type"] == "js"
+                                               ? plugin_params["global"]["developer"]
+                                               : PluginUtils::ExtractDeveloperName(plugin_params["global"]["origname"]);
+        const std::string plugin_name = plugin_params["global"]["type"] == "js"
+                                            ? plugin_params["global"]["origname"]
+                                            : PluginUtils::ExtractPluginName(plugin_params["global"]["origname"]);
 
         if (!PluginUtils::HasPluginMappingCache(
             developer_name, plugin_name, plugin_params["global"]["type"]
