@@ -210,7 +210,7 @@ public:
         trackManager = new CSurf_FP_V2_TrackManager(context, trackNavigator, m_midiout);
         transportManager = new CSurf_TransportManager(context, m_midiout);
         automationManager = new CSurf_FP_V2_AutomationManager(context, trackNavigator, m_midiout);
-        reasonusApi = new ReaSonusApi(context, nullptr, nullptr);
+        reasonusApi = new ReaSonusApi(context, transportManager, nullptr, nullptr);
 
         if (errStats) {
             if (m_midi_in_dev >= 0 && !m_midiin) {

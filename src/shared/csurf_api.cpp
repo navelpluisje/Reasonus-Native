@@ -112,14 +112,35 @@ void ReaSonusApi::HandleTransportSeekSpeed() const {
     DAW::SetExtState(EXT_STATE_FP_TRANSPORT_SEEK_SPEED, "", false);
 }
 
-ReaSonusApi::ReaSonusApi(CSurf_Context *context) : context(context), faderManager(nullptr), trackNavigator(nullptr) {
+void ReaSonusApi::HandleTransportSeekMode() const {
+    if (DAW::GetExtState(EXT_STATE_FP_TRANSPORT_SEEK_MODE, "").empty()) {
+        return;
+    }
+
+    const std::string mode = DAW::GetExtState(EXT_STATE_FP_TRANSPORT_SEEK_MODE, "");
+    if (mode == "-1") {
+        transportManager->StartSeekRewind();
+    } else if (mode == "1") {
+        transportManager->StartSeekForward();
+    } else {
+        transportManager->StopSeek();
+    }
+
+    DAW::SetExtState(EXT_STATE_FP_TRANSPORT_SEEK_MODE, "", false);
 }
 
 ReaSonusApi::ReaSonusApi(
     CSurf_Context *context,
+    CSurf_TransportManager *transportManager
+) : context(context), transportManager(transportManager), faderManager(nullptr), trackNavigator(nullptr) {
+}
+
+ReaSonusApi::ReaSonusApi(
+    CSurf_Context *context,
+    CSurf_TransportManager *transportManager,
     CSurf_FP_8_FaderManager *faderManager,
     CSurf_FP_8_Navigator *trackNavigator
-) : context(context), faderManager(faderManager), trackNavigator(trackNavigator) {
+) : context(context), transportManager(transportManager), faderManager(faderManager), trackNavigator(trackNavigator) {
 }
 
 ReaSonusApi::~ReaSonusApi() {
@@ -135,4 +156,5 @@ void ReaSonusApi::HandleApi(const std::string &device) const {
         HandleSetFaderMode();
     }
     HandleTransportSeekSpeed();
+    HandleTransportSeekMode();
 }

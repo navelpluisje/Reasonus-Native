@@ -5,8 +5,8 @@
 #include "../controls/csurf_button.hpp"
 #include "../shared/csurf_context.hpp"
 #include "../shared/csurf_utils.hpp"
-#include "../ui/windows/csurf_ui_fp_v2_control_panel.hpp"
 #include "../ui/windows/csurf_ui_fp_8_control_panel.hpp"
+#include "../ui/windows/csurf_ui_fp_v2_control_panel.hpp"
 
 void CSurf_TransportManager::SetButtonValues(const bool force) const {
     play_button->SetValue(ButtonBlinkOnOff(is_paused, is_playing), force);
@@ -253,6 +253,10 @@ void CSurf_TransportManager::HandleRewindButton(const int value) {
         return;
     }
 
+    if (is_forwarding) {
+        StopRewindOrForward();
+    }
+
     const int now = static_cast<int>(GetTickCount());
 
     if (value == 0) {
@@ -314,6 +318,10 @@ void CSurf_TransportManager::HandleForwardButton(const int value) {
         return;
     }
 
+    if (is_rewinding) {
+        StopRewindOrForward();
+    }
+
     const int now = static_cast<int>(GetTickCount());
 
     if (value == 0) {
@@ -369,6 +377,22 @@ void CSurf_TransportManager::HandleFootSwitchClick(const int value) const {
     } else {
         handleFunctionKey("1", FUNCTION_FOOTSWITCH);
     }
+}
+
+void CSurf_TransportManager::StartSeekRewind() {
+    StopRewindOrForward();
+    SetPause();
+    SetRewindingState();
+}
+
+void CSurf_TransportManager::StopSeek() {
+    StopRewindOrForward();
+}
+
+void CSurf_TransportManager::StartSeekForward() {
+    StopRewindOrForward();
+    SetPause();
+    SetForwardingState();
 }
 
 void CSurf_TransportManager::HandlePlayStateChange() {

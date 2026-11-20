@@ -77,6 +77,12 @@ public:
 
     void HandleFootSwitchClick(int value) const;
 
+    void StartSeekRewind();
+
+    void StopSeek();
+
+    void StartSeekForward();
+
     void HandlePlayStateChange();
 };
 

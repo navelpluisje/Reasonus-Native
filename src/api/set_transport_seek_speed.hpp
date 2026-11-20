@@ -19,4 +19,28 @@ namespace REASONUS_API {
             "Set the new transport seek speed.\n"
             "Min value: 1\n"
             "Max value: 10\n";
+
+    inline void IncrementTransportSeekSpeed() {
+        DAW::SetExtState(
+            EXT_STATE_FP_TRANSPORT_SEEK_SPEED,
+            "0",
+            false
+        );
+    }
+
+    inline auto defstring_IncrementTransportSeekSpeed =
+            "void\0\0\0"
+            "Increment the transport seek speed.";
+
+    inline void DecrementTransportSeekSpeed() {
+        DAW::SetExtState(
+            EXT_STATE_FP_TRANSPORT_SEEK_SPEED,
+            "-1",
+            false
+        );
+    }
+
+    inline auto defstring_DecrementTransportSeekSpeed =
+            "void\0\0\0"
+            "Decrement the transport seek speed.";
 }

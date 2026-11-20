@@ -2,10 +2,12 @@
 #define REASONUSNATIVE_CSURF_API_HPP
 
 #include "./csurf_context.hpp"
+#include "csurf_transport_manager.hpp"
 #include "../csurf_faderport_8/csurf_fp_8_fader_manager.hpp"
 
 class ReaSonusApi {
     CSurf_Context *context;
+    CSurf_TransportManager *transportManager;
     CSurf_FP_8_FaderManager *faderManager;
     CSurf_FP_8_Navigator *trackNavigator;
 
@@ -25,10 +27,16 @@ class ReaSonusApi {
 
     void HandleTransportSeekSpeed() const;
 
-public:
-    explicit ReaSonusApi(CSurf_Context *context);
+    void HandleTransportSeekMode() const;
 
-    ReaSonusApi(CSurf_Context *context, CSurf_FP_8_FaderManager *faderManager, CSurf_FP_8_Navigator *trackNavigator);
+public:
+    explicit ReaSonusApi(CSurf_Context *context, CSurf_TransportManager *transportManager);
+
+    ReaSonusApi(
+        CSurf_Context *context,
+        CSurf_TransportManager *transportManager,
+        CSurf_FP_8_FaderManager *faderManager,
+        CSurf_FP_8_Navigator *trackNavigator);
 
     ~ReaSonusApi();
 
