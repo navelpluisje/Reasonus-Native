@@ -3,8 +3,6 @@
 
 #include "csurf_fp_8_channel_manager.hpp"
 
-extern const int MOMENTARY_TIMEOUT;
-
 class CSurf_FP_8_PanManager : public CSurf_FP_8_ChannelManager {
     int mute_start[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     int solo_start[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -174,7 +172,7 @@ public:
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
 
         if (value == 0 && settings->GetMuteSoloMomentary()) {
-            if (now - mute_start[index] > MOMENTARY_TIMEOUT) {
+            if (now - mute_start[index] > CSurf_Context::MOMENTARY_TIMEOUT) {
                 DAW::ToggleTrackMuted(media_track);
             }
             mute_start[index] = 0;
@@ -189,7 +187,7 @@ public:
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
 
         if (value == 0 && settings->GetMuteSoloMomentary()) {
-            if (now - solo_start[index] > MOMENTARY_TIMEOUT) {
+            if (now - solo_start[index] > CSurf_Context::MOMENTARY_TIMEOUT) {
                 DAW::ToggleTrackSoloed(media_track);
             }
             solo_start[index] = 0;

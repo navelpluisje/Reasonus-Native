@@ -5,7 +5,7 @@
 
 namespace REASONUS_API {
     inline int FPv2GetControlledTrack() {
-        const std::string controlled_track = DAW::GetExtState(EXT_STATE_FP_V2_CONTROLLED_TRACK, "0");;
+        const std::string controlled_track = DAW::GetExtState(EXT_STATE_FP_V2_CONTROLLED_TRACK, "0");
         return stoi(controlled_track);
     }
 

@@ -1,31 +1,33 @@
 #include "api.hpp"
 
-#include "reaper_vararg.hpp"
 #include <reaper_plugin_functions.h>
-#include "get_reasonus_version.hpp"
-#include "fp_8_get_track_offset.hpp"
-#include "fp_v2_get_controlled_track.hpp"
 #include "fp_8_control_plugin.hpp"
 #include "fp_8_control_thing_under_pointer.hpp"
-#include "fp_8_set_track_filter_by_name.hpp"
+#include "fp_8_get_track_offset.hpp"
 #include "fp_8_set_fader_mode.hpp"
-#include "fp_8_set_fader_mode_track.hpp"
-#include "fp_8_set_fader_mode_plugin.hpp"
-#include "fp_8_set_fader_mode_send.hpp"
-#include "fp_8_set_fader_mode_receive.hpp"
 #include "fp_8_set_fader_mode_pan.hpp"
+#include "fp_8_set_fader_mode_plugin.hpp"
+#include "fp_8_set_fader_mode_receive.hpp"
+#include "fp_8_set_fader_mode_send.hpp"
+#include "fp_8_set_fader_mode_track.hpp"
 #include "fp_8_set_track_filter.hpp"
 #include "fp_8_set_track_filter_all.hpp"
-#include "fp_8_set_track_filter_sends.hpp"
-#include "fp_8_set_track_filter_receives.hpp"
+#include "fp_8_set_track_filter_all_folders.hpp"
+#include "fp_8_set_track_filter_by_name.hpp"
+#include "fp_8_set_track_filter_effects.hpp"
 #include "fp_8_set_track_filter_hw_outputs.hpp"
 #include "fp_8_set_track_filter_instruments.hpp"
-#include "fp_8_set_track_filter_effects.hpp"
+#include "fp_8_set_track_filter_receives.hpp"
+#include "fp_8_set_track_filter_sends.hpp"
 #include "fp_8_set_track_filter_top_folders.hpp"
-#include "fp_8_set_track_filter_all_folders.hpp"
-#include "fp_8_set_track_filter_with_midi.hpp"
-#include "fp_8_set_track_filter_with_audio.hpp"
 #include "fp_8_set_track_filter_vca.hpp"
+#include "fp_8_set_track_filter_with_audio.hpp"
+#include "fp_8_set_track_filter_with_midi.hpp"
+#include "fp_v2_get_controlled_track.hpp"
+#include "get_reasonus_version.hpp"
+#include "reaper_vararg.hpp"
+#include "set_transport_seek.hpp"
+#include "set_transport_seek_speed.hpp"
 
 namespace REASONUS_API {
     void Register() {
@@ -155,5 +157,46 @@ namespace REASONUS_API {
         plugin_register("APIdef_ReaSonus_FP8_SetTrackFilterVca", (void *) defstring_FP8SetTrackFilterVca);
         plugin_register("APIvararg_ReaSonus_FP8_SetTrackFilterVca",
                         reinterpret_cast<void *>(&InvokeReaScriptAPI<&FP8SetTrackFilterVca>));
+
+        plugin_register("API_ReaSonus_SetTransportSeekSpeed", reinterpret_cast<void *>(SetTransportSeekSpeed));
+        plugin_register("APIdef_ReaSonus_SetTransportSeekSpeed", (void *) defstring_SetTransportSeekSpeed);
+        plugin_register("APIvararg_ReaSonus_SetTransportSeekSpeed",
+                        reinterpret_cast<void *>(&InvokeReaScriptAPI<&SetTransportSeekSpeed>));
+
+        plugin_register("API_ReaSonus_IncrementTransportSeekSpeed",
+                        reinterpret_cast<void *>(IncrementTransportSeekSpeed));
+        plugin_register("APIdef_ReaSonus_IncrementTransportSeekSpeed", (void *) defstring_IncrementTransportSeekSpeed);
+        plugin_register("APIvararg_ReaSonus_IncrementTransportSeekSpeed",
+                        reinterpret_cast<void *>(&InvokeReaScriptAPI<&IncrementTransportSeekSpeed>));
+
+        plugin_register("API_ReaSonus_DecrementTransportSeekSpeed",
+                        reinterpret_cast<void *>(DecrementTransportSeekSpeed));
+        plugin_register("APIdef_ReaSonus_DecrementTransportSeekSpeed", (void *) defstring_DecrementTransportSeekSpeed);
+        plugin_register("APIvararg_ReaSonus_DecrementTransportSeekSpeed",
+                        reinterpret_cast<void *>(&InvokeReaScriptAPI<&DecrementTransportSeekSpeed>));
+
+        plugin_register("API_ReaSonus_SetTransportSeek",
+                        reinterpret_cast<void *>(SetTransportSeek));
+        plugin_register("APIdef_ReaSonus_SetTransportSeek", (void *) defstring_SetTransportSeek);
+        plugin_register("APIvararg_ReaSonus_SetTransportSeek",
+                        reinterpret_cast<void *>(&InvokeReaScriptAPI<&SetTransportSeek>));
+
+        plugin_register("API_ReaSonus_SetTransportSeekRewind",
+                        reinterpret_cast<void *>(SetTransportSeekRewind));
+        plugin_register("APIdef_ReaSonus_SetTransportSeekRewind", (void *) defstring_SetTransportSeekRewind);
+        plugin_register("APIvararg_ReaSonus_SetTransportSeekRewind",
+                        reinterpret_cast<void *>(&InvokeReaScriptAPI<&SetTransportSeekRewind>));
+
+        plugin_register("API_ReaSonus_SetTransportSeekStop",
+                        reinterpret_cast<void *>(SetTransportSeekStop));
+        plugin_register("APIdef_ReaSonus_SetTransportSeekStop", (void *) defstring_SetTransportSeekStop);
+        plugin_register("APIvararg_ReaSonus_SetTransportSeekStop",
+                        reinterpret_cast<void *>(&InvokeReaScriptAPI<&SetTransportSeekStop>));
+
+        plugin_register("API_ReaSonus_SetTransportSeekForward",
+                        reinterpret_cast<void *>(SetTransportSeekForward));
+        plugin_register("APIdef_ReaSonus_SetTransportSeekForward", (void *) defstring_SetTransportSeekForward);
+        plugin_register("APIvararg_ReaSonus_SetTransportSeekForward",
+                        reinterpret_cast<void *>(&InvokeReaScriptAPI<&SetTransportSeekForward>));
     }
 }

@@ -1,9 +1,9 @@
 #pragma once
 #include <string>
 
-#include "reaper_plugin_functions.h"
 #include "../shared/csurf.h"
 #include "../shared/csurf_utils.hpp"
+#include "../shared/csurf_daw.hpp"
 
 namespace REASONUS_API {
     inline void FP8ControlPlugin(MediaTrack *media_track, int plugin_index) {

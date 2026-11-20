@@ -310,7 +310,7 @@ public:
         automationManager = new CSurf_FP_8_AutomationManager(context, faderManager, m_midiout);
         generalControlManager = new CSurf_FP_8_GeneralControlManager(context, trackNavigator, faderManager, m_midiout);
         lastTouchedFxManager = new CSurf_FP_8_LastTouchedFXManager(lastTouchedFxTrack, context, m_midiout);
-        reasonusApi = new ReaSonusApi(context, faderManager, trackNavigator);
+        reasonusApi = new ReaSonusApi(context, transportManager, faderManager, trackNavigator);
 
         if (errStats != nullptr && *errStats > 0) {
             if (m_midi_in_dev >= 0 && m_midiin == nullptr) {
@@ -464,7 +464,7 @@ public:
                     DAW::SetExtState(EXT_STATE_KEY_SAVED_SETTINGS, EXT_STATE_VALUE_FALSE, false);
                 }
             }
-            reasonusApi->HandleApi();
+            reasonusApi->HandleApi(FP_8);
         }
     }
 

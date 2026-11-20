@@ -5,50 +5,61 @@
 #include "../controls/csurf_button.hpp"
 #include "../shared/csurf_context.hpp"
 #include "../shared/csurf_utils.hpp"
-#include "../ui/windows/csurf_ui_fp_v2_control_panel.hpp"
 #include "../ui/windows/csurf_ui_fp_8_control_panel.hpp"
+#include "../ui/windows/csurf_ui_fp_v2_control_panel.hpp"
 
 void CSurf_TransportManager::SetButtonValues(const bool force) const {
-    playButton->SetValue(ButtonBlinkOnOff(isPaused, isPlaying), force);
-    stopButton->SetValue(isStopped ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
-    recordButton->SetValue(isRecording ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
-    repeatButton->SetValue(isRepeat ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
-    rewindButton->SetValue(ButtonBlinkOnOff(isRewinding && isFastFwdRwd, isRewinding), force);
-    forwardButton->SetValue(ButtonBlinkOnOff(isForwarding && isFastFwdRwd, isForwarding), force);
+    play_button->SetValue(ButtonBlinkOnOff(is_paused, is_playing), force);
+    stop_button->SetValue(is_stopped ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+    record_button->SetValue(is_recording ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+    repeat_button->SetValue(is_repeat ? BTN_VALUE_ON : BTN_VALUE_OFF, force);
+    rewind_button->SetValue(ButtonBlinkOnOff(is_rewinding && is_fast_fwdRwd, is_rewinding), force);
+    forward_button->SetValue(ButtonBlinkOnOff(is_forwarding && is_fast_fwdRwd, is_forwarding), force);
 }
 
-void CSurf_TransportManager::StopRewindOrForward() {
-    isFastFwdRwd = false;
-    isForwarding = false;
-    isRewinding = false;
+void CSurf_TransportManager::StopRewindOrForward(const bool skip_reset_playstate) {
+    if (!is_rewinding && !is_forwarding) {
+        return;
+    }
+
+    is_forwarding = false;
+    is_rewinding = false;
+    fwd_started = 0;
+    rwd_started = 0;
+    forwarding_active = false;
+    rewinding_active = false;
 
     if (context->GetSetting("surface", "mute-master-on-fwd-rwd") != "0") {
         DAW::SetTrackMuted(GetMasterTrack(nullptr), false);
     }
+
+    context->StopTransportSeek();
+
+    if (skip_reset_playstate) {
+        return;
+    }
+
+    ResetPlayState();
 }
 
 void CSurf_TransportManager::HandleRewind() const {
-    CSurf_OnRew(0);
+    const int speed = context->GetTransportSeekSpeed();
 
-    if (isFastFwdRwd) {
-        CSurf_OnRew(0);
-        CSurf_OnRew(0);
+    for (int i = 0; i < speed; i++) {
         CSurf_OnRew(0);
     }
 }
 
 void CSurf_TransportManager::HandleForward() const {
-    CSurf_OnFwd(0);
+    const int speed = context->GetTransportSeekSpeed();
 
-    if (isFastFwdRwd) {
-        CSurf_OnFwd(0);
-        CSurf_OnFwd(0);
+    for (int i = 0; i < speed; i++) {
         CSurf_OnFwd(0);
     }
 }
 
 void CSurf_TransportManager::SetPause() const {
-    if (isPlaying) {
+    if (is_playing) {
         CSurf_OnPlay();
     }
 }
@@ -58,13 +69,14 @@ void CSurf_TransportManager::SetRewindingState() {
         DAW::SetTrackMuted(GetMasterTrack(nullptr), true);
     }
 
-    if (isRewinding) {
-        isFastFwdRwd = !isFastFwdRwd;
+    if (is_rewinding) {
         return;
     }
-    isFastFwdRwd = false;
-    isForwarding = false;
-    isRewinding = true;
+
+    context->StartTransportSeek();
+    SetPreviousPlayState();
+    is_forwarding = false;
+    is_rewinding = true;
 }
 
 void CSurf_TransportManager::SetForwardingState() {
@@ -72,13 +84,13 @@ void CSurf_TransportManager::SetForwardingState() {
         DAW::SetTrackMuted(GetMasterTrack(nullptr), true);
     }
 
-    if (isForwarding) {
-        isFastFwdRwd = !isFastFwdRwd;
+    if (is_forwarding) {
         return;
     }
-    isFastFwdRwd = false;
-    isRewinding = false;
-    isForwarding = true;
+
+    context->StartTransportSeek();
+    is_rewinding = false;
+    is_forwarding = true;
 }
 
 void CSurf_TransportManager::handleFunctionKey(const std::string &key, const FunctionTypes type) const {
@@ -87,9 +99,9 @@ void CSurf_TransportManager::handleFunctionKey(const std::string &key, const Fun
 
     if (action_id == "0") {
         const int result = MB(
-        "There is no action assigned to this function.\nDo you want to assign an action?",
-          "No action assigned",
-          MB_TYPE_OK_CANCEL
+            "There is no action assigned to this function.\nDo you want to assign an action?",
+            "No action assigned",
+            MB_TYPE_OK_CANCEL
         );
 
         if (result == MB_RETURN_OK) {
@@ -113,13 +125,48 @@ void CSurf_TransportManager::handleFunctionKey(const std::string &key, const Fun
     }
 }
 
+void CSurf_TransportManager::SetPreviousPlayState() {
+    if (is_playing) {
+        previous_play_state = PLAY_STATE_PLAYING;
+    } else if (is_paused) {
+        previous_play_state = PLAY_STATE_PAUSED;
+    } else if (is_recording) {
+        previous_play_state = PLAY_STATE_RECORDING;
+    } else {
+        previous_play_state = PLAY_STATE_STOPPED;
+    }
+}
+
+void CSurf_TransportManager::ResetPlayState() const {
+    switch (previous_play_state) {
+        case PLAY_STATE_PLAYING:
+            if (!is_playing) {
+                CSurf_OnPlay();
+            }
+            break;
+
+        case PLAY_STATE_PAUSED:
+            if (!is_paused) {
+                CSurf_OnPause();
+            }
+            break;
+
+        case PLAY_STATE_RECORDING:
+            CSurf_OnRecord();
+            break;
+
+        default:
+            CSurf_OnStop();
+    }
+}
+
 CSurf_TransportManager::CSurf_TransportManager(CSurf_Context *context, midi_Output *m_midiout) : context(context) {
-    playButton = new CSurf_Button(BTN_PLAY, BTN_VALUE_OFF, m_midiout);
-    stopButton = new CSurf_Button(BTN_STOP, BTN_VALUE_OFF, m_midiout);
-    recordButton = new CSurf_Button(BTN_RECORD, BTN_VALUE_OFF, m_midiout);
-    repeatButton = new CSurf_Button(BTN_LOOP, BTN_VALUE_OFF, m_midiout);
-    rewindButton = new CSurf_Button(BTN_REWIND, BTN_VALUE_OFF, m_midiout);
-    forwardButton = new CSurf_Button(BTN_FORWARD, BTN_VALUE_OFF, m_midiout);
+    play_button = new CSurf_Button(BTN_PLAY, BTN_VALUE_OFF, m_midiout);
+    stop_button = new CSurf_Button(BTN_STOP, BTN_VALUE_OFF, m_midiout);
+    record_button = new CSurf_Button(BTN_RECORD, BTN_VALUE_OFF, m_midiout);
+    repeat_button = new CSurf_Button(BTN_LOOP, BTN_VALUE_OFF, m_midiout);
+    rewind_button = new CSurf_Button(BTN_REWIND, BTN_VALUE_OFF, m_midiout);
+    forward_button = new CSurf_Button(BTN_FORWARD, BTN_VALUE_OFF, m_midiout);
 
     settings = ReaSonusSettings::GetInstance(context->GetNbChannels() > 1 ? FP_8 : FP_V2);
 
@@ -127,18 +174,18 @@ CSurf_TransportManager::CSurf_TransportManager(CSurf_Context *context, midi_Outp
 }
 
 void CSurf_TransportManager::Update(const bool force_update) {
-    const int playState = GetPlayStateEx(nullptr);
-    isPlaying = hasBit(playState, 0);
-    isPaused = hasBit(playState, 1);
-    isRecording = hasBit(playState, 2);
-    isStopped = !isPlaying && !isPaused;
-    isRepeat = GetSetRepeatEx(nullptr, -1) > 0;
+    const auto playState = static_cast<PLAY_STATES>(GetPlayStateEx(nullptr));
+    is_playing = hasBit(playState, 0);
+    is_paused = hasBit(playState, 1);
+    is_recording = hasBit(playState, 2);
+    is_stopped = !is_playing && !is_paused;
+    is_repeat = GetSetRepeatEx(nullptr, -1) > 0;
 
-    if (isRewinding) {
+    if (is_rewinding) {
         HandleRewind();
     }
 
-    if (isForwarding) {
+    if (is_forwarding) {
         HandleForward();
     }
 
@@ -190,16 +237,12 @@ void CSurf_TransportManager::HandleRecordButton(const int value) {
 }
 
 void CSurf_TransportManager::HandleRewindButton(const int value) {
-    if (value == 0) {
-        return;
-    }
-
-    if (context->GetShiftRight()) {
+    if (context->GetShiftRight() && value > 0) {
         handleFunctionKey("3", FUNCTION_TRANSPORT);
         return;
     }
 
-    if (context->GetShiftLeft()) {
+    if (context->GetShiftLeft() && value > 0) {
         const std::string action_id = settings->GetFunction("1", FUNCTION_TRANSPORT);
 
         if (action_id == "0") {
@@ -207,24 +250,63 @@ void CSurf_TransportManager::HandleRewindButton(const int value) {
         } else {
             handleFunctionKey("1", FUNCTION_TRANSPORT);
         }
-
         return;
     }
-    SetPause();
-    SetRewindingState();
+
+    if (is_forwarding) {
+        StopRewindOrForward();
+    }
+
+    const int now = static_cast<int>(GetTickCount());
+
+    if (value == 0) {
+        const bool short_press = now - fwd_started < 200;
+
+        if (
+            (short_press && settings->GetTransportFwdRwdButtonTapAction() == 0)
+            || (!short_press && settings->GetTransportFwdRwdButtonHoldAction() == 2)
+        ) {
+            if (is_rewinding && rewinding_active) {
+                StopRewindOrForward();
+                return;
+            }
+
+            rewinding_active = true;
+            return;
+        }
+
+        if (
+            (short_press && settings->GetTransportFwdRwdButtonTapAction() == 1)
+            || (!short_press && settings->GetTransportFwdRwdButtonHoldAction() == 1)
+        ) {
+            StopRewindOrForward();
+            Main_OnCommandAsyncEx(41041, 0, nullptr);
+            return;
+        }
+
+        if (
+            (!short_press && settings->GetTransportFwdRwdButtonHoldAction() == 0)
+            || short_press
+        ) {
+            StopRewindOrForward();
+        }
+    } else {
+        if (!is_rewinding) {
+            SetPreviousPlayState();
+        }
+        SetPause();
+        SetRewindingState();
+        fwd_started = now;
+    }
 }
 
 void CSurf_TransportManager::HandleForwardButton(const int value) {
-    if (value == 0) {
-        return;
-    }
-
-    if (context->GetShiftRight()) {
+    if (context->GetShiftRight() && value > 0) {
         handleFunctionKey("4", FUNCTION_TRANSPORT);
         return;
     }
 
-    if (context->GetShiftLeft()) {
+    if (context->GetShiftLeft() && value > 0) {
         const std::string action_id = settings->GetFunction("2", FUNCTION_TRANSPORT);
 
         if (action_id == "0") {
@@ -236,8 +318,51 @@ void CSurf_TransportManager::HandleForwardButton(const int value) {
         return;
     }
 
-    SetPause();
-    SetForwardingState();
+    if (is_rewinding) {
+        StopRewindOrForward();
+    }
+
+    const int now = static_cast<int>(GetTickCount());
+
+    if (value == 0) {
+        const bool short_press = now - fwd_started < 200;
+
+        if (
+            (short_press && settings->GetTransportFwdRwdButtonTapAction() == 0)
+            || (!short_press && settings->GetTransportFwdRwdButtonHoldAction() == 2)
+        ) {
+            if (is_forwarding && forwarding_active) {
+                StopRewindOrForward();
+                return;
+            }
+
+            forwarding_active = true;
+            return;
+        }
+
+        if (
+            (short_press && settings->GetTransportFwdRwdButtonTapAction() == 1)
+            || (!short_press && settings->GetTransportFwdRwdButtonHoldAction() == 1)
+        ) {
+            StopRewindOrForward();
+            Main_OnCommandAsyncEx(41040, 0, nullptr);
+            return;
+        }
+
+        if (
+            (!short_press && settings->GetTransportFwdRwdButtonHoldAction() == 0)
+            || short_press
+        ) {
+            StopRewindOrForward();
+        }
+    } else {
+        if (!is_forwarding) {
+            SetPreviousPlayState();
+        }
+        SetPause();
+        SetForwardingState();
+        fwd_started = now;
+    }
 }
 
 void CSurf_TransportManager::HandleFootSwitchClick(const int value) const {
@@ -254,6 +379,24 @@ void CSurf_TransportManager::HandleFootSwitchClick(const int value) const {
     }
 }
 
-void CSurf_TransportManager::HandlePlayStateChange() {
+void CSurf_TransportManager::StartSeekRewind() {
     StopRewindOrForward();
+    SetPause();
+    SetRewindingState();
+}
+
+void CSurf_TransportManager::StopSeek() {
+    StopRewindOrForward();
+}
+
+void CSurf_TransportManager::StartSeekForward() {
+    StopRewindOrForward();
+    SetPause();
+    SetForwardingState();
+}
+
+void CSurf_TransportManager::HandlePlayStateChange() {
+    if (is_forwarding || is_rewinding) {
+        StopRewindOrForward(true);
+    }
 }

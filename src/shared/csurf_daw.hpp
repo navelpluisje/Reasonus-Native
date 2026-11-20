@@ -69,6 +69,13 @@ enum MESSAGE_BOX_RETURN {
     MB_RETURN_NO     = 7,
 };
 
+enum PLAY_STATES {
+    PLAY_STATE_STOPPED   = 0,
+    PLAY_STATE_PLAYING   = 1,
+    PLAY_STATE_PAUSED    = 2,
+    PLAY_STATE_RECORDING = 4,
+};
+
 static std::map<Features, double> feature_versions = { // NOLINT(*-statically-constructed-objects, *-throwing-static-initialization)
     {FEATURE_PINNED_TRACKS, 7.46},
     {FEATURE_EXTENSION_DATA, 7.79},
@@ -1019,6 +1026,8 @@ public:
      * @param default_value The value to return when the given key does not exist
      */
     static std::string GetExtState(const std::string &key, std::string default_value);
+
+    static int GetExtState(const std::string &key, int default_value);
 
     /**
      * Set the value to the Ext state with the given key

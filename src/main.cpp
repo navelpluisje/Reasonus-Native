@@ -22,11 +22,13 @@
 #include "actions/action_ui_fp_v2_display_widget.hpp"
 #include "actions/action_ui_plugin_type_mapping.hpp"
 #include "ui/pages/csurf_ui_function_keys.hpp"
-
+#include "api/api.hpp"
 // ReSharper disable once CppUnusedIncludeDirective
 #include "resource.h"
 #include "shared/csurf.h"
 #include "shared/csurf_daw.hpp"
+
+constexpr int MOMENTARY_TIMEOUT = 500;
 
 extern reaper_csurf_reg_t
         csurf_faderport_8_reg,
@@ -47,14 +49,17 @@ reaper_plugin_info_t *g_reaper_plugin_info;
 
 extern "C" {
     REAPER_PLUGIN_DLL_EXPORT auto REAPER_PLUGIN_ENTRYPOINT(
-        REAPER_PLUGIN_HINSTANCE hInstance, reaper_plugin_info_t *reaper_plugin_info) -> int {
+        REAPER_PLUGIN_HINSTANCE hInstance,
+        reaper_plugin_info_t *reaper_plugin_info
+    ) -> int {
         g_hInst = hInstance;
 
         /**
          * reaper_plugin_info is not available, so no need to run.
          */
         if (
-            reaper_plugin_info == nullptr || reaper_plugin_info->caller_version != REAPER_PLUGIN_VERSION
+            reaper_plugin_info == nullptr
+            || reaper_plugin_info->caller_version != REAPER_PLUGIN_VERSION
             || !reaper_plugin_info->GetFunc
         ) {
             ACTION_CLOSE_ALL_FLOATING_FX_WINDOWS::Unregister();
@@ -76,7 +81,6 @@ extern "C" {
             ACTION_UI_FP_V2_CONTROL_PANEL::Unregister();
             ACTION_UI_PLUGIN_TYPE_MAPPING::Unregister();
             ACTION_UI_TRANSLATIONS_EDITOR::Unregister();
-            ACTION_UI_FP_V2_DISPLAY_WIDGET::Unregister();
 
             return 0;
         }
@@ -90,26 +94,19 @@ extern "C" {
             if (REAPERAPI_LoadAPI(reaper_plugin_info->GetFunc) != 0) {
                 // This is the WIN32 / swell MessageBox, not REAPER's API MB.  This should create a separate window that is listed in the taskbar,
                 //		and more easily visible behind REAPER's splash screen.
-                MessageBox(
-                    nullptr,
-                    "Unable to import default API functions.\n\nNOTE:\nThis extension requires REAPER v7.40 or higher.",
-                    "ERROR: ReaSonus Native",
-                    0
-                );
+                MessageBox(nullptr,
+                           "Unable to import default API functions.\n\nNOTE:\nThis extension requires REAPER v7.40 or higher.",
+                           "ERROR: ReaSonus Native", 0);
                 return 0;
             }
             //		Load each of the undocumented functions.
             if (!(*reinterpret_cast<void **>(&CoolSB_GetScrollInfo) = reaper_plugin_info->GetFunc(
-                      "CoolSB_GetScrollInfo"
-                  )
-            )) {
+                      "CoolSB_GetScrollInfo"))) {
                 MessageBox(nullptr, "Unable to import CoolSB_GetScrollInfo function.", "ERROR: ReaSonus Native", 0);
                 return 0;
             }
-            if (!(*reinterpret_cast<void **>(&CoolSB_SetScrollPos) = reaper_plugin_info->GetFunc(
-                      "CoolSB_SetScrollPos"
-                  )
-            )) {
+            if (!(*reinterpret_cast<void **>(&CoolSB_SetScrollPos) = reaper_plugin_info->
+                  GetFunc("CoolSB_SetScrollPos"))) {
                 MessageBox(nullptr, "Unable to import CoolSB_SetScrollPos function.", "ERROR: ReaSonus Native", 0);
                 return 0;
             }
@@ -135,17 +132,20 @@ extern "C" {
         ACTION_UI_PLUGIN_TYPE_MAPPING::Register();
         ACTION_UI_TRANSLATIONS_EDITOR::Register();
         ACTION_UI_FP_V2_DISPLAY_WIDGET::Register();
-
+  
         reaper_plugin_info->Register("csurf", &csurf_faderport_8_reg);
         reaper_plugin_info->Register("csurf", &csurf_faderport_v2_reg);
 
         if (DAW::VersionHasFeature(FEATURE_EXTENSION_DATA)) {
             const std::string version = GIT_VERSION;
             const std::string name = "ReaSonus Native (" + version + ")";
+
             plugin_register("ext_name", (void *) name.c_str());
             plugin_register("ext_url", (void *) "https://reasonus.net/");
             plugin_register("ext_vendor", (void *) "Navelpluisje");
         }
+
+        REASONUS_API::Register();
 
         return 1;
     }
