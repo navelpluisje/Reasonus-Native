@@ -11,7 +11,7 @@ mkdir -p tmp/UserPlugins/ReaSonus
 file="./scripts/reaper-package-info.txt"
 version_placeholder=%version%
 echo $1
-sed -i $file -r "s|$version_placeholder|$1|g" $file
+sed -i -r "s|$version_placeholder|$1|g" $file
 
 # Copy localizations file and reaper-package-info.txt
 cp ./src/i18n/locales/en-US.ini ./tmp/UserPlugins/ReaSonus
