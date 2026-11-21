@@ -151,6 +151,7 @@ jobs:
             ./src/i18n/locales/en-US.ini
 
   reaperpkg:
+    needs: [ build ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -176,7 +177,7 @@ jobs:
             ./reasonusNative.ReaperPkg
 
   release:
-    needs: [ build, locales ]
+    needs: [ build, locales, reaperpkg ]
     runs-on: ubuntu-latest
     steps:
       - name: Download artifact
