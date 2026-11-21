@@ -5,7 +5,7 @@ rm -rf ./tmp
 file="./scripts/reaper-package-info.txt"
 version_placeholder=%version%
 echo $1
-sed -i "" "s|$version_placeholder|$1|g" $file
+sed -i "" -r "s|$version_placeholder|$1|g" $file
 
 # Setup the folder structure
 mkdir -p tmp/os_mac_64/UserPlugins
