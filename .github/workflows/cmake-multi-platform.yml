@@ -7,6 +7,7 @@ on:
 env:
   VS_PATH: "%ProgramFiles%\\Microsoft Visual Studio\\2022\\Enterprise\\VC\\Auxiliary\\Build"
   MACOSX_DEPLOYMENT_TARGET: 11.0
+  REAPER_PKG_VERSION: ${{ github.workspace }}
 
 jobs:
   build:
