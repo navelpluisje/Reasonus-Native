@@ -1,6 +1,12 @@
 # Remove the tmp folder first to be sure we start with a clean sheet
 rm -rf ./tmp
 
+# Read the file and set the latest version number
+file="./scripts/reaper-package-info.txt"
+version_placeholder=%version%
+echo $1
+sed -i "" "s|$version_placeholder|$1|g" $file
+
 # Setup the folder structure
 mkdir -p tmp/os_mac_64/UserPlugins
 mkdir -p tmp/os_win_x64/UserPlugins
@@ -16,11 +22,11 @@ cp ./artifacts/reasonus-native-macos-latest-arm64\;x86_64/reaper_ReasonusNative-
 cp ./artifacts/reasonus-native-windows-2022-x64/reaper_ReasonusNative-x64.dll ./tmp/os_win_x64/UserPlugins
 cp ./artifacts/reasonus-native-windows-2022-x86/reaper_ReasonusNative-x86.dll ./tmp/os_win_32/UserPlugins
 
-# Read the file and set the latest version number
-file="tmp/reaper-package-info.txt"
-version_placeholder=%version%
-echo $1
-sed -i "" "s|$version_placeholder|$1|g" $file
+## Read the file and set the latest version number
+#file="tmp/reaper-package-info.txt"
+#version_placeholder=%version%
+#echo $1
+#sed -i "" "s|$version_placeholder|$1|g" $file
 
 # Zip all the contents
 cd tmp || exit
