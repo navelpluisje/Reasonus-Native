@@ -1,17 +1,17 @@
 # Remove the tmp folder first to be sure we start with a clean sheet
 rm -rf ./tmp
 
-# Read the file and set the latest version number
-file="./scripts/reaper-package-info.txt"
-version_placeholder=%version%
-echo $1
-sed -i $file -r "s|$version_placeholder|$1|g" $file
-
 # Setup the folder structure
 mkdir -p tmp/os_mac_64/UserPlugins
 mkdir -p tmp/os_win_x64/UserPlugins
 mkdir -p tmp/os_win_32/UserPlugins
 mkdir -p tmp/UserPlugins/ReaSonus
+
+# Read the file and set the latest version number
+file="./scripts/reaper-package-info.txt"
+version_placeholder=%version%
+echo $1
+sed -i $file -r "s|$version_placeholder|$1|g" $file
 
 # Copy localizations file and reaper-package-info.txt
 cp ./src/i18n/locales/en-US.ini ./tmp/UserPlugins/ReaSonus

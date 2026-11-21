@@ -1,5 +1,5 @@
 NAME "ReaSonus Native"
 AUTHOR "Navelpluisje"
-VERSION "%version%"
+VERSION "0.1.0"
 URL "https://reasonus.net"
 INFO "changelog.txt"
