@@ -1,13 +1,18 @@
 #include "csurf_context.hpp"
 #include <array>
 #include <map>
+
+#include "csurf.h"
 #include "csurf_context_resources.hpp"
+#include "csurf_daw.hpp"
 #include "csurf_reasonus_settings.hpp"
 #include "csurf_utils.hpp"
 #include "reaper_plugin.h"
 #include "reaper_plugin_functions.h"
 
-CSurf_Context::CSurf_Context(const int nbChannels) : nbChannels(nbChannels) {
+int CSurf_Context::MOMENTARY_TIMEOUT = 500;
+
+CSurf_Context::CSurf_Context(const int nbChannels) : nbChannels(nbChannels), transport_seek_speed(0) {
     if (nbChannels == 1) {
         device = FP_V2;
     } else {
@@ -173,7 +178,6 @@ void CSurf_Context::SetNbChannels(const int count) {
 }
 
 int CSurf_Context::GetNbChannels() const {
-    // TODO: Should be only nbChannels
     return last_touched_fx_mode ? nbChannels - 1 : nbChannels;
 }
 
@@ -363,4 +367,32 @@ std::array<int, 4> CSurf_Context::GetDisplayAlignValues() const {
 
 std::array<int, 4> CSurf_Context::GetDisplayInvertValues() const {
     return settings->GetTrackDisplayInvertValues();
+}
+
+/**************************************************************************
+* Transport Seek Speed
+**************************************************************************/
+int CSurf_Context::GetTransportSeekSpeed() const {
+    return transport_seek_speed;
+}
+
+void CSurf_Context::StartTransportSeek() {
+    transport_seek_speed = DAW::GetExtState(EXT_STATE_SEEK_SPEED, settings->GetTransportFwdRwdDefaultTempo());
+}
+
+void CSurf_Context::StopTransportSeek() {
+    DAW::SetExtState(EXT_STATE_SEEK_SPEED, transport_seek_speed, false);
+    transport_seek_speed = 0;
+}
+
+void CSurf_Context::SetTransportSeekSpeed(const int speed) {
+    transport_seek_speed = min(speed, 10);
+}
+
+void CSurf_Context::IncrementTransportSeekSpeed() {
+    transport_seek_speed = min(transport_seek_speed + 1, 10);
+}
+
+void CSurf_Context::DecrementTransportSeekSpeed() {
+    transport_seek_speed = max(transport_seek_speed - 1, 1);
 }

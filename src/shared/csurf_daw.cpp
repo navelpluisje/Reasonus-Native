@@ -1177,7 +1177,7 @@ std::vector<std::string> DAW::GetProjectTime(const bool overwrite_time_code, con
         proj_time_mode = GetProjectTimeMode();
     }
 
-    int const play_state = GetPlayStateEx(nullptr);
+    const auto play_state = static_cast<PLAY_STATES>(GetPlayStateEx(nullptr));
     bool const is_playing = hasBit(play_state, 0);
 
     if (is_playing) {
@@ -1279,6 +1279,12 @@ std::string DAW::GetExtState(const std::string &key, std::string default_value) 
     return HasExtState(EXT_STATE_SECTION, key.c_str())
                ? ::GetExtState(EXT_STATE_SECTION, key.c_str())
                : std::move(default_value);
+}
+
+int DAW::GetExtState(const std::string &key, const int default_value) {
+    return HasExtState(EXT_STATE_SECTION, key.c_str())
+               ? std::stoi(::GetExtState(EXT_STATE_SECTION, key.c_str()))
+               : default_value;
 }
 
 void DAW::SetExtState(const std::string &key, const std::string &value, const bool persist) {
