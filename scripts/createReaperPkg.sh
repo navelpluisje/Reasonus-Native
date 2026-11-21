@@ -12,9 +12,9 @@ cp ./src/i18n/locales/en-US.ini ./tmp/UserPlugins/ReaSonus
 cp ./scripts/reaper-package-info.txt ./tmp
 
 # Have to copy the assets generated to the correct folders
-cp reaper_ReasonusNative-arm64-x86_64.dylib ./tmp/os_mac_64/UserPlugins
-cp reaper_ReasonusNative-x64.dll ./tmp/os_win_x64/UserPlugins
-cp reaper_ReasonusNative-x86.dll ./tmp/os_win_32/UserPlugins
+cp ./artifacts/reaper_ReasonusNative-arm64-x86_64.dylib ./tmp/os_mac_64/UserPlugins
+cp ./artifacts/reaper_ReasonusNative-x64.dll ./tmp/os_win_x64/UserPlugins
+cp ./artifacts/reaper_ReasonusNative-x86.dll ./tmp/os_win_32/UserPlugins
 
 # Read the file and set the latest version number
 file="tmp/reaper-package-info.txt"

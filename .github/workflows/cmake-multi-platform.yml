@@ -123,10 +123,6 @@ jobs:
             sudo cpack
           fi
 
-      - name: Create ReaperPkg
-        working-directory: ${{ github.workspace }}
-        run: ./scripts/createReaperPkg.sh
-
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
@@ -153,6 +149,31 @@ jobs:
           name: reasonus-native-ini
           path: |
             ./src/i18n/locales/en-US.ini
+
+  reaperpkg:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          # Might need a version or something here
+          pattern: reasonus-native-*
+          path: ./artifacts
+
+      - name: Create ReaperPkg
+        working-directory: ${{ github.workspace }}
+        run: ./scripts/createReaperPkg.sh
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: reasonus-native-reaperpkg
+          path: |
+            ./reasonusNative.ReaperPkg
 
   release:
     needs: [ build, locales ]
