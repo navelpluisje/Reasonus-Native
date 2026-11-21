@@ -176,3 +176,4 @@ jobs:
             ./**/*.dll
             ./**/*.dylib
             ./**/*.ini
+            ./**/*.ReaperPkg
