@@ -19,7 +19,7 @@ cp ./artifacts/reasonus-native-windows-2022-x86/reaper_ReasonusNative-x86.dll ./
 # Read the file and set the latest version number
 file="tmp/reaper-package-info.txt"
 version_placeholder=%version%
-sed -i "" "s|$version_placeholder|$REAPER_PKG_VERSION|g" $file
+sed -i "" "s|$version_placeholder|$1|g" $file
 
 # Zip all the contents
 cd tmp || exit

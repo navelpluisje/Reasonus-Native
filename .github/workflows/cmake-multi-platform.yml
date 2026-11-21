@@ -168,7 +168,7 @@ jobs:
 
       - name: Create ReaperPkg
         working-directory: ${{ github.workspace }}
-        run: ./scripts/createReaperPkg.sh
+        run: ./scripts/createReaperPkg.sh ${{ github.ref_name }}
 
       - name: tree
         working-directory: ${{ github.workspace }}
