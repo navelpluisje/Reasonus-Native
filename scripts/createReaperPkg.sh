@@ -5,13 +5,15 @@ rm -rf ./tmp
 mkdir -p tmp/os_mac_64/UserPlugins
 mkdir -p tmp/os_win_x64/UserPlugins
 mkdir -p tmp/os_win_32/UserPlugins
+mkdir -p tmp/os_linux_x86_64/UserPlugins
+mkdir -p tmp/os_linux_aarch64/UserPlugins
 mkdir -p tmp/UserPlugins/ReaSonus
 
 # Read the file and set the latest version number
 file="./scripts/reaper-package-info.txt"
 version_placeholder=%version%
 sed -i -r "s|$version_placeholder|$1|g" $file
-
+tree
 # Copy localizations file and reaper-package-info.txt
 cp ./src/i18n/locales/en-US.ini ./tmp/UserPlugins/ReaSonus
 cp ./scripts/reaper-package-info.txt ./tmp

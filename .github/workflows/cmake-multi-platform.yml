@@ -24,6 +24,10 @@ jobs:
           - os: windows-2022
             arch: x86
             win_build_type: Release
+          - os: ubuntu-latest
+            arch: x86_64
+          - os: ubuntu-latest
+            arch: aarch64
 
     steps:
       - uses: actions/checkout@v2
