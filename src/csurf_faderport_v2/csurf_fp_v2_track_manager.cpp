@@ -1,11 +1,10 @@
 #include "csurf_fp_v2_track_manager.hpp"
-#include <fmt/format.h>
 
-#include <WDL/db2val.h>
+#include "csurf_fp_v2_pan_fader_manager.cpp"
+#include "csurf_fp_v2_param_fader_manager.cpp"
+#include "csurf_fp_v2_track_fader_manager.cpp"
 #include "../shared/csurf.h"
 #include "../shared/csurf_daw.hpp"
-
-// constexpr int MOMENTARY_TIMEOUT = 500;
 
 bool CSurf_FP_V2_TrackManager::HasSinglePointAutomation(
     MediaTrack *media_track,
@@ -63,89 +62,35 @@ void CSurf_FP_V2_TrackManager::HandleSinglePointAutomation(
     single_point_automation = nullptr;
 }
 
-void CSurf_FP_V2_TrackManager::HandleTrackFaderTouch(const int value) {
-    MediaTrack *media_track = navigator->GetControllerTrack();
+void CSurf_FP_V2_TrackManager::CheckFaderMode() {
+    FaderModeV2 new_fader_mode = TrackFaderMode;
 
-    if (GetTrackAutomationMode(media_track) == AUTOMATION_TOUCH) {
-        touch_start = value > 0 ? 1 : 0;
-        if (touch_start > 0) {
-            DAW::SetTrackVolume(media_track, DAW::GetTrackVolume(media_track));
-        }
+    if (context->GetLastTouchedFxMode()) {
+        new_fader_mode = LastTouchedParamFaderMode;
     }
 
-    /**
-     * Check if we have the proper conditions to continue with Single point automation
-     */
-    if (HasSinglePointAutomation(media_track, value, false)) {
-        // Get the value to write for the automation
-        double volume;
-        // The slider max value in the REAPER settings has effect on the value to get and write for the automation
-        // That's why we need the decibel offset and use it to determine the actual value to write to the automation.
-        const double fader_offset = 12 - DAW::GetSliderMaxVolume();
-
-        if (value > 0) {
-            // We need to set it to read first to get the actual volume of the envelope
-            SetTrackAutomationMode(media_track, AUTOMATION_READ);
-            volume = DB2SLIDER(VAL2DB(DAW::GetTrackVolume(media_track)) - fader_offset);
-            SetTrackAutomationMode(media_track, AUTOMATION_TRIM);
-        } else {
-            volume = DB2SLIDER(VAL2DB(DAW::GetTrackVolume(media_track)) - fader_offset);
-        }
-
-        HandleSinglePointAutomation(media_track, value, "<VOLENV2", volume, SPA_Track);
+    if (context->GetPanFaderMode()) {
+        new_fader_mode = PanFaderMode;
     }
-}
 
-void CSurf_FP_V2_TrackManager::HandleLastTouchedParamFaderTouch(const int value) {
-    int track_number = -1;
-    int plugin_index = -1;
-    int plugin_param_index = -1;
-
-    if (!GetLastTouchedFX(&track_number, &plugin_index, &plugin_param_index)) {
+    if (fader_mode == new_fader_mode) {
         return;
     }
 
-    MediaTrack *media_track = GetTrack(nullptr, track_number - 1);
-    if (media_track == nullptr) {
-        return;
-    }
+    fader_mode = new_fader_mode;
 
-    /**
-     * Check if we have the proper conditions to continue with Single point automation
-     * All pan related values (except for width) are displayed reversed.
-     * Therefore some fo the values are inverted as well, to make it mork as it should
-     */
-    if (HasSinglePointAutomation(media_track, value, true)) {
-        double parameter_value = 0.0;
-        double dummy;
+    switch (fader_mode) {
+        case TrackFaderMode:
+            fader_manager = new CSurf_FP_V2_TrackFaderManager(navigator, context, track, m_midiout);
+            break;
 
-        // Get the value to write for the automation
-        if (value > 0) {
-            previous_automation_mode = GetTrackAutomationMode(media_track);
-            // We need to set it to read first to get the actual volume of the envelope
-            SetTrackAutomationMode(media_track, AUTOMATION_READ);
-            parameter_value = TrackFX_GetParam(media_track, plugin_index, plugin_param_index, &dummy, &dummy);
-            SetTrackAutomationMode(media_track, AUTOMATION_TRIM);
-        } else {
-            parameter_value = TrackFX_GetParam(media_track, plugin_index, plugin_param_index, &dummy, &dummy);
-            SetTrackAutomationMode(media_track, previous_automation_mode);
-        }
+        case LastTouchedParamFaderMode:
+            fader_manager = new CSurf_FP_V2_ParamFaderManager(navigator, context, track, m_midiout);
+            break;
 
-        HandleSinglePointAutomation(
-            media_track,
-            value,
-            fmt::format("{}_{}_{}", 0, plugin_index, plugin_param_index),
-            parameter_value,
-            SPA_Plugin,
-            plugin_index,
-            plugin_param_index
-        );
-    } else {
-        if (value > 0 || media_track == nullptr) {
-            return;
-        }
-        // Tell REAPER we do not alter the automation anymore
-        TrackFX_EndParamEdit(media_track, track_number, plugin_param_index);
+        case PanFaderMode:
+            fader_manager = new CSurf_FP_V2_PanFaderManager(navigator, context, track, m_midiout);
+            break;
     }
 }
 
@@ -171,11 +116,15 @@ CSurf_FP_V2_TrackManager::CSurf_FP_V2_TrackManager(
     CSurf_FP_V2_Navigator *navigator,
     midi_Output *m_midiout
 ) : navigator(navigator), context(context), m_midiout(m_midiout), color() {
+    previous_automation_mode = 0;
+    fader_mode = TrackFaderMode;
     track = new CSurf_FP_V2_Track(context, m_midiout);
+    fader_manager = new CSurf_FP_V2_TrackFaderManager(navigator, context, track, m_midiout);
 }
 
 void CSurf_FP_V2_TrackManager::UpdateTrack() {
     MediaTrack *media_track = navigator->GetControllerTrack();
+    CheckFaderMode();
 
     if (context->GetMasterFaderMode()) {
         DAW::SetExtState(EXT_STATE_FP_V2_WIDGET_MODE, FP_V2_WIDGET_MASTER_MODE, false);
@@ -185,7 +134,7 @@ void CSurf_FP_V2_TrackManager::UpdateTrack() {
         DAW::SetExtState(EXT_STATE_FP_V2_WIDGET_MODE, FP_V2_WIDGET_TRACK_MODE, false);
     }
 
-    int fader_value = 0;
+    // int fader_value = 0;
 
     if (media_track == nullptr || CountTracks(nullptr) < 1) {
         ClearTrack();
@@ -195,7 +144,7 @@ void CSurf_FP_V2_TrackManager::UpdateTrack() {
 
     const bool isArmed = DAW::IsTrackArmed(media_track);
 
-    GetFaderValue(media_track, &fader_value);
+    // GetFaderValue(media_track, &fader_value);
 
     if (context->GetShiftLeft()) {
         track->SetMuteButtonValue(navigator->HasTracksWithMute() ? BTN_VALUE_ON : BTN_VALUE_OFF, force_update);
@@ -213,22 +162,7 @@ void CSurf_FP_V2_TrackManager::UpdateTrack() {
                              force_update);
     track->SetBypassButtonValue(DAW::GetTrackFxBypassed(media_track) ? BTN_VALUE_ON : BTN_VALUE_OFF);
 
-    if (context->GetLastTouchedFxMode()) {
-        double param_value = 0.0;
-        int track_number = -1;
-        int plugin_index = -1;
-        int param_index = -1;
-
-        GetLastTouchedFX(&track_number, &plugin_index, &param_index);
-        if (MediaTrack *_media_track = GetTrack(nullptr, track_number - 1)) {
-            param_value = TrackFX_GetParamNormalized(_media_track, plugin_index, param_index);
-            track->SetFaderValue(static_cast<int>(param_value * 16383.0), force_update);
-        }
-    } else {
-        if (!context->GetFaderDisabled() || !settings->GetCanDisableFader()) {
-            track->SetFaderValue(fader_value, force_update);
-        }
-    }
+    fader_manager->UpdateTracks(force_update);
 
     hasLastTouchedFxEnabled = context->GetLastTouchedFxMode();
     force_update = false;
@@ -349,38 +283,10 @@ void CSurf_FP_V2_TrackManager::HandleBypassClick(int index, const int value) con
         : DAW::ToggleTrackFxBypass(media_track);   // Track: Toggle FX bypass for selected tracks
 }
 
-void CSurf_FP_V2_TrackManager::HandleFaderTouch(const int value) {
-    if (context->GetLastTouchedFxMode()) {
-        HandleLastTouchedParamFaderTouch(value);
-        return;
-    }
-
-    HandleTrackFaderTouch(value);
+void CSurf_FP_V2_TrackManager::HandleFaderTouch(const int value) const {
+    fader_manager->HandleFaderTouch(value);
 }
 
 void CSurf_FP_V2_TrackManager::HandleFaderMove(const int msb, const int lsb) const {
-    if (context->GetLastTouchedFxMode()) {
-        int track_number = -1;
-        int plugin_index = -1;
-        int param_index = -1;
-
-        if (GetLastTouchedFX(&track_number, &plugin_index, &param_index)) {
-            if (MediaTrack *media_track = GetTrack(nullptr, track_number - 1)) {
-                TrackFX_SetParamNormalized(media_track, plugin_index, param_index, int14ToNormalized(msb, lsb));
-            }
-        }
-        return;
-    }
-
-    MediaTrack *media_track = navigator->GetControllerTrack();
-
-    if (context->GetShiftLeft()) {
-        CSurf_SetSurfacePan(
-            media_track,
-            CSurf_OnPanChange(media_track, normalizedToPan(int14ToNormalized(msb, lsb)), false),
-            nullptr
-        );
-    } else {
-        CSurf_SetSurfaceVolume(media_track, CSurf_OnVolumeChange(media_track, int14ToVol(msb, lsb), false), nullptr);
-    }
+    fader_manager->HandleFaderMove(msb, lsb);
 }

@@ -1,4 +1,6 @@
 #include "csurf_fp_v2_navigator.hpp"
+
+#include "reaper_plugin_functions.h"
 #include "../shared/csurf.h"
 #include "../shared/csurf_daw.hpp"
 

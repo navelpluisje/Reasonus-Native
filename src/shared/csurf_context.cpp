@@ -140,6 +140,7 @@ void CSurf_Context::ToggleLastTouchedFxMode() {
 void CSurf_Context::SetLastTouchedFxMode(const bool value) {
     if (value) {
         master_fader_mode = false;
+        pan_fader_mode = false;
     }
     last_touched_fx_mode = value;
 }
@@ -158,6 +159,7 @@ void CSurf_Context::ToggleMasterFaderMode() {
 void CSurf_Context::SetMasterFaderMode(const bool value) {
     if (value) {
         last_touched_fx_mode = false;
+        pan_fader_mode = false;
     }
     master_fader_mode = value;
 }
@@ -168,6 +170,21 @@ bool CSurf_Context::GetMasterFaderMode() const {
     }
 
     return master_fader_mode;
+}
+
+/**************************************************************************
+ * Pan Fader mode for the V2
+ **************************************************************************/
+void CSurf_Context::SetPanFaderMode(const bool value) {
+    if (value) {
+        last_touched_fx_mode = false;
+        master_fader_mode = false;
+    }
+    pan_fader_mode = value;
+}
+
+bool CSurf_Context::GetPanFaderMode() const {
+    return pan_fader_mode;
 }
 
 /**************************************************************************

@@ -31,6 +31,9 @@ class CSurf_Context {
     // Make the fader control the master track for the FaderPort V2
     bool master_fader_mode;
 
+    // Make the fader control the pan of the selected track for the FaderPort V2
+    bool pan_fader_mode;
+
     // Set the track id that has the add send mode. -1 is unselected
     int add_send_receive_mode = -1;
     int current_selected_send_receive = 0;
@@ -139,6 +142,13 @@ public:
     void SetMasterFaderMode(bool value);
 
     [[nodiscard]] bool GetMasterFaderMode() const;
+
+    /**************************************************************************
+     * Pan Fader mode
+     **************************************************************************/
+    void SetPanFaderMode(bool value);
+
+    bool GetPanFaderMode() const;
 
     /**************************************************************************
      * Number of device channels

@@ -15,6 +15,7 @@
 enum SessionTypes // NOLINT(*-use-internal-linkage)
 {
     Pan,
+    Flip,
     Channel,
     Zoom,
     Scroll,
@@ -49,6 +50,10 @@ protected:
                                       ? BTN_VALUE_BLINK
                                       : BTN_VALUE_ON;
 
+        const Btn_Value valueOnNoShift = !settings->GetDistractionFreeMode()
+                                             ? BTN_VALUE_BLINK
+                                             : BTN_VALUE_ON;
+
         linkButton->SetValue(
             GetToggleCommandStringState("_REASONUS_TOGGLE_PLAY_CURSOR_COMMAND") && context->GetShiftLeft()
                 ? BTN_VALUE_ON
@@ -57,11 +62,13 @@ protected:
                       : BTN_VALUE_OFF);
 
         panButton->SetValue(
-            ReaSonusV2ControlPanel::control_panel_open && context->GetShiftLeft()
+            session_type == Flip && context->GetShiftLeft()
                 ? BTN_VALUE_ON
                 : session_type == Pan // NOLINT(*-avoid-nested-conditional-operator)
                       ? valueOn
-                      : BTN_VALUE_OFF
+                      : session_type == Flip // NOLINT(*-avoid-nested-conditional-operator)
+                            ? valueOnNoShift
+                            : BTN_VALUE_OFF
         );
 
         channelButton->SetValue(
@@ -90,7 +97,7 @@ protected:
 
         channelButton->SetColor(context->GetShiftLeft() && context->GetFaderDisabled() ? ButtonColorYellow : color);
         linkButton->SetColor(context->GetShiftLeft() ? ButtonColorYellow : ButtonColorGreen);
-        panButton->SetColor(context->GetShiftLeft() ? ButtonColorYellow : ButtonColorWhite);
+        panButton->SetColor(context->GetShiftLeft() || session_type == Flip ? ButtonColorYellow : ButtonColorWhite);
         scrollButton->SetColor(session_type == Zoom ? ButtonColorYellow : ButtonColorWhite);
     }
 
@@ -154,6 +161,7 @@ public:
 
     void SetSession(const SessionTypes _session_type) {
         session_type = _session_type;
+        context->SetPanFaderMode(_session_type == Flip);
         context->SetMasterFaderMode(_session_type == Master);
     }
 
@@ -221,7 +229,7 @@ public:
         }
 
         if (context->GetShiftLeft()) {
-            ToggleFPV2ControlPanel(ReaSonusV2ControlPanel::FUNCTIONS_PAGE);
+            SetSession(Flip);
             return;
         }
         SetSession(Pan);
@@ -325,6 +333,7 @@ public:
 
         switch (session_type) {
             case Pan:
+            case Flip:
             case Channel:
             case Master:
             case Scroll:
@@ -332,21 +341,25 @@ public:
                     ? DAW::EditUndo()
                     : DAW::SetUniqueSelectedTrack(trackNavigator->GetPreviousTrack());
                 break;
+
             case Zoom:
                 context->GetShiftLeft()
                     ? Main_OnCommandAsyncEx(40112, 0, nullptr) // View: Zoom out vertical
                     : Main_OnCommandAsyncEx(1011, 0, nullptr); // View: Zoom out horizontal
                 break;
+
             case Click:
                 context->GetShiftLeft()
                     ? DAW::EditUndo()
                     : Main_OnCommandAsyncEx(42456, 0, nullptr); // Options: Set metronome speed to 1x
                 break;
+
             case Section:
                 context->GetShiftLeft()
                     ? Main_OnCommandAsyncEx(40625, 0, nullptr)                // Time selection: Set start point
                     : Main_OnCommandStringEx("_SWS_SELPREVMORR", 0, nullptr); // SWS: Goto/select previous marker/region
                 break;
+
             case Marker:
                 context->GetShiftLeft()
                     ? Main_OnCommandAsyncEx(40029, 0, nullptr)                // Edit: Undo
@@ -370,6 +383,7 @@ public:
 
         switch (session_type) {
             case Pan:
+            case Flip:
             case Channel:
             case Scroll:
             case Master:
@@ -377,22 +391,26 @@ public:
                     ? DAW::EditRedo()
                     : DAW::SetUniqueSelectedTrack(trackNavigator->GetNextTrack());
                 break;
+
             case Zoom:
                 context->GetShiftLeft()
                     ? Main_OnCommandAsyncEx(40111, 0, nullptr) // View: Zoom in vertical
                     : Main_OnCommandAsyncEx(1012, 0, nullptr); // View: Zoom in horizontal
                 break;
+
             case Click:
                 context->GetShiftLeft()
                     ? DAW::EditRedo()
                     : Main_OnCommandAsyncEx(42457, 0, nullptr); // Options: Set metronome speed to 2x
                 break;
+
             case Section:
                 context->GetShiftLeft()
                     ? Main_OnCommandAsyncEx(40626, 0, nullptr)                // Time selection: Set end point
                     : Main_OnCommandStringEx("_SWS_SELNEXTMORR", 0, nullptr); // SWS: Goto/select next marker/region
 
                 break;
+
             case Marker:
                 context->GetShiftLeft()
                     ? DAW::EditRedo()
@@ -411,25 +429,32 @@ public:
             case Pan:
                 IncrementPan(value);
                 break;
+
+            case Flip:
             case Channel:
                 Main_OnCommandAsyncEx(40285, 0, nullptr); // Track: Go to next track
                 break;
+
             case Zoom:
                 context->GetShiftLeft()
                     ? Main_OnCommandAsyncEx(40111, 0, nullptr) // View: Zoom in vertical
                     : Main_OnCommandAsyncEx(1012, 0, nullptr); // View: Zoom in horizontal
                 break;
+
             case Scroll:
                 context->GetShiftLeft()
                     ? Main_OnCommandAsyncEx(40141, 0, nullptr)  // View: Scroll view left
                     : Main_OnCommandAsyncEx(40139, 0, nullptr); // View: Scroll view up
                 break;
+
             case Master:
                 IncrementPan(value);
                 break;
+
             case Click:
                 IncrementMetronomeVolume();
                 break;
+
             case Section:
             case Marker:
                 context->GetShiftLeft()
@@ -449,25 +474,32 @@ public:
             case Pan:
                 DecrementPan(value);
                 break;
+
+            case Flip:
             case Channel:
                 Main_OnCommandAsyncEx(40286, 0, nullptr); // Track: Go to previous track
                 break;
+
             case Zoom:
                 context->GetShiftLeft()
                     ? Main_OnCommandAsyncEx(40112, 0, nullptr) // View: Zoom out vertical
                     : Main_OnCommandAsyncEx(1011, 0, nullptr); // View: Zoom out horizontal
                 break;
+
             case Scroll:
                 context->GetShiftLeft()
                     ? Main_OnCommandAsyncEx(40140, 0, nullptr)  // View: Scroll view right
                     : Main_OnCommandAsyncEx(40138, 0, nullptr); // View: Scroll view down
                 break;
+
             case Master:
                 DecrementPan(value);
                 break;
+
             case Click:
                 DecrementMetronomeVolume();
                 break;
+
             case Section:
             case Marker:
                 context->GetShiftLeft()
@@ -490,34 +522,42 @@ public:
                     ? DAW::EditSave()
                     : resetPan();
                 break;
+
+            case Flip:
             case Channel:
                 break;
+
             case Zoom:
                 context->GetShiftLeft()
                     ? Main_OnCommandAsyncEx(40113, 0, nullptr)  // View: Toggle track zoom to maximum height
                     : Main_OnCommandAsyncEx(40110, 0, nullptr); // View: Toggle track zoom to minimum height
                 break;
+
             case Scroll:
                 context->GetShiftLeft()
                     ? Main_OnCommandStringEx("_SWS_HSCROLLPLAY50", 0, nullptr)
                     // SWS: Horizontal scroll to put play cursor at 50%
                     : Main_OnCommandAsyncEx(40913, 0, nullptr); // Track: Vertical scroll selected tracks into view
                 break;
+
             case Master:
                 context->GetShiftLeft()
                     ? DAW::EditSave()
                     : resetPan();
                 break;
+
             case Click:
                 context->GetShiftLeft()
                     ? Main_OnCommandAsyncEx(40363, 0, nullptr)  // Options: Show metronome/pre-roll settings
                     : Main_OnCommandAsyncEx(40364, 0, nullptr); // Options: Toggle metronome
                 break;
+
             case Section:
                 context->GetShiftLeft()
                     ? Main_OnCommandAsyncEx(40615, 0, nullptr)  // Markers: Delete region near cursor
                     : Main_OnCommandAsyncEx(40306, 0, nullptr); // Markers: Insert region from time selection and edit
                 break;
+
             case Marker:
                 context->GetShiftLeft()
                     ? Main_OnCommandAsyncEx(40613, 0, nullptr) // Markers: Delete marker near cursor

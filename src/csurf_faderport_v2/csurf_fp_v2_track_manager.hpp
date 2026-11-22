@@ -1,17 +1,20 @@
 #ifndef CSURF_CHANNEL_MANAGER_V2_H_
 #define CSURF_CHANNEL_MANAGER_V2_H_
 
+#include "csurf_fp_v2_fader_manager.hpp"
 #include "csurf_fp_v2_navigator.hpp"
 #include "csurf_fp_v2_track.hpp"
 #include "../shared/csurf_single_point_automation_item.hpp"
 
 class CSurf_FP_V2_TrackManager {
     CSurf_FP_V2_Navigator *navigator;
+    CSurf_FP_V2_FaderManager *fader_manager;
     CSurf_Context *context;
     midi_Output *m_midiout;
 
     CSurf_FP_V2_Track *track;
     ReaSonusSettings *settings = ReaSonusSettings::GetInstance(FP_V2);
+    FaderModeV2 fader_mode;
 
     int mute_start = 0;
     int solo_start = 0;
@@ -40,9 +43,7 @@ protected:
         int sub_item_index = -1
     );
 
-    void HandleTrackFaderTouch(int value);
-
-    void HandleLastTouchedParamFaderTouch(int value);
+    void CheckFaderMode();
 
 public:
     CSurf_FP_V2_TrackManager(
@@ -68,7 +69,7 @@ public:
 
     void HandleBypassClick(int index, int value) const;
 
-    void HandleFaderTouch(int value);
+    void HandleFaderTouch(int value) const;
 
     void HandleFaderMove(int msb, int lsb) const;
 };

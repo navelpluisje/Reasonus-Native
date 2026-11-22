@@ -20,6 +20,12 @@ enum ChannelMode {
     MenuMode
 };
 
+enum FaderModeV2 {
+    TrackFaderMode,
+    PanFaderMode,
+    LastTouchedParamFaderMode,
+};
+
 enum ChannelManagerType {
     Track,
     Hui,
