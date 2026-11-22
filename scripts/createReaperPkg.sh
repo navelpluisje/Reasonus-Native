@@ -13,7 +13,7 @@ mkdir -p tmp/UserPlugins/ReaSonus
 file="./scripts/reaper-package-info.txt"
 version_placeholder=%version%
 sed -i -r "s|$version_placeholder|$1|g" $file
-tree
+
 # Copy localizations file and reaper-package-info.txt
 cp ./src/i18n/locales/en-US.ini ./tmp/UserPlugins/ReaSonus
 cp ./scripts/reaper-package-info.txt ./tmp
@@ -23,6 +23,8 @@ cp ./scripts/changelog.txt ./tmp
 cp ./artifacts/reasonus-native-macos-latest-arm64\;x86_64/reaper_ReasonusNative-arm64-x86_64.dylib ./tmp/os_mac_64/UserPlugins
 cp ./artifacts/reasonus-native-windows-2022-x64/reaper_ReasonusNative-x64.dll ./tmp/os_win_x64/UserPlugins
 cp ./artifacts/reasonus-native-windows-2022-x86/reaper_ReasonusNative-x86.dll ./tmp/os_win_32/UserPlugins
+cp ./artifacts/reasonus-native-ubuntu-latest-aarch64/reaper_ReasonusNative-aarch64.so ./tmp/os_linux_aarch64/UserPlugins
+cp ./artifacts/reasonus-native-ubuntu-latest-x86_64/reaper_ReasonusNative-x86_64.so ./tmp/os_linux_x86_64/UserPlugins
 
 # Zip all the contents
 cd tmp || exit
