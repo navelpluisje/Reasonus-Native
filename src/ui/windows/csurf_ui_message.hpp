@@ -16,6 +16,8 @@ public:
     ~ReaSonusMessage();
 
 private:
+    mINI::INIStructure changelog;
+
     static void Loop();
 
     CSurf_UI_Assets *assets;

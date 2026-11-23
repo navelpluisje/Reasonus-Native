@@ -121,7 +121,7 @@ private:
 
 struct DoubleClickState {
     bool active = false; // NOLINT(*-non-private-member-variables-in-classes)
-    int start = 0;      // NOLINT(*-non-private-member-variables-in-classes)
+    int start = 0;       // NOLINT(*-non-private-member-variables-in-classes)
     int clicks = 0;      // NOLINT(*-non-private-member-variables-in-classes)
 
     void SetValue(const bool value) {
@@ -285,6 +285,8 @@ std::string GetReaSonusLocalesFolderPath();
 std::string GetReaSonusLocalesPath(const std::string &language);
 
 std::string GetReaSonusLocalesRootFile();
+
+std::string GetReaSonusChangelogFile();
 
 bool isInteger(const std::string &value);
 

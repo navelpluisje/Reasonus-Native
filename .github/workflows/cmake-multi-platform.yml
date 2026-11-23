@@ -26,8 +26,8 @@ jobs:
             win_build_type: Release
           - os: ubuntu-latest
             arch: x86_64
-          - os: ubuntu-latest
-            arch: aarch64
+    #          - os: ubuntu-latest
+    #            arch: aarch64
 
     steps:
       - uses: actions/checkout@v2
@@ -154,6 +154,7 @@ jobs:
           name: reasonus-native-ini
           path: |
             ./src/i18n/locales/en-US.ini
+            ./src/changelog.ini
 
   reaperpkg:
     needs: [ build ]
@@ -202,5 +203,6 @@ jobs:
           files: |
             ./**/*.dll
             ./**/*.dylib
+            ./**/*.so
             ./**/*.ini
             ./**/*.ReaperPkg
