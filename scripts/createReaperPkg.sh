@@ -15,8 +15,9 @@ mkdir -p tmp/UserPlugins/ReaSonus
 
 source ./scripts/changelog.sh
 
-# Copy localizations file and reaper-package-info.txt
+# Copy localizations file, changelog and reaper-package-info.txt
 cp ./src/i18n/locales/en-US.ini ./tmp/UserPlugins/ReaSonus
+cp ./src/changelog.ini ./tmp/UserPlugins/ReaSonus
 cp ./scripts/reaper-package-info.txt ./tmp
 
 # Have to copy the assets generated to the correct folders
