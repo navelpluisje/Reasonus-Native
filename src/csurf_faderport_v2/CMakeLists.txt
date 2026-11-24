@@ -6,6 +6,9 @@ target_sources(${PROJECT_NAME}
         csurf_fp_v2_navigator.cpp
         csurf_fp_v2_session_manager.cpp
         csurf_fp_v2_track_manager.cpp
+        csurf_fp_v2_track_fader_manager.cpp
+        csurf_fp_v2_param_fader_manager.cpp
+        csurf_fp_v2_pan_fader_manager.cpp
         csurf_fp_v2_track.cpp
         ../ui/windows/csurf_ui_fp_v2_control_panel.cpp
         ../ui/pages/csurf_ui_fp_v2_settings_page.cpp

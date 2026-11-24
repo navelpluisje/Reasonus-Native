@@ -336,6 +336,18 @@ public:
             trackNavigator->SetOffset(track_index - 1);
         }
     }
+
+    int Extended(const int call, void *param1, void *param2, void *param3) override {
+        (void) param1;
+        (void) param2;
+        (void) param3;
+
+        if (call == CSURF_EXT_SUPPORTS_EXTENDED_TOUCH) {
+            return 1;
+        }
+
+        return 1;
+    }
 };
 
 static IReaperControlSurface *createFuncV2(const char *type_string, const char *configString, int *errStats) {

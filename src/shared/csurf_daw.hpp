@@ -306,6 +306,10 @@ public:
      */
     static void SetTrackVolume(MediaTrack *media_track, double value);
 
+    static double GetTrackPan1(MediaTrack *media_track);
+
+    static double GetTrackPan2(MediaTrack *media_track);
+
     /**************************************************************************************************************
      *  Track plugins related methods
      *************************************************************************************************************/

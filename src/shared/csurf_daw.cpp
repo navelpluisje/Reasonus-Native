@@ -302,6 +302,26 @@ double DAW::GetTrackVolume(MediaTrack *media_track) {
     return volume;
 }
 
+double DAW::GetTrackPan1(MediaTrack *media_track) {
+    double pan1 = 0.0;
+    double pan2 = 0.0;
+    int pan_mode = 0;
+
+    GetTrackUIPan(media_track, &pan1, &pan2, &pan_mode);
+
+    return pan1;
+}
+
+double DAW::GetTrackPan2(MediaTrack *media_track) {
+    double pan1 = 0.0;
+    double pan2 = 0.0;
+    int pan_mode = 0;
+
+    GetTrackUIPan(media_track, &pan1, &pan2, &pan_mode);
+
+    return pan2;
+}
+
 /************************************************************************
  * Track FX
  ************************************************************************/
