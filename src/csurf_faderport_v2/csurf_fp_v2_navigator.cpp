@@ -78,9 +78,14 @@ bool CSurf_FP_V2_Navigator::IsTrackTouched(const MediaTrack *media_track, const 
     if (media_track != GetControllerTrack() || context->GetLastTouchedFxMode()) {
         return false;
     }
-
-    if ((!context->GetShiftLeft() && is_pan == 0) || (context->GetShiftLeft() && is_pan == 1)) {
-        return isTouched;
+    if (context->GetPanFaderMode()) {
+        if ((!context->GetShiftLeft() && is_pan == 1) || (context->GetShiftLeft() && is_pan == 2)) {
+            return isTouched;
+        }
+    } else {
+        if ((!context->GetShiftLeft() && is_pan == 0) || (context->GetShiftLeft() && is_pan == 1)) {
+            return isTouched;
+        }
     }
 
     return false;

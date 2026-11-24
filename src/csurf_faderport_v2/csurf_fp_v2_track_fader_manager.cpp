@@ -53,7 +53,11 @@ public:
     void HandleFaderTouch(const int value) override {
         MediaTrack *media_track = navigator->GetControllerTrack();
 
-        if (GetTrackAutomationMode(media_track) == AUTOMATION_TOUCH) {
+        if (
+            GetTrackAutomationMode(media_track) == AUTOMATION_TOUCH
+            || GetTrackAutomationMode(media_track) == AUTOMATION_LATCH
+            || GetTrackAutomationMode(media_track) == AUTOMATION_PREVIEW
+        ) {
             touch_start = value > 0 ? 1 : 0;
             if (touch_start > 0) {
                 DAW::SetTrackVolume(media_track, DAW::GetTrackVolume(media_track));

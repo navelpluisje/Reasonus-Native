@@ -400,7 +400,11 @@ public:
             return;
         }
 
-        if (GetTrackAutomationMode(media_track) == AUTOMATION_TOUCH) {
+        if (
+            GetTrackAutomationMode(media_track) == AUTOMATION_TOUCH
+            || GetTrackAutomationMode(media_track) == AUTOMATION_LATCH
+            || GetTrackAutomationMode(media_track) == AUTOMATION_PREVIEW
+        ) {
             touch_start[index] = value > 0 ? 1 : 0;
             if (touch_start[index] > 0) {
                 DAW::SetTrackVolume(media_track, DAW::GetTrackVolume(media_track));

@@ -66,13 +66,17 @@ public:
         MediaTrack *media_track = navigator->GetControllerTrack();
         const int pan_mode = DAW::GetTrackPanMode(media_track);
 
-        if (GetTrackAutomationMode(media_track) == AUTOMATION_TOUCH) {
+        if (
+            GetTrackAutomationMode(media_track) == AUTOMATION_TOUCH
+            || GetTrackAutomationMode(media_track) == AUTOMATION_LATCH
+            || GetTrackAutomationMode(media_track) == AUTOMATION_PREVIEW
+        ) {
             touch_start = value > 0 ? 1 : 0;
             if (touch_start > 0) {
                 if (context->GetShiftLeft()) {
-                    DAW::SetTrackPan2(media_track, DAW::GetTrackPan1(media_track));
+                    DAW::SetTrackPan2(media_track, DAW::GetTrackPan2(media_track));
                 } else {
-                    DAW::SetTrackPan1(media_track, DAW::GetTrackPan2(media_track));
+                    DAW::SetTrackPan1(media_track, DAW::GetTrackPan1(media_track));
                 }
             }
         }

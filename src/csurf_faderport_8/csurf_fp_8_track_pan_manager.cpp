@@ -6,6 +6,7 @@
 class CSurf_FP_8_PanManager : public CSurf_FP_8_ChannelManager {
     int mute_start[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     int solo_start[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    int touch_start[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 protected:
     bool has_last_touched_fx_enabled = false;
@@ -198,7 +199,6 @@ public:
     }
 
     void HandleFaderTouch(const int index, const int value) override {
-        (void) value;
         MediaTrack *media_track = navigator->GetTrackByIndex(index);
         const int pan_mode = DAW::GetTrackPanMode(media_track);
 
@@ -209,6 +209,21 @@ public:
                 DAW::SetTrackPan2(media_track, pan_mode < 5 ? 0.0 : 1.0);
             }
             return;
+        }
+
+        if (
+            GetTrackAutomationMode(media_track) == AUTOMATION_TOUCH
+            || GetTrackAutomationMode(media_track) == AUTOMATION_LATCH
+            || GetTrackAutomationMode(media_track) == AUTOMATION_PREVIEW
+        ) {
+            touch_start[index] = value > 0 ? 1 : 0;
+            if (touch_start[index] > 0) {
+                if (context->IsChannelMode(PanMode1)) {
+                    DAW::SetTrackPan1(media_track, DAW::GetTrackPan1(media_track));
+                } else if (context->IsChannelMode(PanMode2)) {
+                    DAW::SetTrackPan2(media_track, DAW::GetTrackPan2(media_track));
+                }
+            }
         }
 
         /**
