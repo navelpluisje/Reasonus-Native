@@ -2,10 +2,10 @@
 #define CSURF_FP_V2_TRACK_FADER_MANAGER_H_
 
 #include <vector>
+#include <WDL/db2val.h>
 #include "csurf_fp_v2_fader_manager.hpp"
 #include "csurf_fp_v2_navigator.hpp"
 #include "csurf_fp_v2_track.hpp"
-#include "db2val.h"
 #include "reaper_plugin_functions.h"
 #include "../shared/csurf_daw.hpp"
 #include "../shared/csurf_single_point_automation_item.hpp"
