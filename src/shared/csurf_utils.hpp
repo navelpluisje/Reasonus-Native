@@ -286,6 +286,8 @@ std::string GetReaSonusLocalesPath(const std::string &language);
 
 std::string GetReaSonusLocalesRootFile();
 
+std::string GetReaSonusChangelogFile();
+
 bool isInteger(const std::string &value);
 
 std::vector<std::string> split(const std::string &str, const std::string &delimiter);

@@ -15,11 +15,12 @@ static void reportError(const ImGui_Error &e) {
     ShowMessageBox(e.what(), g_name, 0);
 }
 
-ReaSonusMessage::ReaSonusMessage()
-    : m_ctx{} {
+ReaSonusMessage::ReaSonusMessage() : m_ctx{} {
     ImGui::init(plugin_getapi);
     m_ctx = ImGui::CreateContext(g_name);
     assets = new CSurf_UI_Assets(m_ctx);
+    const mINI::INIFile file(GetReaSonusChangelogFile());
+    file.read(changelog);
 
     plugin_register("timer", reinterpret_cast<void *>(&Loop));
 }
@@ -100,30 +101,32 @@ void ReaSonusMessage::Frame() {
             ReaSonusPageTitle(m_ctx, assets, "ReaSonus Native New Version: " + std::string(GIT_VERSION), false);
             ImGui::PushTextWrapPos(m_ctx, 0.0);
 
-            ImGui::Text(m_ctx, "This release has the following changes:");
-            ImGui::BulletText(
-                m_ctx,
-                "Respect plugin and send slots. This can be enabled in the settings under the Controller and Plugin Control tabs");
+            if (changelog.has("global")) {
+                for (auto const &[key, value]: changelog["global"]) {
+                    ImGui::Text(m_ctx, value.c_str());
+                }
+            }
+            ImGui::Text(m_ctx, " ");
 
-            ImGui::BulletText(
-                m_ctx,
-                "MIDI device disable check: Added MIDI-device disabled check in the setup window (REAPER settings)");
+            if (changelog.has("all")) {
+                for (auto const &[key, value]: changelog["all"]) {
+                    ImGui::BulletText(m_ctx, fmt::format("[ALL] {}", value).c_str());
+                }
+                ImGui::Text(m_ctx, " ");
+            }
 
-            ImGui::BulletText(
-                m_ctx,
-                "Settings to start with track mode for send, receive and plugin control. This can be enabled in the settings under the Controller and Plugin Control tabs");
+            if (changelog.has("fp8")) {
+                for (auto const &[key, value]: changelog["fp8"]) {
+                    ImGui::BulletText(m_ctx, fmt::format("[FP 8] {}", value).c_str());
+                }
+                ImGui::Text(m_ctx, " ");
+            }
 
-            ImGui::BulletText(
-                m_ctx,
-                "Custom Forward and Rewind actions. In the ReaSonus Control Panel  under the Function Keys you can now set custom actions for the Forward and Rewind buttons");
-
-            ImGui::BulletText(
-                m_ctx,
-                "Control input plugins: Added the option to control the input plugins");
-
-            ImGui::BulletText(
-                m_ctx,
-                "3th line  in Send mode configurable. In the ReaSonus Control pannel under Settings > Displays, you can now set the value for the third line in send mode");
+            if (changelog.has("v2")) {
+                for (auto const &[key, value]: changelog["v2"]) {
+                    ImGui::BulletText(m_ctx, fmt::format("[FP V2] {}", value).c_str());
+                }
+            }
 
             ImGui::Text(m_ctx, " ");
             ImGui::Text(m_ctx, "Check the documentation for more info on these changes");

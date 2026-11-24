@@ -203,6 +203,10 @@ std::string GetReaSonusLocalesRootFile() {
     return createPathName({std::string(GetResourcePath()), "UserPlugins", "ReaSonus", "en-US.ini"});
 }
 
+std::string GetReaSonusChangelogFile() {
+    return createPathName({std::string(GetResourcePath()), "UserPlugins", "ReaSonus", "changelog.ini"});
+}
+
 bool isInteger(const std::string &value) {
     if (value.empty()) {
         return false;

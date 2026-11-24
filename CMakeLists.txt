@@ -350,6 +350,11 @@ install(
         DESTINATION "${REAPER_USER_PLUGINS}/ReaSonus"
 )
 
+install(
+        FILES ${PROJECT_SOURCE_DIR}/src/changelog.ini
+        DESTINATION "${REAPER_USER_PLUGINS}/ReaSonus"
+)
+
 # Set the component as required
 set(CPACK_COMPONENT_${PROJECT_NAME}_REQUIRED ON)
 if (MSVC)
