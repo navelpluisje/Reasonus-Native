@@ -97,12 +97,10 @@ public:
     }
 
     virtual void HandleFaderTouch(const int value) {
-        (void) index;
         (void) value;
     }
 
     virtual void HandleFaderMove(const int msb, const int lsb) {
-        (void) index;
         (void) msb;
         (void) lsb;
     }
