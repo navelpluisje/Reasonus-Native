@@ -29,6 +29,7 @@
 
 extern HWND g_hwnd;
 extern REAPER_PLUGIN_HINSTANCE g_hInst;
+
 ReaSonusSettings *ReaSonusSettings::instanceV2Ptr = nullptr;
 
 class CSurf_FaderPortV2 : public IReaperControlSurface {

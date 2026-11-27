@@ -26,6 +26,7 @@ private:
     double start_position;
     double end_position;
     std::string chunk_name;
+    const std::string device;
     SinglePointAutomationType type;
 
     /**
@@ -47,15 +48,16 @@ public:
         MediaTrack *media_track,
         const std::string &chunk_name,
         const double value,
-        const SinglePointAutomationType spa_type
-    ) : chunk_name(chunk_name), type(spa_type) {
+        const SinglePointAutomationType spa_type,
+        std::string device
+    ) : chunk_name(chunk_name), device(std::move(device)), type(spa_type) {
         start_position = GetPlayPosition();
-
         envelope = DAW::GetTrackEnvelopeByChunkName(
             media_track,
             start_position,
             chunk_name,
-            value
+            value,
+            device
         );
 
         end_position = -1;
@@ -66,11 +68,13 @@ public:
         const std::string &chunk_name,
         const double value,
         const SinglePointAutomationType spa_type,
-        const int item_index
-    ) : chunk_name(chunk_name), type(spa_type) {
+        const int item_index,
+        const std::string &device
+    ) : chunk_name(chunk_name), device(device), type(spa_type) {
         start_position = GetPlayPosition();
+
         if (spa_type == SPA_Send) {
-            envelope = DAW::GetTrackSendEnvelope(media_track, item_index, start_position, chunk_name, value);
+            envelope = DAW::GetTrackSendEnvelope(media_track, item_index, start_position, chunk_name, value, device);
         }
 
         end_position = -1;
@@ -82,11 +86,19 @@ public:
         const double value,
         const SinglePointAutomationType spa_type,
         const int plugin_index,
-        const int plugin_param_index
-    ) : chunk_name(std::move(chunk_name)), type(spa_type) {
+        const int plugin_param_index,
+        const std::string &device
+    ) : chunk_name(std::move(chunk_name)), device(device), type(spa_type) {
         start_position = GetPlayPosition();
 
-        envelope = DAW::GetTrackFXEnvelope(media_track, plugin_index, plugin_param_index, start_position, value);
+        envelope = DAW::GetTrackFXEnvelope(
+            media_track,
+            plugin_index,
+            plugin_param_index,
+            start_position,
+            value,
+            device
+        );
 
         end_position = -1;
     }
@@ -101,7 +113,8 @@ public:
         DAW::InsertEnvelopePoint(
             envelope,
             start_position,
-            value
+            value,
+            device
         );
     }
 
@@ -124,7 +137,8 @@ public:
         DAW::InsertEnvelopePoint(
             envelope,
             end_position,
-            value
+            value,
+            device
         );
         DeleteRange();
     }

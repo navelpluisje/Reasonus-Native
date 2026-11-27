@@ -135,11 +135,6 @@ class ReaSonusSettings {
         {"surface", "mute-master-on-fwd-rwd", "0"},
         {"surface", "use-automation-colors", "0"},
         {"surface", "automation-colors", join(automation_colors, ",")},
-        {"surface", "use-automation-point-touch", "0"},
-        {"surface", "overwrite-automation-point-shape", "0"},
-        {"surface", "automation-point-shape", "0"},
-        {"surface", "automation-single-bezier-tension", "0"},
-        {"surface", "automation-single-button-blink", "1"},
         {"surface", "start-with-track-send-mode", "0"},
         {"surface", "start-with-track-plugin-mode", "0"},
 

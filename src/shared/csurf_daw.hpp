@@ -470,8 +470,14 @@ public:
      */
     static void SetTrackFXParamUntouched(MediaTrack *media_track, int fx_index);
 
-    static TrackEnvelope *GetTrackFXEnvelope(MediaTrack *media_track, int plugin_index, int plugin_param_index,
-                                             double position, double value);
+    static TrackEnvelope *GetTrackFXEnvelope(
+        MediaTrack *media_track,
+        int plugin_index,
+        int plugin_param_index,
+        double position,
+        double value,
+        const std::string &device
+    );
 
     /**************************************************************************************************************
      *  Track Receives related methods
@@ -837,7 +843,7 @@ public:
         int send_index,
         double position,
         const std::string &chunk_name,
-        double value
+        double value, const std::string &device
     );
 
     // *************************************************************************************************************
@@ -851,13 +857,14 @@ public:
      * @param position The current position for the initial point
      * @param chunk_name The chunk name for the envelope. This is the name as it is used in the RPP file
      * @param value The base value to set if the envelope has to be created
+     * @param device
      * @return The envelope
      */
     static TrackEnvelope *GetTrackEnvelopeByChunkName(
         MediaTrack *media_track,
         double position,
         const std::string &chunk_name,
-        double value
+        double value, const std::string &device
     );
 
     /**
@@ -875,8 +882,9 @@ public:
      * @param env The envelope to initialize
      * @param position The position to set the initial value
      * @param value The initial point to set. The initial point is needed to make the chunk valid
+     * @param device
      */
-    static void InitializeEnvelope(TrackEnvelope *env, double position, double value);
+    static void InitializeEnvelope(TrackEnvelope *env, double position, double value, const std::string &device);
 
     /**
      * Disable the given envelope
@@ -913,8 +921,9 @@ public:
      * @param env The envelope to set the point
      * @param position The play position to set the value
      * @param value The value to set
+     * @param device
      */
-    static void InsertEnvelopePoint(TrackEnvelope *env, double position, double value);
+    static void InsertEnvelopePoint(TrackEnvelope *env, double position, double value, const std::string &device);
 
     //**************************************************************************************************************
     // *  Project related methods

@@ -15,7 +15,7 @@ protected:
     midi_Output *m_midiout;
     CSurf_FP_V2_Track *track;
 
-    ReaSonusSettings *settings = ReaSonusSettings::GetInstance(FP_8);
+    ReaSonusSettings *settings = ReaSonusSettings::GetInstance(FP_V2);
     ProjectState *project_state = ProjectState::GetInstance();
     SinglePointAutomationItem *single_point_automation = nullptr;
     bool touch_start;
@@ -49,7 +49,8 @@ protected:
                         point_value,
                         spa_type,
                         item_index,
-                        sub_item_index
+                        sub_item_index,
+                        FP_V2
                     );
                     break;
                 }
@@ -59,7 +60,8 @@ protected:
                         media_track,
                         chunk_name,
                         point_value,
-                        spa_type
+                        spa_type,
+                        FP_V2
                     );
             }
         }

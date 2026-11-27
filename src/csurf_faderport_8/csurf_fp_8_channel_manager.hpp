@@ -84,7 +84,8 @@ protected:
                         point_value,
                         spa_type,
                         item_index,
-                        sub_item_index
+                        sub_item_index,
+                        FP_8
                     );
                     break;
                 }
@@ -95,7 +96,8 @@ protected:
                         chunk_name,
                         point_value,
                         spa_type,
-                        item_index
+                        item_index,
+                        FP_8
                     );
                     break;
                 }
@@ -105,7 +107,8 @@ protected:
                         media_track,
                         chunk_name,
                         point_value,
-                        spa_type
+                        spa_type,
+                        FP_8
                     );
             }
         }

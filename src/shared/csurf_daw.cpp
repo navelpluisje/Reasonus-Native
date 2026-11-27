@@ -542,7 +542,8 @@ TrackEnvelope *DAW::GetTrackFXEnvelope(
     const int plugin_index,
     const int plugin_param_index,
     const double position,
-    const double value
+    const double value,
+    const std::string &device
 ) {
     auto *env = GetFXEnvelope(media_track, plugin_index, plugin_param_index, true);
 
@@ -550,7 +551,7 @@ TrackEnvelope *DAW::GetTrackFXEnvelope(
         return nullptr;
     }
 
-    InitializeEnvelope(env, position, value);
+    InitializeEnvelope(env, position, value, device);
 
     return env;
 }
@@ -935,7 +936,8 @@ TrackEnvelope *DAW::GetTrackSendEnvelope(
     const int send_index,
     const double position,
     const std::string &chunk_name,
-    const double value
+    const double value,
+    const std::string &device
 ) {
     // turn the default double return value into a proper Envelope pointer
     // As a double can not be sacted to a TrackEnvelope pointer instant, we have to cast it to an int pointer type first
@@ -948,7 +950,7 @@ TrackEnvelope *DAW::GetTrackSendEnvelope(
         return nullptr;
     }
 
-    InitializeEnvelope(env, position, value);
+    InitializeEnvelope(env, position, value, device);
 
     return env;
 }
@@ -957,7 +959,8 @@ TrackEnvelope *DAW::GetTrackEnvelopeByChunkName(
     MediaTrack *media_track,
     const double position,
     const std::string &chunk_name,
-    const double value
+    const double value,
+    const std::string &device
 ) {
     TrackEnvelope *env = ::GetTrackEnvelopeByChunkName(media_track, chunk_name.c_str());
 
@@ -968,7 +971,7 @@ TrackEnvelope *DAW::GetTrackEnvelopeByChunkName(
         return nullptr;
     }
 
-    InitializeEnvelope(env, position, value);
+    InitializeEnvelope(env, position, value, device);
 
     return env;
 }
@@ -988,7 +991,7 @@ std::string DAW::GetEnvelopeChunk(TrackEnvelope *env) {
     return envelope_chunk;
 }
 
-void DAW::InitializeEnvelope(TrackEnvelope *env, const double position, const double value) {
+void DAW::InitializeEnvelope(TrackEnvelope *env, const double position, const double value, const std::string &device) {
     if (env == nullptr) {
         return;
     }
@@ -999,7 +1002,7 @@ void DAW::InitializeEnvelope(TrackEnvelope *env, const double position, const do
      * Without a point, an envelope is invalid and will never get set to active
      */
     if (CountEnvelopePoints(env) == 0) {
-        InsertEnvelopePoint(env, position, value);
+        InsertEnvelopePoint(env, position, value, device);
     }
 
     /**
@@ -1058,15 +1061,20 @@ int DAW::GetSliderMaxVolume() {
     return GetDoubleConfigVar("slidermaxv");
 }
 
-void DAW::InsertEnvelopePoint(TrackEnvelope *env, const double position, const double value) {
-    const bool overwrite_point_shape = ReaSonusSettings::GetInstance(FP_8)->OverwriteAutomationPointShape();
+void DAW::InsertEnvelopePoint(
+    TrackEnvelope *env,
+    const double position,
+    const double value,
+    const std::string &device
+) {
+    const bool overwrite_point_shape = ReaSonusSettings::GetInstance(device)->OverwriteAutomationPointShape();
     bool sort = false;
     int point_shape;
     double tension = 0.5;
 
     if (overwrite_point_shape) {
-        point_shape = ReaSonusSettings::GetInstance(FP_8)->GetAutomationPointShape();
-        tension = ReaSonusSettings::GetInstance(FP_8)->GetAutomationSingleBezierTension();
+        point_shape = ReaSonusSettings::GetInstance(device)->GetAutomationPointShape();
+        tension = ReaSonusSettings::GetInstance(device)->GetAutomationSingleBezierTension();
     } else {
         point_shape = GetDefaultAutomationPointShape();
     }

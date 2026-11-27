@@ -35,7 +35,8 @@ void CSurf_FP_V2_TrackManager::HandleSinglePointAutomation(
                     point_value,
                     spa_type,
                     item_index,
-                    sub_item_index
+                    sub_item_index,
+                    FP_V2
                 );
                 break;
             }
@@ -45,7 +46,8 @@ void CSurf_FP_V2_TrackManager::HandleSinglePointAutomation(
                     media_track,
                     chunk_name,
                     point_value,
-                    spa_type
+                    spa_type,
+                    FP_V2
                 );
         }
     }

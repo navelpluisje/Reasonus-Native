@@ -62,10 +62,21 @@ void ReaSonusFpV2DisplayWidget::SetDisplayValues() {
     double pan2 = 0.0;
     int pan_mode;
 
+    MediaTrack *track;
+
     const auto widget_mode = static_cast<FP_V2_WIDGET_MODE>(stoi(DAW::GetExtState(
         EXT_STATE_FP_V2_WIDGET_MODE,
         std::to_string(FP_V2_WIDGET_TRACK_MODE)
     )));
+
+    if (widget_mode == FP_V2_WIDGET_MASTER_MODE) {
+        track = GetMasterTrack(nullptr);
+    } else {
+        track = GetSelectedTrack(nullptr, 0);
+    }
+    if (track != media_track) {
+        media_track = track;
+    }
 
     switch (widget_mode) {
         case FP_V2_WIDGET_TRACK_MODE: {
@@ -194,10 +205,6 @@ void ReaSonusFpV2DisplayWidget::Frame() {
         ReaSonusPluginTypeMapping::Start();
     }
 
-    MediaTrack *track = GetSelectedTrack(nullptr, 0);
-    if (track != media_track) {
-        media_track = track;
-    }
     SetDisplayValues();
 
     PushReaSonusColors(m_ctx);
@@ -207,10 +214,7 @@ void ReaSonusFpV2DisplayWidget::Frame() {
 
     UiStyledElements::PushReaSonusWindowStyle(m_ctx);
     ImGui::PushStyleVar(m_ctx, ImGui::StyleVar_WindowPadding, 8, 8);
-    if (ImGui::IsWindowDocked(m_ctx)) {
-        ShowConsoleMsg("");
-        ShowConsoleMsg("Docked");
-    }
+
     if (ImGui::Begin(
         m_ctx,
         g_name,
@@ -220,6 +224,7 @@ void ReaSonusFpV2DisplayWidget::Frame() {
         ImGui::GetContentRegionAvail(m_ctx, &available_width, &available_height);
         const double zoom = available_width / 176;
         double font_size = zoom * 18;
+
         if (!ImGui::IsWindowDocked(m_ctx)) {
             if (available_width < 120) {
                 ImGui::SetWindowSizeEx(m_ctx, g_name, 176, 190);
