@@ -7,6 +7,7 @@
 #include "../shared/csurf_project_state.hpp"
 #include "../shared/csurf_reasonus_settings.hpp"
 #include "../shared/csurf_single_point_automation_item.hpp"
+#include "../shared/csurf_utils.hpp"
 
 class CSurf_FP_V2_FaderManager {
 protected:
